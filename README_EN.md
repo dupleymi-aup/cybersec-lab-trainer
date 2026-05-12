@@ -41,6 +41,20 @@ All content is in Russian and based on current security standards including OWAS
 - **Adaptive interface** — fully responsive design for mobile, tablet, and desktop
 - **Animations and transitions** — smooth UI powered by Framer Motion
 
+## Platform Screenshots
+
+<div align="center">
+
+| | | |
+|-|-|-|
+| <img src="img/Регистрация.png" width="300" alt="Registration"> | <img src="img/Главная страница.png" width="300" alt="Dashboard"> | <img src="img/Модули обучения.png" width="300" alt="Learning Modules"> |
+| <img src="img/OWASP - топ 10.png" width="300" alt="OWASP Top 10"> | <img src="img/SQL Инъекции.png" width="300" alt="SQL Injection"> | <img src="img/Лаборатория XSS-атак.png" width="300" alt="XSS Attacks"> |
+| <img src="img/CSRF-атаки.png" width="300" alt="CSRF Attacks"> | <img src="img/Безопасное кодирование.png" width="300" alt="Secure Coding"> | <img src="img/Инструменты безопасности.png" width="300" alt="Security Tools"> |
+| <img src="img/Security Headers.png" width="300" alt="Security Headers"> | <img src="img/Квизы.png" width="300" alt="Quizzes"> | <img src="img/Достижения.png" width="300" alt="Achievements"> |
+| <img src="img/Глосарий.png" width="300" alt="Glossary"> | <img src="img/Личный профиль.png" width="300" alt="User Profile"> | |
+
+</div>
+
 ## Platform Modules
 
 | # | Module | Category | Description |

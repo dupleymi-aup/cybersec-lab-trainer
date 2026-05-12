@@ -40,6 +40,20 @@
 - **16 достижений** — мотивирующие бейджи за прогресс
 - **Глоссарий из 80+ терминов** с поиском и фильтрацией
 
+### Скриншоты платформы
+
+<div align="center">
+
+| | | |
+|-|-|-|
+| <img src="img/Регистрация.png" width="300" alt="Регистрация"> | <img src="img/Главная страница.png" width="300" alt="Главная страница"> | <img src="img/Модули обучения.png" width="300" alt="Модули обучения"> |
+| <img src="img/OWASP - топ 10.png" width="300" alt="OWASP Top 10"> | <img src="img/SQL Инъекции.png" width="300" alt="SQL Инъекции"> | <img src="img/Лаборатория XSS-атак.png" width="300" alt="XSS-атаки"> |
+| <img src="img/CSRF-атаки.png" width="300" alt="CSRF-атаки"> | <img src="img/Безопасное кодирование.png" width="300" alt="Безопасное кодирование"> | <img src="img/Инструменты безопасности.png" width="300" alt="Инструменты безопасности"> |
+| <img src="img/Security Headers.png" width="300" alt="Security Headers"> | <img src="img/Квизы.png" width="300" alt="Квизы"> | <img src="img/Достижения.png" width="300" alt="Достижения"> |
+| <img src="img/Глосарий.png" width="300" alt="Глоссарий"> | <img src="img/Личный профиль.png" width="300" alt="Личный профиль"> | |
+
+</div>
+
 ### Модули платформы
 
 | # | Модуль | Категория |
