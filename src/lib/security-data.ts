@@ -1259,6 +1259,81 @@ export const quizQuestions: QuizQuestion[] = [
     explanation:
       'Современные рекомендации NIST и других организаций предполагают минимум 12 символов для пароля. Длина является критически важным фактором безопасности — каждый дополнительный символ экспоненциально увеличивает время перебора. Пароль из 12+ символов с разными типами символов обеспечивает надёжную защиту.',
   },
+  {
+    id: 'auth-6',
+    category: 'Аутентификация',
+    difficulty: 'hard',
+    question: 'Что такое атака через перехват кода авторизации OAuth (Authorization Code Interception)?',
+    options: [
+      'Злоумышленник перехватывает код авторизации между браузером и сервером',
+      'Использование вредоносного OAuth-приложения с неправильно настроенным redirect_uri',
+      'Взлом сервера авторизации',
+      'Подделка JWT-токена',
+    ],
+    correctIndex: 1,
+    explanation:
+      'При Authorization Code Interception злоумышленник регистрирует вредоносное приложение или использует открытый редирект для перехвата кода авторизации. Если redirect_uri не валидируется строго, код может быть перенаправлен на сервер злоумышленника. Защита: PKCE (Proof Key for Code Exchange), строгая валидация redirect_uri, использование state-параметра.',
+  },
+  {
+    id: 'auth-7',
+    category: 'Аутентификация',
+    difficulty: 'medium',
+    question: 'Что такое атака «фиксация сессии» (Session Fixation)?',
+    options: [
+      'Злоумышленник крадёт существующую сессию',
+      'Злоумышленник устанавливает ID сессии жертвы, а затем использует его после аутентификации',
+      'Сервер генерирует предсказуемые ID сессий',
+      'Куки сессии передаются по HTTP',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Session Fixation: злоумышленник отправляет жертве ссылку с известным session ID (?sessionid=attacker123). После входа жертвы этот session ID становится аутентифицированным. Злоумышленник использует тот же ID для доступа. Защита: регенерация session ID после логина (session.regenerateId()), привязка сессии к IP/User-Agent.',
+  },
+  {
+    id: 'auth-8',
+    category: 'Аутентификация',
+    difficulty: 'easy',
+    question: 'Что такое Credential Stuffing (перебор учётных данных)?',
+    options: [
+      'Подбор пароля через брутфорс',
+      'Автоматизированная попытка входа с использованием ранее утеклих логинов и паролей на других сайтах',
+      'Кража куки сессии',
+      'Фишинговая атака для получения паролей',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Credential Stuffing использует тот факт, что люди повторно используют пароли. Злоумышленник берёт утечку из одного сервиса (миллионы логинов/паролей) и автоматически проверяет их на других сайтах. Защита: обязательная 2FA, мониторинг утечек паролей (Have I Been Pwned API), rate limiting, CAPTCHA, проверка по IP-репутации.',
+  },
+  {
+    id: 'auth-9',
+    category: 'Аутентификация',
+    difficulty: 'hard',
+    question: 'Какая уязвимость связана с токенами сброса пароля?',
+    options: [
+      'Токены передаются по email',
+      'Токен не инвалидируется после использования или основан на предсказуемых данных',
+      'Токены слишком длинные',
+      'Токены хранятся в базе данных',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Токены сброса пароля часто уязвимы: основаны на MD5(email + timestamp), не имеют срока действия, не инвалидируются после смены пароля, или отправляются по email (который может быть скомпрометирован). Защита: криптографически случайный токен (min 32 bytes), срок действия 1 час, однократное использование, инвалидация при смене email/пароля.',
+  },
+  {
+    id: 'auth-10',
+    category: 'Аутентификация',
+    difficulty: 'medium',
+    question: 'Что такое MFA Fatigue (Push Fatigue) атака?',
+    options: [
+      'Атака на аппаратный токен',
+      'Многократная отправка push-уведомлений пользователю, пока он случайно не подтвердит вход',
+      'Перехват SMS-кодов',
+      'Блокировка MFA-сервера',
+    ],
+    correctIndex: 1,
+    explanation:
+      'MFA Fatigue (Push Bombing): злоумышленник с логином и паролем жертвы многократно инициирует вход, отправляя push-уведомления на устройство жертвы. Устав от уведомлений, пользователь может случайно нажать «Approve». Пример: атака на Uber (2022). Защита: number matching (ввести число из push), ограничение частоты push-запросов, FIDO2/WebAuthn вместо push.',
+  },
   // General
   {
     id: 'general-1',
@@ -1487,6 +1562,76 @@ export const quizQuestions: QuizQuestion[] = [
     explanation:
       'Экранирование кавычек недостаточно, так как SQL-инъекции возможны без кавычек (числовые поля, ORDER BY, LIMIT и т.д.). Кроме того, экранирование зависит от кодировки и может быть обойдено. Параметризованные запросы — надёжный метод защиты.',
   },
+  {
+    id: 'sql-11',
+    category: 'SQL-инъекции',
+    difficulty: 'medium',
+    question: 'Что такое «вторичная» (second-order) SQL-инъекция?',
+    options: [
+      'Инъекция, которая срабатывает при повторном посещении страницы',
+      'Вредоносный SQL-код сохраняется в БД и выполняется при последующих запросах',
+      'Инъекция через второй параметр формы',
+      'Атака на реплику базы данных',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Second-order SQL injection — вредоносный payload сохраняется в базе данных (например, при регистрации пользователя с именем \' OR 1=1--). Он не срабатывает сразу, но выполняется позже, когда приложение использует сохранённые данные в SQL-запросе без санитизации. Это сложнее обнаружить, так как атака и выполнение разделены по времени.',
+  },
+  {
+    id: 'sql-12',
+    category: 'SQL-инъекции',
+    difficulty: 'medium',
+    question: 'Какая функция MySQL используется для time-based слепой SQL-инъекции?',
+    options: ['WAITFOR DELAY', 'SLEEP()', 'BENCHMARK_DELAY()', 'DELAY_EXEC()'],
+    correctIndex: 1,
+    explanation:
+      'SLEEP(секунды) — функция MySQL, которая приостанавливает выполнение запроса. При слепой SQL-инjection злоумышленник использует условный SLEEP: IF(condition, SLEEP(5), 0). Если условие истинно, сервер «зависает» на 5 секунд — это позволяет извлекать данные посимвольно по времени ответа.',
+  },
+  {
+    id: 'sql-13',
+    category: 'SQL-инъекции',
+    difficulty: 'hard',
+    question: 'Как SQL-инъекция возможна в конструкции LIMIT/OFFSET?',
+    options: [
+      'LIMIT не может быть подвержен инъекциям',
+      'Злоумышленник может добавить UNION SELECT или комментарий после числового значения',
+      'Только через XSS',
+      'Через модификацию HTTP-заголовков',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Параметры LIMIT и OFFSET часто считаются безопасными, но в MySQL они могут содержать UNION SELECT: LIMIT 10 UNION SELECT username,password FROM users--. Также можно использовать PROCEDURE ANALYSE() для извлечения данных. Защита — параметризация даже для числовых параметров.',
+  },
+  {
+    id: 'sql-14',
+    category: 'SQL-инъекции',
+    difficulty: 'hard',
+    question: 'Какой метод может помочь обойти WAF при SQL-инъекции?',
+    options: [
+      'Использование только POST-запросов',
+      'Обфускация: кодирование символов (HEX, CHAR), комментарии inline, нестандартный регистр',
+      'Увеличение размера запроса',
+      'Использование IPv6 вместо IPv4',
+    ],
+    correctIndex: 1,
+    explanation:
+      'WAF bypass для SQLi включает: HEX-кодирование строк (0x414243 вместо \'ABC\'()), функция CHAR() для посимвольного создания строк, комментарии /**/ для разрыва ключевых слов (UN/**/ION SEL/**/ECT), нестандартный регистр (UnIoN sElEcT), дублирование ключевых слов (UNIONunionSELECT). Защита: WAF + параметризованные запросы.',
+  },
+  {
+    id: 'sql-15',
+    category: 'SQL-инъекции',
+    difficulty: 'hard',
+    question: 'Что такое «stacked queries» (стопочные запросы) в контексте SQL-инъекций?',
+    options: [
+      'Множественные SELECT в одном UNION',
+      'Выполнение нескольких SQL-команд через разделитель «;» в одном запросе',
+      'Вложенные подзапросы (subqueries)',
+      'Каскадное удаление записей',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Stacked queries позволяют выполнить несколько независимых SQL-команд через разделитель «;»: \' ; DROP TABLE users; --. Это крайне опасно, так как позволяет не только читать, но и модифицировать данные (INSERT, UPDATE, DELETE, DROP). Поддерживается в PostgreSQL, SQL Server, SQLite, но НЕ в MySQL (через mysql_query).',
+  },
   // --- Additional XSS Questions ---
   {
     id: 'xss-6',
@@ -1533,6 +1678,81 @@ export const quizQuestions: QuizQuestion[] = [
     explanation:
       'SVG поддерживает тег <script>, который выполняется при рендеринге изображения. Также <img src=x onerror=...> и <body onload=...> выполняют JavaScript. <iframe srcdoc=...> тоже может содержать скрипты.',
   },
+  {
+    id: 'xss-9',
+    category: 'XSS-атаки',
+    difficulty: 'hard',
+    question: 'Как можно обойти CSP с директивой script-src \'self\' через JSON-in-HTML XSS?',
+    options: [
+      'Это невозможно — CSP script-src \'self\' полностью блокирует XSS',
+      'Если JSON с пользовательским вводом встраивается в <script> без экранирования, CSP не поможет',
+      'Через заголовок X-XSS-Protection',
+      'Используя CSS-инъекцию',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Если сервер помещает JSON-данные в тег <script> без экранирования: <script>var data = {"name": "${userInput}"}</script>, злоумышленник может закрыть строку и выполнить код: "}; alert(1); // — CSP не блокирует, так как скрипт загружен с \'self\', а выполнение происходит внутри разрешённого тега.',
+  },
+  {
+    id: 'xss-10',
+    category: 'XSS-атаки',
+    difficulty: 'hard',
+    question: 'Что такое Mutation XSS (mXSS)?',
+    options: [
+      'XSS через модификацию JavaScript-файлов',
+      'Когда браузер изменяет HTML при sanitization, создавая XSS из «безопасного» входного кода',
+      'XSS через WebSocket-сообщения',
+      'Атака на DOM с помощью мутаций CSS',
+    ],
+    correctIndex: 1,
+    explanation:
+      'mXSS возникает, когда DOM-санитайзер читает innerHTML, санитизирует и записывает обратно. Браузер может нормализовать HTML (например, создать закрывающие теги), и при повторном чтении innerHTML обнаруживаются новые опасные элементы. Пример: <img src=x onerror=alert(1)> помещён в <div>, браузер автозакрывает тег, и при повторном innerHTML санитайзер обнаруживает XSS.',
+  },
+  {
+    id: 'xss-11',
+    category: 'XSS-атаки',
+    difficulty: 'medium',
+    question: 'Почему WebSocket-сообщения уязвимы к XSS, даже если CSP настроен?',
+    options: [
+      'WebSocket не поддерживает XSS',
+      'CSP не применяется к данным из WebSocket — они обрабатываются клиентским JavaScript',
+      'WebSocket шифрует все сообщения',
+      'CSP блокирует WebSocket по умолчанию',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Данные из WebSocket обрабатываются клиентским JavaScript через ws.onmessage. CSP контролирует загрузку ресурсов (скрипты, стили), но не данные, передаваемые через WebSocket. Если сообщение из WS вставляется в DOM без санитизации (el.innerHTML = event.data), возникает XSS.',
+  },
+  {
+    id: 'xss-12',
+    category: 'XSS-атаки',
+    difficulty: 'hard',
+    question: 'Какой метод обхода XSS-фильтров использует Unicode-нормализацию?',
+    options: [
+      'Использование base64-кодирования',
+      'Замена ASCII-символов на совместимые Unicode-символы, которые браузер нормализует',
+      'Использование CSS-стилей для скрытия кода',
+      'Отправка запросов через iframe',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Некоторые браузеры нормализуют Unicode-символы перед выполнением. Например, U+FF1C (полноширинный <) может быть нормализован в <. Злоумышленник использует это для обхода WAF/фильтров, которые проверяют ASCII, но не Unicode. Также используется URL-encoding, HTML-entity encoding и смешанные техники.',
+  },
+  {
+    id: 'xss-13',
+    category: 'XSS-атаки',
+    difficulty: 'hard',
+    question: 'Как data:-URL может быть использован для XSS-атаки?',
+    options: [
+      'data: URL не может выполнять JavaScript',
+      'Через <a href="data:text/html,<script>alert(1)</script>"> — при клике выполняется код',
+      'Через CSS background-image',
+      'Через <img src="data:...">',
+    ],
+    correctIndex: 1,
+    explanation:
+      'data:-URL позволяет встроить HTML/JS прямо в ссылку: <a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg>">Click</a>. При клике браузер загружает и выполняет содержимое. Защита: CSP с директивой default-src, которая блокирует data: для скриптов, и санитизация href-атрибутов.',
+  },
   // --- Additional CSRF Questions ---
   {
     id: 'csrf-6',
@@ -1578,6 +1798,66 @@ export const quizQuestions: QuizQuestion[] = [
     correctIndex: 2,
     explanation:
       'SameSite=Strict запрещает отправку куки с ЛЮБЫМИ кросс-сайтовыми запросами (даже при переходе по ссылке). SameSite=Lax разрешает куки для безопасных GET-навигаций (переход по ссылке). SameSite=None разрешает все, но требует Secure (HTTPS).',
+  },
+  {
+    id: 'csrf-9',
+    category: 'CSRF',
+    difficulty: 'hard',
+    question: 'Почему CSRF-атаки возможны даже на JSON API эндпоинты с Content-Type: application/json?',
+    options: [
+      'JSON эндпоинты не используют куки',
+      'Злоумышленник может использовать Flash или формы с text/plain для отправки JSON-подобных данных',
+      'Content-Type проверяется только на клиенте',
+      'JSON не поддерживает CSRF-токены',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Некоторые API проверяют Content-Type: application/json как защиту от CSRF. Но злоумышленник может отправить POST с Content-Type: text/plain и телом {"action":"transfer"}. Если сервер парсит body до проверки Content-Type, атака сработает. Также можно использовать <form enctype="text/plain"> или Flash для отправки кастомных заголовков.',
+  },
+  {
+    id: 'csrf-10',
+    category: 'CSRF',
+    difficulty: 'medium',
+    question: 'Как предсказуемый CSRF-токен делает защиту бесполезной?',
+    options: [
+      'Токен нельзя угадать',
+      'Если токен основан на timestamp или MD5(session), злоумышленник может его вычислить',
+      'Предсказуемый токен всегда совпадает',
+      'Это проблема только для мобильных приложений',
+    ],
+    correctIndex: 1,
+    explanation:
+      'CSRF-токены должны быть криптографически случайными. Если токен генерируется как MD5(session_id + timestamp) или hash(IP), злоумышленник может вычислить значение. Правильная генерация: crypto.randomBytes(32).toString(\'hex\'). Сервер должен проверять токен на стороне и использовать secure random.',
+  },
+  {
+    id: 'csrf-11',
+    category: 'CSRF',
+    difficulty: 'hard',
+    question: 'Как можно обойти защиту SameSite=Strict для CSRF-атаки?',
+    options: [
+      'SameSite=Strict невозможно обойти',
+      'Через DNS Rebinding или уязвимость на том же домене (XSS) для выполнения запроса из Same-Origin',
+      'Через подмену IP-адреса',
+      'Через изменение User-Agent',
+    ],
+    correctIndex: 1,
+    explanation:
+      'SameSite=Strict защищает от кросс-сайтовых запросов, но если на целевом сайте есть XSS, злоумышленник может выполнить запрос из того же источника — куки будут отправлены. Также DNS Rebinding может создать Same-Origin контекст. Поэтому SameSite — дополнительный слой защиты, а не единственная защита.',
+  },
+  {
+    id: 'csrf-12',
+    category: 'CSRF',
+    difficulty: 'medium',
+    question: 'Почему методы PUT и DELETE в REST API также уязвимы к CSRF?',
+    options: [
+      'Браузеры блокируют PUT и DELETE из форм',
+      'Злоумышленник может использовать XMLHttpRequest/Fetch с методом PUT/DELETE из Same-Origin (через XSS)',
+      'PUT и DELETE не используют куки',
+      'Только POST уязвим к CSRF',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Хотя HTML-формы не поддерживают PUT/DELETE, JavaScript (fetch/XMLHttpRequest) может отправлять такие запросы. Если есть XSS на сайте, злоумышленник выполняет fetch(url, {method: \'DELETE\', credentials: \'include\'}). Куки автоматически отправляются с credentialed запросами. Поэтому все state-changing методы нуждаются в CSRF-защите.',
   },
   // --- Additional OWASP A01 (Broken Access Control) Questions ---
   {
@@ -1766,6 +2046,81 @@ export const quizQuestions: QuizQuestion[] = [
     explanation:
       'DNS Rebinding — атака на SSRF-защиту. Злоумышленник регистрирует домен, который сначала разрешается во внешний IP (проходит валидацию), а затем — в приватный IP (127.0.0.1 или 10.0.0.1). Когда сервер делает запрос к этому домену, DNS-ответ указывает на внутренний ресурс.',
   },
+  {
+    id: 'owasp-12',
+    category: 'OWASP Top 10',
+    difficulty: 'medium',
+    question: 'Что такое «Broken Object Level Authorization» (BOLA) в API Security?',
+    options: [
+      'Отсутствие шифрования API-запросов',
+      'Когда API не проверяет, что пользователь имеет права на доступ к запрошенному объекту',
+      'Слишком частые запросы к API',
+      'Отсутствие документации API',
+    ],
+    correctIndex: 1,
+    explanation:
+      'BOLA (также IDOR для API) — #1 в OWASP API Security Top 10. API эндпоинт принимает ID объекта, но не проверяет авторизацию. Пример: GET /api/orders/123 возвращает заказ любого пользователя. Защита: проверять ownership объекта, использовать GUID вместо sequential IDs, middleware авторизации.',
+  },
+  {
+    id: 'owasp-13',
+    category: 'OWASP Top 10',
+    difficulty: 'medium',
+    question: 'Какие основные риски безопасности связаны с serverless-архитектурой (AWS Lambda, Azure Functions)?',
+    options: [
+      'Serverless полностью безопасен по умолчанию',
+      'Небезопасные зависимости, чрезмерные права (IAM), injection в обработчиках, inadequate monitoring',
+      'Только DDoS-атаки',
+      'Только утечки данных через S3',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Serverless risks: (1) Over-privileged IAM roles — функции имеют больше прав, чем нужно. (2) Event injection — вредоносные данные в trigger events. (3) Insecure dependencies — те же риски, что и в обычных приложениях. (4) Inadequate logging/monitoring — сложнее отследить атаки. Защита: least privilege IAM, sanitization input, dependency scanning, AWS X-Ray/CloudWatch.',
+  },
+  {
+    id: 'owasp-14',
+    category: 'OWASP Top 10',
+    difficulty: 'hard',
+    question: 'Какие основные угрозы безопасности контейнеров и Kubernetes?',
+    options: [
+      'Контейнеры полностью изолированы и безопасны',
+      'Image vulnerabilities, misconfigured RBAC, exposed dashboard, container escape, insecure secrets management',
+      'Только сетевые атаки',
+      'Только DDoS на orchestrator',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Container/K8s threats: (1) Vulnerable images — base images с CVE. (2) RBAC misconfiguration —过度 permissions для service accounts. (3) Exposed K8s dashboard — публичный доступ без auth. (4) Container escape — breakout из контейнера к host (CVE в runc/containerd). (5) Secrets в env vars вместо vault. Защита: image scanning, Pod Security Policies, network policies, sealed secrets.',
+  },
+  {
+    id: 'owasp-15',
+    category: 'OWASP Top 10',
+    difficulty: 'medium',
+    question: 'Что такое OWASP MASVS и для чего он используется?',
+    options: [
+      'Стандарт безопасности веб-приложений',
+      'Mobile App Security Verification Standard — стандарт верификации безопасности мобильных приложений',
+      'Сертификация по облачной безопасности',
+      'Стандарт для IoT-устройств',
+    ],
+    correctIndex: 1,
+    explanation:
+      'OWASP MASVS (Mobile App Security Verification Standard) — comprehensive framework для оценки безопасности мобильных приложений. Включает уровни: L1 (baseline), L2 (defense-in-depth), L3+R (reverse engineering protection). Покрывает: storage, crypto, auth, network comm, platform interaction, code quality, resiliency.',
+  },
+  {
+    id: 'owasp-16',
+    category: 'OWASP Top 10',
+    difficulty: 'hard',
+    question: 'Какие security-риски связаны с использованием AI/ML в приложениях?',
+    options: [
+      'AI полностью безопасен',
+      'Data poisoning, model inversion, membership inference, prompt injection, adversarial examples',
+      'Только производительность моделей',
+      'Только стоимость обучения',
+    ],
+    correctIndex: 1,
+    explanation:
+      'AI/ML risks: (1) Data poisoning — malicious training data. (2) Model inversion — извлечение training data из модели. (3) Membership inference — определить, был ли конкретный datapoint в training set. (4) Prompt injection — манипуляция LLM через crafted prompts. (5) Adversarial examples — inputs designed to cause misclassification. Защита: input sanitization, differential privacy, model monitoring.',
+  },
   // --- Additional Secure Coding Questions ---
   {
     id: 'coding-1',
@@ -1806,6 +2161,111 @@ export const quizQuestions: QuizQuestion[] = [
     correctIndex: 1,
     explanation:
       'Timing Attack использует разницу во времени выполнения для извлечения секретов. Например, посимвольное сравнение строк останавливается при первом несовпадении — по времени ответа можно определить количество совпавших символов. Защита: crypto.timingSafeEqual() в Node.js или bcrypt.compare().',
+  },
+  {
+    id: 'coding-4',
+    category: 'Безопасное кодирование',
+    difficulty: 'medium',
+    question: 'Как правильно предотвратить LDAP Injection?',
+    options: [
+      'Экранирование спецсимволов LDAP: ( ) & | ! = < > ~ * и использование whitelist-валидации',
+      'Использование HTTPS для LDAP',
+      'Ограничение длины ввода',
+      'Удаление пробелов из ввода',
+    ],
+    correctIndex: 0,
+    explanation:
+      'LDAP Injection использует спецсимволы LDAP: (, ), &, |, !, =, <, >, ~, *. Например, ввод *)(uid=*))(|(uid=* в поле поиска. Защита: экранирование через LDAP-библиотеку (ldap.escape в Node.js), whitelist-валидация (только alphanumeric), prepared statements если поддерживаются, least privilege для LDAP-аккаунта.',
+  },
+  {
+    id: 'coding-5',
+    category: 'Безопасное кодирование',
+    difficulty: 'hard',
+    question: 'Что такое Server-Side Template Injection (SSTI) и как защититься?',
+    options: [
+      'XSS на сервере; защита — CSP',
+      'Когда пользовательский ввод интерполируется в шаблон серверного рендеринга; защита — санитизация и логика-less шаблоны',
+      'SQL-инъекция в шаблонах; защита — ORM',
+      'CSS-инъекция; защита — sanitize CSS',
+    ],
+    correctIndex: 1,
+    explanation:
+      'SSTI: пользовательский ввод напрямую попадает в серверный шаблонизатор (Jinja2, Twig, Freemarker). Payload: {{config}} в Flask/Jinja2 раскрывает конфигурацию приложения. Злоумышленник может выполнить произвольный код. Защита: не передавать пользовательский ввод в шаблонизатор, использовать autoescaping, логику в controller, не в template.',
+  },
+  {
+    id: 'coding-6',
+    category: 'Безопасное кодирование',
+    difficulty: 'medium',
+    question: 'Как безопасно обрабатывать загрузку файлов от пользователей?',
+    options: [
+      'Проверять только расширение файла',
+      'Проверять MIME-type, расширение, размер; хранить вне web-root; генерировать случайные имена; сканировать на malware',
+      'Разрешить все типы файлов',
+      'Хранить файлы в базе данных',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Secure file upload: (1) Whitelist расширений (.jpg, .png, .pdf). (2) Проверка MIME-type (не только client-side). (3) Magic bytes verification. (4) Ограничение размера. (5) Случайное имя файла (UUID). (6) Хранение вне web-root или через CDN. (7) Антивирусное сканирование. (8) Content-Disposition: attachment для скачивания.',
+  },
+  {
+    id: 'coding-7',
+    category: 'Безопасное кодирование',
+    difficulty: 'hard',
+    question: 'Что такое Prototype Pollution в JavaScript и как защититься?',
+    options: [
+      'Подмена прототипа HTML-элемента',
+      'Модификация Object.prototype через __proto__ или constructor через пользовательский ввод',
+      'Переполнение прототипа',
+      'Удаление прототипа из объекта',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Prototype Pollution: злоумышленник передаёт {"__proto__":{"isAdmin":true}} в JSON.parse или merge-функцию. Это добавляет isAdmin ко ВСЕМ объектам. Или через constructor.prototype. Защита: Object.freeze(Object.prototype), Object.create(null) для dictionary, sanitize input keys (блокировать __proto__, constructor, prototype), использовать safe merge (lodash.merge с prototype protection).',
+  },
+  {
+    id: 'coding-8',
+    category: 'Безопасное кодирование',
+    difficulty: 'medium',
+    question: 'Как правильно реализовать JWT-верификацию?',
+    options: [
+      'Использовать algorithm: none для разработки',
+      'Проверять алгоритм (reject none), verify signature, check exp/iat/nbf, использовать HS256/RS256, хранить секрет безопасно',
+      'Хранить JWT в localStorage',
+      'Не проверять signature на клиенте',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Secure JWT: (1) Всегда verify signature — reject algorithm: none attack. (2) White-list allowed algorithms. (3) Проверять exp (expiration), nbf (not before), iat (issued at). (4) Для HS256 использовать 256-bit+ секрет. Для RS256 — verify с public key. (5) Хранить в httpOnly cookie (не localStorage). (6) Короткий TTL + refresh token.',
+  },
+  {
+    id: 'coding-9',
+    category: 'Безопасное кодирование',
+    difficulty: 'hard',
+    question: 'Что такое Email Header Injection и как защититься?',
+    options: [
+      'Внедрение HTML в email',
+      'Внедрение CRLF (\\r\\n) в email-заголовки через пользовательский ввод для отправки спама',
+      'XSS в email-клиенте',
+      'Шифрование email',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Email Header Injection: пользовательский ввод в To/Subject используется в mail() без санитизации. Злоумышленник добавляет \\r\\nBcc: victim@target.com для массовой рассылки. Или \\r\\n\\r\\nBODY для изменения тела. Защита: удалять \\r и \\n из всех параметров email, использовать PHPMailer или аналоги с built-in protection, валидировать email-адреса.',
+  },
+  {
+    id: 'coding-10',
+    category: 'Безопасное кодирование',
+    difficulty: 'hard',
+    question: 'Какие риски безопасности несёт GraphQL introspection и как защититься?',
+    options: [
+      'Introspection безопасен по умолчанию',
+      'Раскрытие полной схемы API злоумышленнику; отключить introspection в production',
+      'Замедление сервера',
+      'Проблемы с CORS',
+    ],
+    correctIndex: 1,
+    explanation:
+      'GraphQL introspection позволяет запросить полную схему (__schema, __type). Злоумышленник использует это для reconnaissance: найти скрытые мутации, sensitive поля, admin endpoints. Защита: отключить introspection в production (graphql-validation-complexity), использовать allowlist queries (persisted queries), rate limiting, depth limiting, query complexity analysis.',
   },
   // --- Additional General Security Questions ---
   {
@@ -1868,17 +2328,390 @@ export const quizQuestions: QuizQuestion[] = [
     explanation:
       'MITM-атака — злоумышленник располагается между двумя сторонами (клиентом и сервером), перехватывая и потенциально модифицируя передаваемые данные. Защита: HTTPS/TLS, проверка сертификатов, Certificate Pinning, HSTS.',
   },
-  // --- Quiz category count update needed: SQL + XSS + CSRF + Auth + General + OWASP Top 10 + Secure Coding = 7 ---
+  {
+    id: 'general-15',
+    category: 'Общая безопасность',
+    difficulty: 'hard',
+    question: 'Что такое «жизненный цикл zero-day уязвимости»?',
+    options: [
+      'Обнаружение → эксплуатация → обнаружение защиты → патч → публикация CVE',
+      'Создание эксплойта → продажа → патч',
+      'Публикация → эксплуатация → патч',
+      'Обнаружение → публикация → исправление',
+    ],
+    correctIndex: 0,
+    explanation:
+      'Zero-day lifecycle: (1) Уязвимость существует, но неизвестна (0-day). (2) Злоумышленники эксплуатируют её скрытно (n-day). (3) Исследователи обнаруживают эксплойт или атаку. (4) Разработчик выпускает патч. (5) Публикуется CVE. Ключевой риск — время между началом эксплуатации и выпуском патча, когда у защиты нет сигнатуры.',
+  },
+  {
+    id: 'general-16',
+    category: 'Общая безопасность',
+    difficulty: 'medium',
+    question: 'Как система CVSS v3.1 оценивает критичность уязвимости?',
+    options: [
+      'По количеству затронутых пользователей',
+      'По метрикам: Attack Vector, Complexity, Privileges Required, User Interaction, Impact (CIA)',
+      'По стоимости исправления',
+      'По дате обнаружения',
+    ],
+    correctIndex: 1,
+    explanation:
+      'CVSS v3.1 оценивает: Attack Vector (Network/Adjacent/Local/Physical), Complexity (Low/High), Privileges Required (None/Low/High), User Interaction (None/Required), и Impact на Confidentiality, Integrity, Availability. Базовый скор 0.0–10.0: 0.1–3.9 Low, 4.0–6.9 Medium, 7.0–8.9 High, 9.0–10.0 Critical.',
+  },
+  {
+    id: 'general-17',
+    category: 'Общая безопасность',
+    difficulty: 'medium',
+    question: 'Что означает принцип «Defense in Depth» (глубокая защита)?',
+    options: [
+      'Использование одного мощного фаервола',
+      'Многоуровневая защита: если один слой fails, другие продолжают защищать',
+      'Шифрование всех данных на сервере',
+      'Регулярное обновление ПО',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Defense in Depth — стратегия нескольких слоёв защиты: сетевой (firewall), хостовой (antivirus, hardening), прикладной (input validation, auth), данных (encryption), мониторинг (SIEM, IDS). Если один слой проваливается, другие продолжают защищать. Пример: WAF + параметризованные запросы + least privilege DB account для защиты от SQLi.',
+  },
+  {
+    id: 'general-18',
+    category: 'Общая безопасность',
+    difficulty: 'medium',
+    question: 'Какие фазы включает реагирование на инциденты (Incident Response)?',
+    options: [
+      'Обнаружение → удаление → восстановление',
+      'Preparation → Identification → Containment → Eradication → Recovery → Lessons Learned',
+      'Анализ → исправление → тестирование',
+      'Мониторинг → алерт → блокировка',
+    ],
+    correctIndex: 1,
+    explanation:
+      'NIST Incident Response: (1) Preparation — политики, инструменты, команда. (2) Identification — обнаружение и классификация. (3) Containment — изоляция affected систем. (4) Eradication — удаление угрозы. (5) Recovery — восстановление систем. (6) Lessons Learned — анализ и улучшение процессов. Каждый шаг документируется.',
+  },
+  {
+    id: 'general-19',
+    category: 'Общая безопасность',
+    difficulty: 'hard',
+    question: 'Какая методология пентестинга является наиболее признанной?',
+    options: [
+      'Тестирование только автоматическими сканерами',
+      'PTES (Penetration Testing Execution Standard) + OWASP Testing Guide + NIST SP 800-115',
+      'Только ручное тестирование',
+      'Тестирование только на production',
+    ],
+    correctIndex: 1,
+    explanation:
+      'PTES включает 7 фаз: Pre-engagement, Intelligence Gathering, Threat Modeling, Vulnerability Analysis, Exploitation, Post-exploitation, Reporting. OWASP Testing Guide — специфичен для веб-приложений. NIST SP 800-115 — государственные стандарты. Комбинация обеспечивает полное покрытие: от разведки до отчёта с рекомендациями.',
+  },
+  // --- Network Attacks Questions ---
+  {
+    id: 'net-1',
+    category: 'Сетевые атаки',
+    difficulty: 'medium',
+    question: 'Что такое ARP Spoofing (ARP Poisoning)?',
+    options: [
+      'Подмена DNS-записей',
+      'Отправка фальшивых ARP-ответов для связывания MAC-адреса злоумышленника с IP жертвы',
+      'Переполнение ARP-таблицы',
+      'Блокировка ARP-запросов',
+    ],
+    correctIndex: 1,
+    explanation:
+      'ARP Spoofing: злоумышленник отправляет фальшивые ARP-ответы, связывая свой MAC с IP шлюза. Трафик жертвы перенаправляется к злоумышленнику (MITM). Инструменты: arpspoof, Ettercap. Защита: Static ARP entries, DHCP snooping, Dynamic ARP Inspection (DAI) на свитчах, ARP monitoring.',
+  },
+  {
+    id: 'net-2',
+    category: 'Сетевые атаки',
+    difficulty: 'medium',
+    question: 'Какой тип DDoS-атаки использует отражение и усиление через DNS?',
+    options: [
+      'SYN Flood',
+      'DNS Amplification — отправка мелких запросов с подставным IP-источником, получение больших ответов',
+      'Slowloris',
+      'HTTP Flood',
+    ],
+    correctIndex: 1,
+    explanation:
+      'DNS Amplification: злоумышленник отправляет DNS-запросы с подставным source IP (IP жертвы). DNS-сервер возвращает большой ответ (ANY-запрос → 4000+ байт) жертве. Усиление до 50x. Защита: BCP38 (source address validation), отключение open resolvers, rate limiting, CDN/DDoS-protection.',
+  },
+  {
+    id: 'net-3',
+    category: 'Сетевые атаки',
+    difficulty: 'easy',
+    question: 'Что показывает Nmap-сканирование с флагом -sS (SYN scan)?',
+    options: [
+      'Полное TCP-соединение с каждым портом',
+      'Открытые порты через отправку SYN-пакета без завершения handshake',
+      'Только UDP-порты',
+      'Только ICMP-ответы',
+    ],
+    correctIndex: 1,
+    explanation:
+      'SYN scan (stealth scan): Nmap отправляет SYN, если получает SYN/ACK — порт открыт, RST — закрыт. Полное соединение не устанавливается (не отправляется ACK), что делает сканирование менее заметным в логах. Требует root/admin привилегий.',
+  },
+  {
+    id: 'net-4',
+    category: 'Сетевые атаки',
+    difficulty: 'hard',
+    question: 'Что такое VLAN Hopping и как он работает?',
+    options: [
+      'Прямой доступ к VLAN через физическое подключение',
+      'Double Tagging: добавление двух VLAN-тегов для обхода изоляции между VLAN',
+      'Взлом пароля VLAN',
+      'Использование SNMP для переключения VLAN',
+    ],
+    correctIndex: 1,
+    explanation:
+      'VLAN Hopping через Double Tagging: злоумышленник отправляет кадр с двумя 802.1Q тегами. Первый тег совпадает с native VLAN свитча и удаляется, второй тег остаётся и направляет кадр в целевой VLAN. Защита: не использовать VLAN 1 как native, явно задать native VLAN (non-user), port security.',
+  },
+  {
+    id: 'net-5',
+    category: 'Сетевые атаки',
+    difficulty: 'medium',
+    question: 'Что такое атака Evil Twin (Злой двойник) в WiFi-сетях?',
+    options: [
+      'Взлом WPA2-пароля',
+      'Создание фальшивой точки доступа с тем же SSID, что и легитимная сеть',
+      'Перехват пакетов через promiscuous mode',
+      'Deauthentication attack для отключения клиентов',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Evil Twin: злоумышленник создаёт rogue AP с тем же SSID и более сильным сигналом. Клиенты подключаются к ней, думая, что это легитимная сеть. Весь трафик проходит через злоумышленника (MITM). Защита: WPA2-Enterprise с EAP-TLS (сертификаты), проверка BSSID, отключение автоподключения к известным SSID.',
+  },
+  {
+    id: 'net-6',
+    category: 'Сетевые атаки',
+    difficulty: 'medium',
+    question: 'Какова цель ICMP-флуд атаки?',
+    options: [
+      'Кража данных через ICMP-пакеты',
+      'Перегрузка цели большим количеством ICMP Echo Request (ping) пакетов',
+      'Изменение маршрутизации',
+      'Сканирование портов',
+    ],
+    correctIndex: 1,
+    explanation:
+      'ICMP Flood: злоумышленник отправляет огромный объём ICMP Echo Request пакетов, заставляя цель генерировать ICMP Echo Reply. Это consumes bandwidth и CPU. Пример: Ping of Death (историческая, oversized ICMP). Защита: rate limiting ICMP на фаерволе, блокировка ICMP извне, использование DDoS-protection.',
+  },
+  {
+    id: 'net-7',
+    category: 'Сетевые атаки',
+    difficulty: 'hard',
+    question: 'Что такое BGP Hijacking?',
+    options: [
+      'Взлом BGP-роутера',
+      'Ложная BGP-анонсировка IP-префиксов для перенаправления интернет-трафика',
+      'Шифрование BGP-сессий',
+      'DDoS на BGP-серверы',
+    ],
+    correctIndex: 1,
+    explanation:
+      'BGP Hijacking: злоумышленник (или недобросовестный ISP) анонсирует IP-префиксы, которые ему не принадлежат. BGP (Border Gateway Protocol) не имеет встроенной аутентификации префиксов. Трафик перенаправляется через сеть злоумышленника. Пример: hijacking YouTube-трафика (2008), перехват криптобирж (2018). Защита: RPKI, BGPsec, мониторинг префиксов.',
+  },
+  {
+    id: 'net-8',
+    category: 'Сетевые атаки',
+    difficulty: 'hard',
+    question: 'Как работает атака KRACK (Key Reinstallation Attack) на WPA2?',
+    options: [
+      'Подбор WPA2-пароля через словарь',
+      'Повторная передача handshake-сообщения для сброса nonce и повторного использования ключа шифрования',
+      'Перехват 4-way handshake',
+      'Использование уязвимости в WPS',
+    ],
+    correctIndex: 1,
+    explanation:
+      'KRACK эксплуатирует 4-way handshake WPA2: злоумышленник перехватывает и повторно отправляет Message 3, заставляя клиента переустановить тот же ключ (nonce reset). Это позволяет расшифровать или внедрить пакеты. Затронуты почти все WPA2-клиенты. Исправлено в обновлениях 2017. WPA3 решает проблему.',
+  },
+  {
+    id: 'net-9',
+    category: 'Сетевые атаки',
+    difficulty: 'medium',
+    question: 'Что такое DNS Cache Poisoning?',
+    options: [
+      'Удаление DNS-кэша',
+      'Внедрение фальшивых DNS-записей в кэш DNS-сервера для перенаправления трафика',
+      'Шифрование DNS-запросов',
+      'Блокировка DNS-серверов',
+    ],
+    correctIndex: 1,
+    explanation:
+      'DNS Cache Poisoning: злоумышленник отправляет фальшивые DNS-ответы с правильным transaction ID до легитимного ответа. DNS-сервер кеширует фальшивую запись. Все пользователи получают неверный IP. Пример: атака Каминского (2008). Защита: DNSSEC (подписанные записи), случайные transaction IDs, port randomization, DNS over HTTPS/TLS.',
+  },
+  {
+    id: 'net-10',
+    category: 'Сетевые атаки',
+    difficulty: 'easy',
+    question: 'Какой инструмент наиболее известен для пакетного анализа и захвата трафика?',
+    options: ['Nmap', 'Wireshark', 'Metasploit', 'Burp Suite'],
+    correctIndex: 1,
+    explanation:
+      'Wireshark — стандартный анализатор сетевого трафика. Захватывает пакеты с сетевого интерфейса, декодирует протоколы (TCP, HTTP, DNS, TLS), позволяет фильтровать и анализировать. Используется для диагностики, forensic-анализа и изучения сетевых протоколов. Nmap — сканер портов, Metasploit — фреймворк эксплойтов, Burp Suite — веб-прокси.',
+  },
+  // --- Social Engineering Questions ---
+  {
+    id: 'se-1',
+    category: 'Социальная инженерия',
+    difficulty: 'easy',
+    question: 'Чем Spear Phishing отличается от обычного фишинга?',
+    options: [
+      'Spear Phishing отправляется миллионам пользователей',
+      'Spear Phishing — целевая атака на конкретного человека с использованием персональной информации',
+      'Spear Phishing использует только SMS',
+      'Spear Phishing — это телефонный обман',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Spear Phishing — целевая атака: злоумышленник изучает жертву (соцсети, LinkedIn, корпоративный сайт) и создаёт персонализированное письмо. Пример: письмо «от коллеги» с ссылкой на «документ проекта». Обычный фишинг массовый и безличный. Spear Phishing значительно эффективнее — до 30% успешных открытий.',
+  },
+  {
+    id: 'se-2',
+    category: 'Социальная инженерия',
+    difficulty: 'medium',
+    question: 'Что такое Pretexting (создание предлога)?',
+    options: [
+      'Отправка вредоносных вложений',
+      'Создание вымышленного сценария для получения информации от жертвы',
+      'Взлом через SQL-инъекцию',
+      'Подбор пароля',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Pretexting: злоумышленник создаёт правдоподобный сценарий — представляется IT-специалистом, аудитором, партнёром. Использует заранее собранную информацию для убедительности. Пример: звонок «из службы безопасности банка» с просьбой подтвердить данные. Защита: верификация личности через обратный звонок по официальному номеру, обучение сотрудников.',
+  },
+  {
+    id: 'se-3',
+    category: 'Социальная инженерия',
+    difficulty: 'easy',
+    question: 'Что такое Tailgating (проход за хвостом) в физической безопасности?',
+    options: [
+      'Взлом замка',
+      'Проход в защищённую зону вслед за авторизованным сотрудником без предъявления пропуска',
+      'Копирование пропуска',
+      'Обход камеры видеонаблюдения',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Tailgating (Piggybacking): злоумышленник проходит за сотрудником через дверь контроля доступа. Часто использует социальный инжиниринг — «придержите дверь, пожалуйста», руки заняты коробками. Защита: турникеты, шлюз-кабины (mantrap), обучение сотрудников не пропускать без пропуска, охрана на входе.',
+  },
+  {
+    id: 'se-4',
+    category: 'Социальная инженерия',
+    difficulty: 'medium',
+    question: 'Что такое Vishing (Voice Phishing)?',
+    options: [
+      'Фишинг через электронную почту',
+      'Фишинг через телефонные звонки с использованием подмены номера (spoofing)',
+      'Фишинг через SMS',
+      'Фишинг через социальные сети',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Vishing — фишинг по телефону. Злоумышленник использует caller ID spoofing для отображения номера банка/компании, голосовые роботы для массовых звонков. Цель: получить персональные данные, номера карт, коды 2FA. Пример: «Ваша карта заблокирована, сообщите код из SMS для разблокировки». Защита: перезвонить по официальному номеру.',
+  },
+  {
+    id: 'se-5',
+    category: 'Социальная инженерия',
+    difficulty: 'medium',
+    question: 'Что такое Smishing (SMS Phishing)?',
+    options: [
+      'Фишинг через email',
+      'Отправка вредоносных ссылок или просьб через SMS-сообщения',
+      'Взлом через Bluetooth',
+      'Звонки с подменой номера',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Smishing — фишинг через SMS. Злоумышленник отправляет SMS с ссылкой на фишинговый сайт или просьбой ответить с данными. Примеры: «Ваша посылка задержана, перейдите по ссылке», «Скидка 90% только сегодня». Люди более доверчивы к SMS, чем к email. Защита: не переходить по ссылкам из неизвестных SMS, проверять через официальный сайт.',
+  },
+  {
+    id: 'se-6',
+    category: 'Социальная инженерия',
+    difficulty: 'hard',
+    question: 'Что такое Watering Hole Attack (атака через «водопой»)?',
+    options: [
+      'Атака на серверы водоснабжения',
+      'Компрометация сайтов, которые часто посещает целевая группа, для заражения их устройств',
+      'Фишинг через общественные WiFi',
+      'Отправка вредоносных USB-накопителей',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Watering Hole: злоумышленник определяет, какие сайты посещает целевая группа (форум, ассоциация, новостной сайт), и заражает их эксплойтами. Когда жертва посещает «водопой», её устройство компрометируется. Пример: атака на сайты европейских организаций для заражения правительственных систем. Защита: обновление браузеров/плагинов, EDR, network monitoring.',
+  },
+  {
+    id: 'se-7',
+    category: 'Социальная инженерия',
+    difficulty: 'medium',
+    question: 'Какой психологический принцип чаще всего эксплуатируется в социальной инженерии?',
+    options: [
+      'Математические способности',
+      'Чувство срочности, авторитета, любопытства или страха',
+      'Знание языков программирования',
+      'Физическая сила',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Социальная инженерия эксплуатирует: (1) Срочность — «срочно подтвердите аккаунт, иначе он будет удалён». (2) Авторитет — «это звонок из службы безопасности». (3) Любопытство — «посмотрите, кто вас отметил на фото». (4) Страх — «ваш компьютер заражён». (5) Жадность — «вы выиграли приз». Обучение осознанности — лучшая защита.',
+  },
+  {
+    id: 'se-8',
+    category: 'Социальная инженерия',
+    difficulty: 'hard',
+    question: 'Что такое Baiting (приманка) в контексте социальной инженерии?',
+    options: [
+      'Отправка спама',
+      'Оставление заражённых USB-накопителей в общественных местах в надежде, что кто-то их подключит',
+      'Взлом через брандмауэр',
+      'Создание фальшивого WiFi',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Baiting: злоумышленник оставляет заражённый USB в парковке, lobby или туалете компании. Любопытство заставляет сотрудника подключить его к компьютеру. USB автоматически запускает malware (автозапуск или HID-эмуляция). Пример: исследование Univ. of Illinois — 45% людей подключили найденные USB. Защита: отключить autorun, обучение, блокировка USB-портов.',
+  },
+  {
+    id: 'se-9',
+    category: 'Социальная инженерия',
+    difficulty: 'medium',
+    question: 'Что такое Clone Phishing (клонированный фишинг)?',
+    options: [
+      'Создание копии веб-сайта',
+      'Копирование легитимного письма с заменой ссылки/вложения на вредоносные и повторная отправка',
+      'Дублирование email-адреса',
+      'Копирование DNS-записей',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Clone Phishing: злоумышленник берёт настоящее письмо (например, с вложением), копирует его, заменяет вложение на вредоносное и отправляет заново с адресом, похожим на оригинал. Жертва видит знакомое письмо и доверяет. «Отправляю обновлённую версию документа». Защита: проверка email-заголовков, SPF/DKIM/DMARC, внимательность к вложениям.',
+  },
+  {
+    id: 'se-10',
+    category: 'Социальная инженерия',
+    difficulty: 'hard',
+    question: 'Как работает атака через имперсонацию CEO (CEO Fraud / Whaling)?',
+    options: [
+      'Взлом аккаунта CEO через брутфорс',
+      'Злоумышленник представляется руководителем и просит сотрудника выполнить срочный финансовый перевод',
+      'DDoS на сайт CEO',
+      'Публикация компрометирующих данных CEO',
+    ],
+    correctIndex: 1,
+    explanation:
+      'CEO Fraud (Whaling): злоумышленник изучает структуру компании, имена руководителей, стиль общения. Отправляет email/SMS от имени CEO сотруднику финансов: «Срочно переведите $X на счёт поставщика, детали позже». Использует срочность и авторитет. FBI: потери > $26 млрд (2016–2022). Защита: процедура верификации платежей, 2FA для переводов, обучение.',
+  },
 ];
 
 export const quizCategories = [
-  { id: 'sql', name: 'SQL-инъекции', icon: 'Database', count: 10 },
-  { id: 'xss', name: 'XSS-атаки', icon: 'FileText', count: 8 },
-  { id: 'csrf', name: 'CSRF', icon: 'Link', count: 8 },
-  { id: 'auth', name: 'Аутентификация', icon: 'Lock', count: 8 },
-  { id: 'general', name: 'Общая безопасность', icon: 'Shield', count: 14 },
-  { id: 'owasp', name: 'OWASP Top 10', icon: 'Shield', count: 11 },
-  { id: 'coding', name: 'Безопасное кодирование', icon: 'Code', count: 3 },
+  { id: 'sql', name: 'SQL-инъекции', icon: 'Database', count: 15 },
+  { id: 'xss', name: 'XSS-атаки', icon: 'FileText', count: 13 },
+  { id: 'csrf', name: 'CSRF', icon: 'Link', count: 12 },
+  { id: 'auth', name: 'Аутентификация', icon: 'Lock', count: 10 },
+  { id: 'general', name: 'Общая безопасность', icon: 'Shield', count: 19 },
+  { id: 'owasp', name: 'OWASP Top 10', icon: 'Shield', count: 17 },
+  { id: 'coding', name: 'Безопасное кодирование', icon: 'Code', count: 10 },
+  { id: 'network', name: 'Сетевые атаки', icon: 'Shield', count: 10 },
+  { id: 'social', name: 'Социальная инженерия', icon: 'Shield', count: 10 },
 ];
 
 // ============================================================
@@ -1938,12 +2771,12 @@ export const modules = [
   {
     id: 'secure-coding',
     title: 'Безопасное кодирование',
-    description: '15 задач по ревью кода: найдите уязвимость (SQLi, XSS, IDOR, SSRF, XXE, Race Condition) и выберите правильное решение.',
+    description: '25 задач по ревью кода: найдите уязвимость (SQLi, XSS, IDOR, SSRF, XXE, SSTI, Prototype Pollution, LDAP Injection, Mass Assignment) и выберите правильное решение.',
     icon: 'Code',
     difficulty: 'Продвинутый',
     difficultyColor: 'bg-red-100 text-red-800',
-    lessons: 15,
-    totalSteps: 15,
+    lessons: 25,
+    totalSteps: 25,
   },
   {
     id: 'tools',
@@ -2261,6 +3094,206 @@ async function sendMessage(msg) {
     ],
     explanation:
       'Загрузка файлов без проверки типа и имени позволяет злоумышленнику загрузить исполняемый файл (.php, .jsp, .asp), который сервер выполнит. Защита: белый список расширений, проверка MIME-type (не только extension), генерация случайного имени, хранение вне webroot, антивирусная проверка.',
+  },
+  {
+    id: 'sc-16',
+    title: 'LDAP Injection — инъекция в LDAP-запрос',
+    category: 'Инъекции',
+    code: `app.post('/api/search', (req, res) => {
+  const query = req.body.searchTerm;
+  const filter = "(&(cn=" + query + ")(objectClass=person))";
+  ldap.search(baseDN, filter, (err, results) => {
+    res.json(results);
+  });
+});`,
+    options: [
+      { text: 'Экранировать спецсимволы LDAP через ldap.escape и валидировать ввод', correct: true },
+      { text: 'Использовать HTTPS для LDAP-соединения', correct: false },
+      { text: 'Ограничить длину searchTerm', correct: false },
+      { text: 'Удалить пробелы из searchTerm', correct: false },
+    ],
+    explanation:
+      'LDAP Injection: ввод *)(|(objectClass=*)) закрывает фильтр и добавляет новый условие, возвращая все записи. Защита: экранирование спецсимволов LDAP (\\, (, ), &, |, !, =, <, >, ~, *), whitelist-валидация, least privilege для LDAP-аккаунта.',
+  },
+  {
+    id: 'sc-17',
+    title: 'Server-Side Template Injection (SSTI)',
+    category: 'Инъекции',
+    code: `// Flask/Jinja2 — уязвимый код
+@app.route('/greeting')
+def greeting():
+    name = request.args.get('name', 'World')
+    template = f'<h1>Hello, {name}!</h1>'
+    return render_template_string(template)
+    # Атака: ?name={{ config }} раскрывает конфигурацию`,
+    options: [
+      { text: 'Использовать render_template с отдельным файлом шаблона и передавать name как переменную', correct: true },
+      { text: 'Экранировать фигурные скобки', correct: false },
+      { text: 'Использовать POST вместо GET', correct: false },
+      { text: 'Добавить CSP заголовок', correct: false },
+    ],
+    explanation:
+      'SSTI: пользовательский ввод напрямую интерполируется в шаблон. {{ config }} раскрывает все настройки Flask, {{ self.__init__.__globals__ }} — доступ к Python-объектам. Защита: никогда не передавать пользовательский ввод в render_template_string, использовать отдельные шаблоны с переменными, autoescaping.',
+  },
+  {
+    id: 'sc-18',
+    title: 'Insecure JWT Verification — algorithm none attack',
+    category: 'Криптография',
+    code: `const jwt = require('jsonwebtoken');
+app.get('/api/profile', (req, res) => {
+  const token = req.headers.authorization;
+  const decoded = jwt.verify(token, SECRET);
+  // Атака: {"alg":"none"} bypasses signature verification
+  res.json(decoded);
+});`,
+    options: [
+      { text: 'Явно указать allowedAlgorithms: [\'HS256\'] и reject algorithm: none', correct: true },
+      { text: 'Использовать более длинный секрет', correct: false },
+      { text: 'Добавить срок действия токена', correct: false },
+      { text: 'Хранить токен в localStorage', correct: false },
+    ],
+    explanation:
+      'Algorithm none attack: злоумышленник создаёт JWT с {"alg":"none"} и пустой подписью. Некоторые библиотеки принимают это как «без подписи». Защита: jwt.verify(token, SECRET, { algorithms: [\'HS256\'] }), всегда проверять алгоритм, использовать httpOnly cookies вместо localStorage.',
+  },
+  {
+    id: 'sc-19',
+    title: 'Prototype Pollution — модификация Object.prototype',
+    category: 'Инъекции',
+    code: `app.post('/api/settings', (req, res) => {
+  // Deep merge user input into defaults
+  const settings = _.merge({}, DEFAULT_SETTINGS, req.body);
+  // Атака: {"__proto__":{"isAdmin":true}} pollution
+  res.json(settings);
+});`,
+    options: [
+      { text: 'Использовать Object.create(null) для dictionary и блокировать __proto__ в sanitize', correct: true },
+      { text: 'Использовать JSON.parse', correct: false },
+      { text: 'Ограничить глубину объекта', correct: false },
+      { text: 'Использовать HTTPS', correct: false },
+    ],
+    explanation:
+      'Prototype Pollution: {"__proto__":{"isAdmin":true}} добавляет isAdmin ко всем объектам. _.merge рекурсивно копирует __proto__. Защита: Object.freeze(Object.prototype), sanitize keys (блокировать __proto__, constructor, prototype), использовать safe merge (lodash > 4.17.21), Object.create(null) для dict.',
+  },
+  {
+    id: 'sc-20',
+    title: 'Path Traversal при загрузке файлов',
+    category: 'Контроль доступа',
+    code: `app.post('/api/upload-avatar', (req, res) => {
+  const filename = req.body.filename; // user-controlled
+  const path = \`uploads/avatars/\${filename}\`;
+  fs.writeFileSync(path, req.file.buffer);
+  // Атака: filename = "../../etc/crontab"
+});`,
+    options: [
+      { text: 'Генерировать UUID-имя файла, проверять путь через path.resolve и startsWith разрешённой директории', correct: true },
+      { text: 'Удалить .. из имени файла', correct: false },
+      { text: 'Ограничить размер файла', correct: false },
+      { text: 'Шифровать содержимое файла', correct: false },
+    ],
+    explanation:
+      'Path Traversal: filename=../../etc/crontab перезаписывает системный файл. Простая фильтрация .. недостаточна (можно через %2e%2e, Unicode). Защита: полностью игнорировать пользовательское имя, генерировать UUID, path.resolve() + startsWith(allowedDir), хранение вне webroot.',
+  },
+  {
+    id: 'sc-21',
+    title: 'Email Header Injection через пользовательский ввод',
+    category: 'Инъекции',
+    code: `app.post('/api/contact', (req, res) => {
+  const { name, email, subject } = req.body;
+  // user input goes directly into email headers
+  mail.send({
+    to: 'admin@company.com',
+    from: email,
+    subject: subject,  // Атака: subject = "Test\\r\\nBcc: spam@victim.com"
+  });
+});`,
+    options: [
+      { text: 'Удалять \\r и \\n из всех email-параметров, использовать библиотеку с защитой от header injection', correct: true },
+      { text: 'Экранировать HTML', correct: false },
+      { text: 'Использовать HTTPS', correct: false },
+      { text: 'Проверять SPF/DKIM', correct: false },
+    ],
+    explanation:
+      'Email Header Injection: CRLF (\\r\\n) в subject/from позволяет добавить Bcc-заголовки для массовой рассылки. Или \\r\\n\\r\\n для изменения тела письма. Защита: strip \\r\\n из всех параметров, использовать PHPMailer/Nodemailer (built-in protection), валидировать email-адреса через regex.',
+  },
+  {
+    id: 'sc-22',
+    title: 'GraphQL Introspection — раскрытие схемы API',
+    category: 'Сетевая безопасность',
+    code: `const { ApolloServer } = require('apollo-server');
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  // Introspection enabled by default
+  // Атака: {__schema{types{name fields{name}}}} reveals entire API
+});`,
+    options: [
+      { text: 'Отключить introspection в production: introspection: false, использовать persisted queries', correct: true },
+      { text: 'Добавить CORS заголовки', correct: false },
+      { text: 'Ограничить rate limiting', correct: false },
+      { text: 'Использовать HTTPS', correct: false },
+    ],
+    explanation:
+      'GraphQL introspection позволяет запросить полную схему: типы, поля, мутации. Злоумышленник находит скрытые admin-мутации, sensitive поля. Защита: introspection: false в production, persisted queries (allowlist), depth limiting, query complexity analysis, rate limiting.',
+  },
+  {
+    id: 'sc-23',
+    title: 'IDOR — небезопасная прямая ссылка на объект (UUID bypass)',
+    category: 'Контроль доступа',
+    code: `app.get('/api/documents/:docId', (req, res) => {
+  // Используем UUID вместо sequential ID, но нет проверки прав
+  const doc = await Document.findOne({ uuid: req.params.docId });
+  res.json(doc);
+  // Атака: перебор UUID или получение UUID из реферера
+});`,
+    options: [
+      { text: 'Проверять, что документ принадлежит текущему пользователю: { uuid, ownerId: req.user.id }', correct: true },
+      { text: 'Использовать более длинные UUID', correct: false },
+      { text: 'Ограничить rate limiting', correct: false },
+      { text: 'Логировать все запросы', correct: false },
+    ],
+    explanation:
+      'UUID не заменяет авторизацию. UUID можно получить из логов, реферера, уведомлений. Или brute-force (хотя сложно). Ключевая защита: всегда проверять ownership: Document.findOne({ uuid: req.params.docId, ownerId: req.user.id }). UUID — obscurity, не security.',
+  },
+  {
+    id: 'sc-24',
+    title: 'HTTP Response Splitting — разделение HTTP-ответа',
+    category: 'Инъекции',
+    code: `app.get('/api/redirect', (req, res) => {
+  const url = req.query.url;
+  // user input in redirect header
+  res.writeHead(302, { Location: url });
+  // Атака: url = "http://evil.com\\r\\nX-Injected: header"
+});`,
+    options: [
+      { text: 'Валидировать URL, удалять \\r\\n, использовать whitelist разрешённых доменов для редиректа', correct: true },
+      { text: 'Использовать POST вместо GET', correct: false },
+      { text: 'Добавить Content-Length', correct: false },
+      { text: 'Использовать HTTPS', correct: false },
+    ],
+    explanation:
+      'HTTP Response Splitting: CRLF (\\r\\n) в Location позволяет добавить произвольные заголовки или даже тело ответа. Это может привести к XSS, cache poisoning, session fixation. Защита: валидировать URL (isSafeURL()), strip \\r\\n, whitelist доменов, использовать res.redirect() вместо ручного writeHead.',
+  },
+  {
+    id: 'sc-25',
+    title: 'Mass Assignment — автоматическое связывание всех полей модели',
+    category: 'Контроль доступа',
+    code: `app.put('/api/users/:id', async (req, res) => {
+  // Все поля из req.body автоматически привязываются к модели
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    req.body,  // Атака: {"role":"admin","isVerified":true}
+    { new: true }
+  );
+  res.json(user);
+});`,
+    options: [
+      { text: 'Использовать whitelist разрешённых полей (pick/omit) или явное указание обновляемых полей', correct: true },
+      { text: 'Проверять isAuthenticated', correct: false },
+      { text: 'Использовать HTTPS', correct: false },
+      { text: 'Добавить rate limiting', correct: false },
+    ],
+    explanation:
+      'Mass Assignment: злоумышленник отправляет дополнительные поля (role, isAdmin, isVerified, balance), которые обновляются в БД. Даже если форма не содержит этих полей, API принимает их. Защита: whitelist полей (pick(req.body, [\'name\', \'email\'])), explicit field mapping, DTO/схемы валидации (Zod, Joi), разделение input/output моделей.',
   },
 ];
 
