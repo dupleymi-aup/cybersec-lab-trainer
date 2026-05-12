@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
+import { quizQuestions } from '@/lib/security-data';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle, Lock, Globe, Server, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle, Lock, Globe, Server, ShieldCheck, Trophy, Target } from 'lucide-react';
 
 const attackSteps = [
   {
@@ -156,13 +157,34 @@ export default function CSRFLab() {
   const [currentStep, setCurrentStep] = useState(0);
   const [showDefense, setShowDefense] = useState(false);
   const [activeDefense, setActiveDefense] = useState(0);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [correctCount, setCorrectCount] = useState(0);
 
   const isCompleted = completedModules.includes('csrf');
+  const csrfQuizzes = quizQuestions.filter(q => q.category === 'CSRF');
+  const currentQuiz = csrfQuizzes[quizIndex % csrfQuizzes.length];
 
   const handleComplete = () => {
     if (!isCompleted) {
       completeModule('csrf');
     }
+  };
+
+  const submitQuiz = (optionIndex: number) => {
+    setQuizAnswer(optionIndex);
+    setQuizSubmitted(true);
+    if (optionIndex === currentQuiz.correctIndex) {
+      setCorrectCount(c => c + 1);
+    }
+  };
+
+  const nextQuiz = () => {
+    setQuizIndex(q => q + 1);
+    setQuizAnswer(null);
+    setQuizSubmitted(false);
   };
 
   return (
@@ -198,7 +220,9 @@ export default function CSRFLab() {
       {/* Attack simulation */}
       <Card className="border-slate-200">
         <CardContent className="p-5">
-          <h3 className="text-sm font-semibold mb-1">🎭 Симуляция атаки — пошаговая демонстрация</h3>
+          <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
+            <Target size={16} className="text-emerald-600" /> Симуляция атаки — пошаговая демонстрация
+          </h3>
           <p className="text-xs text-slate-500 mb-4">
             Нажимайте «Далее», чтобы увидеть каждый этап CSRF-атаки
           </p>
@@ -346,17 +370,88 @@ export default function CSRFLab() {
             ))}
           </div>
 
-          {/* Complete */}
-          {!isCompleted ? (
+          {/* Quiz button */}
+          {!showQuiz ? (
             <Button
-              className="w-full bg-emerald-600 hover:bg-emerald-700"
-              onClick={handleComplete}
+              className="w-full mt-4 bg-violet-600 hover:bg-violet-700"
+              onClick={() => setShowQuiz(true)}
             >
-              Отметить модуль как изученный
+              <Trophy size={16} className="mr-2" /> Проверить знания
             </Button>
           ) : (
-            <div className="text-center text-sm text-emerald-600 font-medium flex items-center justify-center gap-2">
-              <CheckCircle2 size={16} /> Модуль завершён!
+            <div className="mt-4 space-y-4">
+              <Card className="border-violet-200">
+                <CardContent className="p-5 space-y-4">
+                  <h3 className="text-sm font-semibold text-violet-800 flex items-center gap-2">
+                    <Trophy size={16} /> Вопрос {quizIndex + 1}/{csrfQuizzes.length}
+                    <span className="text-xs font-normal ml-auto">Правильно: {correctCount}</span>
+                  </h3>
+                  <p className="text-sm font-medium">{currentQuiz.question}</p>
+                  <div className="space-y-2">
+                    {currentQuiz.options.map((option, i) => {
+                      let optionStyle = 'border-slate-200 hover:border-violet-300';
+                      if (quizSubmitted) {
+                        if (i === currentQuiz.correctIndex) {
+                          optionStyle = 'border-emerald-400 bg-emerald-50';
+                        } else if (i === quizAnswer && quizAnswer !== currentQuiz.correctIndex) {
+                          optionStyle = 'border-red-400 bg-red-50';
+                        }
+                      } else if (i === quizAnswer) {
+                        optionStyle = 'border-violet-400 bg-violet-50';
+                      }
+                      return (
+                        <button
+                          key={i}
+                          disabled={quizSubmitted}
+                          onClick={() => submitQuiz(i)}
+                          className={`w-full text-left p-3 rounded-lg border-2 text-sm transition-all ${optionStyle}`}
+                        >
+                          <span className="font-medium mr-2">{String.fromCharCode(65 + i)}.</span>
+                          {option}
+                          {quizSubmitted && i === currentQuiz.correctIndex && (
+                            <CheckCircle2 size={14} className="inline ml-2 text-emerald-600" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {quizSubmitted && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className={`p-3 rounded-lg text-sm ${
+                        quizAnswer === currentQuiz.correctIndex
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-red-50 text-red-700'
+                      }`}
+                    >
+                      <p className="font-medium mb-1">
+                        {quizAnswer === currentQuiz.correctIndex ? 'Правильно!' : 'Неверно.'}
+                      </p>
+                      <p className="text-xs leading-relaxed">{currentQuiz.explanation}</p>
+                    </motion.div>
+                  )}
+                  {quizSubmitted && quizIndex < csrfQuizzes.length - 1 && (
+                    <Button size="sm" className="w-full bg-violet-600 hover:bg-violet-700" onClick={nextQuiz}>
+                      Следующий вопрос <ArrowRight size={14} className="ml-1" />
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Complete */}
+              {!isCompleted ? (
+                <Button
+                  className="w-full bg-emerald-600 hover:bg-emerald-700"
+                  onClick={handleComplete}
+                >
+                  Отметить модуль как изученный
+                </Button>
+              ) : (
+                <div className="text-center text-sm text-emerald-600 font-medium flex items-center justify-center gap-2">
+                  <CheckCircle2 size={16} /> Модуль завершён!
+                </div>
+              )}
             </div>
           )}
         </motion.div>

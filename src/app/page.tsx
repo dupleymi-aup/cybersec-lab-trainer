@@ -15,6 +15,7 @@ import QuizSystem from '@/components/security-trainer/QuizSystem';
 import AchievementsGlossary from '@/components/security-trainer/AchievementsGlossary';
 import AuthPages from '@/components/security-trainer/AuthPages';
 import ProfilePage from '@/components/security-trainer/ProfilePage';
+import SecurityHeadersLab from '@/components/security-trainer/SecurityHeadersLab';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'sonner';
 
@@ -27,6 +28,7 @@ const pages: Record<string, React.ReactNode> = {
   auth: <AuthSecurityLab />,
   'secure-coding': <SecureCodingLab />,
   tools: <ToolsLab />,
+  'security-headers': <SecurityHeadersLab />,
   quiz: <QuizSystem />,
   achievements: <AchievementsGlossary />,
   profile: <ProfilePage />,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,6 +23,8 @@ import {
   KeyRound,
   AlertTriangle,
   CheckCircle2,
+  Lightbulb,
+  X,
 } from 'lucide-react';
 
 export default function AuthSecurityLab() {
@@ -34,6 +36,40 @@ export default function AuthSecurityLab() {
   const [crackLength, setCrackLength] = useState(8);
   const [crackComplexity, setCrackComplexity] = useState(1);
   const [hashInput, setHashInput] = useState('');
+
+  // OTP/2FA state
+  const [otpInput, setOtpInput] = useState('');
+  const [otpSecret] = useState(() => Math.random().toString(36).substring(2, 10).toUpperCase());
+  const [otpTimeLeft, setOtpTimeLeft] = useState(30);
+  const [otpVerified, setOtpVerified] = useState<boolean | null>(null);
+
+  // Simulated TOTP code (changes every 30 seconds)
+  const generateTOTP = useCallback((secret: string, timeStep: number) => {
+    let hash = 0;
+    const input = secret + timeStep;
+    for (let i = 0; i < input.length; i++) {
+      hash = ((hash << 5) - hash + input.charCodeAt(i)) | 0;
+    }
+    return Math.abs(hash).toString().padStart(6, '0').substring(0, 6);
+  }, []);
+
+  const currentTOTP = generateTOTP(otpSecret, Math.floor(Date.now() / 30000));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const remaining = 30 - (Math.floor(Date.now() / 1000) % 30);
+      setOtpTimeLeft(remaining);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const verifyOTP = () => {
+    if (otpInput === currentTOTP) {
+      setOtpVerified(true);
+    } else if (otpInput.length === 6) {
+      setOtpVerified(false);
+    }
+  };
 
   // Password strength checker
   const getPasswordAnalysis = () => {
@@ -125,7 +161,7 @@ export default function AuthSecurityLab() {
       </div>
 
       <Tabs defaultValue="password" className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
           <TabsTrigger value="password" className="text-xs">
             <KeyRound size={14} className="mr-1" /> Пароли
           </TabsTrigger>
@@ -134,6 +170,9 @@ export default function AuthSecurityLab() {
           </TabsTrigger>
           <TabsTrigger value="hashing" className="text-xs">
             <Hash size={14} className="mr-1" /> Хеширование
+          </TabsTrigger>
+          <TabsTrigger value="otp" className="text-xs">
+            <ShieldCheck size={14} className="mr-1" /> 2FA/OTP
           </TabsTrigger>
           <TabsTrigger value="sessions" className="text-xs">
             <Clock size={14} className="mr-1" /> Сессии
@@ -291,10 +330,11 @@ export default function AuthSecurityLab() {
                 </div>
 
                 <div className="bg-emerald-50 rounded-lg p-3">
-                  <p className="text-xs text-emerald-700">
-                    💡 <strong>Рекомендация:</strong> Используйте пароли длиной 12+ символов с
+                  <p className="text-xs text-emerald-700 flex items-start gap-2">
+                    <Lightbulb size={14} className="mt-0.5 shrink-0" />
+                    <span><strong>Рекомендация:</strong> Используйте пароли длиной 12+ символов с
                     заглавными и строчными буквами, цифрами и спецсимволами. Такой пароль потребует
-                    сотни лет для подбора даже на мощных GPU-кластерах.
+                    сотни лет для подбора даже на мощных GPU-кластерах.</span>
                   </p>
                 </div>
               </div>
@@ -357,8 +397,8 @@ export default function AuthSecurityLab() {
                   </div>
 
                   <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
-                    <h4 className="text-xs font-semibold text-emerald-700 mb-1">
-                      🛡️ Почему bcrypt?
+                    <h4 className="text-xs font-semibold text-emerald-700 mb-1 flex items-center gap-1.5">
+                      <ShieldCheck size={14} /> Почему bcrypt?
                     </h4>
                     <ul className="text-[11px] text-emerald-600 space-y-1">
                       <li>• Автоматически добавляет соль — защита от rainbow tables</li>
@@ -391,6 +431,147 @@ async function verify(password, hash) {
                 language="javascript"
                 title="bcrypt-usage.js"
               />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* OTP/2FA */}
+        <TabsContent value="otp" className="space-y-4">
+          <Card className="border-slate-200">
+            <CardContent className="p-5 space-y-4">
+              <h3 className="text-sm font-semibold flex items-center gap-2">
+                <ShieldCheck size={16} className="text-emerald-600" />
+                Интерактивная демонстрация TOTP (Time-based One-Time Password)
+              </h3>
+              <p className="text-xs text-slate-500">
+                TOTP генерирует одноразовый 6-значный код, который меняется каждые 30 секунд.
+                Это второй фактор аутентификации — даже если злоумышленник узнает пароль,
+                без этого кода он не войдёт.
+              </p>
+
+              {/* Simulated TOTP display */}
+              <div className="bg-slate-900 rounded-xl p-6 text-center space-y-3">
+                <p className="text-xs text-slate-400">Ваш секретный ключ:</p>
+                <code className="text-sm font-mono text-amber-400 bg-amber-400/10 px-3 py-1 rounded">{otpSecret}</code>
+                <Separator />
+                <p className="text-xs text-slate-400">Текущий TOTP-код (обновляется каждые 30 сек):</p>
+                <p className="text-4xl font-bold font-mono text-emerald-400 tracking-wider">{currentTOTP}</p>
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-32 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-1000 ${
+                        otpTimeLeft <= 5 ? 'bg-red-500' : otpTimeLeft <= 15 ? 'bg-amber-500' : 'bg-emerald-500'
+                      }`}
+                      style={{ width: `${(otpTimeLeft / 30) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-mono text-slate-400">{otpTimeLeft}с</span>
+                </div>
+              </div>
+
+              {/* Verification simulation */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold">Проверка кода:</h4>
+                <div className="flex gap-2">
+                  <Input
+                    value={otpInput}
+                    onChange={(e) => { setOtpInput(e.target.value.replace(/\D/g, '').substring(0, 6)); setOtpVerified(null); }}
+                    placeholder="Введите 6-значный код"
+                    className="font-mono text-center text-lg tracking-widest"
+                    maxLength={6}
+                    onKeyDown={(e) => e.key === 'Enter' && verifyOTP()}
+                  />
+                  <Button onClick={verifyOTP} className="bg-emerald-600 hover:bg-emerald-700 shrink-0">
+                    Проверить
+                  </Button>
+                </div>
+                {otpVerified === true && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-emerald-600 font-medium flex items-center gap-2">
+                    <CheckCircle2 size={16} /> Код верный! Вход разрешён.
+                  </motion.div>
+                )}
+                {otpVerified === false && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600 font-medium flex items-center gap-2">
+                    <AlertTriangle size={16} /> Код неверный. Попробуйте ещё раз.
+                  </motion.div>
+                )}
+                <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                  <Lightbulb size={12} /> Подсказка: скопируйте код сверху ({currentTOTP}) и вставьте его для проверки
+                </p>
+              </div>
+
+              <Separator />
+
+              {/* How 2FA works */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-semibold">Как работает TOTP:</h4>
+                <div className="space-y-2">
+                  {[
+                    { step: '1', title: 'Секретный ключ', desc: 'Сервер генерирует случайный секрет (обычно 16-32 символа Base32) и передаёт его пользователю (QR-код).' },
+                    { step: '2', title: 'Вычисление HMAC', desc: 'Клиент и сервер вычисляют HMAC-SHA1 от секрета и текущего временного шага (timestamp / 30).' },
+                    { step: '3', title: 'Динамическое усечение', desc: 'Из HMAC извлекаются 4 байта, преобразуются в 31-битное число, затем берётся по модулю 10^6 = 6-значный код.' },
+                    { step: '4', title: 'Сверка', desc: 'Сервер сравнивает код клиента с собственным вычислением. Допускается ±1 шаг (30 сек) для компенсации задержки.' },
+                  ].map((item) => (
+                    <div key={item.step} className="flex gap-3">
+                      <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">
+                        {item.step}
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold">{item.title}</p>
+                        <p className="text-[11px] text-slate-500">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <CodeBlock
+                code={`// TOTP на сервере (Node.js)
+import { authenticator } from 'otplib';
+
+// 1. Генерация секрета при включении 2FA
+const secret = authenticator.generateSecret();
+// Сохранить secret в БД пользователя
+
+// 2. Генерация QR-кода для Google Authenticator
+const otpauth = authenticator.keyuri(user.email, 'MyApp', secret);
+// otpauth://totp/MyApp:user@email?secret=ABCD...
+
+// 3. Проверка кода при входе
+const isValid = authenticator.check(token, user.secret);
+// Возвращает true, если код совпадает (±1 шаг)
+
+// Без 2FA — только пароль
+// С 2FA — пароль + TOTP-код из телефона
+// Даже при утечке пароля — аккаунт защищён`}
+                language="javascript"
+                title="totp-auth.js"
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+                  <h4 className="text-xs font-semibold text-red-700 mb-2 flex items-center gap-1.5">
+                    <X size={14} /> Без 2FA
+                  </h4>
+                  <ul className="text-[11px] text-red-600 space-y-1">
+                    <li>• Только пароль — одна точка отказа</li>
+                    <li>• Утечка из БД = мгновенный доступ</li>
+                    <li>• Фишинг = полный компромисс</li>
+                    <li>• Брутфорс = eventual access</li>
+                  </ul>
+                </div>
+                <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+                  <h4 className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
+                    <CheckCircle2 size={14} /> С 2FA (TOTP)
+                  </h4>
+                  <ul className="text-[11px] text-emerald-600 space-y-1">
+                    <li>• Нужен пароль + устройство с TOTP</li>
+                    <li>• Код действует только 30 секунд</li>
+                    <li>• Секрет не передаётся по сети</li>
+                    <li>• Защита от фишинга и брутфорса</li>
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -448,7 +629,9 @@ function authenticate(req, res, next) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="bg-red-50 rounded-lg p-3 border border-red-200">
-                    <h4 className="text-xs font-semibold text-red-700 mb-2">❌ Небезопасно</h4>
+                    <h4 className="text-xs font-semibold text-red-700 mb-2 flex items-center gap-1.5">
+                      <X size={14} /> Небезопасно
+                    </h4>
                     <ul className="text-[11px] text-red-600 space-y-1">
                       <li>• Хранение JWT в localStorage (доступен через XSS)</li>
                       <li>• Срок действия больше 24 часов</li>
@@ -457,7 +640,9 @@ function authenticate(req, res, next) {
                     </ul>
                   </div>
                   <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
-                    <h4 className="text-xs font-semibold text-emerald-700 mb-2">✅ Безопасно</h4>
+                    <h4 className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
+                      <CheckCircle2 size={14} /> Безопасно
+                    </h4>
                     <ul className="text-[11px] text-emerald-600 space-y-1">
                       <li>• Хранение в HttpOnly + Secure куках</li>
                       <li>• Короткий срок (15-30 мин) + refresh-токен</li>

@@ -25,6 +25,7 @@ import {
   RotateCcw,
   Trophy,
   Target,
+  Code,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -33,6 +34,7 @@ const iconMap: Record<string, React.ReactNode> = {
   Link: <Link size={20} />,
   Lock: <Lock size={20} />,
   Shield: <Shield size={20} />,
+  Code: <Code size={20} />,
 };
 
 type QuizState = 'select' | 'playing' | 'result';
@@ -41,6 +43,7 @@ export default function QuizSystem() {
   const { quizScores, setQuizScore, setCurrentPage } = useAppStore();
   const [quizState, setQuizState] = useState<QuizState>('select');
   const [activeCategory, setActiveCategory] = useState('');
+  const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [showAnswer, setShowAnswer] = useState(false);
@@ -48,14 +51,23 @@ export default function QuizSystem() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [answers, setAnswers] = useState<(boolean | null)[]>([]);
   const [timerActive, setTimerActive] = useState(false);
+  const [startTime, setStartTime] = useState(0);
+  const [totalTimeTaken, setTotalTimeTaken] = useState(0);
 
   const categoryQuestions = quizQuestions.filter((q) => {
     const catId = quizCategories.find((c) => c.name === activeCategory)?.id;
-    return catId && q.category === activeCategory;
+    const catMatch = catId && q.category === activeCategory;
+    const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
+    return catMatch && diffMatch;
   });
 
   const startQuiz = (categoryName: string) => {
-    const questions = quizQuestions.filter((q) => q.category === categoryName);
+    const questions = quizQuestions.filter((q) => {
+      const catMatch = q.category === categoryName;
+      const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
+      return catMatch && diffMatch;
+    });
+    if (questions.length === 0) return;
     setActiveCategory(categoryName);
     setCurrentQuestion(0);
     setCorrectCount(0);
@@ -64,6 +76,8 @@ export default function QuizSystem() {
     setTimeLeft(30);
     setAnswers(new Array(questions.length).fill(null));
     setTimerActive(true);
+    setStartTime(Date.now());
+    setTotalTimeTaken(0);
     setQuizState('playing');
   };
 
@@ -79,6 +93,7 @@ export default function QuizSystem() {
       const catId = quizCategories.find((c) => c.name === activeCategory)?.id || '';
       const score = Math.round((finalCount / categoryQuestions.length) * 100);
       setQuizScore(catId, score);
+      setTotalTimeTaken(Math.round((Date.now() - startTime) / 1000));
       setTimerActive(false);
       setQuizState('result');
     }
@@ -154,7 +169,40 @@ export default function QuizSystem() {
           <Card className="border-none shadow-sm">
             <CardContent className="p-5">
               <h2 className="font-semibold mb-1">Выберите категорию квиза</h2>
-              <p className="text-xs text-slate-500">Каждый квиз содержит 5 вопросов с таймером 30 секунд на каждый.</p>
+              <p className="text-xs text-slate-500">Каждый квиз содержит вопросы с таймером 30 секунд на каждый.</p>
+            </CardContent>
+          </Card>
+
+          {/* Difficulty filter */}
+          <Card className="border-none shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <Target size={16} className="text-slate-500" />
+                <span className="text-xs font-semibold text-slate-600">Сложность:</span>
+                <div className="flex gap-1.5">
+                  {([
+                    ['all', 'Все'],
+                    ['easy', 'Лёгкий'],
+                    ['medium', 'Средний'],
+                    ['hard', 'Сложный'],
+                  ] as const).map(([key, label]) => (
+                    <button
+                      key={key}
+                      onClick={() => setDifficultyFilter(key)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                        difficultyFilter === key
+                          ? key === 'easy' ? 'bg-emerald-100 text-emerald-700'
+                            : key === 'medium' ? 'bg-amber-100 text-amber-700'
+                            : key === 'hard' ? 'bg-red-100 text-red-700'
+                            : 'bg-slate-800 text-white'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -162,6 +210,12 @@ export default function QuizSystem() {
             {quizCategories.map((cat) => {
               const catId = cat.id;
               const score = quizScores[catId];
+              const availableCount = quizQuestions.filter((q) => {
+                const catMatch = q.category === cat.name;
+                const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
+                return catMatch && diffMatch;
+              }).length;
+              if (availableCount === 0) return null;
               return (
                 <Card
                   key={cat.id}
@@ -175,7 +229,7 @@ export default function QuizSystem() {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-sm">{cat.name}</h3>
-                        <p className="text-xs text-slate-500">{cat.count} вопросов</p>
+                        <p className="text-xs text-slate-500">{availableCount} вопросов</p>
                       </div>
                       <div className="text-right">
                         {score !== undefined ? (
@@ -223,6 +277,17 @@ export default function QuizSystem() {
           {/* Question */}
           <Card className="border-slate-200">
             <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Badge
+                  className={`text-[10px] ${
+                    question.difficulty === 'easy' ? 'bg-emerald-100 text-emerald-700'
+                      : question.difficulty === 'medium' ? 'bg-amber-100 text-amber-700'
+                      : 'bg-red-100 text-red-700'
+                  }`}
+                >
+                  {question.difficulty === 'easy' ? 'Лёгкий' : question.difficulty === 'medium' ? 'Средний' : 'Сложный'}
+                </Badge>
+              </div>
               <h3 className="font-semibold text-sm leading-relaxed mb-4">{question.question}</h3>
 
               <RadioGroup
@@ -289,8 +354,12 @@ export default function QuizSystem() {
                   <div className={`rounded-lg p-3 ${
                     answers[currentQuestion] ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'
                   }`}>
-                    <p className={`text-xs font-semibold ${answers[currentQuestion] ? 'text-emerald-700' : 'text-red-700'}`}>
-                      {answers[currentQuestion] ? '✅ Правильно!' : timeLeft <= 0 ? '⏰ Время вышло!' : '❌ Неправильно!'}
+                    <p className={`text-xs font-semibold flex items-center gap-1.5 ${answers[currentQuestion] ? 'text-emerald-700' : 'text-red-700'}`}>
+                      {answers[currentQuestion]
+                        ? (<><CheckCircle2 size={14} /> Правильно!</>)
+                        : timeLeft <= 0
+                          ? (<><Clock size={14} /> Время вышло!</>)
+                          : (<><XCircle size={14} /> Неправильно!</>)}
                     </p>
                     <p className="text-xs text-slate-600 mt-1 leading-relaxed">{question.explanation}</p>
                   </div>
@@ -328,11 +397,33 @@ export default function QuizSystem() {
               <p className="text-slate-300 text-sm mb-4">{activeCategory}</p>
 
               <div className="text-5xl font-bold font-mono mb-2">{finalScore}%</div>
-              <p className="text-slate-400 text-sm mb-6">
+              <p className="text-slate-400 text-sm mb-1">
                 {correctCount} из {categoryQuestions.length} правильных ответов
               </p>
+              {totalTimeTaken > 0 && (
+                <p className="text-slate-400 text-xs mb-4 flex items-center justify-center gap-1">
+                  <Clock size={12} /> Затраченное время: {totalTimeTaken}с
+                </p>
+              )}
 
-              <div className="flex gap-2 justify-center">
+              {/* Difficulty breakdown */}
+              {(() => {
+                const breakdown: Record<string, { correct: number; total: number }> = {};
+                categoryQuestions.forEach((q, i) => {
+                  if (!breakdown[q.difficulty]) breakdown[q.difficulty] = { correct: 0, total: 0 };
+                  breakdown[q.difficulty].total++;
+                  if (answers[i]) breakdown[q.difficulty].correct++;
+                });
+                const diffLabels: Record<string, string> = { easy: 'Лёгкий', medium: 'Средний', hard: 'Сложный' };
+                const diffColors: Record<string, string> = { easy: 'text-emerald-400', medium: 'text-amber-400', hard: 'text-red-400' };
+                return Object.entries(breakdown).map(([diff, stats]) => (
+                  <span key={diff} className={`text-xs font-mono ${diffColors[diff]} mr-3`}>
+                    {diffLabels[diff]}: {stats.correct}/{stats.total}
+                  </span>
+                ));
+              })()}
+
+              <div className="flex gap-2 justify-center mt-4">
                 <Button variant="outline" className="text-white border-white/20 hover:bg-white/10" onClick={resetQuiz}>
                   <RotateCcw size={14} className="mr-2" /> К категориям
                 </Button>

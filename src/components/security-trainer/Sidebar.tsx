@@ -6,6 +6,7 @@ import { modules, achievements } from '@/lib/security-data';
 import {
   LayoutDashboard,
   Shield,
+  ShieldCheck,
   Database,
   FileText,
   Link,
@@ -36,6 +37,7 @@ const iconMap: Record<string, React.ReactNode> = {
   HelpCircle: <HelpCircle size={20} />,
   KeyRound: <KeyRound size={20} />,
   Trophy: <Trophy size={20} />,
+  ShieldCheck: <ShieldCheck size={20} />,
 };
 
 const navItems: { id: PageType; label: string; iconKey: string }[] = [

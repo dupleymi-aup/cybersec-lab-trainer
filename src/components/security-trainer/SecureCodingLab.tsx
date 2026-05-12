@@ -89,8 +89,8 @@ export default function SecureCodingLab() {
               Задание {activeChallenge + 1} из {secureCodingChallenges.length}
             </span>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px]">
-                ✅ {correctCount} правильных
+              <Badge variant="outline" className="text-[10px] flex items-center gap-1">
+                <CheckCircle2 size={12} /> {correctCount} правильных
               </Badge>
               {isCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
             </div>
@@ -220,8 +220,8 @@ export default function SecureCodingLab() {
                       }`}
                     >
                       {challenge.options[selectedOption!]?.correct
-                        ? '✅ Правильно!'
-                        : '❌ Неправильно'}
+                        ? (<><CheckCircle2 size={14} className="inline mr-1" /> Правильно!</>)
+                        : (<><XCircle size={14} className="inline mr-1" /> Неправильно</>)}
                     </h4>
                     <p className="text-xs text-slate-600 leading-relaxed">{challenge.explanation}</p>
                   </div>

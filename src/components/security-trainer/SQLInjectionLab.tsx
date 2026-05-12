@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, CheckCircle2, Play, Eye, EyeOff, Lightbulb, AlertTriangle, Zap } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, Play, Eye, EyeOff, Lightbulb, AlertTriangle, Zap, ShieldCheck, BookOpen } from 'lucide-react';
 
 export default function SQLInjectionLab() {
   const { sqlCompletedLevels, addSqlLevel, completeModule, setCurrentPage } = useAppStore();
@@ -28,8 +28,14 @@ export default function SQLInjectionLab() {
     const input = userInput.trim();
     if (!input) return;
     setShowResult(true);
-    setIsSuccess(true);
-    if (!isCompleted) {
+
+    // Validate: input must contain SQLi-specific patterns
+    const hasQuote = /'/.test(input);
+    const hasSqlKeyword = /\b(OR|UNION|SELECT|DROP|INSERT|UPDATE|DELETE|ALTER|EXEC|SLEEP|WAITFOR|BENCHMARK|LOAD_FILE|xp_cmdshell|CHAR|CONCAT|SUBSTRING|VERSION|information_schema|NULL|--|;|\/\*|0x)\b/i.test(input);
+    const valid = (hasQuote || hasSqlKeyword) && input.length > 2;
+
+    setIsSuccess(valid);
+    if (valid && !isCompleted) {
       addSqlLevel(challenge.id);
       if (sqlCompletedLevels.length + 1 === sqlChallenges.length) {
         completeModule('sql-injection');
@@ -210,15 +216,39 @@ export default function SQLInjectionLab() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
           >
-            <Card className="border-emerald-300 bg-emerald-50">
+            <Card className={isSuccess ? 'border-emerald-300 bg-emerald-50' : 'border-red-300 bg-red-50'}>
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle size={18} className="text-red-500" />
-                  <h3 className="text-sm font-semibold text-red-700">
-                    Атака успешна! Запрос модифицирован
-                  </h3>
+                  {isSuccess ? (
+                    <>
+                      <AlertTriangle size={18} className="text-red-500" />
+                      <h3 className="text-sm font-semibold text-red-700">
+                        Атака успешна! Запрос модифицирован
+                      </h3>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 size={18} className="text-amber-500" />
+                      <h3 className="text-sm font-semibold text-amber-700">
+                        Это не похоже на SQL-инъекцию
+                      </h3>
+                    </>
+                  )}
                 </div>
-                <CodeBlock code={challenge.successQuery} language="sql" title="Модифицированный запрос" />
+                {isSuccess ? (
+                  <CodeBlock code={challenge.successQuery} language="sql" title="Модифицированный запрос" />
+                ) : (
+                  <div className="bg-white rounded-lg p-3">
+                    <p className="text-xs text-slate-600 mb-2">
+                      Ваш ввод: <code className="font-mono text-red-600">{userInput}</code>
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      Для SQL-инъекции попробуйте использовать: одинарные кавычки (<code className="font-mono">'</code>),
+                      SQL-ключевые слова (<code className="font-mono">OR</code>, <code className="font-mono">UNION SELECT</code>, <code className="font-mono">--</code>),
+                      или другие конструкции. Нажмите «Пример ответа» для подсказки.
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex gap-2">
                   <Button
@@ -238,12 +268,16 @@ export default function SQLInjectionLab() {
                       exit={{ opacity: 0, height: 0 }}
                     >
                       <div className="bg-white rounded-lg p-4 mt-2">
-                        <h4 className="text-xs font-semibold text-emerald-700 mb-2">📖 Объяснение</h4>
+                        <h4 className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
+                          <BookOpen size={14} /> Объяснение
+                        </h4>
                         <p className="text-xs text-slate-600 leading-relaxed">
                           {challenge.explanation}
                         </p>
                         <div className="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                          <h4 className="text-xs font-semibold text-emerald-700 mb-1">🛡️ Как защититься?</h4>
+                          <h4 className="text-xs font-semibold text-emerald-700 mb-1 flex items-center gap-1.5">
+                            <ShieldCheck size={14} /> Как защититься?
+                          </h4>
                           <p className="text-xs text-emerald-600">
                             Используйте параметризованные запросы (prepared statements) или ORM-библиотеки
                             (Prisma, Sequelize, TypeORM). Никогда не подставляйте пользовательский ввод

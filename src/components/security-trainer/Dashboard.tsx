@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import {
   Shield,
+  ShieldCheck,
   Database,
   FileText,
   Link,
@@ -30,6 +31,7 @@ import type { PageType } from '@/lib/store';
 
 const iconMap: Record<string, React.ReactNode> = {
   Shield: <Shield size={28} />,
+  ShieldCheck: <ShieldCheck size={28} />,
   Database: <Database size={28} />,
   FileText: <FileText size={28} />,
   Link: <Link size={28} />,
@@ -49,6 +51,11 @@ const achievementIcons: Record<string, React.ReactNode> = {
   'quiz-perfect': <Star size={18} />,
   'crypto-ninja': <Lock size={18} />,
   'full-completion': <Zap size={18} />,
+  'csrf-shield': <Shield size={18} />,
+  'owasp-half': <Shield size={18} />,
+  'quiz-all': <Trophy size={18} />,
+  'crypto-explorer': <KeyRound size={18} />,
+  'coding-pro': <Code size={18} />,
 };
 
 export default function Dashboard() {
@@ -80,7 +87,12 @@ export default function Dashboard() {
       case 'quiz-master': return Object.keys(quizScores).length >= 3;
       case 'quiz-perfect': return Object.values(quizScores).some((s) => s === 100);
       case 'crypto-ninja': return completedModules.includes('tools');
-      case 'full-completion': return completedModules.length >= 7;
+      case 'full-completion': return completedModules.length >= 8;
+      case 'csrf-shield': return completedModules.includes('csrf');
+      case 'owasp-half': return studiedOwaspItems.length >= 5;
+      case 'quiz-all': return Object.keys(quizScores).length >= 7;
+      case 'crypto-explorer': return completedModules.includes('tools');
+      case 'coding-pro': return completedModules.includes('secure-coding');
       default: return false;
     }
   };
@@ -99,11 +111,23 @@ export default function Dashboard() {
     if (!completedModules.includes('xss')) {
       return { text: 'Изучите XSS-атаки — они встречаются на каждом третьем сайте.', page: 'xss' as PageType };
     }
-    if (!completedModules.includes('quiz')) {
-      return { text: 'Проверьте свои знания в квизах!', page: 'quiz' as PageType };
+    if (!completedModules.includes('csrf')) {
+      return { text: 'Изучите CSRF-атаки — подделка запросов от имени пользователя.', page: 'csrf' as PageType };
+    }
+    if (!completedModules.includes('security-headers')) {
+      return { text: 'Освойте Security Headers — CSP, HSTS и другие заголовки безопасности.', page: 'security-headers' as PageType };
+    }
+    if (!completedModules.includes('auth')) {
+      return { text: 'Попробуйте модуль аутентификации — пароли, хеширование и 2FA.', page: 'auth' as PageType };
+    }
+    if (!completedModules.includes('secure-coding')) {
+      return { text: 'Практикуйтесь в безопасном кодировании — 15 задач по ревью кода.', page: 'secure-coding' as PageType };
     }
     if (!completedModules.includes('tools')) {
       return { text: 'Попробуйте инструменты: шифры, кодирование и генератор паролей.', page: 'tools' as PageType };
+    }
+    if (Object.keys(quizScores).length < 7) {
+      return { text: 'Проверьте свои знания в квизах — 7 категорий с фильтрацией по сложности!', page: 'quiz' as PageType };
     }
     if (totalProgress < 100) {
       return { text: 'Завершите оставшиеся модули для полного прохождения!', page: modules.find((m) => !completedModules.includes(m.id))?.id as PageType || 'dashboard' as PageType };
@@ -187,7 +211,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Модули пройдены', value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
-          { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/5`, color: 'text-amber-600' },
+          { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/7`, color: 'text-amber-600' },
           { label: 'Средний балл', value: `${avgQuizScore}%`, color: 'text-sky-600' },
           { label: 'Достижения', value: `${unlockedAchievements.length}/${achievements.length}`, color: 'text-violet-600' },
         ].map((stat, i) => (
@@ -337,13 +361,13 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h3 className="font-semibold text-sm group-hover:text-amber-700 transition-colors">Проверка знаний</h3>
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">Проверьте свои знания по 5 категориям безопасности.</p>
+                        <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">Проверьте свои знания по 7 категориям безопасности с фильтрацией по сложности.</p>
                       </div>
                       <ChevronRight size={16} className="text-slate-300 group-hover:text-amber-500 transition-colors mt-1 shrink-0" />
                     </div>
                     <div className="flex items-center gap-2 mt-3">
-                      <Badge className="bg-amber-100 text-amber-700 border-0 text-[10px]">5 категорий</Badge>
-                      <span className="text-[11px] text-slate-400">25 вопросов</span>
+                      <Badge className="bg-amber-100 text-amber-700 border-0 text-[10px]">7 категорий</Badge>
+                      <span className="text-[11px] text-slate-400">50+ вопросов</span>
                     </div>
                   </div>
                 </div>
@@ -377,7 +401,7 @@ export default function Dashboard() {
                       <Badge className="bg-violet-100 text-violet-700 border-0 text-[10px]">
                         {unlockedAchievements.length}/{achievements.length} разблокировано
                       </Badge>
-                      <span className="text-[11px] text-slate-400">34 термина</span>
+                      <span className="text-[11px] text-slate-400">80+ терминов</span>
                     </div>
                   </div>
                 </div>

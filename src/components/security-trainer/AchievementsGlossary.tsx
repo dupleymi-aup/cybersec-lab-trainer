@@ -22,6 +22,7 @@ import {
   Code,
   Database,
   GraduationCap,
+  KeyRound,
 } from 'lucide-react';
 
 const glossaryTerms: { term: string; definition: string; category: string }[] = [
@@ -59,6 +60,68 @@ const glossaryTerms: { term: string; definition: string; category: string }[] = 
   { term: 'OWASP ZAP', definition: 'Zed Attack Proxy — бесплатный инструмент с открытым исходным кодом для автоматизированного и ручного тестирования безопасности веб-приложений.', category: 'Инструменты' },
   { term: 'Burp Suite', definition: 'Коммерческая платформа для тестирования безопасности веб-приложений. Включает прокси, сканер уязвимостей, инструмент повторного воспроизведения запросов.', category: 'Инструменты' },
   { term: 'Nmap', definition: 'Утилита для сканирования портов и обнаружения служб в сети. Используется для аудита безопасности и обнаружения открытых портов на серверах.', category: 'Инструменты' },
+  // --- Additional Terms ---
+  { term: 'IDOR', definition: 'Insecure Direct Object Reference — уязвимость, при которой пользователь может получить доступ к данным другого пользователя, изменив идентификатор объекта в запросе (например, /api/users/5 вместо /api/users/3).', category: 'Уязвимости' },
+  { term: 'Open Redirect', definition: 'Уязвимость, позволяющая перенаправить пользователя на произвольный внешний URL через параметр приложения. Используется в фишинговых атаках для придания доверия ссылке.', category: 'Уязвимости' },
+  { term: 'Path Traversal', definition: 'Атака, при которой злоумышленник получает доступ к файлам за пределами разрешённой директории через манипуляцию путями (например, ../../../etc/passwd).', category: 'Уязвимости' },
+  { term: 'XXE (XML External Entity)', definition: 'Инъекция внешних сущностей в XML-парсер. Позволяет читать локальные файлы, выполнять SSRF и DoS-атаки. Возникает при включённой обработке DTD в XML-парсере.', category: 'Уязвимости' },
+  { term: 'Deserialization Attack', definition: 'Атака через небезопасную десериализацию объектов. Злоумышленник создаёт вредоносный сериализованный объект, который при десериализации выполняет произвольный код.', category: 'Уязвимости' },
+  { term: 'HMAC', definition: 'Hash-based Message Authentication Code — механизм проверки целостности и подлинности сообщения с использованием криптографического хеша и секретного ключа.', category: 'Криптография' },
+  { term: 'AES', definition: 'Advanced Encryption Standard — симметричный алгоритм блочного шифрования. Использует ключи 128, 192 или 256 бит. Является стандартом для шифрования данных.', category: 'Криптография' },
+  { term: 'RSA', definition: 'Асимметричный алгоритм шифрования, использующий пару ключей (публичный и приватный). Применяется для шифрования, цифровых подписей и обмена ключами.', category: 'Криптография' },
+  { term: 'SAML', definition: 'Security Assertion Markup Language — стандарт для обмена данными аутентификации и авторизации между Identity Provider и Service Provider. Используется в SSO.', category: 'Аутентификация' },
+  { term: 'SSO (Single Sign-On)', definition: 'Единый вход — механизм, позволяющий пользователю аутентифицироваться один раз и получить доступ к нескольким приложениям без повторного ввода пароля.', category: 'Аутентификация' },
+  { term: 'RBAC', definition: 'Role-Based Access Control — модель контроля доступа, в которой права назначаются ролям, а пользователи получают роли. Упрощает управление правами в крупных организациях.', category: 'Защита' },
+  { term: 'Input Validation', definition: 'Процесс проверки входных данных на соответствие ожидаемому формату, типу, диапазону и длине. Первый уровень защиты от инъекций и других атак.', category: 'Защита' },
+  { term: 'Security Headers', definition: 'Набор HTTP-заголовков для усиления безопасности: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy. Настраиваются на сервере.', category: 'Защита' },
+  { term: 'Metasploit', definition: 'Фреймворк для разработки и выполнения эксплойтов. Используется пентестерами для проверки безопасности систем. Содержит базу данных эксплойтов и payloads.', category: 'Инструменты' },
+  { term: 'Wireshark', definition: 'Анализатор сетевого трафика с открытым исходным кодом. Позволяет захватывать и анализировать пакеты, проверять TLS-соединения, обнаруживать аномалии.', category: 'Инструменты' },
+  { term: 'STRIDE', definition: 'Модель классификации угроз: Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation of Privilege. Используется при Threat Modeling для систематической идентификации угроз.', category: 'Методологии' },
+  // --- Additional Terms ---
+  { term: 'DoS / DDoS', definition: 'Denial of Service / Distributed DoS — атака на доступность, цель которой сделать сервис недоступным для легитимных пользователей. DDoS использует множество источников (ботнет).', category: 'Атаки' },
+  { term: 'DNS (Domain Name System)', definition: 'Распределённая система преобразования доменных имён (example.com) в IP-адреса (93.184.216.34). Атаки на DNS включают spoofing, poisoning и hijacking.', category: 'Сеть' },
+  { term: 'DNS Spoofing', definition: 'Атака, при которой злоумышленник подменяет DNS-ответ, направляя жертву на поддельный сервер вместо легитимного. Защита: DNSSEC (подписанные DNS-записи).', category: 'Атаки' },
+  { term: 'Certificate Pinning', definition: 'Механизм, при котором клиент «привязывается» к конкретному SSL-сертификату или CA. Даже если злоумышленник получит поддельный сертификат, соединение будет отклонено.', category: 'Защита' },
+  { term: 'HSTS (HTTP Strict Transport Security)', definition: 'HTTP-заголовок, предписывающий браузеру всегда использовать HTTPS для данного домена. Предотвращает downgrade-атаки и SSL-stripping.', category: 'Защита' },
+  { term: '0-day (Zero-Day)', definition: 'Уязвимость, о которой разработчик ещё не знает или для которой нет патча. Злоумышленники могут эксплуатировать её до выпуска исправления.', category: 'Атаки' },
+  { term: 'WORM', definition: 'Write Once, Read Many — модель хранения данных, при которой записанные данные нельзя изменить или удалить. Используется для защиты логов безопасности от модификации.', category: 'Защита' },
+  { term: 'CIA Triad', definition: 'Confidentiality, Integrity, Availability — фундаментальная модель информационной безопасности: конфиденциальность (данные доступны только авторизованным), целостность (данные не изменены), доступность (данные доступны когда нужны).', category: 'Методологии' },
+  { term: 'Non-repudiation', definition: 'Свойство системы, гарантирующее, что сторона не может отрицать участие в транзакции. Обеспечивается цифровыми подписями и журналированием.', category: 'Методологии' },
+  { term: 'Security Misconfiguration', definition: 'OWASP A05 — уязвимость, вызванная неправильной настройкой приложения: включённая отладка в продакшене, стандартные пароли, открытые облачные хранилища, отсутствие защитных заголовков.', category: 'Уязвимости' },
+  { term: 'Broken Authentication', definition: 'OWASP A07 — ошибки в механизмах аутентификации: слабые пароли, отсутствие MFA, предсказуемые сессионные токены, уязвимые механизмы восстановления пароля.', category: 'Уязвимости' },
+  { term: 'Credential Stuffing', definition: 'Автоматизированная попытка входа на множестве сервисов с использованием email/паролей из одной утечки. Люди часто используют одинаковые пароли, что делает атаку эффективной.', category: 'Атаки' },
+  { term: 'Token-based Auth', definition: 'Модель аутентификации, при которой после входа сервер выдаёт токен (JWT), который клиент предъявляет при каждом запросе. Stateless — сервер не хранит сессию.', category: 'Аутентификация' },
+  { term: 'Session-based Auth', definition: 'Традиционная модель, при которой сервер хранит сессию (в памяти/БД/Redis) и отправляет клиенту session ID в cookie. Stateful — сервер должен хранить данные сессии.', category: 'Аутентификация' },
+  { term: 'Refresh Token', definition: 'Долгоживущий токен, используемый для получения новых short-lived access-токенов без повторного ввода пароля. Хранится в HttpOnly cookie для безопасности.', category: 'Аутентификация' },
+  { term: 'TOTP', definition: 'Time-based One-Time Password (RFC 6238) — алгоритм генерации одноразовых кодов на основе общего секрета и текущего времени. Используется в Google Authenticator, Authy.', category: 'Аутентификация' },
+  { term: 'FIDO2 / WebAuthn', definition: 'Стандарты беспарольной аутентификации с использованием аппаратных ключей (YubiKey) или биометрии. Криптографически подтверждают наличие устройства — защита от фишинга.', category: 'Аутентификация' },
+  { term: 'Subresource Integrity (SRI)', definition: 'Механизм проверки целостности внешних ресурсов (CDN-скрипты, стили) по хешу. Атрибут integrity="sha384-..." в теге <script> гарантирует, что файл не был модифицирован.', category: 'Защита' },
+  { term: 'CSP (Content Security Policy)', definition: 'HTTP-заголовок, определяющий допустимые источники для скриптов, стилей, изображений и других ресурсов. Директива script-src \'self\' блокирует inline-скрипты — эффективная защита от XSS.', category: 'Защита' },
+  { term: 'X-Content-Type-Options', definition: 'HTTP-заголовок со значением nosniff, запрещающий браузеру определять MIME-тип по содержимому. Без него .jpg-файл может быть интерпретирован как JavaScript.', category: 'Защита' },
+  { term: 'Referrer-Policy', definition: 'HTTP-заголовок, контролирующий, сколько информации о предыдущей странице передаётся в заголовке Referer. strict-origin-when-cross-origin — рекомендуемое значение.', category: 'Защита' },
+  { term: 'Permissions-Policy', definition: 'HTTP-заголовок, ограничивающий использование браузерных API (камера, микрофон, геолокация) для текущего документа и iframe. Замена устаревшего Feature-Policy.', category: 'Защита' },
+  { term: 'Helmet.js', definition: 'Библиотека Express.js для настройки защитных HTTP-заголовков: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy и других. Устанавливается одним middleware.', category: 'Инструменты' },
+  { term: 'Dependabot', definition: 'Автоматический сервис GitHub, который мониторит зависимости и создаёт PR при обнаружении уязвимостей или доступных обновлений. Поддерживает npm, pip, Maven и другие.', category: 'Инструменты' },
+  { term: 'Snyk', definition: 'Платформа безопасности для разработчиков: сканирование зависимостей, контейнеров, IaC-файлов на уязвимости. Интегрируется в CI/CD для автоматической проверки.', category: 'Инструменты' },
+  { term: 'SIEM', definition: 'Security Information and Event Management — платформа для сбора, корреляции и анализа логов безопасности в реальном времени. Примеры: Splunk, ELK Stack, IBM QRadar.', category: 'Инструменты' },
+  { term: 'Have I Been Pwned', definition: 'Сервис Troy Hunt для проверки, не попали ли email или пароль в известные утечки данных. API позволяет интегрировать проверку в приложения.', category: 'Инструменты' },
+  { term: 'OWASP Top 10', definition: 'Список 10 наиболее критических угроз безопасности веб-приложений, обновляемый каждые 3-4 года. Текущая версия — 2021. Является отраслевым стандартом для разработчиков и аудиторов.', category: 'Организации' },
+  { term: 'Supply Chain Attack', definition: 'Атака через компрометацию компонентов разработки: библиотек (npm, PyPI), CI/CD-систем, инструментов сборки. Примеры: SolarWinds (2020), event-stream (2018).', category: 'Атаки' },
+  { term: 'Race Condition', definition: 'Уязвимость, возникающая при одновременном выполнении операций, когда результат зависит от порядка выполнения. Пример: двойное списание средств при параллельных запросах.', category: 'Уязвимости' },
+  { term: 'Avalanche Effect', definition: 'Свойство криптографических хеш-функций: изменение даже одного бита входных данных полностью меняет хеш. Хороший хеш меняет ~50% битов при одном изменённом бите входа.', category: 'Криптография' },
+  { term: 'Collision', definition: 'Ситуация, когда два разных входных значения дают одинаковый хеш. MD5 и SHA-1 уязвимы к collision-атакам. SHA-256 и bcrypt считаются устойчивыми.', category: 'Криптография' },
+  // --- More terms ---
+  { term: 'ECC (Elliptic Curve Cryptography)', definition: 'Асимметричная криптография на основе эллиптических кривых. Обеспечивает эквивалентную стойкость с RSA при меньшем размере ключа (256 бит ECC = 3072 бит RSA). Используется в TLS 1.3, Bitcoin.', category: 'Криптография' },
+  { term: 'OAuth 2.1', definition: 'Обновлённая версия OAuth 2.0: обязательный PKCE (Proof Key for Code Exchange), удаление implicit grant и resource owner password credentials. Упрощает спецификацию и повышает безопасность.', category: 'Аутентификация' },
+  { term: 'PKCE', definition: 'Proof Key for Code Exchange — расширение OAuth 2.0 для защиты от authorization code interception. Генерирует code verifier и code challenge для каждого запроса. Обязателен для мобильных и SPA-приложений.', category: 'Аутентификация' },
+  { term: 'OpenID Connect (OIDC)', definition: 'Протокол аутентификации поверх OAuth 2.0. Возвращает ID Token (JWT) с информацией о пользователе (sub, email, name). Используется для Single Sign-On в Google, Microsoft, GitHub.', category: 'Аутентификация' },
+  { term: 'API Security', definition: 'Защита API-эндпоинтов: аутентификация (API keys, JWT, OAuth), авторизация (RBAC, ABAC), rate limiting, валидация входных данных, TLS, CORS-политика, аудит логов.', category: 'Защита' },
+  { term: 'GraphQL Security', definition: 'Специфичные угрозы GraphQL: Query Depth Attack (рекурсивные запросы), Introspection (раскрытие схемы), Batch Attack (множество операций). Защита: лимит глубины, отключение introspection, complexity analysis.', category: 'Уязвимости' },
+  { term: 'OWASP ASVS', definition: 'Application Security Verification Standard — подробный стандарт для оценки безопасности веб-приложений. Содержит 300+ требований по уровням: L1 (базовый), L2 (стандартный), L3 (высокий).', category: 'Организации' },
+  { term: 'Zero Trust', definition: 'Модель безопасности: «никогда не доверяй, всегда проверяй». Каждый запрос аутентифицируется и авторизуется, независимо от источника. Микросегментация, MFA, минимальные привилегии.', category: 'Методологии' },
+  { term: 'DevSecOps', definition: 'Интеграция безопасности в CI/CD-процесс: SAST (статический анализ), DAST (динамический анализ), SCA (анализ зависимостей), IaC-сканирование, автоматические проверки перед деплоем.', category: 'Методологии' },
+  { term: 'SAST', definition: 'Static Application Security Testing — анализ исходного кода на уязвимости без запуска приложения. Обнаруживает SQLi, XSS, хардкод секреты. Примеры: SonarQube, Semgrep, CodeQL.', category: 'Инструменты' },
+  { term: 'DAST', definition: 'Dynamic Application Security Testing — тестирование работающего приложения на уязвимости. Имитирует атаки злоумышленника. Примеры: OWASP ZAP, Burp Suite, Nessus.', category: 'Инструменты' },
 ];
 
 const categoryColors: Record<string, string> = {
@@ -84,12 +147,18 @@ const achievementIcons: Record<string, React.ReactNode> = {
   'quiz-perfect': <Star size={24} />,
   'crypto-ninja': <LockIcon size={24} />,
   'full-completion': <GraduationCap size={24} />,
+  'csrf-shield': <Shield size={24} />,
+  'owasp-half': <Shield size={24} />,
+  'quiz-all': <Trophy size={24} />,
+  'crypto-explorer': <KeyRound size={24} />,
+  'coding-pro': <Code size={24} />,
 };
 
 export default function AchievementsAndGlossary() {
   const { setCurrentPage, completedModules, quizScores, studiedOwaspItems } = useAppStore();
   const [activeTab, setActiveTab] = useState<'achievements' | 'glossary'>('achievements');
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState<string>('');
 
   // Calculate achievements
   const getAchievementStatus = (id: string) => {
@@ -103,7 +172,12 @@ export default function AchievementsAndGlossary() {
       case 'quiz-master': return Object.keys(quizScores).length >= 3;
       case 'quiz-perfect': return Object.values(quizScores).some((s) => s === 100);
       case 'crypto-ninja': return completedModules.includes('tools');
-      case 'full-completion': return completedModules.length >= 7;
+      case 'full-completion': return completedModules.length >= 8;
+      case 'csrf-shield': return completedModules.includes('csrf');
+      case 'owasp-half': return studiedOwaspItems.length >= 5;
+      case 'quiz-all': return Object.keys(quizScores).length >= 7;
+      case 'crypto-explorer': return completedModules.includes('tools');
+      case 'coding-pro': return completedModules.includes('secure-coding');
       default: return false;
     }
   };
@@ -112,8 +186,10 @@ export default function AchievementsAndGlossary() {
 
   const filteredTerms = glossaryTerms.filter(
     (t) =>
-      t.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.definition.toLowerCase().includes(searchTerm.toLowerCase())
+      (activeCategory === '' || t.category === activeCategory) &&
+      (searchTerm === '' ||
+        t.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t.definition.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -229,22 +305,37 @@ export default function AchievementsAndGlossary() {
 
           {/* Category filter */}
           <div className="flex flex-wrap gap-2">
-            {Object.keys(categoryColors).map((cat) => (
-              <Badge
-                key={cat}
-                variant="secondary"
-                className={`text-[10px] cursor-pointer hover:opacity-80 ${categoryColors[cat]}`}
-                onClick={() => setSearchTerm(cat)}
-              >
-                {cat}
-              </Badge>
-            ))}
-            {searchTerm && (
-              <Badge variant="outline" className="text-[10px] cursor-pointer" onClick={() => setSearchTerm('')}>
-                Очистить
-              </Badge>
-            )}
+            <Badge
+              variant={activeCategory === '' ? 'default' : 'secondary'}
+              className={`text-[10px] cursor-pointer hover:opacity-80 ${
+                activeCategory === '' ? '' : 'bg-slate-100 text-slate-700'
+              }`}
+              onClick={() => setActiveCategory('')}
+            >
+              Все ({glossaryTerms.length})
+            </Badge>
+            {Object.keys(categoryColors).map((cat) => {
+              const count = glossaryTerms.filter(t => t.category === cat).length;
+              return (
+                <Badge
+                  key={cat}
+                  variant="secondary"
+                  className={`text-[10px] cursor-pointer hover:opacity-80 ${
+                    activeCategory === cat ? 'ring-2 ring-slate-400' : ''
+                  } ${categoryColors[cat]}`}
+                  onClick={() => setActiveCategory(activeCategory === cat ? '' : cat)}
+                >
+                  {cat} ({count})
+                </Badge>
+              );
+            })}
           </div>
+          {activeCategory && (
+            <p className="text-xs text-slate-500">
+              Показано: <strong>{activeCategory}</strong> — {filteredTerms.length} терминов
+              <button className="text-emerald-600 ml-1 underline" onClick={() => setActiveCategory('')}>Сбросить</button>
+            </p>
+          )}
 
           <div className="space-y-2">
             {filteredTerms.map((term, i) => (
