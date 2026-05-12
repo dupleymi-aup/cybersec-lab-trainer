@@ -270,6 +270,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
         token: state.token,
+        recoveryState: state.recoveryState,
       }),
     }
   )

@@ -36,17 +36,22 @@ interface AppState {
 
 const createAuthStorage = () => {
   return createJSONStorage<AppState>(() => {
-    const user = useAuthStore.getState().user;
-    const userId = user?.id || 'anonymous';
+    let userId = 'anonymous';
+    try {
+      const user = useAuthStore.getState().user;
+      userId = user?.id || 'anonymous';
+    } catch {
+      // Auth store not initialized yet
+    }
     const storageKey = `security-trainer-progress-${userId}`;
     return {
-      getItem: (name: string) => {
+      getItem: () => {
         return localStorage.getItem(storageKey);
       },
-      setItem: (name: string, value: string) => {
+      setItem: (_name: string, value: string) => {
         localStorage.setItem(storageKey, value);
       },
-      removeItem: (name: string) => {
+      removeItem: () => {
         localStorage.removeItem(storageKey);
       },
     };

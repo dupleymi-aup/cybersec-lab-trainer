@@ -8,9 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import OTPModal from './OTPModal';
-import { Shield, Mail, Phone, Eye, EyeOff } from 'lucide-react';
+import { Shield, Mail, Phone, Eye, EyeOff, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 
 type AuthPage = 'login' | 'register' | 'recovery';
 type RecoveryStep = 'enter-contact' | 'enter-otp' | 'new-password';
@@ -41,9 +43,8 @@ export default function AuthPages() {
   const [recoveryOtp, setRecoveryOtp] = useState('');
   const [recoveryNewPassword, setRecoveryNewPassword] = useState('');
   const [recoveryConfirmPassword, setRecoveryConfirmPassword] = useState('');
-  const [generatedOtp, setGeneratedOtp] = useState('');
 
-  const { login, register, sendRecoveryOTP, verifyRecoveryOTP, resetPassword } = useAuthStore();
+  const { login, register, sendRecoveryOTP, verifyRecoveryOTP, resetPassword, recoveryState } = useAuthStore();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,8 +108,6 @@ export default function AuthPages() {
     const result = await sendRecoveryOTP(recoveryContact);
     setLoading(false);
     if (result.success) {
-      // Get the generated OTP from store state - we'll need to access it differently
-      // For now, let's store it in local state
       toast.success('Код отправлен');
       setRecoveryStep('enter-otp');
     } else {
@@ -154,6 +153,30 @@ export default function AuthPages() {
   };
 
   const passwordErrors = validatePassword(regPassword);
+
+  const getPasswordStrength = (pw: string) => {
+    if (!pw) return { score: 0, label: '', color: 'bg-slate-200', checks: [] };
+    const checks = [
+      { label: 'Минимум 8 символов', passed: pw.length >= 8 },
+      { label: 'Строчные буквы (a-z)', passed: /[a-z]/.test(pw) },
+      { label: 'Заглавные буквы (A-Z)', passed: /[A-Z]/.test(pw) },
+      { label: 'Цифры (0-9)', passed: /[0-9]/.test(pw) },
+      { label: 'Спецсимволы (!@#$...)', passed: /[^a-zA-Z0-9]/.test(pw) },
+      { label: 'Минимум 12 символов', passed: pw.length >= 12 },
+    ];
+    const passedCount = checks.filter((c) => c.passed).length;
+    let score = 0;
+    let label = '';
+    let color = 'bg-slate-200';
+    if (passedCount <= 1) { score = 15; label = 'Очень слабый'; color = 'bg-red-500'; }
+    else if (passedCount <= 2) { score = 30; label = 'Слабый'; color = 'bg-red-400'; }
+    else if (passedCount <= 3) { score = 50; label = 'Средний'; color = 'bg-yellow-500'; }
+    else if (passedCount <= 4) { score = 70; label = 'Хороший'; color = 'bg-emerald-400'; }
+    else if (passedCount <= 5) { score = 85; label = 'Надёжный'; color = 'bg-emerald-500'; }
+    else { score = 100; label = 'Отличный'; color = 'bg-emerald-600'; }
+    return { score, label, color, checks };
+  };
+  const pwStrength = getPasswordStrength(regPassword);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900 p-4">
@@ -327,8 +350,42 @@ export default function AuthPages() {
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
-                      {regPassword && !passwordErrors.valid && (
-                        <p className="text-xs text-red-400 mt-1">{passwordErrors.errors.join(', ')}</p>
+                      {regPassword && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="mt-3 space-y-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-slate-400">Надёжность пароля</span>
+                            <span className={`text-xs font-medium ${
+                              pwStrength.score >= 70 ? 'text-emerald-400' :
+                              pwStrength.score >= 50 ? 'text-yellow-400' : 'text-red-400'
+                            }`}>{pwStrength.label}</span>
+                          </div>
+                          <Progress value={pwStrength.score} className="h-1.5" />
+                          <div className="h-1.5 rounded-full overflow-hidden bg-slate-700">
+                            <div
+                              className={`h-full ${pwStrength.color} rounded-full transition-all duration-500`}
+                              style={{ width: `${pwStrength.score}%` }}
+                            />
+                          </div>
+                          <Separator className="bg-slate-700" />
+                          <div className="space-y-1">
+                            {pwStrength.checks.map((check, i) => (
+                              <div key={i} className="flex items-center gap-2 text-xs">
+                                {check.passed ? (
+                                  <CheckCircle2 size={12} className="text-emerald-400" />
+                                ) : (
+                                  <AlertTriangle size={12} className="text-slate-600" />
+                                )}
+                                <span className={check.passed ? 'text-slate-300' : 'text-slate-500'}>
+                                  {check.label}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -438,6 +495,11 @@ export default function AuthPages() {
 
                   {recoveryStep === 'enter-otp' && (
                     <div className="space-y-4">
+                      <div className="text-center mb-2">
+                        <span className="text-xs text-slate-500 bg-slate-700/50 px-3 py-1.5 rounded-lg inline-block">
+                          Ваш код: <strong className="text-violet-400 select-all">{recoveryState?.otp || '—'}</strong>
+                        </span>
+                      </div>
                       <div className="space-y-2">
                         <Label className="text-slate-300">Код подтверждения</Label>
                         <Input
