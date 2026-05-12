@@ -1,16 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/lib/auth-store';
 import { validateEmail, validatePhone, validatePassword } from '@/lib/auth-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import OTPModal from './OTPModal';
 import { Shield, Mail, Phone, Eye, EyeOff, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePasswordStrength } from '@/hooks/use-password-strength';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 
@@ -28,6 +30,7 @@ export default function AuthPages() {
   // Login state
   const [loginContact, setLoginContact] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
   // Register state
   const [regEmail, setRegEmail] = useState('');
@@ -43,6 +46,19 @@ export default function AuthPages() {
   const [recoveryOtp, setRecoveryOtp] = useState('');
   const [recoveryNewPassword, setRecoveryNewPassword] = useState('');
   const [recoveryConfirmPassword, setRecoveryConfirmPassword] = useState('');
+
+  // OTP countdown timer
+  const [countdown, setCountdown] = useState(0);
+  const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (countdown === 0 && recoveryStep === 'enter-otp') {
+      setCanResend(true);
+    }
+  }, [countdown, recoveryStep]);
 
   const { login, register, sendRecoveryOTP, verifyRecoveryOTP, resetPassword, recoveryState } = useAuthStore();
 
@@ -110,6 +126,8 @@ export default function AuthPages() {
     if (result.success) {
       toast.success('Код отправлен');
       setRecoveryStep('enter-otp');
+      setCountdown(60);
+      setCanResend(false);
     } else {
       toast.error(result.error);
     }
@@ -121,6 +139,19 @@ export default function AuthPages() {
       setRecoveryStep('new-password');
     } else {
       toast.error('Неверный или просроченный код');
+    }
+  };
+
+  const handleResendOTP = async () => {
+    setLoading(true);
+    const result = await sendRecoveryOTP(recoveryContact);
+    setLoading(false);
+    if (result.success) {
+      toast.success('Новый код отправлен');
+      setCountdown(60);
+      setCanResend(false);
+    } else {
+      toast.error(result.error);
     }
   };
 
@@ -153,30 +184,8 @@ export default function AuthPages() {
   };
 
   const passwordErrors = validatePassword(regPassword);
-
-  const getPasswordStrength = (pw: string) => {
-    if (!pw) return { score: 0, label: '', color: 'bg-slate-200', checks: [] };
-    const checks = [
-      { label: 'Минимум 8 символов', passed: pw.length >= 8 },
-      { label: 'Строчные буквы (a-z)', passed: /[a-z]/.test(pw) },
-      { label: 'Заглавные буквы (A-Z)', passed: /[A-Z]/.test(pw) },
-      { label: 'Цифры (0-9)', passed: /[0-9]/.test(pw) },
-      { label: 'Спецсимволы (!@#$...)', passed: /[^a-zA-Z0-9]/.test(pw) },
-      { label: 'Минимум 12 символов', passed: pw.length >= 12 },
-    ];
-    const passedCount = checks.filter((c) => c.passed).length;
-    let score = 0;
-    let label = '';
-    let color = 'bg-slate-200';
-    if (passedCount <= 1) { score = 15; label = 'Очень слабый'; color = 'bg-red-500'; }
-    else if (passedCount <= 2) { score = 30; label = 'Слабый'; color = 'bg-red-400'; }
-    else if (passedCount <= 3) { score = 50; label = 'Средний'; color = 'bg-yellow-500'; }
-    else if (passedCount <= 4) { score = 70; label = 'Хороший'; color = 'bg-emerald-400'; }
-    else if (passedCount <= 5) { score = 85; label = 'Надёжный'; color = 'bg-emerald-500'; }
-    else { score = 100; label = 'Отличный'; color = 'bg-emerald-600'; }
-    return { score, label, color, checks };
-  };
-  const pwStrength = getPasswordStrength(regPassword);
+  const regPwStrength = usePasswordStrength(regPassword);
+  const recoveryPwStrength = usePasswordStrength(recoveryNewPassword);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900 p-4">
@@ -250,6 +259,16 @@ export default function AuthPages() {
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="remember-me"
+                        checked={rememberMe}
+                        onCheckedChange={(checked) => setRememberMe(!!checked)}
+                      />
+                      <Label htmlFor="remember-me" className="text-sm text-slate-300 cursor-pointer">
+                        Запомнить меня
+                      </Label>
                     </div>
                     <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
                       {loading ? 'Вход...' : 'Войти'}
@@ -359,20 +378,20 @@ export default function AuthPages() {
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-slate-400">Надёжность пароля</span>
                             <span className={`text-xs font-medium ${
-                              pwStrength.score >= 70 ? 'text-emerald-400' :
-                              pwStrength.score >= 50 ? 'text-yellow-400' : 'text-red-400'
-                            }`}>{pwStrength.label}</span>
+                              regPwStrength.score >= 70 ? 'text-emerald-400' :
+                              regPwStrength.score >= 50 ? 'text-yellow-400' : 'text-red-400'
+                            }`}>{regPwStrength.label}</span>
                           </div>
-                          <Progress value={pwStrength.score} className="h-1.5" />
+                          <Progress value={regPwStrength.score} className="h-1.5" />
                           <div className="h-1.5 rounded-full overflow-hidden bg-slate-700">
                             <div
-                              className={`h-full ${pwStrength.color} rounded-full transition-all duration-500`}
-                              style={{ width: `${pwStrength.score}%` }}
+                              className={`h-full ${regPwStrength.color} rounded-full transition-all duration-500`}
+                              style={{ width: `${regPwStrength.score}%` }}
                             />
                           </div>
                           <Separator className="bg-slate-700" />
                           <div className="space-y-1">
-                            {pwStrength.checks.map((check, i) => (
+                            {regPwStrength.checks.map((check, i) => (
                               <div key={i} className="flex items-center gap-2 text-xs">
                                 {check.passed ? (
                                   <CheckCircle2 size={12} className="text-emerald-400" />
@@ -513,9 +532,24 @@ export default function AuthPages() {
                       <Button onClick={handleVerifyOTP} className="w-full bg-violet-600 hover:bg-violet-700">
                         Подтвердить
                       </Button>
+                      <div className="text-center space-y-2">
+                        {countdown > 0 ? (
+                          <p className="text-xs text-slate-400">
+                            Отправить код повторно через <span className="text-violet-400 font-semibold">{countdown} сек</span>
+                          </p>
+                        ) : (
+                          <button
+                            onClick={handleResendOTP}
+                            disabled={loading}
+                            className="text-sm text-violet-400 hover:text-violet-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Отправить код повторно
+                          </button>
+                        )}
+                      </div>
                       <button
                         onClick={() => setRecoveryStep('enter-contact')}
-                        className="w-full text-sm text-violet-400 hover:text-violet-300"
+                        className="w-full text-sm text-slate-500 hover:text-slate-400"
                       >
                         Изменить способ восстановления
                       </button>
@@ -545,6 +579,43 @@ export default function AuthPages() {
                             {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
+                        {recoveryNewPassword && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="mt-3 space-y-2"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-slate-400">Надёжность пароля</span>
+                              <span className={`text-xs font-medium ${
+                                recoveryPwStrength.score >= 70 ? 'text-emerald-400' :
+                                recoveryPwStrength.score >= 50 ? 'text-yellow-400' : 'text-red-400'
+                              }`}>{recoveryPwStrength.label}</span>
+                            </div>
+                            <Progress value={recoveryPwStrength.score} className="h-1.5" />
+                            <div className="h-1.5 rounded-full overflow-hidden bg-slate-700">
+                              <div
+                                className={`h-full ${recoveryPwStrength.color} rounded-full transition-all duration-500`}
+                                style={{ width: `${recoveryPwStrength.score}%` }}
+                              />
+                            </div>
+                            <Separator className="bg-slate-700" />
+                            <div className="space-y-1">
+                              {recoveryPwStrength.checks.map((check, i) => (
+                                <div key={i} className="flex items-center gap-2 text-xs">
+                                  {check.passed ? (
+                                    <CheckCircle2 size={12} className="text-emerald-400" />
+                                  ) : (
+                                    <AlertTriangle size={12} className="text-slate-600" />
+                                  )}
+                                  <span className={check.passed ? 'text-slate-300' : 'text-slate-500'}>
+                                    {check.label}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="confirm-new-password" className="text-slate-300">
@@ -567,6 +638,17 @@ export default function AuthPages() {
                             {showConfirmNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
+                        {recoveryConfirmPassword && recoveryNewPassword && (
+                          <p className={`text-xs mt-1 flex items-center gap-1 ${
+                            recoveryNewPassword === recoveryConfirmPassword ? 'text-emerald-400' : 'text-red-400'
+                          }`}>
+                            {recoveryNewPassword === recoveryConfirmPassword ? (
+                              <><CheckCircle2 size={12} /> Пароли совпадают</>
+                            ) : (
+                              <><AlertTriangle size={12} /> Пароли не совпадают</>
+                            )}
+                          </p>
+                        )}
                       </div>
                       <Button onClick={handleResetPassword} className="w-full bg-violet-600 hover:bg-violet-700">
                         Сохранить новый пароль

@@ -25,6 +25,8 @@ export interface User {
   bio: string;
   role: UserRole;
   createdAt: string;
+  lastLoginAt: string;
+  loginCount: number;
 }
 
 interface RecoveryState {
@@ -33,11 +35,19 @@ interface RecoveryState {
   expiresAt: number;
 }
 
+export interface LoginActivityEntry {
+  timestamp: string;
+  ip: string;
+  userAgent: string;
+  success: boolean;
+}
+
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   token: string | null;
   recoveryState: RecoveryState | null;
+  loginActivity: LoginActivityEntry[];
 
   login: (emailOrPhone: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (
@@ -50,6 +60,8 @@ interface AuthState {
   sendRecoveryOTP: (emailOrPhone: string) => Promise<{ success: boolean; error?: string }>;
   verifyRecoveryOTP: (otp: string) => boolean;
   resetPassword: (otp: string, newPassword: string) => { success: boolean; error?: string };
+  deleteAccount: () => { success: boolean; error?: string };
+  clearLoginActivity: () => void;
 }
 
 // Simulated user database in localStorage
@@ -66,6 +78,30 @@ function getUsers(): Record<string, { user: User; passwordHash: string }> {
 function saveUsers(users: Record<string, { user: User; passwordHash: string }>) {
   if (typeof window === 'undefined') return;
   localStorage.setItem('security-trainer-users', JSON.stringify(users));
+}
+
+function getLoginActivity(): LoginActivityEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('security-trainer-login-activity');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLoginActivity(activity: LoginActivityEntry[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('security-trainer-login-activity', JSON.stringify(activity.slice(-50)));
+}
+
+function simulateIP(): string {
+  return `${Math.floor(Math.random() * 223) + 1}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
+}
+
+function getUserAgent(): string {
+  if (typeof window === 'undefined') return '';
+  return navigator.userAgent.length > 80 ? navigator.userAgent.substring(0, 80) + '...' : navigator.userAgent;
 }
 
 // Seed default admin user
@@ -86,6 +122,8 @@ function seedAdmin() {
       bio: '',
       role: 'admin',
       createdAt: new Date().toISOString(),
+      lastLoginAt: '',
+      loginCount: 0,
     };
     hashPassword('Admin@123').then((hash) => {
       users[adminId] = { user: admin, passwordHash: hash };
@@ -102,6 +140,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       token: null,
       recoveryState: null,
+      loginActivity: [],
 
       login: async (emailOrPhone, password) => {
         const users = getUsers();
@@ -112,13 +151,44 @@ export const useAuthStore = create<AuthState>()(
         );
 
         if (!found) {
+          const activity = getLoginActivity();
+          activity.push({
+            timestamp: new Date().toISOString(),
+            ip: simulateIP(),
+            userAgent: getUserAgent(),
+            success: false,
+          });
+          saveLoginActivity(activity);
           return { success: false, error: 'Неверные учётные данные' };
         }
 
         const valid = await verifyPassword(password, found.passwordHash);
         if (!valid) {
+          const activity = getLoginActivity();
+          activity.push({
+            timestamp: new Date().toISOString(),
+            ip: simulateIP(),
+            userAgent: getUserAgent(),
+            success: false,
+          });
+          saveLoginActivity(activity);
           return { success: false, error: 'Неверные учётные данные' };
         }
+
+        // Update login tracking
+        found.user.lastLoginAt = new Date().toISOString();
+        found.user.loginCount = (found.user.loginCount || 0) + 1;
+        users[found.user.id] = found;
+        saveUsers(users);
+
+        const activity = getLoginActivity();
+        activity.push({
+          timestamp: new Date().toISOString(),
+          ip: simulateIP(),
+          userAgent: getUserAgent(),
+          success: true,
+        });
+        saveLoginActivity(activity);
 
         const token = generateToken(found.user.id, found.user.role);
         set({
@@ -158,6 +228,8 @@ export const useAuthStore = create<AuthState>()(
           bio: '',
           role: 'student',
           createdAt: new Date().toISOString(),
+          lastLoginAt: '',
+          loginCount: 0,
         };
 
         const passwordHash = await hashPassword(password);
@@ -263,6 +335,27 @@ export const useAuthStore = create<AuthState>()(
         set({ recoveryState: null });
         return { success: true };
       },
+
+      deleteAccount: () => {
+        const { user } = get();
+        if (!user) return { success: false, error: 'Пользователь не найден' };
+
+        const users = getUsers();
+        delete users[user.id];
+        saveUsers(users);
+
+        set({
+          user: null,
+          isAuthenticated: false,
+          token: null,
+        });
+        return { success: true };
+      },
+
+      clearLoginActivity: () => {
+        saveLoginActivity([]);
+        set({ loginActivity: [] });
+      },
     }),
     {
       name: 'security-trainer-auth',
@@ -271,6 +364,7 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
         token: state.token,
         recoveryState: state.recoveryState,
+        loginActivity: state.loginActivity,
       }),
     }
   )

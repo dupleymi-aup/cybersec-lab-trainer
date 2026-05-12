@@ -45,6 +45,7 @@ const navItems: { id: PageType; label: string; iconKey: string }[] = [
   ...modules.map((m) => ({ id: m.id as PageType, label: m.title, iconKey: m.icon })),
   { id: 'quiz', label: 'Квизы', iconKey: 'HelpCircle' },
   { id: 'achievements', label: 'Достижения', iconKey: 'Trophy' },
+  { id: 'profile', label: 'Профиль', iconKey: 'User' },
 ];
 
 export default function Sidebar() {

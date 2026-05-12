@@ -17,7 +17,7 @@ export function generateOTP(): string {
 }
 
 // Client-side token signing (not cryptographically secure but prevents casual forgery)
-const TOKEN_SECRET = 'cybersec-lab-token-secret-v1';
+const TOKEN_SECRET = process.env.NEXT_PUBLIC_TOKEN_SECRET || 'cybersec-lab-token-secret-v1';
 
 function signToken(payload: string): string {
   const hmac = btoa(payload + TOKEN_SECRET);

@@ -35,29 +35,23 @@ interface AppState {
   addXssLevel: (level: string) => void;
 }
 
-const createAuthStorage = () => {
-  return createJSONStorage<AppState>(() => {
-    let userId = 'anonymous';
-    try {
-      const user = useAuthStore.getState().user;
-      userId = user?.id || 'anonymous';
-    } catch {
-      // Auth store not initialized yet
-    }
-    const storageKey = `security-trainer-progress-${userId}`;
-    return {
-      getItem: () => {
-        return localStorage.getItem(storageKey);
-      },
-      setItem: (_name: string, value: string) => {
-        localStorage.setItem(storageKey, value);
-      },
-      removeItem: () => {
-        localStorage.removeItem(storageKey);
-      },
-    };
-  });
-};
+const defaultStorage = createJSONStorage<AppState>(() => ({
+  getItem: (name: string) => {
+    return localStorage.getItem(`${name}-anonymous`);
+  },
+  setItem: (name: string, value: string) => {
+    localStorage.setItem(`${name}-anonymous`, value);
+  },
+  removeItem: () => {
+    localStorage.removeItem(`security-trainer-progress-anonymous`);
+  },
+}));
+
+// Listen for auth changes and migrate progress to user-specific key
+function getStorageKey(userId: string | undefined) {
+  const id = userId || 'anonymous';
+  return `security-trainer-progress-${id}`;
+}
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -111,7 +105,18 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'security-trainer-progress',
-      storage: createAuthStorage(),
+      storage: defaultStorage,
     }
   )
 );
+
+// Migrate progress to user-specific storage on login
+export function migrateProgressToUser(userId: string) {
+  const anonKey = 'security-trainer-progress-anonymous';
+  const userKey = getStorageKey(userId);
+  const data = localStorage.getItem(anonKey);
+  if (data) {
+    localStorage.setItem(userKey, data);
+    localStorage.removeItem(anonKey);
+  }
+}

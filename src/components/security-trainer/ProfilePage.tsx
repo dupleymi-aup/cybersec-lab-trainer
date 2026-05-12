@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useAuthStore } from '@/lib/auth-store';
 import { validatePassword } from '@/lib/auth-utils';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { User, Camera, Shield, Eye, EyeOff, Save } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { User, Camera, Shield, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, AlertCircle, Clock, Trash2, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
-  const { user, updateProfile, updatePassword } = useAuthStore();
+  const { user, updateProfile, updatePassword, deleteAccount, clearLoginActivity, loginActivity } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [group, setGroup] = useState(user?.group || '');
@@ -27,6 +33,37 @@ export default function ProfilePage() {
   const [showOld, setShowOld] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const getPasswordStrength = (pw: string) => {
+    if (!pw) return { score: 0, label: '', color: 'bg-slate-200', checks: [] };
+    const checks = [
+      { label: 'Минимум 8 символов', passed: pw.length >= 8 },
+      { label: 'Строчные буквы (a-z)', passed: /[a-z]/.test(pw) },
+      { label: 'Заглавные буквы (A-Z)', passed: /[A-Z]/.test(pw) },
+      { label: 'Цифры (0-9)', passed: /[0-9]/.test(pw) },
+      { label: 'Спецсимволы (!@#$...)', passed: /[^a-zA-Z0-9]/.test(pw) },
+      { label: 'Минимум 12 символов', passed: pw.length >= 12 },
+    ];
+    const passedCount = checks.filter((c) => c.passed).length;
+    let score = 0;
+    let label = '';
+    let color = 'bg-slate-200';
+    if (passedCount <= 1) { score = 15; label = 'Очень слабый'; color = 'bg-red-500'; }
+    else if (passedCount <= 2) { score = 30; label = 'Слабый'; color = 'bg-red-400'; }
+    else if (passedCount <= 3) { score = 50; label = 'Средний'; color = 'bg-yellow-500'; }
+    else if (passedCount <= 4) { score = 70; label = 'Хороший'; color = 'bg-emerald-400'; }
+    else if (passedCount <= 5) { score = 85; label = 'Надёжный'; color = 'bg-emerald-500'; }
+    else { score = 100; label = 'Отличный'; color = 'bg-emerald-600'; }
+    return { score, label, color, checks };
+  };
+
+  const pwStrength = getPasswordStrength(newPassword);
+
+  const profileCompletion = useMemo(() => {
+    const fields = [fullName, group, course, university, bio];
+    const filled = fields.filter((f) => f.trim()).length;
+    return Math.round((filled / fields.length) * 100);
+  }, [fullName, group, course, university, bio]);
 
   if (!user) return null;
 
@@ -84,6 +121,31 @@ export default function ProfilePage() {
     }
   };
 
+  const handleDeleteAccount = () => {
+    if (deleteConfirmText !== 'УДАЛИТЬ') {
+      toast.error('Введите "УДАЛИТЬ" для подтверждения');
+      return;
+    }
+    const result = deleteAccount();
+    if (result.success) {
+      toast.success('Аккаунт удалён');
+      window.location.reload();
+    } else {
+      toast.error(result.error);
+    }
+  };
+
+  const formatTimeAgo = (iso: string) => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'только что';
+    if (mins < 60) return `${mins} мин назад`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours} ч назад`;
+    const days = Math.floor(hours / 24);
+    return `${days} дн назад`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -117,7 +179,7 @@ export default function ProfilePage() {
               className="hidden"
             />
           </div>
-          <div>
+          <div className="flex-1">
             <CardTitle className="text-lg">{user.fullName}</CardTitle>
             <CardDescription>
               {user.role === 'admin' ? (
@@ -128,6 +190,27 @@ export default function ProfilePage() {
             </CardDescription>
           </div>
         </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-500">Заполненность профиля</span>
+              <span className={`font-semibold ${
+                profileCompletion >= 80 ? 'text-emerald-600' :
+                profileCompletion >= 40 ? 'text-amber-600' : 'text-slate-600'
+              }`}>{profileCompletion}%</span>
+            </div>
+            <Progress value={profileCompletion} className="h-2" />
+            {profileCompletion < 100 && (
+              <p className="text-xs text-slate-400">
+                {!fullName && 'Укажите ФИО. '}
+                {!group && 'Укажите группу. '}
+                {!course && 'Укажите курс. '}
+                {!university && 'Укажите университет. '}
+                {!bio && 'Добавьте биографию.'}
+              </p>
+            )}
+          </div>
+        </CardContent>
       </Card>
 
       {/* Personal Info */}
@@ -257,6 +340,42 @@ export default function ProfilePage() {
                 {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            {newPassword && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-3 space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-500">Надёжность пароля</span>
+                  <span className={`text-xs font-medium ${
+                    pwStrength.score >= 70 ? 'text-emerald-600' :
+                    pwStrength.score >= 50 ? 'text-amber-600' : 'text-red-600'
+                  }`}>{pwStrength.label}</span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden bg-slate-100">
+                  <div
+                    className={`h-full ${pwStrength.color} rounded-full transition-all duration-500`}
+                    style={{ width: `${pwStrength.score}%` }}
+                  />
+                </div>
+                <Separator className="bg-slate-200" />
+                <div className="space-y-1">
+                  {pwStrength.checks.map((check, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs">
+                      {check.passed ? (
+                        <CheckCircle2 size={12} className="text-emerald-500" />
+                      ) : (
+                        <AlertTriangle size={12} className="text-slate-300" />
+                      )}
+                      <span className={check.passed ? 'text-slate-600' : 'text-slate-400'}>
+                        {check.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirm-password">Подтверждение пароля</Label>
@@ -277,10 +396,115 @@ export default function ProfilePage() {
                 {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            {confirmPassword && newPassword && (
+              <p className={`text-xs mt-1 flex items-center gap-1 ${
+                newPassword === confirmPassword ? 'text-emerald-600' : 'text-red-500'
+              }`}>
+                {newPassword === confirmPassword ? (
+                  <><CheckCircle2 size={12} /> Пароли совпадают</>
+                ) : (
+                  <><AlertCircle size={12} /> Пароли не совпадают</>
+                )}
+              </p>
+            )}
           </div>
           <Button onClick={handlePasswordChange} className="bg-violet-600 hover:bg-violet-700">
             Изменить пароль
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Login Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Clock className="w-5 h-5 text-violet-500" />
+            Активность входа
+          </CardTitle>
+          <CardDescription>Последние попытки входа в аккаунт</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {user?.loginCount ? (
+            <p className="text-xs text-slate-500 mb-3">Всего входов: <span className="font-semibold text-slate-700">{user.loginCount}</span>{user.lastLoginAt && ` · Последний: ${formatTimeAgo(user.lastLoginAt)}`}</p>
+          ) : null}
+          {loginActivity && loginActivity.length > 0 ? (
+            <div className="space-y-2">
+              {[...loginActivity].reverse().slice(0, 10).map((entry, i) => (
+                <div key={i} className={`flex items-center justify-between p-3 rounded-lg border ${
+                  entry.success ? 'border-slate-200 bg-white' : 'border-red-200 bg-red-50'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    {entry.success ? (
+                      <CheckCircle2 size={16} className="text-emerald-500" />
+                    ) : (
+                      <AlertCircle size={16} className="text-red-500" />
+                    )}
+                    <div>
+                      <p className="text-xs font-medium">{entry.success ? 'Успешный вход' : 'Неверный пароль'}</p>
+                      <p className="text-[11px] text-slate-400">{entry.ip} · {formatTimeAgo(entry.timestamp)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-slate-400 text-center py-4">Нет записей активности</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Danger Zone */}
+      <Card className="border-red-200">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2 text-red-600">
+            <Trash2 className="w-5 h-5" />
+            Опасная зона
+          </CardTitle>
+          <CardDescription>Необратимые действия с аккаунтом</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!showDeleteConfirm ? (
+            <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
+              <div>
+                <p className="text-sm font-semibold text-red-700">Удалить аккаунт</p>
+                <p className="text-xs text-red-600">Все данные будут удалены навсегда</p>
+              </div>
+              <Button
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-100"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                <Trash2 size={14} className="mr-1" />
+                Удалить
+              </Button>
+            </div>
+          ) : (
+            <div className="p-4 bg-red-50 rounded-lg space-y-3">
+              <p className="text-sm font-semibold text-red-700">Вы уверены? Это действие нельзя отменить.</p>
+              <p className="text-xs text-red-600">Введите <code className="bg-red-100 px-1 rounded font-bold">УДАЛИТЬ</code> для подтверждения:</p>
+              <div className="flex gap-2">
+                <Input
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="УДАЛИТЬ"
+                  className="border-red-300"
+                />
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteAccount}
+                >
+                  <Trash2 size={14} className="mr-1" />
+                  Подтвердить
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); }}
+                >
+                  Отмена
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
