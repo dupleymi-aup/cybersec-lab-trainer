@@ -90,6 +90,65 @@ app.post('/transfer', (req, res) => {
   // Обработка перевода...
 });`,
   },
+  {
+    title: 'Double-Submit Cookie Pattern',
+    description: 'CSRF-токен дублируется в куки и в теле запроса. Сервер сравнивает их — если они совпадают, запрос легитимный. Злоумышленник не может прочитать куки с другого домена.',
+    code: `// Сервер генерирует CSRF-токен в куки
+res.cookie('csrf_token', randomToken, {
+  httpOnly: false, // JavaScript должен читать
+  sameSite: 'strict',
+  secure: true
+});
+
+// Клиент читает токен из куки и отправляет в заголовке
+fetch('/api/transfer', {
+  method: 'POST',
+  headers: {
+    'X-CSRF-Token': getCookie('csrf_token'),
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ amount: 1000, to: 'account123' })
+});
+
+// Сервер сравнивает
+app.post('/api/transfer', (req, res) => {
+  const cookieToken = req.cookies.csrf_token;
+  const headerToken = req.headers['x-csrf-token'];
+  if (cookieToken !== headerToken) {
+    return res.status(403).json({ error: 'CSRF mismatch' });
+  }
+});`,
+  },
+  {
+    title: 'Custom Headers с CORS preflight',
+    description: 'Использование кастомных заголовков (например, X-Requested-With) вызывает CORS preflight-запрос. Браузер блокирует кросс-доменные запросы с кастомными заголовками без явного разрешения сервера.',
+    code: `// Клиент: кастомный заголовок
+fetch('/api/transfer', {
+  method: 'POST',
+  headers: {
+    'X-Requested-With': 'XMLHttpRequest',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ amount: 1000 })
+});
+
+// Браузер отправляет OPTIONS preflight:
+// OPTIONS /api/transfer
+// Origin: https://evil.com
+// Access-Control-Request-Method: POST
+// Access-Control-Request-Headers: X-Requested-With
+
+// Сервер отвечает (если evil.com не в whitelist):
+// HTTP/1.1 403 Forbidden
+// Нет CORS заголовков → браузер блокирует запрос
+
+// Express CORS:
+app.use(cors({
+  origin: ['https://bank.com'],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'X-Requested-With']
+}));`,
+  },
 ];
 
 export default function CSRFLab() {

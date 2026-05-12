@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { useAuthStore } from './auth-store';
 
 export type PageType =
   | 'dashboard'
@@ -11,7 +12,8 @@ export type PageType =
   | 'secure-coding'
   | 'tools'
   | 'quiz'
-  | 'achievements';
+  | 'achievements'
+  | 'profile';
 
 interface AppState {
   currentPage: PageType;
@@ -31,6 +33,25 @@ interface AppState {
   addSqlLevel: (level: string) => void;
   addXssLevel: (level: string) => void;
 }
+
+const createAuthStorage = () => {
+  return createJSONStorage<AppState>(() => {
+    const user = useAuthStore.getState().user;
+    const userId = user?.id || 'anonymous';
+    const storageKey = `security-trainer-progress-${userId}`;
+    return {
+      getItem: (name: string) => {
+        return localStorage.getItem(storageKey);
+      },
+      setItem: (name: string, value: string) => {
+        localStorage.setItem(storageKey, value);
+      },
+      removeItem: (name: string) => {
+        localStorage.removeItem(storageKey);
+      },
+    };
+  });
+};
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -82,6 +103,9 @@ export const useAppStore = create<AppState>()(
             : [...s.xssCompletedLevels, level],
         })),
     }),
-    { name: 'security-trainer-progress' }
+    {
+      name: 'security-trainer-progress',
+      storage: createAuthStorage(),
+    }
   )
 );

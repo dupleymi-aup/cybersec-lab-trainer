@@ -1,6 +1,7 @@
 'use client';
 
 import { useAppStore } from '@/lib/store';
+import { useAuthStore } from '@/lib/auth-store';
 import Sidebar from '@/components/security-trainer/Sidebar';
 import Dashboard from '@/components/security-trainer/Dashboard';
 import OWASPTop10 from '@/components/security-trainer/OWASPTop10';
@@ -12,6 +13,8 @@ import SecureCodingLab from '@/components/security-trainer/SecureCodingLab';
 import ToolsLab from '@/components/security-trainer/ToolsLab';
 import QuizSystem from '@/components/security-trainer/QuizSystem';
 import AchievementsGlossary from '@/components/security-trainer/AchievementsGlossary';
+import AuthPages from '@/components/security-trainer/AuthPages';
+import ProfilePage from '@/components/security-trainer/ProfilePage';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'sonner';
 
@@ -26,10 +29,16 @@ const pages: Record<string, React.ReactNode> = {
   tools: <ToolsLab />,
   quiz: <QuizSystem />,
   achievements: <AchievementsGlossary />,
+  profile: <ProfilePage />,
 };
 
 export default function Home() {
   const { currentPage } = useAppStore();
+  const { isAuthenticated } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <AuthPages />;
+  }
 
   return (
     <div className="min-h-screen flex bg-slate-50">

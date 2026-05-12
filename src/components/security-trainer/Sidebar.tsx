@@ -1,6 +1,7 @@
 'use client';
 
 import { useAppStore, type PageType } from '@/lib/store';
+import { useAuthStore } from '@/lib/auth-store';
 import { modules, achievements } from '@/lib/security-data';
 import {
   LayoutDashboard,
@@ -15,11 +16,14 @@ import {
   Trophy,
   X,
   CheckCircle2,
+  User,
+  LogOut,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard size={20} />,
@@ -49,11 +53,19 @@ export default function Sidebar() {
     setCurrentPage,
     completedModules,
   } = useAppStore();
+  const { user, logout } = useAuthStore();
 
-  // Count trackable items (excluding dashboard and achievements)
-  const trackableItems = navItems.filter((item) => item.id !== 'dashboard' && item.id !== 'achievements');
+  // Count trackable items (excluding dashboard, achievements, and profile)
+  const trackableItems = navItems.filter(
+    (item) => item.id !== 'dashboard' && item.id !== 'achievements' && item.id !== 'profile'
+  );
   const completedCount = trackableItems.filter((item) => completedModules.includes(item.id)).length;
   const progressPct = trackableItems.length > 0 ? Math.round((completedCount / trackableItems.length) * 100) : 0;
+
+  const handleLogout = () => {
+    logout();
+    setCurrentPage('dashboard');
+  };
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 text-white">
@@ -120,16 +132,54 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Progress */}
-      <div className="p-4 border-t border-slate-700">
-        <div className="flex items-center justify-between text-xs mb-2">
-          <span className="text-slate-400">Общий прогресс</span>
-          <span className="text-emerald-400 font-semibold">{progressPct}%</span>
+      {/* User Profile & Progress */}
+      <div className="border-t border-slate-700">
+        {/* Progress */}
+        <div className="p-4 pb-3">
+          <div className="flex items-center justify-between text-xs mb-2">
+            <span className="text-slate-400">Общий прогресс</span>
+            <span className="text-emerald-400 font-semibold">{progressPct}%</span>
+          </div>
+          <Progress value={progressPct} className="h-2 bg-slate-700 [&>div]:bg-emerald-500" />
+          <p className="text-[11px] text-slate-500 mt-2">
+            Пройдено {completedCount} из {trackableItems.length} модулей
+          </p>
         </div>
-        <Progress value={progressPct} className="h-2 bg-slate-700 [&>div]:bg-emerald-500" />
-        <p className="text-[11px] text-slate-500 mt-2">
-          Пройдено {completedCount} из {trackableItems.length} модулей
-        </p>
+
+        <Separator className="bg-slate-700" />
+
+        {/* User section */}
+        {user && (
+          <div className="p-3 space-y-2">
+            <button
+              onClick={() => { setCurrentPage('profile'); setSidebarOpen(false); }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition"
+            >
+              <div className="w-8 h-8 rounded-full bg-violet-600/20 flex items-center justify-center overflow-hidden">
+                {user.avatar ? (
+                  <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <User size={16} className="text-violet-400" />
+                )}
+              </div>
+              <div className="flex-1 text-left">
+                <p className="font-medium text-white truncate">{user.fullName}</p>
+                <p className="text-xs text-slate-400 truncate">{user.email}</p>
+              </div>
+              {user.role === 'admin' && (
+                <Badge variant="destructive" className="text-[10px] px-1.5 py-0">A</Badge>
+              )}
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-400 hover:bg-red-600/10 hover:text-red-300 transition"
+            >
+              <LogOut size={16} />
+              Выйти
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
