@@ -55,13 +55,14 @@ export default function QuizSystem() {
   });
 
   const startQuiz = (categoryName: string) => {
+    const questions = quizQuestions.filter((q) => q.category === categoryName);
     setActiveCategory(categoryName);
     setCurrentQuestion(0);
     setCorrectCount(0);
     setSelectedAnswer('');
     setShowAnswer(false);
     setTimeLeft(30);
-    setAnswers(new Array(categoryQuestions.length).fill(null));
+    setAnswers(new Array(questions.length).fill(null));
     setTimerActive(true);
     setQuizState('playing');
   };
@@ -83,14 +84,6 @@ export default function QuizSystem() {
     }
   };
 
-  const handleTimeUp = () => {
-    setTimerActive(false);
-    setShowAnswer(true);
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = false;
-    setAnswers(newAnswers);
-  };
-
   const handleAnswer = () => {
     if (!selectedAnswer) return;
     setTimerActive(false);
@@ -103,29 +96,27 @@ export default function QuizSystem() {
     setAnswers(newAnswers);
   };
 
-  // Timer
+  // Timer — clean interval with proper cleanup
   useEffect(() => {
-    if (!timerActive || timeLeft <= 0) return;
-    const timer = setTimeout(() => {
-      setTimeLeft((t) => {
-        if (t <= 1) {
-          // Will become 0 — schedule time-up handling outside effect
-          setTimeout(() => {
-            setTimerActive(false);
-            setShowAnswer(true);
-            setAnswers((prev) => {
-              const newAnswers = [...prev];
-              newAnswers[currentQuestion] = false;
-              return newAnswers;
-            });
-          }, 0);
+    if (!timerActive) return;
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setTimerActive(false);
+          setShowAnswer(true);
+          setAnswers((a) => {
+            const updated = [...a];
+            updated[currentQuestion] = false;
+            return updated;
+          });
           return 0;
         }
-        return t - 1;
+        return prev - 1;
       });
     }, 1000);
-    return () => clearTimeout(timer);
-  }, [timerActive, timeLeft]);
+    return () => clearInterval(interval);
+  }, [timerActive, currentQuestion]);
 
   const resetQuiz = () => {
     setQuizState('select');

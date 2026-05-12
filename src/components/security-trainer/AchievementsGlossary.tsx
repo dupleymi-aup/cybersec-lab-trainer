@@ -87,7 +87,7 @@ const achievementIcons: Record<string, React.ReactNode> = {
 };
 
 export default function AchievementsAndGlossary() {
-  const { setCurrentPage, completedModules, quizScores, studiedOwaspItems, sqlCompletedLevels, xssCompletedLevels } = useAppStore();
+  const { setCurrentPage, completedModules, quizScores, studiedOwaspItems } = useAppStore();
   const [activeTab, setActiveTab] = useState<'achievements' | 'glossary'>('achievements');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -97,7 +97,7 @@ export default function AchievementsAndGlossary() {
       case 'first-steps': return completedModules.length >= 1;
       case 'sql-master': return completedModules.includes('sql-injection');
       case 'xss-hunter': return completedModules.includes('xss');
-      case 'security-guard': return completedModules.includes('owasp');
+      case 'security-guard': return studiedOwaspItems.length >= 10;
       case 'auth-expert': return completedModules.includes('auth');
       case 'code-reviewer': return completedModules.includes('secure-coding');
       case 'quiz-master': return Object.keys(quizScores).length >= 3;
