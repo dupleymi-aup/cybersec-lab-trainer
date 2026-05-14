@@ -28,6 +28,19 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: "/logo.svg",
+    apple: "/logo.svg",
+  },
+  manifest: "/manifest.json",
+  themeColor: "#0f172a",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "CyberSec Lab",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
   },
 };
 

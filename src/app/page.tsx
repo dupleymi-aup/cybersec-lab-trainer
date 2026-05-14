@@ -16,6 +16,7 @@ import AchievementsGlossary from '@/components/security-trainer/AchievementsGlos
 import AuthPages from '@/components/security-trainer/AuthPages';
 import ProfilePage from '@/components/security-trainer/ProfilePage';
 import SecurityHeadersLab from '@/components/security-trainer/SecurityHeadersLab';
+import PWAHandler from '@/components/security-trainer/PWAHandler';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'sonner';
 
@@ -61,6 +62,7 @@ export default function Home() {
         </div>
       </main>
       <Toaster position="top-right" />
+      <PWAHandler />
     </div>
   );
 }
