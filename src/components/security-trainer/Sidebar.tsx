@@ -25,6 +25,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import ThemeToggle from './ThemeToggle';
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard size={20} />,
@@ -91,6 +92,7 @@ export default function Sidebar() {
         >
           <X size={20} />
         </Button>
+        <ThemeToggle />
       </div>
 
       <Separator className="bg-slate-700" />
