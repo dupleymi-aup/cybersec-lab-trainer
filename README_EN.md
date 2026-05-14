@@ -210,8 +210,8 @@ cybersec-lab-trainer/
 - [x] Testing system — 110+ questions, timer, difficulty filtering
 - [x] Achievement system and glossary
 - [x] Authentication with OTP verification and user profiles
-- [ ] PWA manifest and offline support
-- [ ] E2E tests (Playwright)
+- [x] PWA manifest and offline support
+- [x] E2E tests (Playwright)
 - [ ] LMS integration (Moodle)
 
 ---
