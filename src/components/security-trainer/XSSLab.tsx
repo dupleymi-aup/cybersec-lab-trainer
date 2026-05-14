@@ -252,7 +252,10 @@ export default function XSSLab() {
           <Card className="border-slate-200">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">🎮 Интерактивная демонстрация</h3>
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <Lightbulb size={16} className="text-amber-500" />
+                  Интерактивная демонстрация
+                </h3>
                 <Button
                   variant="outline"
                   size="sm"

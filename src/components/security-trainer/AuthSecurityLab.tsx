@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAppStore } from '@/lib/store';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
@@ -54,6 +54,8 @@ export default function AuthSecurityLab() {
   }, []);
 
   const currentTOTP = generateTOTP(otpSecret, Math.floor(Date.now() / 30000));
+  const currentTOTPRef = useRef(currentTOTP);
+  currentTOTPRef.current = currentTOTP;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -64,7 +66,8 @@ export default function AuthSecurityLab() {
   }, []);
 
   const verifyOTP = () => {
-    if (otpInput === currentTOTP) {
+    const expected = generateTOTP(otpSecret, Math.floor(Date.now() / 30000));
+    if (otpInput === expected) {
       setOtpVerified(true);
     } else if (otpInput.length === 6) {
       setOtpVerified(false);
@@ -72,7 +75,7 @@ export default function AuthSecurityLab() {
   };
 
   // Password strength checker
-  const getPasswordAnalysis = () => {
+  const passwordAnalysis = useMemo(() => {
     if (!password) return { score: 0, label: '', color: '', checks: [] };
 
     const checks = [
@@ -98,8 +101,7 @@ export default function AuthSecurityLab() {
     else { score = 100; label = 'Отличный'; color = 'bg-emerald-600'; }
 
     return { score, label, color, checks };
-  };
-  const passwordAnalysis = getPasswordAnalysis();
+  }, [password]);
 
   const formatTime = (seconds: number) => {
     if (seconds < 1) return 'Мгновенно';
@@ -114,7 +116,7 @@ export default function AuthSecurityLab() {
   };
 
   // Brute force time estimation
-  const getCrackTime = () => {
+  const crackTime = useMemo(() => {
     let charsetSize = 26;
     if (crackComplexity >= 2) charsetSize += 26;
     if (crackComplexity >= 3) charsetSize += 10;
@@ -123,11 +125,10 @@ export default function AuthSecurityLab() {
     const attemptsPerSecond = 1e10;
     const seconds = combinations / attemptsPerSecond / 2;
     return formatTime(seconds);
-  };
-  const crackTime = getCrackTime();
+  }, [crackLength, crackComplexity]);
 
   // Simulated hash
-  const getSimulatedHash = () => {
+  const simulatedHash = useMemo(() => {
     if (!hashInput) return '';
     let hash = 0;
     const salt = 'a1b2c3d4e5f6';
@@ -137,8 +138,7 @@ export default function AuthSecurityLab() {
     }
     const hexHash = Math.abs(hash).toString(16).padStart(8, '0');
     return `$2b$12$${salt}$${hexHash.repeat(8)}`;
-  };
-  const simulatedHash = getSimulatedHash();
+  }, [hashInput]);
 
   const handleComplete = () => {
     if (!isCompleted) completeModule('auth');

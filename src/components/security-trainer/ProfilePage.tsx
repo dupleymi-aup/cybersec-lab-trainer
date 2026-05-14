@@ -3,6 +3,7 @@
 import { useState, useRef, useMemo } from 'react';
 import { useAuthStore } from '@/lib/auth-store';
 import { validatePassword } from '@/lib/auth-utils';
+import { usePasswordStrength } from '@/hooks/use-password-strength';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,30 +35,7 @@ export default function ProfilePage() {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const getPasswordStrength = (pw: string) => {
-    if (!pw) return { score: 0, label: '', color: 'bg-slate-200', checks: [] };
-    const checks = [
-      { label: 'Минимум 8 символов', passed: pw.length >= 8 },
-      { label: 'Строчные буквы (a-z)', passed: /[a-z]/.test(pw) },
-      { label: 'Заглавные буквы (A-Z)', passed: /[A-Z]/.test(pw) },
-      { label: 'Цифры (0-9)', passed: /[0-9]/.test(pw) },
-      { label: 'Спецсимволы (!@#$...)', passed: /[^a-zA-Z0-9]/.test(pw) },
-      { label: 'Минимум 12 символов', passed: pw.length >= 12 },
-    ];
-    const passedCount = checks.filter((c) => c.passed).length;
-    let score = 0;
-    let label = '';
-    let color = 'bg-slate-200';
-    if (passedCount <= 1) { score = 15; label = 'Очень слабый'; color = 'bg-red-500'; }
-    else if (passedCount <= 2) { score = 30; label = 'Слабый'; color = 'bg-red-400'; }
-    else if (passedCount <= 3) { score = 50; label = 'Средний'; color = 'bg-yellow-500'; }
-    else if (passedCount <= 4) { score = 70; label = 'Хороший'; color = 'bg-emerald-400'; }
-    else if (passedCount <= 5) { score = 85; label = 'Надёжный'; color = 'bg-emerald-500'; }
-    else { score = 100; label = 'Отличный'; color = 'bg-emerald-600'; }
-    return { score, label, color, checks };
-  };
-
-  const pwStrength = getPasswordStrength(newPassword);
+  const pwStrength = usePasswordStrength(newPassword);
 
   const profileCompletion = useMemo(() => {
     const fields = [fullName, group, course, university, bio];
@@ -424,7 +402,7 @@ export default function ProfilePage() {
           <CardDescription>Последние попытки входа в аккаунт</CardDescription>
         </CardHeader>
         <CardContent>
-          {user?.loginCount ? (
+          {user?.loginCount !== undefined ? (
             <p className="text-xs text-slate-500 mb-3">Всего входов: <span className="font-semibold text-slate-700">{user.loginCount}</span>{user.lastLoginAt && ` · Последний: ${formatTimeAgo(user.lastLoginAt)}`}</p>
           ) : null}
           {loginActivity && loginActivity.length > 0 ? (

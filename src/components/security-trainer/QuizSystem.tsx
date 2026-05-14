@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAppStore } from '@/lib/store';
 import { quizQuestions, quizCategories } from '@/lib/security-data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -54,12 +54,12 @@ export default function QuizSystem() {
   const [startTime, setStartTime] = useState(0);
   const [totalTimeTaken, setTotalTimeTaken] = useState(0);
 
-  const categoryQuestions = quizQuestions.filter((q) => {
+  const categoryQuestions = useMemo(() => quizQuestions.filter((q) => {
     const catId = quizCategories.find((c) => c.name === activeCategory)?.id;
     const catMatch = catId && q.category === activeCategory;
     const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
     return catMatch && diffMatch;
-  });
+  }), [activeCategory, difficultyFilter]);
 
   const startQuiz = (categoryName: string) => {
     const questions = quizQuestions.filter((q) => {

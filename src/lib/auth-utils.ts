@@ -35,11 +35,12 @@ function verifyToken(token: string): string | null {
   }
 }
 
-export function generateToken(userId: string, role: string): string {
+export function generateToken(userId: string, role: string, rememberMe?: boolean): string {
+  const expiry = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000;
   const payload = JSON.stringify({
     id: userId,
     role,
-    exp: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+    exp: Date.now() + expiry,
   });
   return signToken(payload);
 }

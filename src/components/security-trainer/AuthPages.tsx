@@ -69,7 +69,7 @@ export default function AuthPages() {
       return;
     }
     setLoading(true);
-    const result = await login(loginContact, loginPassword);
+    const result = await login(loginContact, loginPassword, rememberMe);
     setLoading(false);
     if (!result.success) {
       toast.error(result.error);
@@ -155,7 +155,7 @@ export default function AuthPages() {
     }
   };
 
-  const handleResetPassword = () => {
+  const handleResetPassword = async () => {
     if (!recoveryNewPassword || !recoveryConfirmPassword) {
       toast.error('Заполните все поля');
       return;
@@ -169,7 +169,7 @@ export default function AuthPages() {
       toast.error('Пароли не совпадают');
       return;
     }
-    const result = resetPassword(recoveryOtp, recoveryNewPassword);
+    const result = await resetPassword(recoveryOtp, recoveryNewPassword);
     if (result.success) {
       toast.success('Пароль успешно изменён');
       setPage('login');
@@ -670,8 +670,6 @@ export default function AuthPages() {
         </AnimatePresence>
       </motion.div>
 
-      {/* We need the OTP from the store, but since it's in state, we pass it from a custom hook */}
-      {/* For simplicity, the OTP is shown inline in the recovery step */}
     </div>
   );
 }

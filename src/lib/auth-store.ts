@@ -49,7 +49,7 @@ interface AuthState {
   recoveryState: RecoveryState | null;
   loginActivity: LoginActivityEntry[];
 
-  login: (emailOrPhone: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (emailOrPhone: string, password: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
   register: (
     data: { email: string; phone: string; fullName: string },
     password: string
@@ -59,7 +59,7 @@ interface AuthState {
   updatePassword: (oldPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   sendRecoveryOTP: (emailOrPhone: string) => Promise<{ success: boolean; error?: string }>;
   verifyRecoveryOTP: (otp: string) => boolean;
-  resetPassword: (otp: string, newPassword: string) => { success: boolean; error?: string };
+  resetPassword: (otp: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   deleteAccount: () => { success: boolean; error?: string };
   clearLoginActivity: () => void;
 }
@@ -104,6 +104,20 @@ function getUserAgent(): string {
   return navigator.userAgent.length > 80 ? navigator.userAgent.substring(0, 80) + '...' : navigator.userAgent;
 }
 
+function migrateProgress(userId: string) {
+  if (typeof window === 'undefined') return;
+  const anonKey = 'security-trainer-progress-anonymous';
+  const userKey = `security-trainer-progress-${userId}`;
+  const data = localStorage.getItem(anonKey);
+  if (data) {
+    localStorage.setItem(userKey, data);
+    localStorage.removeItem(anonKey);
+  }
+}
+
+// Pre-computed bcrypt hash for admin password 'Admin@123' (generated once with bcrypt.hashSync)
+const ADMIN_PASSWORD_HASH = '$2b$12$ZAcKXx.S3n3wZNQuxBgtFeu0Yz4FMeEkwbS6lnnQZO0aOm0m8Mvpy';
+
 // Seed default admin user
 function seedAdmin() {
   if (typeof window === 'undefined') return;
@@ -125,10 +139,8 @@ function seedAdmin() {
       lastLoginAt: '',
       loginCount: 0,
     };
-    hashPassword('Admin@123').then((hash) => {
-      users[adminId] = { user: admin, passwordHash: hash };
-      saveUsers(users);
-    });
+    users[adminId] = { user: admin, passwordHash: ADMIN_PASSWORD_HASH };
+    saveUsers(users);
   }
 }
 seedAdmin();
@@ -142,7 +154,7 @@ export const useAuthStore = create<AuthState>()(
       recoveryState: null,
       loginActivity: [],
 
-      login: async (emailOrPhone, password) => {
+      login: async (emailOrPhone, password, rememberMe) => {
         const users = getUsers();
         const found = Object.values(users).find(
           (u) =>
@@ -190,7 +202,8 @@ export const useAuthStore = create<AuthState>()(
         });
         saveLoginActivity(activity);
 
-        const token = generateToken(found.user.id, found.user.role);
+        const token = generateToken(found.user.id, found.user.role, rememberMe);
+        migrateProgress(found.user.id);
         set({
           user: found.user,
           isAuthenticated: true,
@@ -312,7 +325,7 @@ export const useAuthStore = create<AuthState>()(
         return recoveryState.otp === otp;
       },
 
-      resetPassword: (otp, newPassword) => {
+      resetPassword: async (otp, newPassword) => {
         const { recoveryState } = get();
         if (!recoveryState) return { success: false, error: 'Сначала отправьте код' };
         if (Date.now() > recoveryState.expiresAt) return { success: false, error: 'Код просрочен' };
@@ -327,10 +340,8 @@ export const useAuthStore = create<AuthState>()(
 
         if (!found) return { success: false, error: 'Аккаунт не найден' };
 
-        hashPassword(newPassword).then((hash) => {
-          found.passwordHash = hash;
-          saveUsers(users);
-        });
+        found.passwordHash = await hashPassword(newPassword);
+        saveUsers(users);
 
         set({ recoveryState: null });
         return { success: true };

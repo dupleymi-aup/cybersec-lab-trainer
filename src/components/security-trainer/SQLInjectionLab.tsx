@@ -199,7 +199,10 @@ export default function SQLInjectionLab() {
       {/* Query visualization */}
       <Card className="border-slate-200">
         <CardContent className="p-5">
-          <h3 className="text-sm font-semibold mb-3">👁️ Визуализация запроса</h3>
+          <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+            <Eye size={16} className="text-emerald-600" />
+            Визуализация запроса
+          </h3>
           <CodeBlock
             code={getModifiedQuery()}
             language="sql"
