@@ -1,6 +1,7 @@
 'use client';
 
 import { useAppStore } from '@/lib/store';
+import { useAuthStore } from '@/lib/auth-store';
 import { modules, achievements } from '@/lib/security-data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -56,10 +57,16 @@ const achievementIcons: Record<string, React.ReactNode> = {
   'quiz-all': <Trophy size={18} />,
   'crypto-explorer': <KeyRound size={18} />,
   'coding-pro': <Code size={18} />,
+  'headers-guard': <ShieldCheck size={18} />,
+  'coding-master': <Code size={18} />,
+  'network-ninja': <Shield size={18} />,
+  'social-engineer': <Target size={18} />,
+  'all-headers-correct': <ShieldCheck size={18} />,
 };
 
 export default function Dashboard() {
   const { setCurrentPage, completedModules, quizScores, toggleSidebar, studiedOwaspItems } = useAppStore();
+  const { user } = useAuthStore();
 
   const totalModules = modules.length;
   const completedCount = completedModules.filter((id) =>
@@ -87,12 +94,17 @@ export default function Dashboard() {
       case 'quiz-master': return Object.keys(quizScores).length >= 3;
       case 'quiz-perfect': return Object.values(quizScores).some((s) => s === 100);
       case 'crypto-ninja': return completedModules.includes('tools');
-      case 'full-completion': return completedModules.length >= 8;
+      case 'full-completion': return completedModules.length >= modules.length;
       case 'csrf-shield': return completedModules.includes('csrf');
       case 'owasp-half': return studiedOwaspItems.length >= 5;
-      case 'quiz-all': return Object.keys(quizScores).length >= 7;
+      case 'quiz-all': return Object.keys(quizScores).length >= 9;
       case 'crypto-explorer': return completedModules.includes('tools');
       case 'coding-pro': return completedModules.includes('secure-coding');
+      case 'headers-guard': return completedModules.includes('security-headers');
+      case 'coding-master': return Object.values(quizScores).filter((s) => s >= 80).length >= 15;
+      case 'network-ninja': return (quizScores['network'] || 0) >= 80;
+      case 'social-engineer': return (quizScores['social'] || 0) >= 80;
+      case 'all-headers-correct': return (quizScores['headers'] || 0) === 100;
       default: return false;
     }
   };
@@ -102,6 +114,14 @@ export default function Dashboard() {
 
   // Recommendations
   const getRecommendation = () => {
+    // Role-specific recommendations
+    if (user?.role === 'admin' && completedModules.length === 0) {
+      return { text: 'Управляйте пользователями и настройками системы.', page: 'admin-panel' as PageType };
+    }
+    if (user?.role === 'teacher' && completedModules.length === 0) {
+      return { text: 'Посмотрите аналитику и прогресс студентов.', page: 'teacher-panel' as PageType };
+    }
+
     if (completedModules.length === 0) {
       return { text: 'Начните с OWASP Top 10 — это фундамент веб-безопасности.', page: 'owasp' as PageType };
     }
@@ -126,8 +146,8 @@ export default function Dashboard() {
     if (!completedModules.includes('tools')) {
       return { text: 'Попробуйте инструменты: шифры, кодирование и генератор паролей.', page: 'tools' as PageType };
     }
-    if (Object.keys(quizScores).length < 7) {
-      return { text: 'Проверьте свои знания в квизах — 7 категорий с фильтрацией по сложности!', page: 'quiz' as PageType };
+    if (Object.keys(quizScores).length < 9) {
+      return { text: 'Проверьте свои знания в квизах — 9 категорий с фильтрацией по сложности!', page: 'quiz' as PageType };
     }
     if (totalProgress < 100) {
       return { text: 'Завершите оставшиеся модули для полного прохождения!', page: modules.find((m) => !completedModules.includes(m.id))?.id as PageType || 'dashboard' as PageType };
@@ -211,7 +231,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Модули пройдены', value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
-          { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/7`, color: 'text-amber-600' },
+          { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/9`, color: 'text-amber-600' },
           { label: 'Средний балл', value: `${avgQuizScore}%`, color: 'text-sky-600' },
           { label: 'Достижения', value: `${unlockedAchievements.length}/${achievements.length}`, color: 'text-violet-600' },
         ].map((stat, i) => (
@@ -361,13 +381,13 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h3 className="font-semibold text-sm group-hover:text-amber-700 transition-colors">Проверка знаний</h3>
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">Проверьте свои знания по 7 категориям безопасности с фильтрацией по сложности.</p>
+                        <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">Проверьте свои знания по 9 категориям безопасности с фильтрацией по сложности.</p>
                       </div>
                       <ChevronRight size={16} className="text-slate-300 group-hover:text-amber-500 transition-colors mt-1 shrink-0" />
                     </div>
                     <div className="flex items-center gap-2 mt-3">
-                      <Badge className="bg-amber-100 text-amber-700 border-0 text-[10px]">7 категорий</Badge>
-                      <span className="text-[11px] text-slate-400">50+ вопросов</span>
+                      <Badge className="bg-amber-100 text-amber-700 border-0 text-[10px]">9 категорий</Badge>
+                      <span className="text-[11px] text-slate-400">136+ вопросов</span>
                     </div>
                   </div>
                 </div>

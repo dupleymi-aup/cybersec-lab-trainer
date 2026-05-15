@@ -46,7 +46,7 @@ export default function ProfilePage() {
       setUniversity(user.university || '');
       setBio(user.bio || '');
     }
-  }, [user?.fullName, user.group, user.course, user.university, user.bio]);
+  }, [user?.fullName, user?.group, user?.course, user?.university, user?.bio]);
 
   const profileCompletion = useMemo(() => {
     const fields = [fullName, group, course, university, bio];
@@ -173,6 +173,8 @@ export default function ProfilePage() {
             <CardDescription>
               {user.role === 'admin' ? (
                 <Badge variant="destructive" className="mt-1">Администратор</Badge>
+              ) : user.role === 'teacher' ? (
+                <Badge className="mt-1 bg-amber-100 text-amber-700 border-0">Преподаватель</Badge>
               ) : (
                 <Badge variant="secondary" className="mt-1 bg-violet-100 text-violet-700">Студент</Badge>
               )}

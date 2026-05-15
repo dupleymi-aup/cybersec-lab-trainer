@@ -17,6 +17,9 @@ import AuthPages from '@/components/security-trainer/AuthPages';
 import ProfilePage from '@/components/security-trainer/ProfilePage';
 import SecurityHeadersLab from '@/components/security-trainer/SecurityHeadersLab';
 import PWAHandler from '@/components/security-trainer/PWAHandler';
+import RoleGuard from '@/components/security-trainer/RoleGuard';
+import TeacherPanel from '@/components/security-trainer/TeacherPanel';
+import AdminPanel from '@/components/security-trainer/AdminPanel';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'sonner';
 
@@ -33,6 +36,8 @@ const pages: Record<string, React.ReactNode> = {
   quiz: <QuizSystem />,
   achievements: <AchievementsGlossary />,
   profile: <ProfilePage />,
+  'teacher-panel': <RoleGuard requiredRole="teacher"><TeacherPanel /></RoleGuard>,
+  'admin-panel': <RoleGuard requiredRole="admin"><AdminPanel /></RoleGuard>,
 };
 
 export default function Home() {

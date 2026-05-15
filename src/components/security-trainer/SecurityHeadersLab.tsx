@@ -23,10 +23,16 @@ const stepLabels: { key: HeaderStep; label: string }[] = [
 const categoryColors: Record<string, string> = {
   'Защита от XSS': 'bg-red-100 text-red-700',
   'Защита соединения': 'bg-blue-100 text-blue-700',
-  'Контроль фреймов': 'bg-amber-100 text-amber-700',
-  'Типы контента': 'bg-purple-100 text-purple-700',
-  'Конфиденциальность': 'bg-indigo-100 text-indigo-700',
-  'Разрешения браузера': 'bg-teal-100 text-teal-700',
+  'Защита от кликджекинга': 'bg-amber-100 text-amber-700',
+  'Защита от MIME-sniffing': 'bg-purple-100 text-purple-700',
+  'Защита приватности': 'bg-indigo-100 text-indigo-700',
+  'Контроль API браузера': 'bg-teal-100 text-teal-700',
+  'Изоляция процессов': 'bg-rose-100 text-rose-700',
+  'Изоляция ресурсов': 'bg-cyan-100 text-cyan-700',
+  'Защита ресурсов': 'bg-lime-100 text-lime-700',
+  'Кэширование': 'bg-orange-100 text-orange-700',
+  'Приватность': 'bg-pink-100 text-pink-700',
+  'Безопасный выход': 'bg-emerald-100 text-emerald-700',
 };
 
 export default function SecurityHeadersLab() {

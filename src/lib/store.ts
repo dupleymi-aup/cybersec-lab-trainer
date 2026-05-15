@@ -14,7 +14,9 @@ export type PageType =
   | 'security-headers'
   | 'quiz'
   | 'achievements'
-  | 'profile';
+  | 'profile'
+  | 'teacher-panel'
+  | 'admin-panel';
 
 interface AppState {
   currentPage: PageType;

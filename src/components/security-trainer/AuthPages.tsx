@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/lib/auth-store';
+import { useAuthStore, type UserRole } from '@/lib/auth-store';
 import { validateEmail, validatePhone, validatePassword } from '@/lib/auth-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import OTPModal from './OTPModal';
-import { Shield, Mail, Phone, Eye, EyeOff, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Shield, Mail, Phone, Eye, EyeOff, CheckCircle2, AlertTriangle, GraduationCap, Users, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
@@ -38,6 +39,7 @@ export default function AuthPages() {
   const [regName, setRegName] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('student');
 
   // Recovery state
   const [recoveryStep, setRecoveryStep] = useState<RecoveryStep>('enter-contact');
@@ -100,7 +102,7 @@ export default function AuthPages() {
       return;
     }
     setLoading(true);
-    const result = await register({ email: regEmail, phone: regPhone, fullName: regName }, regPassword);
+    const result = await register({ email: regEmail, phone: regPhone, fullName: regName, role: selectedRole }, regPassword);
     setLoading(false);
     if (!result.success) {
       toast.error(result.error);
@@ -300,6 +302,7 @@ export default function AuthPages() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
             >
               <Card className="border-slate-700/50 bg-slate-800/50 backdrop-blur">
                 <CardHeader>
@@ -309,7 +312,13 @@ export default function AuthPages() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleRegister} className="space-y-4">
+                  <form onSubmit={(e) => {
+                    if (selectedRole === 'admin') {
+                      toast.error('Роль администратора назначается только через панель администратора');
+                      return;
+                    }
+                    handleRegister(e);
+                  }} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="reg-name" className="text-slate-300">
                         ФИО
@@ -347,6 +356,31 @@ export default function AuthPages() {
                         placeholder="+7 (999) 123-45-67"
                         className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
                       />
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="text-slate-300">Роль</Label>
+                      <RadioGroup value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)} className="space-y-2">
+                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800/50 transition cursor-pointer">
+                          <RadioGroupItem value="student" id="role-student" className="mt-1" />
+                          <label htmlFor="role-student" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-2">
+                              <GraduationCap size={16} className="text-violet-400" />
+                              <span className="text-sm font-medium text-white">Студент</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-0.5">Изучайте модули, проходите квизы и выполняйте лабораторные работы</p>
+                          </label>
+                        </div>
+                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800/50 transition cursor-pointer">
+                          <RadioGroupItem value="teacher" id="role-teacher" className="mt-1" />
+                          <label htmlFor="role-teacher" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-2">
+                              <Users size={16} className="text-amber-400" />
+                              <span className="text-sm font-medium text-white">Преподаватель</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-0.5">Отслеживайте прогресс студентов, управляйте группами и смотрите аналитику</p>
+                          </label>
+                        </div>
+                      </RadioGroup>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="reg-password" className="text-slate-300">

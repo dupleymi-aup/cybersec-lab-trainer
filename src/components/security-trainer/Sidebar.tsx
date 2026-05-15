@@ -1,7 +1,7 @@
 'use client';
 
 import { useAppStore, type PageType } from '@/lib/store';
-import { useAuthStore } from '@/lib/auth-store';
+import { useAuthStore, hasRole, type UserRole } from '@/lib/auth-store';
 import { modules, achievements } from '@/lib/security-data';
 import {
   LayoutDashboard,
@@ -19,6 +19,8 @@ import {
   CheckCircle2,
   User,
   LogOut,
+  Settings,
+  Users,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Progress } from '@/components/ui/progress';
@@ -39,6 +41,8 @@ const iconMap: Record<string, React.ReactNode> = {
   KeyRound: <KeyRound size={20} />,
   Trophy: <Trophy size={20} />,
   ShieldCheck: <ShieldCheck size={20} />,
+  Settings: <Settings size={20} />,
+  Users: <Users size={20} />,
 };
 
 const navItems: { id: PageType; label: string; iconKey: string }[] = [
@@ -47,6 +51,11 @@ const navItems: { id: PageType; label: string; iconKey: string }[] = [
   { id: 'quiz', label: 'Квизы', iconKey: 'HelpCircle' },
   { id: 'achievements', label: 'Достижения', iconKey: 'Trophy' },
   { id: 'profile', label: 'Профиль', iconKey: 'User' },
+];
+
+const roleNavItems: { id: PageType; label: string; iconKey: string; requiredRole: UserRole }[] = [
+  { id: 'teacher-panel', label: 'Панель преподавателя', iconKey: 'Users', requiredRole: 'teacher' },
+  { id: 'admin-panel', label: 'Панель администратора', iconKey: 'Settings', requiredRole: 'admin' },
 ];
 
 export default function Sidebar() {
@@ -59,9 +68,15 @@ export default function Sidebar() {
   } = useAppStore();
   const { user, logout } = useAuthStore();
 
-  // Count trackable items (excluding dashboard, achievements, and profile)
-  const trackableItems = navItems.filter(
-    (item) => item.id !== 'dashboard' && item.id !== 'achievements' && item.id !== 'profile'
+  // Role-based navigation
+  const visibleNavItems = [
+    ...navItems,
+    ...roleNavItems.filter((item) => hasRole(user?.role, item.requiredRole)),
+  ];
+
+  // Count trackable items (excluding dashboard, achievements, profile, and role panels)
+  const trackableItems = visibleNavItems.filter(
+    (item) => item.id !== 'dashboard' && item.id !== 'achievements' && item.id !== 'profile' && item.id !== 'teacher-panel' && item.id !== 'admin-panel'
   );
   const completedCount = trackableItems.filter((item) => completedModules.includes(item.id)).length;
   const progressPct = trackableItems.length > 0 ? Math.round((completedCount / trackableItems.length) * 100) : 0;
@@ -99,10 +114,11 @@ export default function Sidebar() {
 
       {/* Nav items */}
       <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = currentPage === item.id;
           const isCompleted =
             item.id === 'dashboard' || completedModules.includes(item.id);
+          const isRolePanel = item.id === 'teacher-panel' || item.id === 'admin-panel';
 
           return (
             <button
@@ -114,22 +130,26 @@ export default function Sidebar() {
                 ${
                   isActive
                     ? 'bg-emerald-600/20 text-emerald-400'
-                    : item.id === 'achievements'
-                      ? 'text-amber-400 hover:bg-amber-600/10 hover:text-amber-300'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    : isRolePanel
+                      ? 'text-red-400 hover:bg-red-600/10 hover:text-red-300'
+                      : item.id === 'achievements'
+                        ? 'text-amber-400 hover:bg-amber-600/10 hover:text-amber-300'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }
               `}
             >
               <span className={isActive
                 ? 'text-emerald-400'
-                : item.id === 'achievements'
-                  ? 'text-amber-500 group-hover:text-amber-300'
-                  : 'text-slate-500 group-hover:text-slate-300'
+                : isRolePanel
+                  ? 'text-red-400 group-hover:text-red-300'
+                  : item.id === 'achievements'
+                    ? 'text-amber-500 group-hover:text-amber-300'
+                    : 'text-slate-500 group-hover:text-slate-300'
               }>
                 {iconMap[item.iconKey]}
               </span>
               <span className="flex-1">{item.label}</span>
-              {isCompleted && (
+              {isCompleted && !isRolePanel && (
                 <CheckCircle2 size={16} className="text-emerald-500" />
               )}
             </button>
@@ -173,6 +193,9 @@ export default function Sidebar() {
               </div>
               {user.role === 'admin' && (
                 <Badge variant="destructive" className="text-[10px] px-1.5 py-0">A</Badge>
+              )}
+              {user.role === 'teacher' && (
+                <Badge className="text-[10px] px-1.5 py-0 bg-amber-500 text-white">T</Badge>
               )}
             </button>
 

@@ -30,7 +30,7 @@ export default function OWASPTop10() {
   const { studiedOwaspItems, addStudiedOwasp, completeModule, setCurrentPage } = useAppStore();
   const [view, setView] = useState<LessonView>('overview');
   const [currentLesson, setCurrentLesson] = useState(0);
-  const [lessonStep, setLessonStep] = useState<'description' | 'example' | 'vulnerable' | 'secure' | 'mitigations'>('description');
+  const [lessonStep, setLessonStep] = useState<'description' | 'example' | 'vulnerable' | 'secure' | 'mitigations' | 'resources'>('description');
 
   const studiedCount = studiedOwaspItems.length;
   const totalCount = owaspItems.length;
@@ -85,6 +85,7 @@ export default function OWASPTop10() {
     { key: 'vulnerable' as const, label: 'Уязвимый код', icon: Code },
     { key: 'secure' as const, label: 'Безопасный код', icon: FileCode },
     { key: 'mitigations' as const, label: 'Способы защиты', icon: Lightbulb },
+    { key: 'resources' as const, label: 'Ресурсы', icon: ShieldCheck },
   ];
 
   const currentStepIndex = steps.findIndex((s) => s.key === lessonStep);
@@ -454,6 +455,43 @@ export default function OWASPTop10() {
                   <p className="text-xs text-sky-700">
                     <strong>Совет:</strong> Применяйте эти рекомендации комплексно. Один метод защиты
                     редко бывает достаточен — используйте «глубокую защиту» (Defense in Depth).
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {lessonStep === 'resources' && (
+            <Card className="border-slate-200">
+              <CardContent className="p-5 space-y-4">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <ShieldCheck size={16} className="text-violet-600" />
+                  Дополнительные ресурсы
+                </h3>
+                {'cvssExample' in item && item.cvssExample && (
+                  <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+                    <p className="text-xs font-medium text-red-800 mb-1">Пример CVSS-вектора:</p>
+                    <code className="text-xs bg-red-100 px-2 py-1 rounded font-mono text-red-700 break-all">
+                      {item.cvssExample}
+                    </code>
+                  </div>
+                )}
+                {'toolsForTesting' in item && item.toolsForTesting && (
+                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                    <p className="text-xs font-medium text-amber-800 mb-1">Инструменты для тестирования:</p>
+                    <p className="text-sm text-amber-700">{item.toolsForTesting}</p>
+                  </div>
+                )}
+                {'furtherReading' in item && item.furtherReading && (
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <p className="text-xs font-medium text-blue-800 mb-1">Рекомендуемая литература:</p>
+                    <p className="text-sm text-blue-700">{item.furtherReading}</p>
+                  </div>
+                )}
+                <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
+                  <p className="text-xs text-violet-700">
+                    <strong>Совет:</strong> Используйте эти ресурсы для углублённого изучения темы
+                    и практического тестирования на лабораторных стендах.
                   </p>
                 </div>
               </CardContent>

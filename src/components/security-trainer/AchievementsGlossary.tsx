@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { achievements as achievementDefs } from '@/lib/security-data';
+import { achievements as achievementDefs, modules } from '@/lib/security-data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -121,6 +121,15 @@ const glossaryTerms: { term: string; definition: string; category: string }[] = 
   { term: 'DevSecOps', definition: 'Интеграция безопасности в CI/CD-процесс: SAST (статический анализ), DAST (динамический анализ), SCA (анализ зависимостей), IaC-сканирование, автоматические проверки перед деплоем.', category: 'Методологии' },
   { term: 'SAST', definition: 'Static Application Security Testing — анализ исходного кода на уязвимости без запуска приложения. Обнаруживает SQLi, XSS, хардкод секреты. Примеры: SonarQube, Semgrep, CodeQL.', category: 'Инструменты' },
   { term: 'DAST', definition: 'Dynamic Application Security Testing — тестирование работающего приложения на уязвимости. Имитирует атаки злоумышленника. Примеры: OWASP ZAP, Burp Suite, Nessus.', category: 'Инструменты' },
+  // --- Modern Security Terms ---
+  { term: 'Prompt Injection', definition: 'Атака на LLM (большие языковые модели) через внедрение вредоносных инструкций в промпт. Может заставить модель выполнить нежелательные действия, раскрыть секреты или обойти ограничения.', category: 'Уязвимости' },
+  { term: 'LLM Security', definition: 'Безопасность больших языковых моделей: защита от prompt injection, data poisoning, model theft, inference attacks. Включает OWASP Top 10 for LLM Applications.', category: 'Методологии' },
+  { term: 'RAG Poisoning', definition: 'Атака на Retrieval-Augmented Generation системы через внедрение вредоносных данных в базу знаний. Модель выдаёт скомпрометированные ответы, основываясь на подставленных документах.', category: 'Атаки' },
+  { term: 'Model Theft', definition: 'Кража обученной ML-модели через model extraction attacks (запросы к API для восстановления параметров) или прямой доступ к весам модели. Позволяет обойти защиту или использовать модель коммерчески.', category: 'Атаки' },
+  { term: 'SBOM', definition: 'Software Bill of Materials — полный перечень компонентов программного обеспечения: библиотеки, зависимости, версии, лицензии. Необходим для управления уязвимостями и compliance (Executive Order 14028).', category: 'Защита' },
+  { term: 'Secrets Management', definition: 'Управление секретами (пароли, API-ключи, токены) в приложениях и инфраструктуре. Практики: не хардкодить секреты, использовать HashiCorp Vault, AWS Secrets Manager, GitHub Secrets.', category: 'Защита' },
+  { term: 'Cloud-Native Security', definition: 'Безопасность облачных нативных приложений: контейнеры (Docker), оркестрация (Kubernetes), сервис-меши (Istio), serverless. Включает защиту образов контейнеров, secrets, network policies.', category: 'Методологии' },
+  { term: 'eBPF Security', definition: 'Использование extended Berkeley Packet Filter для безопасности на уровне ядра Linux: мониторинг системных вызовов, сетевых пакетов, процессов. Позволяет обнаруживать аномалии без модификации приложений.', category: 'Защита' },
 ];
 
 const categoryColors: Record<string, string> = {
@@ -151,6 +160,11 @@ const achievementIcons: Record<string, React.ReactNode> = {
   'quiz-all': <Trophy size={24} />,
   'crypto-explorer': <KeyRound size={24} />,
   'coding-pro': <Code size={24} />,
+  'headers-guard': <Shield size={24} />,
+  'coding-master': <Code size={24} />,
+  'network-ninja': <Shield size={24} />,
+  'social-engineer': <Target size={24} />,
+  'all-headers-correct': <Shield size={24} />,
 };
 
 export default function AchievementsAndGlossary() {
@@ -171,12 +185,17 @@ export default function AchievementsAndGlossary() {
       case 'quiz-master': return Object.keys(quizScores).length >= 3;
       case 'quiz-perfect': return Object.values(quizScores).some((s) => s === 100);
       case 'crypto-ninja': return completedModules.includes('tools');
-      case 'full-completion': return completedModules.length >= 8;
+      case 'full-completion': return completedModules.length >= modules.length;
       case 'csrf-shield': return completedModules.includes('csrf');
       case 'owasp-half': return studiedOwaspItems.length >= 5;
-      case 'quiz-all': return Object.keys(quizScores).length >= 7;
+      case 'quiz-all': return Object.keys(quizScores).length >= 9;
       case 'crypto-explorer': return completedModules.includes('tools');
       case 'coding-pro': return completedModules.includes('secure-coding');
+      case 'headers-guard': return completedModules.includes('security-headers');
+      case 'coding-master': return Object.values(quizScores).filter((s) => s >= 80).length >= 15;
+      case 'network-ninja': return (quizScores['network'] || 0) >= 80;
+      case 'social-engineer': return (quizScores['social'] || 0) >= 80;
+      case 'all-headers-correct': return (quizScores['headers'] || 0) === 100;
       default: return false;
     }
   };

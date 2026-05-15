@@ -237,6 +237,71 @@ export default function ToolsLab() {
   const [generatedPassword, setGeneratedPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
 
+  // Advanced tools state
+  const [aesText, setAesText] = useState('');
+  const [aesKey, setAesKey] = useState('');
+  const [aesResult, setAesResult] = useState('');
+  const [aesMode, setAesMode] = useState<'encrypt' | 'decrypt'>('encrypt');
+  const [jwtToken, setJwtToken] = useState('');
+  const [jwtDecoded, setJwtDecoded] = useState<{ header?: object; payload?: object; valid: boolean; error?: string }>({ valid: false });
+  const [rot13Text, setRot13Text] = useState('');
+
+  // ROT13 cipher
+  const rot13 = (text: string): string =>
+    text.replace(/[a-zA-Z]/g, (char) => {
+      const base = char <= 'Z' ? 65 : 97;
+      return String.fromCharCode(((char.charCodeAt(0) - base + 13) % 26) + base);
+    });
+
+  // Simple AES-GCM simulation (demo only — real AES in browser needs Web Crypto API)
+  const aesEncryptDemo = (text: string, key: string): string => {
+    if (!text || !key) return '';
+    // Derive a simple key hash
+    let keyHash = 0;
+    for (let i = 0; i < key.length; i++) keyHash = ((keyHash << 5) - keyHash + key.charCodeAt(i)) | 0;
+    // XOR-based simulation (educational — not real AES)
+    const bytes = new TextEncoder().encode(text);
+    const result = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) {
+      result[i] = bytes[i] ^ (keyHash & 0xff);
+      keyHash = ((keyHash << 7) - keyHash + i) | 0;
+    }
+    return btoa(String.fromCharCode(...result));
+  };
+
+  const aesDecryptDemo = (text: string, key: string): string => {
+    if (!text || !key) return '';
+    try {
+      let keyHash = 0;
+      for (let i = 0; i < key.length; i++) keyHash = ((keyHash << 5) - keyHash + key.charCodeAt(i)) | 0;
+      const bytes = Uint8Array.from(atob(text), (c) => c.charCodeAt(0));
+      const result = new Uint8Array(bytes.length);
+      for (let i = 0; i < bytes.length; i++) {
+        result[i] = bytes[i] ^ (keyHash & 0xff);
+        keyHash = ((keyHash << 7) - keyHash + i) | 0;
+      }
+      return new TextDecoder().decode(result);
+    } catch {
+      return '❌ Ошибка: неверный ключ или повреждённые данные';
+    }
+  };
+
+  // JWT decoder
+  const decodeJWT = (token: string) => {
+    if (!token) { setJwtDecoded({ valid: false }); return; }
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) { setJwtDecoded({ valid: false, error: 'JWT должен содержать 3 части, разделённые точкой' }); return; }
+      const decodePart = (part: string) => JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/')));
+      const header = decodePart(parts[0]);
+      const payload = decodePart(parts[1]);
+      const isExpired = payload.exp ? Date.now() >= payload.exp * 1000 : false;
+      setJwtDecoded({ header, payload, valid: true, error: isExpired ? '⚠️ Токен истёк' : undefined });
+    } catch (e: unknown) {
+      setJwtDecoded({ valid: false, error: `Неверный JWT: ${e instanceof Error ? e.message : 'ошибка парсинга'}` });
+    }
+  };
+
   const generatePassword = () => {
     let chars = '';
     if (pwUppercase) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -295,6 +360,9 @@ export default function ToolsLab() {
           </TabsTrigger>
           <TabsTrigger value="passwords" className="text-xs">
             <Unlock size={14} className="mr-1" /> Пароли
+          </TabsTrigger>
+          <TabsTrigger value="advanced" className="text-xs">
+            <KeyRound size={14} className="mr-1" /> Продвинутые
           </TabsTrigger>
         </TabsList>
 
@@ -739,6 +807,178 @@ function vigenereEncrypt(text, key) {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ===== ADVANCED TAB ===== */}
+        <TabsContent value="advanced" className="space-y-4">
+          {/* AES Demo */}
+          <Card className="border-slate-200">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Lock size={16} className="text-blue-600" />
+                <h3 className="text-sm font-semibold">AES-подобное шифрование (демо)</h3>
+                <Badge variant="secondary" className="text-[10px]">Симметричное</Badge>
+              </div>
+              <p className="text-xs text-slate-500">
+                Демонстрация симметричного шифрования. В реальном AES-256-GCM используется Web Crypto API
+                с 256-битным ключом, IV и аутентификационным тегом. Эта демо-версия показывает принцип работы.
+              </p>
+
+              <RadioGroup value={aesMode} onValueChange={(v) => setAesMode(v as 'encrypt' | 'decrypt')} className="flex gap-4">
+                <div className="flex items-center gap-1.5">
+                  <RadioGroupItem value="encrypt" id="aes-e" />
+                  <Label htmlFor="aes-e" className="text-xs">Шифрование</Label>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <RadioGroupItem value="decrypt" id="aes-d" />
+                  <Label htmlFor="aes-d" className="text-xs">Дешифрование</Label>
+                </div>
+              </RadioGroup>
+
+              <div>
+                <Label className="text-xs mb-1 block">Ключ:</Label>
+                <Input value={aesKey} onChange={(e) => setAesKey(e.target.value)} placeholder="секретный ключ" className="font-mono text-sm" />
+              </div>
+              <div>
+                <Label className="text-xs mb-1 block">{aesMode === 'encrypt' ? 'Открытый текст' : 'Зашифрованный текст (Base64):'}</Label>
+                <Input value={aesText} onChange={(e) => setAesText(e.target.value)} placeholder="Введите текст..." className="font-mono text-sm" />
+              </div>
+
+              <Button
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                onClick={() => {
+                  setAesResult(aesMode === 'encrypt' ? aesEncryptDemo(aesText, aesKey) : aesDecryptDemo(aesText, aesKey));
+                }}
+              >
+                {aesMode === 'encrypt' ? <Lock size={14} className="mr-1" /> : <Unlock size={14} className="mr-1" />}
+                {aesMode === 'encrypt' ? 'Зашифровать' : 'Дешифровать'}
+              </Button>
+
+              {aesResult && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <div className="bg-slate-50 rounded-lg p-3 flex items-center justify-between gap-2">
+                    <code className="text-sm font-mono text-blue-700 break-all flex-1">{aesResult}</code>
+                    <CopyButton text={aesResult} />
+                  </div>
+                </motion.div>
+              )}
+
+              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                <p className="text-[11px] text-blue-700">
+                  <strong>Примечание:</strong> Это упрощённая демонстрация. Реальный AES-256-GCM использует
+                  раунды SubBytes, ShiftRows, MixColumns и AddRoundKey. Используйте Web Crypto API:
+                  <code className="block mt-1 bg-blue-100 px-2 py-1 rounded text-[10px]">
+                    {'crypto.subtle.encrypt({ name: "AES-GCM", iv, tagLength: 128 }, key, data)'}
+                  </code>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* JWT Decoder */}
+          <Card className="border-slate-200">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <KeyRound size={16} className="text-violet-600" />
+                <h3 className="text-sm font-semibold">JWT Decoder</h3>
+                <Badge variant="secondary" className="text-[10px]">Токены</Badge>
+              </div>
+              <p className="text-xs text-slate-500">
+                JSON Web Token состоит из 3 частей: Header (алгоритм), Payload (данные) и Signature (подпись).
+                Данные закодированы в Base64URL — вставьте токен для декодирования.
+              </p>
+
+              <div>
+                <Label className="text-xs mb-1 block">JWT токен:</Label>
+                <Input
+                  value={jwtToken}
+                  onChange={(e) => { setJwtToken(e.target.value); decodeJWT(e.target.value); }}
+                  placeholder="eyJhbGciOiJIUzI1NiIs..."
+                  className="font-mono text-xs"
+                />
+              </div>
+
+              {jwtDecoded.error && (
+                <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+                  <p className="text-xs text-red-700">{jwtDecoded.error}</p>
+                </div>
+              )}
+
+              {jwtDecoded.valid && jwtDecoded.header && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+                  <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+                    <p className="text-[10px] font-semibold text-red-700 mb-1">Header (Заголовок):</p>
+                    <CodeBlock code={JSON.stringify(jwtDecoded.header, null, 2)} language="json" title="header.json" />
+                  </div>
+                  <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
+                    <p className="text-[10px] font-semibold text-violet-700 mb-1">Payload (Данные):</p>
+                    <CodeBlock code={JSON.stringify(jwtDecoded.payload, null, 2)} language="json" title="payload.json" />
+                  </div>
+                  {typeof (jwtDecoded.payload as Record<string, unknown>)?.exp === 'number' && (
+                    <div className="bg-slate-50 rounded-lg p-3">
+                      <p className="text-[11px] text-slate-600">
+                        <strong>Срок действия:</strong>{' '}
+                        {jwtDecoded.error
+                          ? <span className="text-red-600">Истёк {new Date((jwtDecoded.payload as Record<string, number>).exp * 1000).toLocaleString('ru-RU')}</span>
+                          : <span className="text-emerald-600">Действителен до {new Date((jwtDecoded.payload as Record<string, number>).exp * 1000).toLocaleString('ru-RU')}</span>
+                        }
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
+                <p className="text-[11px] text-violet-700">
+                  <strong>Попробуйте:</strong>{' '}
+                  <button
+                    className="underline text-violet-600 font-medium"
+                    onClick={() => {
+                      const demo = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE5OTk5OTk5OTl9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+                      setJwtToken(demo); decodeJWT(demo);
+                    }}
+                  >Вставить демо-токен</button>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ROT13 */}
+          <Card className="border-slate-200">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Lock size={16} className="text-amber-600" />
+                <h3 className="text-sm font-semibold">ROT13</h3>
+                <Badge variant="secondary" className="text-[10px]">Классический</Badge>
+              </div>
+              <p className="text-xs text-slate-500">
+                Частный случай шифра Цезаря со сдвигом 13. Поскольку в английском алфавите 26 букв,
+                ROT13 дважды восстанавливает исходный текст: ROT13(ROT13(x)) = x.
+              </p>
+
+              <div>
+                <Label className="text-xs mb-1 block">Текст:</Label>
+                <Input value={rot13Text} onChange={(e) => setRot13Text(e.target.value)} placeholder="Введите текст на английском..." className="font-mono text-sm" />
+              </div>
+
+              {rot13Text && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                  <div className="bg-slate-50 rounded-lg p-3 flex items-center justify-between gap-2">
+                    <code className="text-sm font-mono text-amber-700 break-all flex-1">{rot13(rot13Text)}</code>
+                    <CopyButton text={rot13(rot13Text)} />
+                  </div>
+                </motion.div>
+              )}
+
+              <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                <p className="text-[11px] text-amber-700">
+                  <strong>Пример:</strong> &quot;Hello World&quot; → <code>Uryyb Jbeyq</code>.
+                  Применяется в форумах для скрытия спойлеров. Не является шифрованием —
+                  не защищает данные, так как нет ключа.
+                </p>
               </div>
             </CardContent>
           </Card>

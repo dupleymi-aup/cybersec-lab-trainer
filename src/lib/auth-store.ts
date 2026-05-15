@@ -11,7 +11,26 @@ import {
   validatePhone,
 } from './auth-utils';
 
-export type UserRole = 'student' | 'admin';
+export type UserRole = 'student' | 'teacher' | 'admin';
+
+export const ROLE_HIERARCHY: Record<UserRole, number> = {
+  student: 0,
+  teacher: 1,
+  admin: 2,
+};
+
+export function hasRole(userRole: UserRole | null | undefined, requiredRole: UserRole): boolean {
+  if (!userRole) return false;
+  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+}
+
+export function getRoleLabel(role: UserRole): string {
+  switch (role) {
+    case 'student': return 'Студент';
+    case 'teacher': return 'Преподаватель';
+    case 'admin': return 'Администратор';
+  }
+}
 
 export interface User {
   id: string;
@@ -51,7 +70,7 @@ interface AuthState {
 
   login: (emailOrPhone: string, password: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
   register: (
-    data: { email: string; phone: string; fullName: string },
+    data: { email: string; phone: string; fullName: string; role: UserRole },
     password: string
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -144,6 +163,66 @@ function seedAdmin() {
   }
 }
 seedAdmin();
+
+// Pre-computed bcrypt hash for teacher password 'Teacher@123'
+const TEACHER_PASSWORD_HASH = '$2b$12$Wejo3M/j.76GAHLH6yyK4eU5vFCJWnb7FSMwSDCSm4otEoWtObB3q';
+
+// Seed default teacher user
+function seedTeacher() {
+  if (typeof window === 'undefined') return;
+  const users = getUsers();
+  const teacherExists = Object.values(users).some((u) => u.user.role === 'teacher');
+  if (!teacherExists) {
+    const teacherId = generateUserId();
+    const teacher: User = {
+      id: teacherId,
+      email: 'teacher@cybersec.lab',
+      phone: '+70000000001',
+      fullName: 'Преподаватель',
+      group: '',
+      course: '',
+      university: '',
+      avatar: '',
+      bio: '',
+      role: 'teacher',
+      createdAt: new Date().toISOString(),
+      lastLoginAt: '',
+      loginCount: 0,
+    };
+    users[teacherId] = { user: teacher, passwordHash: TEACHER_PASSWORD_HASH };
+    saveUsers(users);
+  }
+}
+seedTeacher();
+
+// Export helper to get all users (without password hashes)
+export function getAllUsers(): User[] {
+  const users = getUsers();
+  return Object.values(users).map((u) => u.user);
+}
+
+// Admin: change user role
+export function changeUserRole(userId: string, newRole: UserRole): { success: boolean; error?: string } {
+  if (typeof window === 'undefined') return { success: false, error: 'Not available' };
+  const users = getUsers();
+  if (!users[userId]) return { success: false, error: 'Пользователь не найден' };
+  users[userId].user.role = newRole;
+  saveUsers(users);
+  return { success: true };
+}
+
+// Admin: delete user
+export function deleteUser(userId: string): { success: boolean; error?: string } {
+  if (typeof window === 'undefined') return { success: false, error: 'Not available' };
+  const { user: currentUser } = useAuthStore.getState();
+  if (!currentUser) return { success: false, error: 'Не авторизован' };
+  if (currentUser.id === userId) return { success: false, error: 'Нельзя удалить себя' };
+  const users = getUsers();
+  if (!users[userId]) return { success: false, error: 'Пользователь не найден' };
+  delete users[userId];
+  saveUsers(users);
+  return { success: true };
+}
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -242,7 +321,7 @@ export const useAuthStore = create<AuthState>()(
           university: '',
           avatar: '',
           bio: '',
-          role: 'student',
+          role: data.role,
           createdAt: new Date().toISOString(),
           lastLoginAt: '',
           loginCount: 0,

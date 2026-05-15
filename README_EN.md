@@ -23,21 +23,22 @@
 
 ## About the Project
 
-**CyberSec Lab** is a comprehensive web platform for interactive study of information security fundamentals, web security, and secure development. The project is designed as a full-featured educational application that combines 8 learning modules, a timed testing system (**110+ questions** across 9 categories with difficulty filtering), hands-on labs for SQL injection, XSS, CSRF, code review, cryptographic tools, an achievement system (**16 achievements**), and a glossary of **80+ terms**. The platform is intended for Software Engineering students (09.03.04), educators, and anyone who wants to learn current threats and protection methods through practice.
+**CyberSec Lab** is a comprehensive web platform for interactive study of information security fundamentals, web security, and secure development. The project is designed as a full-featured educational application that combines 8 learning modules, a timed testing system (**136 questions** across 9 categories with difficulty filtering), hands-on labs for SQL injection, XSS, CSRF, code review, cryptographic tools, an achievement system (**16 achievements**), and a glossary of **93 terms**. The platform is intended for Software Engineering students (09.03.04), educators, and anyone who wants to learn current threats and protection methods through practice.
 
 All content is in Russian and based on current security standards including OWASP Top 10 (2021), NIST Incident Response, CVSS v3.1, and OWASP API Security Top 10.
 
 ## Key Features
 
 - **8 interactive modules** — from OWASP Top 10 to Security Headers, each with theory, code examples, and practical exercises
-- **110+ quiz questions** across 9 categories with a timer, detailed explanations, and difficulty filtering
-- **11 SQL injection lab exercises** — from authentication bypass to WAF Bypass, Out-of-band, and Polyglot attacks
-- **6 XSS types** with interactive attack and sanitization demonstrations
-- **25 code review challenges**: identify vulnerabilities (SQLi, XSS, IDOR, SSRF, XXE, SSTI, Prototype Pollution, LDAP Injection, Mass Assignment) and choose the correct fix
-- **Cryptographic tools**: Caesar, Vigenere, XOR ciphers; Base64/URL encoding; hash functions; password generator
+- **136 quiz questions** across 9 categories with a timer, detailed explanations, and difficulty filtering
+- **16 SQL injection lab exercises** — from authentication bypass to WAF Bypass, Out-of-band, NoSQL Injection, and Polyglot attacks
+- **9 XSS types** with interactive attack and sanitization demonstrations (Reflected, Stored, DOM, SVG, Markdown, PDF, Angular, Template Literal, Web Storage)
+- **35 code review challenges**: identify vulnerabilities (SQLi, XSS, IDOR, SSRF, XXE, SSTI, Prototype Pollution, LDAP Injection, Mass Assignment, Prompt Injection, CORS Misconfiguration, File Upload) and choose the correct fix
+- **Cryptographic tools**: Caesar, Vigenere, XOR, ROT13 ciphers; Base64/URL encoding; hash functions; password generator; AES-GCM demo; JWT decoder
+- **12 HTTP security headers** with interactive quizzes for each header
 - **16 achievements** — from first steps to full completion, motivational badges for progress
 - **Progress tracking system** — localStorage persistence, per-module and per-quiz statistics
-- **Glossary of 80+ terms** with search and filtering across 9 categories
+- **Glossary of 93 terms** with search and filtering across 9 categories
 - **Adaptive interface** — fully responsive design for mobile, tablet, and desktop
 - **Animations and transitions** — smooth UI powered by Framer Motion
 
