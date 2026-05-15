@@ -152,7 +152,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       token: null,
       recoveryState: null,
-      loginActivity: [],
+      loginActivity: typeof window !== 'undefined' ? getLoginActivity() : [],
 
       login: async (emailOrPhone, password, rememberMe) => {
         const users = getUsers();
@@ -171,6 +171,7 @@ export const useAuthStore = create<AuthState>()(
             success: false,
           });
           saveLoginActivity(activity);
+          set({ loginActivity: getLoginActivity() });
           return { success: false, error: 'Неверные учётные данные' };
         }
 
@@ -184,6 +185,7 @@ export const useAuthStore = create<AuthState>()(
             success: false,
           });
           saveLoginActivity(activity);
+          set({ loginActivity: getLoginActivity() });
           return { success: false, error: 'Неверные учётные данные' };
         }
 
@@ -201,6 +203,7 @@ export const useAuthStore = create<AuthState>()(
           success: true,
         });
         saveLoginActivity(activity);
+        set({ loginActivity: getLoginActivity() });
 
         const token = generateToken(found.user.id, found.user.role, rememberMe);
         migrateProgress(found.user.id);
@@ -375,7 +378,6 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
         token: state.token,
         recoveryState: state.recoveryState,
-        loginActivity: state.loginActivity,
       }),
     }
   )
