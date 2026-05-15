@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useAppStore } from '@/lib/store';
 import { quizQuestions, quizCategories } from '@/lib/security-data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -53,10 +53,14 @@ export default function QuizSystem() {
   const [timerActive, setTimerActive] = useState(false);
   const [startTime, setStartTime] = useState(0);
   const [totalTimeTaken, setTotalTimeTaken] = useState(0);
+  const currentQuestionRef = useRef(currentQuestion);
+
+  useEffect(() => {
+    currentQuestionRef.current = currentQuestion;
+  }, [currentQuestion]);
 
   const categoryQuestions = useMemo(() => quizQuestions.filter((q) => {
-    const catId = quizCategories.find((c) => c.name === activeCategory)?.id;
-    const catMatch = catId && q.category === activeCategory;
+    const catMatch = q.category === activeCategory;
     const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
     return catMatch && diffMatch;
   }), [activeCategory, difficultyFilter]);
@@ -91,7 +95,7 @@ export default function QuizSystem() {
     } else {
       const finalCount = correctCount;
       const catId = quizCategories.find((c) => c.name === activeCategory)?.id || '';
-      const score = Math.round((finalCount / categoryQuestions.length) * 100);
+      const score = categoryQuestions.length > 0 ? Math.round((finalCount / categoryQuestions.length) * 100) : 0;
       setQuizScore(catId, score);
       setTotalTimeTaken(Math.round((Date.now() - startTime) / 1000));
       setTimerActive(false);
@@ -111,7 +115,7 @@ export default function QuizSystem() {
     setAnswers(newAnswers);
   };
 
-  // Timer — clean interval with proper cleanup
+  // Timer — use ref to avoid stale closure over currentQuestion
   useEffect(() => {
     if (!timerActive) return;
     const interval = setInterval(() => {
@@ -122,7 +126,7 @@ export default function QuizSystem() {
           setShowAnswer(true);
           setAnswers((a) => {
             const updated = [...a];
-            updated[currentQuestion] = false;
+            updated[currentQuestionRef.current] = false;
             return updated;
           });
           return 0;
@@ -131,7 +135,7 @@ export default function QuizSystem() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [timerActive, currentQuestion]);
+  }, [timerActive]);
 
   const resetQuiz = () => {
     setQuizState('select');
@@ -145,7 +149,7 @@ export default function QuizSystem() {
   };
 
   const question = categoryQuestions[currentQuestion];
-  const finalScore = Math.round((correctCount / categoryQuestions.length) * 100);
+  const finalScore = categoryQuestions.length > 0 ? Math.round((correctCount / categoryQuestions.length) * 100) : 0;
 
   return (
     <div className="space-y-6">
