@@ -28,14 +28,14 @@
       "short_name": "Модули",
       "description": "Открыть модули обучения",
       "url": "/?section=modules",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192", "purpose": "any maskable" }]
     },
     {
       "name": "Квизы",
       "short_name": "Квизы",
       "description": "Пройти тестирование",
       "url": "/?section=quiz",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192", "purpose": "any maskable" }]
     }
   ]
 }

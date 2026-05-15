@@ -26,6 +26,9 @@ interface AppState {
   studiedOwaspItems: string[];
   sqlCompletedLevels: string[];
   xssCompletedLevels: string[];
+  csrfCompletedSteps: number[];
+  secureCodingAnsweredChallenges: number[];
+  secureCodingCorrectCount: number;
   setCurrentPage: (page: PageType) => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
@@ -35,19 +38,32 @@ interface AppState {
   addStudiedOwasp: (id: string) => void;
   addSqlLevel: (level: string) => void;
   addXssLevel: (level: string) => void;
+  addCsrfStep: (step: number) => void;
+  addSecureCodingAnswer: (idx: number) => void;
+  removeSecureCodingAnswer: (idx: number) => void;
+  setSecureCodingCorrectCount: (count: number) => void;
 }
 
-const defaultStorage = createJSONStorage<AppState>(() => ({
-  getItem: (name: string) => {
-    return localStorage.getItem(`${name}-anonymous`);
-  },
-  setItem: (name: string, value: string) => {
-    localStorage.setItem(`${name}-anonymous`, value);
-  },
-  removeItem: () => {
-    localStorage.removeItem(`security-trainer-progress-anonymous`);
-  },
-}));
+// Dynamic storage that uses the correct per-user localStorage key
+function createDynamicStorage() {
+  return createJSONStorage<AppState>(() => ({
+    getItem: (name: string) => {
+      const { user } = useAuthStore.getState();
+      const userId = user?.id || 'anonymous';
+      return localStorage.getItem(`${name}-${userId}`);
+    },
+    setItem: (name: string, value: string) => {
+      const { user } = useAuthStore.getState();
+      const userId = user?.id || 'anonymous';
+      localStorage.setItem(`${name}-${userId}`, value);
+    },
+    removeItem: (name: string) => {
+      const { user } = useAuthStore.getState();
+      const userId = user?.id || 'anonymous';
+      localStorage.removeItem(`${name}-${userId}`);
+    },
+  }));
+}
 
 // Listen for auth changes and migrate progress to user-specific key
 function getStorageKey(userId: string | undefined) {
@@ -65,6 +81,9 @@ export const useAppStore = create<AppState>()(
       studiedOwaspItems: [],
       sqlCompletedLevels: [],
       xssCompletedLevels: [],
+      csrfCompletedSteps: [],
+      secureCodingAnsweredChallenges: [],
+      secureCodingCorrectCount: 0,
       setCurrentPage: (page) => set({ currentPage: page, sidebarOpen: false }),
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
@@ -85,6 +104,9 @@ export const useAppStore = create<AppState>()(
           studiedOwaspItems: [],
           sqlCompletedLevels: [],
           xssCompletedLevels: [],
+          csrfCompletedSteps: [],
+          secureCodingAnsweredChallenges: [],
+          secureCodingCorrectCount: 0,
         }),
       addStudiedOwasp: (id) =>
         set((s) => ({
@@ -104,10 +126,28 @@ export const useAppStore = create<AppState>()(
             ? s.xssCompletedLevels
             : [...s.xssCompletedLevels, level],
         })),
+      addCsrfStep: (step) =>
+        set((s) => ({
+          csrfCompletedSteps: s.csrfCompletedSteps.includes(step)
+            ? s.csrfCompletedSteps
+            : [...s.csrfCompletedSteps, step],
+        })),
+      addSecureCodingAnswer: (idx) =>
+        set((s) => ({
+          secureCodingAnsweredChallenges: s.secureCodingAnsweredChallenges.includes(idx)
+            ? s.secureCodingAnsweredChallenges
+            : [...s.secureCodingAnsweredChallenges, idx],
+        })),
+      removeSecureCodingAnswer: (idx) =>
+        set((s) => ({
+          secureCodingAnsweredChallenges: s.secureCodingAnsweredChallenges.filter((i) => i !== idx),
+        })),
+      setSecureCodingCorrectCount: (count) =>
+        set({ secureCodingCorrectCount: count }),
     }),
     {
       name: 'security-trainer-progress',
-      storage: defaultStorage,
+      storage: createDynamicStorage(),
     }
   )
 );
@@ -121,4 +161,6 @@ export function migrateProgressToUser(userId: string) {
     localStorage.setItem(userKey, data);
     localStorage.removeItem(anonKey);
   }
+  // Rehydrate the store so it picks up the user key immediately
+  useAppStore.persist.rehydrate();
 }

@@ -15,20 +15,19 @@ import {
   XCircle,
   ArrowRight,
   ArrowLeft,
+  RotateCcw,
 } from 'lucide-react';
 
 export default function SecureCodingLab() {
-  const { completeModule, setCurrentPage, completedModules } = useAppStore();
+  const { completeModule, setCurrentPage, completedModules, secureCodingAnsweredChallenges, addSecureCodingAnswer, removeSecureCodingAnswer, secureCodingCorrectCount, setSecureCodingCorrectCount } = useAppStore();
   const [activeChallenge, setActiveChallenge] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [answeredChallenges, setAnsweredChallenges] = useState<Set<number>>(new Set());
 
+  const answeredSet = new Set(secureCodingAnsweredChallenges);
   const challenge = secureCodingChallenges[activeChallenge];
-  const isAnswered = answeredChallenges.has(activeChallenge);
+  const isAnswered = answeredSet.has(activeChallenge);
   const isCompleted = completedModules.includes('secure-coding');
-  const allAnswered = answeredChallenges.size === secureCodingChallenges.length;
 
   const handleSelectOption = (index: number) => {
     if (isAnswered) return;
@@ -39,12 +38,14 @@ export default function SecureCodingLab() {
     if (selectedOption === null || isAnswered) return;
     const isCorrect = challenge.options[selectedOption].correct;
     setShowResult(true);
-    const newAnswered = new Set(answeredChallenges);
-    newAnswered.add(activeChallenge);
-    setAnsweredChallenges(newAnswered);
-    if (isCorrect) setCorrectCount((c) => c + 1);
+    addSecureCodingAnswer(activeChallenge);
+    if (isCorrect) {
+      setSecureCodingCorrectCount(secureCodingCorrectCount + 1);
+    }
 
-    if (newAnswered.size === secureCodingChallenges.length) {
+    // Check completion: count current answered (not yet in store) + store length
+    const totalAnswered = answeredSet.size + 1;
+    if (totalAnswered === secureCodingChallenges.length) {
       completeModule('secure-coding');
     }
   };
@@ -63,6 +64,12 @@ export default function SecureCodingLab() {
       setSelectedOption(null);
       setShowResult(false);
     }
+  };
+
+  const retryChallenge = () => {
+    removeSecureCodingAnswer(activeChallenge);
+    setSelectedOption(null);
+    setShowResult(false);
   };
 
   return (
@@ -90,7 +97,7 @@ export default function SecureCodingLab() {
             </span>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="text-[10px] flex items-center gap-1">
-                <CheckCircle2 size={12} /> {correctCount} правильных
+                <CheckCircle2 size={12} /> {secureCodingCorrectCount} правильных
               </Badge>
               {isCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
             </div>
@@ -105,7 +112,7 @@ export default function SecureCodingLab() {
                   setShowResult(false);
                 }}
                 className={`flex-1 h-2 rounded-full transition-all ${
-                  answeredChallenges.has(i)
+                  answeredSet.has(i)
                     ? 'bg-emerald-500'
                     : i === activeChallenge
                       ? 'bg-emerald-300'
@@ -225,6 +232,16 @@ export default function SecureCodingLab() {
                     </h4>
                     <p className="text-xs text-slate-600 leading-relaxed">{challenge.explanation}</p>
                   </div>
+
+                  {/* Retry button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 w-full"
+                    onClick={retryChallenge}
+                  >
+                    <RotateCcw size={14} className="mr-1" /> Повторить
+                  </Button>
 
                   <div className="flex justify-between mt-4">
                     <Button

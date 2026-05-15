@@ -4595,3 +4595,39 @@ export const achievements = [
     condition: 'Наберите 100% в квизе Security Headers',
   },
 ];
+
+/**
+ * Check if an achievement is unlocked based on current progress.
+ * This is a pure function — pass in the state slices it depends on.
+ */
+export function isAchievementUnlocked(
+  id: string,
+  completedModules: string[],
+  studiedOwaspItems: string[],
+  quizScores: Record<string, number>,
+  secureCodingCorrectCount = 0,
+): boolean {
+  switch (id) {
+    case 'first-steps': return completedModules.length >= 1;
+    case 'sql-master': return completedModules.includes('sql-injection');
+    case 'xss-hunter': return completedModules.includes('xss');
+    case 'security-guard': return studiedOwaspItems.length >= 10;
+    case 'auth-expert': return completedModules.includes('auth');
+    case 'code-reviewer': return completedModules.includes('secure-coding');
+    case 'quiz-master': return Object.keys(quizScores).length >= 3;
+    case 'quiz-perfect': return Object.values(quizScores).some((s) => s === 100);
+    case 'crypto-ninja': return completedModules.includes('tools');
+    case 'full-completion': return completedModules.length >= modules.length;
+    case 'csrf-shield': return completedModules.includes('csrf');
+    case 'owasp-half': return studiedOwaspItems.length >= 5;
+    case 'quiz-all': return Object.keys(quizScores).length >= 9;
+    case 'crypto-explorer': return (quizScores['tools'] || 0) >= 50;
+    case 'coding-pro': return secureCodingCorrectCount >= 20;
+    case 'headers-guard': return completedModules.includes('security-headers');
+    case 'coding-master': return Object.values(quizScores).filter((s) => s >= 80).length >= 5;
+    case 'network-ninja': return (quizScores['network'] || 0) >= 80;
+    case 'social-engineer': return (quizScores['social'] || 0) >= 80;
+    case 'all-headers-correct': return (quizScores['headers'] || 0) === 100;
+    default: return false;
+  }
+}

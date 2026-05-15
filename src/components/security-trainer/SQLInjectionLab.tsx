@@ -37,13 +37,10 @@ export default function SQLInjectionLab() {
     setIsSuccess(valid);
     if (valid && !isCompleted) {
       addSqlLevel(challenge.id);
-      // Check completion using getState() to avoid stale closure
-      setTimeout(() => {
-        const { sqlCompletedLevels: updatedCompleted } = useAppStore.getState();
-        if (updatedCompleted.length === sqlChallenges.length) {
-          completeModule('sql-injection');
-        }
-      }, 0);
+      const { sqlCompletedLevels: updatedCompleted } = useAppStore.getState();
+      if (updatedCompleted.length === sqlChallenges.length) {
+        completeModule('sql-injection');
+      }
     }
   };
 

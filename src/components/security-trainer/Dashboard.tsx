@@ -2,12 +2,14 @@
 
 import { useAppStore } from '@/lib/store';
 import { useAuthStore } from '@/lib/auth-store';
-import { modules, achievements } from '@/lib/security-data';
+import { modules, achievements, isAchievementUnlocked } from '@/lib/security-data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import {
   Shield,
   ShieldCheck,
@@ -65,7 +67,7 @@ const achievementIcons: Record<string, React.ReactNode> = {
 };
 
 export default function Dashboard() {
-  const { setCurrentPage, completedModules, quizScores, toggleSidebar, studiedOwaspItems } = useAppStore();
+  const { setCurrentPage, completedModules, quizScores, toggleSidebar, studiedOwaspItems, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, secureCodingCorrectCount } = useAppStore();
   const { user } = useAuthStore();
 
   const totalModules = modules.length;
@@ -82,37 +84,55 @@ export default function Dashboard() {
         )
       : 0;
 
-  // Achievements
-  const getAchievementStatus = (id: string) => {
-    switch (id) {
-      case 'first-steps': return completedModules.length >= 1;
-      case 'sql-master': return completedModules.includes('sql-injection');
-      case 'xss-hunter': return completedModules.includes('xss');
-      case 'security-guard': return studiedOwaspItems.length >= 10;
-      case 'auth-expert': return completedModules.includes('auth');
-      case 'code-reviewer': return completedModules.includes('secure-coding');
-      case 'quiz-master': return Object.keys(quizScores).length >= 3;
-      case 'quiz-perfect': return Object.values(quizScores).some((s) => s === 100);
-      case 'crypto-ninja': return completedModules.includes('tools');
-      case 'full-completion': return completedModules.length >= modules.length;
-      case 'csrf-shield': return completedModules.includes('csrf');
-      case 'owasp-half': return studiedOwaspItems.length >= 5;
-      case 'quiz-all': return Object.keys(quizScores).length >= 9;
-      case 'crypto-explorer': return completedModules.includes('tools');
-      case 'coding-pro': return completedModules.includes('secure-coding');
-      case 'headers-guard': return completedModules.includes('security-headers');
-      case 'coding-master': return Object.values(quizScores).filter((s) => s >= 80).length >= 15;
-      case 'network-ninja': return (quizScores['network'] || 0) >= 80;
-      case 'social-engineer': return (quizScores['social'] || 0) >= 80;
-      case 'all-headers-correct': return (quizScores['headers'] || 0) === 100;
-      default: return false;
-    }
+  // Per-module granular progress
+  const getModuleProgress = (moduleId: string, completed: boolean): { pct: number; label: string } => {
+    const TOTALS: Record<string, number> = {
+      'sql-injection': 11,
+      'xss': 6,
+      'csrf': 4,
+      'secure-coding': 34,
+    };
+    if (completed) return { pct: 100, label: '' };
+    const total = TOTALS[moduleId];
+    if (!total) return { pct: 0, label: '' };
+    const done = (() => {
+      switch (moduleId) {
+        case 'sql-injection': return sqlCompletedLevels.length;
+        case 'xss': return xssCompletedLevels.length;
+        case 'csrf': return csrfCompletedSteps.length;
+        case 'secure-coding': return secureCodingAnsweredChallenges.length;
+        default: return 0;
+      }
+    })();
+    const pct = Math.round((done / total) * 100);
+    return { pct, label: `${done}/${total}` };
   };
 
-  const unlockedAchievements = achievements.filter((a) => getAchievementStatus(a.id));
-  const nextAchievement = achievements.find((a) => !getAchievementStatus(a.id));
+  // Achievements
+  const unlockedAchievements = achievements.filter((a) =>
+    isAchievementUnlocked(a.id, completedModules, studiedOwaspItems, quizScores, secureCodingCorrectCount)
+  );
+  const nextAchievement = achievements.find((a) =>
+    !isAchievementUnlocked(a.id, completedModules, studiedOwaspItems, quizScores, secureCodingCorrectCount)
+  );
 
   // Recommendations
+
+  // Detect newly unlocked achievements and show toasts
+  const prevUnlockedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const current = new Set(unlockedAchievements.map((a) => a.id));
+    const prev = prevUnlockedRef.current;
+    for (const id of current) {
+      if (!prev.has(id)) {
+        const achievement = achievements.find((a) => a.id === id);
+        if (achievement) {
+          toast.success(`🏆 ${achievement.title}`, { description: achievement.description, duration: 5000 });
+        }
+      }
+    }
+    prevUnlockedRef.current = current;
+  }, [unlockedAchievements]);
   const getRecommendation = () => {
     // Role-specific recommendations
     if (user?.role === 'admin' && completedModules.length === 0) {
@@ -351,9 +371,24 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-                    <div className="h-1 bg-slate-100">
-                      <div className={`h-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500 w-full' : 'bg-slate-200 w-0'}`} />
-                    </div>
+                    {(() => {
+                      const { pct, label } = getModuleProgress(mod.id, isCompleted);
+                      return pct > 0 || isCompleted ? (
+                        <div className="px-4 pb-3 pt-1">
+                          <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-emerald-400'}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          {label && <p className="text-[10px] text-slate-400 mt-1">{label}</p>}
+                        </div>
+                      ) : (
+                        <div className="h-1 bg-slate-100">
+                          <div className="h-full bg-slate-200 w-0 transition-all duration-500" />
+                        </div>
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               </motion.div>

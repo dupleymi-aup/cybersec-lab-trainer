@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuthStore, getAllUsers, type UserRole } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
+import { quizCategories } from '@/lib/security-data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -291,51 +292,93 @@ export default function TeacherPanel() {
         <TabsContent value="analytics" className="mt-4 space-y-4">
           <Card className="border-slate-200">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">Общая статистика</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-3 bg-sky-50 rounded-lg">
-                  <p className="text-2xl font-bold text-sky-600">{totalStudents}</p>
-                  <p className="text-xs text-slate-500">Всего студентов</p>
-                </div>
-                <div className="text-center p-3 bg-emerald-50 rounded-lg">
-                  <p className="text-2xl font-bold text-emerald-600">{activeStudents}</p>
-                  <p className="text-xs text-slate-500">Активных</p>
-                </div>
-                <div className="text-center p-3 bg-violet-50 rounded-lg">
-                  <p className="text-2xl font-bold text-violet-600">{avgCompletion}</p>
-                  <p className="text-xs text-slate-500">Ср. модулей пройдено</p>
-                </div>
-                <div className="text-center p-3 bg-amber-50 rounded-lg">
-                  <p className="text-2xl font-bold text-amber-600">{avgQuizScore}%</p>
-                  <p className="text-xs text-slate-500">Средний балл квизов</p>
-                </div>
-              </div>
+              <h3 className="font-semibold text-sm mb-4">Анализ по категориям квизов</h3>
+
+              {/* Compute per-category averages */}
+              {(() => {
+                const categoryStats = quizCategories.map((cat) => {
+                  const scores = students
+                    .map((s) => getStudentProgress(s.id).quizScores[cat.id])
+                    .filter((v) => v !== undefined && v > 0);
+                  const avg = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+                  const attempted = scores.length;
+                  return { id: cat.id, name: cat.name, avg, attempted };
+                });
+
+                const weakest = categoryStats.filter((c) => c.attempted > 0).sort((a, b) => a.avg - b.avg)[0];
+
+                return (
+                  <div className="space-y-3">
+                    {categoryStats.map((cat) => {
+                      const barColor = cat.avg >= 70 ? 'bg-emerald-500' : cat.avg >= 50 ? 'bg-amber-500' : cat.attempted > 0 ? 'bg-red-500' : 'bg-slate-200';
+                      const textColor = cat.avg >= 70 ? 'text-emerald-600' : cat.avg >= 50 ? 'text-amber-600' : cat.attempted > 0 ? 'text-red-600' : 'text-slate-400';
+                      return (
+                        <div key={cat.id}>
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-slate-700 font-medium">{cat.name}</span>
+                            <span className={textColor}>
+                              {cat.attempted > 0 ? `${cat.avg}%` : '—'}
+                              <span className="text-slate-400 ml-1">({cat.attempted}/{totalStudents})</span>
+                              {weakest && weakest.id === cat.id && (
+                                <Badge className="ml-2 bg-red-100 text-red-700 border-0 text-[9px]">Требует внимания</Badge>
+                              )}
+                            </span>
+                          </div>
+                          <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${barColor}`}
+                              style={{ width: `${cat.attempted > 0 ? cat.avg : 0}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
 
+          {/* Top/Bottom students */}
           <Card className="border-slate-200">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">Популярность модулей</h3>
-              <div className="space-y-3">
-                {['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers'].map((modId) => {
-                  const count = students.filter((s) => {
-                    const progress = getStudentProgress(s.id);
-                    return progress.completedModules.includes(modId);
-                  }).length;
-                  const pct = totalStudents > 0 ? Math.round((count / totalStudents) * 100) : 0;
-                  return (
-                    <div key={modId}>
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-slate-700 capitalize">{modId.replace(/-/g, ' ')}</span>
-                        <span className="text-slate-500">{count} ({pct}%)</span>
+              <h3 className="font-semibold text-sm mb-4">Рейтинг студентов</h3>
+              {(() => {
+                const studentRankings = students
+                  .map((s) => {
+                    const p = getStudentProgress(s.id);
+                    const mods = p.completedModules.length;
+                    const scores = Object.values(p.quizScores);
+                    const avgQ = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+                    return { fullName: s.fullName, group: s.group, mods, avgQ, total: mods * 10 + avgQ };
+                  })
+                  .sort((a, b) => b.total - a.total);
+
+                return (
+                  <div className="space-y-2">
+                    {studentRankings.slice(0, 10).map((s, i) => (
+                      <div key={i} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-3">
+                          <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
+                            {i + 1}
+                          </span>
+                          <div>
+                            <span className="font-medium">{s.fullName}</span>
+                            {s.group && <span className="text-xs text-slate-400 ml-2">{s.group}</span>}
+                          </div>
+                        </div>
+                        <div className="flex gap-4 text-xs">
+                          <span className="text-slate-500">{s.mods} модулей</span>
+                          <span className="text-slate-500">квизы: {s.avgQ}%</span>
+                        </div>
                       </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    ))}
+                    {studentRankings.length === 0 && (
+                      <p className="text-center text-xs text-slate-400 py-4">Нет данных</p>
+                    )}
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
         </TabsContent>

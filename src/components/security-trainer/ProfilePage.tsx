@@ -2,6 +2,7 @@
 
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useAuthStore } from '@/lib/auth-store';
+import { useAppStore } from '@/lib/store';
 import { validatePassword } from '@/lib/auth-utils';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,9 @@ import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
   const { user, updateProfile, updatePassword, deleteAccount, clearLoginActivity, loginActivity } = useAuthStore();
+  const { completedModules, quizScores, studiedOwaspItems, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, secureCodingCorrectCount, resetProgress } = useAppStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -108,6 +111,73 @@ export default function ProfilePage() {
     } else {
       toast.error(result.error);
     }
+  };
+
+  // Export progress as JSON file
+  const handleExportProgress = () => {
+    const data = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      user: { fullName: user.fullName, email: user.email, role: user.role },
+      progress: {
+        completedModules,
+        quizScores,
+        studiedOwaspItems,
+        sqlCompletedLevels,
+        xssCompletedLevels,
+        csrfCompletedSteps,
+        secureCodingAnsweredChallenges,
+        secureCodingCorrectCount,
+      },
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cybersec-progress-${user.id}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Прогресс экспортирован');
+  };
+
+  // Import progress from JSON file
+  const handleImportProgress = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (!data.progress) {
+          toast.error('Неверный формат файла');
+          return;
+        }
+        const p = data.progress;
+        // Write directly to localStorage for the current user
+        const key = `security-trainer-progress-${user.id}`;
+        const existing = localStorage.getItem(key) || '{}';
+        const merged = { ...JSON.parse(existing), ...p };
+        localStorage.setItem(key, JSON.stringify(merged));
+        resetProgress(); // Clear current state
+        // Re-read from localStorage by setting values
+        useAppStore.setState({
+          completedModules: p.completedModules || [],
+          quizScores: p.quizScores || {},
+          studiedOwaspItems: p.studiedOwaspItems || [],
+          sqlCompletedLevels: p.sqlCompletedLevels || [],
+          xssCompletedLevels: p.xssCompletedLevels || [],
+          csrfCompletedSteps: p.csrfCompletedSteps || [],
+          secureCodingAnsweredChallenges: p.secureCodingAnsweredChallenges || [],
+          secureCodingCorrectCount: p.secureCodingCorrectCount || 0,
+        });
+        toast.success('Прогресс импортирован');
+      } catch {
+        toast.error('Ошибка при чтении файла');
+      }
+    };
+    reader.readAsText(file);
+    // Reset input so same file can be re-imported
+    e.target.value = '';
   };
 
   const handleDeleteAccount = () => {
@@ -441,6 +511,34 @@ export default function ProfilePage() {
           ) : (
             <p className="text-sm text-slate-400 text-center py-4">Нет записей активности</p>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Export / Import */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Shield className="w-5 h-5 text-violet-500" />
+            Экспорт и импорт прогресса
+          </CardTitle>
+          <CardDescription>Сохраните или восстановите свой прогресс</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-3">
+            <Button onClick={handleExportProgress} className="flex-1 bg-violet-600 hover:bg-violet-700">
+              Экспортировать прогресс
+            </Button>
+            <Button variant="outline" className="flex-1" onClick={() => importInputRef.current?.click()}>
+              Импортировать прогресс
+            </Button>
+            <input
+              ref={importInputRef}
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={handleImportProgress}
+            />
+          </div>
         </CardContent>
       </Card>
 

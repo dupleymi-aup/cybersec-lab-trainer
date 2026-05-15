@@ -54,6 +54,7 @@ export default function QuizSystem() {
   const [startTime, setStartTime] = useState(0);
   const [totalTimeTaken, setTotalTimeTaken] = useState(0);
   const currentQuestionRef = useRef(currentQuestion);
+  const timedOutRef = useRef(false);
 
   useEffect(() => {
     currentQuestionRef.current = currentQuestion;
@@ -107,6 +108,7 @@ export default function QuizSystem() {
     if (!selectedAnswer) return;
     setTimerActive(false);
     setShowAnswer(true);
+    timedOutRef.current = false;
     const question = categoryQuestions[currentQuestion];
     const isCorrect = parseInt(selectedAnswer) === question.correctIndex;
     if (isCorrect) setCorrectCount((c) => c + 1);
@@ -118,6 +120,7 @@ export default function QuizSystem() {
   // Timer — use ref to avoid stale closure over currentQuestion
   useEffect(() => {
     if (!timerActive) return;
+    timedOutRef.current = false; // Reset for new question
     setTimeLeft(30); // Reset timer for new question
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
@@ -125,6 +128,7 @@ export default function QuizSystem() {
           clearInterval(interval);
           setTimerActive(false);
           setShowAnswer(true);
+          timedOutRef.current = true;
           setAnswers((a) => {
             const updated = [...a];
             updated[currentQuestionRef.current] = false;
@@ -137,6 +141,26 @@ export default function QuizSystem() {
     }, 1000);
     return () => clearInterval(interval);
   }, [timerActive, currentQuestion]);
+
+  // Auto-advance after timeout
+  useEffect(() => {
+    if (!showAnswer || !timedOutRef.current) return;
+    const timer = setTimeout(() => {
+      nextQuestion();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [showAnswer]);
+
+  // Pause timer when tab is hidden
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden && timerActive) {
+        setTimerActive(false);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [timerActive]);
 
   const resetQuiz = () => {
     setQuizState('select');

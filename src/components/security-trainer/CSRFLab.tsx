@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle, Lock, Globe, Server, ShieldCheck, Trophy, Target } from 'lucide-react';
+import { ChevronLeft, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle, Lock, Globe, Server, ShieldCheck, Trophy, Target, RotateCcw } from 'lucide-react';
 
 const attackSteps = [
   {
@@ -153,7 +153,7 @@ app.use(cors({
 ];
 
 export default function CSRFLab() {
-  const { completedModules, completeModule, setCurrentPage } = useAppStore();
+  const { completedModules, completeModule, setCurrentPage, csrfCompletedSteps, addCsrfStep } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [showDefense, setShowDefense] = useState(false);
   const [activeDefense, setActiveDefense] = useState(0);
@@ -171,6 +171,23 @@ export default function CSRFLab() {
     if (!isCompleted) {
       completeModule('csrf');
     }
+  };
+
+  const goToStep = (step: number) => {
+    setCurrentStep(step);
+    addCsrfStep(step);
+  };
+
+  const goNext = () => {
+    const next = Math.min(currentStep + 1, attackSteps.length - 1);
+    setCurrentStep(next);
+    addCsrfStep(next);
+  };
+
+  const goPrev = () => {
+    const prev = Math.max(0, currentStep - 1);
+    setCurrentStep(prev);
+    addCsrfStep(prev);
   };
 
   const submitQuiz = (optionIndex: number) => {
@@ -281,7 +298,7 @@ export default function CSRFLab() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+              onClick={goPrev}
               disabled={currentStep === 0}
             >
               <ArrowLeft size={14} className="mr-1" /> Назад
@@ -290,7 +307,7 @@ export default function CSRFLab() {
               {attackSteps.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setCurrentStep(i)}
+                  onClick={() => goToStep(i)}
                   className={`w-2.5 h-2.5 rounded-full transition-all ${
                     i <= currentStep ? 'bg-emerald-500' : 'bg-slate-300'
                   }`}
@@ -301,7 +318,7 @@ export default function CSRFLab() {
               <Button
                 size="sm"
                 className="bg-emerald-600 hover:bg-emerald-700"
-                onClick={() => setCurrentStep(currentStep + 1)}
+                onClick={goNext}
               >
                 Далее <ArrowRight size={14} className="ml-1" />
               </Button>
@@ -440,6 +457,23 @@ export default function CSRFLab() {
                     <Button size="sm" className="w-full bg-violet-600 hover:bg-violet-700" onClick={nextQuiz}>
                       Следующий вопрос <ArrowRight size={14} className="ml-1" />
                     </Button>
+                  )}
+                  {quizSubmitted && quizIndex >= csrfQuizzes.length - 1 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-3 p-4 rounded-lg bg-violet-50 border border-violet-200 text-center"
+                    >
+                      <p className="text-sm font-semibold text-violet-800 mb-1">Квиз завершён!</p>
+                      <p className="text-2xl font-bold text-violet-600">{correctCount}/{csrfQuizzes.length}</p>
+                      <p className="text-xs text-violet-500 mb-3">
+                        {correctCount === csrfQuizzes.length ? 'Отлично! Все ответы правильные!' :
+                         correctCount >= csrfQuizzes.length * 0.7 ? 'Хороший результат!' : 'Стоит повторить материал.'}
+                      </p>
+                      <Button size="sm" variant="outline" onClick={() => { setQuizIndex(0); setCorrectCount(0); setQuizSubmitted(false); setQuizAnswer(null); }}>
+                        <RotateCcw size={14} className="mr-1" /> Пройти заново
+                      </Button>
+                    </motion.div>
                   )}
                     </>
                   )}

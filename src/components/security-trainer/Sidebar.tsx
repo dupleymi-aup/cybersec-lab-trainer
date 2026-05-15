@@ -28,6 +28,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ThemeToggle from './ThemeToggle';
+import GlobalSearch from './GlobalSearch';
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard size={20} />,
@@ -108,6 +109,11 @@ export default function Sidebar() {
           <X size={20} />
         </Button>
         <ThemeToggle />
+      </div>
+
+      {/* Global search */}
+      <div className="px-3 pt-2">
+        <GlobalSearch />
       </div>
 
       <Separator className="bg-slate-700" />
@@ -191,6 +197,9 @@ export default function Sidebar() {
                 <p className="font-medium text-white truncate">{user.fullName}</p>
                 <p className="text-xs text-slate-400 truncate">{user.email}</p>
               </div>
+              {user.role === 'student' && (
+                <Badge className="text-[10px] px-1.5 py-0 bg-violet-500 text-white">S</Badge>
+              )}
               {user.role === 'admin' && (
                 <Badge variant="destructive" className="text-[10px] px-1.5 py-0">A</Badge>
               )}

@@ -41,6 +41,7 @@ export default function SecurityHeadersLab() {
   const [step, setStep] = useState<HeaderStep>('description');
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [correctHeaders, setCorrectHeaders] = useState<Set<number>>(new Set());
 
   const header = securityHeaders[currentHeader];
   const isCompleted = completedModules.includes('security-headers');
@@ -91,6 +92,9 @@ export default function SecurityHeadersLab() {
   const submitQuiz = (optionIndex: number) => {
     setQuizAnswer(optionIndex);
     setQuizSubmitted(true);
+    if (optionIndex === header.quiz.correctIndex) {
+      setCorrectHeaders((prev) => new Set(prev).add(currentHeader));
+    }
   };
 
   const isQuizCorrect = quizAnswer === header.quiz.correctIndex;
@@ -115,7 +119,7 @@ export default function SecurityHeadersLab() {
       <Card className="border-none shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium">Заголовки: {currentHeader + 1}/{securityHeaders.length}</span>
+            <span className="text-sm font-medium">Заголовки: {correctHeaders.size}/{securityHeaders.length} правильных</span>
             {isCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
           </div>
           <div className="flex gap-1.5">
@@ -124,7 +128,7 @@ export default function SecurityHeadersLab() {
                 key={h.id}
                 onClick={() => { setCurrentHeader(i); setStep('description'); setQuizAnswer(null); setQuizSubmitted(false); }}
                 className={`flex-1 h-2 rounded-full transition-all ${
-                  i < currentHeader ? 'bg-sky-500' : i === currentHeader ? 'bg-sky-300' : 'bg-slate-200'
+                  correctHeaders.has(i) ? 'bg-emerald-500' : i === currentHeader ? 'bg-sky-300' : 'bg-slate-200'
                 }`}
                 title={h.name}
               />

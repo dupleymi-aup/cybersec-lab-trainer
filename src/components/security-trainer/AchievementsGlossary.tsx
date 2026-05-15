@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { achievements as achievementDefs, modules } from '@/lib/security-data';
+import { achievements as achievementDefs, isAchievementUnlocked } from '@/lib/security-data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -168,37 +168,14 @@ const achievementIcons: Record<string, React.ReactNode> = {
 };
 
 export default function AchievementsAndGlossary() {
-  const { setCurrentPage, completedModules, quizScores, studiedOwaspItems } = useAppStore();
+  const { setCurrentPage, completedModules, quizScores, studiedOwaspItems, secureCodingCorrectCount } = useAppStore();
   const [activeTab, setActiveTab] = useState<'achievements' | 'glossary'>('achievements');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');
 
-  // Calculate achievements
-  const getAchievementStatus = (id: string) => {
-    switch (id) {
-      case 'first-steps': return completedModules.length >= 1;
-      case 'sql-master': return completedModules.includes('sql-injection');
-      case 'xss-hunter': return completedModules.includes('xss');
-      case 'security-guard': return studiedOwaspItems.length >= 10;
-      case 'auth-expert': return completedModules.includes('auth');
-      case 'code-reviewer': return completedModules.includes('secure-coding');
-      case 'quiz-master': return Object.keys(quizScores).length >= 3;
-      case 'quiz-perfect': return Object.values(quizScores).some((s) => s === 100);
-      case 'crypto-ninja': return completedModules.includes('tools');
-      case 'full-completion': return completedModules.length >= modules.length;
-      case 'csrf-shield': return completedModules.includes('csrf');
-      case 'owasp-half': return studiedOwaspItems.length >= 5;
-      case 'quiz-all': return Object.keys(quizScores).length >= 9;
-      case 'crypto-explorer': return completedModules.includes('tools');
-      case 'coding-pro': return completedModules.includes('secure-coding');
-      case 'headers-guard': return completedModules.includes('security-headers');
-      case 'coding-master': return Object.values(quizScores).filter((s) => s >= 80).length >= 15;
-      case 'network-ninja': return (quizScores['network'] || 0) >= 80;
-      case 'social-engineer': return (quizScores['social'] || 0) >= 80;
-      case 'all-headers-correct': return (quizScores['headers'] || 0) === 100;
-      default: return false;
-    }
-  };
+  // Calculate achievements — use single source of truth
+  const getAchievementStatus = (id: string) =>
+    isAchievementUnlocked(id, completedModules, studiedOwaspItems, quizScores, secureCodingCorrectCount);
 
   const unlockedCount = achievementDefs.filter((a) => getAchievementStatus(a.id)).length;
 

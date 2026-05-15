@@ -40,6 +40,7 @@ export default function AuthPages() {
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole>('student');
+  const [adminInviteCode, setAdminInviteCode] = useState('');
 
   // Recovery state
   const [recoveryStep, setRecoveryStep] = useState<RecoveryStep>('enter-contact');
@@ -51,16 +52,14 @@ export default function AuthPages() {
 
   // OTP countdown timer
   const [countdown, setCountdown] = useState(0);
-  const [canResend, setCanResend] = useState(false);
+  const canResend = countdown === 0 && recoveryStep === 'enter-otp';
 
   useEffect(() => {
     if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      const timer = setTimeout(() => setCountdown(c => c - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (countdown === 0 && recoveryStep === 'enter-otp') {
-      setCanResend(true);
     }
-  }, [countdown, recoveryStep]);
+  }, [countdown]);
 
   const { login, register, sendRecoveryOTP, verifyRecoveryOTP, resetPassword, recoveryState } = useAuthStore();
 
@@ -102,10 +101,15 @@ export default function AuthPages() {
       return;
     }
     setLoading(true);
-    const result = await register({ email: regEmail, phone: regPhone, fullName: regName, role: selectedRole }, regPassword);
+    const result = await register(
+      { email: regEmail, phone: regPhone, fullName: regName, role: selectedRole, inviteCode: adminInviteCode },
+      regPassword
+    );
     setLoading(false);
     if (!result.success) {
       toast.error(result.error);
+    } else {
+      setAdminInviteCode('');
     }
   };
 
@@ -129,7 +133,6 @@ export default function AuthPages() {
       toast.success('Код отправлен');
       setRecoveryStep('enter-otp');
       setCountdown(60);
-      setCanResend(false);
     } else {
       toast.error(result.error);
     }
@@ -151,7 +154,6 @@ export default function AuthPages() {
     if (result.success) {
       toast.success('Новый код отправлен');
       setCountdown(60);
-      setCanResend(false);
     } else {
       toast.error(result.error);
     }
@@ -312,13 +314,7 @@ export default function AuthPages() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={(e) => {
-                    if (selectedRole === 'admin') {
-                      toast.error('Роль администратора назначается только через панель администратора');
-                      return;
-                    }
-                    handleRegister(e);
-                  }} className="space-y-4">
+                  <form onSubmit={handleRegister} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="reg-name" className="text-slate-300">
                         ФИО
@@ -380,8 +376,42 @@ export default function AuthPages() {
                             <p className="text-xs text-slate-400 mt-0.5">Отслеживайте прогресс студентов, управляйте группами и смотрите аналитику</p>
                           </label>
                         </div>
+                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800/50 transition cursor-pointer">
+                          <RadioGroupItem value="admin" id="role-admin" className="mt-1" />
+                          <label htmlFor="role-admin" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-2">
+                              <ShieldCheck size={16} className="text-red-400" />
+                              <span className="text-sm font-medium text-white">Администратор</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-0.5">Полный доступ: управление пользователями, база данных, системные настройки</p>
+                          </label>
+                        </div>
                       </RadioGroup>
                     </div>
+                    <AnimatePresence>
+                      {selectedRole === 'admin' && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2"
+                        >
+                          <Label htmlFor="admin-invite-code" className="text-slate-300">
+                            Код приглашения администратора
+                          </Label>
+                          <Input
+                            id="admin-invite-code"
+                            value={adminInviteCode}
+                            onChange={(e) => setAdminInviteCode(e.target.value)}
+                            placeholder="Введите код приглашения"
+                            className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                          />
+                          <p className="text-xs text-amber-400">
+                            Для получения роли администратора необходим код приглашения
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     <div className="space-y-2">
                       <Label htmlFor="reg-password" className="text-slate-300">
                         Пароль
