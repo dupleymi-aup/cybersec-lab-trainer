@@ -42,9 +42,13 @@ export default function OWASPTop10() {
   const handleMarkStudied = () => {
     if (isStudied) return;
     addStudiedOwasp(item.id);
-    if (studiedOwaspItems.length + 1 === totalCount) {
-      completeModule('owasp');
-    }
+    // Check completion using functional update to avoid stale closure
+    setTimeout(() => {
+      const { studiedOwaspItems: updatedStudied } = useAppStore.getState();
+      if (updatedStudied.length === totalCount) {
+        completeModule('owasp');
+      }
+    }, 0);
   };
 
   const goToLesson = (index: number) => {

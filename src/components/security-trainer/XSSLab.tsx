@@ -38,9 +38,13 @@ export default function XSSLab() {
   const handleMarkComplete = (id: string) => {
     if (!xssCompletedLevels.includes(id)) {
       addXssLevel(id);
-      if (xssCompletedLevels.length + 1 === xssTypes.length) {
-        completeModule('xss');
-      }
+      // Check completion using getState() to avoid stale closure
+      setTimeout(() => {
+        const { xssCompletedLevels: updatedCompleted } = useAppStore.getState();
+        if (updatedCompleted.length === xssTypes.length) {
+          completeModule('xss');
+        }
+      }, 0);
     }
   };
 

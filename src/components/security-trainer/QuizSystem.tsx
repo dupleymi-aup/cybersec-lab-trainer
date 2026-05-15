@@ -118,6 +118,7 @@ export default function QuizSystem() {
   // Timer — use ref to avoid stale closure over currentQuestion
   useEffect(() => {
     if (!timerActive) return;
+    setTimeLeft(30); // Reset timer for new question
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -135,7 +136,7 @@ export default function QuizSystem() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [timerActive]);
+  }, [timerActive, currentQuestion]);
 
   const resetQuiz = () => {
     setQuizState('select');

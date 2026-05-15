@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useAuthStore } from '@/lib/auth-store';
 import { validatePassword } from '@/lib/auth-utils';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
@@ -36,6 +36,17 @@ export default function ProfilePage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const pwStrength = usePasswordStrength(newPassword);
+
+  // Sync form state when user data changes
+  useEffect(() => {
+    if (user) {
+      setFullName(user.fullName || '');
+      setGroup(user.group || '');
+      setCourse(user.course || '');
+      setUniversity(user.university || '');
+      setBio(user.bio || '');
+    }
+  }, [user?.fullName, user.group, user.course, user.university, user.bio]);
 
   const profileCompletion = useMemo(() => {
     const fields = [fullName, group, course, university, bio];

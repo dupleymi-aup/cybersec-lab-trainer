@@ -10,9 +10,13 @@ export default function PWAHandler() {
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
+      const handler = () => {
         window.location.reload();
-      });
+      };
+      navigator.serviceWorker.addEventListener('controllerchange', handler);
+      return () => {
+        navigator.serviceWorker.removeEventListener('controllerchange', handler);
+      };
     }
   }, []);
 

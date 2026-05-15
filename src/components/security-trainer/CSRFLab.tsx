@@ -165,7 +165,7 @@ export default function CSRFLab() {
 
   const isCompleted = completedModules.includes('csrf');
   const csrfQuizzes = quizQuestions.filter(q => q.category === 'CSRF');
-  const currentQuiz = csrfQuizzes[quizIndex % csrfQuizzes.length];
+  const currentQuiz = csrfQuizzes.length > 0 ? csrfQuizzes[quizIndex % csrfQuizzes.length] : null;
 
   const handleComplete = () => {
     if (!isCompleted) {
@@ -174,6 +174,7 @@ export default function CSRFLab() {
   };
 
   const submitQuiz = (optionIndex: number) => {
+    if (!currentQuiz) return;
     setQuizAnswer(optionIndex);
     setQuizSubmitted(true);
     if (optionIndex === currentQuiz.correctIndex) {
@@ -382,6 +383,10 @@ export default function CSRFLab() {
             <div className="mt-4 space-y-4">
               <Card className="border-violet-200">
                 <CardContent className="p-5 space-y-4">
+                  {!currentQuiz ? (
+                    <p className="text-sm text-slate-500 text-center">Вопросы для CSRF пока не добавлены</p>
+                  ) : (
+                    <>
                   <h3 className="text-sm font-semibold text-violet-800 flex items-center gap-2">
                     <Trophy size={16} /> Вопрос {quizIndex + 1}/{csrfQuizzes.length}
                     <span className="text-xs font-normal ml-auto">Правильно: {correctCount}</span>
@@ -435,6 +440,8 @@ export default function CSRFLab() {
                     <Button size="sm" className="w-full bg-violet-600 hover:bg-violet-700" onClick={nextQuiz}>
                       Следующий вопрос <ArrowRight size={14} className="ml-1" />
                     </Button>
+                  )}
+                    </>
                   )}
                 </CardContent>
               </Card>
