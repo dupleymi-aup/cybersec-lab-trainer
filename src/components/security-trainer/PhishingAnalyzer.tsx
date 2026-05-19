@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import DOMPurify from 'dompurify';
 import { useAppStore } from '@/lib/store';
 import { phishingEmails, phishingEducationContent } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -241,7 +242,7 @@ export default function PhishingAnalyzer() {
                   ) : (
                     <div
                       className="prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: currentEmail.body }}
+                      dangerouslySetInnerHTML={{ __html: useMemo(() => DOMPurify.sanitize(currentEmail.body), [currentEmail.body]) }}
                     />
                   )}
                 </div>

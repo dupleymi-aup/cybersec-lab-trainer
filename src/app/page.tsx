@@ -105,12 +105,15 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [resolvedPage]);
 
+  // Redirect to dashboard if current page is not accessible
+  useEffect(() => {
+    if (resolvedPage !== currentPage) {
+      setCurrentPage(resolvedPage);
+    }
+  }, [resolvedPage, currentPage, setCurrentPage]);
+
   if (!isAuthenticated) {
     return <AuthPages />;
-  }
-
-  if (resolvedPage !== currentPage) {
-    setCurrentPage(resolvedPage);
   }
 
   return (

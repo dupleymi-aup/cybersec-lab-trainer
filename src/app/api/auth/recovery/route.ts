@@ -15,18 +15,25 @@ export async function POST(request: NextRequest) {
     where: { OR: [{ email: emailOrPhone }, { phone: emailOrPhone }] },
   });
 
+  // Always return same message to prevent user enumeration
+  const response = {
+    success: true,
+    message: 'Если пользователь найден, OTP отправлен на email',
+  };
+
   if (!user) {
-    return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
+    return NextResponse.json(response);
   }
 
   const otp = generateOTP();
   const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
   otpStore.set(user.id, { otp, expiresAt });
 
-  return NextResponse.json({
-    success: true,
-    message: 'OTP sent',
-    userId: user.id,
-    otp,
-  });
+  // TODO: Send OTP via email in production
+  // For development, OTP is stored server-side and shown in dev tools
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[DEV] OTP for ${user.email}: ${otp}`);
+  }
+
+  return NextResponse.json(response);
 }

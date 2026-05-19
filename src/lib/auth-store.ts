@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { useAppStore, migrateProgressToUser } from './store';
 import {
   validateEmail,
   validatePhone,
@@ -48,10 +47,11 @@ export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
 
 import { hasRole, getRoleLabel } from './auth-types';
 
-export const ADMIN_INVITE_CODE = 'CYBERSEC-ADMIN-2024';
+export const ADMIN_INVITE_CODE = process.env.ADMIN_INVITE_CODE || (process.env.NODE_ENV === 'development' ? 'CYBERSEC-ADMIN-2024' : '');
 
 export function validateAdminInviteCode(code: string): boolean {
-  return code.trim().toUpperCase() === ADMIN_INVITE_CODE;
+  const expected = process.env.ADMIN_INVITE_CODE || 'CYBERSEC-ADMIN-2024';
+  return code.trim().toUpperCase() === expected;
 }
 
 export { hasRole, getRoleLabel };
@@ -477,9 +477,11 @@ export const useAuthStore = create<AuthState>()(
           });
 
           // Migrate anonymous progress to user
+          const { migrateProgressToUser } = await import('./store');
           migrateProgressToUser(data.user.id);
 
           // Load user's progress from server
+          const { useAppStore } = await import('./store');
           useAppStore.getState().loadFromDatabase(data.user.id);
 
           return { success: true };
@@ -524,6 +526,7 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           loginActivity: [],
         });
+        const { useAppStore } = await import('./store');
         useAppStore.getState().setUserId(null);
       },
 

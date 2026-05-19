@@ -1,14 +1,17 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { useAuthStore, saveProgressSnapshot } from './auth-store';
 import { quizCategories, modules } from '@/lib/data';
 import { NotificationHelper } from './notification-store';
+import { getCurrentUserId, saveProgressSnapshotProxy } from './auth-bridge';
 
 // ─── API client ───────────────────────────────────────────────
-function getAuthHeaders(): Record<string, string> {
-  const { token } = useAuthStore.getState();
+async function getAuthHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  try {
+    const { useAuthStore } = await import('./auth-store');
+    const { token } = useAuthStore.getState();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+  } catch {}
   return headers;
 }
 
@@ -198,7 +201,7 @@ const syncWithDatabase = async (state: AppState, set: (partial: Partial<AppStore
     for (const p of progress) {
       const score = typeof p.score === 'number' ? p.score : 0;
       const completed = p.completed === true;
-      saveProgressSnapshot(p.moduleId as string, score, completed).catch(() => {});
+      saveProgressSnapshotProxy(p.moduleId as string, score, completed).catch(() => {});
     }
 
     set({ syncStatus: 'synced', lastSyncedAt: new Date() });
@@ -334,18 +337,15 @@ type PersistedState = Pick<AppState,
 function createDynamicStorage() {
   return createJSONStorage<PersistedState>(() => ({
     getItem: (name: string) => {
-      const { user } = useAuthStore.getState();
-      const userId = user?.id || 'anonymous';
+      const userId = getCurrentUserId();
       return localStorage.getItem(`${name}-${userId}`);
     },
     setItem: (name: string, value: string) => {
-      const { user } = useAuthStore.getState();
-      const userId = user?.id || 'anonymous';
+      const userId = getCurrentUserId();
       localStorage.setItem(`${name}-${userId}`, value);
     },
     removeItem: (name: string) => {
-      const { user } = useAuthStore.getState();
-      const userId = user?.id || 'anonymous';
+      const userId = getCurrentUserId();
       localStorage.removeItem(`${name}-${userId}`);
     },
   }));
