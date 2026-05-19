@@ -5,6 +5,8 @@ import { useAuthStore } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
 import { validatePassword } from '@/lib/auth-utils';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
+import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
+import { modules, achievements } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +14,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { User, Camera, Shield, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, AlertCircle, Clock, Trash2 } from 'lucide-react';
+import {
+  User, Camera, Shield, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, AlertCircle, Clock, Trash2,
+  BookOpen, Brain, Trophy, Target, GraduationCap, Star, Activity, Calendar,
+  Database, Code, LockIcon, KeyRound,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
@@ -56,6 +62,72 @@ export default function ProfilePage() {
     const filled = fields.filter((f) => f.trim()).length;
     return Math.round((filled / fields.length) * 100);
   }, [fullName, group, course, university, bio]);
+
+  // Stats
+  const totalModules = modules.length;
+  const completedCount = completedModules.filter((id) => modules.some((m) => m.id === id)).length;
+  const totalProgress = Math.round((completedCount / totalModules) * 100);
+
+  const avgQuizScore =
+    Object.keys(quizScores).length > 0
+      ? Math.round(
+          Object.values(quizScores).reduce((a, b) => a + b, 0) / Object.values(quizScores).length
+        )
+      : 0;
+
+  const challengeStats = {
+    owaspCorrect: 0,
+    authCorrect: 0,
+  };
+
+  const unlockedAchievements = achievements.filter((a) =>
+    getAchievementStatus(a.id, completedModules, quizScores, challengeStats)
+  );
+  const unlockedCount = unlockedAchievements.length;
+  const totalAchievements = achievements.length;
+
+  // Build recent activity from store timestamps
+  const recentActivity = useMemo(() => {
+    const events: Array<{ date: Date; type: string; label: string }> = [];
+    for (const [moduleId, ts] of Object.entries(useAppStore.getState().moduleTimestamps || {})) {
+      const mod = modules.find((m) => m.id === moduleId);
+      if (mod) events.push({ date: new Date(ts), type: 'module', label: mod.title });
+    }
+    for (const [quizId, ts] of Object.entries(useAppStore.getState().quizTimestamps || {})) {
+      const cat = modules.find((m) => m.id === quizId);
+      events.push({ date: new Date(ts), type: 'quiz', label: cat?.title || `Квиз: ${quizId}` });
+    }
+    return events.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 10);
+  }, []);
+
+  const achievementIcons: Record<string, React.ReactNode> = {
+    'first-steps': <BookOpen size={20} />,
+    'sql-master': <Database size={20} />,
+    'xss-hunter': <Code size={20} />,
+    'security-guard': <Shield size={20} />,
+    'auth-expert': <Target size={20} />,
+    'code-reviewer': <Code size={20} />,
+    'quiz-master': <Trophy size={20} />,
+    'quiz-perfect': <Star size={20} />,
+    'crypto-ninja': <LockIcon size={20} />,
+    'full-completion': <GraduationCap size={20} />,
+    'csrf-shield': <Shield size={20} />,
+    'owasp-half': <Shield size={20} />,
+    'quiz-all': <Trophy size={20} />,
+    'crypto-explorer': <KeyRound size={20} />,
+    'coding-pro': <Code size={20} />,
+    'headers-guard': <Shield size={20} />,
+    'coding-master': <Code size={20} />,
+    'network-ninja': <Shield size={20} />,
+    'social-engineer': <Target size={20} />,
+    'all-headers-correct': <Shield size={20} />,
+  };
+
+  const formatDate = (iso: string) => {
+    try {
+      return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch { return iso; }
+  };
 
   if (!user) return null;
 
@@ -273,6 +345,114 @@ export default function ProfilePage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Statistics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Activity className="w-5 h-5 text-emerald-500" />
+            Статистика обучения
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+              <div className="flex items-center gap-2 mb-1">
+                <BookOpen size={14} className="text-emerald-600" />
+                <span className="text-[11px] text-emerald-700 font-medium">Модули</span>
+              </div>
+              <p className="text-lg font-bold">{completedCount}/{totalModules}</p>
+              <div className="w-full bg-emerald-200 rounded-full h-1.5 mt-1">
+                <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${totalProgress}%` }} />
+              </div>
+            </div>
+            <div className="p-3 rounded-lg bg-violet-50 border border-violet-200">
+              <div className="flex items-center gap-2 mb-1">
+                <Brain size={14} className="text-violet-600" />
+                <span className="text-[11px] text-violet-700 font-medium">Ср. балл</span>
+              </div>
+              <p className="text-lg font-bold">{avgQuizScore}%</p>
+              <p className="text-[11px] text-violet-600 mt-0.5">{Object.keys(quizScores).length} квизов</p>
+            </div>
+            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
+              <div className="flex items-center gap-2 mb-1">
+                <Trophy size={14} className="text-amber-600" />
+                <span className="text-[11px] text-amber-700 font-medium">Достижения</span>
+              </div>
+              <p className="text-lg font-bold">{unlockedCount}/{totalAchievements}</p>
+              <div className="w-full bg-amber-200 rounded-full h-1.5 mt-1">
+                <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${(unlockedCount / totalAchievements) * 100}%` }} />
+              </div>
+            </div>
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+              <div className="flex items-center gap-2 mb-1">
+                <Calendar size={14} className="text-blue-600" />
+                <span className="text-[11px] text-blue-700 font-medium">На платформе</span>
+              </div>
+              <p className="text-lg font-bold">{formatDate(user.createdAt).split(' ').slice(1, 3).join(' ')}</p>
+              <p className="text-[11px] text-blue-600 mt-0.5">Входов: {user.loginCount}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent Activity */}
+      {recentActivity.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Clock className="w-5 h-5 text-slate-600" />
+              Последняя активность
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1.5">
+              {recentActivity.map((event, i) => (
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
+                  <div className={`w-2 h-2 rounded-full ${
+                    event.type === 'module' ? 'bg-emerald-400' : 'bg-violet-400'
+                  }`} />
+                  <span className="text-[11px] text-slate-400 min-w-[80px]">
+                    {event.date.toLocaleDateString('ru-RU')}
+                  </span>
+                  <span className="text-xs text-slate-700">{event.label}</span>
+                  <Badge variant="secondary" className="text-[10px] ml-auto">
+                    {event.type === 'module' ? 'Модуль' : 'Квиз'}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Achievements */}
+      {unlockedAchievements.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-amber-500" />
+              Разблокированные достижения
+              <Badge className="ml-auto text-[11px]">{unlockedCount}/{totalAchievements}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {unlockedAchievements.map((a) => (
+                <div key={a.id} className="flex items-center gap-2 p-2 rounded-lg bg-amber-50 border border-amber-200">
+                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                    {achievementIcons[a.id] || <Trophy size={16} />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold truncate">{a.title}</p>
+                    <p className="text-[10px] text-amber-700 truncate">{a.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Personal Info */}
       <Card>
