@@ -4,7 +4,8 @@ import { useAppStore } from '@/lib/store';
 import { useAuthStore } from '@/lib/auth-store';
 import { modules, achievements, sqlChallenges, xssTypes, attackSteps, secureCodingChallenges } from '@/lib/data';
 import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
-import { NotificationHelper } from '@/lib/notification-store';
+import { NotificationHelper, loadAnnouncementsIntoNotifications } from '@/lib/notification-store';
+import NotificationBell from './NotificationBell';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -114,8 +115,10 @@ export default function Dashboard() {
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set());
   useEffect(() => {
     setAnnouncements(loadActiveAnnouncements());
+    loadAnnouncementsIntoNotifications();
     const interval = setInterval(() => {
       setAnnouncements(loadActiveAnnouncements());
+      loadAnnouncementsIntoNotifications();
     }, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -277,11 +280,14 @@ export default function Dashboard() {
     <div className="space-y-8">
       {/* Top bar mobile */}
       <div className="flex items-center gap-3 md:hidden">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-          <Menu size={22} />
-        </Button>
-        <Shield size={22} className="text-emerald-600" />
-        <span className="font-bold text-lg">CyberSec Lab</span>
+          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            <Menu size={22} />
+          </Button>
+          <Shield size={22} className="text-emerald-600" />
+          <span className="font-bold text-lg">CyberSec Lab</span>
+          <div className="ml-auto">
+            <NotificationBell />
+          </div>
       </div>
 
       {/* Announcements */}

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type NotificationType = 'achievement' | 'progress' | 'quiz' | 'system' | 'warning';
+export type NotificationType = 'achievement' | 'progress' | 'quiz' | 'system' | 'warning' | 'announcement';
 
 export interface Notification {
   id: string;
@@ -122,4 +122,34 @@ export const NotificationHelper = {
       message,
     });
   },
+  announcement: (title: string, message: string, priority?: 'low' | 'normal' | 'high') => {
+    useNotificationStore.getState().addNotification({
+      type: 'announcement',
+      title: priority === 'high' ? '📢 Важное объявление' : '📢 Объявление',
+      message,
+    });
+  },
 };
+
+/** Load announcements from localStorage into notifications */
+export function loadAnnouncementsIntoNotifications() {
+  try {
+    const raw = localStorage.getItem('cybersec-announcements');
+    if (!raw) return;
+    const announcements = JSON.parse(raw) as Array<{
+      id: string; title: string; content: string; priority: string;
+    }>;
+    const store = useNotificationStore.getState();
+    const existing = new Set(store.notifications.map((n) => n.title + n.message));
+    for (const a of announcements.slice(0, 10)) {
+      const key = a.title + a.content.split('\n')[0];
+      if (!existing.has(key)) {
+        store.addNotification({
+          type: 'announcement',
+          title: a.priority === 'high' ? '📢 Важное объявление' : '📢 Объявление',
+          message: `${a.title}: ${a.content.split('\n')[0]}`,
+        });
+      }
+    }
+  } catch { /* ignore */ }
+}
