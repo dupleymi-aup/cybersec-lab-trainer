@@ -15,6 +15,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ModuleNavigation from '@/components/security-trainer/ModuleNavigation';
 import KeyboardShortcuts from '@/components/security-trainer/KeyboardShortcuts';
 import CompletionCelebration from '@/components/security-trainer/CompletionCelebration';
+import OfflineBanner from '@/components/security-trainer/OfflineBanner';
 
 const modulePageIds = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
 
@@ -99,6 +100,7 @@ export default function Home() {
     <div className="min-h-screen flex bg-background">
       <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
+        <OfflineBanner />
         {impersonation.isImpersonating && user && (
           <div className="bg-amber-500 text-white px-4 py-2 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
