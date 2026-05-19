@@ -519,15 +519,16 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
+      logout: async () => {
         set({
           user: null,
           isAuthenticated: false,
           token: null,
           loginActivity: [],
         });
-        const { useAppStore } = await import('./store');
-        useAppStore.getState().setUserId(null);
+        import('./store').then(({ useAppStore }) => {
+          useAppStore.getState().setUserId(null);
+        });
       },
 
       updateProfile: async (data) => {
