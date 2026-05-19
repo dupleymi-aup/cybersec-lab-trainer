@@ -96,18 +96,18 @@ export default function SSRFLab() {
             <Badge variant="secondary" className="bg-red-100 text-red-800">Продвинутый</Badge>
             {isCompleted && <Badge className="bg-emerald-100 text-emerald-700 border-0">Пройден</Badge>}
           </div>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             Server-Side Request Forgery — подделка запросов на стороне сервера
           </p>
         </div>
       </div>
 
       {/* Progress */}
-      <Card className="border-none shadow-sm bg-white">
+      <Card className="border-none shadow-sm bg-card">
         <CardContent className="p-4">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-slate-500">Прогресс лаборатории</span>
-            <span className="font-medium text-slate-700">
+            <span className="text-muted-foreground">Прогресс лаборатории</span>
+            <span className="font-medium text-foreground/70">
               Сценарий {currentScenario + 1} из {ssrfScenarios.length}
             </span>
           </div>
@@ -136,7 +136,7 @@ export default function SSRFLab() {
                 ? 'bg-red-600 text-white'
                 : i < currentScenario
                   ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-muted text-muted-foreground hover:bg-slate-200'
             }`}
           >
             {s.title}
@@ -160,7 +160,7 @@ export default function SSRFLab() {
                   <AlertTriangle size={20} className="text-red-500" />
                   {scenario.title}
                 </h2>
-                <p className="text-sm text-slate-600 mt-2">{scenario.description}</p>
+                <p className="text-sm text-muted-foreground mt-2">{scenario.description}</p>
               </div>
 
               {/* Vulnerable code */}
@@ -188,7 +188,7 @@ export default function SSRFLab() {
                 </h3>
                 <div className="space-y-2">
                   {scenario.options.map((opt, i) => {
-                    let itemClass = 'border-slate-200 hover:border-slate-300 bg-white';
+                    let itemClass = 'border-border hover:border-border bg-card';
                     if (selectedOption === i) {
                       itemClass = optionSubmitted
                         ? opt.correct
@@ -218,7 +218,7 @@ export default function SSRFLab() {
                             <div className="w-4 h-4 rounded-full border-2 border-red-500 bg-red-500 shrink-0" />
                           )}
                           {!optionSubmitted && selectedOption !== i && (
-                            <div className="w-4 h-4 rounded-full border-2 border-slate-300 shrink-0" />
+                            <div className="w-4 h-4 rounded-full border-2 border-border shrink-0" />
                           )}
                           <span>{opt.text}</span>
                         </div>
@@ -236,7 +236,7 @@ export default function SSRFLab() {
                     Проверить ответ
                   </Button>
                 ) : (
-                  <Card className="mt-3 border-none bg-slate-50">
+                  <Card className="mt-3 border-none bg-secondary">
                     <CardContent className="p-3">
                       <p className="text-sm font-medium">
                         {scenario.options[selectedOption!]?.correct ? (
@@ -257,7 +257,7 @@ export default function SSRFLab() {
                     <ShieldCheck size={16} /> Исправленный код
                   </h3>
                   <CodeBlock code={scenario.fix} language="javascript" />
-                  <p className="text-xs text-slate-500 mt-2">{scenario.fixExplanation}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{scenario.fixExplanation}</p>
                 </motion.div>
               )}
             </CardContent>
@@ -289,10 +289,10 @@ export default function SSRFLab() {
                 className="mt-4 space-y-3"
               >
                 {ssrfDefenseMechanisms.map((d, i) => (
-                  <Card key={i} className="border-white/50 bg-white/70">
+                  <Card key={i} className="border-white/50 bg-card/70">
                     <CardContent className="p-3">
                       <h4 className="text-sm font-semibold text-emerald-700">{d.title}</h4>
-                      <p className="text-xs text-slate-600 mt-1">{d.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{d.description}</p>
                       <CodeBlock code={d.code} language="javascript" />
                     </CardContent>
                   </Card>

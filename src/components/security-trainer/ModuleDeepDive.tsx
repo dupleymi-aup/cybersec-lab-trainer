@@ -41,7 +41,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-white"
+            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
           >
             <option value={7}>7 дней</option>
             <option value={30}>30 дней</option>
@@ -88,28 +88,28 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
           <TabsContent key={m.moduleId} value={m.moduleId} className="mt-4 space-y-4">
             {/* Summary cards */}
             <div className="grid grid-cols-3 gap-3">
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-4 text-center">
                   <p className="text-2xl font-bold text-indigo-600">{m.totalStudents}</p>
-                  <p className="text-xs text-slate-500">Студентов</p>
+                  <p className="text-xs text-muted-foreground">Студентов</p>
                 </CardContent>
               </Card>
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-4 text-center">
                   <p className="text-2xl font-bold text-emerald-600">{m.completionRate}%</p>
-                  <p className="text-xs text-slate-500">Завершение</p>
+                  <p className="text-xs text-muted-foreground">Завершение</p>
                 </CardContent>
               </Card>
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-4 text-center">
                   <p className="text-2xl font-bold text-amber-600">{m.avgScore}%</p>
-                  <p className="text-xs text-slate-500">Ср. балл</p>
+                  <p className="text-xs text-muted-foreground">Ср. балл</p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Level progress */}
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
                   <BarChart3 size={16} /> Прогресс по уровням
@@ -134,12 +134,12 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
               {m.levels.map((l) => (
                 <div key={l.level} className="flex items-center gap-3 text-xs">
                   <span className="w-12 font-medium">Ур. {l.level}</span>
-                  <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden relative">
+                  <div className="flex-1 bg-muted rounded-full h-4 overflow-hidden relative">
                     <div
                       className="h-full bg-emerald-500 rounded-full"
                       style={{ width: `${l.completionRate}%` }}
                     />
-                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-slate-700">
+                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-foreground/70">
                       {l.completed} / {l.started} ({l.completionRate}%)
                     </span>
                   </div>
@@ -148,7 +148,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
             </div>
 
             {/* Challenge scores */}
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Распределение баллов за челленджи</h3>
                 <div className="h-[200px]">
@@ -167,14 +167,14 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
 
             {/* OWASP studied items */}
             {m.studiedItemsCoverage && m.studiedItemsCoverage.length > 0 && (
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-5">
                   <h3 className="font-semibold text-sm mb-3">Покрытие тем OWASP Top 10</h3>
                   <div className="space-y-2">
                     {m.studiedItemsCoverage.map((item) => (
                       <div key={item.item} className="flex items-center gap-3 text-xs">
                         <span className="w-40 truncate">{item.item}</span>
-                        <div className="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
+                        <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
                           <div className="h-full bg-violet-500 rounded-full" style={{ width: `${item.studiedRate}%` }} />
                         </div>
                         <span className="w-12 text-right">{item.studiedRate}%</span>
@@ -187,7 +187,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
 
             {/* Secure coding distribution */}
             {m.secureCodingDistribution && (
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-5">
                   <h3 className="font-semibold text-sm mb-4">Распределение правильных ответов (Безопасное кодирование)</h3>
                   <div className="h-[200px]">

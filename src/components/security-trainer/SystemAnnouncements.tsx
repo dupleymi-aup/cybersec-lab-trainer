@@ -36,7 +36,7 @@ function saveAnnouncements(announcements: Announcement[]) {
 const PRIORITY_CONFIG = {
   high: { icon: AlertCircle, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', badge: 'bg-red-100 text-red-700' },
   normal: { icon: Info, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700' },
-  low: { icon: AlertTriangle, color: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-200', badge: 'bg-slate-100 text-slate-700' },
+  low: { icon: AlertTriangle, color: 'text-muted-foreground', bg: 'bg-secondary', border: 'border-border', badge: 'bg-muted text-foreground/70' },
 };
 
 export default function SystemAnnouncements({ currentUser }: { currentUser: string }) {
@@ -121,7 +121,7 @@ export default function SystemAnnouncements({ currentUser }: { currentUser: stri
           </div>
           <div>
             <h2 className="text-sm font-bold">Системные объявления</h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Создание и управление объявлениями для всех пользователей
             </p>
           </div>
@@ -153,23 +153,23 @@ export default function SystemAnnouncements({ currentUser }: { currentUser: stri
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
                   placeholder="Заголовок объявления"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm bg-card"
                   maxLength={100}
                 />
                 <textarea
                   value={formContent}
                   onChange={(e) => setFormContent(e.target.value)}
                   placeholder="Содержание объявления..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm bg-white min-h-[80px] resize-y"
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm bg-card min-h-[80px] resize-y"
                   maxLength={500}
                 />
                 <div className="flex items-center gap-4 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500">Приоритет:</span>
+                    <span className="text-xs text-muted-foreground">Приоритет:</span>
                     <select
                       value={formPriority}
                       onChange={(e) => setFormPriority(e.target.value as 'low' | 'normal' | 'high')}
-                      className="px-2 py-1.5 border border-slate-200 rounded-md text-xs bg-white"
+                      className="px-2 py-1.5 border border-border rounded-md text-xs bg-card"
                     >
                       <option value="low">Низкий</option>
                       <option value="normal">Обычный</option>
@@ -182,7 +182,7 @@ export default function SystemAnnouncements({ currentUser }: { currentUser: stri
                       type="date"
                       value={formExpiry}
                       onChange={(e) => setFormExpiry(e.target.value)}
-                      className="px-2 py-1.5 border border-slate-200 rounded-md text-xs bg-white"
+                      className="px-2 py-1.5 border border-border rounded-md text-xs bg-card"
                     />
                     <span className="text-[10px] text-slate-400">(дата истечения)</span>
                   </div>
@@ -205,7 +205,7 @@ export default function SystemAnnouncements({ currentUser }: { currentUser: stri
       {sorted.length === 0 ? (
         <div className="text-center py-12">
           <Megaphone size={40} className="text-slate-300 mx-auto mb-3" />
-          <p className="text-sm text-slate-500">Нет активных объявлений</p>
+          <p className="text-sm text-muted-foreground">Нет активных объявлений</p>
           <p className="text-xs text-slate-400 mt-1">
             Создайте первое объявление для всех пользователей
           </p>
@@ -242,7 +242,7 @@ export default function SystemAnnouncements({ currentUser }: { currentUser: stri
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-slate-600 mt-1 whitespace-pre-wrap">{ann.content}</p>
+                      <p className="text-xs text-muted-foreground mt-1 whitespace-pre-wrap">{ann.content}</p>
                       <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400">
                         <span>{new Date(ann.createdAt).toLocaleDateString('ru-RU')}</span>
                         <span>Автор: {ann.author}</span>

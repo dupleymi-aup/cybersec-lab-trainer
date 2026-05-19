@@ -92,7 +92,7 @@ export default function PhishingAnalyzer() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Анализатор фишинговых писем</h1>
-          <p className="text-xs text-slate-500">Научитесь распознавать фишинг по заголовкам, содержимому и ссылкам</p>
+          <p className="text-xs text-muted-foreground">Научитесь распознавать фишинг по заголовкам, содержимому и ссылкам</p>
         </div>
         {score.total > 0 && (
           <Badge className="ml-auto bg-emerald-100 text-emerald-700 border-0">
@@ -135,10 +135,10 @@ export default function PhishingAnalyzer() {
             <h3 className="font-semibold mb-3">Типы фишинговых атак</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {phishingEducationContent.commonTypes.map((t, i) => (
-                <Card key={i} className="border-slate-200">
+                <Card key={i} className="border-border">
                   <CardContent className="p-4">
                     <h4 className="text-sm font-semibold">{t.type}</h4>
-                    <p className="text-xs text-slate-600 mt-1">{t.description}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -151,9 +151,9 @@ export default function PhishingAnalyzer() {
             </h3>
             <div className="space-y-2">
               {phishingEducationContent.howToSpot.map((tip, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 bg-white rounded border border-slate-100">
+                <div key={i} className="flex items-start gap-3 p-3 bg-card rounded border border-slate-100">
                   <CheckCircle2 size={16} className="text-emerald-500 mt-0.5 shrink-0" />
-                  <p className="text-sm text-slate-700">{tip}</p>
+                  <p className="text-sm text-foreground/70">{tip}</p>
                 </div>
               ))}
             </div>
@@ -163,9 +163,9 @@ export default function PhishingAnalyzer() {
             <h3 className="font-semibold mb-3">Что делать, если вы обнаружили фишинг</h3>
             <div className="space-y-2">
               {phishingEducationContent.whatToDo.map((action, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 bg-white rounded border border-slate-100">
+                <div key={i} className="flex items-start gap-3 p-3 bg-card rounded border border-slate-100">
                   <span className="w-6 h-6 rounded-full bg-red-100 text-red-700 text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-                  <p className="text-sm text-slate-700">{action}</p>
+                  <p className="text-sm text-foreground/70">{action}</p>
                 </div>
               ))}
             </div>
@@ -188,7 +188,7 @@ export default function PhishingAnalyzer() {
                 variant={filterDifficulty === d ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => { setFilterDifficulty(d); setCurrentEmailIndex(0); setUserVerdict(null); setRevealedIndicators(new Set()); }}
-                className={filterDifficulty === d ? 'bg-slate-800' : ''}
+                className={filterDifficulty === d ? 'bg-slate-800 dark:bg-slate-700' : ''}
               >
                 {d === 'all' ? 'Все' : d === 'easy' ? 'Лёгкие' : d === 'medium' ? 'Средние' : 'Сложные'}
               </Button>
@@ -196,7 +196,7 @@ export default function PhishingAnalyzer() {
           </div>
 
           {/* Email preview */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               {/* Email metadata */}
               <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -206,36 +206,36 @@ export default function PhishingAnalyzer() {
                 <span className="text-xs text-slate-400">Письмо {currentEmailIndex + 1} из {filteredEmails.length}</span>
               </div>
 
-              <div className="space-y-2 mb-4 p-4 bg-slate-50 rounded-lg">
+              <div className="space-y-2 mb-4 p-4 bg-secondary rounded-lg">
                 <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-slate-500 w-12 shrink-0">Тема:</span>
+                  <span className="text-xs font-semibold text-muted-foreground w-12 shrink-0">Тема:</span>
                   <span className="text-sm font-medium">{currentEmail.subject}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-slate-500 w-12 shrink-0">От:</span>
+                  <span className="text-xs font-semibold text-muted-foreground w-12 shrink-0">От:</span>
                   <span className="text-sm">{currentEmail.from}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-slate-500 w-12 shrink-0">Кому:</span>
+                  <span className="text-xs font-semibold text-muted-foreground w-12 shrink-0">Кому:</span>
                   <span className="text-sm">{currentEmail.to}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-xs font-semibold text-slate-500 w-12 shrink-0">Дата:</span>
+                  <span className="text-xs font-semibold text-muted-foreground w-12 shrink-0">Дата:</span>
                   <span className="text-sm">{currentEmail.date}</span>
                 </div>
               </div>
 
               {/* Email body preview */}
-              <div className="border border-slate-200 rounded-lg overflow-hidden mb-4">
-                <div className="flex items-center justify-between p-2 bg-slate-100 border-b">
-                  <span className="text-xs font-semibold text-slate-600">Тело письма</span>
+              <div className="border border-border rounded-lg overflow-hidden mb-4">
+                <div className="flex items-center justify-between p-2 bg-muted border-b">
+                  <span className="text-xs font-semibold text-muted-foreground">Тело письма</span>
                   <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setShowRawBody(!showRawBody)}>
                     {showRawBody ? <><EyeOff size={12} className="mr-1" /> Скрыть HTML</> : <><Eye size={12} className="mr-1" /> Показать HTML</>}
                   </Button>
                 </div>
                 <div className="p-4">
                   {showRawBody ? (
-                    <pre className="text-[11px] font-mono text-slate-700 whitespace-pre-wrap overflow-x-auto bg-slate-50 p-3 rounded">
+                    <pre className="text-[11px] font-mono text-foreground/70 whitespace-pre-wrap overflow-x-auto bg-secondary p-3 rounded">
                       {currentEmail.body}
                     </pre>
                   ) : (
@@ -254,7 +254,7 @@ export default function PhishingAnalyzer() {
               <AnimatePresence>
                 {showHeaders && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                    <pre className="text-[11px] font-mono text-slate-700 whitespace-pre-wrap overflow-x-auto bg-slate-50 p-3 rounded mt-2 border border-slate-200">
+                    <pre className="text-[11px] font-mono text-foreground/70 whitespace-pre-wrap overflow-x-auto bg-secondary p-3 rounded mt-2 border border-border">
                       {currentEmail.headers}
                     </pre>
                   </motion.div>
@@ -289,11 +289,11 @@ export default function PhishingAnalyzer() {
                         {currentEmail.isPhishing === (userVerdict === 'phishing') ? 'Правильно!' : 'Неверно.'}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-700 mb-3">
+                    <p className="text-sm text-foreground/70 mb-3">
                       Это письмо <b>{currentEmail.isPhishing ? 'фишинговое' : 'легитимное'}</b>.
                       {currentEmail.isPhishing && ` Найдено ${currentEmail.indicators.length} индикаторов.`}
                     </p>
-                    <p className="text-xs text-slate-600 leading-relaxed">{currentEmail.explanation}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{currentEmail.explanation}</p>
                   </CardContent>
                 </Card>
 
@@ -306,7 +306,7 @@ export default function PhishingAnalyzer() {
                     {currentEmail.indicators.map(ind => (
                       <Card
                         key={ind.id}
-                        className={`border cursor-pointer transition-colors ${revealedIndicators.has(ind.id) ? 'border-slate-300' : 'border-slate-100'}`}
+                        className={`border cursor-pointer transition-colors ${revealedIndicators.has(ind.id) ? 'border-border' : 'border-slate-100'}`}
                         onClick={() => toggleIndicator(ind.id)}
                       >
                         <CardContent className="p-3">
@@ -320,7 +320,7 @@ export default function PhishingAnalyzer() {
                           <AnimatePresence>
                             {revealedIndicators.has(ind.id) && (
                               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                                <p className="text-xs text-slate-600 mt-2 leading-relaxed">{ind.description}</p>
+                                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{ind.description}</p>
                               </motion.div>
                             )}
                           </AnimatePresence>
@@ -364,7 +364,7 @@ export default function PhishingAnalyzer() {
 
       {currentPhase === 'practice' && filteredEmails.length === 0 && (
         <Card>
-          <CardContent className="p-8 text-center text-slate-500">
+          <CardContent className="p-8 text-center text-muted-foreground">
             Нет писем с такой сложностью. Выберите «Все».
           </CardContent>
         </Card>

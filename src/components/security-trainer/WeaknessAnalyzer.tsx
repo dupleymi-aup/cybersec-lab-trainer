@@ -152,7 +152,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Анализ слабых мест...</p>
+        <p className="text-sm text-muted-foreground ml-3">Анализ слабых мест...</p>
       </div>
     );
   }
@@ -161,7 +161,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error}</p>
       </div>
     );
   }
@@ -175,7 +175,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
           </div>
           <div>
             <h2 className="text-lg font-bold">Анализ слабых мест</h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Выявление проблемных тем и рекомендации по улучшению
             </p>
           </div>
@@ -192,7 +192,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                 key={key}
                 onClick={() => setSelectedSeverity('all')}
                 className={`p-3 rounded-lg text-center transition-all ${
-                  selectedSeverity === 'all' ? 'bg-slate-800 text-white ring-2 ring-slate-800' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  selectedSeverity === 'all' ? 'bg-slate-800 dark:bg-slate-700 text-white ring-2 ring-slate-800' : 'bg-muted text-foreground/70 hover:bg-slate-200'
                 }`}
               >
                 <p className="text-xl font-bold">{count}</p>
@@ -206,7 +206,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
               key={key}
               onClick={() => setSelectedSeverity(key)}
               className={`p-3 rounded-lg text-center transition-all ${
-                selectedSeverity === key ? `${cfg.bg} ring-2 ring-offset-1` : 'bg-slate-50 hover:bg-slate-100'
+                selectedSeverity === key ? `${cfg.bg} ring-2 ring-offset-1` : 'bg-secondary hover:bg-muted'
               }`}
             >
               <p className={`text-xl font-bold ${cfg.text}`}>{count}</p>
@@ -218,10 +218,10 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Weakness chart */}
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
-              <TrendingUp size={16} className="text-slate-500" />
+              <TrendingUp size={16} className="text-muted-foreground" />
               Топ проблемных тем
             </h3>
             {chartData.length > 0 ? (
@@ -247,7 +247,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
         </Card>
 
         {/* Recommendations */}
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <Lightbulb size={16} className="text-amber-500" />
@@ -261,7 +261,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="p-3 rounded-lg border border-slate-100 hover:border-slate-200"
+                    className="p-3 rounded-lg border border-slate-100 hover:border-border"
                   >
                     <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center gap-2">
@@ -276,10 +276,10 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                         {w.score}%
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500 mb-2">{w.details}</p>
+                    <p className="text-[11px] text-muted-foreground mb-2">{w.details}</p>
                     <ul className="space-y-0.5">
                       {w.recommendations.map((rec, j) => (
-                        <li key={j} className="flex items-start gap-1.5 text-[11px] text-slate-600">
+                        <li key={j} className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
                           <span className="text-emerald-500 mt-0.5">•</span>
                           {rec}
                         </li>
@@ -299,12 +299,12 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
 
       {/* Full weakness table */}
       {filteredWeaknesses.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200">
+                  <tr className="bg-secondary border-b border-border">
                     <th className="text-left p-3 font-semibold text-xs">Тема</th>
                     <th className="text-left p-3 font-semibold text-xs">Тип</th>
                     <th className="text-center p-3 font-semibold text-xs">Балл</th>
@@ -319,7 +319,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.02 }}
-                      className="border-b border-slate-100 hover:bg-slate-50"
+                      className="border-b border-slate-100 hover:bg-secondary"
                     >
                       <td className="p-3 font-medium text-xs">{w.topic}</td>
                       <td className="p-3">
@@ -339,7 +339,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                           {SEVERITY_CONFIG[w.severity].label}
                         </Badge>
                       </td>
-                      <td className="p-3 text-[11px] text-slate-500">{w.details}</td>
+                      <td className="p-3 text-[11px] text-muted-foreground">{w.details}</td>
                     </motion.tr>
                   ))}
                 </tbody>

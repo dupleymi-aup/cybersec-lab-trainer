@@ -16,15 +16,15 @@ export default function AnalyticsFilterBar() {
   }, []);
 
   return (
-    <div className="flex flex-wrap items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl mb-4">
+    <div className="flex flex-wrap items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-white border border-border rounded-xl mb-4">
       {/* Group filter */}
       <div className="flex items-center gap-2">
-        <Users size={15} className="text-slate-500" />
-        <span className="text-xs font-medium text-slate-600">Группа:</span>
+        <Users size={15} className="text-muted-foreground" />
+        <span className="text-xs font-medium text-muted-foreground">Группа:</span>
         <select
           value={groupId}
           onChange={(e) => setGroupId(e.target.value)}
-          className="px-2.5 py-1.5 border border-slate-200 rounded-md text-sm bg-white hover:border-slate-300 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-colors"
+          className="px-2.5 py-1.5 border border-border rounded-md text-sm bg-card hover:border-border focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none transition-colors"
         >
           <option value="">Все группы</option>
           {groups.map((g) => (
@@ -38,17 +38,17 @@ export default function AnalyticsFilterBar() {
 
       {/* Period presets */}
       <div className="flex items-center gap-2">
-        <Calendar size={15} className="text-slate-500" />
-        <span className="text-xs font-medium text-slate-600">Период:</span>
-        <div className="flex gap-1 p-0.5 bg-slate-100 rounded-md">
+        <Calendar size={15} className="text-muted-foreground" />
+        <span className="text-xs font-medium text-muted-foreground">Период:</span>
+        <div className="flex gap-1 p-0.5 bg-muted rounded-md">
           {DAY_PRESETS.map((d) => (
             <button
               key={d}
               onClick={() => setDays(d)}
               className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                 days === d
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {d}д

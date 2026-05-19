@@ -119,7 +119,7 @@ export default function CompletionCelebration() {
             exit={{ opacity: 0, scale: 0.5, y: -20 }}
             className="fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] pointer-events-none"
           >
-            <div className="flex flex-col items-center gap-3 p-8 rounded-2xl bg-white shadow-2xl border border-emerald-200">
+            <div className="flex flex-col items-center gap-3 p-8 rounded-2xl bg-card shadow-2xl border border-emerald-200">
               {event.type === 'module' ? (
                 <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
                   <CheckCircle2 size={36} className="text-emerald-600" />
@@ -134,9 +134,9 @@ export default function CompletionCelebration() {
                 </div>
               )}
               <div className="text-center">
-                <p className="text-lg font-bold text-slate-800">{event.title}</p>
+                <p className="text-lg font-bold text-foreground/80">{event.title}</p>
                 {event.subtitle && (
-                  <p className="text-sm text-slate-500 mt-1">{event.subtitle}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{event.subtitle}</p>
                 )}
               </div>
             </div>

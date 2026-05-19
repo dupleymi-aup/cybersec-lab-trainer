@@ -282,7 +282,7 @@ export default function ProfilePage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Личный профиль</h1>
-        <p className="text-slate-500">Управление данными аккаунта</p>
+        <p className="text-muted-foreground">Управление данными аккаунта</p>
       </div>
 
       {/* Profile Card */}
@@ -326,10 +326,10 @@ export default function ProfilePage() {
         <CardContent>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-500">Заполненность профиля</span>
+              <span className="text-muted-foreground">Заполненность профиля</span>
               <span className={`font-semibold ${
                 profileCompletion >= 80 ? 'text-emerald-600' :
-                profileCompletion >= 40 ? 'text-amber-600' : 'text-slate-600'
+                profileCompletion >= 40 ? 'text-amber-600' : 'text-muted-foreground'
               }`}>{profileCompletion}%</span>
             </div>
             <Progress value={profileCompletion} className="h-2" />
@@ -401,21 +401,21 @@ export default function ProfilePage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Clock className="w-5 h-5 text-slate-600" />
+              <Clock className="w-5 h-5 text-muted-foreground" />
               Последняя активность
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-1.5">
               {recentActivity.map((event, i) => (
-                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary">
                   <div className={`w-2 h-2 rounded-full ${
                     event.type === 'module' ? 'bg-emerald-400' : 'bg-violet-400'
                   }`} />
                   <span className="text-[11px] text-slate-400 min-w-[80px]">
                     {event.date.toLocaleDateString('ru-RU')}
                   </span>
-                  <span className="text-xs text-slate-700">{event.label}</span>
+                  <span className="text-xs text-foreground/70">{event.label}</span>
                   <Badge variant="secondary" className="text-[10px] ml-auto">
                     {event.type === 'module' ? 'Модуль' : 'Квиз'}
                   </Badge>
@@ -475,14 +475,14 @@ export default function ProfilePage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="profile-email">Email</Label>
-              <Input id="profile-email" value={user.email} disabled className="bg-slate-50" />
+              <Input id="profile-email" value={user.email} disabled className="bg-secondary" />
               <p className="text-xs text-slate-400">Email нельзя изменить</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="profile-phone">Телефон</Label>
-              <Input id="profile-phone" value={user.phone} disabled className="bg-slate-50" />
+              <Input id="profile-phone" value={user.phone} disabled className="bg-secondary" />
               <p className="text-xs text-slate-400">Телефон нельзя изменить</p>
             </div>
             <div className="space-y-2">
@@ -523,7 +523,7 @@ export default function ProfilePage() {
               onChange={(e) => setBio(e.target.value)}
               placeholder="Расскажите о себе..."
               rows={3}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 resize-none"
+              className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 resize-none"
             />
           </div>
           <Button onClick={handleSaveProfile} className="bg-violet-600 hover:bg-violet-700">
@@ -588,13 +588,13 @@ export default function ProfilePage() {
                 className="mt-3 space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-500">Надёжность пароля</span>
+                  <span className="text-xs text-muted-foreground">Надёжность пароля</span>
                   <span className={`text-xs font-medium ${
                     pwStrength.score >= 70 ? 'text-emerald-600' :
                     pwStrength.score >= 50 ? 'text-amber-600' : 'text-red-600'
                   }`}>{pwStrength.label}</span>
                 </div>
-                <div className="h-1.5 rounded-full overflow-hidden bg-slate-100">
+                <div className="h-1.5 rounded-full overflow-hidden bg-muted">
                   <div
                     className={`h-full ${pwStrength.color} rounded-full transition-all duration-500`}
                     style={{ width: `${pwStrength.score}%` }}
@@ -609,7 +609,7 @@ export default function ProfilePage() {
                       ) : (
                         <AlertTriangle size={12} className="text-slate-300" />
                       )}
-                      <span className={check.passed ? 'text-slate-600' : 'text-slate-400'}>
+                      <span className={check.passed ? 'text-muted-foreground' : 'text-slate-400'}>
                         {check.label}
                       </span>
                     </div>
@@ -666,13 +666,13 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           {user?.loginCount !== undefined ? (
-            <p className="text-xs text-slate-500 mb-3">Всего входов: <span className="font-semibold text-slate-700">{user.loginCount}</span>{user.lastLoginAt && ` · Последний: ${formatTimeAgo(user.lastLoginAt)}`}</p>
+            <p className="text-xs text-muted-foreground mb-3">Всего входов: <span className="font-semibold text-foreground/70">{user.loginCount}</span>{user.lastLoginAt && ` · Последний: ${formatTimeAgo(user.lastLoginAt)}`}</p>
           ) : null}
           {loginActivity && loginActivity.length > 0 ? (
             <div className="space-y-2">
               {[...loginActivity].reverse().slice(0, 10).map((entry, i) => (
                 <div key={i} className={`flex items-center justify-between p-3 rounded-lg border ${
-                  entry.success ? 'border-slate-200 bg-white' : 'border-red-200 bg-red-50'
+                  entry.success ? 'border-border bg-card' : 'border-red-200 bg-red-50'
                 }`}>
                   <div className="flex items-center gap-3">
                     {entry.success ? (

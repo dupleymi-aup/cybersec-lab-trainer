@@ -80,7 +80,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
           </div>
           <div>
             <h2 className="text-sm font-bold">Сообщения студентам</h2>
-            <p className="text-xs text-slate-500">Отправка уведомлений и объявлений</p>
+            <p className="text-xs text-muted-foreground">Отправка уведомлений и объявлений</p>
           </div>
         </div>
         <Button size="sm" onClick={() => setShowForm(!showForm)}>
@@ -102,23 +102,23 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Тема сообщения"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm bg-card"
                   maxLength={100}
                 />
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Текст сообщения..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm bg-white min-h-[80px] resize-y"
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm bg-card min-h-[80px] resize-y"
                   maxLength={1000}
                 />
                 <div className="flex items-center gap-4 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500">Приоритет:</span>
+                    <span className="text-xs text-muted-foreground">Приоритет:</span>
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value as 'low' | 'normal' | 'high')}
-                      className="px-2 py-1.5 border border-slate-200 rounded-md text-xs bg-white"
+                      className="px-2 py-1.5 border border-border rounded-md text-xs bg-card"
                     >
                       <option value="low">Низкий</option>
                       <option value="normal">Обычный</option>
@@ -131,7 +131,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                       <select
                         value={targetGroup}
                         onChange={(e) => setTargetGroup(e.target.value)}
-                        className="px-2 py-1.5 border border-slate-200 rounded-md text-xs bg-white"
+                        className="px-2 py-1.5 border border-border rounded-md text-xs bg-card"
                       >
                         <option value="">Всем студентам</option>
                         {groups.map((g) => (
@@ -160,7 +160,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
               key={msg.id}
               initial={{ opacity: 0, y: 3 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-3 rounded-lg border border-slate-200 bg-white"
+              className="p-3 rounded-lg border border-border bg-card"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-2 min-w-0">
@@ -175,7 +175,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                       <Badge className={`text-[10px] ${
                         msg.priority === 'high' ? 'bg-red-100 text-red-700' :
                         msg.priority === 'normal' ? 'bg-blue-100 text-blue-700' :
-                        'bg-slate-100 text-slate-700'
+                        'bg-muted text-foreground/70'
                       }`}>
                         {msg.priority === 'high' ? 'Важно' : msg.priority === 'normal' ? 'Обычное' : 'Инфо'}
                       </Badge>
@@ -185,7 +185,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                         </Badge>
                       )}
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{msg.content.split('\n')[0]}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{msg.content.split('\n')[0]}</p>
                     <p className="text-[10px] text-slate-400 mt-1">
                       {new Date(msg.createdAt).toLocaleDateString('ru-RU')}
                     </p>

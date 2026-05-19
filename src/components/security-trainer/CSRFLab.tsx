@@ -114,15 +114,15 @@ export default function CSRFLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">CSRF-атаки</h1>
-          <p className="text-xs text-slate-500">Cross-Site Request Forgery — подделка межсайтовых запросов</p>
+          <p className="text-xs text-muted-foreground">Cross-Site Request Forgery — подделка межсайтовых запросов</p>
         </div>
       </div>
 
       {/* What is CSRF */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h2 className="font-semibold mb-2">Что такое CSRF?</h2>
-          <p className="text-sm text-slate-600 leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             CSRF — это атака, при которой злоумышленник заставляет браузер аутентифицированного пользователя
             выполнить нежелательное действие на сайте, на котором пользователь уже авторизован. Атака
             эксплуатирует то, что браузер автоматически прикрепляет куки аутентификации к каждому запросу
@@ -133,12 +133,12 @@ export default function CSRFLab() {
       </Card>
 
       {/* Attack simulation */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="text-sm font-semibold mb-1 flex items-center gap-2">
             <Target size={16} className="text-emerald-600" /> Симуляция атаки — пошаговая демонстрация
           </h3>
-          <p className="text-xs text-slate-500 mb-4">
+          <p className="text-xs text-muted-foreground mb-4">
             Нажимайте «Далее», чтобы увидеть каждый этап CSRF-атаки
           </p>
 
@@ -151,13 +151,13 @@ export default function CSRFLab() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1, duration: 0.3 }}
                 className={`rounded-lg border-2 p-4 transition-all duration-300 ${
-                  i <= currentStep ? step.color : 'border-slate-100 bg-slate-50 opacity-50'
+                  i <= currentStep ? step.color : 'border-slate-100 bg-secondary opacity-50'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 ${
-                      i <= currentStep ? 'bg-slate-800' : 'bg-slate-300'
+                      i <= currentStep ? 'bg-slate-800 dark:bg-slate-700' : 'bg-slate-300'
                     }`}
                   >
                     {i + 1}
@@ -173,11 +173,11 @@ export default function CSRFLab() {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                         >
-                          <p className="text-xs text-slate-600 leading-relaxed mb-2">
+                          <p className="text-xs text-muted-foreground leading-relaxed mb-2">
                             {step.description}
                           </p>
-                          <div className="bg-white/70 rounded p-2">
-                            <code className="text-[11px] font-mono text-slate-700 whitespace-pre-wrap">
+                          <div className="bg-card/70 rounded p-2">
+                            <code className="text-[11px] font-mono text-foreground/70 whitespace-pre-wrap">
                               {step.detail}
                             </code>
                           </div>
@@ -255,7 +255,7 @@ export default function CSRFLab() {
             {defenseMechanisms.map((def, i) => (
               <Card
                 key={i}
-                className="border-slate-200 cursor-pointer hover:border-emerald-300 transition-colors"
+                className="border-border cursor-pointer hover:border-emerald-300 transition-colors"
                 onClick={() => setActiveDefense(activeDefense === i ? -1 : i)}
               >
                 <CardContent className="p-5">
@@ -265,7 +265,7 @@ export default function CSRFLab() {
                       {activeDefense === i ? 'Скрыть' : 'Показать код'}
                     </Badge>
                   </div>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">{def.description}</p>
+                  <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{def.description}</p>
 
                   <AnimatePresence>
                     {activeDefense === i && (
@@ -329,7 +329,7 @@ export default function CSRFLab() {
                                 exit={{ opacity: 0, height: 0 }}
                                 className="mt-3 space-y-2"
                               >
-                                <p className="text-xs text-slate-600 leading-relaxed">{ex.description}</p>
+                                <p className="text-xs text-muted-foreground leading-relaxed">{ex.description}</p>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                   <div className="bg-red-50 rounded p-2">
                                     <p className="font-semibold text-red-700">Влияние:</p>
@@ -387,7 +387,7 @@ export default function CSRFLab() {
                           return (
                             <>
                               <h4 className="font-semibold text-sm">{ch.title}</h4>
-                              <p className="text-xs text-slate-600">{ch.description}</p>
+                              <p className="text-xs text-muted-foreground">{ch.description}</p>
                               {ch.code && (
                                 <CodeBlock code={ch.code} language="javascript" title="code.js" />
                               )}
@@ -395,7 +395,7 @@ export default function CSRFLab() {
 
                               <div className="space-y-2">
                                 {ch.options.map((option, i) => {
-                                  let optionStyle = 'border-slate-200 hover:border-amber-300';
+                                  let optionStyle = 'border-border hover:border-amber-300';
                                   if (challengeSubmitted) {
                                     if (i === ch.correctIndex) {
                                       optionStyle = 'border-emerald-400 bg-emerald-50';
@@ -493,7 +493,7 @@ export default function CSRFLab() {
               <Card className="border-violet-200">
                 <CardContent className="p-5 space-y-4">
                   {!currentQuiz ? (
-                    <p className="text-sm text-slate-500 text-center">Вопросы для CSRF пока не добавлены</p>
+                    <p className="text-sm text-muted-foreground text-center">Вопросы для CSRF пока не добавлены</p>
                   ) : (
                     <>
                   <h3 className="text-sm font-semibold text-violet-800 flex items-center gap-2">
@@ -503,7 +503,7 @@ export default function CSRFLab() {
                   <p className="text-sm font-medium">{currentQuiz.question}</p>
                   <div className="space-y-2">
                     {currentQuiz.options.map((option, i) => {
-                      let optionStyle = 'border-slate-200 hover:border-violet-300';
+                      let optionStyle = 'border-border hover:border-violet-300';
                       if (quizSubmitted) {
                         if (i === currentQuiz.correctIndex) {
                           optionStyle = 'border-emerald-400 bg-emerald-50';

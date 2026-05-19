@@ -313,7 +313,7 @@ export default function QuizSystem() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Проверка знаний</h1>
-          <p className="text-xs text-slate-500">Тестирование по информационной безопасности</p>
+          <p className="text-xs text-muted-foreground">Тестирование по информационной безопасности</p>
         </div>
       </div>
 
@@ -323,7 +323,7 @@ export default function QuizSystem() {
           <Card className="border-none shadow-sm">
             <CardContent className="p-5">
               <h2 className="font-semibold mb-1">Выберите категорию квиза</h2>
-              <p className="text-xs text-slate-500">Каждый квиз содержит вопросы с таймером 30 секунд на каждый.</p>
+              <p className="text-xs text-muted-foreground">Каждый квиз содержит вопросы с таймером 30 секунд на каждый.</p>
             </CardContent>
           </Card>
 
@@ -331,8 +331,8 @@ export default function QuizSystem() {
           <Card className="border-none shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Target size={16} className="text-slate-500" />
-                <span className="text-xs font-semibold text-slate-600">Сложность:</span>
+                <Target size={16} className="text-muted-foreground" />
+                <span className="text-xs font-semibold text-muted-foreground">Сложность:</span>
                 <div className="flex gap-1.5">
                   {([
                     ['all', 'Все'],
@@ -348,8 +348,8 @@ export default function QuizSystem() {
                           ? key === 'easy' ? 'bg-emerald-100 text-emerald-700'
                             : key === 'medium' ? 'bg-amber-100 text-amber-700'
                             : key === 'hard' ? 'bg-red-100 text-red-700'
-                            : 'bg-slate-800 text-white'
-                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                            : 'bg-slate-800 dark:bg-slate-700 text-white'
+                          : 'bg-muted text-muted-foreground hover:bg-slate-200'
                       }`}
                     >
                       {label}
@@ -374,7 +374,7 @@ export default function QuizSystem() {
               return (
                 <Card
                   key={cat.id}
-                  className="cursor-pointer border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all"
+                  className="cursor-pointer border-border hover:border-emerald-300 hover:shadow-md transition-all"
                   onClick={() => startQuiz(cat.name)}
                 >
                   <CardContent className="p-5">
@@ -384,7 +384,7 @@ export default function QuizSystem() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm">{cat.name}</h3>
-                        <p className="text-xs text-slate-500">{available.length} вопросов</p>
+                        <p className="text-xs text-muted-foreground">{available.length} вопросов</p>
                         <div className="flex gap-1 mt-1">
                           {(['easy', 'medium', 'hard'] as const).map((d) =>
                             breakdown[d] ? (
@@ -435,7 +435,7 @@ export default function QuizSystem() {
                     </motion.div>
                   )}
                 </div>
-                <div className="flex items-center gap-4 text-xs text-slate-500">
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="font-medium">
                     <span className={correctCount > 0 ? 'text-emerald-600' : ''}>{correctCount}</span>
                     <span className="text-slate-300 mx-1">/</span>
@@ -457,7 +457,7 @@ export default function QuizSystem() {
                       />
                     </svg>
                     <span className={`absolute inset-0 flex items-center justify-center text-[11px] font-bold font-mono ${
-                      timeLeft <= 5 ? 'text-red-500' : timeLeft <= 10 ? 'text-amber-500' : 'text-slate-700'
+                      timeLeft <= 5 ? 'text-red-500' : timeLeft <= 10 ? 'text-amber-500' : 'text-foreground/70'
                     }`}>
                       {timeLeft}
                     </span>
@@ -480,7 +480,7 @@ export default function QuizSystem() {
               exit={{ opacity: 0, x: direction === 'next' ? -30 : 30 }}
               transition={{ duration: 0.2 }}
             >
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between mb-3">
                     <Badge
@@ -503,7 +503,7 @@ export default function QuizSystem() {
                     className="space-y-2"
                   >
                     {question.options.map((option, i) => {
-                      let optionClass = 'border-slate-200 hover:border-emerald-400 cursor-pointer';
+                      let optionClass = 'border-border hover:border-emerald-400 cursor-pointer';
                       if (showAnswer) {
                         if (i === question.correctIndex) {
                           optionClass = 'border-emerald-400 bg-emerald-50';
@@ -525,7 +525,7 @@ export default function QuizSystem() {
                           <RadioGroupItem value={String(i)} id={`opt-${i}`} />
                           <div className="flex items-center gap-2 flex-1">
                             {!showAnswer && (
-                              <kbd className="hidden md:inline-flex items-center justify-center w-5 h-5 rounded text-[10px] font-mono bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
+                              <kbd className="hidden md:inline-flex items-center justify-center w-5 h-5 rounded text-[10px] font-mono bg-muted text-muted-foreground border border-border shrink-0">
                                 {i + 1}
                               </kbd>
                             )}
@@ -553,15 +553,15 @@ export default function QuizSystem() {
                       onClick={handleAnswer}
                       disabled={!selectedAnswer}
                     >
-                      Ответить <kbd className="ml-2 hidden md:inline-flex items-center justify-center px-2 h-5 rounded text-[10px] font-mono bg-white/20 border border-white/30">Enter</kbd>
+                      Ответить <kbd className="ml-2 hidden md:inline-flex items-center justify-center px-2 h-5 rounded text-[10px] font-mono bg-card/20 border border-white/30">Enter</kbd>
                     </Button>
                   )}
 
                   {/* Keyboard hints */}
                   <div className="hidden md:flex items-center gap-3 mt-3 text-[11px] text-slate-400">
-                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">1-4</kbd> выбрать</span>
-                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">↑↓</kbd> навигация</span>
-                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">Esc</kbd> выход</span>
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">1-4</kbd> выбрать</span>
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">↑↓</kbd> навигация</span>
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">Esc</kbd> выход</span>
                   </div>
 
                   {showAnswer && (
@@ -580,7 +580,7 @@ export default function QuizSystem() {
                               ? (<><Clock size={14} /> Время вышло!</>)
                               : (<><XCircle size={14} /> Неправильно!</>)}
                         </p>
-                        <p className="text-xs text-slate-600 mt-1 leading-relaxed">{question.explanation}</p>
+                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{question.explanation}</p>
                       </div>
 
                       <Button
@@ -605,7 +605,7 @@ export default function QuizSystem() {
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4">
           <Card className="border-none shadow-sm bg-gradient-to-br from-slate-900 to-emerald-900 text-white">
             <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 rounded-full bg-card/10 flex items-center justify-center mx-auto mb-4">
                 {finalScore >= 80 ? (
                   <Trophy size={32} className="text-amber-400" />
                 ) : finalScore >= 60 ? (
@@ -658,7 +658,7 @@ export default function QuizSystem() {
               })()}
 
               <div className="flex gap-2 justify-center mt-4">
-                <Button variant="outline" className="text-white border-white/20 hover:bg-white/10" onClick={resetQuiz}>
+                <Button variant="outline" className="text-white border-white/20 hover:bg-card/10" onClick={resetQuiz}>
                   <RotateCcw size={14} className="mr-2" /> К категориям
                 </Button>
                 <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => startQuiz(activeCategory)}>
@@ -669,12 +669,12 @@ export default function QuizSystem() {
           </Card>
 
           {/* Answer breakdown */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="text-sm font-semibold mb-3">Разбор ответов</h3>
               <div className="space-y-3">
                 {categoryQuestions.map((q, i) => (
-                  <div key={q.id} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50">
+                  <div key={q.id} className="flex items-start gap-3 p-3 rounded-lg bg-secondary">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
                       answers[i] ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
                     }`}>

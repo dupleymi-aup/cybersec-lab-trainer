@@ -159,7 +159,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
-          <p className="text-sm text-slate-500">Загрузка когортного анализа...</p>
+          <p className="text-sm text-muted-foreground">Загрузка когортного анализа...</p>
         </div>
       </div>
     );
@@ -170,7 +170,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <BarChart3 size={32} className="text-red-400 mx-auto mb-3" />
-          <p className="text-sm text-slate-600 font-medium">Ошибка загрузки данных</p>
+          <p className="text-sm text-muted-foreground font-medium">Ошибка загрузки данных</p>
           <p className="text-xs text-slate-400 mt-1">{error || 'Нет данных'}</p>
         </div>
       </div>
@@ -179,7 +179,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
 
   if (data.cohorts.length === 0) {
     return (
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="flex flex-col items-center justify-center py-16 text-slate-400">
           <Calendar size={40} className="mb-3 opacity-50" />
           <p className="text-sm">Нет данных о когортах</p>
@@ -203,11 +203,11 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
         {/* Group selector — hidden when controlled externally */}
         {!isControlled && (
           <div className="flex items-center gap-2">
-            <Users size={15} className="text-slate-500" />
+            <Users size={15} className="text-muted-foreground" />
             <select
               value={internalGroupId}
               onChange={(e) => setInternalGroupId(e.target.value)}
-              className="px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-white hover:border-slate-300 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 outline-none transition-colors"
+              className="px-3 py-1.5 border border-border rounded-md text-sm bg-card hover:border-border focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 outline-none transition-colors"
             >
               <option value="">Все группы</option>
               {groups.map((g) => (
@@ -253,7 +253,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       </div>
 
       {/* Retention heatmap table */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <BarChart3 size={16} className="text-slate-400" />
@@ -263,15 +263,15 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-2 px-3 font-semibold text-slate-600 min-w-[140px]">
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 px-3 font-semibold text-muted-foreground min-w-[140px]">
                     Когорта
                   </th>
-                  <th className="text-center py-2 px-2 font-semibold text-slate-600">
+                  <th className="text-center py-2 px-2 font-semibold text-muted-foreground">
                     Студентов
                   </th>
                   {RETENTION_WEEKS.map((w) => (
-                    <th key={w.key} className="text-center py-2 px-2 font-semibold text-slate-600 min-w-[90px]">
+                    <th key={w.key} className="text-center py-2 px-2 font-semibold text-muted-foreground min-w-[90px]">
                       <div className="flex flex-col items-center">
                         <span>{w.label}</span>
                         <span className="text-[10px] text-slate-400 font-normal">{w.daysLabel}</span>
@@ -287,9 +287,9 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50"
+                    className="border-b border-slate-100 last:border-0 hover:bg-secondary/50"
                   >
-                    <td className="py-2.5 px-3 font-medium text-slate-700">
+                    <td className="py-2.5 px-3 font-medium text-foreground/70">
                       {cohort.month}
                     </td>
                     <td className="py-2.5 px-2 text-center">
@@ -318,7 +318,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-3 mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500">
+          <div className="flex items-center gap-3 mt-4 pt-3 border-t border-slate-100 text-xs text-muted-foreground">
             <span>Удержание:</span>
             <div className="flex items-center gap-1">
               <div className="w-4 h-4 rounded-sm" style={getHeatmapStyle(90)} />
@@ -345,7 +345,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       </Card>
 
       {/* Overall retention line chart */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <TrendingUp size={16} className="text-slate-400" />

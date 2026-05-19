@@ -359,7 +359,7 @@ export default function PasswordStrengthChecker() {
                 {showPassword ? password : '•'.repeat(password.length)}
                 <button
                   onClick={handleCopy}
-                  className="absolute top-2 right-2 p-1.5 rounded bg-slate-800 hover:bg-slate-700 transition"
+                  className="absolute top-2 right-2 p-1.5 rounded bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 transition"
                 >
                   {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
                 </button>

@@ -26,7 +26,7 @@ const TREND_ICONS = {
 
 const TREND_COLORS = {
   improving: 'text-emerald-600',
-  stable: 'text-slate-500',
+  stable: 'text-muted-foreground',
   declining: 'text-red-600',
 };
 
@@ -53,7 +53,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
       </div>
     );
   }
@@ -62,7 +62,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -89,7 +89,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-white"
+            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
           >
             <option value={30}>30 дней</option>
             <option value={90}>90 дней</option>
@@ -103,13 +103,13 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
         {groups.map((g) => {
           const TrendIcon = TREND_ICONS[g.trend];
           return (
-            <Card key={g.groupName} className={`border-slate-200 ${g.trend === 'improving' ? 'border-emerald-200' : g.trend === 'declining' ? 'border-red-200' : ''}`}>
+            <Card key={g.groupName} className={`border-border ${g.trend === 'improving' ? 'border-emerald-200' : g.trend === 'declining' ? 'border-red-200' : ''}`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-bold text-sm">{g.groupName}</h3>
                   <div className="flex items-center gap-1">
                     <TrendIcon size={14} className={TREND_COLORS[g.trend]} />
-                    <Badge className={`text-[10px] ${g.trend === 'improving' ? 'bg-emerald-100 text-emerald-700' : g.trend === 'declining' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'}`}>
+                    <Badge className={`text-[10px] ${g.trend === 'improving' ? 'bg-emerald-100 text-emerald-700' : g.trend === 'declining' ? 'bg-red-100 text-red-700' : 'bg-muted text-muted-foreground'}`}>
                       {g.trend === 'improving' ? 'Улучшение' : g.trend === 'declining' ? 'Снижение' : 'Стабильно'}
                     </Badge>
                   </div>
@@ -118,19 +118,19 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
                 <div className="grid grid-cols-4 gap-2 text-center mb-3">
                   <div>
                     <p className="text-lg font-bold text-indigo-600">{g.studentCount}</p>
-                    <p className="text-[10px] text-slate-500">Студентов</p>
+                    <p className="text-[10px] text-muted-foreground">Студентов</p>
                   </div>
                   <div>
                     <p className="text-lg font-bold text-violet-600">{g.healthScore}</p>
-                    <p className="text-[10px] text-slate-500">Здоровье</p>
+                    <p className="text-[10px] text-muted-foreground">Здоровье</p>
                   </div>
                   <div>
                     <p className="text-lg font-bold text-amber-600">{g.performanceVariance}</p>
-                    <p className="text-[10px] text-slate-500">Вариация</p>
+                    <p className="text-[10px] text-muted-foreground">Вариация</p>
                   </div>
                   <div>
                     <p className="text-lg font-bold text-emerald-600">{g.peerInfluenceScore}%</p>
-                    <p className="text-[10px] text-slate-500">Влияние</p>
+                    <p className="text-[10px] text-muted-foreground">Влияние</p>
                   </div>
                 </div>
 
@@ -157,7 +157,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
 
       {/* Overall trends */}
       {overallTrends.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
               <TrendingUp size={16} /> Общая динамика здоровья групп

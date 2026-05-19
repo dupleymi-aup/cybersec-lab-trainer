@@ -75,9 +75,9 @@ export default function XSSLab() {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
       return (
-        <div className="bg-white rounded-lg p-4 border border-emerald-200">
-          <p className="text-xs text-slate-500 mb-2">Безопасный вывод (textContent / экранирование):</p>
-          <code className="text-xs bg-slate-100 px-2 py-1 rounded block font-mono break-all whitespace-pre-wrap">
+        <div className="bg-card rounded-lg p-4 border border-emerald-200">
+          <p className="text-xs text-muted-foreground mb-2">Безопасный вывод (textContent / экранирование):</p>
+          <code className="text-xs bg-muted px-2 py-1 rounded block font-mono break-all whitespace-pre-wrap">
             {escaped}
           </code>
           <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1.5">
@@ -87,8 +87,8 @@ export default function XSSLab() {
       );
     }
     return (
-      <div className="bg-white rounded-lg p-4 border border-red-200">
-        <p className="text-xs text-slate-500 mb-2">Небезопасный вывод (innerHTML):</p>
+      <div className="bg-card rounded-lg p-4 border border-red-200">
+        <p className="text-xs text-muted-foreground mb-2">Небезопасный вывод (innerHTML):</p>
         <div className="bg-red-50 rounded-lg p-3 border border-red-200">
           <code className="text-xs font-mono text-red-700 break-all whitespace-pre-wrap">
             {text}
@@ -122,7 +122,7 @@ export default function XSSLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Лаборатория XSS-атак</h1>
-          <p className="text-xs text-slate-500">6 типов Cross-Site Scripting уязвимостей</p>
+          <p className="text-xs text-muted-foreground">6 типов Cross-Site Scripting уязвимостей</p>
         </div>
       </div>
 
@@ -163,7 +163,7 @@ export default function XSSLab() {
             className={`px-3 py-2 rounded-lg text-xs font-medium border-2 transition-all text-center ${
               i === currentIndex
                 ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                : 'border-border bg-card text-muted-foreground hover:border-border'
             }`}
           >
             {x.id === 'reflected' ? 'Отражённый' : x.id === 'stored' ? 'Хранимый' : x.id === 'dom' ? 'DOM-based' : x.id === 'svg' ? 'SVG' : x.id === 'markdown' ? 'Markdown' : 'PDF'}
@@ -173,7 +173,7 @@ export default function XSSLab() {
       </div>
 
       {/* Sanitization toggle */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <div className="flex items-center justify-between">
             <div>
@@ -181,7 +181,7 @@ export default function XSSLab() {
                 <ShieldAlert size={16} className="text-amber-500" />
                 Переключатель санитизации
               </h3>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Включите, чтобы увидеть разницу между безопасным и опасным выводом
               </p>
             </div>
@@ -196,7 +196,7 @@ export default function XSSLab() {
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform ${
                     sanitized ? 'translate-x-6' : 'translate-x-0'
                   }`}
                 />
@@ -217,7 +217,7 @@ export default function XSSLab() {
           className="space-y-4"
         >
           {/* Description */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="font-semibold">{currentXss.title}</h2>
@@ -225,12 +225,12 @@ export default function XSSLab() {
                   {badgeTexts[currentXss.id] || ''}
                 </Badge>
               </div>
-              <p className="text-sm text-slate-600 leading-relaxed">{currentXss.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{currentXss.description}</p>
             </CardContent>
           </Card>
 
           {/* Vulnerable code */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="text-xs font-semibold text-red-600 mb-2 flex items-center gap-1.5">
                 <XCircle size={14} /> Уязвимый код
@@ -240,7 +240,7 @@ export default function XSSLab() {
           </Card>
 
           {/* Secure code */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="text-xs font-semibold text-emerald-600 mb-2 flex items-center gap-1.5">
                 <CheckCircle2 size={14} /> Безопасный код
@@ -250,7 +250,7 @@ export default function XSSLab() {
           </Card>
 
           {/* Interactive demo */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
@@ -275,15 +275,15 @@ export default function XSSLab() {
                     className="space-y-4"
                   >
                     <div>
-                      <p className="text-xs text-slate-500 mb-1">Payload атаки:</p>
-                      <div className="bg-slate-50 rounded-lg p-3">
+                      <p className="text-xs text-muted-foreground mb-1">Payload атаки:</p>
+                      <div className="bg-secondary rounded-lg p-3">
                         <code className="text-xs font-mono text-red-600 break-all whitespace-pre-wrap">
                           {currentXss.attackDemo}
                         </code>
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-500">Результат вывода:</p>
+                    <p className="text-xs text-muted-foreground">Результат вывода:</p>
                     {renderSimulatedPreview()}
 
                     {/* Custom payload input */}

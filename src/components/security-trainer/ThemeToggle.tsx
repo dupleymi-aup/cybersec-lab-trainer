@@ -1,21 +1,42 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/lib/theme-provider';
+import { useTheme } from 'next-themes';
 
 export default function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+
+  const cycleTheme = () => {
+    if (theme === 'system') setTheme('light');
+    else if (theme === 'light') setTheme('dark');
+    else setTheme('system');
+  };
+
+  const isDark = resolvedTheme === 'dark';
+  const label =
+    theme === 'system'
+      ? 'Системная'
+      : isDark
+        ? 'Тёмная'
+        : 'Светлая';
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      className="h-9 w-9 shrink-0"
-      onClick={toggleTheme}
-      aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+      className="h-9 w-9 shrink-0 relative"
+      onClick={cycleTheme}
+      aria-label={`Сменить тему. Сейчас: ${label}`}
+      title={`Тема: ${label}`}
     >
-      {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+      {theme === 'system' ? (
+        <Monitor size={18} />
+      ) : isDark ? (
+        <Sun size={18} />
+      ) : (
+        <Moon size={18} />
+      )}
     </Button>
   );
 }

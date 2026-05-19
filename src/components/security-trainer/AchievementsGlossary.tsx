@@ -134,15 +134,15 @@ const glossaryTerms: { term: string; definition: string; category: string }[] = 
 ];
 
 const categoryColors: Record<string, string> = {
-  'Уязвимости': 'bg-red-100 text-red-700',
-  'Криптография': 'bg-violet-100 text-violet-700',
-  'Аутентификация': 'bg-amber-100 text-amber-700',
-  'Защита': 'bg-emerald-100 text-emerald-700',
-  'Сеть': 'bg-sky-100 text-sky-700',
-  'Атаки': 'bg-orange-100 text-orange-700',
-  'Организации': 'bg-slate-100 text-slate-700',
-  'Методологии': 'bg-indigo-100 text-indigo-700',
-  'Инструменты': 'bg-teal-100 text-teal-700',
+  'Уязвимости': 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+  'Криптография': 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+  'Аутентификация': 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+  'Защита': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  'Сеть': 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300',
+  'Атаки': 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  'Организации': 'bg-muted text-muted-foreground',
+  'Методологии': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+  'Инструменты': 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
 };
 
 const achievementIcons: Record<string, React.ReactNode> = {
@@ -205,7 +205,7 @@ export default function AchievementsAndGlossary() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Достижения и глоссарий</h1>
-          <p className="text-xs text-slate-500">Отслеживайте прогресс и изучайте термины</p>
+          <p className="text-xs text-muted-foreground">Отслеживайте прогресс и изучайте термины</p>
         </div>
       </div>
 
@@ -226,7 +226,7 @@ export default function AchievementsAndGlossary() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-semibold text-sm">Ваш уровень безопасности</h2>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {unlockedCount === 0
                       ? 'Начните обучение, чтобы получить первые достижения!'
                       : unlockedCount < 5
@@ -257,16 +257,16 @@ export default function AchievementsAndGlossary() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                 >
-                  <Card className={`transition-all ${unlocked ? 'border-amber-300 bg-amber-50/50' : 'border-slate-200 opacity-70'}`}>
+                  <Card className={`transition-all ${unlocked ? 'border-amber-300 bg-amber-50/50' : 'border-border opacity-70'}`}>
                     <CardContent className="p-4 flex items-start gap-4">
                       <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${
-                        unlocked ? 'bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-md' : 'bg-slate-100 text-slate-400'
+                        unlocked ? 'bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-md' : 'bg-muted text-slate-400'
                       }`}>
                         {achievementIcons[ach.id]}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className={`text-sm font-semibold ${unlocked ? 'text-amber-900' : 'text-slate-500'}`}>
+                          <h3 className={`text-sm font-semibold ${unlocked ? 'text-amber-900' : 'text-muted-foreground'}`}>
                             {ach.title}
                           </h3>
                           {unlocked && (
@@ -309,7 +309,7 @@ export default function AchievementsAndGlossary() {
             <Badge
               variant={activeCategory === '' ? 'default' : 'secondary'}
               className={`text-[10px] cursor-pointer hover:opacity-80 ${
-                activeCategory === '' ? '' : 'bg-slate-100 text-slate-700'
+                activeCategory === '' ? '' : 'bg-muted text-foreground/70'
               }`}
               onClick={() => setActiveCategory('')}
             >
@@ -332,7 +332,7 @@ export default function AchievementsAndGlossary() {
             })}
           </div>
           {activeCategory && (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Показано: <strong>{activeCategory}</strong> — {filteredTerms.length} терминов
               <button className="text-emerald-600 ml-1 underline" onClick={() => setActiveCategory('')}>Сбросить</button>
             </p>
@@ -346,15 +346,15 @@ export default function AchievementsAndGlossary() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.02 }}
               >
-                <Card className="border-slate-200 hover:border-emerald-200 transition-colors">
+                <Card className="border-border hover:border-emerald-200 transition-colors">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-1.5">
                       <h3 className="text-sm font-semibold font-mono">{term.term}</h3>
-                      <Badge variant="secondary" className={`text-[10px] ${categoryColors[term.category] || 'bg-slate-100 text-slate-700'}`}>
+                      <Badge variant="secondary" className={`text-[10px] ${categoryColors[term.category] || 'bg-muted text-foreground/70'}`}>
                         {term.category}
                       </Badge>
                     </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">{term.definition}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{term.definition}</p>
                   </CardContent>
                 </Card>
               </motion.div>

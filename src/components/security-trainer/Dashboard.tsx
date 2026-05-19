@@ -93,12 +93,12 @@ const achievementIcons: Record<string, React.ReactNode> = {
 
 function getProficiencyLevel(completedCount: number, totalModules: number, avgScore: number): { label: string; color: string; bg: string; icon: React.ReactNode } {
   const pct = totalModules > 0 ? completedCount / totalModules : 0;
-  if (pct === 0) return { label: 'Новичок', color: 'text-slate-600', bg: 'bg-slate-100', icon: <Star size={14} /> };
-  if (pct < 0.3) return { label: 'Начинающий', color: 'text-emerald-600', bg: 'bg-emerald-100', icon: <Star size={14} /> };
-  if (pct < 0.6) return { label: 'Практикующий', color: 'text-sky-600', bg: 'bg-sky-100', icon: <Star size={14} /> };
-  if (pct < 0.9) return { label: 'Продвинутый', color: 'text-violet-600', bg: 'bg-violet-100', icon: <Star size={14} /> };
-  if (avgScore >= 80) return { label: 'Эксперт', color: 'text-amber-600', bg: 'bg-amber-100', icon: <Trophy size={14} /> };
-  return { label: 'Продвинутый', color: 'text-violet-600', bg: 'bg-violet-100', icon: <Star size={14} /> };
+  if (pct === 0) return { label: 'Новичок', color: 'text-muted-foreground', bg: 'bg-muted', icon: <Star size={14} /> };
+  if (pct < 0.3) return { label: 'Начинающий', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/40', icon: <Star size={14} /> };
+  if (pct < 0.6) return { label: 'Практикующий', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-100 dark:bg-sky-900/40', icon: <Star size={14} /> };
+  if (pct < 0.9) return { label: 'Продвинутый', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-100 dark:bg-violet-900/40', icon: <Star size={14} /> };
+  if (avgScore >= 80) return { label: 'Эксперт', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/40', icon: <Trophy size={14} /> };
+  return { label: 'Продвинутый', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-100 dark:bg-violet-900/40', icon: <Star size={14} /> };
 }
 
 function loadActiveAnnouncements(): Announcement[] {
@@ -404,7 +404,7 @@ export default function Dashboard() {
             const priorityStyles = {
               high: { border: 'border-red-300', bg: 'bg-red-50', icon: AlertCircle, color: 'text-red-600' },
               normal: { border: 'border-blue-200', bg: 'bg-blue-50', icon: Info, color: 'text-blue-600' },
-              low: { border: 'border-slate-200', bg: 'bg-slate-50', icon: Info, color: 'text-slate-500' },
+              low: { border: 'border-border', bg: 'bg-secondary', icon: Info, color: 'text-muted-foreground' },
             };
             const ps = priorityStyles[ann.priority];
             const Icon = ps.icon;
@@ -420,17 +420,17 @@ export default function Dashboard() {
                     <Icon size={18} className={ps.color + ' mt-0.5 shrink-0'} />
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-slate-800">{ann.title}</p>
+                        <p className="text-sm font-semibold text-foreground/80">{ann.title}</p>
                         {ann.priority === 'high' && (
                           <Badge className="bg-red-100 text-red-700 text-[10px] border-0">Важно</Badge>
                         )}
                       </div>
-                      <p className="text-xs text-slate-600 mt-0.5">{ann.content}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{ann.content}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => dismissAnnouncement(ann.id)}
-                    className="text-slate-400 hover:text-slate-600 shrink-0"
+                    className="text-slate-400 hover:text-muted-foreground shrink-0"
                   >
                     <X size={16} />
                   </button>
@@ -498,7 +498,7 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="border-none shadow-sm bg-card">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
                 <Clock size={16} className="text-orange-500" />
@@ -548,16 +548,16 @@ export default function Dashboard() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="text-sm font-semibold text-slate-800 truncate">{deadline.title}</p>
+                            <p className="text-sm font-semibold text-foreground/80 truncate">{deadline.title}</p>
                             {urgencyBadge}
                           </div>
-                          <p className="text-xs text-slate-500">{scopeLabel}</p>
+                          <p className="text-xs text-muted-foreground">{scopeLabel}</p>
                           {deadline.description && (
                             <p className="text-xs text-slate-400 mt-1">{deadline.description}</p>
                           )}
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-xs text-slate-500">{dueDate}</p>
+                          <p className="text-xs text-muted-foreground">{dueDate}</p>
                           <ChevronRight size={14} className="text-slate-300 mt-1 ml-auto" />
                         </div>
                       </div>
@@ -586,7 +586,7 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
           >
-            <Card className="border-none shadow-sm bg-white">
+            <Card className="border-none shadow-sm bg-card">
               <CardContent className="p-4 text-center">
                 {stat.label.includes('Серия') || stat.label.includes('Нет') ? (
                   <>
@@ -595,12 +595,12 @@ export default function Dashboard() {
                     {stat.tooltip && streakData.longest > 0 && (
                       <p className="text-[10px] text-orange-500 mt-0.5">{stat.tooltip}</p>
                     )}
-                    <p className="text-xs text-slate-500 mt-0.5">{stat.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
                   </>
                 ) : (
                   <>
                     <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                    <p className="text-xs text-slate-500 mt-1">{stat.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
                   </>
                 )}
               </CardContent>
@@ -617,7 +617,7 @@ export default function Dashboard() {
               key={action.label}
               variant="outline"
               onClick={() => setCurrentPage(action.page)}
-              className={`flex items-center gap-2 ${action.color} border-slate-200`}
+              className={`flex items-center gap-2 ${action.color} border-border`}
             >
               <action.icon size={16} />
               {action.label}
@@ -641,7 +641,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-xs text-emerald-600 font-medium">Рекомендация</p>
-                <p className="text-sm font-semibold text-slate-800">{recommendation.text}</p>
+                <p className="text-sm font-semibold text-foreground/80">{recommendation.text}</p>
               </div>
             </div>
             <ChevronRight size={18} className="text-emerald-400 shrink-0" />
@@ -679,7 +679,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-sm flex items-center gap-2">
@@ -744,14 +744,14 @@ export default function Dashboard() {
                 transition={{ delay: i * 0.06 }}
               >
                 <Card
-                  className="group cursor-pointer border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all duration-300 overflow-hidden"
+                  className="group cursor-pointer border-border hover:border-emerald-300 hover:shadow-md transition-all duration-300 overflow-hidden"
                   onClick={() => handleStartModule(mod.id)}
                 >
                   <CardContent className="p-0">
                     <div className="flex">
                       <div
                         className={`w-20 shrink-0 flex items-center justify-center ${
-                          isCompleted ? 'bg-emerald-50' : 'bg-slate-50'
+                          isCompleted ? 'bg-emerald-50' : 'bg-secondary'
                         }`}
                       >
                         <span className={isCompleted ? 'text-emerald-600' : 'text-slate-400'}>
@@ -764,7 +764,7 @@ export default function Dashboard() {
                             <h3 className="font-semibold text-sm group-hover:text-emerald-700 transition-colors">
                               {mod.title}
                             </h3>
-                            <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
                               {mod.description}
                             </p>
                           </div>
@@ -788,7 +788,7 @@ export default function Dashboard() {
                       const { pct, label } = getModuleProgress(mod.id, isCompleted);
                       return pct > 0 || isCompleted ? (
                         <div className="px-4 pb-3 pt-1">
-                          <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-1 bg-muted rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-emerald-400'}`}
                               style={{ width: `${pct}%` }}
@@ -797,7 +797,7 @@ export default function Dashboard() {
                           {label && <p className="text-[10px] text-slate-400 mt-1">{label}</p>}
                         </div>
                       ) : (
-                        <div className="h-1 bg-slate-100">
+                        <div className="h-1 bg-muted">
                           <div className="h-full bg-slate-200 w-0 transition-all duration-500" />
                         </div>
                       );
@@ -829,7 +829,7 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h3 className="font-semibold text-sm group-hover:text-amber-700 transition-colors">Проверка знаний</h3>
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">Проверьте свои знания по 9 категориям безопасности с фильтрацией по сложности.</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">Проверьте свои знания по 9 категориям безопасности с фильтрацией по сложности.</p>
                       </div>
                       <ChevronRight size={16} className="text-slate-300 group-hover:text-amber-500 transition-colors mt-1 shrink-0" />
                     </div>
@@ -861,7 +861,7 @@ export default function Dashboard() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h3 className="font-semibold text-sm group-hover:text-violet-700 transition-colors">Достижения и глоссарий</h3>
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">Отслеживайте прогресс и изучайте термины ИБ.</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">Отслеживайте прогресс и изучайте термины ИБ.</p>
                       </div>
                       <ChevronRight size={16} className="text-slate-300 group-hover:text-violet-500 transition-colors mt-1 shrink-0" />
                     </div>
@@ -880,11 +880,11 @@ export default function Dashboard() {
       </div>
 
       {/* Overall progress */}
-      <Card className="border-none shadow-sm bg-white">
+      <Card className="border-none shadow-sm bg-card">
         <CardContent className="p-6">
           <h3 className="font-semibold text-sm mb-3">Общий прогресс обучения</h3>
           <Progress value={totalProgress} className="h-3 mb-2" />
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             {totalProgress === 100
               ? 'Отлично! Вы прошли все модули. Попробуйте квизы для закрепления и откройте все достижения.'
               : totalProgress === 0

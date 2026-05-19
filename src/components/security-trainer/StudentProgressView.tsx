@@ -95,7 +95,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
               transition={{ delay: i * 0.03 }}
             >
               <Card
-                className="border-slate-200 hover:border-emerald-200 transition-colors cursor-pointer"
+                className="border-border hover:border-emerald-200 transition-colors cursor-pointer"
                 onClick={() => setSelectedId(student.id)}
               >
                 <CardContent className="p-3">
@@ -173,9 +173,9 @@ export default function StudentProgressView({ students: studentList, groupId, on
       <div className="flex items-center gap-3">
         <button
           onClick={() => { setSelectedId(null); setData(null); onBack(); }}
-          className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+          className="p-1.5 rounded-lg hover:bg-muted transition-colors"
         >
-          <ArrowLeft size={18} className="text-slate-500" />
+          <ArrowLeft size={18} className="text-muted-foreground" />
         </button>
         <div className="flex items-center gap-3 flex-1">
           <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden">
@@ -209,14 +209,14 @@ export default function StudentProgressView({ students: studentList, groupId, on
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <BookOpen size={14} className="text-blue-500" />
-                  <span className="text-xs text-slate-500">Модули</span>
+                  <span className="text-xs text-muted-foreground">Модули</span>
                 </div>
                 <p className="text-xl font-bold mt-1">{data.kpis.modulesCompleted}/{data.kpis.totalModules}</p>
-                <div className="w-full bg-slate-100 rounded-full h-1.5 mt-1">
+                <div className="w-full bg-muted rounded-full h-1.5 mt-1">
                   <div
                     className="bg-blue-500 h-1.5 rounded-full transition-all"
                     style={{ width: `${data.kpis.totalModules > 0 ? (data.kpis.modulesCompleted / data.kpis.totalModules) * 100 : 0}%` }}
@@ -224,31 +224,31 @@ export default function StudentProgressView({ students: studentList, groupId, on
                 </div>
               </CardContent>
             </Card>
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <Brain size={14} className="text-emerald-500" />
-                  <span className="text-xs text-slate-500">Ср. балл</span>
+                  <span className="text-xs text-muted-foreground">Ср. балл</span>
                 </div>
                 <p className="text-xl font-bold mt-1">{data.kpis.avgQuizScore}%</p>
                 <p className="text-xs text-slate-400 mt-1">{data.kpis.totalQuizAttempts} попыток</p>
               </CardContent>
             </Card>
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <Activity size={14} className="text-violet-500" />
-                  <span className="text-xs text-slate-500">Вовлечённость</span>
+                  <span className="text-xs text-muted-foreground">Вовлечённость</span>
                 </div>
                 <p className="text-xl font-bold mt-1">{data.kpis.engagementScore}%</p>
                 <p className="text-xs text-slate-400 mt-1">Не активен {data.kpis.lastActiveDays} дн.</p>
               </CardContent>
             </Card>
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <Target size={14} className={data.kpis.riskScore > 60 ? 'text-red-500' : data.kpis.riskScore > 30 ? 'text-amber-500' : 'text-emerald-500'} />
-                  <span className="text-xs text-slate-500">Риск</span>
+                  <span className="text-xs text-muted-foreground">Риск</span>
                 </div>
                 <p className="text-xl font-bold mt-1">{data.kpis.riskScore}%</p>
                 <p className="text-xs text-slate-400 mt-1">
@@ -271,7 +271,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
             <TabsContent value="overview" className="mt-3 space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Radar Chart */}
-                <Card className="border-slate-200">
+                <Card className="border-border">
                   <CardContent className="p-3">
                     <h4 className="text-xs font-semibold mb-2">Компетенции</h4>
                     <div className="h-56">
@@ -290,14 +290,14 @@ export default function StudentProgressView({ students: studentList, groupId, on
                 </Card>
 
                 {/* Category Breakdown */}
-                <Card className="border-slate-200">
+                <Card className="border-border">
                   <CardContent className="p-3">
                     <h4 className="text-xs font-semibold mb-2">Результаты по категориям</h4>
                     <div className="space-y-2">
                       {radarData.map((cat) => (
                         <div key={cat.category} className="flex items-center gap-2">
-                          <span className="text-[11px] text-slate-600 w-24 truncate" title={cat.category}>{cat.category}</span>
-                          <div className="flex-1 bg-slate-100 rounded-full h-2">
+                          <span className="text-[11px] text-muted-foreground w-24 truncate" title={cat.category}>{cat.category}</span>
+                          <div className="flex-1 bg-muted rounded-full h-2">
                             <div
                               className={`h-2 rounded-full transition-all ${
                                 cat.student >= 80 ? 'bg-emerald-500' :
@@ -316,7 +316,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
 
               {/* Recent Activity Preview */}
               {data.activityTimeline.length > 0 && (
-                <Card className="border-slate-200">
+                <Card className="border-border">
                   <CardContent className="p-3">
                     <h4 className="text-xs font-semibold mb-2">Последние действия</h4>
                     <div className="space-y-1.5">
@@ -326,10 +326,10 @@ export default function StudentProgressView({ students: studentList, groupId, on
                             event.type === 'module' ? 'bg-blue-400' :
                             event.type === 'quiz' ? 'bg-emerald-400' : 'bg-slate-300'
                           }`} />
-                          <span className="text-slate-500 min-w-[80px]">
+                          <span className="text-muted-foreground min-w-[80px]">
                             {new Date(event.date).toLocaleDateString('ru-RU')}
                           </span>
-                          <span className="text-slate-700">{event.details}</span>
+                          <span className="text-foreground/70">{event.details}</span>
                         </div>
                       ))}
                     </div>
@@ -340,14 +340,14 @@ export default function StudentProgressView({ students: studentList, groupId, on
 
             {/* Modules Tab */}
             <TabsContent value="modules" className="mt-3">
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-3">
                   <h4 className="text-xs font-semibold mb-3">Прогресс по модулям</h4>
                   <div className="space-y-1.5">
                     {data.moduleProgress.map((mod) => {
                       const modInfo = modules.find((m) => m.id === mod.moduleId);
                       return (
-                        <div key={mod.moduleId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
+                        <div key={mod.moduleId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary">
                           <div className="w-6 h-6 rounded-full flex items-center justify-center">
                             {mod.completed ? (
                               <CheckCircle2 size={16} className="text-emerald-500" />
@@ -378,7 +378,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
 
             {/* Trends Tab */}
             <TabsContent value="trends" className="mt-3">
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-3">
                   <h4 className="text-xs font-semibold mb-3">Динамика успеваемости</h4>
                   {trends.length > 0 ? (
@@ -408,13 +408,13 @@ export default function StudentProgressView({ students: studentList, groupId, on
 
             {/* Activity Tab */}
             <TabsContent value="activity" className="mt-3">
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-3">
                   <h4 className="text-xs font-semibold mb-3">Хронология активности</h4>
                   {data.activityTimeline.length > 0 ? (
                     <div className="space-y-1.5 max-h-96 overflow-y-auto">
                       {data.activityTimeline.map((event, i) => (
-                        <div key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50">
+                        <div key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-secondary">
                           <div className="mt-0.5">
                             <div className={`w-2 h-2 rounded-full ${
                               event.type === 'module' ? 'bg-blue-400' :
@@ -422,7 +422,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
                             }`} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs text-slate-700">{event.details}</p>
+                            <p className="text-xs text-foreground/70">{event.details}</p>
                             <p className="text-[10px] text-slate-400 mt-0.5">
                               {new Date(event.date).toLocaleString('ru-RU')}
                             </p>

@@ -19,7 +19,7 @@ export default function ModuleNavigation({ currentId }: { currentId: string }) {
   const nextMod = next ? modules.find((m) => m.id === next) : null;
 
   return (
-    <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-200 mt-8">
+    <div className="flex items-center justify-between gap-3 pt-4 border-t border-border mt-8">
       <div>
         {prev && prevMod && (
           <Button

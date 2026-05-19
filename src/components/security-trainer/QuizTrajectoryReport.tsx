@@ -140,7 +140,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground">Загрузка данных...</p>
       </div>
     );
   }
@@ -149,7 +149,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-600 font-medium">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium">{error}</p>
       </div>
     );
   }
@@ -158,13 +158,13 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
     <div className="space-y-6">
       {/* Period selector (hidden when controlled externally) */}
       {!isControlled && (
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                days === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -206,7 +206,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
       </div>
 
       {/* Trajectory chart */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Траектория квизов по категориям</h3>
           {chartData.length > 0 ? (

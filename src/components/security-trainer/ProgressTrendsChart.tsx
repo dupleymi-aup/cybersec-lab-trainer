@@ -37,7 +37,7 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <Card className="border-slate-200 bg-card rounded-xl">
+      <Card className="border-border bg-card rounded-xl">
         <CardContent className="p-5">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
             <h3 className="font-semibold text-sm">Динамика прогресса</h3>
@@ -47,7 +47,7 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
                 <select
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
-                  className="px-3 py-1.5 border border-slate-200 rounded-md text-xs bg-white"
+                  className="px-3 py-1.5 border border-border rounded-md text-xs bg-card"
                 >
                   <option value="">Все студенты</option>
                   {students.map((s) => (
@@ -58,15 +58,15 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
                 </select>
               )}
 
-              <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
+              <div className="flex items-center gap-1 bg-muted rounded-md p-0.5">
                 {dateRangeOptions.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setDateRange(opt.value)}
                     className={`px-2.5 py-1 text-xs rounded transition-colors ${
                       dateRange === opt.value
-                        ? 'bg-white text-slate-800 shadow-sm font-medium'
-                        : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-background text-foreground shadow-sm font-medium'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {opt.label}

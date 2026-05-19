@@ -53,7 +53,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground">Загрузка данных...</p>
       </div>
     );
   }
@@ -62,7 +62,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-600 font-medium">Ошибка загрузки</p>
+        <p className="text-sm text-muted-foreground font-medium">Ошибка загрузки</p>
         <p className="text-xs text-slate-400 mt-1">{error || 'Нет данных'}</p>
       </div>
     );
@@ -82,13 +82,13 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
     <div className="space-y-6">
       {/* Period selector (only when not controlled externally) */}
       {!isControlled && (
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                days === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -165,7 +165,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
 
       {/* Score Distribution + Module Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Распределение баллов</h3>
             {scorePieData.length > 0 ? (
@@ -194,7 +194,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Завершение модулей</h3>
             {moduleDistribution.length > 0 ? (
@@ -220,7 +220,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
 
       {/* Top Performers + Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Топ студентов</h3>
             {topPerformers.length > 0 ? (
@@ -235,7 +235,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
                   >
                     <div className="flex items-center gap-3">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                        i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-slate-600' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
+                        i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-muted-foreground' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-muted text-muted-foreground'
                       }`}>
                         {i + 1}
                       </span>
@@ -259,7 +259,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Последняя активность</h3>
             {recentActivity.length > 0 ? (

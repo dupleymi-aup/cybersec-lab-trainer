@@ -20,7 +20,7 @@ const PERIOD_OPTIONS = [
 ];
 
 function getScoreColor(score: number | null): string {
-  if (score === null) return 'bg-slate-100 text-slate-400';
+  if (score === null) return 'bg-muted text-slate-400';
   if (score >= 70) return 'bg-emerald-100 text-emerald-700';
   if (score >= 50) return 'bg-amber-100 text-amber-700';
   return 'bg-red-100 text-red-700';
@@ -82,7 +82,7 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
       </div>
     );
   }
@@ -91,7 +91,7 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -101,13 +101,13 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
       {/* Controls */}
       <div className="flex flex-wrap gap-3 items-center">
         {controlledDays === undefined && (
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
+          <div className="flex gap-1 p-1 bg-muted rounded-lg">
             {PERIOD_OPTIONS.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setInternalDays(key)}
                 className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                  days === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                  days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {label}
@@ -122,7 +122,7 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
             <select
               value={internalGroupId}
               onChange={(e) => setInternalGroupId(e.target.value)}
-              className="px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+              className="px-3 py-2 border border-border rounded-md text-sm bg-card"
             >
               <option value="">Все группы</option>
               {groups.map((g) => (
@@ -148,13 +148,13 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
       </div>
 
       {/* Gradebook Table */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="sticky left-0 bg-slate-50 text-left p-3 font-semibold z-10 min-w-[200px]">
+                <tr className="bg-secondary border-b border-border">
+                  <th className="sticky left-0 bg-secondary text-left p-3 font-semibold z-10 min-w-[200px]">
                     Студент
                   </th>
                   <th className="text-left p-3 font-semibold min-w-[100px]">Группа</th>
@@ -180,9 +180,9 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.02 }}
-                      className="border-b border-slate-100 hover:bg-slate-50"
+                      className="border-b border-slate-100 hover:bg-secondary"
                     >
-                      <td className="sticky left-0 bg-white p-3 font-medium z-10">
+                      <td className="sticky left-0 bg-card p-3 font-medium z-10">
                         <button
                           onClick={() => setSelectedStudentId(student.id)}
                           className="text-blue-600 hover:text-blue-800 hover:underline text-left"
@@ -221,8 +221,8 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
               </tbody>
               {filteredStudents.length > 0 && (
                 <tfoot>
-                  <tr className="bg-slate-50 border-t-2 border-slate-200 font-semibold">
-                    <td className="sticky left-0 bg-slate-50 p-3 z-10">Средние значения</td>
+                  <tr className="bg-secondary border-t-2 border-border font-semibold">
+                    <td className="sticky left-0 bg-secondary p-3 z-10">Средние значения</td>
                     <td className="p-3"></td>
                     {data.modules.map((module) => {
                       const scores = filteredStudents
@@ -260,26 +260,26 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
 
       {/* Summary */}
       <div className="grid grid-cols-3 gap-4">
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-indigo-600">{filteredStudents.length}</p>
-            <p className="text-xs text-slate-500 mt-1">Студентов</p>
+            <p className="text-xs text-muted-foreground mt-1">Студентов</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-emerald-600">
               {filteredStudents.filter((s) => s.avgQuizScore >= 70).length}
             </p>
-            <p className="text-xs text-slate-500 mt-1">Средний балл ≥ 70%</p>
+            <p className="text-xs text-muted-foreground mt-1">Средний балл ≥ 70%</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-amber-600">
               {filteredStudents.filter((s) => s.avgQuizScore < 50 && s.avgQuizScore > 0).length}
             </p>
-            <p className="text-xs text-slate-500 mt-1">Средний балл {'<'} 50%</p>
+            <p className="text-xs text-muted-foreground mt-1">Средний балл {'<'} 50%</p>
           </CardContent>
         </Card>
       </div>

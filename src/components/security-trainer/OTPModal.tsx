@@ -78,11 +78,11 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+      <div className="bg-card rounded-2xl shadow-xl p-6 w-full max-w-sm">
         <h3 className="text-xl font-bold text-slate-900 mb-2 text-center">
           Введите код подтверждения
         </h3>
-        <p className="text-sm text-slate-500 mb-4 text-center">
+        <p className="text-sm text-muted-foreground mb-4 text-center">
           Мы отправили 6-значный код для восстановления доступа
         </p>
 
@@ -97,7 +97,7 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
               value={digit}
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
-              className="w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 border-slate-200 focus:border-violet-500 focus:ring-violet-500"
+              className="w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 border-border focus:border-violet-500 focus:ring-violet-500"
             />
           ))}
         </div>
@@ -106,13 +106,13 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
           <button
             type="button"
             onClick={() => setShowOtp(!showOtp)}
-            className="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 hover:bg-slate-200 transition"
+            className="text-xs text-slate-400 bg-muted px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 hover:bg-slate-200 transition"
           >
             {showOtp ? (
               <>
                 <EyeOff className="w-3 h-3" />
-                <span className="text-slate-700 font-mono">{otp}</span>
-                <span className="text-slate-500">скрыть</span>
+                <span className="text-foreground/70 font-mono">{otp}</span>
+                <span className="text-muted-foreground">скрыть</span>
               </>
             ) : (
               <>
@@ -136,7 +136,7 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
           >
             Отправить снова {cooldown > 0 ? `(${cooldown}с)` : ''}
           </button>
-          <button type="button" onClick={onClose} className="text-slate-500 hover:text-slate-700">
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground/70">
             Отмена
           </button>
         </div>

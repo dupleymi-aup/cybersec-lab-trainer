@@ -42,7 +42,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
       </div>
     );
   }
@@ -51,7 +51,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -71,7 +71,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-white"
+            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
           >
             <option value={7}>7 дней</option>
             <option value={30}>30 дней</option>
@@ -82,7 +82,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
 
       {/* Timing by category */}
       {categoryTiming.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Среднее время по категориям (сек)</h3>
             <div className="h-[250px]">
@@ -103,7 +103,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
 
       {/* Time vs Performance */}
       {timeVsPerformance.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Время vs Результат</h3>
             <div className="h-[250px]">
@@ -123,7 +123,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
 
       {/* Hourly performance */}
       {hourlyPerformance.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Результат по часам дня</h3>
             <div className="h-[200px]">
@@ -144,17 +144,17 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
       {/* Weekday vs Weekend */}
       <div className="grid grid-cols-2 gap-4">
         {weekdayVsWeekend.map((d) => (
-          <Card key={d.dayType} className="border-slate-200">
+          <Card key={d.dayType} className="border-border">
             <CardContent className="p-4">
               <h3 className="font-semibold text-sm mb-3">{d.dayType === 'weekday' ? 'Будни' : 'Выходные'}</h3>
               <div className="grid grid-cols-2 gap-3 text-center">
                 <div>
                   <p className="text-xl font-bold text-indigo-600">{d.avgPercentage}%</p>
-                  <p className="text-xs text-slate-500">Ср. балл</p>
+                  <p className="text-xs text-muted-foreground">Ср. балл</p>
                 </div>
                 <div>
                   <p className="text-xl font-bold text-amber-600">{d.attemptCount}</p>
-                  <p className="text-xs text-slate-500">Попыток</p>
+                  <p className="text-xs text-muted-foreground">Попыток</p>
                 </div>
               </div>
             </CardContent>
@@ -164,28 +164,28 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
 
       {/* Rushed quizzes */}
       {rushedQuizzes.length > 0 && (
-        <Card className="border-l-4 border-l-red-400 border-slate-200">
+        <Card className="border-l-4 border-l-red-400 border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-3 flex items-center gap-2 text-red-600">
               <AlertCircle size={16} /> Обнаружены rushed-квизы ({rushedQuizzes.length})
             </h3>
-            <p className="text-xs text-slate-500 mb-3">Студенты, завершившие квиз менее чем за 30 секунд (возможно, угадывание)</p>
+            <p className="text-xs text-muted-foreground mb-3">Студенты, завершившие квиз менее чем за 30 секунд (возможно, угадывание)</p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-secondary border-b border-border">
                   <tr>
-                    <th className="text-left p-2 font-medium text-slate-600">Студент</th>
-                    <th className="p-2 font-medium text-slate-600">Категория</th>
-                    <th className="p-2 font-medium text-slate-600 text-center">Время (сек)</th>
-                    <th className="p-2 font-medium text-slate-600 text-center">Вопросов</th>
-                    <th className="p-2 font-medium text-slate-600 text-center">Результат</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">Студент</th>
+                    <th className="p-2 font-medium text-muted-foreground">Категория</th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">Время (сек)</th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">Вопросов</th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">Результат</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rushedQuizzes.slice(0, 20).map((r, i) => (
-                    <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
+                    <tr key={i} className="border-b border-slate-100 hover:bg-secondary">
                       <td className="p-2 font-medium">{r.fullName}</td>
-                      <td className="p-2 text-slate-500">{r.category}</td>
+                      <td className="p-2 text-muted-foreground">{r.category}</td>
                       <td className="p-2 text-center">
                         <Badge variant="destructive" className="text-[10px]">{r.duration}с</Badge>
                       </td>

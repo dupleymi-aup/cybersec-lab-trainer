@@ -41,7 +41,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-white"
+            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
           >
             <option value={30}>30 дней</option>
             <option value={90}>90 дней</option>
@@ -89,38 +89,38 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Users size={18} className="mx-auto mb-1 text-indigo-600" />
             <p className="text-2xl font-bold text-indigo-600">{studentVelocities.length}</p>
-            <p className="text-xs text-slate-500">Студентов с данными</p>
+            <p className="text-xs text-muted-foreground">Студентов с данными</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Clock size={18} className="mx-auto mb-1 text-amber-600" />
             <p className="text-2xl font-bold text-amber-600">{avgDays}</p>
-            <p className="text-xs text-slate-500">Ср. дней/модуль</p>
+            <p className="text-xs text-muted-foreground">Ср. дней/модуль</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <TrendingUp size={18} className="mx-auto mb-1 text-emerald-600" />
             <p className="text-2xl font-bold text-emerald-600">{avgImprovement > 0 ? '+' : ''}{avgImprovement}</p>
-            <p className="text-xs text-slate-500">Ср. улучшение балла</p>
+            <p className="text-xs text-muted-foreground">Ср. улучшение балла</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Zap size={18} className="mx-auto mb-1 text-violet-600" />
             <p className="text-2xl font-bold text-violet-600">{avgVelocity}</p>
-            <p className="text-xs text-slate-500">Ср. индекс скорости</p>
+            <p className="text-xs text-muted-foreground">Ср. индекс скорости</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Scatter: velocity vs score improvement */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Скорость vs Улучшение балла</h3>
           <div className="h-[300px]">
@@ -139,7 +139,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
       </Card>
 
       {/* Velocity distribution */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Распределение скорости</h3>
           <div className="h-[200px]">
@@ -158,7 +158,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
 
       {/* Velocity over time */}
       {velocityOverTime.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Динамика скорости по неделям</h3>
             <div className="h-[200px]">
@@ -179,7 +179,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
 
       {/* By group */}
       {avgVelocityByGroup.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Скорость по группам</h3>
             <div className="h-[200px]">
@@ -199,21 +199,21 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
       )}
 
       {/* Top students ranking */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-3">Рейтинг скорости</h3>
           <div className="space-y-2">
             {studentVelocities.slice(0, 15).map((v, i) => (
               <div key={v.userId} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-3">
-                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-slate-600' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600'}`}>
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-muted-foreground' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-muted text-muted-foreground'}`}>
                     {i + 1}
                   </span>
                   <span className="font-medium">{v.fullName}</span>
                   {v.group && <Badge variant="secondary" className="text-[10px]">{v.group}</Badge>}
                 </div>
                 <div className="flex gap-4 text-xs items-center">
-                  <span className="text-slate-500">{v.avgDaysPerModule} дн/мод</span>
+                  <span className="text-muted-foreground">{v.avgDaysPerModule} дн/мод</span>
                   <span className={v.scoreImprovement > 0 ? 'text-emerald-600' : 'text-red-600'}>
                     {v.scoreImprovement > 0 ? '+' : ''}{v.scoreImprovement}
                   </span>

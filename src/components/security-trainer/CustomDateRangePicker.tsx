@@ -47,15 +47,15 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
+      <div className="flex gap-1 p-1 bg-muted rounded-lg">
         {PRESETS.map((p) => (
           <button
             key={p.key}
             onClick={() => onChange(p.key)}
             className={`px-3 py-1.5 text-xs rounded-md transition-all ${
               days === p.key
-                ? 'bg-white text-slate-900 shadow-sm font-medium'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-background text-foreground shadow-sm font-medium'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {p.label}
@@ -69,7 +69,7 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
           className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md border transition-all ${
             !isPreset
               ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-medium'
-              : 'border-slate-200 text-slate-500 hover:border-slate-300'
+              : 'border-border text-muted-foreground hover:border-border'
           }`}
         >
           <Calendar size={13} />
@@ -78,8 +78,8 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
         </button>
 
         {customOpen && (
-          <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-slate-200 rounded-lg shadow-lg p-3 min-w-[200px]">
-            <p className="text-xs font-medium text-slate-700 mb-2">Свой период</p>
+          <div className="absolute right-0 top-full mt-1 z-20 bg-card border border-border rounded-lg shadow-lg p-3 min-w-[200px]">
+            <p className="text-xs font-medium text-foreground/70 mb-2">Свой период</p>
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -90,7 +90,7 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
                 onChange={(e) => setCustomDays(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCustomSubmit(); }}
                 placeholder="Кол-во дней"
-                className="flex-1 px-3 py-1.5 border border-slate-200 rounded-md text-xs"
+                className="flex-1 px-3 py-1.5 border border-border rounded-md text-xs"
               />
               <button
                 onClick={handleCustomSubmit}

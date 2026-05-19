@@ -370,9 +370,9 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       title: 'Печать отчёта',
       description: 'Открыть оптимизированную версию страницы для печати текущего состояния прогресса',
       onClick: handlePrint,
-      color: 'text-slate-600',
-      bgColor: 'bg-slate-50',
-      borderColor: 'hover:border-slate-300',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-secondary',
+      borderColor: 'hover:border-border',
     },
   ];
 
@@ -382,16 +382,16 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-xl font-bold">Экспорт отчётов</h2>
-          <p className="text-sm text-slate-500 mt-1">Экспортируйте данные о прогрессе студентов в различных форматах</p>
+          <p className="text-sm text-muted-foreground mt-1">Экспортируйте данные о прогрессе студентов в различных форматах</p>
         </div>
         {!controlled && (
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                effectiveDays === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                effectiveDays === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -414,7 +414,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
             >
-              <Card className={`border-slate-200 shadow-sm bg-white transition-colors ${card.borderColor}`}>
+              <Card className={`border-border shadow-sm bg-card transition-colors ${card.borderColor}`}>
                 <CardContent className="p-5">
                   <div className="flex items-start gap-3 mb-3">
                     <div className={`w-10 h-10 rounded-xl ${card.bgColor} flex items-center justify-center flex-shrink-0`}>
@@ -422,7 +422,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-sm">{card.title}</h3>
-                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">{card.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{card.description}</p>
                     </div>
                   </div>
 
@@ -432,16 +432,16 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                       <button
                         type="button"
                         onClick={() => setShowDropdown(!showDropdown)}
-                        className="w-full flex items-center justify-between px-3 py-2 border border-slate-200 rounded-md text-sm bg-white hover:border-slate-300 transition-colors"
+                        className="w-full flex items-center justify-between px-3 py-2 border border-border rounded-md text-sm bg-card hover:border-border transition-colors"
                       >
-                        <span className="truncate text-slate-700">
+                        <span className="truncate text-foreground/70">
                           {selectedStudent ? selectedStudent.fullName : 'Выберите студента...'}
                         </span>
                         <ChevronDown size={14} className="text-slate-400 flex-shrink-0 ml-2" />
                       </button>
 
                       {showDropdown && (
-                        <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                        <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                           {students.length === 0 ? (
                             <div className="px-3 py-3 text-xs text-slate-400 text-center">Нет доступных студентов</div>
                           ) : (
@@ -449,8 +449,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                               <button
                                 key={s.id}
                                 type="button"
-                                className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 transition-colors ${
-                                  s.id === selectedStudentId ? 'bg-violet-50 text-violet-700' : 'text-slate-700'
+                                className={`w-full text-left px-3 py-2 text-sm hover:bg-secondary transition-colors ${
+                                  s.id === selectedStudentId ? 'bg-violet-50 text-violet-700' : 'text-foreground/70'
                                 }`}
                                 onClick={() => {
                                   setSelectedStudentId(s.id);
@@ -509,7 +509,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                       initial={{ opacity: 0, y: 3 }}
                       animate={{ opacity: 1, y: 0 }}
                       className={`mt-2 text-xs text-center ${
-                        status === 'success' ? 'text-emerald-600' : status === 'error' ? 'text-red-500' : 'text-slate-500'
+                        status === 'success' ? 'text-emerald-600' : status === 'error' ? 'text-red-500' : 'text-muted-foreground'
                       }`}
                     >
                       {message}
@@ -531,18 +531,18 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
           onClick={() => setPrintPreview(false)}
         >
           <div
-            className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto"
+            className="bg-card rounded-xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-slate-200">
+            <div className="p-6 border-b border-border">
               <h3 className="text-lg font-bold">Предпросмотр печати</h3>
-              <p className="text-sm text-slate-500 mt-1">Текущий прогресс студентов будет распечатан</p>
+              <p className="text-sm text-muted-foreground mt-1">Текущий прогресс студентов будет распечатан</p>
             </div>
 
             <div className="p-6">
               <div className="text-center mb-6">
                 <h2 className="text-xl font-bold">Отчёт по прогрессу студентов</h2>
-                <p className="text-sm text-slate-500">{new Date().toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p className="text-sm text-muted-foreground">{new Date().toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
               </div>
 
               <div className="space-y-4">
@@ -562,21 +562,21 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                   }
 
                   return (
-                    <div key={s.id} className="border border-slate-200 rounded-lg p-4">
+                    <div key={s.id} className="border border-border rounded-lg p-4">
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold">{s.fullName}</h4>
-                          <p className="text-xs text-slate-500">{s.email}</p>
+                          <p className="text-xs text-muted-foreground">{s.email}</p>
                           {s.group && <Badge variant="secondary" className="text-xs mt-1">{s.group}</Badge>}
                         </div>
                         <div className="flex gap-6 text-sm">
                           <div className="text-center">
                             <p className="font-bold">{moduleCount}</p>
-                            <p className="text-xs text-slate-500">Модулей</p>
+                            <p className="text-xs text-muted-foreground">Модулей</p>
                           </div>
                           <div className="text-center">
                             <p className="font-bold">{quizCount}</p>
-                            <p className="text-xs text-slate-500">Квизов</p>
+                            <p className="text-xs text-muted-foreground">Квизов</p>
                           </div>
                         </div>
                       </div>
@@ -590,7 +590,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
               </div>
             </div>
 
-            <div className="p-6 border-t border-slate-200 flex justify-end gap-3">
+            <div className="p-6 border-t border-border flex justify-end gap-3">
               <Button variant="outline" onClick={() => setPrintPreview(false)}>
                 Отмена
               </Button>

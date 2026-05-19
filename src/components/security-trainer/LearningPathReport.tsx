@@ -70,7 +70,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground">Загрузка данных...</p>
       </div>
     );
   }
@@ -79,7 +79,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-600 font-medium">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium">{error}</p>
       </div>
     );
   }
@@ -101,13 +101,13 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
     <div className="space-y-6">
       {/* Period selector — hidden when controlled externally */}
       {!controlled && (
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                effectiveDays === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                effectiveDays === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -142,7 +142,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
       </div>
 
       {/* Learning Path Funnel - Bar Chart */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Воронка пути обучения</h3>
           {funnelData.length > 0 ? (
@@ -169,7 +169,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
       </Card>
 
       {/* Module Path Cards */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Путь завершения модулей</h3>
           <div className="space-y-3">
@@ -180,7 +180,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
               >
-                <div className="flex items-center gap-4 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+                <div className="flex items-center gap-4 p-3 rounded-lg bg-secondary hover:bg-muted transition-colors">
                   {/* Step number */}
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
                     <span className="text-xs font-bold text-indigo-600">{i + 1}</span>
@@ -230,19 +230,19 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
       </Card>
 
       {/* Detail Table */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Детальная статистика</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">#</th>
-                  <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">Модуль</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Завершено</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Всего студентов</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Завершение %</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Отток</th>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">#</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Модуль</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Завершено</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Всего студентов</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Завершение %</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Отток</th>
                 </tr>
               </thead>
               <tbody>
@@ -252,9 +252,9 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.03 }}
-                    className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                    className="border-b border-slate-100 hover:bg-secondary transition-colors"
                   >
-                    <td className="py-2.5 px-3 text-slate-500">{i + 1}</td>
+                    <td className="py-2.5 px-3 text-muted-foreground">{i + 1}</td>
                     <td className="py-2.5 px-3 font-medium">{entry.moduleName}</td>
                     <td className="py-2.5 px-3 text-right">{entry.completedCount}</td>
                     <td className="py-2.5 px-3 text-right">{totalStudents}</td>

@@ -285,7 +285,7 @@ export default function TeacherPanel() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Панель преподавателя</h1>
-          <p className="text-xs text-slate-500">Отслеживайте прогресс и управляйте группами</p>
+          <p className="text-xs text-muted-foreground">Отслеживайте прогресс и управляйте группами</p>
         </div>
       </div>
 
@@ -297,11 +297,11 @@ export default function TeacherPanel() {
           { label: 'Ср. модулей', value: avgCompletion, icon: BookOpen, color: 'text-violet-600' },
           { label: 'Ср. балл квизов', value: `${avgQuizScore}%`, icon: Trophy, color: 'text-amber-600' },
         ].map((stat) => (
-          <Card key={stat.label} className="border-none shadow-sm bg-white">
+          <Card key={stat.label} className="border-none shadow-sm bg-card">
             <CardContent className="p-4 text-center">
               <stat.icon size={20} className={`mx-auto mb-2 ${stat.color}`} />
               <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-              <p className="text-xs text-slate-500 mt-1">{stat.label}</p>
+              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
             </CardContent>
           </Card>
         ))}
@@ -359,7 +359,7 @@ export default function TeacherPanel() {
             <select
               value={gradebookSort}
               onChange={(e) => setGradebookSort(e.target.value as 'name' | 'modules' | 'score')}
-              className="px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+              className="px-3 py-2 border border-border rounded-md text-sm bg-card"
             >
               <option value="name">По имени</option>
               <option value="modules">По модулям</option>
@@ -367,17 +367,17 @@ export default function TeacherPanel() {
             </select>
           </div>
 
-          <div className="border border-slate-200 rounded-lg overflow-x-auto">
+          <div className="border border-border rounded-lg overflow-x-auto">
             <table className="w-full text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-secondary border-b border-border">
                 <tr>
-                  <th className="text-left p-2 font-medium text-slate-600 sticky left-0 bg-slate-50 z-10">Студент</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground sticky left-0 bg-secondary z-10">Студент</th>
                   {modules.map((m) => (
-                    <th key={m.id} className="p-2 font-medium text-slate-600 text-center min-w-[60px]" title={m.title}>
+                    <th key={m.id} className="p-2 font-medium text-muted-foreground text-center min-w-[60px]" title={m.title}>
                       {m.title.split(' ').slice(0, 2).join(' ')}
                     </th>
                   ))}
-                  <th className="p-2 font-medium text-slate-600 text-center">Ср. балл</th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">Ср. балл</th>
                 </tr>
               </thead>
               <tbody>
@@ -398,8 +398,8 @@ export default function TeacherPanel() {
                     const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, [, v]) => a + v, 0) / scores.length) : 0;
 
                     return (
-                      <tr key={student.id} className="border-b border-slate-100 hover:bg-slate-50">
-                        <td className="p-2 font-medium sticky left-0 bg-white z-10">
+                      <tr key={student.id} className="border-b border-slate-100 hover:bg-secondary">
+                        <td className="p-2 font-medium sticky left-0 bg-card z-10">
                           <div>
                             <div className="truncate max-w-[120px]">{student.fullName}</div>
                             {student.group && <div className="text-[10px] text-slate-400">{student.group}</div>}
@@ -409,7 +409,7 @@ export default function TeacherPanel() {
                           const done = progress.completedModules.includes(m.id);
                           return (
                             <td key={m.id} className="p-2 text-center">
-                              <span className={`inline-block w-5 h-5 rounded-full text-[10px] leading-5 ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-300'}`}>
+                              <span className={`inline-block w-5 h-5 rounded-full text-[10px] leading-5 ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-slate-300'}`}>
                                 {done ? '✓' : '·'}
                               </span>
                             </td>
@@ -437,7 +437,7 @@ export default function TeacherPanel() {
         {/* Deadlines Tab */}
         <TabsContent value="deadlines" className="mt-4 space-y-4">
           {/* Create deadline form */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm flex items-center gap-2">
@@ -459,11 +459,11 @@ export default function TeacherPanel() {
                 <div className="space-y-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-medium text-slate-600 mb-1 block">Тип</label>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Тип</label>
                       <select
                         value={newDeadline.scope}
                         onChange={(e) => setNewDeadline({ ...newDeadline, scope: e.target.value, scopeId: '' })}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm"
+                        className="w-full px-3 py-2 border border-border rounded-md text-sm"
                       >
                         <option value="module">Модуль</option>
                         <option value="quiz">Квиз</option>
@@ -471,7 +471,7 @@ export default function TeacherPanel() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-slate-600 mb-1 block">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
                         {newDeadline.scope === 'module' ? 'Модуль' : newDeadline.scope === 'quiz' ? 'Квиз' : 'Название'}
                       </label>
                       {newDeadline.scope === 'course' ? (
@@ -484,7 +484,7 @@ export default function TeacherPanel() {
                         <select
                           value={newDeadline.scopeId}
                           onChange={(e) => setNewDeadline({ ...newDeadline, scopeId: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm"
+                          className="w-full px-3 py-2 border border-border rounded-md text-sm"
                         >
                           <option value="">Выберите модуль</option>
                           {modules.map(m => (
@@ -495,7 +495,7 @@ export default function TeacherPanel() {
                         <select
                           value={newDeadline.scopeId}
                           onChange={(e) => setNewDeadline({ ...newDeadline, scopeId: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm"
+                          className="w-full px-3 py-2 border border-border rounded-md text-sm"
                         >
                           <option value="">Выберите квиз</option>
                           {quizCategories.map(q => (
@@ -505,7 +505,7 @@ export default function TeacherPanel() {
                       )}
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-slate-600 mb-1 block">Срок</label>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Срок</label>
                       <Input
                         type="datetime-local"
                         value={newDeadline.dueAt}
@@ -513,11 +513,11 @@ export default function TeacherPanel() {
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-slate-600 mb-1 block">Группа (пусто = все)</label>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Группа (пусто = все)</label>
                       <select
                         value={newDeadline.group}
                         onChange={(e) => setNewDeadline({ ...newDeadline, group: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm"
+                        className="w-full px-3 py-2 border border-border rounded-md text-sm"
                       >
                         <option value="">Все студенты</option>
                         {groups.map(g => (
@@ -527,7 +527,7 @@ export default function TeacherPanel() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-600 mb-1 block">Описание</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Описание</label>
                     <Input
                       value={newDeadline.description}
                       onChange={(e) => setNewDeadline({ ...newDeadline, description: e.target.value })}
@@ -565,16 +565,16 @@ export default function TeacherPanel() {
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <p className="text-sm font-semibold text-slate-800">{d.title}</p>
+                              <p className="text-sm font-semibold text-foreground/80">{d.title}</p>
                               <Badge variant={isOverdue ? 'destructive' : diffDays <= 3 ? 'secondary' : 'default'} className="text-[10px]">
                                 {isOverdue ? `Просрочен (${Math.abs(diffDays)} дн.)` : diffDays === 0 ? 'Сегодня' : diffDays === 1 ? 'Завтра' : `${diffDays} дн.`}
                               </Badge>
                               {d.group && <Badge variant="outline" className="text-[10px]">{d.group}</Badge>}
                             </div>
-                            <p className="text-xs text-slate-500">{scopeLabel} — {dueDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
+                            <p className="text-xs text-muted-foreground">{scopeLabel} — {dueDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
                             {d.description && <p className="text-xs text-slate-400 mt-1">{d.description}</p>}
                             {reminder && (
-                              <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                                 <span className="flex items-center gap-1"><CheckCircle size={12} className="text-emerald-500" /> {reminder.completedCount}/{reminder.totalStudents} выполнено</span>
                                 <span>{reminder.completionRate}%</span>
                               </div>
@@ -592,13 +592,13 @@ export default function TeacherPanel() {
                         {/* Student status expandable */}
                         {reminder && reminder.studentStatus.length > 0 && (
                           <details className="mt-3">
-                            <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-700">
+                            <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground/70">
                               Статус студентов ({reminder.studentStatus.length})
                             </summary>
                             <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
                               {reminder.studentStatus.map(s => (
                                 <div key={s.id} className="flex items-center justify-between text-xs py-1">
-                                  <span className="text-slate-700">{s.fullName}</span>
+                                  <span className="text-foreground/70">{s.fullName}</span>
                                   <span className="flex items-center gap-1">
                                     {s.completed ? (
                                       <span className="text-emerald-600 flex items-center gap-0.5"><CheckCircle size={10} /> Выполнен</span>
@@ -634,17 +634,17 @@ export default function TeacherPanel() {
               {groups.map((group) => {
                 const groupStudents = students.filter((s) => s.group === group);
                 return (
-                  <Card key={group} className="border-slate-200">
+                  <Card key={group} className="border-border">
                     <CardContent className="p-4">
                       <h3 className="font-semibold text-sm mb-2">{group}</h3>
-                      <p className="text-xs text-slate-500 mb-3">{groupStudents.length} студентов</p>
+                      <p className="text-xs text-muted-foreground mb-3">{groupStudents.length} студентов</p>
                       <div className="space-y-1">
                         {groupStudents.slice(0, 5).map((s) => (
                           <div key={s.id} className="flex items-center gap-2 text-xs">
                             <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center">
                               <GraduationCap size={12} className="text-violet-600" />
                             </div>
-                            <span className="text-slate-700">{s.fullName}</span>
+                            <span className="text-foreground/70">{s.fullName}</span>
                           </div>
                         ))}
                         {groupStudents.length > 5 && (
@@ -667,7 +667,7 @@ export default function TeacherPanel() {
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="mt-4 space-y-4">
           {/* Sub-tab selector */}
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit flex-wrap">
+          <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
             {[
               { key: 'overview' as const, label: 'Обзор', icon: BarChart3 },
               { key: 'trends' as const, label: 'Тренды', icon: TrendingUp },
@@ -686,8 +686,8 @@ export default function TeacherPanel() {
                 onClick={() => setAnalyticsSubTab(key)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   analyticsSubTab === key
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Icon size={13} />
@@ -700,7 +700,7 @@ export default function TeacherPanel() {
           {analyticsSubTab === 'overview' && (
           <>
           {/* Category averages bar chart */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4">Средний балл по категориям квизов</h3>
               <div className="h-[300px]">
@@ -728,7 +728,7 @@ export default function TeacherPanel() {
           {/* Distribution and activity charts */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Score distribution pie chart */}
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Распределение оценок</h3>
                 {(() => {
@@ -764,7 +764,7 @@ export default function TeacherPanel() {
             </Card>
 
             {/* Activity pie chart */}
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Активность студентов</h3>
                 {(() => {
@@ -793,7 +793,7 @@ export default function TeacherPanel() {
           </div>
 
           {/* Top students ranking */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4">Рейтинг студентов</h3>
               {(() => {
@@ -814,7 +814,7 @@ export default function TeacherPanel() {
                       <div key={i} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-3">
                           <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-slate-600' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-600'
+                            i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-muted-foreground' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-muted text-muted-foreground'
                           }`}>
                             {i + 1}
                           </span>
@@ -824,8 +824,8 @@ export default function TeacherPanel() {
                           </div>
                         </div>
                         <div className="flex gap-4 text-xs items-center">
-                          <span className="text-slate-500">{s.mods} модулей</span>
-                          <span className="text-slate-500">квизы: {s.avgQ}%</span>
+                          <span className="text-muted-foreground">{s.mods} модулей</span>
+                          <span className="text-muted-foreground">квизы: {s.avgQ}%</span>
                           <span className="text-slate-400 flex items-center gap-0.5"><Clock size={10} /> {s.lastActive}</span>
                         </div>
                       </div>
@@ -916,7 +916,7 @@ export default function TeacherPanel() {
         <TabsContent value="compare" className="mt-4 space-y-4">
           {groupComparisonData.length > 0 ? (
             <>
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-5">
                   <h3 className="font-semibold text-sm mb-4">Сравнение групп</h3>
                   <div className="h-[280px]">
@@ -941,7 +941,7 @@ export default function TeacherPanel() {
                   const best = groupComparisonData.reduce((a, b) => b.avgScore > a.avgScore ? b : a);
                   const worst = groupComparisonData.reduce((a, b) => b.avgScore < a.avgScore ? b : a);
                   return (
-                    <Card key={g.name} className={`border-slate-200 ${g.name === best.name ? 'border-emerald-300 ring-1 ring-emerald-100' : g.name === worst.name ? 'border-red-300 ring-1 ring-red-100' : ''}`}>
+                    <Card key={g.name} className={`border-border ${g.name === best.name ? 'border-emerald-300 ring-1 ring-emerald-100' : g.name === worst.name ? 'border-red-300 ring-1 ring-red-100' : ''}`}>
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <h3 className="font-semibold text-sm">{g.name}</h3>
@@ -950,16 +950,16 @@ export default function TeacherPanel() {
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
                           <div>
-                            <p className="text-lg font-bold text-slate-700">{g.students}</p>
-                            <p className="text-[10px] text-slate-500">Студентов</p>
+                            <p className="text-lg font-bold text-foreground/70">{g.students}</p>
+                            <p className="text-[10px] text-muted-foreground">Студентов</p>
                           </div>
                           <div>
-                            <p className="text-lg font-bold text-slate-700">{g.avgModules}</p>
-                            <p className="text-[10px] text-slate-500">Ср. модулей</p>
+                            <p className="text-lg font-bold text-foreground/70">{g.avgModules}</p>
+                            <p className="text-[10px] text-muted-foreground">Ср. модулей</p>
                           </div>
                           <div>
-                            <p className="text-lg font-bold text-slate-700">{g.avgScore}%</p>
-                            <p className="text-[10px] text-slate-500">Ср. балл</p>
+                            <p className="text-lg font-bold text-foreground/70">{g.avgScore}%</p>
+                            <p className="text-[10px] text-muted-foreground">Ср. балл</p>
                           </div>
                         </div>
                       </CardContent>
@@ -987,7 +987,7 @@ export default function TeacherPanel() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.03 }}
                 >
-                  <Card className={`border-l-4 ${reasons.length >= 3 ? 'border-l-red-500 border-slate-200' : reasons.length >= 2 ? 'border-l-amber-500 border-slate-200' : 'border-l-orange-400 border-slate-200'}`}>
+                  <Card className={`border-l-4 ${reasons.length >= 3 ? 'border-l-red-500 border-border' : reasons.length >= 2 ? 'border-l-amber-500 border-border' : 'border-l-orange-400 border-border'}`}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -996,21 +996,21 @@ export default function TeacherPanel() {
                           </div>
                           <div>
                             <p className="font-semibold text-sm">{student.fullName}</p>
-                            <p className="text-xs text-slate-500">{student.email}</p>
+                            <p className="text-xs text-muted-foreground">{student.email}</p>
                             {student.group && <Badge variant="secondary" className="text-[10px] mt-0.5">{student.group}</Badge>}
                           </div>
                         </div>
                         <div className="flex items-center gap-4 text-right">
                           <div>
-                            <p className="text-xs text-slate-500">Модули</p>
+                            <p className="text-xs text-muted-foreground">Модули</p>
                             <p className="text-sm font-bold">{progress.completedModules.length}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-slate-500">Ср. балл</p>
+                            <p className="text-xs text-muted-foreground">Ср. балл</p>
                             <p className="text-sm font-bold">{Object.values(progress.quizScores).length > 0 ? `${Math.round(avgScore)}%` : '—'}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-slate-500">Последняя активность</p>
+                            <p className="text-xs text-muted-foreground">Последняя активность</p>
                             <p className="text-sm font-bold">{progress.lastActive ? `${daysSinceActive} дн. назад` : 'Никогда'}</p>
                           </div>
                         </div>

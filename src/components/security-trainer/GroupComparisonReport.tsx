@@ -61,7 +61,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground">Загрузка данных...</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-600 font-medium">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium">{error}</p>
       </div>
     );
   }
@@ -102,13 +102,13 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       {/* Period + dimension selector */}
       <div className="flex gap-3 items-center flex-wrap">
         {!isControlled && (
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
+          <div className="flex gap-1 p-1 bg-muted rounded-lg">
             {PERIOD_OPTIONS.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setInternalDays(key)}
                 className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                  days === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                  days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {label}
@@ -116,13 +116,13 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
             ))}
           </div>
         )}
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg">
           {DIMENSION_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setDimension(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                dimension === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                dimension === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -162,7 +162,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       )}
 
       {/* Grouped bar chart */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Сравнительная диаграмма</h3>
           {barData.length > 0 ? (
@@ -192,7 +192,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
 
       {/* Radar chart */}
       {radarData.length >= 2 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Радар сравнения (топ 5)</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -219,22 +219,22 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       )}
 
       {/* Ranking table */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Рейтинг</h3>
           {dimensions.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">#</th>
-                    <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">{dimension === 'group' ? 'Группа' : dimension === 'course' ? 'Курс' : 'Университет'}</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Студенты</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Завершение</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Ср. балл</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Активность</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Лучший модуль</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Слабый модуль</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">#</th>
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">{dimension === 'group' ? 'Группа' : dimension === 'course' ? 'Курс' : 'Университет'}</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Студенты</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Завершение</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Ср. балл</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Активность</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Лучший модуль</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Слабый модуль</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -244,11 +244,11 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.03 }}
-                      className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                      className="border-b border-slate-100 hover:bg-secondary transition-colors"
                     >
                       <td className="py-2.5 px-3">
                         <span className={`w-6 h-6 rounded-full inline-flex items-center justify-center text-xs font-bold ${
-                          i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-slate-600' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
+                          i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-muted-foreground' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-muted text-muted-foreground'
                         }`}>
                           {i + 1}
                         </span>

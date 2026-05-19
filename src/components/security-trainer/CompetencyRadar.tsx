@@ -71,7 +71,7 @@ export default function CompetencyRadar({ groupId }: Props) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных компетенций...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных компетенций...</p>
       </div>
     );
   }
@@ -80,7 +80,7 @@ export default function CompetencyRadar({ groupId }: Props) {
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error}</p>
       </div>
     );
   }
@@ -97,7 +97,7 @@ export default function CompetencyRadar({ groupId }: Props) {
           </div>
           <div>
             <h2 className="text-lg font-bold">Карта компетенций</h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Радар навыков безопасности по модулям
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function CompetencyRadar({ groupId }: Props) {
         <select
           value={selectedStudentId}
           onChange={(e) => setSelectedStudentId(e.target.value)}
-          className="px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+          className="px-3 py-2 border border-border rounded-md text-sm bg-card"
         >
           <option value="">Среднее по всем студентам</option>
           {students.map((s) => (
@@ -119,7 +119,7 @@ export default function CompetencyRadar({ groupId }: Props) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="border-slate-200 lg:col-span-2">
+        <Card className="border-border lg:col-span-2">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">
               {selectedStudent
@@ -172,7 +172,7 @@ export default function CompetencyRadar({ groupId }: Props) {
         </Card>
 
         <div className="space-y-4">
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-4">
               <h3 className="font-semibold text-sm mb-3">Легенда</h3>
               {chartData.map((item) => (
@@ -182,7 +182,7 @@ export default function CompetencyRadar({ groupId }: Props) {
                   animate={{ opacity: 1, x: 0 }}
                   className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0"
                 >
-                  <span className="text-xs text-slate-600 truncate mr-2">{item.category}</span>
+                  <span className="text-xs text-muted-foreground truncate mr-2">{item.category}</span>
                   <span className={`text-xs font-semibold ${
                     item.score >= 70 ? 'text-emerald-600' : item.score >= 40 ? 'text-amber-600' : 'text-red-600'
                   }`}>
@@ -193,7 +193,7 @@ export default function CompetencyRadar({ groupId }: Props) {
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-4">
               <h3 className="font-semibold text-sm mb-2">Сильные стороны</h3>
               {chartData.filter((d) => d.score >= 70).length > 0 ? (
@@ -215,7 +215,7 @@ export default function CompetencyRadar({ groupId }: Props) {
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-4">
               <h3 className="font-semibold text-sm mb-2">Зоны роста</h3>
               {chartData.filter((d) => d.score < 50).length > 0 ? (

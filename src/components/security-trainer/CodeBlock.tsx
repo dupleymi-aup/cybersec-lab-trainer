@@ -11,7 +11,7 @@ export default function CodeBlock({ code, language = 'javascript', title }: Code
   return (
     <div className="rounded-lg overflow-hidden border border-slate-700 my-3">
       {title && (
-        <div className="bg-slate-800 px-4 py-2 text-xs font-mono text-slate-400 flex items-center gap-2">
+        <div className="bg-slate-800 dark:bg-slate-700 px-4 py-2 text-xs font-mono text-slate-400 flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-red-500 inline-block" />
           <span className="w-3 h-3 rounded-full bg-yellow-500 inline-block" />
           <span className="w-3 h-3 rounded-full bg-green-500 inline-block" />

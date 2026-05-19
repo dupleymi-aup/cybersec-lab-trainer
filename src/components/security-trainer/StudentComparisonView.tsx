@@ -95,13 +95,13 @@ export default function StudentComparisonView(props: Props = {}) {
     <div className="space-y-6">
       {/* Period selector — hidden when controlled externally */}
       {!controlled && (
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                effectiveDays === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                effectiveDays === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -111,7 +111,7 @@ export default function StudentComparisonView(props: Props = {}) {
       )}
 
       {/* Student selector */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-3">Выберите студентов для сравнения (2-4)</h3>
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
@@ -132,7 +132,7 @@ export default function StudentComparisonView(props: Props = {}) {
             })}
           </div>
           {selectedStudents.length > 0 && (
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               Выбрано: {selectedStudents.length} студент(ов)
             </p>
           )}
@@ -142,21 +142,21 @@ export default function StudentComparisonView(props: Props = {}) {
       {loading && (
         <div className="flex items-center justify-center py-16">
           <Loader2 size={32} className="animate-spin text-indigo-500" />
-          <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+          <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
         </div>
       )}
 
       {error && (
         <div className="flex items-center justify-center py-16">
           <AlertTriangle size={32} className="text-red-500" />
-          <p className="text-sm text-slate-600 font-medium ml-3">{error}</p>
+          <p className="text-sm text-muted-foreground font-medium ml-3">{error}</p>
         </div>
       )}
 
       {data && data.students.length >= 2 && (
         <>
           {/* Radar Chart */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4">Сравнение метрик</h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -185,13 +185,13 @@ export default function StudentComparisonView(props: Props = {}) {
           </Card>
 
           {/* Side-by-side metrics */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4">Метрики студентов</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200">
+                    <tr className="border-b border-border">
                       <th className="text-left p-2">Метрика</th>
                       {data.students.map((student, i) => (
                         <th key={student.id} className="text-center p-2" style={{ color: STUDENT_COLORS[i] }}>
@@ -209,7 +209,7 @@ export default function StudentComparisonView(props: Props = {}) {
                       { label: 'Вовлечённость', getValue: (s: typeof data.students[0]) => s.engagementScore },
                       { label: 'Риск', getValue: (s: typeof data.students[0]) => s.riskScore },
                     ].map((row, i) => (
-                      <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
+                      <tr key={i} className="border-b border-slate-100 hover:bg-secondary">
                         <td className="p-2 font-medium">{row.label}</td>
                         {data!.students.map((student) => (
                           <td key={student.id} className="text-center p-2">
@@ -226,7 +226,7 @@ export default function StudentComparisonView(props: Props = {}) {
 
           {/* Module comparison */}
           {moduleComparison.length > 0 && (
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Сравнение по модулям</h3>
                 <ResponsiveContainer width="100%" height={300}>

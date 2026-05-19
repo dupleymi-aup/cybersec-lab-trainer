@@ -161,7 +161,7 @@ const categoryColors: Record<string, string> = {
   Auth: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
   Crypto: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   Network: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
-  Tools: 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400',
+  Tools: 'bg-muted text-foreground/70 dark:bg-slate-900/30 dark:text-slate-400',
 };
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -283,7 +283,7 @@ export default function SecurityCheatSheets() {
                         </pre>
                         <button
                           onClick={() => handleCopy(item.code!, `${sheet.id}-${idx}`)}
-                          className="absolute top-1.5 right-1.5 p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+                          className="absolute top-1.5 right-1.5 p-1 rounded bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-slate-400 hover:text-white transition"
                           title="Копировать"
                         >
                           {copiedId === `${sheet.id}-${idx}` ? (

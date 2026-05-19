@@ -74,7 +74,7 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
   return (
     <div className="space-y-4">
       {/* Create new group */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-4">
           <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
             <Plus size={14} className="text-emerald-500" /> Создать группу
@@ -94,14 +94,14 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
       </Card>
 
       {/* Groups list */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-4">
           <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
             <Users size={14} className="text-sky-500" /> Группы ({groups.length})
           </h3>
 
           {groups.length === 0 ? (
-            <p className="text-sm text-slate-500 text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-4">
               Нет групп. Назначьте пользователям поле «Группа» или создайте группу выше.
             </p>
           ) : (
@@ -109,7 +109,7 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
               {groups.map((name) => (
                 <div
                   key={name}
-                  className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-slate-200 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-border transition-colors"
                 >
                   {editingGroup === name ? (
                     <div className="flex items-center gap-2 flex-1">
@@ -147,7 +147,7 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
                         </div>
                         <div>
                           <p className="font-medium text-sm">{name}</p>
-                          <p className="text-xs text-slate-500">{groupCounts[name] || 0} пользователей</p>
+                          <p className="text-xs text-muted-foreground">{groupCounts[name] || 0} пользователей</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -155,7 +155,7 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
                           variant="ghost"
                           size="icon"
                           onClick={() => { setEditingGroup(name); setEditValue(name); }}
-                          className="text-slate-500 hover:text-emerald-700"
+                          className="text-muted-foreground hover:text-emerald-700"
                         >
                           <Pencil size={14} />
                         </Button>
@@ -163,7 +163,7 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDelete(name)}
-                          className="text-slate-500 hover:text-red-700"
+                          className="text-muted-foreground hover:text-red-700"
                         >
                           <Trash2 size={14} />
                         </Button>
@@ -177,8 +177,8 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
         </CardContent>
       </Card>
 
-      <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-        <p className="text-xs text-slate-500">
+      <div className="p-3 bg-secondary border border-border rounded-lg">
+        <p className="text-xs text-muted-foreground">
           <strong>Совет:</strong> Для назначения пользователей в группу выберите их в списке пользователей и используйте кнопку «Назначить группу» в панели массовых действий.
         </p>
       </div>

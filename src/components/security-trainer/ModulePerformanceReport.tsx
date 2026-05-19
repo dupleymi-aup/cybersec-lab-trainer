@@ -62,7 +62,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground">Загрузка данных...</p>
       </div>
     );
   }
@@ -71,7 +71,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-600 font-medium">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium">{error}</p>
       </div>
     );
   }
@@ -87,13 +87,13 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
     <div className="space-y-6">
       {/* Period selector — hidden when controlled externally */}
       {!controlled && (
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                effectiveDays === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                effectiveDays === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -111,7 +111,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="border-slate-200 hover:border-slate-300 transition-colors">
+            <Card className="border-border hover:border-border transition-colors">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
@@ -121,21 +121,21 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-500">Завершение</span>
+                    <span className="text-muted-foreground">Завершение</span>
                     <span className="font-semibold">{m.completionRate}%</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-500">Ср. балл</span>
+                    <span className="text-muted-foreground">Ср. балл</span>
                     <span className="font-semibold">{m.avgScore}%</span>
                   </div>
                   <div className="flex justify-between text-xs items-center">
-                    <span className="text-slate-500">Сложность</span>
+                    <span className="text-muted-foreground">Сложность</span>
                     <Badge className={`text-[10px] ${getDifficultyColor(m.difficultyIndex)}`}>
                       {getDifficultyLabel(m.difficultyIndex)}
                     </Badge>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-500">Завершили</span>
+                    <span className="text-muted-foreground">Завершили</span>
                     <span className="font-semibold">{m.completedCount}/{m.totalStudents}</span>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
       </div>
 
       {/* Completion rate bar chart */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Завершение модулей (%)</h3>
           {chartData.length > 0 ? (
@@ -170,19 +170,19 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
       </Card>
 
       {/* Module detail table */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Детализация по модулям</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">Модуль</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Студенты</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Завершили</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Завершение</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Ср. балл</th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Сложность</th>
+                <tr className="border-b border-border">
+                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Модуль</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Студенты</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Завершили</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Завершение</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Ср. балл</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Сложность</th>
                 </tr>
               </thead>
               <tbody>
@@ -192,7 +192,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.03 }}
-                    className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                    className="border-b border-slate-100 hover:bg-secondary transition-colors"
                   >
                     <td className="py-2.5 px-3 font-medium">{m.moduleName}</td>
                     <td className="py-2.5 px-3 text-right">{m.totalStudents}</td>

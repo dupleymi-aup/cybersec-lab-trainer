@@ -147,7 +147,7 @@ export default function PredictiveInsights({ groupId }: Props) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Прогнозирование...</p>
+        <p className="text-sm text-muted-foreground ml-3">Прогнозирование...</p>
       </div>
     );
   }
@@ -156,7 +156,7 @@ export default function PredictiveInsights({ groupId }: Props) {
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error}</p>
       </div>
     );
   }
@@ -170,7 +170,7 @@ export default function PredictiveInsights({ groupId }: Props) {
           </div>
           <div>
             <h2 className="text-lg font-bold">Прогнозная аналитика</h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Прогнозирование успеваемости на основе исторических данных
             </p>
           </div>
@@ -187,7 +187,7 @@ export default function PredictiveInsights({ groupId }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
           >
-            <Card className={`border-slate-200 ${
+            <Card className={`border-border ${
               insight.trend === 'up' && insight.label !== 'Риск отставания'
                 ? 'hover:border-emerald-300'
                 : insight.trend === 'down' && insight.label === 'Риск отставания'
@@ -196,7 +196,7 @@ export default function PredictiveInsights({ groupId }: Props) {
             }`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium text-slate-500">{insight.label}</span>
+                  <span className="text-xs font-medium text-muted-foreground">{insight.label}</span>
                   {insight.trend === 'up' ? (
                     <TrendingUp size={16} className="text-emerald-500" />
                   ) : insight.trend === 'down' ? (
@@ -222,7 +222,7 @@ export default function PredictiveInsights({ groupId }: Props) {
                     </p>
                   </div>
                 </div>
-                <div className="mt-2 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${
                       ((insight.trend === 'up' && insight.label !== 'Риск отставания') ||
@@ -244,7 +244,7 @@ export default function PredictiveInsights({ groupId }: Props) {
       </div>
 
       {/* Completion forecast chart */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Прогноз завершения модулей</h3>
           {completionForecastData.length > 0 ? (
@@ -312,7 +312,7 @@ export default function PredictiveInsights({ groupId }: Props) {
       </Card>
 
       {/* Recommendations */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
             <Lightbulb size={16} className="text-amber-500" />

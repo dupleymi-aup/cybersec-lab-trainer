@@ -51,7 +51,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
       </div>
     );
   }
@@ -60,7 +60,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -85,7 +85,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-white"
+            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
           >
             <option value={7}>7 дней</option>
             <option value={30}>30 дней</option>
@@ -96,21 +96,21 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
 
       {/* Summary */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-indigo-600">{summary.avgReadinessScore}</p>
-            <p className="text-xs text-slate-500">Ср. балл готовности</p>
+            <p className="text-xs text-muted-foreground">Ср. балл готовности</p>
           </CardContent>
         </Card>
         {Object.entries(TIER_CONFIG).map(([key, config]) => {
           const count = summary[key as keyof typeof summary] as number;
           const Icon = config.icon;
           return (
-            <Card key={key} className="border-slate-200">
+            <Card key={key} className="border-border">
               <CardContent className="p-4 text-center">
                 <Icon size={20} className={`mx-auto mb-1 ${key === 'ready' ? 'text-emerald-600' : key === 'almost' ? 'text-blue-600' : key === 'needs-work' ? 'text-amber-600' : 'text-red-600'}`} />
                 <p className={`text-2xl font-bold ${key === 'ready' ? 'text-emerald-600' : key === 'almost' ? 'text-blue-600' : key === 'needs-work' ? 'text-amber-600' : 'text-red-600'}`}>{count}</p>
-                <p className="text-xs text-slate-500">{config.label}</p>
+                <p className="text-xs text-muted-foreground">{config.label}</p>
               </CardContent>
             </Card>
           );
@@ -119,7 +119,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
 
       {/* Distribution pie */}
       {tierData.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Распределение по уровням готовности</h3>
             <div className="h-[220px]">
@@ -137,29 +137,29 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
       )}
 
       {/* Student table */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-secondary border-b border-border">
                 <tr>
-                  <th className="text-left p-2 font-medium text-slate-600">Студент</th>
-                  <th className="p-2 font-medium text-slate-600 text-center">Группа</th>
-                  <th className="p-2 font-medium text-slate-600 text-center">Балл</th>
-                  <th className="p-2 font-medium text-slate-600 text-center">Уровень</th>
-                  <th className="p-2 font-medium text-slate-600 text-center">Модули</th>
-                  <th className="p-2 font-medium text-slate-600 text-center">Достижения</th>
-                  <th className="p-2 font-medium text-slate-600"></th>
+                  <th className="text-left p-2 font-medium text-muted-foreground">Студент</th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">Группа</th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">Балл</th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">Уровень</th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">Модули</th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">Достижения</th>
+                  <th className="p-2 font-medium text-muted-foreground"></th>
                 </tr>
               </thead>
               <tbody>
                 {students.map((s) => (
-                  <motion.tr key={s.userId} className="border-b border-slate-100 hover:bg-slate-50" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.tr key={s.userId} className="border-b border-slate-100 hover:bg-secondary" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <td className="p-2 font-medium">{s.fullName}</td>
-                    <td className="p-2 text-center text-slate-500">{s.group || '—'}</td>
+                    <td className="p-2 text-center text-muted-foreground">{s.group || '—'}</td>
                     <td className="p-2 text-center">
                       <div className="flex items-center gap-2 justify-center">
-                        <div className="w-16 bg-slate-100 rounded-full h-2.5">
+                        <div className="w-16 bg-muted rounded-full h-2.5">
                           <div
                             className={`h-full rounded-full ${s.readinessScore >= 75 ? 'bg-emerald-500' : s.readinessScore >= 55 ? 'bg-blue-500' : s.readinessScore >= 35 ? 'bg-amber-500' : 'bg-red-500'}`}
                             style={{ width: `${s.readinessScore}%` }}
@@ -176,7 +176,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                     <td className="p-2 text-center">{s.modulesCompleted}/{s.totalModules}</td>
                     <td className="p-2 text-center">{s.achievements}</td>
                     <td className="p-2 text-center">
-                      <button onClick={() => setExpandedId(expandedId === s.userId ? null : s.userId)} className="text-slate-400 hover:text-slate-600">
+                      <button onClick={() => setExpandedId(expandedId === s.userId ? null : s.userId)} className="text-slate-400 hover:text-muted-foreground">
                         {expandedId === s.userId ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                       </button>
                     </td>
@@ -191,7 +191,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
             const s = students.find((st) => st.userId === expandedId);
             if (!s) return null;
             return (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="p-4 bg-slate-50 border-t border-slate-200">
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="p-4 bg-secondary border-t border-border">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Radar chart */}
                   <div>
@@ -231,7 +231,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                         <h4 className="font-semibold text-sm text-indigo-700 mb-1">Рекомендации</h4>
                         <ul className="space-y-1">
                           {s.recommendations.map((r, i) => (
-                            <li key={i} className="text-xs text-slate-600 flex items-start gap-1">
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1">
                               <span className="text-indigo-500 mt-0.5">•</span> {r}
                             </li>
                           ))}

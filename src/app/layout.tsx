@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import "./globals.css";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { ThemeProvider } from "@/lib/theme-provider";
+import ThemeColorMeta from "@/components/security-trainer/ThemeColorMeta";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,9 +56,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <ThemeProvider>
+        <NextThemesProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          storageKey="theme"
+        >
+          <ThemeColorMeta />
           <ErrorBoundary>{children}</ErrorBoundary>
-        </ThemeProvider>
+        </NextThemesProvider>
       </body>
     </html>
   );

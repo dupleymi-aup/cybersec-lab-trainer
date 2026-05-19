@@ -92,9 +92,9 @@ import GroupDynamics from './GroupDynamics';
 import LoginPatterns from './LoginPatterns';
 
 const roleColors: Record<UserRole, string> = {
-  student: 'bg-violet-100 text-violet-700',
-  teacher: 'bg-amber-100 text-amber-700',
-  admin: 'bg-red-100 text-red-700',
+  student: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+  teacher: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+  admin: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 };
 
 export default function AdminPanel() {
@@ -302,7 +302,7 @@ export default function AdminPanel() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Панель администратора</h1>
-          <p className="text-xs text-slate-500">Управление пользователями и системой</p>
+          <p className="text-xs text-muted-foreground">Управление пользователями и системой</p>
         </div>
       </div>
 
@@ -353,7 +353,7 @@ export default function AdminPanel() {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+              className="px-3 py-2 border border-border rounded-md text-sm bg-card"
             >
               <option value="">Все роли</option>
               <option value="student">Студент</option>
@@ -371,7 +371,7 @@ export default function AdminPanel() {
               checked={filteredUsers.filter((u) => u.id !== user?.id).length > 0 && selectedUserIds.size === filteredUsers.filter((u) => u.id !== user?.id).length}
               onCheckedChange={handleSelectAll}
             />
-            <span className="text-xs text-slate-500">Выбрать всех</span>
+            <span className="text-xs text-muted-foreground">Выбрать всех</span>
             {selectedUserIds.size > 0 && (
               <Badge variant="secondary" className="text-[10px]">Выбрано: {selectedUserIds.size}</Badge>
             )}
@@ -385,7 +385,7 @@ export default function AdminPanel() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
               >
-                <Card className={`border-slate-200 hover:border-red-200 transition-colors ${u.isBlocked ? 'opacity-60' : ''} ${u.id === user?.id ? 'bg-slate-50' : ''}`}>
+                <Card className={`border-border hover:border-red-200 transition-colors ${u.isBlocked ? 'opacity-60' : ''} ${u.id === user?.id ? 'bg-secondary' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -407,7 +407,7 @@ export default function AdminPanel() {
                               <Badge variant="destructive" className="text-[10px]">Заблокирован</Badge>
                             )}
                           </div>
-                          <p className="text-xs text-slate-500">{u.email} • {u.phone}</p>
+                          <p className="text-xs text-muted-foreground">{u.email} • {u.phone}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge className={`text-[10px] ${roleColors[u.role]}`}>
                               {getRoleLabel(u.role)}
@@ -420,7 +420,7 @@ export default function AdminPanel() {
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="text-right mr-2">
-                          <p className="text-xs text-slate-500">Входов: {u.loginCount || 0}</p>
+                          <p className="text-xs text-muted-foreground">Входов: {u.loginCount || 0}</p>
                           <p className="text-[10px] text-slate-400">
                             {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString('ru-RU') : 'Не входил'}
                           </p>
@@ -430,7 +430,7 @@ export default function AdminPanel() {
                             <select
                               value={u.role}
                               onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
-                              className="px-2 py-1 border border-slate-200 rounded-md text-xs bg-white"
+                              className="px-2 py-1 border border-border rounded-md text-xs bg-card"
                             >
                               <option value="student">Студент</option>
                               <option value="teacher">Преподаватель</option>
@@ -439,7 +439,7 @@ export default function AdminPanel() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-slate-500 hover:text-sky-700 hover:bg-sky-50"
+                              className="text-muted-foreground hover:text-sky-700 hover:bg-sky-50"
                               onClick={() => setActivityUser(u)}
                               title="Активность пользователя"
                             >
@@ -448,7 +448,7 @@ export default function AdminPanel() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-slate-500 hover:text-emerald-700 hover:bg-emerald-50"
+                              className="text-muted-foreground hover:text-emerald-700 hover:bg-emerald-50"
                               onClick={() => setEditModalUser(u)}
                             >
                               <Pencil size={16} />
@@ -456,7 +456,7 @@ export default function AdminPanel() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-slate-500 hover:text-amber-700 hover:bg-amber-50"
+                              className="text-muted-foreground hover:text-amber-700 hover:bg-amber-50"
                               onClick={() => setPasswordResetUser(u)}
                               title="Сброс пароля"
                             >
@@ -465,7 +465,7 @@ export default function AdminPanel() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-slate-500 hover:text-purple-700 hover:bg-purple-50"
+                              className="text-muted-foreground hover:text-purple-700 hover:bg-purple-50"
                               onClick={async () => {
                                 const result = await startImpersonation(u.id, user?.id || '');
                                 if (result.success) {
@@ -505,37 +505,37 @@ export default function AdminPanel() {
 
         {/* Database Tab */}
         <TabsContent value="database" className="mt-4 space-y-4">
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4">Пользователи по ролям</h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-violet-50 rounded-lg">
                   <p className="text-3xl font-bold text-violet-600">{studentCount}</p>
-                  <p className="text-xs text-slate-500 mt-1">Студенты</p>
+                  <p className="text-xs text-muted-foreground mt-1">Студенты</p>
                 </div>
                 <div className="text-center p-4 bg-amber-50 rounded-lg">
                   <p className="text-3xl font-bold text-amber-600">{teacherCount}</p>
-                  <p className="text-xs text-slate-500 mt-1">Преподаватели</p>
+                  <p className="text-xs text-muted-foreground mt-1">Преподаватели</p>
                 </div>
                 <div className="text-center p-4 bg-red-50 rounded-lg">
                   <p className="text-3xl font-bold text-red-600">{adminCount}</p>
-                  <p className="text-xs text-slate-500 mt-1">Администраторы</p>
+                  <p className="text-xs text-muted-foreground mt-1">Администраторы</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4">Хранилище (localStorage)</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-sky-50 rounded-lg">
                   <p className="text-3xl font-bold text-sky-600">{keysCount}</p>
-                  <p className="text-xs text-slate-500 mt-1">Ключей</p>
+                  <p className="text-xs text-muted-foreground mt-1">Ключей</p>
                 </div>
                 <div className="text-center p-4 bg-emerald-50 rounded-lg">
                   <p className="text-3xl font-bold text-emerald-600">{storageKB} KB</p>
-                  <p className="text-xs text-slate-500 mt-1">Использовано</p>
+                  <p className="text-xs text-muted-foreground mt-1">Использовано</p>
                 </div>
               </div>
             </CardContent>
@@ -544,7 +544,7 @@ export default function AdminPanel() {
 
         {/* Settings Tab */}
         <TabsContent value="settings" className="mt-4 space-y-4">
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5 space-y-4">
               <h3 className="font-semibold text-sm">Системные действия</h3>
 
@@ -598,25 +598,25 @@ export default function AdminPanel() {
           </Card>
 
           {/* Stats */}
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4">Общая статистика</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-3 bg-violet-50 rounded-lg">
                   <p className="text-2xl font-bold text-violet-600">{totalUsers}</p>
-                  <p className="text-xs text-slate-500 mt-1">Всего</p>
+                  <p className="text-xs text-muted-foreground mt-1">Всего</p>
                 </div>
                 <div className="text-center p-3 bg-red-50 rounded-lg">
                   <p className="text-2xl font-bold text-red-600">{blockedCount}</p>
-                  <p className="text-xs text-slate-500 mt-1">Заблокировано</p>
+                  <p className="text-xs text-muted-foreground mt-1">Заблокировано</p>
                 </div>
                 <div className="text-center p-3 bg-sky-50 rounded-lg">
                   <p className="text-2xl font-bold text-sky-600">{keysCount}</p>
-                  <p className="text-xs text-slate-500 mt-1">Ключей localStorage</p>
+                  <p className="text-xs text-muted-foreground mt-1">Ключей localStorage</p>
                 </div>
                 <div className="text-center p-3 bg-emerald-50 rounded-lg">
                   <p className="text-2xl font-bold text-emerald-600">{storageKB} KB</p>
-                  <p className="text-xs text-slate-500 mt-1">Хранилище</p>
+                  <p className="text-xs text-muted-foreground mt-1">Хранилище</p>
                 </div>
               </div>
             </CardContent>
@@ -631,7 +631,7 @@ export default function AdminPanel() {
             </div>
             <div>
               <h2 className="text-sm font-bold">Управление группами</h2>
-              <p className="text-xs text-slate-500">Создание, переименование и удаление групп</p>
+              <p className="text-xs text-muted-foreground">Создание, переименование и удаление групп</p>
             </div>
           </div>
           <GroupManager adminId={user?.id || ''} onRefresh={refresh} />
@@ -665,7 +665,7 @@ export default function AdminPanel() {
             </div>
             <div>
               <h2 className="text-sm font-bold">Журнал действий</h2>
-              <p className="text-xs text-slate-500">История всех действий администраторов</p>
+              <p className="text-xs text-muted-foreground">История всех действий администраторов</p>
             </div>
           </div>
           <AuditLogView />
@@ -674,7 +674,7 @@ export default function AdminPanel() {
         {/* Report Tab */}
         <TabsContent value="report" className="mt-4 space-y-4">
           {/* Sub-tab selector */}
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit flex-wrap">
+          <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
             {[
               { key: 'summary' as const, label: 'Сводка', icon: FileBarChart },
               { key: 'heatmap' as const, label: 'Активность', icon: Calendar },
@@ -688,8 +688,8 @@ export default function AdminPanel() {
                 onClick={() => setReportSubTab(key)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   reportSubTab === key
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Icon size={13} />
@@ -848,7 +848,7 @@ function AnalyticsSubTabs({
       )}
 
       {/* Sub-tab selector */}
-      <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit flex-wrap">
+      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
         {[
           { key: 'dashboard' as const, label: 'Дашборд', icon: BarChart3 },
           { key: 'modules' as const, label: 'Модули', icon: BookOpen },
@@ -878,8 +878,8 @@ function AnalyticsSubTabs({
             onClick={() => setAnalyticsSubTab(key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
               analyticsSubTab === key
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Icon size={13} />
@@ -970,7 +970,7 @@ function AnalyticsSubTabs({
               <select
                 value={selectedStudentId}
                 onChange={(e) => setSelectedStudentId(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+                className="px-3 py-2 border border-border rounded-md text-sm bg-card"
               >
                 <option value="">Выберите студента...</option>
                 {allUsers.filter((u) => u.role === 'student').map((u) => (

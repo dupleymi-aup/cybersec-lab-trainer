@@ -11,7 +11,7 @@ export default function SyncIndicator() {
   if (!isAuthenticated || !userId) return null;
 
   const icons = {
-    idle: <CloudOff size={14} className="text-slate-500" />,
+    idle: <CloudOff size={14} className="text-muted-foreground" />,
     syncing: <Cloud size={14} className="text-blue-400 animate-pulse" />,
     synced: <CheckCircle2 size={14} className="text-emerald-400" />,
     error: <AlertCircle size={14} className="text-red-400" />,

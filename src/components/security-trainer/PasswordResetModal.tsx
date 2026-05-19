@@ -76,7 +76,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
-        className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md"
+        className="bg-card rounded-2xl shadow-xl p-6 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -91,9 +91,9 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
         </div>
 
         {/* User info */}
-        <div className="mb-4 p-3 bg-slate-50 rounded-lg">
+        <div className="mb-4 p-3 bg-secondary rounded-lg">
           <p className="text-sm font-medium">{user.fullName}</p>
-          <p className="text-xs text-slate-500">{user.email}</p>
+          <p className="text-xs text-muted-foreground">{user.email}</p>
         </div>
 
         {!resetDone ? (
@@ -110,7 +110,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
                 />
                 <button
                   type="button"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -120,14 +120,14 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <Progress value={pwStrength.score} className="h-1.5 flex-1" />
-                    <span className="text-[10px] text-slate-500">{pwStrength.label}</span>
+                    <span className="text-[10px] text-muted-foreground">{pwStrength.label}</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {pwStrength.checks.map((check, i) => (
                       <Badge
                         key={i}
                         variant="outline"
-                        className={`text-[9px] px-1 py-0 ${check.passed ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : 'border-slate-200 text-slate-400'}`}
+                        className={`text-[9px] px-1 py-0 ${check.passed ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : 'border-border text-slate-400'}`}
                       >
                         {check.passed && <Check size={8} className="mr-0.5" />}
                         {check.label}
@@ -150,7 +150,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
                 />
                 <button
                   type="button"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-muted-foreground"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -177,7 +177,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
           <div className="space-y-4">
             <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
               <p className="text-sm font-medium text-emerald-700 mb-2">Пароль успешно сброшен!</p>
-              <div className="flex items-center gap-2 bg-white rounded-lg p-3 border border-emerald-200">
+              <div className="flex items-center gap-2 bg-card rounded-lg p-3 border border-emerald-200">
                 <code className="text-sm font-mono flex-1">{newPassword}</code>
                 <Button variant="ghost" size="icon" onClick={handleCopy} className="shrink-0">
                   <Copy size={16} className={copied ? 'text-emerald-600' : 'text-slate-400'} />

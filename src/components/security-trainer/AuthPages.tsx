@@ -220,7 +220,7 @@ export default function AuthPages() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
             >
-              <Card className="border-slate-700/50 bg-slate-800/50 backdrop-blur">
+              <Card className="border-slate-700/50 bg-slate-800 dark:bg-slate-700/50 backdrop-blur">
                 <CardHeader>
                   <CardTitle className="text-white">Вход в аккаунт</CardTitle>
                   <CardDescription className="text-slate-400">
@@ -238,7 +238,7 @@ export default function AuthPages() {
                         value={loginContact}
                         onChange={(e) => setLoginContact(e.target.value)}
                         placeholder="example@mail.com или +7..."
-                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                       />
                     </div>
                     <div className="space-y-2">
@@ -252,7 +252,7 @@ export default function AuthPages() {
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
                           placeholder="Введите пароль"
-                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                         />
                         <button
                           type="button"
@@ -305,7 +305,7 @@ export default function AuthPages() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.2 }}
             >
-              <Card className="border-slate-700/50 bg-slate-800/50 backdrop-blur">
+              <Card className="border-slate-700/50 bg-slate-800 dark:bg-slate-700/50 backdrop-blur">
                 <CardHeader>
                   <CardTitle className="text-white">Регистрация</CardTitle>
                   <CardDescription className="text-slate-400">
@@ -323,7 +323,7 @@ export default function AuthPages() {
                         value={regName}
                         onChange={(e) => setRegName(e.target.value)}
                         placeholder="Иванов Иван Иванович"
-                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                       />
                     </div>
                     <div className="space-y-2">
@@ -336,7 +336,7 @@ export default function AuthPages() {
                         value={regEmail}
                         onChange={(e) => setRegEmail(e.target.value)}
                         placeholder="example@mail.com"
-                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                       />
                     </div>
                     <div className="space-y-2">
@@ -349,13 +349,13 @@ export default function AuthPages() {
                         value={regPhone}
                         onChange={(e) => setRegPhone(e.target.value)}
                         placeholder="+7 (999) 123-45-67"
-                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                       />
                     </div>
                     <div className="space-y-3">
                       <Label className="text-slate-300">Роль</Label>
                       <RadioGroup value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)} className="space-y-2">
-                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800/50 transition cursor-pointer">
+                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
                           <RadioGroupItem value="student" id="role-student" className="mt-1" />
                           <label htmlFor="role-student" className="flex-1 cursor-pointer">
                             <div className="flex items-center gap-2">
@@ -365,7 +365,7 @@ export default function AuthPages() {
                             <p className="text-xs text-slate-400 mt-0.5">Изучайте модули, проходите квизы и выполняйте лабораторные работы</p>
                           </label>
                         </div>
-                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800/50 transition cursor-pointer">
+                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
                           <RadioGroupItem value="teacher" id="role-teacher" className="mt-1" />
                           <label htmlFor="role-teacher" className="flex-1 cursor-pointer">
                             <div className="flex items-center gap-2">
@@ -375,7 +375,7 @@ export default function AuthPages() {
                             <p className="text-xs text-slate-400 mt-0.5">Отслеживайте прогресс студентов, управляйте группами и смотрите аналитику</p>
                           </label>
                         </div>
-                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800/50 transition cursor-pointer">
+                        <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
                           <RadioGroupItem value="admin" id="role-admin" className="mt-1" />
                           <label htmlFor="role-admin" className="flex-1 cursor-pointer">
                             <div className="flex items-center gap-2">
@@ -403,7 +403,7 @@ export default function AuthPages() {
                             value={adminInviteCode}
                             onChange={(e) => setAdminInviteCode(e.target.value)}
                             placeholder="Введите код приглашения"
-                            className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                            className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                           />
                           <p className="text-xs text-amber-400">
                             Для получения роли администратора необходим код приглашения
@@ -422,7 +422,7 @@ export default function AuthPages() {
                           value={regPassword}
                           onChange={(e) => setRegPassword(e.target.value)}
                           placeholder="Минимум 8 символов"
-                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                         />
                         <button
                           type="button"
@@ -459,9 +459,9 @@ export default function AuthPages() {
                                 {check.passed ? (
                                   <CheckCircle2 size={12} className="text-emerald-400" />
                                 ) : (
-                                  <AlertTriangle size={12} className="text-slate-600" />
+                                  <AlertTriangle size={12} className="text-muted-foreground" />
                                 )}
-                                <span className={check.passed ? 'text-slate-300' : 'text-slate-500'}>
+                                <span className={check.passed ? 'text-slate-300' : 'text-muted-foreground'}>
                                   {check.label}
                                 </span>
                               </div>
@@ -481,7 +481,7 @@ export default function AuthPages() {
                           value={regConfirmPassword}
                           onChange={(e) => setRegConfirmPassword(e.target.value)}
                           placeholder="Повторите пароль"
-                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                         />
                         <button
                           type="button"
@@ -518,7 +518,7 @@ export default function AuthPages() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
             >
-              <Card className="border-slate-700/50 bg-slate-800/50 backdrop-blur">
+              <Card className="border-slate-700/50 bg-slate-800 dark:bg-slate-700/50 backdrop-blur">
                 <CardHeader>
                   <CardTitle className="text-white">Восстановление пароля</CardTitle>
                   <CardDescription className="text-slate-400">
@@ -566,7 +566,7 @@ export default function AuthPages() {
                           value={recoveryContact}
                           onChange={(e) => setRecoveryContact(e.target.value)}
                           placeholder={recoveryMethod === 'email' ? 'example@mail.com' : '+7 (999) 123-45-67'}
-                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500"
+                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                         />
                       </div>
                       <Button onClick={handleSendRecovery} className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
@@ -581,13 +581,13 @@ export default function AuthPages() {
                         <button
                           type="button"
                           onClick={() => setShowRecoveryOtp(!showRecoveryOtp)}
-                          className="text-xs text-slate-500 bg-slate-700/50 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 hover:bg-slate-700/70 transition"
+                          className="text-xs text-muted-foreground bg-slate-700/50 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 hover:bg-slate-700/70 transition"
                         >
                           {showRecoveryOtp ? (
                             <>
                               <EyeOff className="w-3 h-3" />
                               <span className="text-violet-400 font-mono">{recoveryState?.otp || '—'}</span>
-                              <span className="text-slate-500">скрыть</span>
+                              <span className="text-muted-foreground">скрыть</span>
                             </>
                           ) : (
                             <>
@@ -604,7 +604,7 @@ export default function AuthPages() {
                           onChange={(e) => setRecoveryOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                           placeholder="Введите 6-значный код"
                           maxLength={6}
-                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 text-center text-xl tracking-widest"
+                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground text-center text-xl tracking-widest"
                         />
                       </div>
                       <Button onClick={handleVerifyOTP} className="w-full bg-violet-600 hover:bg-violet-700">
@@ -627,7 +627,7 @@ export default function AuthPages() {
                       </div>
                       <button
                         onClick={() => setRecoveryStep('enter-contact')}
-                        className="w-full text-sm text-slate-500 hover:text-slate-400"
+                        className="w-full text-sm text-muted-foreground hover:text-slate-400"
                       >
                         Изменить способ восстановления
                       </button>
@@ -647,7 +647,7 @@ export default function AuthPages() {
                             value={recoveryNewPassword}
                             onChange={(e) => setRecoveryNewPassword(e.target.value)}
                             placeholder="Минимум 8 символов"
-                            className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+                            className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                           />
                           <button
                             type="button"
@@ -684,9 +684,9 @@ export default function AuthPages() {
                                   {check.passed ? (
                                     <CheckCircle2 size={12} className="text-emerald-400" />
                                   ) : (
-                                    <AlertTriangle size={12} className="text-slate-600" />
+                                    <AlertTriangle size={12} className="text-muted-foreground" />
                                   )}
-                                  <span className={check.passed ? 'text-slate-300' : 'text-slate-500'}>
+                                  <span className={check.passed ? 'text-slate-300' : 'text-muted-foreground'}>
                                     {check.label}
                                   </span>
                                 </div>
@@ -706,7 +706,7 @@ export default function AuthPages() {
                             value={recoveryConfirmPassword}
                             onChange={(e) => setRecoveryConfirmPassword(e.target.value)}
                             placeholder="Повторите пароль"
-                            className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+                            className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                           />
                           <button
                             type="button"

@@ -80,7 +80,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition text-sm font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-muted dark:bg-slate-800 dark:bg-slate-700 text-foreground/70 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition text-sm font-medium"
               >
                 <RefreshCw size={16} />
                 Перезагрузить страницу
@@ -99,24 +99,24 @@ export class ErrorBoundary extends Component<Props, State> {
                 </button>
 
                 {showDetails && (
-                  <div className="mt-2 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border text-xs font-mono overflow-auto max-h-60">
+                  <div className="mt-2 p-3 bg-secondary dark:bg-slate-900 rounded-lg border text-xs font-mono overflow-auto max-h-60">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-sans font-semibold text-red-600">{error.name}: {error.message}</span>
                       <button
                         onClick={this.handleCopyError}
-                        className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                        className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 dark:bg-slate-700 transition-colors"
                         title="Копировать"
                       >
                         <Copy size={14} />
                       </button>
                     </div>
                     {error.stack && (
-                      <pre className="whitespace-pre-wrap text-slate-600 dark:text-slate-400">
+                      <pre className="whitespace-pre-wrap text-muted-foreground dark:text-slate-400">
                         {error.stack.split('\n').slice(0, 10).join('\n')}
                       </pre>
                     )}
                     {errorInfo?.componentStack && (
-                      <pre className="whitespace-pre-wrap text-slate-500 dark:text-slate-500 mt-2">
+                      <pre className="whitespace-pre-wrap text-muted-foreground dark:text-muted-foreground mt-2">
                         {errorInfo.componentStack.split('\n').slice(0, 8).join('\n')}
                       </pre>
                     )}

@@ -135,14 +135,14 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
-        className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-card rounded-2xl shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-lg font-bold">Активность пользователя</h2>
-            <p className="text-xs text-slate-500">{user.fullName} • {user.email}</p>
+            <p className="text-xs text-muted-foreground">{user.fullName} • {user.email}</p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X size={18} />
@@ -171,22 +171,22 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
           <div className="text-center p-3 bg-sky-50 rounded-lg">
             <BarChart3 size={18} className="text-sky-500 mx-auto mb-1" />
             <p className="text-xl font-bold text-sky-600">{completedCount}/{totalModules}</p>
-            <p className="text-[10px] text-slate-500">Модули</p>
+            <p className="text-[10px] text-muted-foreground">Модули</p>
           </div>
           <div className="text-center p-3 bg-emerald-50 rounded-lg">
             <Trophy size={18} className="text-emerald-500 mx-auto mb-1" />
             <p className="text-xl font-bold text-emerald-600">{avgScore}%</p>
-            <p className="text-[10px] text-slate-500">Ср. балл</p>
+            <p className="text-[10px] text-muted-foreground">Ср. балл</p>
           </div>
           <div className="text-center p-3 bg-violet-50 rounded-lg">
             <Activity size={18} className="text-violet-500 mx-auto mb-1" />
             <p className="text-xl font-bold text-violet-600">{totalLogins}</p>
-            <p className="text-[10px] text-slate-500">Входов</p>
+            <p className="text-[10px] text-muted-foreground">Входов</p>
           </div>
           <div className="text-center p-3 bg-amber-50 rounded-lg">
             <Clock size={18} className="text-amber-500 mx-auto mb-1" />
             <p className="text-xl font-bold text-amber-600">{user.loginCount || 0}</p>
-            <p className="text-[10px] text-slate-500">Всего</p>
+            <p className="text-[10px] text-muted-foreground">Всего</p>
           </div>
         </div>
 
@@ -221,7 +221,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
           {/* Quizzes tab */}
           <TabsContent value="quizzes" className="mt-4 space-y-2">
             {quizEntries.length === 0 ? (
-              <p className="text-sm text-slate-500 text-center py-4">Квизы ещё не проходились</p>
+              <p className="text-sm text-muted-foreground text-center py-4">Квизы ещё не проходились</p>
             ) : (
               quizEntries.map(([category, score]) => (
                 <div key={category} className="p-3 rounded-lg border border-slate-100">
@@ -248,7 +248,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                 <Database size={14} className="text-sky-500" /> SQL-инъекции
               </h4>
               {progress.sqlCompletedLevels.length === 0 ? (
-                <p className="text-xs text-slate-500">Уровни не пройдены</p>
+                <p className="text-xs text-muted-foreground">Уровни не пройдены</p>
               ) : (
                 <div className="space-y-1">
                   {progress.sqlCompletedLevels.map((level) => (
@@ -265,7 +265,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                 <BookOpen size={14} className="text-amber-500" /> XSS атаки
               </h4>
               {progress.xssCompletedLevels.length === 0 ? (
-                <p className="text-xs text-slate-500">Уровни не пройдены</p>
+                <p className="text-xs text-muted-foreground">Уровни не пройдены</p>
               ) : (
                 <div className="space-y-1">
                   {progress.xssCompletedLevels.map((level) => (
@@ -282,7 +282,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                 <ShieldCheck size={14} className="text-emerald-500" /> CSRF атаки
               </h4>
               {progress.csrfCompletedSteps?.length === 0 ? (
-                <p className="text-xs text-slate-500">Шаги не пройдены</p>
+                <p className="text-xs text-muted-foreground">Шаги не пройдены</p>
               ) : (
                 <div className="space-y-1">
                   {progress.csrfCompletedSteps.map((step) => (
@@ -299,7 +299,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                 <Code size={14} className="text-purple-500" /> Безопасное кодирование
               </h4>
               {progress.secureCodingAnsweredChallenges?.length === 0 ? (
-                <p className="text-xs text-slate-500">Задания не пройдены</p>
+                <p className="text-xs text-muted-foreground">Задания не пройдены</p>
               ) : (
                 <div className="space-y-1">
                   {progress.secureCodingAnsweredChallenges.map((idx) => (
@@ -316,7 +316,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
           <TabsContent value="logins" className="mt-4 space-y-2">
             {loginActivity.length === 0 ? (
               <div className="text-center py-4">
-                <p className="text-sm text-slate-500">Нет записей о входах</p>
+                <p className="text-sm text-muted-foreground">Нет записей о входах</p>
                 <p className="text-xs text-slate-400 mt-1">Записи появляются после каждого входа в систему</p>
               </div>
             ) : (
@@ -331,7 +331,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                       <p className="text-[10px] text-slate-400">{entry.ip}</p>
                     </div>
                   </div>
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[10px] text-muted-foreground">
                     {new Date(entry.timestamp).toLocaleString('ru-RU')}
                   </p>
                 </div>

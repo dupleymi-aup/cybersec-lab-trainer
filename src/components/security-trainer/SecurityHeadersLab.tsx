@@ -111,7 +111,7 @@ export default function SecurityHeadersLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Security Headers</h1>
-          <p className="text-xs text-slate-500">Интерактивный гид по HTTP-заголовкам безопасности</p>
+          <p className="text-xs text-muted-foreground">Интерактивный гид по HTTP-заголовкам безопасности</p>
         </div>
       </div>
 
@@ -138,15 +138,15 @@ export default function SecurityHeadersLab() {
       </Card>
 
       {/* Header title & category */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <div className="flex items-center gap-3 mb-3">
             <h2 className="text-lg font-bold">{header.name}</h2>
-            <Badge className={`text-[11px] ${categoryColors[header.category] || 'bg-slate-100 text-slate-700'}`}>
+            <Badge className={`text-[11px] ${categoryColors[header.category] || 'bg-muted text-foreground/70'}`}>
               {header.category}
             </Badge>
           </div>
-          <p className="text-sm text-slate-600 leading-relaxed">{header.description}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{header.description}</p>
         </CardContent>
       </Card>
 
@@ -161,7 +161,7 @@ export default function SecurityHeadersLab() {
                 ? 'bg-sky-100 text-sky-700'
                 : i === stepIndex
                   ? 'bg-sky-600 text-white'
-                  : 'bg-slate-100 text-slate-400'
+                  : 'bg-muted text-slate-400'
             }`}
           >
             {i + 1}. {s.label}
@@ -236,7 +236,7 @@ export default function SecurityHeadersLab() {
                 <p className="text-sm font-medium">{header.quiz.question}</p>
                 <div className="space-y-2">
                   {header.quiz.options.map((option, i) => {
-                    let optionStyle = 'border-slate-200 hover:border-violet-300';
+                    let optionStyle = 'border-border hover:border-violet-300';
                     if (quizSubmitted) {
                       if (i === header.quiz.correctIndex) {
                         optionStyle = 'border-emerald-400 bg-emerald-50';

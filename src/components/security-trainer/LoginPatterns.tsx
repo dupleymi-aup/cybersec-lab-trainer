@@ -41,7 +41,7 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -73,7 +73,7 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-white"
+            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
           >
             <option value={7}>7 дней</option>
             <option value={30}>30 дней</option>
@@ -84,38 +84,38 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <LogIn size={18} className="mx-auto mb-1 text-sky-600" />
             <p className="text-2xl font-bold text-sky-600">{totalLogins}</p>
-            <p className="text-xs text-slate-500">Входов</p>
+            <p className="text-xs text-muted-foreground">Входов</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Users size={18} className="mx-auto mb-1 text-indigo-600" />
             <p className="text-2xl font-bold text-indigo-600">{loginFrequency.length}</p>
-            <p className="text-xs text-slate-500">Студентов</p>
+            <p className="text-xs text-muted-foreground">Студентов</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <AlertCircle size={18} className="mx-auto mb-1 text-amber-600" />
             <p className="text-2xl font-bold text-amber-600">{failedLogins.length}</p>
-            <p className="text-xs text-slate-500">С ошибками входа</p>
+            <p className="text-xs text-muted-foreground">С ошибками входа</p>
           </CardContent>
         </Card>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Clock size={18} className="mx-auto mb-1 text-red-600" />
             <p className="text-2xl font-bold text-red-600">{dormantAccounts.length}</p>
-            <p className="text-xs text-slate-500">Спящих аккаунтов</p>
+            <p className="text-xs text-muted-foreground">Спящих аккаунтов</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Hourly distribution */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Распределение входов по часам</h3>
           <div className="h-[200px]">
@@ -134,7 +134,7 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
 
       {/* Daily distribution */}
       {dailyDistribution.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Входы по дням</h3>
             <div className="h-[200px]">
@@ -154,28 +154,28 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
 
       {/* Failed logins */}
       {failedLogins.length > 0 && (
-        <Card className="border-l-4 border-l-amber-400 border-slate-200">
+        <Card className="border-l-4 border-l-amber-400 border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-3 flex items-center gap-2 text-amber-600">
               <AlertCircle size={16} /> Частые ошибки входа ({failedLogins.length} студентов)
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-secondary border-b border-border">
                   <tr>
-                    <th className="text-left p-2 font-medium text-slate-600">Студент</th>
-                    <th className="p-2 font-medium text-slate-600 text-center">Ошибок</th>
-                    <th className="p-2 font-medium text-slate-600 text-center">Последние попытки</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">Студент</th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">Ошибок</th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">Последние попытки</th>
                   </tr>
                 </thead>
                 <tbody>
                   {failedLogins.slice(0, 15).map((f) => (
-                    <tr key={f.userId} className="border-b border-slate-100 hover:bg-slate-50">
+                    <tr key={f.userId} className="border-b border-slate-100 hover:bg-secondary">
                       <td className="p-2 font-medium">{f.fullName}</td>
                       <td className="p-2 text-center">
                         <Badge variant="destructive" className="text-[10px]">{f.count}</Badge>
                       </td>
-                      <td className="p-2 text-center text-slate-500">
+                      <td className="p-2 text-center text-muted-foreground">
                         {f.recentAttempts.map((a, i) => (
                           <span key={i} className="mr-2">{new Date(a.timestamp).toLocaleDateString('ru-RU')} ({a.ip})</span>
                         ))}
@@ -191,27 +191,27 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
 
       {/* Dormant accounts */}
       {dormantAccounts.length > 0 && (
-        <Card className="border-l-4 border-l-red-400 border-slate-200">
+        <Card className="border-l-4 border-l-red-400 border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-3 flex items-center gap-2 text-red-600">
               <Clock size={16} /> Спящие аккаунты ({dormantAccounts.length})
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-secondary border-b border-border">
                   <tr>
-                    <th className="text-left p-2 font-medium text-slate-600">Студент</th>
-                    <th className="p-2 font-medium text-slate-600">Группа</th>
-                    <th className="p-2 font-medium text-slate-600 text-center">Последний вход</th>
-                    <th className="p-2 font-medium text-slate-600 text-center">Дней неактивен</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">Студент</th>
+                    <th className="p-2 font-medium text-muted-foreground">Группа</th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">Последний вход</th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">Дней неактивен</th>
                   </tr>
                 </thead>
                 <tbody>
                   {dormantAccounts.slice(0, 20).map((d) => (
-                    <tr key={d.userId} className="border-b border-slate-100 hover:bg-slate-50">
+                    <tr key={d.userId} className="border-b border-slate-100 hover:bg-secondary">
                       <td className="p-2 font-medium">{d.fullName}</td>
-                      <td className="p-2 text-slate-500">{d.group || '—'}</td>
-                      <td className="p-2 text-center text-slate-500">{new Date(d.lastLogin).toLocaleDateString('ru-RU')}</td>
+                      <td className="p-2 text-muted-foreground">{d.group || '—'}</td>
+                      <td className="p-2 text-center text-muted-foreground">{new Date(d.lastLogin).toLocaleDateString('ru-RU')}</td>
                       <td className="p-2 text-center">
                         <Badge variant="destructive" className="text-[10px]">{d.daysInactive} дн.</Badge>
                       </td>

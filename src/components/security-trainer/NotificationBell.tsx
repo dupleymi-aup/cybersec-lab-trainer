@@ -12,7 +12,7 @@ const ICON_MAP: Record<NotifType['type'], { icon: typeof Trophy; className: stri
   progress: { icon: BookOpen, className: 'text-green-500' },
   quiz: { icon: Brain, className: 'text-blue-500' },
   warning: { icon: AlertTriangle, className: 'text-red-500' },
-  system: { icon: Bell, className: 'text-slate-500' },
+  system: { icon: Bell, className: 'text-muted-foreground' },
   announcement: { icon: Megaphone, className: 'text-purple-500' },
   deadline: { icon: Clock, className: 'text-orange-500' },
 };
@@ -138,7 +138,7 @@ export default function NotificationBell() {
                   <div className="divide-y">
                     {filtered.map((notif) => {
                       const Icon = ICON_MAP[notif.type]?.icon || Bell;
-                      const colorClass = ICON_MAP[notif.type]?.className || 'text-slate-500';
+                      const colorClass = ICON_MAP[notif.type]?.className || 'text-muted-foreground';
                       return (
                         <div
                           key={notif.id}

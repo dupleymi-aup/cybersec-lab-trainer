@@ -95,7 +95,7 @@ export default function SQLInjectionLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Лаборатория SQL-инъекций</h1>
-          <p className="text-xs text-slate-500">Интерактивная среда для изучения уязвимостей SQL</p>
+          <p className="text-xs text-muted-foreground">Интерактивная среда для изучения уязвимостей SQL</p>
         </div>
       </div>
 
@@ -125,7 +125,7 @@ export default function SQLInjectionLab() {
       </Card>
 
       {/* Challenge info */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -143,12 +143,12 @@ export default function SQLInjectionLab() {
             )}
           </div>
           <h2 className="font-semibold mb-2">{challenge.title}</h2>
-          <p className="text-sm text-slate-600 leading-relaxed">{challenge.description}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{challenge.description}</p>
         </CardContent>
       </Card>
 
       {/* Simulated form */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5 space-y-4">
           <h3 className="text-sm font-semibold flex items-center gap-2">
             <Play size={16} className="text-emerald-600" />
@@ -156,7 +156,7 @@ export default function SQLInjectionLab() {
           </h3>
 
           <div>
-            <label className="text-xs text-slate-500 mb-1 block">SQL-инъекция:</label>
+            <label className="text-xs text-muted-foreground mb-1 block">SQL-инъекция:</label>
             <div className="flex gap-2">
               <Input
                 value={userInput}
@@ -234,7 +234,7 @@ export default function SQLInjectionLab() {
       </Card>
 
       {/* Query visualization */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
             <Eye size={16} className="text-emerald-600" />
@@ -278,11 +278,11 @@ export default function SQLInjectionLab() {
                 {isSuccess ? (
                   <CodeBlock code={challenge.successQuery} language="sql" title="Модифицированный запрос" />
                 ) : (
-                  <div className="bg-white rounded-lg p-3">
-                    <p className="text-xs text-slate-600 mb-2">
+                  <div className="bg-card rounded-lg p-3">
+                    <p className="text-xs text-muted-foreground mb-2">
                       Ваш ввод: <code className="font-mono text-red-600">{userInput}</code>
                     </p>
-                    <p className="text-xs text-slate-600">
+                    <p className="text-xs text-muted-foreground">
                       Для SQL-инъекции попробуйте использовать: одинарные кавычки (<code className="font-mono">'</code>),
                       SQL-ключевые слова (<code className="font-mono">OR</code>, <code className="font-mono">UNION SELECT</code>, <code className="font-mono">--</code>),
                       или другие конструкции. Нажмите «Пример ответа» для подсказки.
@@ -307,11 +307,11 @@ export default function SQLInjectionLab() {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                     >
-                      <div className="bg-white rounded-lg p-4 mt-2">
+                      <div className="bg-card rounded-lg p-4 mt-2">
                         <h4 className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
                           <BookOpen size={14} /> Объяснение
                         </h4>
-                        <p className="text-xs text-slate-600 leading-relaxed">
+                        <p className="text-xs text-muted-foreground leading-relaxed">
                           {challenge.explanation}
                         </p>
                         <div className="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">

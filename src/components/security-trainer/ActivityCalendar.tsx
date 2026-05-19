@@ -92,7 +92,7 @@ export default function ActivityCalendar() {
   }
 
   const levelColors = [
-    'bg-slate-100',
+    'bg-muted',
     'bg-emerald-200',
     'bg-emerald-400',
     'bg-emerald-500',
@@ -110,19 +110,19 @@ export default function ActivityCalendar() {
         {currentStreak > 0 && (
           <div className="flex items-center gap-1.5">
             <Flame size={16} className="text-orange-500" />
-            <span className="font-semibold text-slate-700">{currentStreak} дн.</span>
+            <span className="font-semibold text-foreground/70">{currentStreak} дн.</span>
             <span className="text-slate-400">текущая серия</span>
           </div>
         )}
         {longestStreak > 0 && (
           <div className="flex items-center gap-1.5">
             <CalendarDays size={14} className="text-violet-500" />
-            <span className="font-semibold text-slate-700">{longestStreak} дн.</span>
+            <span className="font-semibold text-foreground/70">{longestStreak} дн.</span>
             <span className="text-slate-400">макс. серия</span>
           </div>
         )}
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-slate-700">{totalActiveDays}</span>
+          <span className="font-semibold text-foreground/70">{totalActiveDays}</span>
           <span className="text-slate-400">активных дней</span>
         </div>
       </div>

@@ -30,7 +30,7 @@ const monthNames = [
 ];
 
 const levelColors = [
-  'bg-slate-100',
+  'bg-muted',
   'bg-emerald-200',
   'bg-emerald-300',
   'bg-emerald-500',
@@ -169,7 +169,7 @@ export default function ActivityHeatmap() {
       const label = item.hour || item.day;
       const value = p.payload[0].value;
       return (
-        <div className="bg-slate-800 text-white text-xs rounded px-3 py-2 shadow-lg">
+        <div className="bg-slate-800 dark:bg-slate-700 text-white text-xs rounded px-3 py-2 shadow-lg">
           <p className="font-medium">{label}</p>
           <p>{value} активностей</p>
         </div>
@@ -192,7 +192,7 @@ export default function ActivityHeatmap() {
           <select
             value={selectedUserId}
             onChange={(e) => setSelectedUserId(e.target.value)}
-            className="px-3 py-1.5 border border-slate-200 rounded-md text-xs bg-white"
+            className="px-3 py-1.5 border border-border rounded-md text-xs bg-card"
           >
             <option value="">Все студенты</option>
             {students.map((s) => (
@@ -203,15 +203,15 @@ export default function ActivityHeatmap() {
           </select>
 
           {/* Date range selector */}
-          <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
+          <div className="flex items-center gap-1 bg-muted rounded-md p-0.5">
             {dateRangeOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setDateRange(opt.value)}
                 className={`px-2.5 py-1 text-xs rounded transition-colors ${
                   dateRange === opt.value
-                    ? 'bg-white text-slate-800 shadow-sm font-medium'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-background text-foreground shadow-sm font-medium'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {opt.label}
@@ -224,7 +224,7 @@ export default function ActivityHeatmap() {
       {/* Loading state */}
       {loading && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="flex items-center justify-center h-[300px]">
               <Loader2 size={24} className="animate-spin text-slate-400 mr-2" />
               <span className="text-sm text-slate-400">Загрузка...</span>
@@ -238,14 +238,14 @@ export default function ActivityHeatmap() {
         <>
           {/* GitHub-style contribution grid */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5">
                 {/* Month labels row */}
                 <div className="flex ml-8 mb-1">
                   {gridData && gridData.monthLabels.map((ml) => (
                     <div
                       key={ml.weekIndex}
-                      className="absolute text-[10px] text-slate-500"
+                      className="absolute text-[10px] text-muted-foreground"
                       style={{ left: `calc(2rem + ${ml.weekIndex} * 14px)` }}
                     >
                       {ml.label}
@@ -255,7 +255,7 @@ export default function ActivityHeatmap() {
                     {gridData && gridData.monthLabels.map((ml) => (
                       <span
                         key={ml.weekIndex}
-                        className="absolute text-[10px] text-slate-500"
+                        className="absolute text-[10px] text-muted-foreground"
                         style={{ left: `${ml.weekIndex * 14}px` }}
                       >
                         {ml.label}
@@ -269,7 +269,7 @@ export default function ActivityHeatmap() {
                   {/* Day-of-week labels */}
                   <div className="flex flex-col justify-around pr-1 pt-0.5" style={{ height: `${7 * 14}px` }}>
                     {dayLabels.map((label, i) => (
-                      <div key={i} className="text-[10px] text-slate-500 leading-[14px]">
+                      <div key={i} className="text-[10px] text-muted-foreground leading-[14px]">
                         {label}
                       </div>
                     ))}
@@ -307,7 +307,7 @@ export default function ActivityHeatmap() {
                 {/* Tooltip */}
                 {tooltip.visible && (
                   <div
-                    className="fixed z-50 pointer-events-none bg-slate-800 text-white text-xs rounded px-3 py-2 shadow-lg -translate-x-1/2 -translate-y-full"
+                    className="fixed z-50 pointer-events-none bg-slate-800 dark:bg-slate-700 text-white text-xs rounded px-3 py-2 shadow-lg -translate-x-1/2 -translate-y-full"
                     style={{ left: tooltip.x, top: tooltip.y - 8 }}
                   >
                     <p className="font-medium">{formatDate(tooltip.date)}</p>
@@ -316,7 +316,7 @@ export default function ActivityHeatmap() {
                 )}
 
                 {/* Legend */}
-                <div className="flex items-center gap-1 mt-3 text-[10px] text-slate-500 justify-end">
+                <div className="flex items-center gap-1 mt-3 text-[10px] text-muted-foreground justify-end">
                   <span>Меньше</span>
                   {levelColors.map((color, i) => (
                     <div key={i} className={`w-3 h-3 rounded-sm ${color}`} title={levelLabels[i]} />
@@ -335,46 +335,46 @@ export default function ActivityHeatmap() {
           >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {/* Total activities */}
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-4 text-center">
                   <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center mx-auto mb-2">
                     <Zap size={16} className="text-emerald-600" />
                   </div>
                   <p className="text-2xl font-bold text-emerald-600">{heatmapData.totalActivities}</p>
-                  <p className="text-xs text-slate-500 mt-1">Всего активностей</p>
+                  <p className="text-xs text-muted-foreground mt-1">Всего активностей</p>
                 </CardContent>
               </Card>
 
               {/* Most active day */}
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-4 text-center">
                   <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center mx-auto mb-2">
                     <Calendar size={16} className="text-sky-600" />
                   </div>
                   <p className="text-2xl font-bold text-sky-600">{heatmapData.mostActiveDay ? formatDate(heatmapData.mostActiveDay) : '—'}</p>
-                  <p className="text-xs text-slate-500 mt-1">Самый активный день</p>
+                  <p className="text-xs text-muted-foreground mt-1">Самый активный день</p>
                 </CardContent>
               </Card>
 
               {/* Most active hour */}
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-4 text-center">
                   <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center mx-auto mb-2">
                     <Clock size={16} className="text-violet-600" />
                   </div>
                   <p className="text-2xl font-bold text-violet-600">{heatmapData.mostActiveHour !== undefined ? `${String(heatmapData.mostActiveHour).padStart(2, '0')}:00` : '—'}</p>
-                  <p className="text-xs text-slate-500 mt-1">Самый активный час</p>
+                  <p className="text-xs text-muted-foreground mt-1">Самый активный час</p>
                 </CardContent>
               </Card>
 
               {/* Streak */}
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-4 text-center">
                   <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center mx-auto mb-2">
                     <Flame size={16} className="text-amber-600" />
                   </div>
                   <p className="text-2xl font-bold text-amber-600">{heatmapData.streakDays}</p>
-                  <p className="text-xs text-slate-500 mt-1">Дней подряд</p>
+                  <p className="text-xs text-muted-foreground mt-1">Дней подряд</p>
                 </CardContent>
               </Card>
             </div>
@@ -388,7 +388,7 @@ export default function ActivityHeatmap() {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Hour-of-day distribution */}
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-5">
                   <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
                     <Clock size={16} className="text-slate-400" />
@@ -409,7 +409,7 @@ export default function ActivityHeatmap() {
               </Card>
 
               {/* Day-of-week distribution */}
-              <Card className="border-slate-200">
+              <Card className="border-border">
                 <CardContent className="p-5">
                   <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
                     <Calendar size={16} className="text-slate-400" />
@@ -436,7 +436,7 @@ export default function ActivityHeatmap() {
       {/* Empty state */}
       {!loading && heatmapData && heatmapData.totalActivities === 0 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="flex flex-col items-center justify-center h-[300px] text-slate-400">
               <Calendar size={40} className="mb-3 opacity-50" />
               <p className="text-sm">Нет данных об активности</p>

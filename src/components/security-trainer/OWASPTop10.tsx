@@ -103,7 +103,7 @@ export default function OWASPTop10() {
           </div>
           <div>
             <h1 className="text-xl font-bold">OWASP Top 10 (2021)</h1>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               10 критических угроз безопасности веб-приложений
             </p>
           </div>
@@ -151,7 +151,7 @@ export default function OWASPTop10() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-4 mt-3 text-[11px] text-slate-500">
+            <div className="flex gap-4 mt-3 text-[11px] text-muted-foreground">
               <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-500" /> Критический</span>
               <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-500" /> Высокий</span>
               <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-yellow-500" /> Средний</span>
@@ -173,14 +173,14 @@ export default function OWASPTop10() {
                   transition={{ delay: index * 0.04 }}
                 >
                   <Card
-                    className={`cursor-pointer border-slate-200 hover:shadow-md transition-all ${
+                    className={`cursor-pointer border-border hover:shadow-md transition-all ${
                       isItemStudied ? 'border-emerald-300 bg-emerald-50/30' : 'hover:border-emerald-200'
                     }`}
                     onClick={() => goToLesson(index)}
                   >
                     <CardContent className="p-4 flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        isItemStudied ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'
+                        isItemStudied ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-muted-foreground'
                       }`}>
                         <ShieldCheck size={20} />
                       </div>
@@ -225,7 +225,7 @@ export default function OWASPTop10() {
 
         <Card className="border-none shadow-sm bg-gradient-to-br from-emerald-600 to-teal-700 text-white">
           <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-card/10 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 size={40} className="text-white" />
             </div>
             <h2 className="text-2xl font-bold mb-2">
@@ -237,11 +237,11 @@ export default function OWASPTop10() {
                 : 'Продолжайте изучать оставшиеся темы для полного прохождения.'}
             </p>
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" className="text-white border-white/20 hover:bg-white/10" onClick={() => setView('overview')}>
+              <Button variant="outline" className="text-white border-white/20 hover:bg-card/10" onClick={() => setView('overview')}>
                 К списку уроков
               </Button>
               {!isStudied && (
-                <Button className="bg-white text-emerald-700 hover:bg-emerald-50" onClick={handleMarkStudied}>
+                <Button className="bg-card text-emerald-700 hover:bg-emerald-50" onClick={handleMarkStudied}>
                   Отметить последний как изученный
                 </Button>
               )}
@@ -250,7 +250,7 @@ export default function OWASPTop10() {
         </Card>
 
         {/* Summary */}
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="text-sm font-semibold mb-3">Прогресс по темам</h3>
             <div className="space-y-2">
@@ -261,9 +261,9 @@ export default function OWASPTop10() {
                     {done ? (
                       <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
                     ) : (
-                      <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-300 shrink-0" />
+                      <div className="w-3.5 h-3.5 rounded-full border-2 border-border shrink-0" />
                     )}
-                    <span className={`flex-1 ${done ? 'text-emerald-700 font-medium' : 'text-slate-500'}`}>
+                    <span className={`flex-1 ${done ? 'text-emerald-700 font-medium' : 'text-muted-foreground'}`}>
                       {owaspItem.code} — {owaspItem.title}
                     </span>
                     <Badge className={`text-[10px] text-white ${owaspItem.severityColor} border-0`}>
@@ -307,7 +307,7 @@ export default function OWASPTop10() {
             <span className="text-sm font-medium">
               Урок {currentLesson + 1} из {totalCount}
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-muted-foreground">
               Шаг {currentStepIndex + 1} из {steps.length}
             </span>
           </div>
@@ -357,13 +357,13 @@ export default function OWASPTop10() {
           transition={{ duration: 0.2 }}
         >
           {lessonStep === 'description' && (
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5 space-y-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <BookOpen size={16} className="text-emerald-600" />
                   Описание уязвимости
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{item.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
                 <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
                   <p className="text-xs text-emerald-700">
                     <strong>Почему это важно:</strong> Эта уязвимость входит в OWASP Top 10 —
@@ -376,7 +376,7 @@ export default function OWASPTop10() {
           )}
 
           {lessonStep === 'example' && (
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5 space-y-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <Globe size={16} className="text-amber-600" />
@@ -385,8 +385,8 @@ export default function OWASPTop10() {
                 <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                   <p className="text-sm text-amber-800 leading-relaxed">{item.realExample}</p>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-slate-600">
+                <div className="bg-secondary rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">
                     <strong>Вывод:</strong> Реальные инциденты показывают, что даже крупные компании
                     с большими бюджетами на безопасность подвержены этим уязвимостям.
                     Понимание механизмов атак — первый шаг к защите.
@@ -397,7 +397,7 @@ export default function OWASPTop10() {
           )}
 
           {lessonStep === 'vulnerable' && (
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5 space-y-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <Code size={16} className="text-red-600" />
@@ -416,7 +416,7 @@ export default function OWASPTop10() {
           )}
 
           {lessonStep === 'secure' && (
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5 space-y-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <FileCode size={16} className="text-emerald-600" />
@@ -435,7 +435,7 @@ export default function OWASPTop10() {
           )}
 
           {lessonStep === 'mitigations' && (
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5 space-y-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <Lightbulb size={16} className="text-sky-600" />
@@ -443,11 +443,11 @@ export default function OWASPTop10() {
                 </h3>
                 <div className="space-y-3">
                   {item.mitigations.map((m, i) => (
-                    <div key={i} className="flex items-start gap-3 bg-slate-50 rounded-lg p-3">
+                    <div key={i} className="flex items-start gap-3 bg-secondary rounded-lg p-3">
                       <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold shrink-0">
                         {i + 1}
                       </div>
-                      <p className="text-sm text-slate-700">{m}</p>
+                      <p className="text-sm text-foreground/70">{m}</p>
                     </div>
                   ))}
                 </div>
@@ -462,7 +462,7 @@ export default function OWASPTop10() {
           )}
 
           {lessonStep === 'resources' && (
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-5 space-y-4">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <ShieldCheck size={16} className="text-violet-600" />

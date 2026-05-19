@@ -60,7 +60,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-slate-500 ml-3">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-slate-600 font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -92,13 +92,13 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       {/* Controls */}
       <div className="flex flex-wrap gap-3 items-center">
         {showPeriodSelector && (
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
+          <div className="flex gap-1 p-1 bg-muted rounded-lg">
             {PERIOD_OPTIONS.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setInternalDays(key)}
                 className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                  days === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                  days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {label}
@@ -111,7 +111,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
           <select
             value={internalGroupId}
             onChange={(e) => setInternalGroupId(e.target.value)}
-            className="px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+            className="px-3 py-2 border border-border rounded-md text-sm bg-card"
           >
             <option value="">Все группы</option>
             {groups.map((g) => (
@@ -154,7 +154,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       </div>
 
       {/* Score Distribution */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Распределение вовлечённости</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -170,7 +170,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       </Card>
 
       {/* Hourly Activity */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Активность по часам</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -186,7 +186,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       </Card>
 
       {/* Weekly Pattern */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Активность по дням недели</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -207,7 +207,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
 
       {/* Engagement Trend */}
       {engagementTrend.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Тренд вовлечённости</h3>
             <ResponsiveContainer width="100%" height={250}>
@@ -225,7 +225,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
 
       {/* Streak Leaderboard */}
       {streakLeaderboard.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">
               <Flame size={16} className="inline mr-2 text-amber-500" />
@@ -238,14 +238,14 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50"
+                  className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-secondary"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       i === 0 ? 'bg-amber-100 text-amber-700' :
-                      i === 1 ? 'bg-slate-100 text-slate-700' :
+                      i === 1 ? 'bg-muted text-foreground/70' :
                       i === 2 ? 'bg-orange-100 text-orange-700' :
-                      'bg-slate-50 text-slate-500'
+                      'bg-secondary text-muted-foreground'
                     }`}>
                       {i + 1}
                     </div>

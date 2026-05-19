@@ -111,11 +111,11 @@ export default function GlobalSearch() {
       {/* Trigger button — shown in sidebar header or dashboard */}
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white/50 text-sm text-slate-400 hover:border-slate-300 hover:text-slate-500 transition-colors"
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card/50 text-sm text-slate-400 hover:border-border hover:text-muted-foreground transition-colors"
       >
         <Search size={14} />
         <span className="flex-1 text-left">Поиск...</span>
-        <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-slate-100 text-[10px] font-mono text-slate-500">
+        <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono text-muted-foreground">
           ⌘K
         </kbd>
       </button>
@@ -138,7 +138,7 @@ export default function GlobalSearch() {
               transition={{ duration: 0.15 }}
               className="fixed top-[15vh] left-1/2 -translate-x-1/2 w-full max-w-lg z-50"
             >
-              <div className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden mx-4">
+              <div className="bg-card rounded-xl shadow-2xl border border-border overflow-hidden mx-4">
                 {/* Search input */}
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
                   <Search size={18} className="text-slate-400 shrink-0" />
@@ -149,7 +149,7 @@ export default function GlobalSearch() {
                     placeholder="Поиск модулей, квизов, терминов..."
                     className="flex-1 text-sm outline-none bg-transparent placeholder:text-slate-400"
                   />
-                  <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">
+                  <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-muted-foreground">
                     <X size={16} />
                   </button>
                 </div>
@@ -166,9 +166,9 @@ export default function GlobalSearch() {
                     <button
                       key={result.id}
                       onClick={() => handleSelect(result.page)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors text-left"
                     >
-                      <span className="text-slate-500 shrink-0">{result.icon}</span>
+                      <span className="text-muted-foreground shrink-0">{result.icon}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{result.title}</p>
                         <p className="text-xs text-slate-400 truncate">{result.subtitle}</p>

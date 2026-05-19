@@ -84,7 +84,7 @@ export default function SecureCodingLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Безопасное кодирование</h1>
-          <p className="text-xs text-slate-500">Найдите уязвимость и выберите правильное решение</p>
+          <p className="text-xs text-muted-foreground">Найдите уязвимость и выберите правильное решение</p>
         </div>
       </div>
 
@@ -131,7 +131,7 @@ export default function SecureCodingLab() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <div className="flex items-center gap-2 mb-3">
               <Badge variant="secondary" className="text-[10px]">
@@ -148,7 +148,7 @@ export default function SecureCodingLab() {
               <h3 className="text-sm font-semibold mb-3">Что нужно исправить?</h3>
               <div className="space-y-2">
                 {challenge.options.map((option, i) => {
-                  let optionStyle = 'border-slate-200 hover:border-slate-400 hover:bg-slate-50';
+                  let optionStyle = 'border-border hover:border-slate-400 hover:bg-secondary';
                   if (isAnswered) {
                     if (option.correct) {
                       optionStyle = 'border-emerald-400 bg-emerald-50';
@@ -177,7 +177,7 @@ export default function SecureCodingLab() {
                                 ? 'border-red-500 bg-red-500'
                                 : selectedOption === i
                                   ? 'border-emerald-500 bg-emerald-100'
-                                  : 'border-slate-300'
+                                  : 'border-border'
                           }`}
                         >
                           {(isAnswered && option.correct) && <CheckCircle2 size={14} className="text-white" />}
@@ -230,7 +230,7 @@ export default function SecureCodingLab() {
                         ? (<><CheckCircle2 size={14} className="inline mr-1" /> Правильно!</>)
                         : (<><XCircle size={14} className="inline mr-1" /> Неправильно</>)}
                     </h4>
-                    <p className="text-xs text-slate-600 leading-relaxed">{challenge.explanation}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{challenge.explanation}</p>
                   </div>
 
                   {/* Retry button */}

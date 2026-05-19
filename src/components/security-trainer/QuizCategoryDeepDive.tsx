@@ -65,12 +65,12 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
         </div>
         <div>
           <h2 className="text-lg font-bold">Детализация категорий квизов</h2>
-          <p className="text-xs text-slate-500">Статистика по каждой категории</p>
+          <p className="text-xs text-muted-foreground">Статистика по каждой категории</p>
         </div>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -90,12 +90,12 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
 
       {hardestQuestions.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4">Самые сложные вопросы</h3>
               <div className="space-y-2">
                 {hardestQuestions.slice(0, 10).map((q, i) => (
-                  <div key={q.questionId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
+                  <div key={q.questionId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary">
                     <span className="text-xs text-slate-400 w-5">{i + 1}</span>
                     <p className="text-xs flex-1 truncate">{q.questionText}</p>
                     <Badge variant="secondary" className="text-[10px]">{q.category}</Badge>
@@ -111,23 +111,23 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
       )}
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Таблица категорий</h3>
-            <div className="border border-slate-200 rounded-lg overflow-x-auto">
+            <div className="border border-border rounded-lg overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-secondary border-b border-border">
                   <tr>
-                    <th className="text-left p-2 font-medium text-slate-600">Категория</th>
-                    <th className="text-center p-2 font-medium text-slate-600">Попытки</th>
-                    <th className="text-center p-2 font-medium text-slate-600">Студентов</th>
-                    <th className="text-center p-2 font-medium text-slate-600">Средний балл</th>
-                    <th className="text-center p-2 font-medium text-slate-600">Проходной %</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">Категория</th>
+                    <th className="text-center p-2 font-medium text-muted-foreground">Попытки</th>
+                    <th className="text-center p-2 font-medium text-muted-foreground">Студентов</th>
+                    <th className="text-center p-2 font-medium text-muted-foreground">Средний балл</th>
+                    <th className="text-center p-2 font-medium text-muted-foreground">Проходной %</th>
                   </tr>
                 </thead>
                 <tbody>
                   {categories.map((cat) => (
-                    <tr key={cat.categoryId} className="border-b border-slate-100 hover:bg-slate-50">
+                    <tr key={cat.categoryId} className="border-b border-slate-100 hover:bg-secondary">
                       <td className="p-2 font-medium">{cat.categoryName}</td>
                       <td className="p-2 text-center">{cat.totalAttempts}</td>
                       <td className="p-2 text-center">{cat.uniqueStudents}</td>

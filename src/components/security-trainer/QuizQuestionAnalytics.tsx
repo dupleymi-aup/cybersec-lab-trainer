@@ -39,7 +39,7 @@ function getDifficultyBadgeClasses(difficulty: string): string {
     case 'easy': return 'bg-emerald-100 text-emerald-700';
     case 'medium': return 'bg-amber-100 text-amber-700';
     case 'hard': return 'bg-red-100 text-red-700';
-    default: return 'bg-slate-100 text-slate-600';
+    default: return 'bg-muted text-muted-foreground';
   }
 }
 
@@ -105,7 +105,7 @@ export default function QuizQuestionAnalytics() {
         </div>
         <div>
           <h2 className="text-lg font-bold">Аналитика вопросов квизов</h2>
-          <p className="text-xs text-slate-500">Самые сложные вопросы и статистика ответов</p>
+          <p className="text-xs text-muted-foreground">Самые сложные вопросы и статистика ответов</p>
         </div>
       </div>
 
@@ -113,12 +113,12 @@ export default function QuizQuestionAnalytics() {
       <div className="flex flex-wrap gap-3 items-center">
         <div className="flex items-center gap-2">
           <Filter size={14} className="text-slate-400" />
-          <span className="text-xs text-slate-500">Категория:</span>
+          <span className="text-xs text-muted-foreground">Категория:</span>
         </div>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="px-3 py-1.5 border border-slate-200 rounded-md text-sm bg-white"
+          className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
         >
           <option value={ALL_CATEGORIES}>Все категории</option>
           {quizCategories.map((cat) => (
@@ -127,7 +127,7 @@ export default function QuizQuestionAnalytics() {
         </select>
 
         <div className="flex items-center gap-1.5 ml-2">
-          <span className="text-xs text-slate-500">Сложность:</span>
+          <span className="text-xs text-muted-foreground">Сложность:</span>
         </div>
         <div className="flex gap-1">
           {DIFFICULTY_OPTIONS.map((opt) => (
@@ -139,7 +139,7 @@ export default function QuizQuestionAnalytics() {
               className={`text-xs px-2.5 py-1 h-7 ${
                 difficulty === opt.value
                   ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                  : 'border-border text-muted-foreground hover:bg-secondary'
               }`}
             >
               {opt.label}
@@ -150,7 +150,7 @@ export default function QuizQuestionAnalytics() {
 
       {/* Top 10 Hardest Questions Bar Chart */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-1">Топ 10 самых сложных вопросов</h3>
             <p className="text-xs text-slate-400 mb-4">Вопросы с наименьшим процентом правильных ответов</p>
@@ -192,19 +192,19 @@ export default function QuizQuestionAnalytics() {
 
       {/* Question Heatmap Table */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Таблица вопросов</h3>
-            <div className="border border-slate-200 rounded-lg overflow-x-auto">
+            <div className="border border-border rounded-lg overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-secondary border-b border-border">
                   <tr>
-                    <th className="text-left p-2 font-medium text-slate-600">#</th>
-                    <th className="text-left p-2 font-medium text-slate-600 min-w-[200px]">Вопрос</th>
-                    <th className="text-left p-2 font-medium text-slate-600">Категория</th>
-                    <th className="text-left p-2 font-medium text-slate-600">Сложность</th>
-                    <th className="text-center p-2 font-medium text-slate-600">Попытки</th>
-                    <th className="text-center p-2 font-medium text-slate-600">Правильно</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">#</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground min-w-[200px]">Вопрос</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">Категория</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">Сложность</th>
+                    <th className="text-center p-2 font-medium text-muted-foreground">Попытки</th>
+                    <th className="text-center p-2 font-medium text-muted-foreground">Правильно</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -212,7 +212,7 @@ export default function QuizQuestionAnalytics() {
                     .filter((s) => s.totalAttempts > 0)
                     .sort((a, b) => a.correctRate - b.correctRate)
                     .map((stat, i) => (
-                      <tr key={stat.questionId} className="border-b border-slate-100 hover:bg-slate-50">
+                      <tr key={stat.questionId} className="border-b border-slate-100 hover:bg-secondary">
                         <td className="p-2 text-slate-400 font-mono">{i + 1}</td>
                         <td className="p-2">
                           <span className="truncate max-w-[200px] inline-block" title={stat.questionText}>

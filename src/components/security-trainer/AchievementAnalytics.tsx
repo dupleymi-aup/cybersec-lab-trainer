@@ -109,7 +109,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
       {/* Charts row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Achievement unlock rates - horizontal bar chart */}
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Частота разблокировки достижений</h3>
             <div className="h-[400px]">
@@ -134,7 +134,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
         </Card>
 
         {/* Rarity distribution pie chart */}
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">Распределение по редкости</h3>
             {pieData.length > 0 ? (
@@ -182,7 +182,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
               >
-                <Card className="border-slate-200 hover:border-emerald-200 transition-colors">
+                <Card className="border-border hover:border-emerald-200 transition-colors">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0`} style={{ backgroundColor: `${rarityColors[item.rarity]}20` }}>
@@ -195,11 +195,11 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
                             {rarityLabels[item.rarity]}
                           </Badge>
                         </div>
-                        <p className="text-xs text-slate-500 mb-2 line-clamp-2">{description}</p>
-                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-1.5">
+                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{description}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1.5">
                           <span>{item.unlockedCount} из {totalStudents} студентов разблокировали</span>
                         </div>
-                        <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                           <motion.div
                             className="h-full rounded-full"
                             style={{ backgroundColor: rarityColors[item.rarity] }}

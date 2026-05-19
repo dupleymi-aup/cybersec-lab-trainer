@@ -150,7 +150,7 @@ export default function AuthSecurityLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Безопасность аутентификации</h1>
-          <p className="text-xs text-slate-500">Пароли, хеширование и управление сессиями</p>
+          <p className="text-xs text-muted-foreground">Пароли, хеширование и управление сессиями</p>
         </div>
       </div>
 
@@ -175,7 +175,7 @@ export default function AuthSecurityLab() {
 
         {/* Password Strength Checker */}
         <TabsContent value="password" className="space-y-4">
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <KeyRound size={16} className="text-emerald-600" />
@@ -213,7 +213,7 @@ export default function AuthSecurityLab() {
                     value={passwordAnalysis.score}
                     className="h-2"
                   />
-                  <div className="h-2 rounded-full overflow-hidden bg-slate-100">
+                  <div className="h-2 rounded-full overflow-hidden bg-muted">
                     <div className={`h-full ${passwordAnalysis.color} rounded-full transition-all duration-500`}
                       style={{ width: `${passwordAnalysis.score}%` }}
                     />
@@ -222,7 +222,7 @@ export default function AuthSecurityLab() {
                   <Separator />
 
                   <div className="space-y-2">
-                    <h4 className="text-xs font-semibold text-slate-600">Критерии проверки:</h4>
+                    <h4 className="text-xs font-semibold text-muted-foreground">Критерии проверки:</h4>
                     {passwordAnalysis.checks.map((check, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
                         {check.passed ? (
@@ -230,7 +230,7 @@ export default function AuthSecurityLab() {
                         ) : (
                           <AlertTriangle size={14} className="text-slate-300" />
                         )}
-                        <span className={check.passed ? 'text-slate-700' : 'text-slate-400'}>
+                        <span className={check.passed ? 'text-foreground/70' : 'text-slate-400'}>
                           {check.label}
                         </span>
                       </div>
@@ -244,13 +244,13 @@ export default function AuthSecurityLab() {
 
         {/* Brute Force Visualizer */}
         <TabsContent value="bruteforce" className="space-y-4">
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <Zap size={16} className="text-red-500" />
                 Визуализация полного перебора (Brute Force)
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Узнайте, сколько времени нужно для подбора пароля с учётом длины и сложности.
               </p>
 
@@ -315,7 +315,7 @@ export default function AuthSecurityLab() {
                   }`}>
                     {crackTime}
                   </p>
-                  <p className="text-[11px] text-slate-500 mt-2">
+                  <p className="text-[11px] text-muted-foreground mt-2">
                     Комбинаций: {Math.pow(
                       crackComplexity === 1 ? 26 : crackComplexity === 2 ? 52 : crackComplexity === 3 ? 62 : 94,
                       crackLength
@@ -338,13 +338,13 @@ export default function AuthSecurityLab() {
 
         {/* Hashing Demo */}
         <TabsContent value="hashing" className="space-y-4">
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <Hash size={16} className="text-violet-600" />
                 Демонстрация хеширования паролей
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Введите пароль, чтобы увидеть, как работает bcrypt-хеширование с солью.
               </p>
 
@@ -362,8 +362,8 @@ export default function AuthSecurityLab() {
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-3"
                 >
-                  <div className="bg-slate-50 rounded-lg p-3">
-                    <p className="text-[10px] text-slate-500 mb-1">Оригинальный пароль:</p>
+                  <div className="bg-secondary rounded-lg p-3">
+                    <p className="text-[10px] text-muted-foreground mb-1">Оригинальный пароль:</p>
                     <code className="text-xs font-mono">{hashInput}</code>
                   </div>
 
@@ -372,20 +372,20 @@ export default function AuthSecurityLab() {
                     <code className="text-xs font-mono text-violet-700 break-all">{simulatedHash}</code>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-3">
-                    <p className="text-[10px] text-slate-500 mb-1">Структура хеша:</p>
+                  <div className="bg-secondary rounded-lg p-3">
+                    <p className="text-[10px] text-muted-foreground mb-1">Структура хеша:</p>
                     <div className="space-y-1">
                       <p className="text-[11px]">
                         <code className="bg-red-100 text-red-700 px-1 rounded">$2b$12$</code>
-                        <span className="text-slate-500 ml-1">— алгоритм (bcrypt) и стоимость (12 раундов)</span>
+                        <span className="text-muted-foreground ml-1">— алгоритм (bcrypt) и стоимость (12 раундов)</span>
                       </p>
                       <p className="text-[11px]">
                         <code className="bg-amber-100 text-amber-700 px-1 rounded">a1b2c3d4e5f6</code>
-                        <span className="text-slate-500 ml-1">— соль (уникальная для каждого пользователя)</span>
+                        <span className="text-muted-foreground ml-1">— соль (уникальная для каждого пользователя)</span>
                       </p>
                       <p className="text-[11px]">
                         <code className="bg-emerald-100 text-emerald-700 px-1 rounded">7f3a...</code>
-                        <span className="text-slate-500 ml-1">— собственно хеш пароля</span>
+                        <span className="text-muted-foreground ml-1">— собственно хеш пароля</span>
                       </p>
                     </div>
                   </div>
@@ -431,13 +431,13 @@ async function verify(password, hash) {
 
         {/* OTP/2FA */}
         <TabsContent value="otp" className="space-y-4">
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <ShieldCheck size={16} className="text-emerald-600" />
                 Интерактивная демонстрация TOTP (Time-based One-Time Password)
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 TOTP генерирует одноразовый 6-значный код, который меняется каждые 30 секунд.
                 Это второй фактор аутентификации — даже если злоумышленник узнает пароль,
                 без этого кода он не войдёт.
@@ -512,7 +512,7 @@ async function verify(password, hash) {
                       </div>
                       <div>
                         <p className="text-xs font-semibold">{item.title}</p>
-                        <p className="text-[11px] text-slate-500">{item.desc}</p>
+                        <p className="text-[11px] text-muted-foreground">{item.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -572,7 +572,7 @@ const isValid = authenticator.check(token, user.secret);
 
         {/* Session Security */}
         <TabsContent value="sessions" className="space-y-4">
-          <Card className="border-slate-200">
+          <Card className="border-border">
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <Clock size={16} className="text-sky-600" />

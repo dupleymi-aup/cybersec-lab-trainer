@@ -120,14 +120,14 @@ export default function AuditLogView() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
           >
-            <Card className="border-slate-200">
+            <Card className="border-border">
               <CardContent className="p-4 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-slate-500 block mb-1">Тип действия</label>
+                  <label className="text-xs text-muted-foreground block mb-1">Тип действия</label>
                   <select
                     value={filterAction}
                     onChange={(e) => setFilterAction(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-card"
                   >
                     <option value="">Все действия</option>
                     {(Object.keys(actionLabels) as AuditAction[]).map((a) => (
@@ -136,11 +136,11 @@ export default function AuditLogView() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500 block mb-1">Администратор</label>
+                  <label className="text-xs text-muted-foreground block mb-1">Администратор</label>
                   <select
                     value={filterAdmin}
                     onChange={(e) => setFilterAdmin(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+                    className="w-full px-3 py-2 border border-border rounded-md text-sm bg-card"
                   >
                     <option value="">Все</option>
                     {adminNames.map((name) => (
@@ -157,7 +157,7 @@ export default function AuditLogView() {
       {/* Entries */}
       {filtered.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-sm text-slate-500">Записей не найдено</p>
+          <p className="text-sm text-muted-foreground">Записей не найдено</p>
           <p className="text-xs text-slate-400 mt-1">Действия администраторов будут отображаться здесь</p>
         </div>
       ) : (
@@ -169,7 +169,7 @@ export default function AuditLogView() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(i * 0.02, 0.3) }}
             >
-              <Card className="border-slate-100 hover:border-slate-200 transition-colors">
+              <Card className="border-slate-100 hover:border-border transition-colors">
                 <CardContent className="p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -177,15 +177,15 @@ export default function AuditLogView() {
                         <Badge className={`text-[10px] ${actionColors[entry.action]}`}>
                           {actionLabels[entry.action]}
                         </Badge>
-                        <span className="text-xs font-medium text-slate-700">
+                        <span className="text-xs font-medium text-foreground/70">
                           {entry.adminName}
                         </span>
                         <span className="text-xs text-slate-400">→</span>
-                        <span className="text-xs font-medium text-slate-600 truncate">
+                        <span className="text-xs font-medium text-muted-foreground truncate">
                           {entry.targetName || '—'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500">{entry.details}</p>
+                      <p className="text-xs text-muted-foreground">{entry.details}</p>
                     </div>
                     <span className="text-[10px] text-slate-400 whitespace-nowrap">
                       {new Date(entry.timestamp).toLocaleString('ru-RU', {

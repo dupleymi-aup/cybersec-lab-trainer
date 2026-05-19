@@ -71,7 +71,6 @@ const navItems: { id: PageType; label: string; iconKey: string }[] = [
   { id: 'password-checker' as PageType, label: 'Проверка пароля', iconKey: 'Key' },
   { id: 'leaderboard' as PageType, label: 'Рейтинг', iconKey: 'TrendingUp' },
   { id: 'career-paths' as PageType, label: 'Карьерные пути', iconKey: 'Target' },
-  { id: 'profile', label: 'Профиль', iconKey: 'User' },
 ];
 
 const roleNavItems: { id: PageType; label: string; iconKey: string; requiredRole: UserRole }[] = [
@@ -131,7 +130,7 @@ export default function Sidebar() {
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-slate-900 text-white">
+    <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-colors duration-200">
       {/* Header */}
       <div className="p-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -140,13 +139,13 @@ export default function Sidebar() {
           </div>
           <div>
             <h2 className="font-bold text-sm leading-tight">CyberSec Lab</h2>
-            <p className="text-[11px] text-slate-400">09.03.04</p>
+            <p className="text-[11px] text-sidebar-foreground/50">09.03.04</p>
           </div>
         </div>
         <Button
           variant="ghost"
           size="icon"
-          className="text-slate-400 hover:text-white md:hidden"
+          className="text-sidebar-foreground/50 hover:text-sidebar-foreground md:hidden"
           onClick={() => setSidebarOpen(false)}
         >
           <X size={20} />
@@ -162,7 +161,7 @@ export default function Sidebar() {
         <GlobalSearch />
       </div>
 
-      <Separator className="bg-slate-700" />
+      <Separator className="bg-sidebar-border" />
 
       {/* Nav items */}
       <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
@@ -183,10 +182,10 @@ export default function Sidebar() {
                   isActive
                     ? 'bg-emerald-600/20 text-emerald-400'
                     : isRolePanel
-                      ? 'text-red-400 hover:bg-red-600/10 hover:text-red-300'
+                      ? 'text-red-400 dark:text-red-400 hover:bg-sidebar-accent hover:text-red-300'
                       : item.id === 'achievements'
-                        ? 'text-amber-400 hover:bg-amber-600/10 hover:text-amber-300'
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        ? 'text-amber-500 hover:bg-sidebar-accent hover:text-amber-400'
+                        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                 }
               `}
             >
@@ -195,8 +194,8 @@ export default function Sidebar() {
                 : isRolePanel
                   ? 'text-red-400 group-hover:text-red-300'
                   : item.id === 'achievements'
-                    ? 'text-amber-500 group-hover:text-amber-300'
-                    : 'text-slate-500 group-hover:text-slate-300'
+                    ? 'text-amber-500 group-hover:text-amber-400'
+                    : 'text-sidebar-foreground/40 group-hover:text-sidebar-foreground/70'
               }>
                 {iconMap[item.iconKey]}
               </span>
@@ -218,38 +217,38 @@ export default function Sidebar() {
       </nav>
 
       {/* User Profile & Progress */}
-      <div className="border-t border-slate-700">
+      <div className="border-t border-sidebar-border">
         {/* Progress */}
         <div className="p-4 pb-3">
           <div className="flex items-center justify-between text-xs mb-2">
-            <span className="text-slate-400">Общий прогресс</span>
+            <span className="text-sidebar-foreground/50">Общий прогресс</span>
             <span className="text-emerald-400 font-semibold">{progressPct}%</span>
           </div>
-          <Progress value={progressPct} className="h-2 bg-slate-700 [&>div]:bg-emerald-500" />
-          <p className="text-[11px] text-slate-500 mt-2">
+          <Progress value={progressPct} className="h-2 bg-sidebar-border [&>div]:bg-emerald-500" />
+          <p className="text-[11px] text-sidebar-foreground/40 mt-2">
             Пройдено {completedCount} из {trackableItems.length} модулей
           </p>
         </div>
 
-        <Separator className="bg-slate-700" />
+        <Separator className="bg-sidebar-border" />
 
         {/* User section */}
         {user && (
           <div className="p-3 space-y-2">
             <button
               onClick={() => { setCurrentPage('profile'); setSidebarOpen(false); }}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition"
             >
-              <div className="w-8 h-8 rounded-full bg-violet-600/20 flex items-center justify-center overflow-hidden">
+              <div className="w-8 h-8 rounded-full bg-violet-600/30 dark:bg-violet-600/20 flex items-center justify-center overflow-hidden">
                 {user.avatar ? (
                   <img src={user.avatar} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <User size={16} className="text-violet-400" />
+                  <User size={16} className="text-violet-600 dark:text-violet-400" />
                 )}
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-white truncate">{user.fullName}</p>
-                <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                <p className="font-medium text-sidebar-foreground truncate">{user.fullName}</p>
+                <p className="text-xs text-sidebar-foreground/50 truncate">{user.email}</p>
               </div>
               {user.role === 'student' && (
                 <Badge className="text-[10px] px-1.5 py-0 bg-violet-500 text-white">S</Badge>

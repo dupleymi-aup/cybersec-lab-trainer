@@ -83,7 +83,7 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Загрузка данных...</p>
+        <p className="text-sm text-muted-foreground">Загрузка данных...</p>
       </div>
     );
   }
@@ -92,7 +92,7 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-        <p className="text-sm text-slate-600 font-medium">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium">{error}</p>
       </div>
     );
   }
@@ -101,13 +101,13 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
     <div className="space-y-6">
       {/* Period selector */}
       {controlledDays === undefined && (
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                days === key ? 'bg-white text-slate-900 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -152,7 +152,7 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
       </div>
 
       {/* Risk distribution chart */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Распределение риска</h3>
           {riskBuckets.some((b) => b.count > 0) ? (
@@ -176,28 +176,28 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
       </Card>
 
       {/* At-risk table */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="font-semibold text-sm mb-4">Студенты в зоне риска</h3>
           {sortedStudents.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="text-left py-2 px-3 text-xs font-medium text-slate-500 cursor-pointer" onClick={() => handleSort('fullName')}>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground cursor-pointer" onClick={() => handleSort('fullName')}>
                       ФИО {sortField === 'fullName' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                     </th>
-                    <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">Группа</th>
-                    <th className="text-left py-2 px-3 text-xs font-medium text-slate-500 min-w-[180px]">Риск</th>
-                    <th className="text-left py-2 px-3 text-xs font-medium text-slate-500">Причины</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500 cursor-pointer" onClick={() => handleSort('lastActiveDays')}>
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Группа</th>
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground min-w-[180px]">Риск</th>
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">Причины</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground cursor-pointer" onClick={() => handleSort('lastActiveDays')}>
                       Неактивен {sortField === 'lastActiveDays' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                     </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500">Модули</th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500 cursor-pointer" onClick={() => handleSort('avgQuizScore')}>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">Модули</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground cursor-pointer" onClick={() => handleSort('avgQuizScore')}>
                       Ср. балл {sortField === 'avgQuizScore' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                     </th>
-                    <th className="text-center py-2 px-3 text-xs font-medium text-slate-500">Тренд</th>
+                    <th className="text-center py-2 px-3 text-xs font-medium text-muted-foreground">Тренд</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -207,7 +207,7 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.02 }}
-                      className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                      className="border-b border-slate-100 hover:bg-secondary transition-colors"
                     >
                       <td className="py-2.5 px-3 font-medium">
                         <button

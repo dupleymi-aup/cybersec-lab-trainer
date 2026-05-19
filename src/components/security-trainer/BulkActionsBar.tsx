@@ -91,18 +91,18 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-slate-300 hover:text-white hover:bg-slate-800"
+                className="text-slate-300 hover:text-white hover:bg-slate-800 dark:bg-slate-700"
                 onClick={() => setShowRolePicker(!showRolePicker)}
               >
                 <Shield size={14} className="mr-1" /> Роль
               </Button>
               {showRolePicker && (
-                <div className="absolute bottom-full mb-2 left-0 bg-white rounded-lg shadow-xl p-1 min-w-[160px]">
+                <div className="absolute bottom-full mb-2 left-0 bg-card rounded-lg shadow-xl p-1 min-w-[160px]">
                   {(['student', 'teacher', 'admin'] as UserRole[]).map((r) => (
                     <button
                       key={r}
                       onClick={() => handleBulkRoleChange(r)}
-                      className="w-full text-left px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 rounded-md"
+                      className="w-full text-left px-3 py-1.5 text-sm text-foreground/70 hover:bg-muted rounded-md"
                     >
                       {getRoleLabel(r)}
                     </button>
@@ -115,7 +115,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
             <Button
               variant="ghost"
               size="sm"
-              className="text-amber-400 hover:text-amber-300 hover:bg-slate-800"
+              className="text-amber-400 hover:text-amber-300 hover:bg-slate-800 dark:bg-slate-700"
               onClick={() => handleBulkBlock(true)}
             >
               <Ban size={14} className="mr-1" /> Блокировать
@@ -123,7 +123,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
             <Button
               variant="ghost"
               size="sm"
-              className="text-emerald-400 hover:text-emerald-300 hover:bg-slate-800"
+              className="text-emerald-400 hover:text-emerald-300 hover:bg-slate-800 dark:bg-slate-700"
               onClick={() => handleBulkBlock(false)}
             >
               <CheckCircle size={14} className="mr-1" /> Разблокировать
@@ -134,25 +134,25 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-sky-400 hover:text-sky-300 hover:bg-slate-800"
+                className="text-sky-400 hover:text-sky-300 hover:bg-slate-800 dark:bg-slate-700"
                 onClick={() => setShowGroupPicker(!showGroupPicker)}
               >
                 <Users size={14} className="mr-1" /> Группа
               </Button>
               {showGroupPicker && (
-                <div className="absolute bottom-full mb-2 left-0 bg-white rounded-lg shadow-xl p-2 min-w-[220px]">
+                <div className="absolute bottom-full mb-2 left-0 bg-card rounded-lg shadow-xl p-2 min-w-[220px]">
                   <div className="space-y-1">
                     {groups.map((g) => (
                       <button
                         key={g}
                         onClick={() => handleGroupAssign(g)}
-                        className="w-full text-left px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 rounded-md"
+                        className="w-full text-left px-3 py-1.5 text-sm text-foreground/70 hover:bg-muted rounded-md"
                       >
                         {g}
                       </button>
                     ))}
                   </div>
-                  <div className="border-t border-slate-200 mt-1 pt-1">
+                  <div className="border-t border-border mt-1 pt-1">
                     <div className="flex gap-1">
                       <Input
                         value={newGroupInput}
@@ -176,7 +176,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
             <Button
               variant="ghost"
               size="sm"
-              className="text-red-400 hover:text-red-300 hover:bg-slate-800"
+              className="text-red-400 hover:text-red-300 hover:bg-slate-800 dark:bg-slate-700"
               onClick={handleBulkDelete}
             >
               <Trash2 size={14} className="mr-1" /> Удалить
@@ -187,7 +187,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
             <Button
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-white hover:bg-slate-800"
+              className="text-slate-400 hover:text-white hover:bg-slate-800 dark:bg-slate-700"
               onClick={onDone}
             >
               <X size={14} />

@@ -44,7 +44,7 @@ export default function KPICard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.08 }}
     >
-      <Card className="border-slate-200 hover:border-slate-300 transition-colors">
+      <Card className="border-border hover:border-border transition-colors">
         <CardContent className="p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
@@ -53,7 +53,7 @@ export default function KPICard({
               </div>
               <div>
                 <p className="text-2xl font-bold">{value}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
               </div>
             </div>
             {trend && (

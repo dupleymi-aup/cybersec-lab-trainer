@@ -61,10 +61,10 @@ export default function StudentDrillDown({
           initial={{ opacity: 0, y: 20, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.98 }}
-          className="relative w-full max-w-4xl max-h-[80vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          className="relative w-full max-w-4xl max-h-[80vh] bg-card rounded-2xl shadow-2xl overflow-hidden flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-white">
+          <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-blue-50 to-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                 <Users size={20} className="text-blue-600" />
@@ -73,7 +73,7 @@ export default function StudentDrillDown({
                 <h2 className="font-bold text-slate-900">
                   {data?.profile?.fullName || 'Загрузка...'}
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   {data?.profile?.email} {data?.profile?.group && `• ${data.profile.group}`}
                 </p>
               </div>
@@ -93,14 +93,14 @@ export default function StudentDrillDown({
             {loading && (
               <div className="flex items-center justify-center py-16">
                 <Loader2 size={32} className="animate-spin text-blue-500" />
-                <p className="text-sm text-slate-500 ml-3">Загрузка данных студента...</p>
+                <p className="text-sm text-muted-foreground ml-3">Загрузка данных студента...</p>
               </div>
             )}
 
             {error && (
               <div className="flex items-center justify-center py-16">
                 <AlertTriangle size={32} className="text-red-500" />
-                <p className="text-sm text-slate-600 font-medium ml-3">{error}</p>
+                <p className="text-sm text-muted-foreground font-medium ml-3">{error}</p>
               </div>
             )}
 
@@ -108,35 +108,35 @@ export default function StudentDrillDown({
               <>
                 {/* KPI Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <Card className="border-slate-200">
+                  <Card className="border-border">
                     <CardContent className="p-3 text-center">
                       <p className="text-2xl font-bold text-blue-600">{data.kpis?.modulesCompleted ?? 0}</p>
-                      <p className="text-xs text-slate-500">Модулей пройдено</p>
+                      <p className="text-xs text-muted-foreground">Модулей пройдено</p>
                     </CardContent>
                   </Card>
-                  <Card className="border-slate-200">
+                  <Card className="border-border">
                     <CardContent className="p-3 text-center">
                       <p className="text-2xl font-bold text-emerald-600">{data.kpis?.avgQuizScore ?? 0}%</p>
-                      <p className="text-xs text-slate-500">Средний балл</p>
+                      <p className="text-xs text-muted-foreground">Средний балл</p>
                     </CardContent>
                   </Card>
-                  <Card className="border-slate-200">
+                  <Card className="border-border">
                     <CardContent className="p-3 text-center">
                       <p className="text-2xl font-bold text-amber-600">{data.kpis?.totalQuizAttempts ?? 0}</p>
-                      <p className="text-xs text-slate-500">Попыток quiz</p>
+                      <p className="text-xs text-muted-foreground">Попыток quiz</p>
                     </CardContent>
                   </Card>
-                  <Card className="border-slate-200">
+                  <Card className="border-border">
                     <CardContent className="p-3 text-center">
                       <p className="text-2xl font-bold text-purple-600">{data.achievements?.filter((a: any) => a.unlocked).length ?? 0}</p>
-                      <p className="text-xs text-slate-500">Достижений</p>
+                      <p className="text-xs text-muted-foreground">Достижений</p>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* Module Progress Chart */}
                 {data.moduleProgress && data.moduleProgress.length > 0 && (
-                  <Card className="border-slate-200">
+                  <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                         <BookOpen size={16} className="text-blue-500" /> Прогресс по модулям
@@ -156,14 +156,14 @@ export default function StudentDrillDown({
 
                 {/* Quiz Category Breakdown */}
                 {data.categoryBreakdown && data.categoryBreakdown.length > 0 && (
-                  <Card className="border-slate-200">
+                  <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                         <HelpCircle size={16} className="text-amber-500" /> Результаты по категориям quiz
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                         {data.categoryBreakdown.map((cat) => (
-                          <div key={cat.category} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
+                          <div key={cat.category} className="flex items-center justify-between p-2 bg-secondary rounded-lg">
                             <span className="text-xs font-medium truncate">{cat.category || cat.category}</span>
                             <Badge className={
                               cat.avgScore >= 70 ? 'bg-emerald-100 text-emerald-700' :
@@ -181,14 +181,14 @@ export default function StudentDrillDown({
 
                 {/* Activity Timeline */}
                 {data.activityTimeline && data.activityTimeline.length > 0 && (
-                  <Card className="border-slate-200">
+                  <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                         <Activity size={16} className="text-purple-500" /> Последняя активность
                       </h3>
                       <div className="space-y-2 max-h-48 overflow-y-auto">
                         {data.activityTimeline.slice(0, 10).map((item, i) => (
-                          <div key={i} className="flex items-start gap-3 p-2 bg-slate-50 rounded-lg">
+                          <div key={i} className="flex items-start gap-3 p-2 bg-secondary rounded-lg">
                             <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-medium">{item.details}</p>
@@ -205,14 +205,14 @@ export default function StudentDrillDown({
 
                 {/* Achievements */}
                 {data.achievements && data.achievements.length > 0 && (
-                  <Card className="border-slate-200">
+                  <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                         <Award size={16} className="text-amber-500" /> Достижения ({data.achievements.length})
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                         {data.achievements.map((ach) => (
-                          <div key={ach.id} className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg">
+                          <div key={ach.id} className="flex items-center gap-2 p-2 bg-secondary rounded-lg">
                             <span className="text-lg">🏆</span>
                             <div className="min-w-0">
                               <p className="text-xs font-medium truncate">{ach.title}</p>

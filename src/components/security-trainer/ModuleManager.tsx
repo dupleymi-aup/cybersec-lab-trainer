@@ -119,7 +119,7 @@ export default function ModuleManager() {
             </div>
             <div>
               <h2 className="text-sm font-bold">Управление модулями</h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Включение, порядок и обязательность модулей
               </p>
             </div>
@@ -145,7 +145,7 @@ export default function ModuleManager() {
         </div>
       </div>
 
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-0">
           <Reorder.Group axis="y" values={moduleOrder} onReorder={handleReorder} className="divide-y divide-slate-100">
             {moduleOrder.map((mod) => (
@@ -153,14 +153,14 @@ export default function ModuleManager() {
                 key={mod.id}
                 value={mod}
                 as="div"
-                className="p-4 bg-white hover:bg-slate-50 transition-colors"
+                className="p-4 bg-card hover:bg-secondary transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500">
+                  <div className="cursor-grab active:cursor-grabbing text-slate-300 hover:text-muted-foreground">
                     <GripVertical size={18} />
                   </div>
 
-                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                     <BookOpen size={18} className={mod.enabled ? 'text-indigo-600' : 'text-slate-300'} />
                   </div>
 
@@ -181,7 +181,7 @@ export default function ModuleManager() {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-xs text-slate-500">
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span>Обязат.</span>
                       <Switch
                         checked={mod.required && mod.enabled}
@@ -191,7 +191,7 @@ export default function ModuleManager() {
                       />
                     </label>
 
-                    <label className="flex items-center gap-2 text-xs text-slate-500">
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
                       {mod.enabled ? <Eye size={14} className="text-emerald-500" /> : <EyeOff size={14} className="text-slate-300" />}
                       <Switch
                         checked={mod.enabled}

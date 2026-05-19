@@ -38,7 +38,7 @@ export default function KeyboardShortcuts() {
       {/* Floating hint button */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-4 right-4 z-30 w-9 h-9 rounded-full bg-slate-800 text-white shadow-lg flex items-center justify-center hover:bg-slate-700 transition-colors opacity-60 hover:opacity-100"
+        className="fixed bottom-4 right-4 z-30 w-9 h-9 rounded-full bg-slate-800 dark:bg-slate-700 text-white shadow-lg flex items-center justify-center hover:bg-slate-700 transition-colors opacity-60 hover:opacity-100"
         title="Шорткаты (?)"
       >
         <Keyboard size={16} />
@@ -57,7 +57,7 @@ export default function KeyboardShortcuts() {
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b">
                 <div className="flex items-center gap-2">
-                  <Keyboard size={18} className="text-slate-500" />
+                  <Keyboard size={18} className="text-muted-foreground" />
                   <h2 className="font-semibold">Клавиатурные шорткаты</h2>
                 </div>
                 <button
@@ -72,17 +72,17 @@ export default function KeyboardShortcuts() {
               <div className="overflow-y-auto p-4 space-y-2">
                 {SHORTCUTS.map((sc, i) => (
                   <div key={i} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
-                    <span className="text-sm text-slate-600">{sc.desc}</span>
+                    <span className="text-sm text-muted-foreground">{sc.desc}</span>
                     <div className="flex items-center gap-1">
                       {sc.keys.map((key, j) => (
                         <span key={j} className="inline-flex items-center gap-1">
                           {j > 0 && <span className="text-slate-300 text-xs">+</span>}
                           <kbd className={`inline-flex items-center justify-center h-7 min-w-[28px] px-2 rounded-md text-xs font-mono font-medium border ${
                             key === 'Ctrl' || key === 'Cmd'
-                              ? 'bg-slate-100 border-slate-300 text-slate-700'
+                              ? 'bg-muted border-border text-foreground/70'
                               : key === 'Enter'
                                 ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                                : 'bg-slate-50 border-slate-200 text-slate-600'
+                                : 'bg-secondary border-border text-muted-foreground'
                           }`}>
                             {key === 'Ctrl' ? <><Command size={12} className="mr-0.5" />K</> : key}
                           </kbd>
@@ -94,7 +94,7 @@ export default function KeyboardShortcuts() {
               </div>
 
               <div className="p-3 border-t text-center text-[11px] text-slate-400">
-                Нажмите <kbd className="inline-flex items-center justify-center px-1.5 h-5 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mx-1">?</kbd> чтобы открыть/закрыть
+                Нажмите <kbd className="inline-flex items-center justify-center px-1.5 h-5 rounded text-[10px] font-mono bg-muted border border-border mx-1">?</kbd> чтобы открыть/закрыть
               </div>
             </motion.div>
           </>

@@ -68,7 +68,7 @@ function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, 
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.08 }}
     >
-      <Card className="border-slate-200 hover:border-slate-300 transition-colors">
+      <Card className="border-border hover:border-border transition-colors">
         <CardContent className="p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, 
               </div>
               <div>
                 <p className="text-2xl font-bold">{value}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
               </div>
             </div>
             {trend && (
@@ -177,7 +177,7 @@ export default function AdminSummaryReport() {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
-          <p className="text-sm text-slate-500">Загрузка данных...</p>
+          <p className="text-sm text-muted-foreground">Загрузка данных...</p>
         </div>
       </div>
     );
@@ -188,7 +188,7 @@ export default function AdminSummaryReport() {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-          <p className="text-sm text-slate-600 font-medium">Ошибка загрузки</p>
+          <p className="text-sm text-muted-foreground font-medium">Ошибка загрузки</p>
           <p className="text-xs text-slate-400 mt-1">{error || 'Нет данных'}</p>
         </div>
       </div>
@@ -250,19 +250,19 @@ export default function AdminSummaryReport() {
       </div>
 
       {/* Aggregation Chart */}
-      <Card className="border-slate-200">
+      <Card className="border-border">
         <CardContent className="p-5">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h3 className="font-semibold text-sm">Агрегация по группам</h3>
-            <div className="flex gap-1 bg-slate-100 rounded-lg p-0.5">
+            <div className="flex gap-1 bg-muted rounded-lg p-0.5">
               {(['group', 'course', 'university'] as GroupBy[]).map((key) => (
                 <button
                   key={key}
                   onClick={() => setGroupBy(key)}
                   className={`px-3 py-1 text-xs rounded-md transition-colors ${
                     groupBy === key
-                      ? 'bg-white text-slate-800 shadow-sm font-medium'
-                      : 'text-slate-500 hover:text-slate-700'
+                      ? 'bg-background text-foreground shadow-sm font-medium'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {groupByLabels[key]}
@@ -317,7 +317,7 @@ export default function AdminSummaryReport() {
 
       {/* Summary Table */}
       {tData.length > 0 && (
-        <Card className="border-slate-200">
+        <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">
               Сводка{' '}
@@ -328,17 +328,17 @@ export default function AdminSummaryReport() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="text-left py-2 px-3 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       {groupBy === 'group' ? 'Группа' : groupBy === 'course' ? 'Курс' : 'Университет'}
                     </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Студенты
                     </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Ср. завершение
                     </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Ср. балл квизов
                     </th>
                   </tr>
@@ -350,7 +350,7 @@ export default function AdminSummaryReport() {
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.04 }}
-                      className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                      className="border-b border-slate-100 hover:bg-secondary transition-colors"
                     >
                       <td className="py-2.5 px-3 font-medium">{row.name}</td>
                       <td className="py-2.5 px-3 text-right">{row.students}</td>
