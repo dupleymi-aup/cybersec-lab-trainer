@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
   HelpCircle,
@@ -27,6 +27,12 @@ import {
   Trophy,
   Target,
   Code,
+  Globe,
+  Users,
+  Flame,
+  Zap,
+  AlertTriangle,
+  ChevronRight,
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -36,9 +42,31 @@ const iconMap: Record<string, React.ReactNode> = {
   Lock: <Lock size={20} />,
   Shield: <Shield size={20} />,
   Code: <Code size={20} />,
+  Globe: <Globe size={20} />,
+  Users: <Users size={20} />,
 };
 
 type QuizState = 'select' | 'playing' | 'result';
+
+function getDifficultyBreakdown(questions: typeof quizQuestions): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const q of questions) {
+    counts[q.difficulty] = (counts[q.difficulty] || 0) + 1;
+  }
+  return counts;
+}
+
+const DIFF_LABELS: Record<string, string> = { easy: 'Лёгкий', medium: 'Средний', hard: 'Сложный' };
+const DIFF_COLORS: Record<string, string> = {
+  easy: 'bg-emerald-100 text-emerald-700',
+  medium: 'bg-amber-100 text-amber-700',
+  hard: 'bg-red-100 text-red-700',
+};
+const DIFF_BG: Record<string, string> = {
+  easy: 'bg-emerald-500',
+  medium: 'bg-amber-500',
+  hard: 'bg-red-400',
+};
 
 export default function QuizSystem() {
   const { quizScores, setQuizScore, setCurrentPage } = useAppStore();
@@ -54,6 +82,9 @@ export default function QuizSystem() {
   const [timerActive, setTimerActive] = useState(false);
   const [startTime, setStartTime] = useState(0);
   const [totalTimeTaken, setTotalTimeTaken] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
+  const [direction, setDirection] = useState<'next' | 'prev'>('next');
   const currentQuestionRef = useRef(currentQuestion);
   const timedOutRef = useRef(false);
 
@@ -82,11 +113,15 @@ export default function QuizSystem() {
     setTimerActive(true);
     setStartTime(Date.now());
     setTotalTimeTaken(0);
+    setStreak(0);
+    setMaxStreak(0);
+    setDirection('next');
     setQuizState('playing');
   };
 
   const nextQuestion = () => {
     if (currentQuestion < categoryQuestions.length - 1) {
+      setDirection('next');
       setCurrentQuestion((q) => q + 1);
       setSelectedAnswer('');
       setShowAnswer(false);
@@ -101,7 +136,6 @@ export default function QuizSystem() {
       setTotalTimeTaken(Math.round((Date.now() - startTime) / 1000));
       setTimerActive(false);
 
-      // Save per-question attempts
       const attempts: QuizAttemptData[] = categoryQuestions.map((q, i) => ({
         questionId: q.id,
         difficulty: q.difficulty,
@@ -121,23 +155,33 @@ export default function QuizSystem() {
     timedOutRef.current = false;
     const question = categoryQuestions[currentQuestion];
     const isCorrect = parseInt(selectedAnswer) === question.correctIndex;
-    if (isCorrect) setCorrectCount((c) => c + 1);
+    if (isCorrect) {
+      setCorrectCount((c) => c + 1);
+      setStreak((s) => {
+        const newStreak = s + 1;
+        if (newStreak > maxStreak) setMaxStreak(newStreak);
+        return newStreak;
+      });
+    } else {
+      setStreak(0);
+    }
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = isCorrect;
     setAnswers(newAnswers);
   };
 
-  // Timer — use ref to avoid stale closure over currentQuestion
+  // Timer
   useEffect(() => {
     if (!timerActive) return;
-    timedOutRef.current = false; // Reset for new question
-    setTimeLeft(30); // Reset timer for new question
+    timedOutRef.current = false;
+    setTimeLeft(30);
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
           setTimerActive(false);
           setShowAnswer(true);
+          setStreak(0);
           timedOutRef.current = true;
           setAnswers((a) => {
             const updated = [...a];
@@ -172,14 +216,24 @@ export default function QuizSystem() {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [timerActive]);
 
+  // Warn on page leave during quiz
+  useEffect(() => {
+    if (quizState !== 'playing') return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [quizState]);
+
   const question = categoryQuestions[currentQuestion];
   const finalScore = categoryQuestions.length > 0 ? Math.round((correctCount / categoryQuestions.length) * 100) : 0;
 
-  // Keyboard shortcuts during quiz
+  // Keyboard shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (quizState !== 'playing' || !question) return;
 
-    // Number keys 1-4 to select answers
     if (!showAnswer && e.key >= '1' && e.key <= '4') {
       const idx = parseInt(e.key) - 1;
       if (idx < question.options.length) {
@@ -188,7 +242,6 @@ export default function QuizSystem() {
       return;
     }
 
-    // Arrow keys to navigate options
     if (!showAnswer) {
       if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
         e.preventDefault();
@@ -208,7 +261,6 @@ export default function QuizSystem() {
       }
     }
 
-    // Enter to confirm answer or advance
     if (e.key === 'Enter') {
       e.preventDefault();
       if (!showAnswer && selectedAnswer) {
@@ -218,7 +270,6 @@ export default function QuizSystem() {
       }
     }
 
-    // Escape to go back
     if (e.key === 'Escape') {
       resetQuiz();
     }
@@ -238,7 +289,17 @@ export default function QuizSystem() {
     setTimeLeft(30);
     setAnswers([]);
     setTimerActive(false);
+    setStreak(0);
+    setMaxStreak(0);
   };
+
+  const timerPercent = (timeLeft / 30) * 100;
+  const timerColor =
+    timeLeft > 20 ? 'stroke-emerald-500' :
+    timeLeft > 10 ? 'stroke-amber-500' : 'stroke-red-500';
+
+  const timerCircumference = 2 * Math.PI * 18;
+  const timerOffset = timerCircumference - (timerPercent / 100) * timerCircumference;
 
   return (
     <div className="space-y-6">
@@ -303,12 +364,13 @@ export default function QuizSystem() {
             {quizCategories.map((cat) => {
               const catId = cat.id;
               const score = quizScores[catId];
-              const availableCount = quizQuestions.filter((q) => {
+              const available = quizQuestions.filter((q) => {
                 const catMatch = q.category === cat.name;
                 const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
                 return catMatch && diffMatch;
-              }).length;
-              if (availableCount === 0) return null;
+              });
+              if (available.length === 0) return null;
+              const breakdown = getDifficultyBreakdown(available);
               return (
                 <Card
                   key={cat.id}
@@ -320,11 +382,20 @@ export default function QuizSystem() {
                       <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
                         {iconMap[cat.icon]}
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm">{cat.name}</h3>
-                        <p className="text-xs text-slate-500">{availableCount} вопросов</p>
+                        <p className="text-xs text-slate-500">{available.length} вопросов</p>
+                        <div className="flex gap-1 mt-1">
+                          {(['easy', 'medium', 'hard'] as const).map((d) =>
+                            breakdown[d] ? (
+                              <span key={d} className={`text-[10px] px-1.5 py-0.5 rounded ${DIFF_COLORS[d]}`}>
+                                {DIFF_LABELS[d]}: {breakdown[d]}
+                              </span>
+                            ) : null
+                          )}
+                        </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         {score !== undefined ? (
                           <Badge className={score >= 80 ? 'bg-emerald-600' : score >= 60 ? 'bg-amber-500' : 'bg-red-500'}>
                             {score}%
@@ -347,140 +418,185 @@ export default function QuizSystem() {
       {/* Playing */}
       {quizState === 'playing' && question && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          {/* Quiz progress */}
+          {/* Quiz progress bar */}
           <Card className="border-none shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <Badge variant="secondary" className="text-xs">{activeCategory}</Badge>
-                <div className="flex items-center gap-3 text-xs text-slate-500">
-                  <span>Вопрос {currentQuestion + 1}/{categoryQuestions.length}</span>
-                  <div className={`flex items-center gap-1 ${timeLeft <= 10 ? 'text-red-500' : 'text-slate-500'}`}>
-                    <Clock size={14} />
-                    <span className="font-mono font-bold">{timeLeft}с</span>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">{activeCategory}</Badge>
+                  {streak >= 3 && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="flex items-center gap-1 text-xs text-amber-600 font-semibold"
+                    >
+                      <Flame size={14} className="text-orange-500" />
+                      {streak}
+                    </motion.div>
+                  )}
+                </div>
+                <div className="flex items-center gap-4 text-xs text-slate-500">
+                  <span className="font-medium">
+                    <span className={correctCount > 0 ? 'text-emerald-600' : ''}>{correctCount}</span>
+                    <span className="text-slate-300 mx-1">/</span>
+                    <span>{categoryQuestions.length}</span>
+                  </span>
+                  {/* Timer ring */}
+                  <div className="relative w-10 h-10">
+                    <svg className="w-10 h-10 -rotate-90" viewBox="0 0 42 42">
+                      <circle cx="21" cy="21" r="18" fill="none" stroke="#e2e8f0" strokeWidth="3" />
+                      <circle
+                        cx="21" cy="21" r="18"
+                        fill="none"
+                        className={timerColor}
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeDasharray={timerCircumference}
+                        strokeDashoffset={timerOffset}
+                        style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s' }}
+                      />
+                    </svg>
+                    <span className={`absolute inset-0 flex items-center justify-center text-[11px] font-bold font-mono ${
+                      timeLeft <= 5 ? 'text-red-500' : timeLeft <= 10 ? 'text-amber-500' : 'text-slate-700'
+                    }`}>
+                      {timeLeft}
+                    </span>
                   </div>
                 </div>
               </div>
               <Progress
                 value={((currentQuestion + 1) / categoryQuestions.length) * 100}
-                className="h-2"
+                className="h-1.5"
               />
             </CardContent>
           </Card>
 
-          {/* Question */}
-          <Card className="border-slate-200">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Badge
-                  className={`text-[10px] ${
-                    question.difficulty === 'easy' ? 'bg-emerald-100 text-emerald-700'
-                      : question.difficulty === 'medium' ? 'bg-amber-100 text-amber-700'
-                      : 'bg-red-100 text-red-700'
-                  }`}
-                >
-                  {question.difficulty === 'easy' ? 'Лёгкий' : question.difficulty === 'medium' ? 'Средний' : 'Сложный'}
-                </Badge>
-              </div>
-              <h3 className="font-semibold text-sm leading-relaxed mb-4">{question.question}</h3>
-
-              <RadioGroup
-                value={selectedAnswer}
-                onValueChange={setSelectedAnswer}
-                disabled={showAnswer}
-                className="space-y-2"
-              >
-                {question.options.map((option, i) => {
-                  let optionClass = 'border-slate-200 hover:border-emerald-400 cursor-pointer';
-                  if (showAnswer) {
-                    if (i === question.correctIndex) {
-                      optionClass = 'border-emerald-400 bg-emerald-50';
-                    } else if (selectedAnswer === String(i) && i !== question.correctIndex) {
-                      optionClass = 'border-red-400 bg-red-50';
-                    } else {
-                      optionClass = 'border-slate-100 opacity-50';
-                    }
-                  } else if (selectedAnswer === String(i)) {
-                    optionClass = 'border-emerald-400 bg-emerald-50/50';
-                  }
-
-                  return (
-                    <div
-                      key={i}
-                      className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${optionClass}`}
-                      onClick={() => !showAnswer && setSelectedAnswer(String(i))}
+          {/* Question with slide animation */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentQuestion}
+              initial={{ opacity: 0, x: direction === 'next' ? 30 : -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction === 'next' ? -30 : 30 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Card className="border-slate-200">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <Badge
+                      className={`text-[10px] ${
+                        question.difficulty === 'easy' ? 'bg-emerald-100 text-emerald-700'
+                          : question.difficulty === 'medium' ? 'bg-amber-100 text-amber-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}
                     >
-                      <RadioGroupItem value={String(i)} id={`opt-${i}`} />
-                      <div className="flex items-center gap-2 flex-1">
-                        {!showAnswer && (
-                          <kbd className="hidden md:inline-flex items-center justify-center w-5 h-5 rounded text-[10px] font-mono bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
-                            {i + 1}
-                          </kbd>
-                        )}
-                        <Label
-                          htmlFor={`opt-${i}`}
-                          className="flex-1 text-sm cursor-pointer leading-relaxed"
+                      {DIFF_LABELS[question.difficulty]}
+                    </Badge>
+                    <span className="text-[10px] text-slate-400">Вопрос {currentQuestion + 1}/{categoryQuestions.length}</span>
+                  </div>
+                  <h3 className="font-semibold text-sm leading-relaxed mb-4">{question.question}</h3>
+
+                  <RadioGroup
+                    value={selectedAnswer}
+                    onValueChange={setSelectedAnswer}
+                    disabled={showAnswer}
+                    className="space-y-2"
+                  >
+                    {question.options.map((option, i) => {
+                      let optionClass = 'border-slate-200 hover:border-emerald-400 cursor-pointer';
+                      if (showAnswer) {
+                        if (i === question.correctIndex) {
+                          optionClass = 'border-emerald-400 bg-emerald-50';
+                        } else if (selectedAnswer === String(i) && i !== question.correctIndex) {
+                          optionClass = 'border-red-400 bg-red-50';
+                        } else {
+                          optionClass = 'border-slate-100 opacity-50';
+                        }
+                      } else if (selectedAnswer === String(i)) {
+                        optionClass = 'border-emerald-400 bg-emerald-50/50';
+                      }
+
+                      return (
+                        <div
+                          key={i}
+                          className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${optionClass}`}
+                          onClick={() => !showAnswer && setSelectedAnswer(String(i))}
                         >
-                          {option}
-                        </Label>
-                      </div>
-                      {showAnswer && i === question.correctIndex && (
-                        <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
-                      )}
-                      {showAnswer && selectedAnswer === String(i) && i !== question.correctIndex && (
-                        <XCircle size={16} className="text-red-500 shrink-0" />
-                      )}
-                    </div>
-                  );
-                })}
-              </RadioGroup>
+                          <RadioGroupItem value={String(i)} id={`opt-${i}`} />
+                          <div className="flex items-center gap-2 flex-1">
+                            {!showAnswer && (
+                              <kbd className="hidden md:inline-flex items-center justify-center w-5 h-5 rounded text-[10px] font-mono bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
+                                {i + 1}
+                              </kbd>
+                            )}
+                            <Label
+                              htmlFor={`opt-${i}`}
+                              className="flex-1 text-sm cursor-pointer leading-relaxed"
+                            >
+                              {option}
+                            </Label>
+                          </div>
+                          {showAnswer && i === question.correctIndex && (
+                            <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                          )}
+                          {showAnswer && selectedAnswer === String(i) && i !== question.correctIndex && (
+                            <XCircle size={16} className="text-red-500 shrink-0" />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </RadioGroup>
 
-              {/* Action buttons */}
-              {!showAnswer && (
-                <Button
-                  className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700"
-                  onClick={handleAnswer}
-                  disabled={!selectedAnswer}
-                >
-                  Ответить <kbd className="ml-2 hidden md:inline-flex items-center justify-center px-2 h-5 rounded text-[10px] font-mono bg-white/20 border border-white/30">Enter</kbd>
-                </Button>
-              )}
+                  {!showAnswer && (
+                    <Button
+                      className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700"
+                      onClick={handleAnswer}
+                      disabled={!selectedAnswer}
+                    >
+                      Ответить <kbd className="ml-2 hidden md:inline-flex items-center justify-center px-2 h-5 rounded text-[10px] font-mono bg-white/20 border border-white/30">Enter</kbd>
+                    </Button>
+                  )}
 
-              {/* Keyboard shortcuts hint */}
-              <div className="hidden md:flex items-center gap-3 mt-3 text-[11px] text-slate-400">
-                <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">1-4</kbd> выбрать</span>
-                <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">↑↓</kbd> навигация</span>
-                <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">Esc</kbd> выход</span>
-              </div>
-
-              {showAnswer && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 space-y-3"
-                >
-                  <div className={`rounded-lg p-3 ${
-                    answers[currentQuestion] ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'
-                  }`}>
-                    <p className={`text-xs font-semibold flex items-center gap-1.5 ${answers[currentQuestion] ? 'text-emerald-700' : 'text-red-700'}`}>
-                      {answers[currentQuestion]
-                        ? (<><CheckCircle2 size={14} /> Правильно!</>)
-                        : timeLeft <= 0
-                          ? (<><Clock size={14} /> Время вышло!</>)
-                          : (<><XCircle size={14} /> Неправильно!</>)}
-                    </p>
-                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">{question.explanation}</p>
+                  {/* Keyboard hints */}
+                  <div className="hidden md:flex items-center gap-3 mt-3 text-[11px] text-slate-400">
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">1-4</kbd> выбрать</span>
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">↑↓</kbd> навигация</span>
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">Esc</kbd> выход</span>
                   </div>
 
-                  <Button
-                    className="w-full bg-emerald-600 hover:bg-emerald-700"
-                    onClick={nextQuestion}
-                  >
-                    {currentQuestion < categoryQuestions.length - 1 ? 'Следующий вопрос →' : 'Результаты'}
-                  </Button>
-                </motion.div>
-              )}
-            </CardContent>
-          </Card>
+                  {showAnswer && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 space-y-3"
+                    >
+                      <div className={`rounded-lg p-3 ${
+                        answers[currentQuestion] ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'
+                      }`}>
+                        <p className={`text-xs font-semibold flex items-center gap-1.5 ${answers[currentQuestion] ? 'text-emerald-700' : 'text-red-700'}`}>
+                          {answers[currentQuestion]
+                            ? (<><CheckCircle2 size={14} /> Правильно!</>)
+                            : timeLeft <= 0
+                              ? (<><Clock size={14} /> Время вышло!</>)
+                              : (<><XCircle size={14} /> Неправильно!</>)}
+                        </p>
+                        <p className="text-xs text-slate-600 mt-1 leading-relaxed">{question.explanation}</p>
+                      </div>
+
+                      <Button
+                        className="w-full bg-emerald-600 hover:bg-emerald-700"
+                        onClick={nextQuestion}
+                      >
+                        {currentQuestion < categoryQuestions.length - 1 ? (
+                          <>Следующий вопрос <ChevronRight size={14} className="ml-1" /></>
+                        ) : 'Результаты'}
+                      </Button>
+                    </motion.div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </AnimatePresence>
         </motion.div>
       )}
 
@@ -507,6 +623,14 @@ export default function QuizSystem() {
               <p className="text-slate-400 text-sm mb-1">
                 {correctCount} из {categoryQuestions.length} правильных ответов
               </p>
+
+              {/* Streak info */}
+              {maxStreak >= 3 && (
+                <p className="text-amber-400 text-xs mb-2 flex items-center justify-center gap-1">
+                  <Flame size={14} /> Максимальная серия: {maxStreak} подряд
+                </p>
+              )}
+
               {totalTimeTaken > 0 && (
                 <p className="text-slate-400 text-xs mb-4 flex items-center justify-center gap-1">
                   <Clock size={12} /> Затраченное время: {totalTimeTaken}с
@@ -521,13 +645,16 @@ export default function QuizSystem() {
                   breakdown[q.difficulty].total++;
                   if (answers[i]) breakdown[q.difficulty].correct++;
                 });
-                const diffLabels: Record<string, string> = { easy: 'Лёгкий', medium: 'Средний', hard: 'Сложный' };
-                const diffColors: Record<string, string> = { easy: 'text-emerald-400', medium: 'text-amber-400', hard: 'text-red-400' };
-                return Object.entries(breakdown).map(([diff, stats]) => (
-                  <span key={diff} className={`text-xs font-mono ${diffColors[diff]} mr-3`}>
-                    {diffLabels[diff]}: {stats.correct}/{stats.total}
-                  </span>
-                ));
+                return (
+                  <div className="flex justify-center gap-4 mb-4">
+                    {Object.entries(breakdown).map(([diff, stats]) => (
+                      <span key={diff} className="text-xs font-mono">
+                        <span className={DIFF_COLORS[diff].split(' ')[1]}>{DIFF_LABELS[diff]}</span>
+                        : {stats.correct}/{stats.total}
+                      </span>
+                    ))}
+                  </div>
+                );
               })()}
 
               <div className="flex gap-2 justify-center mt-4">
