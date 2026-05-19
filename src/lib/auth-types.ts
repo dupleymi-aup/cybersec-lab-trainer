@@ -388,3 +388,134 @@ export interface ModuleSettings {
   required: boolean;
   minScore?: number;
 }
+
+// ─── Module Deep-Dive ────────────────────────────────────────
+
+export interface ModuleLevelProgress {
+  level: number;
+  started: number;
+  completed: number;
+  completionRate: number;
+}
+
+export interface ModuleDeepDiveData {
+  moduleId: string;
+  moduleName: string;
+  levels: ModuleLevelProgress[];
+  challengeScores: { range: string; count: number }[];
+  totalStudents: number;
+  avgScore: number;
+  completionRate: number;
+  studiedItemsCoverage?: Array<{ item: string; studiedCount: number; studiedRate: number }>;
+  secureCodingDistribution?: { correctRange: string; count: number }[];
+}
+
+// ─── Certification Readiness ─────────────────────────────────
+
+export interface CertificationCategoryReadiness {
+  category: string;
+  score: number;
+  ready: boolean;
+}
+
+export interface CertificationStudentData {
+  userId: string;
+  fullName: string;
+  email: string;
+  group: string;
+  readinessScore: number;
+  readinessTier: 'ready' | 'almost' | 'needs-work' | 'not-ready';
+  categoryReadiness: CertificationCategoryReadiness[];
+  modulesCompleted: number;
+  totalModules: number;
+  achievements: number;
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+}
+
+export interface CertificationReadinessData {
+  students: CertificationStudentData[];
+  summary: {
+    ready: number;
+    almost: number;
+    needsWork: number;
+    notReady: number;
+    avgReadinessScore: number;
+  };
+}
+
+// ─── Learning Velocity ───────────────────────────────────────
+
+export interface StudentVelocity {
+  userId: string;
+  fullName: string;
+  group: string;
+  modulesCompleted: number;
+  avgDaysPerModule: number;
+  firstModuleDate: string;
+  lastModuleDate: string;
+  scoreImprovement: number;
+  velocityScore: number;
+}
+
+export interface LearningVelocityData {
+  studentVelocities: StudentVelocity[];
+  velocityDistribution: { range: string; count: number }[];
+  avgVelocityByGroup: { group: string; avgDaysPerModule: number; avgScoreImprovement: number }[];
+  velocityOverTime: { week: string; avgDaysPerModule: number; avgScoreImprovement: number }[];
+}
+
+// ─── Quiz Session Analytics ──────────────────────────────────
+
+export interface QuizSessionData {
+  categoryTiming: { category: string; avgDuration: number; medianDuration: number; attemptCount: number }[];
+  rushedQuizzes: { userId: string; fullName: string; category: string; duration: number; score: number; percentage: number; questionCount: number }[];
+  timeVsPerformance: { durationBucket: string; avgPercentage: number; attemptCount: number }[];
+  hourlyPerformance: { hour: number; avgPercentage: number; attemptCount: number }[];
+  weekdayVsWeekend: { dayType: 'weekday' | 'weekend'; avgPercentage: number; attemptCount: number; avgDuration: number }[];
+}
+
+// ─── Group Dynamics ──────────────────────────────────────────
+
+export interface GroupActivityWeek {
+  week: string;
+  activeStudents: number;
+  modulesCompleted: number;
+  quizAttempts: number;
+}
+
+export interface GroupDynamicsEntry {
+  groupName: string;
+  studentCount: number;
+  activityTimeline: GroupActivityWeek[];
+  performanceVariance: number;
+  peerInfluenceScore: number;
+  newMemberIntegrationDays: number;
+  healthScore: number;
+  trend: 'improving' | 'stable' | 'declining';
+}
+
+export interface GroupDynamicsData {
+  groups: GroupDynamicsEntry[];
+  overallTrends: { week: string; avgHealthScore: number; totalActive: number }[];
+}
+
+// ─── Login Patterns ──────────────────────────────────────────
+
+export interface LoginFrequencyEntry {
+  userId: string;
+  fullName: string;
+  group: string;
+  loginCount: number;
+  lastLogin: string;
+  successRate: number;
+}
+
+export interface LoginPatternsData {
+  loginFrequency: LoginFrequencyEntry[];
+  failedLogins: { userId: string; fullName: string; count: number; recentAttempts: { timestamp: string; ip: string }[] }[];
+  dormantAccounts: { userId: string; fullName: string; group: string; lastLogin: string; daysInactive: number }[];
+  hourlyDistribution: { hour: number; loginCount: number }[];
+  dailyDistribution: { day: string; loginCount: number }[];
+}

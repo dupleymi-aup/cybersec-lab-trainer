@@ -17,6 +17,8 @@ import type {
   CohortAnalysisData, QuizAttemptData,
   CompetencyRadarData, WeaknessAnalysis, PredictiveAnalyticsData,
   PredictiveInsight, Announcement, ModuleSettings,
+  ModuleDeepDiveData, CertificationReadinessData, LearningVelocityData,
+  QuizSessionData, GroupDynamicsData, LoginPatternsData,
 } from './auth-types';
 
 import {
@@ -27,6 +29,8 @@ import {
   getStudentPerformance, getStudentComparison, getGradebook,
   getEngagementAnalytics, getLearningPathAnalytics, getQuizTrajectory,
   getCohortAnalysis,
+  getModuleDeepDive, getCertificationReadiness, getLearningVelocity,
+  getQuizSessionAnalytics, getGroupDynamics, getLoginPatterns,
 } from './analytics-api';
 
 export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
@@ -38,6 +42,8 @@ export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
   CohortAnalysisData, QuizAttemptData,
   CompetencyRadarData, WeaknessAnalysis, PredictiveAnalyticsData,
   PredictiveInsight, Announcement, ModuleSettings,
+  ModuleDeepDiveData, CertificationReadinessData, LearningVelocityData,
+  QuizSessionData, GroupDynamicsData, LoginPatternsData,
 };
 
 import { hasRole, getRoleLabel } from './auth-types';
@@ -681,4 +687,6 @@ export {
   getStudentPerformance, getStudentComparison, getGradebook,
   getEngagementAnalytics, getLearningPathAnalytics, getQuizTrajectory,
   getCohortAnalysis,
+  getModuleDeepDive, getCertificationReadiness, getLearningVelocity,
+  getQuizSessionAnalytics, getGroupDynamics, getLoginPatterns,
 };

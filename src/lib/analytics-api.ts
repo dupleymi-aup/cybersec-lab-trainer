@@ -5,6 +5,8 @@ import type {
   StudentPerformanceData, StudentComparisonData, GradebookData,
   EngagementData, LearningPathEntry, QuizTrajectoryPoint,
   CohortAnalysisData, QuizAttemptData,
+  ModuleDeepDiveData, CertificationReadinessData, LearningVelocityData,
+  QuizSessionData, GroupDynamicsData, LoginPatternsData,
 } from './auth-types';
 
 function getAuthHeaders(): Record<string, string> {
@@ -297,5 +299,77 @@ export async function getCohortAnalysis(groupId?: string): Promise<CohortAnalysi
       cohorts: [],
       overallRetention: { week1: 0, week2: 0, week4: 0, week8: 0, week12: 0 },
     };
+  }
+}
+
+export async function getModuleDeepDive(days = 30, groupId?: string): Promise<ModuleDeepDiveData[]> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/module-deep-dive?${params}`);
+    const data = await res.json();
+    return data.modules || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getCertificationReadiness(days = 30, groupId?: string): Promise<CertificationReadinessData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/certification-readiness?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { students: [], summary: { ready: 0, almost: 0, needsWork: 0, notReady: 0, avgReadinessScore: 0 } };
+  }
+}
+
+export async function getLearningVelocity(days = 90, groupId?: string): Promise<LearningVelocityData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/learning-velocity?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { studentVelocities: [], velocityDistribution: [], avgVelocityByGroup: [], velocityOverTime: [] };
+  }
+}
+
+export async function getQuizSessionAnalytics(days = 30, groupId?: string): Promise<QuizSessionData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/quiz-session?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { categoryTiming: [], rushedQuizzes: [], timeVsPerformance: [], hourlyPerformance: [], weekdayVsWeekend: [] };
+  }
+}
+
+export async function getGroupDynamics(days = 90, groupId?: string): Promise<GroupDynamicsData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/group-dynamics?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { groups: [], overallTrends: [] };
+  }
+}
+
+export async function getLoginPatterns(days = 30, groupId?: string): Promise<LoginPatternsData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/login-patterns?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { loginFrequency: [], failedLogins: [], dormantAccounts: [], hourlyDistribution: [], dailyDistribution: [] };
   }
 }

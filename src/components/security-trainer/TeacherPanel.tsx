@@ -42,6 +42,9 @@ import WeaknessAnalyzer from './WeaknessAnalyzer';
 import PredictiveInsights from './PredictiveInsights';
 import TeacherMessaging from './TeacherMessaging';
 import StudentProgressView from './StudentProgressView';
+import ModuleDeepDive from './ModuleDeepDive';
+import CertificationReadiness from './CertificationReadiness';
+import QuizSessionAnalytics from './QuizSessionAnalytics';
 
 interface StudentProgress {
   userId: string;
@@ -109,7 +112,7 @@ export default function TeacherPanel() {
   const [searchTerm, setSearchTerm] = useState('');
   const [groupFilter, setGroupFilter] = useState('');
   const [gradebookSort, setGradebookSort] = useState<'name' | 'modules' | 'score'>('name');
-  const [analyticsSubTab, setAnalyticsSubTab] = useState<'overview' | 'trends' | 'questions' | 'achievements' | 'competency' | 'weaknesses' | 'predictive' | 'export'>('overview');
+  const [analyticsSubTab, setAnalyticsSubTab] = useState<'overview' | 'trends' | 'questions' | 'achievements' | 'competency' | 'weaknesses' | 'predictive' | 'export' | 'module-deep-dive' | 'certification' | 'quiz-session'>('overview');
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; email: string; group: string; avatar: string }>>([]);
 
@@ -411,6 +414,9 @@ export default function TeacherPanel() {
               { key: 'competency' as const, label: 'Компетенции', icon: BarChart3 },
               { key: 'weaknesses' as const, label: 'Слабые места', icon: AlertTriangle },
               { key: 'predictive' as const, label: 'Прогноз', icon: TrendingUp },
+              { key: 'module-deep-dive' as const, label: 'Модули+', icon: BookOpen },
+              { key: 'certification' as const, label: 'Сертификация', icon: Trophy },
+              { key: 'quiz-session' as const, label: 'Сессии квизов', icon: Clock },
               { key: 'export' as const, label: 'Экспорт', icon: Download },
             ].map(({ key, label, icon: Icon }) => (
               <button
@@ -612,6 +618,27 @@ export default function TeacherPanel() {
           {analyticsSubTab === 'predictive' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <PredictiveInsights groupId={groupFilter || undefined} />
+            </motion.div>
+          )}
+
+          {/* Module Deep-Dive sub-tab */}
+          {analyticsSubTab === 'module-deep-dive' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <ModuleDeepDive groupId={groupFilter} />
+            </motion.div>
+          )}
+
+          {/* Certification Readiness sub-tab */}
+          {analyticsSubTab === 'certification' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <CertificationReadiness groupId={groupFilter} />
+            </motion.div>
+          )}
+
+          {/* Quiz Session sub-tab */}
+          {analyticsSubTab === 'quiz-session' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <QuizSessionAnalytics groupId={groupFilter} />
             </motion.div>
           )}
 
