@@ -6,6 +6,7 @@ import { modules, achievements, sqlChallenges, xssTypes, attackSteps, secureCodi
 import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
 import { NotificationHelper, loadAnnouncementsIntoNotifications } from '@/lib/notification-store';
 import NotificationBell from './NotificationBell';
+import ActivityCalendar from './ActivityCalendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -381,6 +382,9 @@ export default function Dashboard() {
           </div>
         </div>
       </motion.div>
+
+      {/* Activity Calendar */}
+      <ActivityCalendar />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
