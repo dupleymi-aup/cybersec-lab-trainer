@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { User, resetUserPassword } from '@/lib/auth-store';
+import { type User, resetUserPassword } from '@/lib/auth-store';
 import { validatePassword } from '@/lib/auth-utils';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
 import { Button } from '@/components/ui/button';

@@ -3,12 +3,21 @@
  * Provides a lazy getter for the auth store to avoid initialization issues.
  */
 
-let _authStore: any = null;
+type AuthStoreModule = {
+  useAuthStore: { getState: () => { user?: { id: string } | null } };
+  saveProgressSnapshot: (moduleId: string, score: number, completed: boolean) => Promise<void>;
+};
 
-function getAuthStoreModule() {
+let _authStore: AuthStoreModule | null = null;
+
+function getAuthStoreModule(): AuthStoreModule {
   if (!_authStore) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    _authStore = require('./auth-store');
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      _authStore = require('./auth-store');
+    } catch {
+      throw new Error('Failed to load auth-store module');
+    }
   }
   return _authStore;
 }

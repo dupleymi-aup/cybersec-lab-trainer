@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { User, getRoleLabel, type LoginActivityEntry } from '@/lib/auth-store';
+import { type User, getRoleLabel, type LoginActivityEntry } from '@/lib/auth-store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

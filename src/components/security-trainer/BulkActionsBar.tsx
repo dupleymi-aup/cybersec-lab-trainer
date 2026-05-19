@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { UserRole, getRoleLabel, bulkDeleteUsers, bulkChangeRole, bulkToggleBlock, assignUsersToGroup, getAllGroups } from '@/lib/auth-store';
+import { type UserRole, getRoleLabel, bulkDeleteUsers, bulkChangeRole, bulkToggleBlock, assignUsersToGroup, getAllGroups } from '@/lib/auth-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AnimatePresence, motion } from 'framer-motion';

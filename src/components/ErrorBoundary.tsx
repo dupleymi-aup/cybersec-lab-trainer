@@ -80,7 +80,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-muted dark:bg-slate-800 dark:bg-slate-700 text-foreground/70 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition text-sm font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-foreground/70 rounded-lg hover:bg-accent transition text-sm font-medium"
               >
                 <RefreshCw size={16} />
                 Перезагрузить страницу

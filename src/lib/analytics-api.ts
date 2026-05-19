@@ -9,10 +9,10 @@ import type {
   QuizSessionData, GroupDynamicsData, LoginPatternsData,
 } from './auth-types';
 
-function getAuthHeaders(): Record<string, string> {
+async function getAuthHeaders(): Promise<Record<string, string>> {
   try {
-    const store = require('./auth-store').useAuthStore;
-    const { token } = store.getState();
+    const { useAuthStore } = await import('./auth-store');
+    const { token } = useAuthStore.getState();
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     return headers;
@@ -22,9 +22,10 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const authHeaders = await getAuthHeaders();
   return fetch(url, {
     ...options,
-    headers: { ...getAuthHeaders(), ...options.headers },
+    headers: { ...authHeaders, ...options.headers },
   });
 }
 
