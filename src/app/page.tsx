@@ -13,6 +13,7 @@ import { Toaster } from 'sonner';
 import { useMemo } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ModuleNavigation from '@/components/security-trainer/ModuleNavigation';
+import KeyboardShortcuts from '@/components/security-trainer/KeyboardShortcuts';
 
 const modulePageIds = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
 
@@ -136,6 +137,7 @@ export default function Home() {
       <Toaster position="top-right" />
       <PWAHandler />
       <OnboardingTour />
+      <KeyboardShortcuts />
     </div>
   );
 }
