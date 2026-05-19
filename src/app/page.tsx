@@ -12,9 +12,15 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'sonner';
 import { useMemo } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import ModuleNavigation from '@/components/security-trainer/ModuleNavigation';
 
-const ModuleWrapper = ({ name, children }: { name: string; children: React.ReactNode }) => (
-  <ErrorBoundary name={name}>{children}</ErrorBoundary>
+const modulePageIds = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
+
+const ModuleWrapper = ({ name, children, pageId }: { name: string; children: React.ReactNode; pageId?: string }) => (
+  <ErrorBoundary name={name}>
+    {children}
+    {pageId && modulePageIds.includes(pageId) && <ModuleNavigation currentId={pageId} />}
+  </ErrorBoundary>
 );
 
 const LazyOWASPTop10 = dynamic(() => import('@/components/security-trainer/OWASPTop10'), { ssr: false });
@@ -36,16 +42,16 @@ const LazyRoleGuard = dynamic(() => import('@/components/security-trainer/RoleGu
 
 const pages: Record<string, React.ReactNode> = {
   dashboard: <ModuleWrapper name="Dashboard"><Dashboard /></ModuleWrapper>,
-  owasp: <ModuleWrapper name="OWASP Top 10"><LazyOWASPTop10 /></ModuleWrapper>,
-  'sql-injection': <ModuleWrapper name="SQL Injection Lab"><LazySQLInjectionLab /></ModuleWrapper>,
-  xss: <ModuleWrapper name="XSS Lab"><LazyXSSLab /></ModuleWrapper>,
-  csrf: <ModuleWrapper name="CSRF Lab"><LazyCSRFLab /></ModuleWrapper>,
-  auth: <ModuleWrapper name="Auth Lab"><LazyAuthSecurityLab /></ModuleWrapper>,
-  'secure-coding': <ModuleWrapper name="Secure Coding Lab"><LazySecureCodingLab /></ModuleWrapper>,
-  tools: <ModuleWrapper name="Tools Lab"><LazyToolsLab /></ModuleWrapper>,
-  'security-headers': <ModuleWrapper name="Security Headers Lab"><LazySecurityHeadersLab /></ModuleWrapper>,
-  idor: <ModuleWrapper name="IDOR Lab"><LazyIDORLab /></ModuleWrapper>,
-  ssrf: <ModuleWrapper name="SSRF Lab"><LazySSRFLab /></ModuleWrapper>,
+  owasp: <ModuleWrapper name="OWASP Top 10" pageId="owasp"><LazyOWASPTop10 /></ModuleWrapper>,
+  'sql-injection': <ModuleWrapper name="SQL Injection Lab" pageId="sql-injection"><LazySQLInjectionLab /></ModuleWrapper>,
+  xss: <ModuleWrapper name="XSS Lab" pageId="xss"><LazyXSSLab /></ModuleWrapper>,
+  csrf: <ModuleWrapper name="CSRF Lab" pageId="csrf"><LazyCSRFLab /></ModuleWrapper>,
+  auth: <ModuleWrapper name="Auth Lab" pageId="auth"><LazyAuthSecurityLab /></ModuleWrapper>,
+  'secure-coding': <ModuleWrapper name="Secure Coding Lab" pageId="secure-coding"><LazySecureCodingLab /></ModuleWrapper>,
+  tools: <ModuleWrapper name="Tools Lab" pageId="tools"><LazyToolsLab /></ModuleWrapper>,
+  'security-headers': <ModuleWrapper name="Security Headers Lab" pageId="security-headers"><LazySecurityHeadersLab /></ModuleWrapper>,
+  idor: <ModuleWrapper name="IDOR Lab" pageId="idor"><LazyIDORLab /></ModuleWrapper>,
+  ssrf: <ModuleWrapper name="SSRF Lab" pageId="ssrf"><LazySSRFLab /></ModuleWrapper>,
   quiz: <ModuleWrapper name="Quiz System"><LazyQuizSystem /></ModuleWrapper>,
   achievements: <ModuleWrapper name="Achievements"><LazyAchievementsGlossary /></ModuleWrapper>,
   profile: <ModuleWrapper name="Profile"><LazyProfilePage /></ModuleWrapper>,
