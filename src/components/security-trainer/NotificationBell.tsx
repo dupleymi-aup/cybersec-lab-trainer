@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNotificationStore, type Notification as NotifType } from '@/lib/notification-store';
 import {
-  Bell, BellOff, Check, Trash2, X, AlertTriangle, Trophy, BookOpen, Brain, Megaphone,
+  Bell, BellOff, Check, Trash2, X, AlertTriangle, Trophy, BookOpen, Brain, Megaphone, Clock,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,6 +14,7 @@ const ICON_MAP: Record<NotifType['type'], { icon: typeof Trophy; className: stri
   warning: { icon: AlertTriangle, className: 'text-red-500' },
   system: { icon: Bell, className: 'text-slate-500' },
   announcement: { icon: Megaphone, className: 'text-purple-500' },
+  deadline: { icon: Clock, className: 'text-orange-500' },
 };
 
 function formatTime(ts: number): string {

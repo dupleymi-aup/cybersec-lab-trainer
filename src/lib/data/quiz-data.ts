@@ -2019,6 +2019,514 @@ export const quizQuestions: QuizQuestion[] = [
     explanation:
       'Принцип авторитета (Authority) — один из 6 принципов влияния Cialdini. Люди склонны подчиняться авторитетам без критического анализа. SE-атаки часто используют: форму IT-специалиста, бейдж «руководителя», юридический жаргон, поддельные письма от «CEO». Пример: CEO Fraud. Защита: процедура верификации запросов от «руководства», обучение о принципе авторитета.',
   },
+  // --- API Security Questions ---
+  {
+    id: 'api-1',
+    category: 'Безопасность API',
+    difficulty: 'easy',
+    question: 'Что такое BOLA (Broken Object Level Authorization) в контексте API Security?',
+    options: [
+      'Отсутствие шифрования API-запросов',
+      'Когда API не проверяет, что пользователь имеет права на доступ к запрошенному объекту',
+      'Слишком частые запросы к API',
+      'Отсутствие документации API',
+    ],
+    correctIndex: 1,
+    explanation:
+      'BOLA (также IDOR для API) — #1 в OWASP API Security Top 10. API эндпоинт принимает ID объекта, но не проверяет авторизацию. Пример: GET /api/orders/123 возвращает заказ любого пользователя. Защита: проверять ownership объекта, использовать GUID вместо sequential IDs, middleware авторизации.',
+  },
+  {
+    id: 'api-2',
+    category: 'Безопасность API',
+    difficulty: 'easy',
+    question: 'Что такое BFLA (Broken Function Level Authorization)?',
+    options: [
+      'Пользователь может получить доступ к данным другого пользователя',
+      'Пользователь может выполнять функции, которые ему не разрешены (например, административные)',
+      'API не ограничивает частоту запросов',
+      'API возвращает слишком много данных',
+    ],
+    correctIndex: 1,
+    explanation:
+      'BFLA возникает, когда API позволяет пользователям выполнять операции, которые им не разрешены. Например, обычный пользователь вызывает DELETE /api/users/5 (административная функция). Защита: RBAC middleware для каждого эндпоинта, не полагаться на скрытие эндпоинтов из UI.',
+  },
+  {
+    id: 'api-3',
+    category: 'Безопасность API',
+    difficulty: 'medium',
+    question: 'Что такое Mass Assignment уязвимость?',
+    options: [
+      'Присваивание нескольких переменных в одной строке',
+      'Когда API принимает весь JSON body и передаёт его напрямую в БД, позволяя изменять любые поля',
+      'Массовая регистрация пользователей',
+      'Автоматическое назначение ролей',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Mass Assignment: пользователь отправляет {"name":"John","role":"admin"} при обновлении профиля, и API сохраняет поле role. Защита: использовать allowlist разрешённых полей для каждого эндпоинта, DTO для сериализации.',
+  },
+  {
+    id: 'api-4',
+    category: 'Безопасность API',
+    difficulty: 'medium',
+    question: 'Почему SSRF особенно опасен в облачных средах?',
+    options: [
+      'Облачные серверы медленнее',
+      'Через SSRF можно получить доступ к metadata service (169.254.169.254) и получить IAM-учётные данные',
+      'Облачные API не используют HTTPS',
+      'SSRF работает только в AWS',
+    ],
+    correctIndex: 1,
+    explanation:
+      'В облачных средах (AWS, GCP, Azure) каждый инстанс имеет metadata service на 169.254.169.254. Через SSRF можно получить IAM credentials, конфигурацию, user data. Это может привести к полной компрометации аккаунта.',
+  },
+  {
+    id: 'api-5',
+    category: 'Безопасность API',
+    difficulty: 'easy',
+    question: 'Что такое Rate Limiting и зачем он нужен?',
+    options: [
+      'Ограничение размера ответа API',
+      'Ограничение количества запросов от одного клиента за определённый период',
+      'Ограничение скорости интернета',
+      'Ограничение числа пользователей',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Rate Limiting ограничивает количество запросов (например, 5 попыток входа за 15 минут). Защищает от брутфорса, credential stuffing, DoS. Реализуется через express-rate-limit, Redis-based counters, API Gateway quotas.',
+  },
+  {
+    id: 'api-6',
+    category: 'Безопасность API',
+    difficulty: 'hard',
+    question: 'Как обойти простую чёрный список IP для SSRF-защиты?',
+    options: [
+      'Нельзя обойти чёрный список',
+      'Через DNS rebinding, decimal IP (2130706433 = 127.0.0.1), IPv6 localhost [::1], 0.0.0.0',
+      'Только через прокси',
+      'Через модификацию HTTP-заголовков',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Чёрные списки легко обойти: 0.0.0.0 → 127.0.0.1, 2130706433 (decimal) → 127.0.0.1, 127.0.0.1.nip.io → DNS rebinding, [::1] → IPv6 localhost. Правильная защита: allowlist доменов + DNS resolution + проверка IP после resolution.',
+  },
+  {
+    id: 'api-7',
+    category: 'Безопасность API',
+    difficulty: 'medium',
+    question: 'Что такое Shadow API?',
+    options: [
+      'API, работающий в тёмном режиме',
+      'Недокументированные API-эндпоинты, созданные без ведома security-команды',
+      'API, использующий шифрование',
+      'Анонимный API',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Shadow API — эндпоинты, не задокументированные в OpenAPI/Swagger, не прошедшие security review. Часто создаются разработчиками для быстрого решения задач. Могут содержать уязвимости. Защита: полный реестр API, автоматическое обнаружение, API Gateway.',
+  },
+  {
+    id: 'api-8',
+    category: 'Безопасность API',
+    difficulty: 'hard',
+    question: 'Почему алгоритм "none" в JWT опасен?',
+    options: [
+      'Он слишком медленный',
+      'Злоумышленник может создать токен без подписи, и сервер примет его',
+      'Он не поддерживает шифрование',
+      'Он работает только в development',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Algorithm none attack: злоумышленник создаёт JWT с header {"alg":"none"} и пустой подписью. Если сервер не проверяет алгоритм, он примет токен без верификации. Защита: явно указывать algorithms: ["HS256"] при верификации, reject unknown algorithms.',
+  },
+  {
+    id: 'api-9',
+    category: 'Безопасность API',
+    difficulty: 'medium',
+    question: 'Что такое CORS и почему небезопасная конфигурация опасна?',
+    options: [
+      'CORS — это система аутентификации',
+      'CORS контролирует кросс-доменные запросы; origin: "*" с credentials: true позволяет любому сайту делать авторизованные запросы',
+      'CORS шифрует данные',
+      'CORS нужен только для WebSocket',
+    ],
+    correctIndex: 1,
+    explanation:
+      'CORS (Cross-Origin Resource Sharing) контролирует запросы между доменами. origin: "*" с credentials: true — опасная комбинация, позволяющая любому сайту делать запросы с куками. Защита: конкретный список разрешённых доменов, минимальные методы.',
+  },
+  {
+    id: 'api-10',
+    category: 'Безопасность API',
+    difficulty: 'easy',
+    question: 'Что такое "Zombie API"?',
+    options: [
+      'API, который медленно работает',
+      'Старые версии API, которые забыли отключить и которые могут содержать известные уязвимости',
+      'API без документации',
+      'API, который часто падает',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Zombie API — старые версии API (v1, v2), которые продолжают работать после выпуска новых версий. Часто не получают патчей безопасности, не имеют MFA, rate limiting. Защита: sunset header, план декомиссии, мониторинг использования.',
+  },
+  {
+    id: 'api-11',
+    category: 'Безопасность API',
+    difficulty: 'hard',
+    question: 'Что такое GraphQL Introspection и почему его нужно отключать в production?',
+    options: [
+      'Это система мониторинга GraphQL',
+      'Возможность запросить полную схему API (__schema), что раскрывает все эндпоинты, типы и мутации злоумышленнику',
+      'Это метод оптимизации запросов',
+      'Это система аутентификации',
+    ],
+    correctIndex: 1,
+    explanation:
+      'GraphQL introspection позволяет запросить полную схему через __schema и __type. Злоумышленник использует это для reconnaissance: найти скрытые мутации, sensitive поля, admin endpoints. Защита: отключить introspection в production, persisted queries, depth limiting.',
+  },
+  {
+    id: 'api-12',
+    category: 'Безопасность API',
+    difficulty: 'medium',
+    question: 'Какой HTTP-заголовок используется для информирования о депрекации API?',
+    options: ['X-Deprecated', 'Deprecation', 'Sunset-Header', 'X-API-Version'],
+    correctIndex: 1,
+    explanation:
+      'Заголовок Deprecation: true указывает клиенту, что эндпоинт будет удалён. Sunset: 2024-01-01T00:00:00Z указывает дату удаления. Link: </api/v2>; rel="successor-version" указывает новую версию. Это помогает клиентам мигрировать.',
+  },
+  {
+    id: 'api-13',
+    category: 'Безопасность API',
+    difficulty: 'hard',
+    question: 'Что такое API Quota Management?',
+    options: [
+      'Система подсчёта запросов для billing',
+      'Ограничение общего числа запросов для API-ключа/пользователя за период (день/месяц)',
+      'Система кеширования API',
+      'Метод аутентификации API',
+    ],
+    correctIndex: 1,
+    explanation:
+      'API Quotas ограничивают общее число запросов за более длительный период (в отличие от rate limiting). Например, 10,000 запросов/день для free tier, 1,000,000 для enterprise. Защита от excessive consumption, billing abuse, resource exhaustion.',
+  },
+  {
+    id: 'api-14',
+    category: 'Безопасность API',
+    difficulty: 'medium',
+    question: 'Почему API-ключи нельзя хранить в клиентском коде?',
+    options: [
+      'Они слишком длинные',
+      'Клиентский код виден всем — злоумышленник может извлечь ключ и использовать его',
+      'Ключи не работают на клиенте',
+      'Ключи нужно обновлять каждый час',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Любой код, выполняемый в браузере, виден пользователю. API-ключи в JS-коде можно найти через DevTools. Защита: серверный прокси — клиент делает запрос к вашему серверу, сервер добавляет API-ключ и forwarding к внешнему API.',
+  },
+  {
+    id: 'api-15',
+    category: 'Безопасность API',
+    difficulty: 'medium',
+    question: 'Что такое GraphQL Query Depth Attack?',
+    options: [
+      'Атака через глубокие ссылки',
+      'Рекурсивный GraphQL-запрос с большой глубиной вложенности, потребляющий ресурсы сервера',
+      'Атака через глубокие пагинации',
+      'Внедрение кода в GraphQL-запрос',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Query Depth Attack: злоумышленник отправляет запрос с глубиной вложенности 100+ (user { friends { friends { friends {...} } } }). Каждый уровень умножает количество записей, вызывая DoS. Защита: depth limiting (graphql-depth-limit), complexity analysis, query timeout.',
+  },
+  // --- IDOR Questions ---
+  {
+    id: 'idor-1',
+    category: 'IDOR-атаки',
+    difficulty: 'easy',
+    question: 'Что такое IDOR (Insecure Direct Object Reference)?',
+    options: [
+      'Прямая ссылка на внешний ресурс',
+      'Когда пользователь может получить доступ к чужим данным, изменив идентификатор объекта в URL или параметрах запроса',
+      'Небезопасная прямая загрузка файлов',
+      'Отсутствие защиты от XSS',
+    ],
+    correctIndex: 1,
+    explanation:
+      'IDOR возникает, когда приложение использует идентификатор объекта (например, /api/orders/123) без проверки, имеет ли текущий пользователь права на этот объект. Изменив 123 на 124, можно получить доступ к чужим данным.',
+  },
+  {
+    id: 'idor-2',
+    category: 'IDOR-атаки',
+    difficulty: 'easy',
+    question: 'Какой метод лучше всего защищает от IDOR?',
+    options: [
+      'Использование GUID вместо sequential ID',
+      'Проверка авторизации (ownership) на сервере для каждого запроса',
+      'Шифрование URL',
+      'Скрытие URL от пользователя',
+    ],
+    correctIndex: 1,
+    explanation:
+      'GUID усложняет угадывание ID, но не заменяет проверку авторизации. Единственная надёжная защита — проверять на сервере, что текущий пользователь владеет запрошенным объектом: if (order.userId !== req.user.id) return 403.',
+  },
+  {
+    id: 'idor-3',
+    category: 'IDOR-атаки',
+    difficulty: 'medium',
+    question: 'Почему использование GUID не является достаточной защитой от IDOR?',
+    options: [
+      'GUID легко угадать',
+      'GUID не защищает от доступа к данным, если злоумышленник каким-то образом узнал GUID другого пользователя',
+      'GUID замедляет базу данных',
+      'GUID не поддерживает индексы',
+    ],
+    correctIndex: 1,
+    explanation:
+      'GUID только усложняет перебор ID (security through obscurity). Но если злоумышленник получил GUID через лог, референр или другую уязвимость, он всё равно получит доступ. Настоящая защита — серверная проверка авторизации.',
+  },
+  {
+    id: 'idor-4',
+    category: 'IDOR-атаки',
+    difficulty: 'medium',
+    question: 'Какой тип IDOR позволяет изменять данные другого пользователя?',
+    options: [
+      'Read IDOR — чтение данных',
+      'Write IDOR — изменение/удаление данных через PUT/PATCH/DELETE',
+      'Reflected IDOR',
+      'Stored IDOR',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Write IDOR позволяет не только читать, но и изменять/удалять чужие данные. Например, PUT /api/users/123/profile с телом {"role":"admin"}. Это ещё опаснее Read IDOR, так как приводит к модификации данных.',
+  },
+  {
+    id: 'idor-5',
+    category: 'IDOR-атаки',
+    difficulty: 'hard',
+    question: 'Что такое «Indirect IDOR» (косвенный IDOR)?',
+    options: [
+      'IDOR через редирект',
+      'Когда ID объекта передаётся не в URL, а в теле запроса или заголовке, и проверка авторизации отсутствует',
+      'IDOR через cookie',
+      'IDOR через JavaScript',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Indirect IDOR: идентификатор передаётся в POST-теле, JSON body или HTTP-заголовке. Например: {"targetUserId": "123", "action": "grantAccess"}. Многие разработчики проверяют авторизацию для URL-параметров, но забывают про body-параметры.',
+  },
+  {
+    id: 'idor-6',
+    category: 'IDOR-атаки',
+    difficulty: 'medium',
+    question: 'Как IDOR связан с OWASP Top 10?',
+    options: [
+      'IDOR — это A01:2021 Broken Access Control',
+      'IDOR — это A03:2021 Injection',
+      'IDOR — это A07:2021 Identification and Authentication Failures',
+      'IDOR не входит в OWASP Top 10',
+    ],
+    correctIndex: 0,
+    explanation:
+      'IDOR является частным случаем A01:2021 — Broken Access Control. Это самая распространённая уязвимость в OWASP Top 10 2021 года. В API Security Top 10 он известен как BOLA (Broken Object Level Authorization) и занимает #1.',
+  },
+  {
+    id: 'idor-7',
+    category: 'IDOR-атаки',
+    difficulty: 'hard',
+    question: 'Какой паттерн middleware наиболее эффективен для предотвращения IDOR?',
+    options: [
+      'Глобальный auth middleware для всех маршрутов',
+      'Resource-level ownership middleware: проверка принадлежности ресурса к текущему пользователю',
+      'Rate limiting middleware',
+      'CORS middleware',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Resource-level ownership: для каждого эндпоинта middleware загружает ресурс и проверяет resource.userId === req.user.id. Это можно реализовать как reusable middleware: checkOwnership(Order), checkOwnership(Document). Универсальный auth middleware проверяет только наличие токена, но не ownership.',
+  },
+  {
+    id: 'idor-8',
+    category: 'IDOR-атаки',
+    difficulty: 'easy',
+    question: 'Какой HTTP-статус должен возвращаться при попытке IDOR?',
+    options: ['200 OK', '401 Unauthorized', '403 Forbidden', '404 Not Found'],
+    correctIndex: 2,
+    explanation:
+      '403 Forbidden — пользователь аутентифицирован, но не имеет прав на этот ресурс. Некоторые API возвращают 404 Not Found, чтобы не раскрывать существование ресурса. Никогда не возвращайте 200 с данными другого пользователя!',
+  },
+  {
+    id: 'idor-9',
+    category: 'IDOR-атаки',
+    difficulty: 'medium',
+    question: 'Как автоматизировать тестирование на IDOR?',
+    options: [
+      'Только ручное тестирование',
+      'Создать тесты: пользователь A запрашивает ресурсы пользователя B — должен получить 403',
+      'Использовать только сканеры уязвимостей',
+      'IDOR невозможно тестировать автоматически',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Автоматические IDOR-тесты: создать двух пользователей, получить ресурс A, затем запросить его от имени B. Ожидается 403. Такие тесты должны быть в CI/CD для каждого нового эндпоинта. Инструменты: Burp Suite Autorize, OWASP ZAP, кастомные integration tests.',
+  },
+  {
+    id: 'idor-10',
+    category: 'IDOR-атаки',
+    difficulty: 'hard',
+    question: 'Что такое IDOR через массовые операции (Bulk Operations)?',
+    options: [
+      'IDOR при загрузке файлов',
+      'Когда API принимает массив ID и не проверяет авторизацию для каждого элемента',
+      'IDOR через GraphQL batch',
+      'IDOR при экспорте данных',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Bulk IDOR: POST /api/documents/delete {ids: [1, 2, 3, 4, 5]}. Если сервер не проверяет ownership для каждого ID, пользователь может удалить чужие документы. Защита: проверять каждый ID в массиве, возвращать частичный результат с ошибками для unauthorized IDs.',
+  },
+  // --- SSRF Questions ---
+  {
+    id: 'ssrf-1',
+    category: 'SSRF-атаки',
+    difficulty: 'easy',
+    question: 'Что такое SSRF (Server-Side Request Forgery)?',
+    options: [
+      'Атака на клиентский JavaScript',
+      'Когда злоумышленник заставляет сервер сделать HTTP-запрос к указанному URL',
+      'Подмена серверных куки',
+      'Атака на DNS-сервер',
+    ],
+    correctIndex: 1,
+    explanation:
+      'SSRF позволяет злоумышленнику указать серверу сделать запрос к любому URL. Сервер выступает как «прокси». Это особенно опасно в облачных средах, где можно получить доступ к metadata service (169.254.169.254) и получить IAM credentials.',
+  },
+  {
+    id: 'ssrf-2',
+    category: 'SSRF-атаки',
+    difficulty: 'easy',
+    question: 'Какой IP-адрес используется для получения метаданных AWS EC2?',
+    options: ['192.168.0.1', '10.0.0.1', '169.254.169.254', '127.0.0.1'],
+    correctIndex: 2,
+    explanation:
+      '169.254.169.254 — link-local адрес AWS EC2 metadata service. Через него можно получить IAM credentials, конфигурацию инстанса, user data. SSRF, направленный на этот адрес, может привести к полной компрометации AWS-аккаунта.',
+  },
+  {
+    id: 'ssrf-3',
+    category: 'SSRF-атаки',
+    difficulty: 'medium',
+    question: 'Как обойти простую чёрный список IP-адресов для SSRF?',
+    options: [
+      'Нельзя обойти',
+      'Через DNS rebinding, decimal IP (2130706433 = 127.0.0.1), IPv6 [::1], 0.0.0.0',
+      'Через модификацию заголовков',
+      'Только через прокси',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Чёрные списки легко обойти: 0.0.0.0 → 127.0.0.1, 2130706433 (decimal) → 127.0.0.1, [::1] → IPv6 localhost, 127.0.0.1.nip.io → DNS rebinding. Правильная защита: allowlist доменов + DNS resolution + проверка IP после resolution.',
+  },
+  {
+    id: 'ssrf-4',
+    category: 'SSRF-атаки',
+    difficulty: 'medium',
+    question: 'Почему SSRF опасен в микросервисной архитектуре?',
+    options: [
+      'Микросервисы не используют HTTPS',
+      'SSRF позволяет получить доступ к внутренним сервисам, не доступным из интернета',
+      'Микросервисы не имеют аутентификации',
+      'SSRF работает только с монолитами',
+    ],
+    correctIndex: 1,
+    explanation:
+      'В микросервисной архитектуре внутренние сервисы (базы данных, кэши, admin panels) обычно доступны только из внутренней сети. SSRF на публичном API может дать доступ к этим внутренним сервисам через внутренние IP (10.0.x.x, 172.16.x.x).',
+  },
+  {
+    id: 'ssrf-5',
+    category: 'SSRF-атаки',
+    difficulty: 'hard',
+    question: 'Что такое Blind SSRF?',
+    options: [
+      'SSRF без использования HTTP',
+      'Когда сервер делает запрос, но ответ не возвращается клиенту — атака определяется по поведению (time-based, DNS interaction)',
+      'SSRF через WebSocket',
+      'SSRF только для внутренних IP',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Blind SSRF: сервер делает запрос, но ответ не показывается пользователю. Определение: (1) Time-based — если сервер запрашивает внешний URL, замерить время ответа. (2) DNS interaction — использовать DNS-сервис (Burp Collaborator) для получения callback. (3) HTTP callback — запрос к контролируемому серверу.',
+  },
+  {
+    id: 'ssrf-6',
+    category: 'SSRF-атаки',
+    difficulty: 'medium',
+    question: 'Какой протокол может быть использован для SSRF помимо HTTP?',
+    options: ['Только HTTP/HTTPS', 'FTP, Gopher, Dict, File, Redis — зависит от HTTP-клиента сервера', 'Только WebSocket', 'Только TCP'],
+    correctIndex: 1,
+    explanation:
+      'Многие HTTP-клиенты поддерживают другие протоколы: file:///etc/passwd (чтение файлов), gopher:// (произвольные TCP-соединения), dict:// (отправка команд Redis/Memcached). Защита: разрешать только http/https протоколы.',
+  },
+  {
+    id: 'ssrf-7',
+    category: 'SSRF-атаки',
+    difficulty: 'hard',
+    question: 'Как защититься от SSRF через редиректы?',
+    options: [
+      'Отключить редиректы полностью',
+      'Валидировать URL после каждого редиректа или отключить автоматические редиректы',
+      'Разрешить только GET-запросы',
+      'Использовать только HTTPS',
+    ],
+    correctIndex: 1,
+    explanation:
+      'SSRF через редирект: сервер валидирует initial URL (внешний), но после редиректа (302) идёт на внутренний IP. Защита: (1) отключить автоматические редиректы (followRedirect: false), (2) валидировать Location header перед переходом, (3) проверять IP после каждого редиректа.',
+  },
+  {
+    id: 'ssrf-8',
+    category: 'SSRF-атаки',
+    difficulty: 'medium',
+    question: 'Какой диапазон IP считается приватным и должен быть заблокирован?',
+    options: [
+      'Только 127.0.0.1',
+      '10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 127.0.0.0/8, 169.254.0.0/16, 0.0.0.0',
+      'Только 192.168.x.x',
+      'Только localhost',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Все приватные диапазоны: 10.0.0.0/8 (Class A private), 172.16.0.0/12 (Class B private), 192.168.0.0/16 (Class C private), 127.0.0.0/8 (loopback), 169.254.0.0/16 (link-local, cloud metadata), 0.0.0.0 (all interfaces).',
+  },
+  {
+    id: 'ssrf-9',
+    category: 'SSRF-атаки',
+    difficulty: 'hard',
+    question: 'Как SSRF может быть использован для сканирования внутренней сети?',
+    options: [
+      'SSRF не позволяет сканировать',
+      'Отправляя запросы к разным внутренним IP и анализируя ответы/таймауты/ошибки',
+      'Через DNS-туннель',
+      'Только через ICMP',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Network scanning via SSRF: последовательные запросы к 10.0.0.1, 10.0.0.2... Разные ответы указывают на разные сервисы: 200 — веб-сервер, connection refused — нет сервиса, timeout — файрвол. Это позволяет составить карту внутренней сети.',
+  },
+  {
+    id: 'ssrf-10',
+    category: 'SSRF-атаки',
+    difficulty: 'medium',
+    question: 'Какой заголовок может раскрыть внутреннюю информацию при SSRF?',
+    options: [
+      'User-Agent',
+      'Server, X-Powered-By, X-Internal-Debug, X-Forwarded-For в ответе от внутреннего сервиса',
+      'Content-Type',
+      'Accept-Encoding',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Ответы от внутренних сервисов могут содержать чувствительные заголовки: Server: InternalAPI/2.1, X-Powered-By: Express, X-Internal-Debug: true, X-Forwarded-For: 10.0.0.5. Эта информация помогает злоумышленнику понять архитектуру.',
+  },
 ];
 
 export const quizCategories = [
@@ -2031,4 +2539,7 @@ export const quizCategories = [
   { id: 'coding', name: 'Безопасное кодирование', icon: 'Code', count: 10 },
   { id: 'network', name: 'Сетевые атаки', icon: 'Globe', count: 20 },
   { id: 'social', name: 'Социальная инженерия', icon: 'Users', count: 20 },
+  { id: 'api', name: 'Безопасность API', icon: 'ShieldAlert', count: 15 },
+  { id: 'idor', name: 'IDOR-атаки', icon: 'Eye', count: 10 },
+  { id: 'ssrf', name: 'SSRF-атаки', icon: 'Globe', count: 10 },
 ];

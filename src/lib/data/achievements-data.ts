@@ -124,6 +124,24 @@ export const achievements = [
     description: 'Правильно ответьте на все вопросы квиза Security Headers.',
     condition: 'Наберите 100% в квизе Security Headers',
   },
+  {
+    id: 'api-guardian',
+    title: 'Страж API',
+    description: 'Изучите все 10 тем модуля «Безопасность API».',
+    condition: 'Пройдите модуль Безопасность API',
+  },
+  {
+    id: 'idor-detective',
+    title: 'IDOR-детектив',
+    description: 'Пройдите квиз по IDOR-атакам на 80%+.',
+    condition: 'Наберите 80%+ в квизе IDOR',
+  },
+  {
+    id: 'ssrf-hunter',
+    title: 'SSRF-охотник',
+    description: 'Пройдите квиз по SSRF-атакам на 80%+.',
+    condition: 'Наберите 80%+ в квизе SSRF',
+  },
 ];
 
 /**
@@ -158,6 +176,9 @@ export function isAchievementUnlocked(
     case 'network-ninja': return (quizScores['network'] || 0) >= 80;
     case 'social-engineer': return (quizScores['social'] || 0) >= 80;
     case 'all-headers-correct': return (quizScores['headers'] || 0) === 100;
+    case 'api-guardian': return completedModules.includes('api-security');
+    case 'idor-detective': return (quizScores['idor'] || 0) >= 80;
+    case 'ssrf-hunter': return (quizScores['ssrf'] || 0) >= 80;
     default: return false;
   }
 }

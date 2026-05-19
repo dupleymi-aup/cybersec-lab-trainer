@@ -46,6 +46,17 @@ import {
 import type { PageType } from '@/lib/store';
 import type { Announcement } from '@/lib/auth-types';
 
+interface UpcomingDeadline {
+  id: string;
+  scope: string;
+  scopeId: string;
+  dueAt: string;
+  title: string;
+  description: string;
+  daysLeft: number;
+  isOverdue: boolean;
+}
+
 const iconMap: Record<string, React.ReactNode> = {
   Shield: <Shield size={28} />,
   ShieldCheck: <ShieldCheck size={28} />,
@@ -115,6 +126,7 @@ export default function Dashboard() {
   const { user } = useAuthStore();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set());
+  const [upcomingDeadlines, setUpcomingDeadlines] = useState<UpcomingDeadline[]>([]);
   useEffect(() => {
     setAnnouncements(loadActiveAnnouncements());
     loadAnnouncementsIntoNotifications();
@@ -123,6 +135,24 @@ export default function Dashboard() {
       loadAnnouncementsIntoNotifications();
     }, 60000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Fetch upcoming deadlines on mount
+  useEffect(() => {
+    fetch('/api/deadlines/upcoming')
+      .then(r => r.json())
+      .then(data => {
+        if (data.upcoming) {
+          setUpcomingDeadlines(data.upcoming);
+          // Create in-app notifications for overdue or imminent deadlines
+          for (const d of data.upcoming) {
+            if (d.daysLeft <= 2) {
+              NotificationHelper.deadlineWarning(d.title, d.daysLeft);
+            }
+          }
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const dismissAnnouncement = (id: string) => {
@@ -211,6 +241,14 @@ export default function Dashboard() {
       return { text: 'Посмотрите аналитику и прогресс студентов.', page: 'teacher-panel' as PageType };
     }
 
+    // Streak-based recommendations
+    if (streakData.current >= 7) {
+      return { text: `Отличная серия — ${streakData.current} дней подряд! Продолжайте и открывайте новые достижения.`, page: 'achievements' as PageType };
+    }
+    if (streakData.current === 0 && streakData.daysSinceLast >= 3) {
+      return { text: `Вы не занимались ${streakData.daysSinceLast} дн. Вернитесь к обучению — серия ждёт!`, page: modules.find((m) => !completedModules.includes(m.id))?.id as PageType || 'quiz' as PageType };
+    }
+
     if (completedModules.length === 0) {
       return { text: 'Начните с OWASP Top 10 — это фундамент веб-безопасности.', page: 'owasp' as PageType };
     }
@@ -235,8 +273,11 @@ export default function Dashboard() {
     if (!completedModules.includes('tools')) {
       return { text: 'Попробуйте инструменты: шифры, кодирование и генератор паролей.', page: 'tools' as PageType };
     }
-    if (Object.keys(quizScores).length < 9) {
-      return { text: 'Проверьте свои знания в квизах — 9 категорий с фильтрацией по сложности!', page: 'quiz' as PageType };
+    if (!completedModules.includes('api-security')) {
+      return { text: 'Изучите OWASP API Security Top 10 — уязвимости современных API.', page: 'api-security' as PageType };
+    }
+    if (Object.keys(quizScores).length < 11) {
+      return { text: 'Проверьте свои знания в квизах — 11 категорий с фильтрацией по сложности!', page: 'quiz' as PageType };
     }
     if (totalProgress < 100) {
       return { text: 'Завершите оставшиеся модули для полного прохождения!', page: modules.find((m) => !completedModules.includes(m.id))?.id as PageType || 'dashboard' as PageType };
@@ -246,7 +287,7 @@ export default function Dashboard() {
 
   const proficiency = getProficiencyLevel(completedCount, totalModules, avgQuizScore);
 
-  // Build activity timeline from store data
+  // Build activity timeline from store data (needed by recommendation engine)
   const activityTimeline = useMemo(() => {
     const events: Array<{ date: Date; type: 'module' | 'quiz'; label: string }> = [];
     for (const [moduleId, ts] of Object.entries(moduleTimestamps)) {
@@ -260,6 +301,69 @@ export default function Dashboard() {
     }
     events.sort((a, b) => b.date.getTime() - a.date.getTime());
     return events;
+  }, [moduleTimestamps, quizTimestamps]);
+
+  // Calculate current and longest streak from activity timestamps
+  const streakData = useMemo(() => {
+    const allDates = new Set<string>();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Collect all unique activity dates (YYYY-MM-DD)
+    for (const ts of Object.values(moduleTimestamps)) {
+      const d = new Date(ts);
+      d.setHours(0, 0, 0, 0);
+      allDates.add(d.toISOString().split('T')[0]);
+    }
+    for (const ts of Object.values(quizTimestamps)) {
+      const d = new Date(ts);
+      d.setHours(0, 0, 0, 0);
+      allDates.add(d.toISOString().split('T')[0]);
+    }
+
+    if (allDates.size === 0) return { current: 0, longest: 0, isToday: false, daysSinceLast: 999 };
+
+    // Current streak: count consecutive days starting from today (or yesterday if today has no activity)
+    let current = 0;
+    const todayStr = today.toISOString().split('T')[0];
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    let checkDate = allDates.has(todayStr) ? today : allDates.has(yesterdayStr) ? yesterday : null;
+    if (checkDate) {
+      while (checkDate) {
+        const dateStr = checkDate.toISOString().split('T')[0];
+        if (allDates.has(dateStr)) {
+          current++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+    }
+
+    // Longest streak: find the longest consecutive sequence
+    let longest = 0;
+    let currentLongest = 0;
+    const sortedAsc = Array.from(allDates).sort();
+    for (let i = 0; i < sortedAsc.length; i++) {
+      if (i === 0) {
+        currentLongest = 1;
+      } else {
+        const prev = new Date(sortedAsc[i - 1]);
+        const curr = new Date(sortedAsc[i]);
+        const diff = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
+        currentLongest = diff === 1 ? currentLongest + 1 : 1;
+      }
+      longest = Math.max(longest, currentLongest);
+    }
+
+    // Days since last activity
+    const lastDate = new Date(sortedAsc[sortedAsc.length - 1]);
+    const daysSinceLast = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    return { current, longest: Math.max(longest, current), isToday: allDates.has(todayStr), daysSinceLast };
   }, [moduleTimestamps, quizTimestamps]);
 
   const recommendation = getRecommendation();
@@ -388,13 +492,92 @@ export default function Dashboard() {
       {/* Activity Calendar */}
       <ActivityCalendar />
 
+      {/* Upcoming Deadlines */}
+      {upcomingDeadlines.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border-none shadow-sm bg-white">
+            <CardContent className="p-5">
+              <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                <Clock size={16} className="text-orange-500" />
+                Предстоящие дедлайны
+              </h3>
+              <div className="space-y-3">
+                {upcomingDeadlines.map((deadline) => {
+                  const urgencyColor = deadline.isOverdue
+                    ? 'border-l-crimson-500 bg-red-50'
+                    : deadline.daysLeft <= 1
+                      ? 'border-l-red-500 bg-red-50'
+                      : deadline.daysLeft <= 3
+                        ? 'border-l-orange-500 bg-orange-50'
+                        : 'border-l-emerald-500 bg-emerald-50';
+
+                  const urgencyBadge = deadline.isOverdue
+                    ? <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">Просрочен</Badge>
+                    : deadline.daysLeft <= 1
+                      ? <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">{deadline.daysLeft === 0 ? 'Сегодня' : 'Завтра'}</Badge>
+                      : <Badge className="bg-orange-100 text-orange-700 border-0 text-[10px]">{deadline.daysLeft} дн.</Badge>;
+
+                  const scopeLabel = deadline.scope === 'course'
+                    ? 'Курс'
+                    : deadline.scope === 'module'
+                      ? modules.find(m => m.id === deadline.scopeId)?.title || deadline.scopeId
+                      : `Квиз: ${deadline.scopeId}`;
+
+                  const dueDate = new Date(deadline.dueAt).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'long',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  });
+
+                  const targetPage: PageType = deadline.scope === 'course'
+                    ? 'dashboard'
+                    : deadline.scope === 'module'
+                      ? deadline.scopeId as PageType
+                      : 'quiz';
+
+                  return (
+                    <div
+                      key={deadline.id}
+                      className={`rounded-lg border-l-4 ${urgencyColor} p-4 cursor-pointer hover:shadow-md transition-shadow`}
+                      onClick={() => setCurrentPage(targetPage)}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-sm font-semibold text-slate-800 truncate">{deadline.title}</p>
+                            {urgencyBadge}
+                          </div>
+                          <p className="text-xs text-slate-500">{scopeLabel}</p>
+                          {deadline.description && (
+                            <p className="text-xs text-slate-400 mt-1">{deadline.description}</p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-xs text-slate-500">{dueDate}</p>
+                          <ChevronRight size={14} className="text-slate-300 mt-1 ml-auto" />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         {[
           { label: 'Модули пройдены', value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
           { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/9`, color: 'text-amber-600' },
           { label: 'Средний балл', value: `${avgQuizScore}%`, color: 'text-sky-600' },
           { label: 'Достижения', value: `${unlockedAchievements.length}/${achievements.length}`, color: 'text-violet-600' },
+          { label: streakData.current > 0 ? 'Серия дней' : 'Нет серии', value: streakData.current > 0 ? `${streakData.current} дн.` : '—', color: 'text-orange-600', tooltip: streakData.longest > 0 ? `Лучшая серия: ${streakData.longest} дн.` : undefined },
           { label: 'Уровень', value: proficiency.label, color: proficiency.color },
         ].map((stat, i) => (
           <motion.div
@@ -405,8 +588,21 @@ export default function Dashboard() {
           >
             <Card className="border-none shadow-sm bg-white">
               <CardContent className="p-4 text-center">
-                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-xs text-slate-500 mt-1">{stat.label}</p>
+                {stat.label.includes('Серия') || stat.label.includes('Нет') ? (
+                  <>
+                    <Flame size={20} className={`mx-auto mb-1 ${streakData.current > 0 ? 'text-orange-500' : 'text-slate-300'}`} />
+                    <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                    {stat.tooltip && streakData.longest > 0 && (
+                      <p className="text-[10px] text-orange-500 mt-0.5">{stat.tooltip}</p>
+                    )}
+                    <p className="text-xs text-slate-500 mt-0.5">{stat.label}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+                    <p className="text-xs text-slate-500 mt-1">{stat.label}</p>
+                  </>
+                )}
               </CardContent>
             </Card>
           </motion.div>

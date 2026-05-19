@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
+
+  const { id } = params;
+  const existing = await prisma.deadline.findUnique({ where: { id } });
+  if (!existing) return NextResponse.json({ error: 'Deadline not found' }, { status: 404 });
+  if (existing.createdBy !== auth.id && auth.role !== 'admin') return forbidden();
+
+  const body = await request.json();
+  const { dueAt, title, description, group } = body;
+
+  const deadline = await prisma.deadline.update({
+    where: { id },
+    data: {
+      ...(dueAt && { dueAt: new Date(dueAt) }),
+      ...(title !== undefined && { title }),
+      ...(description !== undefined && { description }),
+      ...(group !== undefined && { group }),
+    },
+    include: {
+      creator: { select: { fullName: true } },
+    },
+  });
+
+  return NextResponse.json({ success: true, deadline });
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
+
+  const { id } = params;
+  const existing = await prisma.deadline.findUnique({ where: { id } });
+  if (!existing) return NextResponse.json({ error: 'Deadline not found' }, { status: 404 });
+  if (existing.createdBy !== auth.id && auth.role !== 'admin') return forbidden();
+
+  await prisma.deadline.delete({ where: { id } });
+  return NextResponse.json({ success: true });
+}

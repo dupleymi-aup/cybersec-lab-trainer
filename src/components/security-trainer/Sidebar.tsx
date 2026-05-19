@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useAppStore, type PageType } from '@/lib/store';
 import { useAuthStore, hasRole, type UserRole } from '@/lib/auth-store';
 import { modules } from '@/lib/data';
@@ -7,6 +8,7 @@ import {
   LayoutDashboard,
   Shield,
   ShieldCheck,
+  ShieldAlert,
   Database,
   FileText,
   Link,
@@ -14,6 +16,7 @@ import {
   Code,
   HelpCircle,
   KeyRound,
+  Key,
   Trophy,
   X,
   CheckCircle2,
@@ -21,6 +24,11 @@ import {
   LogOut,
   Settings,
   Users,
+  BookOpen,
+  TrendingUp,
+  Mail,
+  Target,
+  Clock,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Progress } from '@/components/ui/progress';
@@ -44,8 +52,14 @@ const iconMap: Record<string, React.ReactNode> = {
   KeyRound: <KeyRound size={20} />,
   Trophy: <Trophy size={20} />,
   ShieldCheck: <ShieldCheck size={20} />,
+  ShieldAlert: <ShieldAlert size={20} />,
+  Mail: <Mail size={20} />,
   Settings: <Settings size={20} />,
   Users: <Users size={20} />,
+  BookOpen: <BookOpen size={20} />,
+  Key: <Key size={20} />,
+  TrendingUp: <TrendingUp size={20} />,
+  Target: <Target size={20} />,
 };
 
 const navItems: { id: PageType; label: string; iconKey: string }[] = [
@@ -53,6 +67,10 @@ const navItems: { id: PageType; label: string; iconKey: string }[] = [
   ...modules.map((m) => ({ id: m.id as PageType, label: m.title, iconKey: m.icon })),
   { id: 'quiz', label: 'Квизы', iconKey: 'HelpCircle' },
   { id: 'achievements', label: 'Достижения', iconKey: 'Trophy' },
+  { id: 'cheat-sheets' as PageType, label: 'Шпаргалки', iconKey: 'BookOpen' },
+  { id: 'password-checker' as PageType, label: 'Проверка пароля', iconKey: 'Key' },
+  { id: 'leaderboard' as PageType, label: 'Рейтинг', iconKey: 'TrendingUp' },
+  { id: 'career-paths' as PageType, label: 'Карьерные пути', iconKey: 'Target' },
   { id: 'profile', label: 'Профиль', iconKey: 'User' },
 ];
 
@@ -76,6 +94,29 @@ export default function Sidebar() {
     ...navItems,
     ...roleNavItems.filter((item) => hasRole(user?.role, item.requiredRole)),
   ];
+
+  // Deadlines indicator: map moduleId -> daysLeft
+  const [deadlineMap, setDeadlineMap] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    fetch('/api/deadlines/upcoming')
+      .then(r => r.json())
+      .then(data => {
+        if (data.upcoming) {
+          const map: Record<string, number> = {};
+          for (const d of data.upcoming) {
+            if (d.scope === 'module' || d.scope === 'quiz') {
+              // Only show the most urgent deadline per item
+              if (!map[d.scopeId] || d.daysLeft < map[d.scopeId]) {
+                map[d.scopeId] = d.daysLeft;
+              }
+            }
+          }
+          setDeadlineMap(map);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Count trackable items (excluding dashboard, achievements, profile, and role panels)
   const trackableItems = visibleNavItems.filter(
@@ -160,6 +201,14 @@ export default function Sidebar() {
                 {iconMap[item.iconKey]}
               </span>
               <span className="flex-1">{item.label}</span>
+              {deadlineMap[item.id] !== undefined && (
+                <span className={`flex items-center gap-0.5 text-[10px] font-medium ${
+                  deadlineMap[item.id] <= 0 ? 'text-red-400' : deadlineMap[item.id] <= 2 ? 'text-orange-400' : 'text-amber-400'
+                }`}>
+                  <Clock size={11} />
+                  {deadlineMap[item.id] <= 0 ? '!' : deadlineMap[item.id]}
+                </span>
+              )}
               {isCompleted && !isRolePanel && (
                 <CheckCircle2 size={16} className="text-emerald-500" />
               )}

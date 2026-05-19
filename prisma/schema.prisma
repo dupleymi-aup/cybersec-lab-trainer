@@ -33,6 +33,8 @@ model User {
   loginActivities   LoginActivity[]
   quizAttempts      QuizAttempt[]
   progressSnapshots ProgressSnapshot[]
+  createdDeadlines  Deadline[]       @relation("DeadlineCreator")
+  reminderLogs      ReminderLog[]
 
   @@map("users")
 }
@@ -47,6 +49,7 @@ model Progress {
   sqlLevels              String   @default("")       @map("sql_levels")
   xssLevels              String   @default("")       @map("xss_levels")
   csrfSteps              String   @default("")       @map("csrf_steps")
+  csrfChallengeScores    String   @default("")       @map("csrf_challenge_scores")
   secureCodingAnswers    String   @default("")       @map("secure_coding_answers")
   secureCodingCorrectCount Int    @default(0)        @map("secure_coding_correct_count")
   studiedOwaspItems      String   @default("")       @map("studied_owasp_items")
@@ -126,4 +129,37 @@ model ProgressSnapshot {
 
   @@index([userId, recordedAt])
   @@map("progress_snapshots")
+}
+
+model Deadline {
+  id          String   @id @default(cuid())
+  scope       String   // "course" | "module" | "quiz"
+  scopeId     String   @map("scope_id")
+  dueAt       DateTime @map("due_at")
+  title       String
+  description String   @default("")
+  group       String   @default("")  // "" = all students
+  createdAt   DateTime @default(now()) @map("created_at")
+  createdBy   String   @map("created_by")
+  creator     User     @relation("DeadlineCreator", fields: [createdBy], references: [id])
+  reminderLog ReminderLog[]
+
+  @@index([scope, scopeId])
+  @@index([group])
+  @@index([dueAt])
+  @@map("deadlines")
+}
+
+model ReminderLog {
+  id         String   @id @default(cuid())
+  deadlineId String   @map("deadline_id")
+  deadline   Deadline @relation(fields: [deadlineId], references: [id], onDelete: Cascade)
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  type       String   // "email" | "in-app"
+  sentAt     DateTime @default(now()) @map("sent_at")
+
+  @@unique([deadlineId, userId, type])
+  @@index([userId])
+  @@map("reminder_logs")
 }

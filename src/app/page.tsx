@@ -17,7 +17,7 @@ import KeyboardShortcuts from '@/components/security-trainer/KeyboardShortcuts';
 import CompletionCelebration from '@/components/security-trainer/CompletionCelebration';
 import OfflineBanner from '@/components/security-trainer/OfflineBanner';
 
-const modulePageIds = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
+const modulePageIds = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf', 'api-security', 'phishing-analyzer', 'career-paths'];
 
 const ModuleWrapper = ({ name, children, pageId }: { name: string; children: React.ReactNode; pageId?: string }) => (
   <ErrorBoundary name={name}>
@@ -39,9 +39,15 @@ const LazyProfilePage = dynamic(() => import('@/components/security-trainer/Prof
 const LazySecurityHeadersLab = dynamic(() => import('@/components/security-trainer/SecurityHeadersLab'), { ssr: false });
 const LazyIDORLab = dynamic(() => import('@/components/security-trainer/IDORLab'), { ssr: false });
 const LazySSRFLab = dynamic(() => import('@/components/security-trainer/SSRFLab'), { ssr: false });
+const LazyAPISecurityLab = dynamic(() => import('@/components/security-trainer/APISecurityLab'), { ssr: false });
 const LazyTeacherPanel = dynamic(() => import('@/components/security-trainer/TeacherPanel'), { ssr: false });
 const LazyAdminPanel = dynamic(() => import('@/components/security-trainer/AdminPanel'), { ssr: false });
 const LazyRoleGuard = dynamic(() => import('@/components/security-trainer/RoleGuard'), { ssr: false });
+const LazySecurityCheatSheets = dynamic(() => import('@/components/security-trainer/SecurityCheatSheets'), { ssr: false });
+const LazyPasswordStrengthChecker = dynamic(() => import('@/components/security-trainer/PasswordStrengthChecker'), { ssr: false });
+const LazyLeaderboard = dynamic(() => import('@/components/security-trainer/Leaderboard'), { ssr: false });
+const LazyPhishingAnalyzer = dynamic(() => import('@/components/security-trainer/PhishingAnalyzer'), { ssr: false });
+const LazyCareerPaths = dynamic(() => import('@/components/security-trainer/CareerPaths'), { ssr: false });
 
 const pages: Record<string, React.ReactNode> = {
   dashboard: <ModuleWrapper name="Dashboard"><Dashboard /></ModuleWrapper>,
@@ -55,8 +61,13 @@ const pages: Record<string, React.ReactNode> = {
   'security-headers': <ModuleWrapper name="Security Headers Lab" pageId="security-headers"><LazySecurityHeadersLab /></ModuleWrapper>,
   idor: <ModuleWrapper name="IDOR Lab" pageId="idor"><LazyIDORLab /></ModuleWrapper>,
   ssrf: <ModuleWrapper name="SSRF Lab" pageId="ssrf"><LazySSRFLab /></ModuleWrapper>,
+  'api-security': <ModuleWrapper name="API Security Lab" pageId="api-security"><LazyAPISecurityLab /></ModuleWrapper>,
+  'phishing-analyzer': <ModuleWrapper name="Phishing Analyzer" pageId="phishing-analyzer"><LazyPhishingAnalyzer /></ModuleWrapper>,
+  'career-paths': <ModuleWrapper name="Career Paths" pageId="career-paths"><LazyCareerPaths /></ModuleWrapper>,
   quiz: <ModuleWrapper name="Quiz System"><LazyQuizSystem /></ModuleWrapper>,
   achievements: <ModuleWrapper name="Achievements"><LazyAchievementsGlossary /></ModuleWrapper>,
+  'cheat-sheets': <ModuleWrapper name="Cheat Sheets"><LazySecurityCheatSheets /></ModuleWrapper>,
+  'password-checker': <ModuleWrapper name="Password Checker"><LazyPasswordStrengthChecker /></ModuleWrapper>,
   profile: <ModuleWrapper name="Profile"><LazyProfilePage /></ModuleWrapper>,
   'teacher-panel': (
     <ModuleWrapper name="Teacher Panel">
@@ -68,6 +79,7 @@ const pages: Record<string, React.ReactNode> = {
       <LazyRoleGuard requiredRole="admin"><LazyAdminPanel /></LazyRoleGuard>
     </ModuleWrapper>
   ),
+  leaderboard: <ModuleWrapper name="Leaderboard"><LazyLeaderboard /></ModuleWrapper>,
 };
 
 export default function Home() {

@@ -33,6 +33,7 @@ const apiClient = {
     sqlLevels?: string[];
     xssLevels?: string[];
     csrfSteps?: number[];
+    csrfChallengeScores?: { id: number; correct: boolean }[];
     secureCodingAnswers?: number[];
     secureCodingCorrectCount?: number;
     studiedOwaspItems?: string[];
@@ -101,6 +102,7 @@ interface AppActions {
   addSqlLevel: (level: string) => void;
   addXssLevel: (level: string) => void;
   addCsrfStep: (step: number) => void;
+  addCsrfChallengeAnswer: (id: number, correct: boolean) => void;
   addSecureCodingAnswer: (idx: number) => void;
   removeSecureCodingAnswer: (idx: number) => void;
   setSecureCodingCorrectCount: (count: number) => void;
@@ -148,6 +150,7 @@ const syncWithDatabase = async (state: AppState, set: (partial: Partial<AppStore
       progress.push({
         moduleId: 'csrf',
         csrfSteps: state.csrfCompletedSteps,
+        csrfChallengeScores: state.csrfChallengeScores,
         completed: state.completedModules.includes('csrf'),
       });
     }
@@ -221,6 +224,7 @@ const loadFromDatabase = async (
           if (p.sqlLevels) updates.sqlCompletedLevels = p.sqlLevels;
           if (p.xssLevels) updates.xssCompletedLevels = p.xssLevels;
           if (p.csrfSteps) updates.csrfCompletedSteps = p.csrfSteps;
+          if (p.csrfChallengeScores) updates.csrfChallengeScores = p.csrfChallengeScores;
           if (p.secureCodingAnswers) updates.secureCodingAnsweredChallenges = p.secureCodingAnswers;
           if (p.secureCodingCorrectCount !== undefined) updates.secureCodingCorrectCount = p.secureCodingCorrectCount;
           if (p.studiedOwaspItems) updates.studiedOwaspItems = p.studiedOwaspItems;
@@ -254,11 +258,17 @@ export type PageType =
   | 'security-headers'
   | 'idor'
   | 'ssrf'
+  | 'api-security'
+  | 'phishing-analyzer'
+  | 'career-paths'
   | 'quiz'
   | 'achievements'
+  | 'cheat-sheets'
+  | 'password-checker'
   | 'profile'
   | 'teacher-panel'
-  | 'admin-panel';
+  | 'admin-panel'
+  | 'leaderboard';
 
 interface AppState {
   currentPage: PageType;
@@ -271,6 +281,7 @@ interface AppState {
   sqlCompletedLevels: string[];
   xssCompletedLevels: string[];
   csrfCompletedSteps: number[];
+  csrfChallengeScores: { correct: number; total: number; answered: number[] };
   secureCodingAnsweredChallenges: number[];
   secureCodingCorrectCount: number;
   owaspChallengeScores: { correct: number; total: number; answered: number[] };
@@ -289,6 +300,7 @@ interface AppState {
   addSqlLevel: (level: string) => void;
   addXssLevel: (level: string) => void;
   addCsrfStep: (step: number) => void;
+  addCsrfChallengeAnswer: (id: number, correct: boolean) => void;
   addSecureCodingAnswer: (idx: number) => void;
   removeSecureCodingAnswer: (idx: number) => void;
   setSecureCodingCorrectCount: (count: number) => void;
@@ -310,6 +322,7 @@ type PersistedState = Pick<AppState,
   | 'sqlCompletedLevels'
   | 'xssCompletedLevels'
   | 'csrfCompletedSteps'
+  | 'csrfChallengeScores'
   | 'secureCodingAnsweredChallenges'
   | 'secureCodingCorrectCount'
   | 'owaspChallengeScores'
@@ -357,6 +370,7 @@ export const useAppStore = create<AppStore>()(
       sqlCompletedLevels: [],
       xssCompletedLevels: [],
       csrfCompletedSteps: [],
+      csrfChallengeScores: { correct: 0, total: 0, answered: [] },
       secureCodingAnsweredChallenges: [],
       secureCodingCorrectCount: 0,
       owaspChallengeScores: { correct: 0, total: 0, answered: [] },
@@ -398,6 +412,7 @@ export const useAppStore = create<AppStore>()(
           sqlCompletedLevels: [],
           xssCompletedLevels: [],
           csrfCompletedSteps: [],
+          csrfChallengeScores: { correct: 0, total: 0, answered: [] },
           secureCodingAnsweredChallenges: [],
           secureCodingCorrectCount: 0,
           owaspChallengeScores: { correct: 0, total: 0, answered: [] },
@@ -431,6 +446,18 @@ export const useAppStore = create<AppStore>()(
             ? s.csrfCompletedSteps
             : [...s.csrfCompletedSteps, step],
         })),
+      addCsrfChallengeAnswer: (id, correct) =>
+        set((s) => {
+          const already = s.csrfChallengeScores.answered.includes(id);
+          if (already) return s;
+          return {
+            csrfChallengeScores: {
+              correct: s.csrfChallengeScores.correct + (correct ? 1 : 0),
+              total: s.csrfChallengeScores.total + 1,
+              answered: [...s.csrfChallengeScores.answered, id],
+            },
+          };
+        }),
       addSecureCodingAnswer: (idx) =>
         set((s) => ({
           secureCodingAnsweredChallenges: s.secureCodingAnsweredChallenges.includes(idx)
@@ -474,6 +501,7 @@ export const useAppStore = create<AppStore>()(
         sqlCompletedLevels: state.sqlCompletedLevels,
         xssCompletedLevels: state.xssCompletedLevels,
         csrfCompletedSteps: state.csrfCompletedSteps,
+        csrfChallengeScores: state.csrfChallengeScores,
         secureCodingAnsweredChallenges: state.secureCodingAnsweredChallenges,
         secureCodingCorrectCount: state.secureCodingCorrectCount,
         owaspChallengeScores: state.owaspChallengeScores,

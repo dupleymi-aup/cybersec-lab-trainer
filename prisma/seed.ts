@@ -3,8 +3,23 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+function getDefaultPassword(role: 'admin' | 'teacher'): string {
+  const envVar = role === 'admin' ? 'SEED_ADMIN_PASSWORD' : 'SEED_TEACHER_PASSWORD';
+  const defaultPassword = role === 'admin' ? 'Admin@123' : 'Teacher@123';
+  return process.env[envVar] || defaultPassword;
+}
+
 async function main() {
   console.log('Seeding database...');
+
+  // Warn about default passwords
+  if (!process.env.SEED_ADMIN_PASSWORD || !process.env.SEED_TEACHER_PASSWORD) {
+    console.warn(
+      '\n⚠️  WARNING: Using default seed passwords. ' +
+      'Set SEED_ADMIN_PASSWORD and SEED_TEACHER_PASSWORD environment variables. ' +
+      'Change default passwords immediately after first login!\n'
+    );
+  }
 
   // Check if admin already exists
   const existingAdmin = await prisma.user.findUnique({
@@ -12,7 +27,8 @@ async function main() {
   });
 
   if (!existingAdmin) {
-    const adminHash = await bcrypt.hash('Admin@123', 12);
+    const adminPassword = getDefaultPassword('admin');
+    const adminHash = await bcrypt.hash(adminPassword, 12);
     await prisma.user.create({
       data: {
         id: 'usr_admin_seed',
@@ -23,7 +39,7 @@ async function main() {
         passwordHash: adminHash,
       },
     });
-    console.log('Created admin user (admin@cybersec.lab / Admin@123)');
+    console.log('Created admin user (admin@cybersec.lab)');
   } else {
     console.log('Admin user already exists');
   }
@@ -34,7 +50,8 @@ async function main() {
   });
 
   if (!existingTeacher) {
-    const teacherHash = await bcrypt.hash('Teacher@123', 12);
+    const teacherPassword = getDefaultPassword('teacher');
+    const teacherHash = await bcrypt.hash(teacherPassword, 12);
     await prisma.user.create({
       data: {
         id: 'usr_teacher_seed',
@@ -45,7 +62,7 @@ async function main() {
         passwordHash: teacherHash,
       },
     });
-    console.log('Created teacher user (teacher@cybersec.lab / Teacher@123)');
+    console.log('Created teacher user (teacher@cybersec.lab)');
   } else {
     console.log('Teacher user already exists');
   }

@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
       sqlLevels: p.sqlLevels,
       xssLevels: p.xssLevels,
       csrfSteps: p.csrfSteps,
+      csrfChallengeScores: p.csrfChallengeScores,
       secureCodingAnswers: p.secureCodingAnswers,
       secureCodingCorrectCount: p.secureCodingCorrectCount,
       studiedOwaspItems: p.studiedOwaspItems,
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
   if (!auth) return unauthorized();
 
   const body = await request.json();
-  const { moduleId, completed, score, sqlLevels, xssLevels, csrfSteps, secureCodingAnswers, secureCodingCorrectCount, studiedOwaspItems, challengeScores } = body;
+  const { moduleId, completed, score, sqlLevels, xssLevels, csrfSteps, csrfChallengeScores, secureCodingAnswers, secureCodingCorrectCount, studiedOwaspItems, challengeScores } = body;
 
   if (!moduleId) {
     return NextResponse.json({ error: 'Module ID required' }, { status: 400 });
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
       sqlLevels: sqlLevels || [],
       xssLevels: xssLevels || [],
       csrfSteps: csrfSteps || [],
+      csrfChallengeScores: csrfChallengeScores || [],
       secureCodingAnswers: secureCodingAnswers || [],
       secureCodingCorrectCount: secureCodingCorrectCount || 0,
       studiedOwaspItems: studiedOwaspItems || [],
@@ -75,6 +77,7 @@ export async function POST(request: NextRequest) {
       ...(sqlLevels && { sqlLevels }),
       ...(xssLevels && { xssLevels }),
       ...(csrfSteps && { csrfSteps }),
+      ...(csrfChallengeScores && { csrfChallengeScores }),
       ...(secureCodingAnswers && { secureCodingAnswers }),
       ...(secureCodingCorrectCount !== undefined && { secureCodingCorrectCount }),
       ...(studiedOwaspItems && { studiedOwaspItems }),

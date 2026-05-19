@@ -32,6 +32,12 @@ import {
   Award,
   Download,
   MessageSquare,
+  Calendar,
+  Trash2,
+  Plus,
+  Edit,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import ProgressTrendsChart from './ProgressTrendsChart';
 import QuizQuestionAnalytics from './QuizQuestionAnalytics';
@@ -119,6 +125,66 @@ export default function TeacherPanel() {
   useEffect(() => {
     getAllUsers().then((users) => setStudents(users.filter((u) => u.role === 'student')));
   }, []);
+
+  // Deadlines state
+  const [deadlines, setDeadlines] = useState<Array<{
+    id: string; scope: string; scopeId: string; dueAt: string; title: string;
+    description: string; group: string; creator: { fullName: string };
+  }>>([]);
+  const [deadlineReminders, setDeadlineReminders] = useState<Array<{
+    deadline: { id: string; scope: string; scopeId: string; dueAt: string; title: string; group: string };
+    totalStudents: number; completedCount: number; completionRate: number;
+    studentStatus: Array<{ id: string; fullName: string; email: string; group: string; completed: boolean; isOverdue: boolean }>;
+  }>>([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newDeadline, setNewDeadline] = useState({
+    scope: 'module' as string,
+    scopeId: '',
+    dueAt: '',
+    title: '',
+    description: '',
+    group: '',
+  });
+  const [editingDeadlineId, setEditingDeadlineId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/deadlines')
+      .then(r => r.json())
+      .then(data => { if (data.deadlines) setDeadlines(data.deadlines); })
+      .catch(() => {});
+
+    fetch('/api/deadlines/teacher/reminders')
+      .then(r => r.json())
+      .then(data => { if (data.results) setDeadlineReminders(data.results); })
+      .catch(() => {});
+  }, []);
+
+  const createDeadline = async () => {
+    if (!newDeadline.title || !newDeadline.dueAt || !newDeadline.scopeId) return;
+    const res = await fetch('/api/deadlines', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newDeadline),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setDeadlines(prev => [...prev, data.deadline]);
+      setNewDeadline({ scope: 'module', scopeId: '', dueAt: '', title: '', description: '', group: '' });
+      setShowCreateForm(false);
+      // Refresh reminders
+      const r2 = await fetch('/api/deadlines/teacher/reminders');
+      const d2 = await r2.json();
+      if (d2.results) setDeadlineReminders(d2.results);
+    }
+  };
+
+  const deleteDeadline = async (id: string) => {
+    const res = await fetch(`/api/deadlines/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      setDeadlines(prev => prev.filter(d => d.id !== id));
+      setDeadlineReminders(prev => prev.filter(r => r.deadline.id !== id));
+    }
+  };
 
   const filteredStudents = useMemo(() => students.filter((s) => {
     const matchesSearch =
@@ -242,7 +308,7 @@ export default function TeacherPanel() {
       </div>
 
       <Tabs defaultValue="progress">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="progress" className="text-xs">
             <BarChart3 size={14} className="mr-1" /> Прогресс
           </TabsTrigger>
@@ -254,6 +320,9 @@ export default function TeacherPanel() {
           </TabsTrigger>
           <TabsTrigger value="messages" className="text-xs">
             <MessageSquare size={14} className="mr-1" /> Сообщения
+          </TabsTrigger>
+          <TabsTrigger value="deadlines" className="text-xs">
+            <Calendar size={14} className="mr-1" /> Дедлайны
           </TabsTrigger>
           <TabsTrigger value="groups" className="text-xs">
             <Users size={14} className="mr-1" /> Группы
@@ -363,6 +432,199 @@ export default function TeacherPanel() {
         {/* Messages Tab */}
         <TabsContent value="messages" className="mt-4 space-y-4">
           <TeacherMessaging currentUser={user?.fullName || 'Преподаватель'} groups={groups} />
+        </TabsContent>
+
+        {/* Deadlines Tab */}
+        <TabsContent value="deadlines" className="mt-4 space-y-4">
+          {/* Create deadline form */}
+          <Card className="border-slate-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <Calendar size={16} className="text-orange-500" />
+                  Управление дедлайнами
+                </h3>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowCreateForm(!showCreateForm)}
+                  className="text-xs"
+                >
+                  <Plus size={14} className="mr-1" />
+                  {showCreateForm ? 'Отмена' : 'Новый дедлайн'}
+                </Button>
+              </div>
+
+              {showCreateForm && (
+                <div className="space-y-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-medium text-slate-600 mb-1 block">Тип</label>
+                      <select
+                        value={newDeadline.scope}
+                        onChange={(e) => setNewDeadline({ ...newDeadline, scope: e.target.value, scopeId: '' })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm"
+                      >
+                        <option value="module">Модуль</option>
+                        <option value="quiz">Квиз</option>
+                        <option value="course">Курс</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-slate-600 mb-1 block">
+                        {newDeadline.scope === 'module' ? 'Модуль' : newDeadline.scope === 'quiz' ? 'Квиз' : 'Название'}
+                      </label>
+                      {newDeadline.scope === 'course' ? (
+                        <Input
+                          value={newDeadline.title}
+                          onChange={(e) => setNewDeadline({ ...newDeadline, title: e.target.value, scopeId: 'course' })}
+                          placeholder="Название дедлайна"
+                        />
+                      ) : newDeadline.scope === 'module' ? (
+                        <select
+                          value={newDeadline.scopeId}
+                          onChange={(e) => setNewDeadline({ ...newDeadline, scopeId: e.target.value })}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm"
+                        >
+                          <option value="">Выберите модуль</option>
+                          {modules.map(m => (
+                            <option key={m.id} value={m.id}>{m.title}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <select
+                          value={newDeadline.scopeId}
+                          onChange={(e) => setNewDeadline({ ...newDeadline, scopeId: e.target.value })}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm"
+                        >
+                          <option value="">Выберите квиз</option>
+                          {quizCategories.map(q => (
+                            <option key={q.id} value={q.id}>{q.name}</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-slate-600 mb-1 block">Срок</label>
+                      <Input
+                        type="datetime-local"
+                        value={newDeadline.dueAt}
+                        onChange={(e) => setNewDeadline({ ...newDeadline, dueAt: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-slate-600 mb-1 block">Группа (пусто = все)</label>
+                      <select
+                        value={newDeadline.group}
+                        onChange={(e) => setNewDeadline({ ...newDeadline, group: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm"
+                      >
+                        <option value="">Все студенты</option>
+                        {groups.map(g => (
+                          <option key={g} value={g}>{g}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-slate-600 mb-1 block">Описание</label>
+                    <Input
+                      value={newDeadline.description}
+                      onChange={(e) => setNewDeadline({ ...newDeadline, description: e.target.value })}
+                      placeholder="Необязательно"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setShowCreateForm(false)}>Отмена</Button>
+                    <Button size="sm" onClick={createDeadline}>Создать</Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Active deadliness list */}
+              {deadlines.length > 0 ? (
+                <div className="space-y-3 mt-3">
+                  {deadlines.map((d) => {
+                    const reminder = deadlineReminders.find(r => r.deadline.id === d.id);
+                    const dueDate = new Date(d.dueAt);
+                    const now = new Date();
+                    const diffDays = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    const isOverdue = diffDays < 0;
+
+                    const scopeLabel = d.scope === 'course'
+                      ? 'Курс'
+                      : d.scope === 'module'
+                        ? modules.find(m => m.id === d.scopeId)?.title || d.scopeId
+                        : quizCategories.find(q => q.id === d.scopeId)?.name || d.scopeId;
+
+                    return (
+                      <div
+                        key={d.id}
+                        className={`rounded-lg border-l-4 p-4 ${isOverdue ? 'border-l-red-500 bg-red-50/50' : diffDays <= 3 ? 'border-l-orange-500 bg-orange-50/50' : 'border-l-emerald-500 bg-emerald-50/50'}`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="text-sm font-semibold text-slate-800">{d.title}</p>
+                              <Badge variant={isOverdue ? 'destructive' : diffDays <= 3 ? 'secondary' : 'default'} className="text-[10px]">
+                                {isOverdue ? `Просрочен (${Math.abs(diffDays)} дн.)` : diffDays === 0 ? 'Сегодня' : diffDays === 1 ? 'Завтра' : `${diffDays} дн.`}
+                              </Badge>
+                              {d.group && <Badge variant="outline" className="text-[10px]">{d.group}</Badge>}
+                            </div>
+                            <p className="text-xs text-slate-500">{scopeLabel} — {dueDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
+                            {d.description && <p className="text-xs text-slate-400 mt-1">{d.description}</p>}
+                            {reminder && (
+                              <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                                <span className="flex items-center gap-1"><CheckCircle size={12} className="text-emerald-500" /> {reminder.completedCount}/{reminder.totalStudents} выполнено</span>
+                                <span>{reminder.completionRate}%</span>
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => deleteDeadline(d.id)}
+                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors shrink-0"
+                            title="Удалить"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+
+                        {/* Student status expandable */}
+                        {reminder && reminder.studentStatus.length > 0 && (
+                          <details className="mt-3">
+                            <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-700">
+                              Статус студентов ({reminder.studentStatus.length})
+                            </summary>
+                            <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
+                              {reminder.studentStatus.map(s => (
+                                <div key={s.id} className="flex items-center justify-between text-xs py-1">
+                                  <span className="text-slate-700">{s.fullName}</span>
+                                  <span className="flex items-center gap-1">
+                                    {s.completed ? (
+                                      <span className="text-emerald-600 flex items-center gap-0.5"><CheckCircle size={10} /> Выполнен</span>
+                                    ) : s.isOverdue ? (
+                                      <span className="text-red-600 flex items-center gap-0.5"><XCircle size={10} /> Просрочен</span>
+                                    ) : (
+                                      <span className="text-orange-500">В процессе</span>
+                                    )}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-400">
+                  <Calendar size={32} className="mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">Нет активных дедлайнов. Создайте первый!</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Groups Tab */}

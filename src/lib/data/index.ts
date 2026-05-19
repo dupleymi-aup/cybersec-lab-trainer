@@ -2,7 +2,7 @@
 export { owaspItems } from './owasp-data';
 export { sqlChallenges } from './sql-data';
 export { xssTypes } from './xss-data';
-export { attackSteps, defenseMechanisms } from './csrf-data';
+export { attackSteps, defenseMechanisms, csrfChallenges, realWorldExamples } from './csrf-data';
 export { quizQuestions, quizCategories } from './quiz-data';
 export type { QuizQuestion } from './quiz-data';
 export { modules } from './modules-data';
@@ -15,6 +15,11 @@ export { idorScenarios, idorDefenseMechanisms } from './idor-data';
 export type { IDORScenario } from './idor-data';
 export { ssrfScenarios, ssrfDefenseMechanisms } from './ssrf-data';
 export type { SSRFScenario } from './ssrf-data';
+export { apiSecurityTopics } from './api-security-data';
+export { phishingEmails, phishingEducationContent } from './phishing-data';
+export type { PhishingEmail, PhishingIndicator } from './phishing-data';
+export { careerPaths, skillLevels, industryDemand } from './career-paths-data';
+export type { CareerPath } from './career-paths-data';
 export {
   PASSWORD_CHECKS,
   PASSWORD_STRENGTH_LEVELS,

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type NotificationType = 'achievement' | 'progress' | 'quiz' | 'system' | 'warning' | 'announcement';
+export type NotificationType = 'achievement' | 'progress' | 'quiz' | 'system' | 'warning' | 'announcement' | 'deadline';
 
 export interface Notification {
   id: string;
@@ -127,6 +127,18 @@ export const NotificationHelper = {
       type: 'announcement',
       title: priority === 'high' ? '📢 Важное объявление' : '📢 Объявление',
       message,
+    });
+  },
+  deadlineWarning: (title: string, daysLeft: number) => {
+    const urgency = daysLeft <= 0
+      ? 'Просрочен!'
+      : daysLeft === 1
+        ? 'Завтра последний день!'
+        : `Осталось ${daysLeft} дн.`;
+    useNotificationStore.getState().addNotification({
+      type: 'deadline',
+      title: `Дедлайн: ${title}`,
+      message: urgency,
     });
   },
 };

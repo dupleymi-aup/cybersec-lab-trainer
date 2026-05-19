@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { quizQuestions, attackSteps, defenseMechanisms } from '@/lib/data';
+import { quizQuestions, attackSteps, defenseMechanisms, csrfChallenges, realWorldExamples } from '@/lib/data';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle, Lock, Globe, Server, ShieldCheck, Trophy, Target, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle, Lock, Globe, Server, ShieldCheck, Trophy, Target, RotateCcw, BookOpen, History, Lightbulb } from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
   Globe: <Globe size={20} className="text-emerald-600" />,
@@ -22,7 +22,7 @@ const mappedAttackSteps = attackSteps.map(step => ({
 }));
 
 export default function CSRFLab() {
-  const { completedModules, completeModule, setCurrentPage, addCsrfStep } = useAppStore();
+  const { completedModules, completeModule, setCurrentPage, addCsrfStep, addCsrfChallengeAnswer, csrfChallengeScores } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [showDefense, setShowDefense] = useState(false);
   const [activeDefense, setActiveDefense] = useState(0);
@@ -31,6 +31,17 @@ export default function CSRFLab() {
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
+
+  // Challenge states
+  const [showChallenges, setShowChallenges] = useState(false);
+  const [currentChallenge, setCurrentChallenge] = useState(0);
+  const [challengeAnswer, setChallengeAnswer] = useState<number | null>(null);
+  const [challengeSubmitted, setChallengeSubmitted] = useState(false);
+  const [challengeCorrect, setChallengeCorrect] = useState(0);
+
+  // Real-world examples state
+  const [showRealWorld, setShowRealWorld] = useState(false);
+  const [expandedExample, setExpandedExample] = useState<number | null>(null);
 
   const isCompleted = completedModules.includes('csrf');
   const csrfQuizzes = quizQuestions.filter(q => q.category === 'CSRF');
@@ -72,6 +83,23 @@ export default function CSRFLab() {
     setQuizIndex(q => q + 1);
     setQuizAnswer(null);
     setQuizSubmitted(false);
+  };
+
+  // Challenge handlers
+  const submitChallenge = (optionIndex: number) => {
+    const challenge = csrfChallenges[currentChallenge];
+    if (!challenge) return;
+    setChallengeAnswer(optionIndex);
+    setChallengeSubmitted(true);
+    const isCorrect = optionIndex === challenge.correctIndex;
+    if (isCorrect) setChallengeCorrect(c => c + 1);
+    addCsrfChallengeAnswer(challenge.id, isCorrect);
+  };
+
+  const nextChallenge = () => {
+    setCurrentChallenge(c => c + 1);
+    setChallengeAnswer(null);
+    setChallengeSubmitted(false);
   };
 
   return (
@@ -257,13 +285,208 @@ export default function CSRFLab() {
             ))}
           </div>
 
+          {/* Real-world examples */}
+          {!showChallenges && !showQuiz && (
+            <div className="mt-6 space-y-3">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setShowRealWorld(!showRealWorld)}
+              >
+                <History size={16} className="mr-2" />
+                {showRealWorld ? 'Скрыть' : 'Показать'} реальные примеры CSRF-атак
+              </Button>
+
+              <AnimatePresence>
+                {showRealWorld && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="space-y-3"
+                  >
+                    {realWorldExamples.map((ex, i) => (
+                      <Card
+                        key={i}
+                        className="border-amber-200 cursor-pointer hover:border-amber-400 transition-colors"
+                        onClick={() => setExpandedExample(expandedExample === i ? null : i)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-amber-100 text-amber-700 border-0">{ex.year}</Badge>
+                              <span className="text-sm font-semibold">{ex.company}</span>
+                            </div>
+                            <Badge variant="outline" className="text-[10px]">
+                              {expandedExample === i ? 'Скрыть' : 'Подробнее'}
+                            </Badge>
+                          </div>
+                          <AnimatePresence>
+                            {expandedExample === i && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="mt-3 space-y-2"
+                              >
+                                <p className="text-xs text-slate-600 leading-relaxed">{ex.description}</p>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  <div className="bg-red-50 rounded p-2">
+                                    <p className="font-semibold text-red-700">Влияние:</p>
+                                    <p className="text-red-600">{ex.impact}</p>
+                                  </div>
+                                  <div className="bg-emerald-50 rounded p-2">
+                                    <p className="font-semibold text-emerald-700">Исправление:</p>
+                                    <p className="text-emerald-600">{ex.fix}</p>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Interactive challenges */}
+          {!showQuiz && (
+            <div className="mt-4 space-y-3">
+              <Button
+                className="w-full bg-amber-600 hover:bg-amber-700"
+                onClick={() => setShowChallenges(!showChallenges)}
+              >
+                <Lightbulb size={16} className="mr-2" />
+                {showChallenges ? 'Скрыть' : 'Пройти'} интерактивные задания ({csrfChallenges.length} шт.)
+              </Button>
+
+              <AnimatePresence>
+                {showChallenges && currentChallenge < csrfChallenges.length && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <Card className="border-amber-200">
+                      <CardContent className="p-5 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-semibold text-amber-800 flex items-center gap-2">
+                            <BookOpen size={16} /> Задание {currentChallenge + 1}/{csrfChallenges.length}
+                          </h3>
+                          {csrfChallengeScores.total > 0 && (
+                            <Badge className="bg-amber-100 text-amber-700 border-0">
+                              {csrfChallengeScores.correct}/{csrfChallengeScores.total}
+                            </Badge>
+                          )}
+                        </div>
+
+                        {(() => {
+                          const ch = csrfChallenges[currentChallenge];
+                          return (
+                            <>
+                              <h4 className="font-semibold text-sm">{ch.title}</h4>
+                              <p className="text-xs text-slate-600">{ch.description}</p>
+                              {ch.code && (
+                                <CodeBlock code={ch.code} language="javascript" title="code.js" />
+                              )}
+                              <p className="text-sm font-medium">{ch.question}</p>
+
+                              <div className="space-y-2">
+                                {ch.options.map((option, i) => {
+                                  let optionStyle = 'border-slate-200 hover:border-amber-300';
+                                  if (challengeSubmitted) {
+                                    if (i === ch.correctIndex) {
+                                      optionStyle = 'border-emerald-400 bg-emerald-50';
+                                    } else if (i === challengeAnswer && challengeAnswer !== ch.correctIndex) {
+                                      optionStyle = 'border-red-400 bg-red-50';
+                                    }
+                                  } else if (i === challengeAnswer) {
+                                    optionStyle = 'border-amber-400 bg-amber-50';
+                                  }
+                                  return (
+                                    <button
+                                      key={i}
+                                      disabled={challengeSubmitted}
+                                      onClick={() => submitChallenge(i)}
+                                      className={`w-full text-left p-3 rounded-lg border-2 text-sm transition-all ${optionStyle}`}
+                                    >
+                                      <span className="font-medium mr-2">{String.fromCharCode(65 + i)}.</span>
+                                      {option}
+                                      {challengeSubmitted && i === ch.correctIndex && (
+                                        <CheckCircle2 size={14} className="inline ml-2 text-emerald-600" />
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {challengeSubmitted && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: 'auto' }}
+                                  className={`p-3 rounded-lg text-sm ${
+                                    challengeAnswer === ch.correctIndex
+                                      ? 'bg-emerald-50 text-emerald-700'
+                                      : 'bg-red-50 text-red-700'
+                                  }`}
+                                >
+                                  <p className="font-medium mb-1">
+                                    {challengeAnswer === ch.correctIndex ? 'Правильно!' : 'Неверно.'}
+                                  </p>
+                                  <p className="text-xs leading-relaxed">{ch.explanation}</p>
+                                </motion.div>
+                              )}
+
+                              {challengeSubmitted && currentChallenge < csrfChallenges.length - 1 && (
+                                <Button size="sm" className="w-full bg-amber-600 hover:bg-amber-700" onClick={nextChallenge}>
+                                  Следующее задание <ArrowRight size={14} className="ml-1" />
+                                </Button>
+                              )}
+
+                              {challengeSubmitted && currentChallenge >= csrfChallenges.length - 1 && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="mt-3 p-4 rounded-lg bg-amber-50 border border-amber-200 text-center"
+                                >
+                                  <p className="text-sm font-semibold text-amber-800 mb-1">Все задания пройдены!</p>
+                                  <p className="text-2xl font-bold text-amber-600">{challengeCorrect}/{csrfChallenges.length}</p>
+                                  <p className="text-xs text-amber-500 mb-3">
+                                    {challengeCorrect === csrfChallenges.length ? 'Отлично! Все ответы правильные!' :
+                                     challengeCorrect >= csrfChallenges.length * 0.7 ? 'Хороший результат!' : 'Стоит повторить материал.'}
+                                  </p>
+                                  <Button size="sm" variant="outline" onClick={() => { setCurrentChallenge(0); setChallengeCorrect(0); setChallengeSubmitted(false); setChallengeAnswer(null); }}>
+                                    <RotateCcw size={14} className="mr-1" /> Пройти заново
+                                  </Button>
+                                </motion.div>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
           {/* Quiz button */}
-          {!showQuiz ? (
+          {!showQuiz && !showChallenges ? (
             <Button
               className="w-full mt-4 bg-violet-600 hover:bg-violet-700"
               onClick={() => setShowQuiz(true)}
             >
               <Trophy size={16} className="mr-2" /> Проверить знания
+            </Button>
+          ) : !showQuiz && showChallenges ? (
+            <Button
+              className="w-full mt-4 bg-violet-600 hover:bg-violet-700"
+              onClick={() => setShowQuiz(true)}
+            >
+              <Trophy size={16} className="mr-2" /> Или проверьте знания квизом
             </Button>
           ) : (
             <div className="mt-4 space-y-4">
