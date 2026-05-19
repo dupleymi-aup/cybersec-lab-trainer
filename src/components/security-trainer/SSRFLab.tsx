@@ -289,7 +289,7 @@ export default function SSRFLab() {
                 className="mt-4 space-y-3"
               >
                 {ssrfDefenseMechanisms.map((d, i) => (
-                  <Card key={i} className="border-white/50 bg-card/70">
+                  <Card key={i} className="border-white/50 bg-white/80 dark:bg-card/70">
                     <CardContent className="p-3">
                       <h4 className="text-sm font-semibold text-emerald-700">{d.title}</h4>
                       <p className="text-xs text-muted-foreground mt-1">{d.description}</p>

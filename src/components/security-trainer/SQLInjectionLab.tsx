@@ -278,7 +278,7 @@ export default function SQLInjectionLab() {
                 {isSuccess ? (
                   <CodeBlock code={challenge.successQuery} language="sql" title="Модифицированный запрос" />
                 ) : (
-                  <div className="bg-card rounded-lg p-3">
+                  <div className="bg-white dark:bg-card rounded-lg p-3">
                     <p className="text-xs text-muted-foreground mb-2">
                       Ваш ввод: <code className="font-mono text-red-600">{userInput}</code>
                     </p>
@@ -307,7 +307,7 @@ export default function SQLInjectionLab() {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                     >
-                      <div className="bg-card rounded-lg p-4 mt-2">
+                      <div className="bg-white dark:bg-card rounded-lg p-4 mt-2">
                         <h4 className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
                           <BookOpen size={14} /> Объяснение
                         </h4>

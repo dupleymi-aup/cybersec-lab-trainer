@@ -128,7 +128,7 @@ export default function StudentDrillDown({
                   </Card>
                   <Card className="border-border">
                     <CardContent className="p-3 text-center">
-                      <p className="text-2xl font-bold text-purple-600">{data.achievements?.filter((a: any) => a.unlocked).length ?? 0}</p>
+                      <p className="text-2xl font-bold text-purple-600">{data.achievements?.filter((a: { unlocked?: boolean }) => a.unlocked).length ?? 0}</p>
                       <p className="text-xs text-muted-foreground">Достижений</p>
                     </CardContent>
                   </Card>

@@ -34,7 +34,6 @@ import {
   Target,
   ArrowRight,
   Zap,
-  Megaphone,
   X,
   Clock,
   CheckCircle2,
