@@ -10,6 +10,10 @@ import AchievementAnalytics from './AchievementAnalytics';
 import LearningPathReport from './LearningPathReport';
 import QuizTrajectoryReport from './QuizTrajectoryReport';
 import CohortAnalysis from './CohortAnalysis';
+import CompetencyRadar from './CompetencyRadar';
+import WeaknessAnalyzer from './WeaknessAnalyzer';
+import PredictiveInsights from './PredictiveInsights';
+import CustomDateRangePicker from './CustomDateRangePicker';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -49,6 +53,8 @@ import {
   GitBranch,
   Target,
   Layers,
+  Megaphone,
+  Radar,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import UserModal from './UserModal';
@@ -72,6 +78,8 @@ import StudentPerformanceReport from './StudentPerformanceReport';
 import StudentComparisonView from './StudentComparisonView';
 import GradebookView from './GradebookView';
 import EngagementAnalytics from './EngagementAnalytics';
+import ModuleManager from './ModuleManager';
+import SystemAnnouncements from './SystemAnnouncements';
 
 const roleColors: Record<UserRole, string> = {
   student: 'bg-violet-100 text-violet-700',
@@ -290,7 +298,7 @@ export default function AdminPanel() {
 
       <AnalyticsProvider>
       <Tabs defaultValue="users">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="users" className="text-xs">
             <Users size={14} className="mr-1" /> Пользователи
           </TabsTrigger>
@@ -302,6 +310,12 @@ export default function AdminPanel() {
           </TabsTrigger>
           <TabsTrigger value="settings" className="text-xs">
             <Settings size={14} className="mr-1" /> Настройки
+          </TabsTrigger>
+          <TabsTrigger value="modules" className="text-xs">
+            <BookOpen size={14} className="mr-1" /> Модули
+          </TabsTrigger>
+          <TabsTrigger value="announcements" className="text-xs">
+            <Megaphone size={14} className="mr-1" /> Объявления
           </TabsTrigger>
           <TabsTrigger value="analytics" className="text-xs">
             <LineChart size={14} className="mr-1" /> Аналитика
@@ -613,6 +627,16 @@ export default function AdminPanel() {
           <GroupManager adminId={user?.id || ''} onRefresh={refresh} />
         </TabsContent>
 
+        {/* Module Manager Tab */}
+        <TabsContent value="modules" className="mt-4 space-y-4">
+          <ModuleManager />
+        </TabsContent>
+
+        {/* Announcements Tab */}
+        <TabsContent value="announcements" className="mt-4 space-y-4">
+          <SystemAnnouncements currentUser={user?.fullName || 'Администратор'} />
+        </TabsContent>
+
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="mt-4 space-y-4">
           <AnalyticsFilterBar />
@@ -769,7 +793,7 @@ function AnalyticsSubTabs({
   selectedStudentId: string;
   setSelectedStudentId: (id: string) => void;
 }) {
-  const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort'>('dashboard');
+  const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort' | 'competency' | 'weaknesses' | 'predictive'>('dashboard');
   const { groupId, days } = useAnalyticsFilters();
   const [summary, setSummary] = useState<any>(null);
 
@@ -828,6 +852,9 @@ function AnalyticsSubTabs({
           { key: 'learning-path' as const, label: 'Воронка', icon: GitBranch },
           { key: 'quiz-trajectory' as const, label: 'Траектория', icon: Target },
           { key: 'cohort' as const, label: 'Когорты', icon: Layers },
+          { key: 'competency' as const, label: 'Компетенции', icon: Radar },
+          { key: 'weaknesses' as const, label: 'Слабые места', icon: AlertTriangle },
+          { key: 'predictive' as const, label: 'Прогноз', icon: TrendingUp },
           { key: 'student' as const, label: 'Студент', icon: Users },
         ].map(({ key, label, icon: Icon }) => (
           <button
@@ -903,6 +930,21 @@ function AnalyticsSubTabs({
       {analyticsSubTab === 'cohort' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <CohortAnalysis groupId={groupId} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'competency' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <CompetencyRadar groupId={groupId} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'weaknesses' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <WeaknessAnalyzer groupId={groupId} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'predictive' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <PredictiveInsights groupId={groupId} />
         </motion.div>
       )}
       {analyticsSubTab === 'student' && (

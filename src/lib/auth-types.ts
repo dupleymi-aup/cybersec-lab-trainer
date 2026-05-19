@@ -325,3 +325,66 @@ export interface CohortAnalysisData {
   cohorts: CohortData[];
   overallRetention: CohortRetentionData;
 }
+
+export interface CompetencyRadarData {
+  categories: Array<{
+    name: string;
+    studentAvg: number;
+    groupAvg?: number;
+    maxScore: number;
+  }>;
+  studentName?: string;
+}
+
+export interface WeaknessAnalysis {
+  weaknesses: Array<{
+    topic: string;
+    category: string;
+    score: number;
+    studentCount: number;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    recommendedActions: string[];
+  }>;
+  summary: {
+    totalWeaknesses: number;
+    criticalCount: number;
+    highCount: number;
+    mostAffectedCategory: string;
+    topPriorityTopic: string;
+  };
+}
+
+export interface PredictiveInsight {
+  metric: string;
+  currentValue: number;
+  predictedValue: number;
+  trend: 'improving' | 'declining' | 'stable';
+  confidence: number;
+  daysAhead: number;
+}
+
+export interface PredictiveAnalyticsData {
+  insights: PredictiveInsight[];
+  atRiskTrend: Array<{ date: string; predicted: number; actual?: number }>;
+  completionForecast: Array<{ date: string; predicted: number; lower: number; upper: number }>;
+  recommendations: string[];
+}
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  expiresAt?: string;
+  priority: 'low' | 'normal' | 'high';
+  active: boolean;
+}
+
+export interface ModuleSettings {
+  moduleId: string;
+  enabled: boolean;
+  order: number;
+  required: boolean;
+  minScore?: number;
+}

@@ -15,6 +15,8 @@ import type {
   StudentPerformanceData, StudentComparisonData, GradebookData,
   LearningPathEntry, EngagementData, QuizTrajectoryPoint,
   CohortAnalysisData, QuizAttemptData,
+  CompetencyRadarData, WeaknessAnalysis, PredictiveAnalyticsData,
+  PredictiveInsight, Announcement, ModuleSettings,
 } from './auth-types';
 
 import {
@@ -34,6 +36,8 @@ export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
   StudentPerformanceData, StudentComparisonData, GradebookData,
   LearningPathEntry, EngagementData, QuizTrajectoryPoint,
   CohortAnalysisData, QuizAttemptData,
+  CompetencyRadarData, WeaknessAnalysis, PredictiveAnalyticsData,
+  PredictiveInsight, Announcement, ModuleSettings,
 };
 
 import { hasRole, getRoleLabel } from './auth-types';

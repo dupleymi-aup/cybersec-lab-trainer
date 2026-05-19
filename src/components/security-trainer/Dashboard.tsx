@@ -9,8 +9,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import {
   Shield,
@@ -31,8 +31,17 @@ import {
   Target,
   ArrowRight,
   Zap,
+  Megaphone,
+  X,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Info,
+  Activity,
+  UserCheck,
 } from 'lucide-react';
 import type { PageType } from '@/lib/store';
+import type { Announcement } from '@/lib/auth-types';
 
 const iconMap: Record<string, React.ReactNode> = {
   Shield: <Shield size={28} />,
@@ -68,9 +77,54 @@ const achievementIcons: Record<string, React.ReactNode> = {
   'all-headers-correct': <ShieldCheck size={18} />,
 };
 
+function getProficiencyLevel(completedCount: number, totalModules: number, avgScore: number): { label: string; color: string; bg: string; icon: React.ReactNode } {
+  const pct = totalModules > 0 ? completedCount / totalModules : 0;
+  if (pct === 0) return { label: 'Новичок', color: 'text-slate-600', bg: 'bg-slate-100', icon: <Star size={14} /> };
+  if (pct < 0.3) return { label: 'Начинающий', color: 'text-emerald-600', bg: 'bg-emerald-100', icon: <Star size={14} /> };
+  if (pct < 0.6) return { label: 'Практикующий', color: 'text-sky-600', bg: 'bg-sky-100', icon: <Star size={14} /> };
+  if (pct < 0.9) return { label: 'Продвинутый', color: 'text-violet-600', bg: 'bg-violet-100', icon: <Star size={14} /> };
+  if (avgScore >= 80) return { label: 'Эксперт', color: 'text-amber-600', bg: 'bg-amber-100', icon: <Trophy size={14} /> };
+  return { label: 'Продвинутый', color: 'text-violet-600', bg: 'bg-violet-100', icon: <Star size={14} /> };
+}
+
+function loadActiveAnnouncements(): Announcement[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('cybersec-announcements');
+    if (raw) {
+      const parsed = JSON.parse(raw) as Announcement[];
+      const now = new Date();
+      return parsed.filter((a) => {
+        if (!a.active) return false;
+        if (a.expiresAt && new Date(a.expiresAt) < now) return false;
+        return true;
+      }).sort((a, b) => {
+        const priorityOrder = { high: 0, normal: 1, low: 2 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+      });
+    }
+  } catch { }
+  return [];
+}
+
 export default function Dashboard() {
-  const { setCurrentPage, completedModules, quizScores, toggleSidebar, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, owaspChallengeScores, authChallengeScores } = useAppStore();
+  const { setCurrentPage, completedModules, quizScores, toggleSidebar, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, owaspChallengeScores, authChallengeScores, moduleTimestamps, quizTimestamps } = useAppStore();
   const { user } = useAuthStore();
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    setAnnouncements(loadActiveAnnouncements());
+    const interval = setInterval(() => {
+      setAnnouncements(loadActiveAnnouncements());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const dismissAnnouncement = (id: string) => {
+    setDismissedAnnouncements((prev) => new Set([...prev, id]));
+  };
+
+  const visibleAnnouncements = announcements.filter((a) => !dismissedAnnouncements.has(a.id));
 
   const challengeStats = {
     owaspCorrect: owaspChallengeScores.correct,
@@ -184,11 +238,40 @@ export default function Dashboard() {
     return { text: 'Великолепно! Вы прошли все модули. Посмотрите достижения!', page: 'achievements' as PageType };
   };
 
+  const proficiency = getProficiencyLevel(completedCount, totalModules, avgQuizScore);
+
+  // Build activity timeline from store data
+  const activityTimeline = useMemo(() => {
+    const events: Array<{ date: Date; type: 'module' | 'quiz'; label: string }> = [];
+    for (const [moduleId, ts] of Object.entries(moduleTimestamps)) {
+      const mod = modules.find((m) => m.id === moduleId);
+      if (mod) {
+        events.push({ date: new Date(ts), type: 'module' as const, label: mod.title });
+      }
+    }
+    for (const [quizId, ts] of Object.entries(quizTimestamps)) {
+      events.push({ date: new Date(ts), type: 'quiz' as const, label: `Квиз: ${quizId}` });
+    }
+    events.sort((a, b) => b.date.getTime() - a.date.getTime());
+    return events;
+  }, [moduleTimestamps, quizTimestamps]);
+
   const recommendation = getRecommendation();
+  const [showAllActivity, setShowAllActivity] = useState(false);
 
   const handleStartModule = (moduleId: string) => {
     setCurrentPage(moduleId as PageType);
   };
+
+  // Role-based quick actions
+  const quickActions = [
+    ...(user?.role === 'admin' || user?.role === 'teacher'
+      ? [{ label: 'Панель администратора' as const, page: 'admin-panel' as PageType, icon: Shield, color: 'bg-red-100 text-red-600' }]
+      : []),
+    ...(user?.role === 'teacher' || user?.role === 'admin'
+      ? [{ label: 'Панель преподавателя' as const, page: 'teacher-panel' as PageType, icon: UserCheck, color: 'bg-amber-100 text-amber-600' }]
+      : []),
+  ];
 
   return (
     <div className="space-y-8">
@@ -201,6 +284,50 @@ export default function Dashboard() {
         <span className="font-bold text-lg">CyberSec Lab</span>
       </div>
 
+      {/* Announcements */}
+      {visibleAnnouncements.length > 0 && (
+        <div className="space-y-2">
+          {visibleAnnouncements.map((ann) => {
+            const priorityStyles = {
+              high: { border: 'border-red-300', bg: 'bg-red-50', icon: AlertCircle, color: 'text-red-600' },
+              normal: { border: 'border-blue-200', bg: 'bg-blue-50', icon: Info, color: 'text-blue-600' },
+              low: { border: 'border-slate-200', bg: 'bg-slate-50', icon: Info, color: 'text-slate-500' },
+            };
+            const ps = priorityStyles[ann.priority];
+            const Icon = ps.icon;
+            return (
+              <motion.div
+                key={ann.id}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`rounded-lg border ${ps.border} ${ps.bg} p-4`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1">
+                    <Icon size={18} className={ps.color + ' mt-0.5 shrink-0'} />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-slate-800">{ann.title}</p>
+                        {ann.priority === 'high' && (
+                          <Badge className="bg-red-100 text-red-700 text-[10px] border-0">Важно</Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-600 mt-0.5">{ann.content}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => dismissAnnouncement(ann.id)}
+                    className="text-slate-400 hover:text-slate-600 shrink-0"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+
       {/* Hero */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -210,11 +337,16 @@ export default function Dashboard() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
         <div className="relative z-10">
-          <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-600/30 mb-4">
-            09.03.04 Программная инженерия
-          </Badge>
+          <div className="flex items-center gap-3 mb-4">
+            <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-600/30">
+              09.03.04 Программная инженерия
+            </Badge>
+            <Badge className={`${proficiency.bg} ${proficiency.color} border-0`}>
+              {proficiency.icon} {proficiency.label}
+            </Badge>
+          </div>
           <h1 className="text-2xl md:text-3xl font-bold mb-3">
-            Тренажёр по информационной безопасности
+            Добро пожаловать{user?.fullName ? `, ${user.fullName.split(' ')[0]}` : ''}!
           </h1>
           <p className="text-slate-300 max-w-2xl leading-relaxed">
             Интерактивная платформа для изучения уязвимостей веб-приложений, методов атак и защитных
@@ -245,12 +377,13 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
           { label: 'Модули пройдены', value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
           { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/9`, color: 'text-amber-600' },
           { label: 'Средний балл', value: `${avgQuizScore}%`, color: 'text-sky-600' },
           { label: 'Достижения', value: `${unlockedAchievements.length}/${achievements.length}`, color: 'text-violet-600' },
+          { label: 'Уровень', value: proficiency.label, color: proficiency.color },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -267,6 +400,23 @@ export default function Dashboard() {
           </motion.div>
         ))}
       </div>
+
+      {/* Quick actions for role-based users */}
+      {quickActions.length > 0 && (
+        <div className="flex gap-3">
+          {quickActions.map((action) => (
+            <Button
+              key={action.label}
+              variant="outline"
+              onClick={() => setCurrentPage(action.page)}
+              className={`flex items-center gap-2 ${action.color} border-slate-200`}
+            >
+              <action.icon size={16} />
+              {action.label}
+            </Button>
+          ))}
+        </div>
+      )}
 
       {/* Recommendation banner */}
       <motion.div
@@ -309,6 +459,64 @@ export default function Dashboard() {
                 <p className="text-[11px] text-amber-700">{nextAchievement.condition}</p>
               </div>
               <Trophy size={20} className="text-amber-300 shrink-0" />
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Activity Timeline */}
+      {activityTimeline.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <Activity size={16} className="text-indigo-500" />
+                  Хронология активности
+                </h3>
+                {activityTimeline.length > 5 && (
+                  <button
+                    onClick={() => setShowAllActivity(!showAllActivity)}
+                    className="text-xs text-indigo-600 hover:text-indigo-800"
+                  >
+                    {showAllActivity ? 'Свернуть' : 'Показать все'}
+                  </button>
+                )}
+              </div>
+              <div className="space-y-1">
+                {(showAllActivity ? activityTimeline : activityTimeline.slice(0, 5)).map((event, i) => (
+                  <motion.div
+                    key={`${event.type}-${event.label}-${i}`}
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0"
+                  >
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                      event.type === 'module' ? 'bg-emerald-100' : 'bg-amber-100'
+                    }`}>
+                      {event.type === 'module' ? (
+                        <CheckCircle2 size={14} className="text-emerald-600" />
+                      ) : (
+                        <Trophy size={14} className="text-amber-600" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate">{event.label}</p>
+                      <p className="text-[10px] text-slate-400">
+                        {event.date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="text-[10px]">
+                      {event.type === 'module' ? 'Модуль' : 'Квиз'}
+                    </Badge>
+                  </motion.div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </motion.div>

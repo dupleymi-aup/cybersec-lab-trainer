@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { getAllUsers } from '@/lib/auth-store';
+import { getAllUsers, useAuthStore } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
 import { quizCategories, modules } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,11 +31,17 @@ import {
   HelpCircle,
   Award,
   Download,
+  MessageSquare,
 } from 'lucide-react';
 import ProgressTrendsChart from './ProgressTrendsChart';
 import QuizQuestionAnalytics from './QuizQuestionAnalytics';
 import AchievementAnalytics from './AchievementAnalytics';
 import AnalyticsExportPanel from './AnalyticsExportPanel';
+import CompetencyRadar from './CompetencyRadar';
+import WeaknessAnalyzer from './WeaknessAnalyzer';
+import PredictiveInsights from './PredictiveInsights';
+import TeacherMessaging from './TeacherMessaging';
+import StudentProgressView from './StudentProgressView';
 
 interface StudentProgress {
   userId: string;
@@ -99,10 +105,12 @@ function getStudentProgress(userId: string): StudentProgress {
 
 export default function TeacherPanel() {
   const { setCurrentPage } = useAppStore();
+  const { user } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [groupFilter, setGroupFilter] = useState('');
   const [gradebookSort, setGradebookSort] = useState<'name' | 'modules' | 'score'>('name');
-  const [analyticsSubTab, setAnalyticsSubTab] = useState<'overview' | 'trends' | 'questions' | 'achievements' | 'export'>('overview');
+  const [analyticsSubTab, setAnalyticsSubTab] = useState<'overview' | 'trends' | 'questions' | 'achievements' | 'competency' | 'weaknesses' | 'predictive' | 'export'>('overview');
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; email: string; group: string; avatar: string }>>([]);
 
   useEffect(() => {
@@ -231,7 +239,7 @@ export default function TeacherPanel() {
       </div>
 
       <Tabs defaultValue="progress">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="progress" className="text-xs">
             <BarChart3 size={14} className="mr-1" /> Прогресс
           </TabsTrigger>
@@ -240,6 +248,9 @@ export default function TeacherPanel() {
           </TabsTrigger>
           <TabsTrigger value="analytics" className="text-xs">
             <Filter size={14} className="mr-1" /> Аналитика
+          </TabsTrigger>
+          <TabsTrigger value="messages" className="text-xs">
+            <MessageSquare size={14} className="mr-1" /> Сообщения
           </TabsTrigger>
           <TabsTrigger value="groups" className="text-xs">
             <Users size={14} className="mr-1" /> Группы
@@ -254,92 +265,11 @@ export default function TeacherPanel() {
 
         {/* Progress Tab */}
         <TabsContent value="progress" className="mt-4 space-y-4">
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Поиск по имени или email..."
-                className="pl-10"
-              />
-            </div>
-            {groups.length > 0 && (
-              <select
-                value={groupFilter}
-                onChange={(e) => setGroupFilter(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
-              >
-                <option value="">Все группы</option>
-                {groups.map((g) => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            {filteredStudents.map((student, i) => {
-              const progress = getStudentProgress(student.id);
-              const moduleCount = progress.completedModules.length;
-              const quizCount = Object.keys(progress.quizScores).length;
-              const avgScore = Object.values(progress.quizScores).length > 0
-                ? Math.round(Object.values(progress.quizScores).reduce((a, b) => a + b, 0) / Object.values(progress.quizScores).length)
-                : 0;
-
-              return (
-                <motion.div
-                  key={student.id}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                >
-                  <Card className="border-slate-200 hover:border-emerald-200 transition-colors">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden">
-                            {student.avatar ? (
-                              <img src={student.avatar} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <GraduationCap size={18} className="text-violet-600" />
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-sm">{student.fullName}</p>
-                            <p className="text-xs text-slate-500">{student.email}</p>
-                            {student.group && (
-                              <Badge variant="secondary" className="text-[10px] mt-0.5">{student.group}</Badge>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 text-right">
-                          <div>
-                            <p className="text-xs text-slate-500">Модули</p>
-                            <p className="text-sm font-bold">{moduleCount}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-slate-500">Квизы</p>
-                            <p className="text-sm font-bold">{quizCount}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-slate-500">Ср. балл</p>
-                            <p className="text-sm font-bold">{avgScore}%</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
-            {filteredStudents.length === 0 && (
-              <div className="text-center py-12 text-slate-400">
-                <Users size={40} className="mx-auto mb-3 opacity-50" />
-                <p className="text-sm">Студенты не найдены</p>
-              </div>
-            )}
-          </div>
+          <StudentProgressView
+            students={filteredStudents}
+            groupId={groupFilter || undefined}
+            onBack={() => setSelectedStudentId(null)}
+          />
         </TabsContent>
 
         {/* Gradebook Tab */}
@@ -427,6 +357,11 @@ export default function TeacherPanel() {
           </div>
         </TabsContent>
 
+        {/* Messages Tab */}
+        <TabsContent value="messages" className="mt-4 space-y-4">
+          <TeacherMessaging currentUser={user?.fullName || 'Преподаватель'} groups={groups} />
+        </TabsContent>
+
         {/* Groups Tab */}
         <TabsContent value="groups" className="mt-4 space-y-4">
           {groups.length > 0 ? (
@@ -467,12 +402,15 @@ export default function TeacherPanel() {
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="mt-4 space-y-4">
           {/* Sub-tab selector */}
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
+          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit flex-wrap">
             {[
               { key: 'overview' as const, label: 'Обзор', icon: BarChart3 },
               { key: 'trends' as const, label: 'Тренды', icon: TrendingUp },
               { key: 'questions' as const, label: 'Вопросы', icon: HelpCircle },
               { key: 'achievements' as const, label: 'Достижения', icon: Award },
+              { key: 'competency' as const, label: 'Компетенции', icon: BarChart3 },
+              { key: 'weaknesses' as const, label: 'Слабые места', icon: AlertTriangle },
+              { key: 'predictive' as const, label: 'Прогноз', icon: TrendingUp },
               { key: 'export' as const, label: 'Экспорт', icon: Download },
             ].map(({ key, label, icon: Icon }) => (
               <button
@@ -653,6 +591,27 @@ export default function TeacherPanel() {
           {analyticsSubTab === 'achievements' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <AchievementAnalytics students={students} groupId={groupFilter} />
+            </motion.div>
+          )}
+
+          {/* Competency sub-tab */}
+          {analyticsSubTab === 'competency' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <CompetencyRadar groupId={groupFilter || undefined} />
+            </motion.div>
+          )}
+
+          {/* Weaknesses sub-tab */}
+          {analyticsSubTab === 'weaknesses' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <WeaknessAnalyzer groupId={groupFilter || undefined} />
+            </motion.div>
+          )}
+
+          {/* Predictive sub-tab */}
+          {analyticsSubTab === 'predictive' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <PredictiveInsights groupId={groupFilter || undefined} />
             </motion.div>
           )}
 
