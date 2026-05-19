@@ -1,42 +1,37 @@
 /**
  * Bridge module to break circular dependency between store.ts and auth-store.ts.
- * Provides a lazy getter for the auth store to avoid initialization issues.
+ * Uses a callback-based init pattern to avoid require() in browser bundle.
  */
 
-type AuthStoreModule = {
-  useAuthStore: { getState: () => { user?: { id: string } | null } };
+type AuthStoreRef = {
+  getUserId: () => string;
   saveProgressSnapshot: (moduleId: string, score: number, completed: boolean) => Promise<void>;
 };
 
-let _authStore: AuthStoreModule | null = null;
+let _ref: AuthStoreRef | null = null;
 
-function getAuthStoreModule(): AuthStoreModule {
-  if (!_authStore) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      _authStore = require('./auth-store');
-    } catch {
-      throw new Error('Failed to load auth-store module');
-    }
+/**
+ * Initialize the bridge with auth store references.
+ * Called once during app startup from a place where both stores are available.
+ */
+export function initAuthBridge(getUserId: () => string, saveProgressSnapshot: (moduleId: string, score: number, completed: boolean) => Promise<void>) {
+  _ref = { getUserId, saveProgressSnapshot };
+}
+
+function getRef(): AuthStoreRef {
+  if (!_ref) {
+    return {
+      getUserId: () => 'anonymous',
+      saveProgressSnapshot: () => Promise.resolve(),
+    };
   }
-  return _authStore;
+  return _ref;
 }
 
 export function getCurrentUserId(): string {
-  try {
-    const { useAuthStore } = getAuthStoreModule();
-    const { user } = useAuthStore.getState();
-    return user?.id || 'anonymous';
-  } catch {
-    return 'anonymous';
-  }
+  return getRef().getUserId();
 }
 
-export function saveProgressSnapshotProxy(moduleId: string, score: number, completed: boolean) {
-  try {
-    const { saveProgressSnapshot } = getAuthStoreModule();
-    return saveProgressSnapshot(moduleId, score, completed);
-  } catch {
-    return Promise.resolve();
-  }
+export function saveProgressSnapshotProxy(moduleId: string, score: number, completed: boolean): Promise<void> {
+  return getRef().saveProgressSnapshot(moduleId, score, completed);
 }

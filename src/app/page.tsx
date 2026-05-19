@@ -2,7 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import { useAppStore } from '@/lib/store';
-import { useAuthStore, hasRole, getRoleLabel, getImpersonationState, stopImpersonation, type UserRole } from '@/lib/auth-store';
+import { useAuthStore, hasRole, getRoleLabel, getImpersonationState, stopImpersonation, saveProgressSnapshot, type UserRole } from '@/lib/auth-store';
+import { initAuthBridge } from '@/lib/auth-bridge';
 import Sidebar from '@/components/security-trainer/Sidebar';
 import Dashboard from '@/components/security-trainer/Dashboard';
 import AuthPages from '@/components/security-trainer/AuthPages';
@@ -87,6 +88,14 @@ export default function Home() {
   const { isAuthenticated, user } = useAuthStore();
   const impersonation = getImpersonationState();
 
+  // Initialize auth bridge to break circular dependency
+  useEffect(() => {
+    initAuthBridge(
+      () => useAuthStore.getState().user?.id || 'anonymous',
+      saveProgressSnapshot
+    );
+  }, []);
+
   const roleRestrictedPages: Record<string, UserRole> = {
     'teacher-panel': 'teacher',
     'admin-panel': 'admin',
@@ -129,8 +138,8 @@ export default function Home() {
               </span>
             </div>
             <button
-              onClick={() => {
-                const result = stopImpersonation();
+              onClick={async () => {
+                const result = await stopImpersonation();
                 if (result.success) {
                   setCurrentPage('admin-panel');
                 }

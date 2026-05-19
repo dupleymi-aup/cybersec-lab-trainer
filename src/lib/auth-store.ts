@@ -298,7 +298,7 @@ export async function startImpersonation(
   }
 }
 
-export function stopImpersonation(): { success: boolean; error?: string } {
+export async function stopImpersonation(): Promise<{ success: boolean; error?: string }> {
   const raw = localStorage.getItem(IMPERSONATION_KEY);
   if (!raw) return { success: false, error: 'Нет активной имперсонации' };
 
@@ -306,10 +306,22 @@ export function stopImpersonation(): { success: boolean; error?: string } {
     const data = JSON.parse(raw);
     if (!data.originalUserId) return { success: false, error: 'Нет активной имперсонации' };
 
-    const { user } = useAuthStore.getState();
-    if (!user) return { success: false, error: 'User not found' };
+    // Fetch original user data
+    const res = await fetch(`/api/users/${data.originalUserId}`);
+    if (!res.ok) {
+      localStorage.removeItem(IMPERSONATION_KEY);
+      return { success: false, error: 'Не удалось восстановить аккаунт' };
+    }
 
+    const userData = await res.json();
     localStorage.removeItem(IMPERSONATION_KEY);
+
+    // Restore original user in store
+    useAuthStore.setState({
+      user: userData,
+      isAuthenticated: true,
+    });
+
     return { success: true };
   } catch {
     return { success: false, error: 'Ошибка завершения имперсонации' };

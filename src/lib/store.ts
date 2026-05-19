@@ -19,7 +19,7 @@ const apiClient = {
   async saveProgress(moduleId: string, completed: boolean, score?: number) {
     const response = await fetch('/api/progress', {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ moduleId, completed, score }),
     });
     if (!response.ok) {
@@ -44,7 +44,7 @@ const apiClient = {
   }) {
     const response = await fetch('/api/progress', {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) {
@@ -57,7 +57,7 @@ const apiClient = {
   async saveQuizResults(quizId: string, score: number, total: number) {
     const response = await fetch('/api/quiz', {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ quizId, score, total }),
     });
     if (!response.ok) {
@@ -70,7 +70,7 @@ const apiClient = {
   async loadProgress() {
     const response = await fetch('/api/progress', {
       method: 'GET',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
     });
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Unknown error' }));
@@ -82,7 +82,7 @@ const apiClient = {
   async batchSave(progress: unknown[], quizResults: unknown[]) {
     const response = await fetch('/api/progress/batch', {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ progress, quizResults }),
     });
     if (!response.ok) {

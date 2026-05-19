@@ -161,28 +161,36 @@ export default function TeacherPanel() {
 
   const createDeadline = async () => {
     if (!newDeadline.title || !newDeadline.dueAt || !newDeadline.scopeId) return;
-    const res = await fetch('/api/deadlines', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newDeadline),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setDeadlines(prev => [...prev, data.deadline]);
-      setNewDeadline({ scope: 'module', scopeId: '', dueAt: '', title: '', description: '', group: '' });
-      setShowCreateForm(false);
-      // Refresh reminders
-      const r2 = await fetch('/api/deadlines/teacher/reminders');
-      const d2 = await r2.json();
-      if (d2.results) setDeadlineReminders(d2.results);
+    try {
+      const res = await fetch('/api/deadlines', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newDeadline),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDeadlines(prev => [...prev, data.deadline]);
+        setNewDeadline({ scope: 'module', scopeId: '', dueAt: '', title: '', description: '', group: '' });
+        setShowCreateForm(false);
+        // Refresh reminders
+        const r2 = await fetch('/api/deadlines/teacher/reminders');
+        const d2 = await r2.json();
+        if (d2.results) setDeadlineReminders(d2.results);
+      }
+    } catch (err) {
+      console.error('Failed to create deadline:', err);
     }
   };
 
   const deleteDeadline = async (id: string) => {
-    const res = await fetch(`/api/deadlines/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setDeadlines(prev => prev.filter(d => d.id !== id));
-      setDeadlineReminders(prev => prev.filter(r => r.deadline.id !== id));
+    try {
+      const res = await fetch(`/api/deadlines/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setDeadlines(prev => prev.filter(d => d.id !== id));
+        setDeadlineReminders(prev => prev.filter(r => r.deadline.id !== id));
+      }
+    } catch (err) {
+      console.error('Failed to delete deadline:', err);
     }
   };
 
