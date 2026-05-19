@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, Eye, EyeOff, Check, Copy, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/auth-store';
@@ -43,7 +43,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
     return () => document.removeEventListener('keydown', handleEscape);
   }, [handleEscape]);
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!password) { toast.error('Введите пароль'); return; }
     if (password !== confirmPassword) { toast.error('Пароли не совпадают'); return; }
 
@@ -53,7 +53,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
     const { user: admin } = useAuthStore.getState();
     if (!admin) { toast.error('Не авторизован'); return; }
 
-    const result = resetUserPassword(user.id, password, admin.id);
+    const result = await resetUserPassword(user.id, password, admin.id);
     if (result.success) {
       setNewPassword(password);
       setResetDone(true);

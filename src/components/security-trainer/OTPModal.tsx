@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface OTPModalProps {
   otp: string;
@@ -14,6 +15,7 @@ interface OTPModalProps {
 
 export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalProps) {
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const [showOtp, setShowOtp] = useState(false);
   const [cooldown, setCooldown] = useState(30);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -101,9 +103,24 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
         </div>
 
         <div className="text-center mb-4">
-          <span className="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg inline-block">
-            Ваш код: <strong className="text-slate-700 select-all">{otp}</strong>
-          </span>
+          <button
+            type="button"
+            onClick={() => setShowOtp(!showOtp)}
+            className="text-xs text-slate-400 bg-slate-100 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 hover:bg-slate-200 transition"
+          >
+            {showOtp ? (
+              <>
+                <EyeOff className="w-3 h-3" />
+                <span className="text-slate-700 font-mono">{otp}</span>
+                <span className="text-slate-500">скрыть</span>
+              </>
+            ) : (
+              <>
+                <Eye className="w-3 h-3" />
+                Показать код
+              </>
+            )}
+          </button>
         </div>
 
         <Button onClick={handleSubmit} className="w-full mb-3">

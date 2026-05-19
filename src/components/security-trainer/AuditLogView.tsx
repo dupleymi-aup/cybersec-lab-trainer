@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAuditLogEntries, clearAuditLog, type AuditAction, getAllUsers, getRoleLabel } from '@/lib/auth-store';
+import { getAuditLogEntries, clearAuditLog, type AuditAction, type AuditLogEntry } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Trash2, Filter, RotateCcw } from 'lucide-react';
+import { Trash2, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -46,19 +46,17 @@ const actionColors: Record<AuditAction, string> = {
   'group_users_reassigned': 'bg-indigo-100 text-indigo-700',
 };
 
-interface AuditLogViewProps {
-  adminId: string;
-}
 
-export default function AuditLogView({ adminId }: AuditLogViewProps) {
-  const [entries, setEntries] = useState<ReturnType<typeof getAuditLogEntries>>([]);
+export default function AuditLogView() {
+  const [entries, setEntries] = useState<AuditLogEntry[]>([]);
   const [filterAction, setFilterAction] = useState('');
   const [filterAdmin, setFilterAdmin] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  const loadData = () => {
-    setEntries(getAuditLogEntries().reverse());
+  const loadData = async () => {
+    const result = await getAuditLogEntries();
+    setEntries(result.reverse());
   };
 
   useEffect(() => {

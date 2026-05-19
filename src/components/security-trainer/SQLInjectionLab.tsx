@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { sqlChallenges } from '@/lib/security-data';
+import { sqlChallenges } from '@/lib/data';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, CheckCircle2, Play, Eye, EyeOff, Lightbulb, AlertTriangle, Zap, ShieldCheck, BookOpen } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, Play, Eye, Lightbulb, AlertTriangle, Zap, ShieldCheck, BookOpen } from 'lucide-react';
 
 export default function SQLInjectionLab() {
   const { sqlCompletedLevels, addSqlLevel, completeModule, setCurrentPage } = useAppStore();
@@ -17,6 +17,7 @@ export default function SQLInjectionLab() {
   const [userInput, setUserInput] = useState('');
   const [showResult, setShowResult] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
   const [showExplanation, setShowExplanation] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -66,6 +67,7 @@ export default function SQLInjectionLab() {
     setUserInput('');
     setShowResult(false);
     setShowHint(false);
+    setHintLevel(0);
     setShowExplanation(false);
     setIsSuccess(false);
   };
@@ -173,9 +175,9 @@ export default function SQLInjectionLab() {
             <Button variant="outline" size="sm" onClick={tryExample}>
               <Lightbulb size={14} className="mr-1" /> Пример ответа
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setShowHint(!showHint)}>
-              {showHint ? <EyeOff size={14} className="mr-1" /> : <Eye size={14} className="mr-1" />}
-              {showHint ? 'Скрыть подсказку' : 'Подсказка'}
+            <Button variant="outline" size="sm" onClick={() => { setShowHint(true); setHintLevel(1); }}>
+              <Lightbulb size={14} className="mr-1" />
+              {showHint ? (hintLevel < 3 ? `Подсказка ${hintLevel + 1}/3` : 'Все подсказки показаны') : 'Подсказка'}
             </Button>
           </div>
 
@@ -186,10 +188,44 @@ export default function SQLInjectionLab() {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
               >
-                <div className="bg-amber-50 rounded-lg p-3">
-                  <p className="text-xs text-amber-700">
-                    <strong>Подсказка:</strong> {challenge.hint}
-                  </p>
+                <div className="bg-amber-50 rounded-lg p-3 space-y-2">
+                  {/* Current hint */}
+                  <div className={`rounded-lg p-2 ${
+                    hintLevel === 1 ? 'bg-amber-100/50' : hintLevel === 2 ? 'bg-orange-100/50' : 'bg-red-100/50'
+                  }`}>
+                    <p className={`text-xs font-semibold mb-1 ${
+                      hintLevel === 1 ? 'text-amber-700' : hintLevel === 2 ? 'text-orange-700' : 'text-red-700'
+                    }`}>
+                      {hintLevel === 1 ? '💡 Общая идея:' : hintLevel === 2 ? '🔍 Конкретнее:' : '🎯 Решение:'}
+                    </p>
+                    <p className="text-xs text-amber-800">
+                      {challenge.hint}
+                    </p>
+                  </div>
+                  {/* Show previous hints if on higher level */}
+                  {hintLevel >= 2 && (
+                    <div className="rounded-lg p-2 bg-amber-100/30 opacity-70">
+                      <p className="text-xs font-semibold text-amber-700 mb-1">💡 Общая идея:</p>
+                      <p className="text-xs text-amber-800">{challenge.hint}</p>
+                    </div>
+                  )}
+                  {hintLevel >= 3 && (
+                    <div className="rounded-lg p-2 bg-orange-100/30 opacity-70">
+                      <p className="text-xs font-semibold text-orange-700 mb-1">🔍 Конкретнее:</p>
+                      <p className="text-xs text-amber-800">{challenge.hint}</p>
+                    </div>
+                  )}
+                  {/* More hints button */}
+                  {hintLevel < 3 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-amber-700 hover:text-amber-800 h-auto py-1 px-2"
+                      onClick={() => setHintLevel(hintLevel + 1)}
+                    >
+                      Показать следующую подсказку ({hintLevel + 1}/3) →
+                    </Button>
+                  )}
                 </div>
               </motion.div>
             )}

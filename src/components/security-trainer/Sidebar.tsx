@@ -2,7 +2,7 @@
 
 import { useAppStore, type PageType } from '@/lib/store';
 import { useAuthStore, hasRole, type UserRole } from '@/lib/auth-store';
-import { modules, achievements } from '@/lib/security-data';
+import { modules } from '@/lib/data';
 import {
   LayoutDashboard,
   Shield,
@@ -29,6 +29,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ThemeToggle from './ThemeToggle';
 import GlobalSearch from './GlobalSearch';
+import SyncIndicator from './SyncIndicator';
+import NotificationBell from './NotificationBell';
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard size={20} />,
@@ -108,7 +110,10 @@ export default function Sidebar() {
         >
           <X size={20} />
         </Button>
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <NotificationBell />
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Global search */}
@@ -215,6 +220,10 @@ export default function Sidebar() {
               <LogOut size={16} />
               Выйти
             </button>
+
+            <div className="px-3 pb-1">
+              <SyncIndicator />
+            </div>
           </div>
         )}
       </div>

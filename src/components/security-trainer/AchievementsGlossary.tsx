@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { achievements as achievementDefs, isAchievementUnlocked } from '@/lib/security-data';
+import { achievements as achievementDefs } from '@/lib/data';
+import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -168,16 +169,21 @@ const achievementIcons: Record<string, React.ReactNode> = {
 };
 
 export default function AchievementsAndGlossary() {
-  const { setCurrentPage, completedModules, quizScores, studiedOwaspItems, secureCodingCorrectCount } = useAppStore();
+  const { setCurrentPage, completedModules, quizScores, owaspChallengeScores, authChallengeScores } = useAppStore();
   const [activeTab, setActiveTab] = useState<'achievements' | 'glossary'>('achievements');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');
 
-  // Calculate achievements — use single source of truth
-  const getAchievementStatus = (id: string) =>
-    isAchievementUnlocked(id, completedModules, studiedOwaspItems, quizScores, secureCodingCorrectCount);
+  const challengeStats = {
+    owaspCorrect: owaspChallengeScores.correct,
+    authCorrect: authChallengeScores.correct,
+  };
 
-  const unlockedCount = achievementDefs.filter((a) => getAchievementStatus(a.id)).length;
+  // Calculate achievements — use centralized achievement-utils
+  const getAchievement = (id: string) =>
+    getAchievementStatus(id, completedModules, quizScores, challengeStats);
+
+  const unlockedCount = countUnlockedAchievements(completedModules, quizScores, challengeStats);
 
   const filteredTerms = glossaryTerms.filter(
     (t) =>
@@ -243,7 +249,7 @@ export default function AchievementsAndGlossary() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {achievementDefs.map((ach, i) => {
-              const unlocked = getAchievementStatus(ach.id);
+              const unlocked = getAchievement(ach.id);
               return (
                 <motion.div
                   key={ach.id}

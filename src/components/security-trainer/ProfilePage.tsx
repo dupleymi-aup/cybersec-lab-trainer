@@ -12,12 +12,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { User, Camera, Shield, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, AlertCircle, Clock, Trash2, LogOut } from 'lucide-react';
+import { User, Camera, Shield, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, AlertCircle, Clock, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
-  const { user, updateProfile, updatePassword, deleteAccount, clearLoginActivity, loginActivity } = useAuthStore();
+  const { user, updateProfile, updatePassword, deleteAccount, loginActivity } = useAuthStore();
   const { completedModules, quizScores, studiedOwaspItems, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, secureCodingCorrectCount, resetProgress } = useAppStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -71,20 +71,20 @@ export default function ProfilePage() {
       return;
     }
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       const base64 = ev.target?.result as string;
-      updateProfile({ avatar: base64 });
+      await updateProfile({ avatar: base64 });
       toast.success('Аватар обновлён');
     };
     reader.readAsDataURL(file);
   };
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (!fullName.trim()) {
       toast.error('ФИО обязательно');
       return;
     }
-    updateProfile({ fullName, group, course, university, bio });
+    await updateProfile({ fullName, group, course, university, bio });
     toast.success('Профиль сохранён');
   };
 
@@ -180,12 +180,12 @@ export default function ProfilePage() {
     e.target.value = '';
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'УДАЛИТЬ') {
       toast.error('Введите "УДАЛИТЬ" для подтверждения');
       return;
     }
-    const result = deleteAccount();
+    const result = await deleteAccount();
     if (result.success) {
       toast.success('Аккаунт удалён');
       window.location.reload();

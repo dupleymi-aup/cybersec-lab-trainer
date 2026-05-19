@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAppStore, type PageType } from '@/lib/store';
-import { modules, quizCategories } from '@/lib/security-data';
+import { modules, quizCategories } from '@/lib/data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, LayoutDashboard, Database, FileText, Link, Lock, Code, Shield, HelpCircle, BookOpen, Trophy, GraduationCap } from 'lucide-react';
 

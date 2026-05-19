@@ -16,48 +16,6 @@ export function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Client-side token signing (not cryptographically secure but prevents casual forgery)
-const TOKEN_SECRET = process.env.NEXT_PUBLIC_TOKEN_SECRET || 'cybersec-lab-token-secret-v1';
-
-function signToken(payload: string): string {
-  const hmac = btoa(payload + TOKEN_SECRET);
-  return btoa(JSON.stringify({ p: payload, s: hmac }));
-}
-
-function verifyToken(token: string): string | null {
-  try {
-    const decoded = JSON.parse(atob(token));
-    const expected = btoa(decoded.p + TOKEN_SECRET);
-    if (decoded.s !== expected) return null;
-    return decoded.p;
-  } catch {
-    return null;
-  }
-}
-
-export function generateToken(userId: string, role: string, rememberMe?: boolean): string {
-  const expiry = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000;
-  const payload = JSON.stringify({
-    id: userId,
-    role,
-    exp: Date.now() + expiry,
-  });
-  return signToken(payload);
-}
-
-export function validateToken(token: string | null): { valid: boolean; payload?: { id: string; role: string } } {
-  if (!token) return { valid: false };
-  const payload = verifyToken(token);
-  if (!payload) return { valid: false };
-  try {
-    const data = JSON.parse(payload);
-    if (data.exp < Date.now()) return { valid: false };
-    return { valid: true, payload: { id: data.id, role: data.role } };
-  } catch {
-    return { valid: false };
-  }
-}
-
 export function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }

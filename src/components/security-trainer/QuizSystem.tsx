@@ -1,16 +1,17 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useAppStore } from '@/lib/store';
-import { quizQuestions, quizCategories } from '@/lib/security-data';
+import { quizQuestions, quizCategories } from '@/lib/data';
+import { saveQuizAttempts, type QuizAttemptData } from '@/lib/auth-store';
+import { NotificationHelper } from '@/lib/notification-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ChevronLeft,
   HelpCircle,
@@ -60,18 +61,16 @@ export default function QuizSystem() {
     currentQuestionRef.current = currentQuestion;
   }, [currentQuestion]);
 
-  const categoryQuestions = useMemo(() => quizQuestions.filter((q) => {
-    const catMatch = q.category === activeCategory;
+  const filterQuestions = (categoryName: string) => quizQuestions.filter((q) => {
+    const catMatch = q.category === categoryName;
     const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
     return catMatch && diffMatch;
-  }), [activeCategory, difficultyFilter]);
+  });
+
+  const categoryQuestions = useMemo(() => filterQuestions(activeCategory), [activeCategory, difficultyFilter]);
 
   const startQuiz = (categoryName: string) => {
-    const questions = quizQuestions.filter((q) => {
-      const catMatch = q.category === categoryName;
-      const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
-      return catMatch && diffMatch;
-    });
+    const questions = filterQuestions(categoryName);
     if (questions.length === 0) return;
     setActiveCategory(categoryName);
     setCurrentQuestion(0);
@@ -98,8 +97,19 @@ export default function QuizSystem() {
       const catId = quizCategories.find((c) => c.name === activeCategory)?.id || '';
       const score = categoryQuestions.length > 0 ? Math.round((finalCount / categoryQuestions.length) * 100) : 0;
       setQuizScore(catId, score);
+      NotificationHelper.quizCompleted(activeCategory, score);
       setTotalTimeTaken(Math.round((Date.now() - startTime) / 1000));
       setTimerActive(false);
+
+      // Save per-question attempts
+      const attempts: QuizAttemptData[] = categoryQuestions.map((q, i) => ({
+        questionId: q.id,
+        difficulty: q.difficulty,
+        category: q.category,
+        correct: answers[i] === true,
+      }));
+      saveQuizAttempts(catId, attempts);
+
       setQuizState('result');
     }
   };
@@ -162,6 +172,63 @@ export default function QuizSystem() {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [timerActive]);
 
+  const question = categoryQuestions[currentQuestion];
+  const finalScore = categoryQuestions.length > 0 ? Math.round((correctCount / categoryQuestions.length) * 100) : 0;
+
+  // Keyboard shortcuts during quiz
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (quizState !== 'playing' || !question) return;
+
+    // Number keys 1-4 to select answers
+    if (!showAnswer && e.key >= '1' && e.key <= '4') {
+      const idx = parseInt(e.key) - 1;
+      if (idx < question.options.length) {
+        setSelectedAnswer(String(idx));
+      }
+      return;
+    }
+
+    // Arrow keys to navigate options
+    if (!showAnswer) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setSelectedAnswer((prev) => {
+          const cur = prev === '' ? 0 : parseInt(prev);
+          return String(Math.max(0, cur - 1));
+        });
+        return;
+      }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        setSelectedAnswer((prev) => {
+          const cur = prev === '' ? 0 : parseInt(prev);
+          return String(Math.min(question.options.length - 1, cur + 1));
+        });
+        return;
+      }
+    }
+
+    // Enter to confirm answer or advance
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!showAnswer && selectedAnswer) {
+        handleAnswer();
+      } else if (showAnswer) {
+        nextQuestion();
+      }
+    }
+
+    // Escape to go back
+    if (e.key === 'Escape') {
+      resetQuiz();
+    }
+  }, [quizState, showAnswer, selectedAnswer, question]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
   const resetQuiz = () => {
     setQuizState('select');
     setCurrentQuestion(0);
@@ -172,9 +239,6 @@ export default function QuizSystem() {
     setAnswers([]);
     setTimerActive(false);
   };
-
-  const question = categoryQuestions[currentQuestion];
-  const finalScore = categoryQuestions.length > 0 ? Math.round((correctCount / categoryQuestions.length) * 100) : 0;
 
   return (
     <div className="space-y-6">
@@ -346,12 +410,19 @@ export default function QuizSystem() {
                       onClick={() => !showAnswer && setSelectedAnswer(String(i))}
                     >
                       <RadioGroupItem value={String(i)} id={`opt-${i}`} />
-                      <Label
-                        htmlFor={`opt-${i}`}
-                        className="flex-1 text-sm cursor-pointer leading-relaxed"
-                      >
-                        {option}
-                      </Label>
+                      <div className="flex items-center gap-2 flex-1">
+                        {!showAnswer && (
+                          <kbd className="hidden md:inline-flex items-center justify-center w-5 h-5 rounded text-[10px] font-mono bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
+                            {i + 1}
+                          </kbd>
+                        )}
+                        <Label
+                          htmlFor={`opt-${i}`}
+                          className="flex-1 text-sm cursor-pointer leading-relaxed"
+                        >
+                          {option}
+                        </Label>
+                      </div>
                       {showAnswer && i === question.correctIndex && (
                         <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
                       )}
@@ -370,9 +441,16 @@ export default function QuizSystem() {
                   onClick={handleAnswer}
                   disabled={!selectedAnswer}
                 >
-                  Ответить
+                  Ответить <kbd className="ml-2 hidden md:inline-flex items-center justify-center px-2 h-5 rounded text-[10px] font-mono bg-white/20 border border-white/30">Enter</kbd>
                 </Button>
               )}
+
+              {/* Keyboard shortcuts hint */}
+              <div className="hidden md:flex items-center gap-3 mt-3 text-[11px] text-slate-400">
+                <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">1-4</kbd> выбрать</span>
+                <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">↑↓</kbd> навигация</span>
+                <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-slate-100 border border-slate-200 mr-1">Esc</kbd> выход</span>
+              </div>
 
               {showAnswer && (
                 <motion.div

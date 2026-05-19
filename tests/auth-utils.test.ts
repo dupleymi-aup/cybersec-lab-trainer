@@ -4,8 +4,6 @@ import {
   validateEmail,
   validatePhone,
   validatePassword,
-  validateToken,
-  generateToken,
   generateUserId,
 } from '@/lib/auth-utils';
 
@@ -19,7 +17,6 @@ describe('generateOTP', () => {
   it('should generate different OTPs on subsequent calls', () => {
     const otp1 = generateOTP();
     const otp2 = generateOTP();
-    // They could theoretically be the same, but it's extremely unlikely
     expect(otp1 === otp2).toBe(false);
   });
 });
@@ -95,30 +92,6 @@ describe('validatePassword', () => {
   it('should return all applicable errors', () => {
     const result = validatePassword('123');
     expect(result.errors.length).toBeGreaterThan(2);
-  });
-});
-
-describe('generateToken & validateToken', () => {
-  it('should generate a valid token', () => {
-    const token = generateToken('usr_123', 'admin');
-    const result = validateToken(token);
-    expect(result.valid).toBe(true);
-    expect(result.payload?.id).toBe('usr_123');
-    expect(result.payload?.role).toBe('admin');
-  });
-
-  it('should reject null token', () => {
-    expect(validateToken(null).valid).toBe(false);
-  });
-
-  it('should reject tampered token', () => {
-    const token = generateToken('usr_123', 'admin');
-    const tampered = token.slice(0, -5) + 'XXXXX';
-    expect(validateToken(tampered).valid).toBe(false);
-  });
-
-  it('should reject random string as token', () => {
-    expect(validateToken('random-garbage-string').valid).toBe(false);
   });
 });
 

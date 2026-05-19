@@ -1,44 +1,64 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useAppStore } from '@/lib/store';
 import { useAuthStore, hasRole, getRoleLabel, getImpersonationState, stopImpersonation, type UserRole } from '@/lib/auth-store';
 import Sidebar from '@/components/security-trainer/Sidebar';
 import Dashboard from '@/components/security-trainer/Dashboard';
-import OWASPTop10 from '@/components/security-trainer/OWASPTop10';
-import SQLInjectionLab from '@/components/security-trainer/SQLInjectionLab';
-import XSSLab from '@/components/security-trainer/XSSLab';
-import CSRFLab from '@/components/security-trainer/CSRFLab';
-import AuthSecurityLab from '@/components/security-trainer/AuthSecurityLab';
-import SecureCodingLab from '@/components/security-trainer/SecureCodingLab';
-import ToolsLab from '@/components/security-trainer/ToolsLab';
-import QuizSystem from '@/components/security-trainer/QuizSystem';
-import AchievementsGlossary from '@/components/security-trainer/AchievementsGlossary';
 import AuthPages from '@/components/security-trainer/AuthPages';
-import ProfilePage from '@/components/security-trainer/ProfilePage';
-import SecurityHeadersLab from '@/components/security-trainer/SecurityHeadersLab';
 import PWAHandler from '@/components/security-trainer/PWAHandler';
-import RoleGuard from '@/components/security-trainer/RoleGuard';
-import TeacherPanel from '@/components/security-trainer/TeacherPanel';
-import AdminPanel from '@/components/security-trainer/AdminPanel';
+import OnboardingTour from '@/components/security-trainer/OnboardingTour';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'sonner';
 import { useMemo } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+
+const ModuleWrapper = ({ name, children }: { name: string; children: React.ReactNode }) => (
+  <ErrorBoundary name={name}>{children}</ErrorBoundary>
+);
+
+const LazyOWASPTop10 = dynamic(() => import('@/components/security-trainer/OWASPTop10'), { ssr: false });
+const LazySQLInjectionLab = dynamic(() => import('@/components/security-trainer/SQLInjectionLab'), { ssr: false });
+const LazyXSSLab = dynamic(() => import('@/components/security-trainer/XSSLab'), { ssr: false });
+const LazyCSRFLab = dynamic(() => import('@/components/security-trainer/CSRFLab'), { ssr: false });
+const LazyAuthSecurityLab = dynamic(() => import('@/components/security-trainer/AuthSecurityLab'), { ssr: false });
+const LazySecureCodingLab = dynamic(() => import('@/components/security-trainer/SecureCodingLab'), { ssr: false });
+const LazyToolsLab = dynamic(() => import('@/components/security-trainer/ToolsLab'), { ssr: false });
+const LazyQuizSystem = dynamic(() => import('@/components/security-trainer/QuizSystem'), { ssr: false });
+const LazyAchievementsGlossary = dynamic(() => import('@/components/security-trainer/AchievementsGlossary'), { ssr: false });
+const LazyProfilePage = dynamic(() => import('@/components/security-trainer/ProfilePage'), { ssr: false });
+const LazySecurityHeadersLab = dynamic(() => import('@/components/security-trainer/SecurityHeadersLab'), { ssr: false });
+const LazyIDORLab = dynamic(() => import('@/components/security-trainer/IDORLab'), { ssr: false });
+const LazySSRFLab = dynamic(() => import('@/components/security-trainer/SSRFLab'), { ssr: false });
+const LazyTeacherPanel = dynamic(() => import('@/components/security-trainer/TeacherPanel'), { ssr: false });
+const LazyAdminPanel = dynamic(() => import('@/components/security-trainer/AdminPanel'), { ssr: false });
+const LazyRoleGuard = dynamic(() => import('@/components/security-trainer/RoleGuard'), { ssr: false });
 
 const pages: Record<string, React.ReactNode> = {
-  dashboard: <Dashboard />,
-  owasp: <OWASPTop10 />,
-  'sql-injection': <SQLInjectionLab />,
-  xss: <XSSLab />,
-  csrf: <CSRFLab />,
-  auth: <AuthSecurityLab />,
-  'secure-coding': <SecureCodingLab />,
-  tools: <ToolsLab />,
-  'security-headers': <SecurityHeadersLab />,
-  quiz: <QuizSystem />,
-  achievements: <AchievementsGlossary />,
-  profile: <ProfilePage />,
-  'teacher-panel': <RoleGuard requiredRole="teacher"><TeacherPanel /></RoleGuard>,
-  'admin-panel': <RoleGuard requiredRole="admin"><AdminPanel /></RoleGuard>,
+  dashboard: <ModuleWrapper name="Dashboard"><Dashboard /></ModuleWrapper>,
+  owasp: <ModuleWrapper name="OWASP Top 10"><LazyOWASPTop10 /></ModuleWrapper>,
+  'sql-injection': <ModuleWrapper name="SQL Injection Lab"><LazySQLInjectionLab /></ModuleWrapper>,
+  xss: <ModuleWrapper name="XSS Lab"><LazyXSSLab /></ModuleWrapper>,
+  csrf: <ModuleWrapper name="CSRF Lab"><LazyCSRFLab /></ModuleWrapper>,
+  auth: <ModuleWrapper name="Auth Lab"><LazyAuthSecurityLab /></ModuleWrapper>,
+  'secure-coding': <ModuleWrapper name="Secure Coding Lab"><LazySecureCodingLab /></ModuleWrapper>,
+  tools: <ModuleWrapper name="Tools Lab"><LazyToolsLab /></ModuleWrapper>,
+  'security-headers': <ModuleWrapper name="Security Headers Lab"><LazySecurityHeadersLab /></ModuleWrapper>,
+  idor: <ModuleWrapper name="IDOR Lab"><LazyIDORLab /></ModuleWrapper>,
+  ssrf: <ModuleWrapper name="SSRF Lab"><LazySSRFLab /></ModuleWrapper>,
+  quiz: <ModuleWrapper name="Quiz System"><LazyQuizSystem /></ModuleWrapper>,
+  achievements: <ModuleWrapper name="Achievements"><LazyAchievementsGlossary /></ModuleWrapper>,
+  profile: <ModuleWrapper name="Profile"><LazyProfilePage /></ModuleWrapper>,
+  'teacher-panel': (
+    <ModuleWrapper name="Teacher Panel">
+      <LazyRoleGuard requiredRole="teacher"><LazyTeacherPanel /></LazyRoleGuard>
+    </ModuleWrapper>
+  ),
+  'admin-panel': (
+    <ModuleWrapper name="Admin Panel">
+      <LazyRoleGuard requiredRole="admin"><LazyAdminPanel /></LazyRoleGuard>
+    </ModuleWrapper>
+  ),
 };
 
 export default function Home() {
@@ -63,7 +83,6 @@ export default function Home() {
     return <AuthPages />;
   }
 
-  // Redirect to dashboard if user lost access to current page
   if (resolvedPage !== currentPage) {
     setCurrentPage(resolvedPage);
   }
@@ -72,7 +91,6 @@ export default function Home() {
     <div className="min-h-screen flex bg-background">
       <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
-        {/* Impersonation Banner */}
         {impersonation.isImpersonating && user && (
           <div className="bg-amber-500 text-white px-4 py-2 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -111,6 +129,7 @@ export default function Home() {
       </div>
       <Toaster position="top-right" />
       <PWAHandler />
+      <OnboardingTour />
     </div>
   );
 }

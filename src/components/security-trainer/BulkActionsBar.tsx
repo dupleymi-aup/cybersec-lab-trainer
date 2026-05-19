@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UserRole, getRoleLabel, bulkDeleteUsers, bulkChangeRole, bulkToggleBlock, assignUsersToGroup, getAllGroups } from '@/lib/auth-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,12 +18,15 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
   const [showRolePicker, setShowRolePicker] = useState(false);
   const [showGroupPicker, setShowGroupPicker] = useState(false);
   const [newGroupInput, setNewGroupInput] = useState('');
+  const [groups, setGroups] = useState<string[]>([]);
 
-  const groups = getAllGroups();
+  useEffect(() => {
+    getAllGroups().then(setGroups);
+  }, []);
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (!confirm(`Удалить ${selectedIds.length} пользователей?`)) return;
-    const result = bulkDeleteUsers(selectedIds, currentUserId);
+    const result = await bulkDeleteUsers(selectedIds, currentUserId);
     if (result.success) {
       toast.success(`Удалено: ${result.count}`);
       onDone();
@@ -32,8 +35,8 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
     }
   };
 
-  const handleBulkRoleChange = (role: UserRole) => {
-    const result = bulkChangeRole(selectedIds, role);
+  const handleBulkRoleChange = async (role: UserRole) => {
+    const result = await bulkChangeRole(selectedIds, role);
     if (result.success) {
       toast.success(`Роль изменена у ${result.count} пользователей`);
       setShowRolePicker(false);
@@ -41,8 +44,8 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
     }
   };
 
-  const handleBulkBlock = (blocked: boolean) => {
-    const result = bulkToggleBlock(selectedIds, currentUserId, blocked);
+  const handleBulkBlock = async (blocked: boolean) => {
+    const result = await bulkToggleBlock(selectedIds, currentUserId, blocked);
     if (result.success) {
       toast.success(blocked ? `Заблокировано: ${result.count}` : `Разблокировано: ${result.count}`);
       onDone();
@@ -51,9 +54,9 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
     }
   };
 
-  const handleGroupAssign = (groupName: string) => {
+  const handleGroupAssign = async (groupName: string) => {
     if (!groupName.trim()) { toast.error('Введите название группы'); return; }
-    const result = assignUsersToGroup(selectedIds, groupName, currentUserId);
+    const result = await assignUsersToGroup(selectedIds, groupName, currentUserId);
     if (result.success) {
       toast.success(`Группа "${groupName.trim()}" назначена ${result.count} пользователям`);
       setShowGroupPicker(false);

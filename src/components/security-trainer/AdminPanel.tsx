@@ -1,8 +1,15 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
-import { useAuthStore, getAllUsers, changeUserRole, deleteUser, toggleUserBlock, createUser, startImpersonation, getAuditLogEntries, clearAuditLog, getRoleLabel, type UserRole, type User } from '@/lib/auth-store';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useAuthStore, getAllUsers, changeUserRole, deleteUser, toggleUserBlock, createUser, startImpersonation, getComprehensiveSummary, getRoleLabel, type UserRole, type User } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
+import { AnalyticsProvider, useAnalyticsFilters } from '@/lib/analytics-context';
+import KPICard from './KPICard';
+import AnalyticsFilterBar from './AnalyticsFilterBar';
+import AchievementAnalytics from './AchievementAnalytics';
+import LearningPathReport from './LearningPathReport';
+import QuizTrajectoryReport from './QuizTrajectoryReport';
+import CohortAnalysis from './CohortAnalysis';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,11 +30,25 @@ import {
   Upload,
   RotateCcw,
   Pencil,
-  Ban,
   UserPlus,
   KeyRound,
   LogIn,
   Activity,
+  FileBarChart,
+  Calendar,
+  LineChart,
+  BarChart3,
+  BookOpen,
+  TrendingUp,
+  AlertTriangle,
+  GitCompare,
+  HelpCircle,
+  Table,
+  Flame,
+  Award,
+  GitBranch,
+  Target,
+  Layers,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import UserModal from './UserModal';
@@ -36,6 +57,21 @@ import PasswordResetModal from './PasswordResetModal';
 import UserActivityModal from './UserActivityModal';
 import GroupManager from './GroupManager';
 import AuditLogView from './AuditLogView';
+import AdminSummaryReport from './AdminSummaryReport';
+import ActivityHeatmap from './ActivityHeatmap';
+import ComprehensiveDashboard from './ComprehensiveDashboard';
+import ModulePerformanceReport from './ModulePerformanceReport';
+import ProgressDynamicsChart from './ProgressDynamicsChart';
+import AtRiskReport from './AtRiskReport';
+import GroupComparisonReport from './GroupComparisonReport';
+import QuizCategoryDeepDive from './QuizCategoryDeepDive';
+import AnalyticsExportPanel from './AnalyticsExportPanel';
+import ProgressTrendsChart from './ProgressTrendsChart';
+import QuizQuestionAnalytics from './QuizQuestionAnalytics';
+import StudentPerformanceReport from './StudentPerformanceReport';
+import StudentComparisonView from './StudentComparisonView';
+import GradebookView from './GradebookView';
+import EngagementAnalytics from './EngagementAnalytics';
 
 const roleColors: Record<UserRole, string> = {
   student: 'bg-violet-100 text-violet-700',
@@ -46,10 +82,14 @@ const roleColors: Record<UserRole, string> = {
 export default function AdminPanel() {
   const { user } = useAuthStore();
   const { setCurrentPage } = useAppStore();
+  const { groupId: analyticsGroupId, days: analyticsDays } = useAnalyticsFilters();
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [reportSubTab, setReportSubTab] = useState<'summary' | 'heatmap' | 'quiz-categories' | 'quiz-questions' | 'student-comparison' | 'at-risk' | 'group-compare' | 'export'>('summary');
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalUser, setEditModalUser] = useState<User | null>(null);
   const [passwordResetUser, setPasswordResetUser] = useState<User | null>(null);
@@ -59,7 +99,10 @@ export default function AdminPanel() {
   // Force re-render by toggling key
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
-  const allUsers = getAllUsers();
+  // Load users from API
+  useEffect(() => {
+    getAllUsers().then(setAllUsers);
+  }, [refreshKey]);
   const filteredUsers = allUsers.filter((u) => {
     const matchesSearch =
       searchTerm === '' ||
@@ -91,8 +134,8 @@ export default function AdminPanel() {
   }
   const storageKB = (storageUsed / 1024).toFixed(1);
 
-  const handleRoleChange = (userId: string, newRole: UserRole) => {
-    const result = changeUserRole(userId, newRole);
+  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+    const result = await changeUserRole(userId, newRole);
     if (result.success) {
       toast.success(`Роль изменена на ${getRoleLabel(newRole)}`);
       refresh();
@@ -101,9 +144,9 @@ export default function AdminPanel() {
     }
   };
 
-  const handleDeleteUser = (userId: string, fullName: string) => {
+  const handleDeleteUser = async (userId: string, fullName: string) => {
     if (!confirm(`Удалить пользователя "${fullName}"?`)) return;
-    const result = deleteUser(userId);
+    const result = await deleteUser(userId);
     if (result.success) {
       toast.success('Пользователь удалён');
       refresh();
@@ -112,8 +155,8 @@ export default function AdminPanel() {
     }
   };
 
-  const handleToggleBlock = (userId: string) => {
-    const result = toggleUserBlock(userId);
+  const handleToggleBlock = async (userId: string) => {
+    const result = await toggleUserBlock(userId);
     if (result.success) {
       const isNowBlocked = allUsers.find((u) => u.id === userId)?.isBlocked;
       toast.success(isNowBlocked ? 'Пользователь заблокирован' : 'Пользователь разблокирован');
@@ -147,7 +190,7 @@ export default function AdminPanel() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const text = event.target?.result as string;
         const lines = text.split('\n').filter((l) => l.trim());
@@ -182,7 +225,7 @@ export default function AdminPanel() {
           if (existing) { skipped++; continue; }
 
           const defaultPassword = 'Temp@1234';
-          const result = createUser(
+          const result = await createUser(
             { email, phone, fullName, role, group, course: '', university: '' },
             defaultPassword
           );
@@ -245,8 +288,9 @@ export default function AdminPanel() {
         </div>
       </div>
 
+      <AnalyticsProvider>
       <Tabs defaultValue="users">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="users" className="text-xs">
             <Users size={14} className="mr-1" /> Пользователи
           </TabsTrigger>
@@ -259,8 +303,14 @@ export default function AdminPanel() {
           <TabsTrigger value="settings" className="text-xs">
             <Settings size={14} className="mr-1" /> Настройки
           </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs">
+            <LineChart size={14} className="mr-1" /> Аналитика
+          </TabsTrigger>
           <TabsTrigger value="audit" className="text-xs">
             <Activity size={14} className="mr-1" /> Журнал
+          </TabsTrigger>
+          <TabsTrigger value="report" className="text-xs">
+            <FileBarChart size={14} className="mr-1" /> Отчёт
           </TabsTrigger>
         </TabsList>
 
@@ -392,8 +442,8 @@ export default function AdminPanel() {
                               variant="ghost"
                               size="icon"
                               className="text-slate-500 hover:text-purple-700 hover:bg-purple-50"
-                              onClick={() => {
-                                const result = startImpersonation(u.id, user?.id || '');
+                              onClick={async () => {
+                                const result = await startImpersonation(u.id, user?.id || '');
                                 if (result.success) {
                                   toast.success(`Вы вошли как ${u.fullName}`);
                                   setCurrentPage('dashboard');
@@ -563,6 +613,16 @@ export default function AdminPanel() {
           <GroupManager adminId={user?.id || ''} onRefresh={refresh} />
         </TabsContent>
 
+        {/* Analytics Tab */}
+        <TabsContent value="analytics" className="mt-4 space-y-4">
+          <AnalyticsFilterBar />
+          <AnalyticsSubTabs
+              allUsers={allUsers}
+              selectedStudentId={selectedStudentId}
+              setSelectedStudentId={setSelectedStudentId}
+            />
+        </TabsContent>
+
         {/* Audit Log Tab */}
         <TabsContent value="audit" className="mt-4 space-y-4">
           <div className="flex items-center gap-3 mb-2">
@@ -574,9 +634,80 @@ export default function AdminPanel() {
               <p className="text-xs text-slate-500">История всех действий администраторов</p>
             </div>
           </div>
-          <AuditLogView adminId={user?.id || ''} />
+          <AuditLogView />
+        </TabsContent>
+
+        {/* Report Tab */}
+        <TabsContent value="report" className="mt-4 space-y-4">
+          {/* Sub-tab selector */}
+          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit flex-wrap">
+            {[
+              { key: 'summary' as const, label: 'Сводка', icon: FileBarChart },
+              { key: 'heatmap' as const, label: 'Активность', icon: Calendar },
+              { key: 'quiz-categories' as const, label: 'Квизы', icon: HelpCircle },
+              { key: 'quiz-questions' as const, label: 'Вопросы', icon: HelpCircle },
+              { key: 'student-comparison' as const, label: 'Студенты', icon: GitCompare },
+              { key: 'export' as const, label: 'Экспорт', icon: Download },
+            ].map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => setReportSubTab(key)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  reportSubTab === key
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                <Icon size={13} />
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Summary sub-tab */}
+          {reportSubTab === 'summary' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+              <AdminSummaryReport />
+            </motion.div>
+          )}
+
+          {/* Heatmap sub-tab */}
+          {reportSubTab === 'heatmap' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+              <ActivityHeatmap />
+            </motion.div>
+          )}
+
+          {/* Quiz Categories sub-tab */}
+          {reportSubTab === 'quiz-categories' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+              <QuizCategoryDeepDive groupId={analyticsGroupId} days={analyticsDays} />
+            </motion.div>
+          )}
+
+          {/* Quiz Questions sub-tab */}
+          {reportSubTab === 'quiz-questions' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+              <QuizQuestionAnalytics />
+            </motion.div>
+          )}
+
+          {/* Student Comparison sub-tab */}
+          {reportSubTab === 'student-comparison' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+              <StudentComparisonView groupId={analyticsGroupId} days={analyticsDays} />
+            </motion.div>
+          )}
+
+          {/* Export sub-tab */}
+          {reportSubTab === 'export' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+              <AnalyticsExportPanel groupId={analyticsGroupId} days={analyticsDays} />
+            </motion.div>
+          )}
         </TabsContent>
       </Tabs>
+      </AnalyticsProvider>
 
       {/* Modals */}
       <AnimatePresence>
@@ -626,5 +757,173 @@ export default function AdminPanel() {
         onDone={() => { setSelectedUserIds(new Set()); refresh(); }}
       />
     </div>
+  );
+}
+
+function AnalyticsSubTabs({
+  allUsers,
+  selectedStudentId,
+  setSelectedStudentId,
+}: {
+  allUsers: User[];
+  selectedStudentId: string;
+  setSelectedStudentId: (id: string) => void;
+}) {
+  const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort'>('dashboard');
+  const { groupId, days } = useAnalyticsFilters();
+  const [summary, setSummary] = useState<any>(null);
+
+  useEffect(() => {
+    getComprehensiveSummary(days, groupId).then(setSummary);
+  }, [days, groupId]);
+
+  return (
+    <>
+      {/* KPI Summary Row */}
+      {summary && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <KPICard
+            icon={<Users size={18} />}
+            value={summary.totalStudents ?? 0}
+            label="Всего студентов"
+            trend={summary.totalStudentsTrend ?? 'stable'}
+            delta={summary.totalStudentsDelta ?? 0}
+          />
+          <KPICard
+            icon={<Activity size={18} />}
+            value={`${summary.activePercentage ?? 0}%`}
+            label="Активных"
+            trend={summary.activePercentageTrend ?? 'stable'}
+            delta={summary.activePercentageDelta ?? 0}
+          />
+          <KPICard
+            icon={<BookOpen size={18} />}
+            value={`${summary.avgCompletionRate ?? 0}%`}
+            label="Среднее завершение"
+            trend={summary.avgCompletionRateTrend ?? 'stable'}
+            delta={summary.avgCompletionRateDelta ?? 0}
+          />
+          <KPICard
+            icon={<HelpCircle size={18} />}
+            value={`${summary.avgQuizScore ?? 0}%`}
+            label="Средний балл quiz"
+            trend={summary.avgQuizScoreTrend ?? 'stable'}
+            delta={summary.avgQuizScoreDelta ?? 0}
+          />
+        </div>
+      )}
+
+      {/* Sub-tab selector */}
+      <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit flex-wrap">
+        {[
+          { key: 'dashboard' as const, label: 'Дашборд', icon: BarChart3 },
+          { key: 'modules' as const, label: 'Модули', icon: BookOpen },
+          { key: 'dynamics' as const, label: 'Динамика', icon: TrendingUp },
+          { key: 'trends' as const, label: 'Тренды', icon: LineChart },
+          { key: 'at-risk' as const, label: 'Внимание', icon: AlertTriangle },
+          { key: 'comparison' as const, label: 'Сравнение', icon: GitCompare },
+          { key: 'engagement' as const, label: 'Вовлечённость', icon: Flame },
+          { key: 'achievements' as const, label: 'Достижения', icon: Award },
+          { key: 'gradebook' as const, label: 'Ведомость', icon: Table },
+          { key: 'learning-path' as const, label: 'Воронка', icon: GitBranch },
+          { key: 'quiz-trajectory' as const, label: 'Траектория', icon: Target },
+          { key: 'cohort' as const, label: 'Когорты', icon: Layers },
+          { key: 'student' as const, label: 'Студент', icon: Users },
+        ].map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setAnalyticsSubTab(key)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              analyticsSubTab === key
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Icon size={13} />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {analyticsSubTab === 'dashboard' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <ComprehensiveDashboard groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'modules' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <ModulePerformanceReport groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'dynamics' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <ProgressDynamicsChart groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'trends' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <ProgressTrendsChart groupId={groupId} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'at-risk' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <AtRiskReport groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'comparison' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <GroupComparisonReport groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'engagement' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <EngagementAnalytics groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'achievements' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <AchievementAnalytics groupId={groupId} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'gradebook' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <GradebookView groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'learning-path' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <LearningPathReport groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'quiz-trajectory' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <QuizTrajectoryReport groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'cohort' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <CohortAnalysis groupId={groupId} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'student' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <select
+                value={selectedStudentId}
+                onChange={(e) => setSelectedStudentId(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-md text-sm bg-white"
+              >
+                <option value="">Выберите студента...</option>
+                {allUsers.filter((u) => u.role === 'student').map((u) => (
+                  <option key={u.id} value={u.id}>{u.fullName} ({u.email})</option>
+                ))}
+              </select>
+            </div>
+            <StudentPerformanceReport userId={selectedStudentId} />
+          </div>
+        </motion.div>
+      )}
+    </>
   );
 }

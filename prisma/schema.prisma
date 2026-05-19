@@ -1,0 +1,129 @@
+// CyberSec Lab Trainer — Prisma Schema
+// PostgreSQL database for user management, progress tracking, and audit logging
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("SQLITE_URL")
+}
+
+model User {
+  id           String    @id
+  email        String    @unique
+  phone        String    @unique
+  fullName     String
+  group        String    @default("")
+  course       String    @default("")
+  university   String    @default("")
+  avatar       String    @default("")
+  bio          String    @default("")
+  role         String    @default("student")  // student, teacher, admin
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @default(now())       @map("created_at")
+  lastLoginAt  DateTime?                       @map("last_login_at")
+  loginCount   Int       @default(0)           @map("login_count")
+  isBlocked    Boolean   @default(false)       @map("is_blocked")
+
+  progress          Progress[]
+  quizResults       QuizResult[]
+  auditLogs         AuditLog[]       @relation("AdminAuditLogs")
+  loginActivities   LoginActivity[]
+  quizAttempts      QuizAttempt[]
+  progressSnapshots ProgressSnapshot[]
+
+  @@map("users")
+}
+
+model Progress {
+  id                     String   @id
+  userId                 String   @map("user_id")
+  user                   User     @relation(fields: [userId], references: [id])
+  moduleId               String   @map("module_id")  // owasp, sql-injection, xss, csrf, auth, secure-coding, tools, security-headers
+  completed              Boolean  @default(false)
+  score                  Int?     // 0-100
+  sqlLevels              String   @default("")       @map("sql_levels")
+  xssLevels              String   @default("")       @map("xss_levels")
+  csrfSteps              String   @default("")       @map("csrf_steps")
+  secureCodingAnswers    String   @default("")       @map("secure_coding_answers")
+  secureCodingCorrectCount Int    @default(0)        @map("secure_coding_correct_count")
+  studiedOwaspItems      String   @default("")       @map("studied_owasp_items")
+  challengeScores        String?  @map("challenge_scores")  // JSON string: { owasp, auth, headers }
+  updatedAt              DateTime @updatedAt         @map("updated_at")
+
+  @@unique([userId, moduleId])
+  @@map("progress")
+}
+
+model QuizResult {
+  id         String   @id
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId     String   @map("quiz_id")  // category: sql, xss, csrf, auth, general, owasp, coding, network, social
+  score      Int      // correct answers
+  total      Int      // total questions
+  percentage Int      // computed: round(score/total * 100)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, quizId])
+  @@map("quiz_results")
+}
+
+model LoginActivity {
+  id        String   @id
+  userId    String?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id])
+  email     String?
+  ip        String
+  userAgent String   @map("user_agent")
+  success   Boolean
+  timestamp DateTime @default(now())
+
+  @@map("login_activity")
+}
+
+model AuditLog {
+  id         String   @id
+  adminId    String   @map("admin_id")
+  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id])
+  adminName  String   @map("admin_name")
+  action     String   // role_change, user_created, user_deleted, user_blocked, impersonation, bulk_operation
+  targetId   String   @map("target_id")
+  targetName String   @map("target_name")
+  details    String   @default("")
+  timestamp  DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  quizId      String   @map("quiz_id")
+  questionId  String   @map("question_id")
+  difficulty  String
+  category    String
+  correct     Boolean
+  attemptedAt DateTime @default(now()) @map("attempted_at")
+
+  @@index([questionId])
+  @@index([userId, quizId])
+  @@map("quiz_attempts")
+}
+
+model ProgressSnapshot {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  moduleId   String   @map("module_id")
+  score      Int
+  completed  Boolean
+  recordedAt DateTime @default(now()) @map("recorded_at")
+
+  @@index([userId, recordedAt])
+  @@map("progress_snapshots")
+}

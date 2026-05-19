@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { quizQuestions } from '@/lib/security-data';
+import { quizQuestions, attackSteps, defenseMechanisms } from '@/lib/data';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,150 +10,19 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ArrowRight, ArrowLeft, CheckCircle2, AlertTriangle, Lock, Globe, Server, ShieldCheck, Trophy, Target, RotateCcw } from 'lucide-react';
 
-const attackSteps = [
-  {
-    id: 1,
-    title: 'Вход в банковское приложение',
-    description: 'Пользователь заходит на bank.com и успешно проходит аутентификацию. Сервер устанавливает сессионную куку в браузер.',
-    detail: 'Set-Cookie: session_id=abc123; Domain=bank.com; Path=/',
-    icon: <Globe size={20} className="text-emerald-600" />,
-    color: 'border-emerald-300 bg-emerald-50',
-  },
-  {
-    id: 2,
-    title: 'Посещение вредоносного сайта',
-    description: 'Пользователь переходит на evil.com, который содержит скрытую HTML-форму, автоматически отправляющую запрос к bank.com.',
-    detail: 'На evil.com загружается страница с невидимой формой, JavaScript автоматически отправляет POST-запрос.',
-    icon: <AlertTriangle size={20} className="text-amber-600" />,
-    color: 'border-amber-300 bg-amber-50',
-  },
-  {
-    id: 3,
-    title: 'Автоматическая отправка запроса',
-    description: 'Скрытая форма на evil.com автоматически отправляет POST-запрос к bank.com/transfer с параметрами перевода.',
-    detail: 'POST /transfer HTTP/1.1\nHost: bank.com\nCookie: session_id=abc123\n\namount=10000&to=attacker_account',
-    icon: <Server size={20} className="text-orange-600" />,
-    color: 'border-orange-300 bg-orange-50',
-  },
-  {
-    id: 4,
-    title: 'Банк обрабатывает запрос',
-    description: 'Банк получает запрос с корректной сессионной кукой и выполняет перевод. Сервер не может отличить этот запрос от легитимного действия пользователя.',
-    detail: 'Сервер проверяет session_id → cookie валиден → выполняет перевод. Деньги переведены злоумышленнику!',
-    icon: <AlertTriangle size={20} className="text-red-600" />,
-    color: 'border-red-300 bg-red-50',
-  },
-];
+const iconMap: Record<string, React.ReactNode> = {
+  Globe: <Globe size={20} className="text-emerald-600" />,
+  AlertTriangle: <AlertTriangle size={20} className="text-amber-600" />,
+  Server: <Server size={20} className="text-orange-600" />,
+};
 
-const defenseMechanisms = [
-  {
-    title: 'CSRF-токены (Anti-CSRF Tokens)',
-    description: 'Сервер генерирует уникальный случайный токен для каждой формы и сохраняет его в сессии. При отправке формы токен проверяется на сервере. Злоумышленник не может получить токен из-за Same-Origin Policy.',
-    code: `// Генерация CSRF-токена
-app.use(csrf({ cookie: true }));
-
-// В форме
-<form action="/transfer" method="POST">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <input name="amount" type="number">
-  <button type="submit">Перевести</button>
-</form>`,
-  },
-  {
-    title: 'SameSite Cookie Attribute',
-    description: 'Атрибут SameSite контролирует, когда куки отправляются с кросс-сайтовыми запросами. SameSite=Strict полностью блокирует, SameSite=Lax разрешает только навигационные GET-запросы.',
-    code: `// Настройка куки с SameSite
-Set-Cookie: session_id=abc123;
-  SameSite=Strict;
-  Secure;
-  HttpOnly
-
-// Express.js
-app.use(session({
-  cookie: {
-    sameSite: 'strict',
-    secure: true,
-    httpOnly: true
-  }
-}));`,
-  },
-  {
-    title: 'Проверка Referer / Origin',
-    description: 'Сервер проверяет заголовок Referer или Origin входящего запроса. Если запрос приходит не с собственного домена — он отклоняется.',
-    code: `// Проверка Origin заголовка
-app.post('/transfer', (req, res) => {
-  const origin = req.headers.origin;
-  if (origin !== 'https://bank.com') {
-    return res.status(403).json({
-      error: 'CSRF: неверный Origin'
-    });
-  }
-  // Обработка перевода...
-});`,
-  },
-  {
-    title: 'Double-Submit Cookie Pattern',
-    description: 'CSRF-токен дублируется в куки и в теле запроса. Сервер сравнивает их — если они совпадают, запрос легитимный. Злоумышленник не может прочитать куки с другого домена.',
-    code: `// Сервер генерирует CSRF-токен в куки
-res.cookie('csrf_token', randomToken, {
-  httpOnly: false, // JavaScript должен читать
-  sameSite: 'strict',
-  secure: true
-});
-
-// Клиент читает токен из куки и отправляет в заголовке
-fetch('/api/transfer', {
-  method: 'POST',
-  headers: {
-    'X-CSRF-Token': getCookie('csrf_token'),
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ amount: 1000, to: 'account123' })
-});
-
-// Сервер сравнивает
-app.post('/api/transfer', (req, res) => {
-  const cookieToken = req.cookies.csrf_token;
-  const headerToken = req.headers['x-csrf-token'];
-  if (cookieToken !== headerToken) {
-    return res.status(403).json({ error: 'CSRF mismatch' });
-  }
-});`,
-  },
-  {
-    title: 'Custom Headers с CORS preflight',
-    description: 'Использование кастомных заголовков (например, X-Requested-With) вызывает CORS preflight-запрос. Браузер блокирует кросс-доменные запросы с кастомными заголовками без явного разрешения сервера.',
-    code: `// Клиент: кастомный заголовок
-fetch('/api/transfer', {
-  method: 'POST',
-  headers: {
-    'X-Requested-With': 'XMLHttpRequest',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ amount: 1000 })
-});
-
-// Браузер отправляет OPTIONS preflight:
-// OPTIONS /api/transfer
-// Origin: https://evil.com
-// Access-Control-Request-Method: POST
-// Access-Control-Request-Headers: X-Requested-With
-
-// Сервер отвечает (если evil.com не в whitelist):
-// HTTP/1.1 403 Forbidden
-// Нет CORS заголовков → браузер блокирует запрос
-
-// Express CORS:
-app.use(cors({
-  origin: ['https://bank.com'],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'X-Requested-With']
-}));`,
-  },
-];
+const mappedAttackSteps = attackSteps.map(step => ({
+  ...step,
+  icon: iconMap[step.icon] || step.icon,
+}));
 
 export default function CSRFLab() {
-  const { completedModules, completeModule, setCurrentPage, csrfCompletedSteps, addCsrfStep } = useAppStore();
+  const { completedModules, completeModule, setCurrentPage, addCsrfStep } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [showDefense, setShowDefense] = useState(false);
   const [activeDefense, setActiveDefense] = useState(0);
@@ -179,7 +48,7 @@ export default function CSRFLab() {
   };
 
   const goNext = () => {
-    const next = Math.min(currentStep + 1, attackSteps.length - 1);
+    const next = Math.min(currentStep + 1, mappedAttackSteps.length - 1);
     setCurrentStep(next);
     addCsrfStep(next);
   };
@@ -247,7 +116,7 @@ export default function CSRFLab() {
 
           {/* Steps */}
           <div className="space-y-3">
-            {attackSteps.map((step, i) => (
+            {mappedAttackSteps.map((step, i) => (
               <motion.div
                 key={step.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -304,7 +173,7 @@ export default function CSRFLab() {
               <ArrowLeft size={14} className="mr-1" /> Назад
             </Button>
             <div className="flex gap-1">
-              {attackSteps.map((_, i) => (
+              {mappedAttackSteps.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => goToStep(i)}
@@ -314,7 +183,7 @@ export default function CSRFLab() {
                 />
               ))}
             </div>
-            {currentStep < attackSteps.length - 1 ? (
+            {currentStep < mappedAttackSteps.length - 1 ? (
               <Button
                 size="sm"
                 className="bg-emerald-600 hover:bg-emerald-700"

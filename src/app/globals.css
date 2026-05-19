@@ -120,3 +120,42 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body > *:not(.print-report) {
+    display: none !important;
+  }
+  .print-report {
+    display: block !important;
+    padding: 2rem;
+    font-size: 12pt;
+  }
+  .print-report h1 {
+    font-size: 18pt;
+    margin-bottom: 1rem;
+  }
+  .print-report h2 {
+    font-size: 14pt;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .print-report table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .print-report th,
+  .print-report td {
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    text-align: left;
+    font-size: 10pt;
+  }
+  .print-report th {
+    background-color: #f8fafc;
+    font-weight: 600;
+  }
+  @page {
+    margin: 1.5cm;
+  }
+}

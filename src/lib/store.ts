@@ -1,34 +1,96 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { useAuthStore } from './auth-store';
+import { useAuthStore, saveProgressSnapshot } from './auth-store';
+import { quizCategories, modules } from '@/lib/data';
+import { NotificationHelper } from './notification-store';
 
-export type PageType =
-  | 'dashboard'
-  | 'owasp'
-  | 'sql-injection'
-  | 'xss'
-  | 'csrf'
-  | 'auth'
-  | 'secure-coding'
-  | 'tools'
-  | 'security-headers'
-  | 'quiz'
-  | 'achievements'
-  | 'profile'
-  | 'teacher-panel'
-  | 'admin-panel';
+// ─── API client ───────────────────────────────────────────────
+function getAuthHeaders(): Record<string, string> {
+  const { token } = useAuthStore.getState();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+}
 
-interface AppState {
-  currentPage: PageType;
-  sidebarOpen: boolean;
-  completedModules: string[];
-  quizScores: Record<string, number>;
-  studiedOwaspItems: string[];
-  sqlCompletedLevels: string[];
-  xssCompletedLevels: string[];
-  csrfCompletedSteps: number[];
-  secureCodingAnsweredChallenges: number[];
-  secureCodingCorrectCount: number;
+const apiClient = {
+  async saveProgress(moduleId: string, completed: boolean, score?: number) {
+    const response = await fetch('/api/progress', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ moduleId, completed, score }),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to save progress');
+    }
+    return response.json();
+  },
+
+  async saveFullProgress(data: {
+    moduleId: string;
+    completed?: boolean;
+    score?: number;
+    sqlLevels?: string[];
+    xssLevels?: string[];
+    csrfSteps?: number[];
+    secureCodingAnswers?: number[];
+    secureCodingCorrectCount?: number;
+    studiedOwaspItems?: string[];
+    challengeScores?: unknown;
+  }) {
+    const response = await fetch('/api/progress', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to save progress');
+    }
+    return response.json();
+  },
+
+  async saveQuizResults(quizId: string, score: number, total: number) {
+    const response = await fetch('/api/quiz', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ quizId, score, total }),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to save quiz results');
+    }
+    return response.json();
+  },
+
+  async loadProgress() {
+    const response = await fetch('/api/progress', {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to load progress');
+    }
+    return response.json();
+  },
+
+  async batchSave(progress: unknown[], quizResults: unknown[]) {
+    const response = await fetch('/api/progress/batch', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ progress, quizResults }),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || 'Failed to batch save');
+    }
+    return response.json();
+  },
+};
+
+// ─── Sync logic ───────────────────────────────────────────────
+interface AppActions {
   setCurrentPage: (page: PageType) => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
@@ -42,11 +104,222 @@ interface AppState {
   addSecureCodingAnswer: (idx: number) => void;
   removeSecureCodingAnswer: (idx: number) => void;
   setSecureCodingCorrectCount: (count: number) => void;
+  setOwaspChallengeScore: (correct: number, answered: number[]) => void;
+  setAuthChallengeScore: (correct: number, answered: number[]) => void;
+  setHeadersChallengeScore: (correct: number, answered: number[]) => void;
+  setUserId: (userId: string | null) => void;
+  syncWithDatabase: () => Promise<void>;
+  loadFromDatabase: (userId: string) => Promise<void>;
 }
+
+type AppStore = AppState & AppActions;
+
+const syncWithDatabase = async (state: AppState, set: (partial: Partial<AppStore>) => void) => {
+  if (!state.userId) {
+    set({ syncStatus: 'idle' });
+    return;
+  }
+
+  set({ syncStatus: 'syncing' });
+  try {
+    // Build full progress array for all modules
+    const progress: Record<string, unknown>[] = state.completedModules.map(moduleId => ({
+      moduleId,
+      completed: true,
+      score: 100,
+    }));
+
+    // Add detailed progress for lab modules
+    if (state.sqlCompletedLevels.length > 0) {
+      progress.push({
+        moduleId: 'sql-injection',
+        sqlLevels: state.sqlCompletedLevels,
+        completed: state.completedModules.includes('sql-injection'),
+      });
+    }
+    if (state.xssCompletedLevels.length > 0) {
+      progress.push({
+        moduleId: 'xss',
+        xssLevels: state.xssCompletedLevels,
+        completed: state.completedModules.includes('xss'),
+      });
+    }
+    if (state.csrfCompletedSteps.length > 0) {
+      progress.push({
+        moduleId: 'csrf',
+        csrfSteps: state.csrfCompletedSteps,
+        completed: state.completedModules.includes('csrf'),
+      });
+    }
+    if (state.secureCodingAnsweredChallenges.length > 0) {
+      progress.push({
+        moduleId: 'secure-coding',
+        secureCodingAnswers: state.secureCodingAnsweredChallenges,
+        secureCodingCorrectCount: state.secureCodingCorrectCount,
+        completed: state.completedModules.includes('secure-coding'),
+      });
+    }
+    if (state.studiedOwaspItems.length > 0) {
+      progress.push({
+        moduleId: 'owasp',
+        studiedOwaspItems: state.studiedOwaspItems,
+        completed: state.completedModules.includes('owasp'),
+      });
+    }
+
+    // Add challenge scores
+    const challengeModules = [
+      { moduleId: 'owasp-challenge', data: state.owaspChallengeScores },
+      { moduleId: 'auth-challenge', data: state.authChallengeScores },
+      { moduleId: 'headers-challenge', data: state.headersChallengeScores },
+    ];
+    for (const cm of challengeModules) {
+      if (cm.data.answered.length > 0) {
+        progress.push({
+          moduleId: cm.moduleId,
+          challengeScores: cm.data,
+        });
+      }
+    }
+
+    // Build quiz results array
+    const quizResults = Object.entries(state.quizScores).map(([quizId, percentage]) => {
+      const total = quizCategories.find((c) => c.id === quizId)?.count ?? 100;
+      const score = Math.round((percentage / 100) * total);
+      return { quizId, score, total };
+    });
+
+    await apiClient.batchSave(progress, quizResults);
+
+    // Save ProgressSnapshot records for each module (fire-and-forget)
+    for (const p of progress) {
+      const score = typeof p.score === 'number' ? p.score : 0;
+      const completed = p.completed === true;
+      saveProgressSnapshot(p.moduleId as string, score, completed).catch(() => {});
+    }
+
+    set({ syncStatus: 'synced', lastSyncedAt: new Date() });
+  } catch (e) {
+    console.error('Sync error:', e);
+    set({ syncStatus: 'error' });
+  }
+};
+
+const loadFromDatabase = async (
+  set: (partial: Partial<AppStore> | ((state: AppStore) => Partial<AppStore>)) => void,
+  userId: string
+) => {
+  try {
+    const data = await apiClient.loadProgress();
+
+    set((s) => ({
+      completedModules: data.completedModules || s.completedModules,
+      quizScores: data.quizScores || s.quizScores,
+      ...(data.progress && data.progress.length > 0 && (() => {
+        const updates: Record<string, unknown> = {};
+        for (const p of data.progress) {
+          if (p.sqlLevels) updates.sqlCompletedLevels = p.sqlLevels;
+          if (p.xssLevels) updates.xssCompletedLevels = p.xssLevels;
+          if (p.csrfSteps) updates.csrfCompletedSteps = p.csrfSteps;
+          if (p.secureCodingAnswers) updates.secureCodingAnsweredChallenges = p.secureCodingAnswers;
+          if (p.secureCodingCorrectCount !== undefined) updates.secureCodingCorrectCount = p.secureCodingCorrectCount;
+          if (p.studiedOwaspItems) updates.studiedOwaspItems = p.studiedOwaspItems;
+          if (p.challengeScores) {
+            if (p.moduleId === 'owasp-challenge') updates.owaspChallengeScores = p.challengeScores;
+            if (p.moduleId === 'auth-challenge') updates.authChallengeScores = p.challengeScores;
+            if (p.moduleId === 'headers-challenge') updates.headersChallengeScores = p.challengeScores;
+          }
+        }
+        return updates;
+      })()),
+      userId,
+      syncStatus: 'synced' as const,
+      lastSyncedAt: new Date(),
+    }));
+  } catch (e) {
+    console.error('Load error:', e);
+    set({ syncStatus: 'error', userId });
+  }
+};
+
+export type PageType =
+  | 'dashboard'
+  | 'owasp'
+  | 'sql-injection'
+  | 'xss'
+  | 'csrf'
+  | 'auth'
+  | 'secure-coding'
+  | 'tools'
+  | 'security-headers'
+  | 'idor'
+  | 'ssrf'
+  | 'quiz'
+  | 'achievements'
+  | 'profile'
+  | 'teacher-panel'
+  | 'admin-panel';
+
+interface AppState {
+  currentPage: PageType;
+  sidebarOpen: boolean;
+  completedModules: string[];
+  quizScores: Record<string, number>;
+  moduleTimestamps: Record<string, string>;
+  quizTimestamps: Record<string, string>;
+  studiedOwaspItems: string[];
+  sqlCompletedLevels: string[];
+  xssCompletedLevels: string[];
+  csrfCompletedSteps: number[];
+  secureCodingAnsweredChallenges: number[];
+  secureCodingCorrectCount: number;
+  owaspChallengeScores: { correct: number; total: number; answered: number[] };
+  authChallengeScores: { correct: number; total: number; answered: number[] };
+  headersChallengeScores: { correct: number; total: number; answered: number[] };
+  userId: string | null;
+  syncStatus: 'idle' | 'syncing' | 'synced' | 'error';
+  lastSyncedAt: Date | null;
+  setCurrentPage: (page: PageType) => void;
+  toggleSidebar: () => void;
+  setSidebarOpen: (open: boolean) => void;
+  completeModule: (moduleId: string) => void;
+  setQuizScore: (category: string, score: number) => void;
+  resetProgress: () => void;
+  addStudiedOwasp: (id: string) => void;
+  addSqlLevel: (level: string) => void;
+  addXssLevel: (level: string) => void;
+  addCsrfStep: (step: number) => void;
+  addSecureCodingAnswer: (idx: number) => void;
+  removeSecureCodingAnswer: (idx: number) => void;
+  setSecureCodingCorrectCount: (count: number) => void;
+  setOwaspChallengeScore: (correct: number, answered: number[]) => void;
+  setAuthChallengeScore: (correct: number, answered: number[]) => void;
+  setHeadersChallengeScore: (correct: number, answered: number[]) => void;
+  setUserId: (userId: string | null) => void;
+}
+
+// Type for what actually gets persisted (matches partialize output)
+type PersistedState = Pick<AppState,
+  | 'currentPage'
+  | 'sidebarOpen'
+  | 'completedModules'
+  | 'quizScores'
+  | 'moduleTimestamps'
+  | 'quizTimestamps'
+  | 'studiedOwaspItems'
+  | 'sqlCompletedLevels'
+  | 'xssCompletedLevels'
+  | 'csrfCompletedSteps'
+  | 'secureCodingAnsweredChallenges'
+  | 'secureCodingCorrectCount'
+  | 'owaspChallengeScores'
+  | 'authChallengeScores'
+  | 'headersChallengeScores'
+>;
 
 // Dynamic storage that uses the correct per-user localStorage key
 function createDynamicStorage() {
-  return createJSONStorage<AppState>(() => ({
+  return createJSONStorage<PersistedState>(() => ({
     getItem: (name: string) => {
       const { user } = useAuthStore.getState();
       const userId = user?.id || 'anonymous';
@@ -71,43 +344,69 @@ function getStorageKey(userId: string | undefined) {
   return `security-trainer-progress-${id}`;
 }
 
-export const useAppStore = create<AppState>()(
+export const useAppStore = create<AppStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       currentPage: 'dashboard',
       sidebarOpen: false,
       completedModules: [],
       quizScores: {},
+      moduleTimestamps: {},
+      quizTimestamps: {},
       studiedOwaspItems: [],
       sqlCompletedLevels: [],
       xssCompletedLevels: [],
       csrfCompletedSteps: [],
       secureCodingAnsweredChallenges: [],
       secureCodingCorrectCount: 0,
+      owaspChallengeScores: { correct: 0, total: 0, answered: [] },
+      authChallengeScores: { correct: 0, total: 0, answered: [] },
+      headersChallengeScores: { correct: 0, total: 0, answered: [] },
+      userId: null,
+      syncStatus: 'idle',
+      lastSyncedAt: null,
       setCurrentPage: (page) => set({ currentPage: page, sidebarOpen: false }),
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
-      completeModule: (moduleId) =>
-        set((s) => ({
-          completedModules: s.completedModules.includes(moduleId)
-            ? s.completedModules
-            : [...s.completedModules, moduleId],
-        })),
-      setQuizScore: (category, score) =>
+      completeModule: (moduleId) => {
+        set((s) => {
+          const alreadyCompleted = s.completedModules.includes(moduleId);
+          if (alreadyCompleted) return s;
+          const mod = modules.find((m) => m.id === moduleId);
+          if (mod) {
+            NotificationHelper.moduleCompleted(mod.title);
+          }
+          return {
+            completedModules: [...s.completedModules, moduleId],
+            moduleTimestamps: { ...s.moduleTimestamps, [moduleId]: new Date().toISOString() },
+          };
+        });
+      },
+      setQuizScore: (category, score) => {
         set((s) => ({
           quizScores: { ...s.quizScores, [category]: score },
-        })),
+          quizTimestamps: { ...s.quizTimestamps, [category]: new Date().toISOString() },
+        }));
+      },
       resetProgress: () =>
-        set({
+        set((s) => ({
           completedModules: [],
           quizScores: {},
+          moduleTimestamps: {},
+          quizTimestamps: {},
           studiedOwaspItems: [],
           sqlCompletedLevels: [],
           xssCompletedLevels: [],
           csrfCompletedSteps: [],
           secureCodingAnsweredChallenges: [],
           secureCodingCorrectCount: 0,
-        }),
+          owaspChallengeScores: { correct: 0, total: 0, answered: [] },
+          authChallengeScores: { correct: 0, total: 0, answered: [] },
+          headersChallengeScores: { correct: 0, total: 0, answered: [] },
+          userId: s.userId,
+          syncStatus: 'idle' as const,
+          lastSyncedAt: null,
+        })),
       addStudiedOwasp: (id) =>
         set((s) => ({
           studiedOwaspItems: s.studiedOwaspItems.includes(id)
@@ -144,10 +443,44 @@ export const useAppStore = create<AppState>()(
         })),
       setSecureCodingCorrectCount: (count) =>
         set({ secureCodingCorrectCount: count }),
+      setOwaspChallengeScore: (correct, answered) => {
+        set({ owaspChallengeScores: { correct, total: answered.length, answered } });
+      },
+      setAuthChallengeScore: (correct, answered) => {
+        set({ authChallengeScores: { correct, total: answered.length, answered } });
+      },
+      setHeadersChallengeScore: (correct, answered) => {
+        set({ headersChallengeScores: { correct, total: answered.length, answered } });
+      },
+      setUserId: (uid) => set({ userId: uid }),
+      syncWithDatabase: async () => {
+        await syncWithDatabase(get(), set);
+      },
+      loadFromDatabase: async (userId: string) => {
+        await loadFromDatabase(set, userId);
+      },
     }),
     {
       name: 'security-trainer-progress',
       storage: createDynamicStorage(),
+      partialize: (state) => ({
+        currentPage: state.currentPage,
+        sidebarOpen: state.sidebarOpen,
+        completedModules: state.completedModules,
+        quizScores: state.quizScores,
+        moduleTimestamps: state.moduleTimestamps,
+        quizTimestamps: state.quizTimestamps,
+        studiedOwaspItems: state.studiedOwaspItems,
+        sqlCompletedLevels: state.sqlCompletedLevels,
+        xssCompletedLevels: state.xssCompletedLevels,
+        csrfCompletedSteps: state.csrfCompletedSteps,
+        secureCodingAnsweredChallenges: state.secureCodingAnsweredChallenges,
+        secureCodingCorrectCount: state.secureCodingCorrectCount,
+        owaspChallengeScores: state.owaspChallengeScores,
+        authChallengeScores: state.authChallengeScores,
+        headersChallengeScores: state.headersChallengeScores,
+        // syncStatus and lastSyncedAt are runtime-only, not persisted
+      }),
     }
   )
 );
@@ -164,3 +497,6 @@ export function migrateProgressToUser(userId: string) {
   // Rehydrate the store so it picks up the user key immediately
   useAppStore.persist.rehydrate();
 }
+
+// Export apiClient for use in components that need direct API calls
+export { apiClient };

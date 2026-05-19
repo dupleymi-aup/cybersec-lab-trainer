@@ -26,16 +26,9 @@ export function usePasswordStrength(password: string): PasswordStrength {
     ];
 
     const passedCount = checks.filter((c) => c.passed).length;
-    let score = 0;
-    let label = '';
-    let color = 'bg-slate-200';
-
-    if (passedCount <= 1) { score = 15; label = 'Очень слабый'; color = 'bg-red-500'; }
-    else if (passedCount <= 2) { score = 30; label = 'Слабый'; color = 'bg-red-400'; }
-    else if (passedCount <= 3) { score = 50; label = 'Средний'; color = 'bg-yellow-500'; }
-    else if (passedCount <= 4) { score = 70; label = 'Хороший'; color = 'bg-emerald-400'; }
-    else if (passedCount <= 5) { score = 85; label = 'Надёжный'; color = 'bg-emerald-500'; }
-    else { score = 100; label = 'Отличный'; color = 'bg-emerald-600'; }
+    const score = passedCount <= 1 ? 15 : passedCount <= 2 ? 30 : passedCount <= 3 ? 50 : passedCount <= 4 ? 70 : passedCount <= 5 ? 85 : 100;
+    const label = passedCount <= 1 ? 'Очень слабый' : passedCount <= 2 ? 'Слабый' : passedCount <= 3 ? 'Средний' : passedCount <= 4 ? 'Хороший' : passedCount <= 5 ? 'Надёжный' : 'Отличный';
+    const color = passedCount <= 1 ? 'bg-red-500' : passedCount <= 2 ? 'bg-red-400' : passedCount <= 3 ? 'bg-yellow-500' : passedCount <= 4 ? 'bg-emerald-400' : passedCount <= 5 ? 'bg-emerald-500' : 'bg-emerald-600';
 
     return { score, label, color, checks };
   }, [password]);

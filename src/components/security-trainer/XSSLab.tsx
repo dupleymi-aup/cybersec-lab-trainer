@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { xssTypes } from '@/lib/security-data';
+import { xssTypes } from '@/lib/data';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

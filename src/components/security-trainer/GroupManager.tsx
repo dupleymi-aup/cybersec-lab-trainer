@@ -5,9 +5,8 @@ import { getAllGroups, renameGroup, deleteGroup, getAllUsers } from '@/lib/auth-
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Users, Plus, Check, X, Save } from 'lucide-react';
+import { Pencil, Trash2, Users, Plus, Check, X } from 'lucide-react';
 
 interface GroupManagerProps {
   adminId: string;
@@ -21,10 +20,10 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
   const [editValue, setEditValue] = useState('');
   const [newGroupName, setNewGroupName] = useState('');
 
-  const loadData = () => {
-    const allGroups = getAllGroups();
+  const loadData = async () => {
+    const allGroups = await getAllGroups();
     setGroups(allGroups);
-    const users = getAllUsers();
+    const users = await getAllUsers();
     const counts: Record<string, number> = {};
     for (const g of allGroups) {
       counts[g] = users.filter((u) => u.group === g).length;
@@ -36,9 +35,9 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
     loadData();
   }, []);
 
-  const handleRename = (oldName: string) => {
+  const handleRename = async (oldName: string) => {
     if (!editValue.trim()) { toast.error('Название не может быть пустым'); return; }
-    const result = renameGroup(oldName, editValue, adminId);
+    const result = await renameGroup(oldName, editValue, adminId);
     if (result.success) {
       toast.success(`Группа переименована, ${result.count} пользователей обновлено`);
       setEditingGroup(null);
@@ -50,10 +49,10 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
     }
   };
 
-  const handleDelete = (name: string) => {
+  const handleDelete = async (name: string) => {
     const count = groupCounts[name] || 0;
     if (!confirm(`Удалить группу "${name}"? ${count} пользователей потеряют привязку к группе.`)) return;
-    const result = deleteGroup(name, adminId);
+    const result = await deleteGroup(name, adminId);
     if (result.success) {
       toast.success(`Группа удалена, ${result.count} пользователей отвязано`);
       loadData();
@@ -107,7 +106,7 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
             </p>
           ) : (
             <div className="space-y-2">
-              {groups.map((name, i) => (
+              {groups.map((name) => (
                 <div
                   key={name}
                   className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-slate-200 transition-colors"

@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import OTPModal from './OTPModal';
 import { Shield, Mail, Phone, Eye, EyeOff, CheckCircle2, AlertTriangle, GraduationCap, Users, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,12 +46,12 @@ export default function AuthPages() {
   const [recoveryMethod, setRecoveryMethod] = useState<'email' | 'phone'>('email');
   const [recoveryContact, setRecoveryContact] = useState('');
   const [recoveryOtp, setRecoveryOtp] = useState('');
+  const [showRecoveryOtp, setShowRecoveryOtp] = useState(false);
   const [recoveryNewPassword, setRecoveryNewPassword] = useState('');
   const [recoveryConfirmPassword, setRecoveryConfirmPassword] = useState('');
 
   // OTP countdown timer
   const [countdown, setCountdown] = useState(0);
-  const canResend = countdown === 0 && recoveryStep === 'enter-otp';
 
   useEffect(() => {
     if (countdown > 0) {
@@ -131,6 +130,7 @@ export default function AuthPages() {
     setLoading(false);
     if (result.success) {
       toast.success('Код отправлен');
+      setShowRecoveryOtp(false);
       setRecoveryStep('enter-otp');
       setCountdown(60);
     } else {
@@ -138,8 +138,8 @@ export default function AuthPages() {
     }
   };
 
-  const handleVerifyOTP = () => {
-    const valid = verifyRecoveryOTP(recoveryOtp);
+  const handleVerifyOTP = async () => {
+    const valid = await verifyRecoveryOTP(recoveryOtp);
     if (valid) {
       setRecoveryStep('new-password');
     } else {
@@ -187,7 +187,6 @@ export default function AuthPages() {
     }
   };
 
-  const passwordErrors = validatePassword(regPassword);
   const regPwStrength = usePasswordStrength(regPassword);
   const recoveryPwStrength = usePasswordStrength(recoveryNewPassword);
 
@@ -579,9 +578,24 @@ export default function AuthPages() {
                   {recoveryStep === 'enter-otp' && (
                     <div className="space-y-4">
                       <div className="text-center mb-2">
-                        <span className="text-xs text-slate-500 bg-slate-700/50 px-3 py-1.5 rounded-lg inline-block">
-                          Ваш код: <strong className="text-violet-400 select-all">{recoveryState?.otp || '—'}</strong>
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowRecoveryOtp(!showRecoveryOtp)}
+                          className="text-xs text-slate-500 bg-slate-700/50 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 hover:bg-slate-700/70 transition"
+                        >
+                          {showRecoveryOtp ? (
+                            <>
+                              <EyeOff className="w-3 h-3" />
+                              <span className="text-violet-400 font-mono">{recoveryState?.otp || '—'}</span>
+                              <span className="text-slate-500">скрыть</span>
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="w-3 h-3" />
+                              Показать код
+                            </>
+                          )}
+                        </button>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-slate-300">Код подтверждения</Label>

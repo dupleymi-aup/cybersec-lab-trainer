@@ -83,7 +83,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
     return () => document.removeEventListener('keydown', handleEscape);
   }, [handleEscape]);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!fullName.trim()) { toast.error('Введите имя'); return; }
     if (!validateEmail(email)) { toast.error('Неверный email'); return; }
     if (!validatePhone(phone)) { toast.error('Неверный телефон'); return; }
@@ -96,7 +96,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
       toast.error('Неверный код приглашения для администратора'); return;
     }
 
-    const result = createUser(
+    const result = await createUser(
       { email, phone, fullName, role, group, course, university, inviteCode },
       password
     );
@@ -108,13 +108,13 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
     }
   };
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     if (!user) return;
     if (!editFullName.trim()) { toast.error('Имя не может быть пустым'); return; }
     if (!validateEmail(editEmail)) { toast.error('Неверный email'); return; }
     if (!validatePhone(editPhone)) { toast.error('Неверный телефон'); return; }
 
-    const result = updateUser(user.id, {
+    const result = await updateUser(user.id, {
       fullName: editFullName,
       email: editEmail,
       phone: editPhone,

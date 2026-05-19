@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { owaspItems } from '@/lib/security-data';
+import { owaspItems } from '@/lib/data';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

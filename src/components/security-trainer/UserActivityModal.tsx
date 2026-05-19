@@ -5,10 +5,9 @@ import { User, getRoleLabel, type LoginActivityEntry } from '@/lib/auth-store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { AnimatePresence, motion } from 'framer-motion';
-import { X, BookOpen, Trophy, Activity, BarChart3, Database, Clock, ExternalLink, ShieldCheck, Code } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { X, BookOpen, Trophy, Activity, BarChart3, Database, Clock, ShieldCheck, Code } from 'lucide-react';
 
 interface UserActivityModalProps {
   user: User;

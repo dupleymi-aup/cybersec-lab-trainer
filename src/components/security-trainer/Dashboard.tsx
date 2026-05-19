@@ -2,7 +2,9 @@
 
 import { useAppStore } from '@/lib/store';
 import { useAuthStore } from '@/lib/auth-store';
-import { modules, achievements, isAchievementUnlocked } from '@/lib/security-data';
+import { modules, achievements, sqlChallenges, xssTypes, attackSteps, secureCodingChallenges } from '@/lib/data';
+import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
+import { NotificationHelper } from '@/lib/notification-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -67,8 +69,13 @@ const achievementIcons: Record<string, React.ReactNode> = {
 };
 
 export default function Dashboard() {
-  const { setCurrentPage, completedModules, quizScores, toggleSidebar, studiedOwaspItems, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, secureCodingCorrectCount } = useAppStore();
+  const { setCurrentPage, completedModules, quizScores, toggleSidebar, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, owaspChallengeScores, authChallengeScores } = useAppStore();
   const { user } = useAuthStore();
+
+  const challengeStats = {
+    owaspCorrect: owaspChallengeScores.correct,
+    authCorrect: authChallengeScores.correct,
+  };
 
   const totalModules = modules.length;
   const completedCount = completedModules.filter((id) =>
@@ -84,13 +91,22 @@ export default function Dashboard() {
         )
       : 0;
 
+  // Achievements — use centralized achievement-utils
+  const unlockedAchievements = achievements.filter((a) =>
+    getAchievementStatus(a.id, completedModules, quizScores, challengeStats)
+  );
+  const nextAchievement = achievements.find((a) =>
+    !getAchievementStatus(a.id, completedModules, quizScores, challengeStats)
+  );
+  const unlockedCount = countUnlockedAchievements(completedModules, quizScores, challengeStats);
+
   // Per-module granular progress
   const getModuleProgress = (moduleId: string, completed: boolean): { pct: number; label: string } => {
     const TOTALS: Record<string, number> = {
-      'sql-injection': 11,
-      'xss': 6,
-      'csrf': 4,
-      'secure-coding': 34,
+      'sql-injection': sqlChallenges.length,
+      'xss': xssTypes.length,
+      'csrf': attackSteps.length,
+      'secure-coding': secureCodingChallenges.length,
     };
     if (completed) return { pct: 100, label: '' };
     const total = TOTALS[moduleId];
@@ -108,14 +124,6 @@ export default function Dashboard() {
     return { pct, label: `${done}/${total}` };
   };
 
-  // Achievements
-  const unlockedAchievements = achievements.filter((a) =>
-    isAchievementUnlocked(a.id, completedModules, studiedOwaspItems, quizScores, secureCodingCorrectCount)
-  );
-  const nextAchievement = achievements.find((a) =>
-    !isAchievementUnlocked(a.id, completedModules, studiedOwaspItems, quizScores, secureCodingCorrectCount)
-  );
-
   // Recommendations
 
   // Detect newly unlocked achievements and show toasts
@@ -128,6 +136,7 @@ export default function Dashboard() {
         const achievement = achievements.find((a) => a.id === id);
         if (achievement) {
           toast.success(`🏆 ${achievement.title}`, { description: achievement.description, duration: 5000 });
+          NotificationHelper.achievementUnlocked(achievement.title, achievement.description);
         }
       }
     }
@@ -176,18 +185,6 @@ export default function Dashboard() {
   };
 
   const recommendation = getRecommendation();
-
-  // Recent activity - show modules in order of completion concept
-  const recentActivity = [
-    ...completedModules.map((id) => {
-      const mod = modules.find((m) => m.id === id);
-      return mod ? { type: 'module' as const, name: mod.title, icon: mod.icon } : null;
-    }).filter(Boolean),
-    ...Object.keys(quizScores).map((cat) => {
-      const score = quizScores[cat];
-      return { type: 'quiz' as const, name: `Квиз: ${cat}`, score };
-    }),
-  ].slice(-5);
 
   const handleStartModule = (moduleId: string) => {
     setCurrentPage(moduleId as PageType);
@@ -241,7 +238,7 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Star size={16} className="text-amber-400" />
-              <span className="text-slate-300">{unlockedAchievements.length} достижений</span>
+              <span className="text-slate-300">{unlockedCount} достижений</span>
             </div>
           </div>
         </div>

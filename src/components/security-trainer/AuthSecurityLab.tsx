@@ -90,15 +90,9 @@ export default function AuthSecurityLab() {
     ];
 
     const passedCount = checks.filter((c) => c.passed).length;
-    let score = 0;
-    let label = '';
-    let color = '';
-
-    if (passedCount <= 2) { score = 20; label = 'Очень слабый'; color = 'bg-red-500'; }
-    else if (passedCount <= 3) { score = 40; label = 'Слабый'; color = 'bg-red-400'; }
-    else if (passedCount <= 5) { score = 60; label = 'Средний'; color = 'bg-yellow-500'; }
-    else if (passedCount <= 6) { score = 80; label = 'Надёжный'; color = 'bg-emerald-500'; }
-    else { score = 100; label = 'Отличный'; color = 'bg-emerald-600'; }
+    const score = passedCount <= 2 ? 20 : passedCount <= 3 ? 40 : passedCount <= 5 ? 60 : passedCount <= 6 ? 80 : 100;
+    const label = passedCount <= 2 ? 'Очень слабый' : passedCount <= 3 ? 'Слабый' : passedCount <= 5 ? 'Средний' : passedCount <= 6 ? 'Надёжный' : 'Отличный';
+    const color = passedCount <= 2 ? 'bg-red-500' : passedCount <= 3 ? 'bg-red-400' : passedCount <= 5 ? 'bg-yellow-500' : passedCount <= 6 ? 'bg-emerald-500' : 'bg-emerald-600';
 
     return { score, label, color, checks };
   }, [password]);
