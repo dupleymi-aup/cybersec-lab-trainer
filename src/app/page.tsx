@@ -10,7 +10,7 @@ import PWAHandler from '@/components/security-trainer/PWAHandler';
 import OnboardingTour from '@/components/security-trainer/OnboardingTour';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'sonner';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ModuleNavigation from '@/components/security-trainer/ModuleNavigation';
 import KeyboardShortcuts from '@/components/security-trainer/KeyboardShortcuts';
@@ -87,6 +87,11 @@ export default function Home() {
     }
     return currentPage;
   }, [currentPage, user]);
+
+  // Scroll to top on page change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [resolvedPage]);
 
   if (!isAuthenticated) {
     return <AuthPages />;
