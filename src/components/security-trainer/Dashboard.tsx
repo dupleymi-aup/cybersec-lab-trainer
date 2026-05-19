@@ -7,6 +7,7 @@ import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achieveme
 import { NotificationHelper, loadAnnouncementsIntoNotifications } from '@/lib/notification-store';
 import NotificationBell from './NotificationBell';
 import ActivityCalendar from './ActivityCalendar';
+import { triggerCelebration } from './CompletionCelebration';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -195,6 +196,7 @@ export default function Dashboard() {
         if (achievement) {
           toast.success(`🏆 ${achievement.title}`, { description: achievement.description, duration: 5000 });
           NotificationHelper.achievementUnlocked(achievement.title, achievement.description);
+          triggerCelebration({ type: 'achievement', title: `🏆 ${achievement.title}`, subtitle: achievement.description });
         }
       }
     }
