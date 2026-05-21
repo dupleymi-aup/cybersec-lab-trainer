@@ -256,6 +256,11 @@ export interface StudentPerformanceData {
   categoryBreakdown: Array<{ category: string; attempts: number; correctRate: number; avgScore: number }>;
   activityTimeline: Array<{ date: string; type: string; details: string }>;
   achievements: Array<{ id: string; title: string; description: string; unlocked: boolean; unlockedAt: string | null }>;
+  moduleCompletionTimeline: Array<{ date: string; moduleId: string; score: number | null; completed: boolean }>;
+  quizCategoryTrajectory: Array<{ week: string; category: string; avgScore: number; attempts: number }>;
+  loginActivityTimeline: Array<{ date: string; count: number; successCount: number }>;
+  skillsGap: Array<{ moduleId: string; studentScore: number; cohortAvg: number; gap: number; severity: 'low' | 'medium' | 'high' }>;
+  recommendations: Array<{ type: string; title: string; description: string; priority: 'high' | 'medium' | 'low' }>;
 }
 
 export interface StudentComparisonData {

@@ -38,6 +38,7 @@ import {
   Edit,
   CheckCircle,
   XCircle,
+  FileBarChart,
 } from 'lucide-react';
 import ProgressTrendsChart from './ProgressTrendsChart';
 import QuizQuestionAnalytics from './QuizQuestionAnalytics';
@@ -316,7 +317,7 @@ export default function TeacherPanel() {
       </div>
 
       <Tabs defaultValue="progress">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="progress" className="text-xs">
             <BarChart3 size={14} className="mr-1" /> Прогресс
           </TabsTrigger>
@@ -340,6 +341,9 @@ export default function TeacherPanel() {
           </TabsTrigger>
           <TabsTrigger value="at-risk" className="text-xs">
             <AlertTriangle size={14} className="mr-1" /> Внимание
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="text-xs">
+            <FileBarChart size={14} className="mr-1" /> Отчёты
           </TabsTrigger>
         </TabsList>
 
@@ -1038,6 +1042,226 @@ export default function TeacherPanel() {
               <AlertTriangle size={40} className="mx-auto mb-3 opacity-50" />
               <p className="text-sm">Все студенты в порядке! Нет студентов с признаками риска.</p>
             </div>
+          )}
+        </TabsContent>
+
+        {/* Reports Tab */}
+        <TabsContent value="reports" className="mt-4 space-y-4">
+          {/* Class Overview KPIs */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Card className="border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                    <Users size={20} className="text-indigo-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{totalStudents}</p>
+                    <p className="text-xs text-muted-foreground">Всего студентов</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                    <TrendingUp size={20} className="text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{activeStudents}</p>
+                    <p className="text-xs text-muted-foreground">Активных</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                    <BookOpen size={20} className="text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{avgCompletion}</p>
+                    <p className="text-xs text-muted-foreground">Ср. модулей</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center">
+                    <Trophy size={20} className="text-violet-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{avgQuizScore}%</p>
+                    <p className="text-xs text-muted-foreground">Ср. балл квизов</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Module Completion by Group */}
+          {groupComparisonData.length > 0 && (
+            <Card className="border-border">
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-sm mb-4">Завершение модулей по группам</h3>
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart data={groupComparisonData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="avgModules" fill="#6366f1" name="Ср. модулей" />
+                    <Bar dataKey="avgScore" fill="#10b981" name="Ср. балл" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Quiz Score Distribution */}
+          <Card className="border-border">
+            <CardContent className="p-5">
+              <h3 className="font-semibold text-sm mb-4">Распределение баллов квизов</h3>
+              {(() => {
+                const ranges = [
+                  { label: '0-20%', min: 0, max: 20, color: '#ef4444' },
+                  { label: '21-40%', min: 21, max: 40, color: '#f97316' },
+                  { label: '41-60%', min: 41, max: 60, color: '#f59e0b' },
+                  { label: '61-80%', min: 61, max: 80, color: '#84cc16' },
+                  { label: '81-100%', min: 81, max: 100, color: '#10b981' },
+                ];
+                const distribution = ranges.map((range) => {
+                  let count = 0;
+                  students.forEach((s) => {
+                    const progress = getStudentProgress(s.id);
+                    const scores = Object.values(progress.quizScores);
+                    if (scores.length > 0) {
+                      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                      if (avg >= range.min && avg <= range.max) count++;
+                    }
+                  });
+                  return { range: range.label, count, color: range.color };
+                });
+                return (
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie
+                        data={distribution}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        dataKey="count"
+                        nameKey="range"
+                        label={({ range, percent }) => `${range} (${(percent * 100).toFixed(0)}%)`}
+                      >
+                        {distribution.map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                );
+              })()}
+            </CardContent>
+          </Card>
+
+          {/* Engagement Leaderboard */}
+          <Card className="border-border">
+            <CardContent className="p-5">
+              <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                <Trophy size={16} className="text-amber-500" />
+                Лидеры по вовлечённости
+              </h3>
+              <div className="space-y-2">
+                {(() => {
+                  const now = new Date();
+                  const engagementData = students
+                    .map((s) => {
+                      const progress = getStudentProgress(s.id);
+                      const scores = Object.values(progress.quizScores);
+                      const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+                      const daysSinceActive = progress.lastActive
+                        ? Math.floor((now.getTime() - new Date(progress.lastActive).getTime()) / (1000 * 60 * 60 * 24))
+                        : 999;
+                      const activityFactor = Math.min(25, Math.round((Math.max(0, 30 - daysSinceActive) / 30) * 25));
+                      const completionFactor = Math.min(25, Math.round((progress.completedModules.length / 12) * 25));
+                      const quizFactor = Math.round((avgScore / 100) * 25);
+                      const attemptsFactor = Math.min(25, Math.round((scores.length / 10) * 25));
+                      const engagementScore = activityFactor + completionFactor + quizFactor + attemptsFactor;
+                      return { ...s, progress, avgScore, daysSinceActive, engagementScore };
+                    })
+                    .sort((a, b) => b.engagementScore - a.engagementScore)
+                    .slice(0, 10);
+
+                  return engagementData.map((student, i) => (
+                    <motion.div
+                      key={student.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.03 }}
+                      className="flex items-center justify-between p-3 rounded-lg border border-slate-100"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-100 text-slate-600' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-muted text-muted-foreground'
+                        }`}>
+                          {i + 1}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold">{student.fullName}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {student.group} • Модулей: {student.progress.completedModules.length}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-xs font-bold">{Math.round(student.avgScore)}%</p>
+                          <p className="text-[10px] text-muted-foreground">Квиз</p>
+                        </div>
+                        <Badge variant={student.engagementScore >= 70 ? 'default' : student.engagementScore >= 40 ? 'secondary' : 'destructive'}>
+                          {student.engagementScore}
+                        </Badge>
+                      </div>
+                    </motion.div>
+                  ));
+                })()}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* At-Risk Alerts */}
+          {atRiskStudents.length > 0 && (
+            <Card className="border-l-4 border-l-red-500 border-border">
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                  <AlertTriangle size={16} className="text-red-500" />
+                  Студенты с признаками риска ({atRiskStudents.length})
+                </h3>
+                <div className="space-y-2">
+                  {atRiskStudents.slice(0, 5).map(({ student, progress, avgScore, daysSinceActive, reasons }) => (
+                    <div key={student.id} className="flex items-center justify-between p-2 rounded-lg bg-red-50/50">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle size={14} className="text-red-500" />
+                        <span className="text-sm font-medium">{student.fullName}</span>
+                        {student.group && <Badge variant="secondary" className="text-[10px]">{student.group}</Badge>}
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {reasons.slice(0, 2).map((r, i) => (
+                          <Badge key={i} variant="destructive" className="text-[10px]">{r}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
       </Tabs>

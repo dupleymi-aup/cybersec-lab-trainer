@@ -15,6 +15,255 @@ export function downloadCSV(csv: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
+// Trigger browser download of PDF
+async function downloadPDF(pdfBlob: Blob, filename: string): Promise<void> {
+  const url = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Generate student performance PDF report
+export async function generateStudentReportPDF(
+  student: { fullName: string; email: string; group: string; course: string; university: string },
+  kpis: { modulesCompleted: number; totalModules: number; avgQuizScore: number; engagementScore: number; riskScore: number },
+  progress: Array<{ moduleId: string; completed: boolean; score: number | null }>,
+  quizResults: Array<{ quizId: string; score: number; total: number; percentage: number }>,
+  recommendations: Array<{ title: string; description: string; priority: string }>
+): Promise<void> {
+  const { jsPDF } = await import('jspdf');
+  const doc = new jsPDF();
+
+  // Title
+  doc.setFontSize(18);
+  doc.text('Отчёт по студенту', 14, 20);
+
+  // Student info
+  doc.setFontSize(12);
+  doc.text(`ФИО: ${student.fullName}`, 14, 35);
+  doc.text(`Email: ${student.email}`, 14, 45);
+  doc.text(`Группа: ${student.group}`, 14, 55);
+  doc.text(`Курс: ${student.course}`, 14, 65);
+  doc.text(`Университет: ${student.university}`, 14, 75);
+
+  // KPIs
+  doc.setFontSize(14);
+  doc.text('Ключевые показатели', 14, 95);
+  doc.setFontSize(10);
+  doc.text(`Модули: ${kpis.modulesCompleted}/${kpis.totalModules}`, 14, 105);
+  doc.text(`Средний балл: ${kpis.avgQuizScore}%`, 70, 105);
+  doc.text(`Вовлечённость: ${kpis.engagementScore}`, 126, 105);
+  doc.text(`Риск-скор: ${kpis.riskScore}`, 156, 105);
+
+  // Module progress table
+  doc.setFontSize(14);
+  doc.text('Прогресс по модулям', 14, 120);
+  const { autoTable } = await import('jspdf-autotable');
+  autoTable(doc, {
+    startY: 125,
+    head: [['Модуль', 'Пройден', 'Балл (%)']],
+    body: progress.map(p => [p.moduleId, p.completed ? 'Да' : 'Нет', p.score?.toString() ?? 'N/A']),
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+    styles: { fontSize: 8 },
+  });
+
+  // Quiz results
+  const finalY = (doc as any).lastAutoTable?.finalY || 150;
+  doc.setFontSize(14);
+  doc.text('Результаты квизов', 14, finalY + 10);
+  autoTable(doc, {
+    startY: finalY + 15,
+    head: [['Квиз', 'Правильных', 'Всего', 'Процент (%)']],
+    body: quizResults.map(q => [q.quizId, String(q.score), String(q.total), String(q.percentage)]),
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+    styles: { fontSize: 8 },
+  });
+
+  // Recommendations
+  if (recommendations && recommendations.length > 0) {
+    const recY = (doc as any).lastAutoTable?.finalY || 200;
+    doc.setFontSize(14);
+    doc.text('Рекомендации', 14, recY + 10);
+    doc.setFontSize(9);
+    recommendations.slice(0, 5).forEach((rec, i) => {
+      const y = recY + 20 + i * 15;
+      doc.setFont(undefined, 'bold');
+      doc.text(`• ${rec.title}`, 14, y);
+      doc.setFont(undefined, 'normal');
+      const splitDesc = doc.splitTextToSize(rec.description, 170);
+      doc.text(splitDesc, 20, y + 5);
+    });
+  }
+
+  // Footer
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`CyberSec Lab Trainer — ${new Date().toLocaleDateString('ru-RU')} — Стр. ${i}/${pageCount}`, 14, 290);
+  }
+
+  const pdfBlob = doc.output('blob');
+  await downloadPDF(pdfBlob, `student-report-${student.fullName.replace(/\s+/g, '-')}.pdf`);
+}
+
+// Generate gradebook PDF
+export async function generateGradebookPDF(
+  students: Array<{ id: string; fullName: string; email: string; group: string; modulesCompleted: number; quizCount: number; avgScore: number }>,
+  title: string = 'Журнал успеваемости'
+): Promise<void> {
+  const { jsPDF } = await import('jspdf');
+  const { autoTable } = await import('jspdf-autotable');
+  const doc = new jsPDF('landscape');
+
+  doc.setFontSize(16);
+  doc.text(title, 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(150);
+  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего студентов: ${students.length}`, 14, 30);
+
+  autoTable(doc, {
+    startY: 40,
+    head: [['#', 'ФИО', 'Email', 'Группа', 'Модули', 'Квизы', 'Ср. балл (%)']],
+    body: students.map((s, i) => [
+      String(i + 1), s.fullName, s.email, s.group,
+      String(s.modulesCompleted), String(s.quizCount), s.avgScore.toFixed(1)
+    ]),
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+    styles: { fontSize: 9 },
+    columnStyles: { 0: { cellWidth: 10 }, 6: { halign: 'center' } },
+  });
+
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
+  }
+
+  const pdfBlob = doc.output('blob');
+  await downloadPDF(pdfBlob, 'gradebook.pdf');
+}
+
+// Generate at-risk students PDF
+export async function generateAtRiskPDF(
+  atRiskStudents: Array<{ fullName: string; email: string; group: string; riskScore: number; reasons: string[]; lastActiveDays: number; modulesCompleted: number; avgQuizScore: number }>
+): Promise<void> {
+  const { jsPDF } = await import('jspdf');
+  const { autoTable } = await import('jspdf-autotable');
+  const doc = new jsPDF('landscape');
+
+  doc.setFontSize(16);
+  doc.setTextColor(239, 68, 68);
+  doc.text('Студенты с признаками риска', 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(150);
+  doc.text(`Всего: ${atRiskStudents.length} | Дата: ${new Date().toLocaleDateString('ru-RU')}`, 14, 30);
+
+  autoTable(doc, {
+    startY: 40,
+    head: [['#', 'ФИО', 'Email', 'Группа', 'Риск', 'Неактивен (дн.)', 'Модули', 'Ср. балл (%)', 'Причины']],
+    body: atRiskStudents.map((s, i) => [
+      String(i + 1), s.fullName, s.email, s.group,
+      String(s.riskScore), String(s.lastActiveDays),
+      String(s.modulesCompleted), String(s.avgQuizScore),
+      s.reasons.join('; ')
+    ]),
+    theme: 'striped',
+    headStyles: { fillColor: [239, 68, 68] },
+    styles: { fontSize: 8 },
+    didParseCell: (data: any) => {
+      if (data.column.index === 4 && Number(data.cell.raw) >= 70) {
+        data.cell.styles.textColor = [239, 68, 68];
+        data.cell.styles.fontStyle = 'bold';
+      }
+    },
+  });
+
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
+  }
+
+  const pdfBlob = doc.output('blob');
+  await downloadPDF(pdfBlob, 'at-risk-students.pdf');
+}
+
+// Generate comprehensive analytics PDF
+export async function generateAnalyticsPDF(
+  summary: { kpis: { totalStudents: number; activeStudents: number; activePercentage: number; avgCompletionRate: number; avgQuizScore: number; totalModulesCompleted: number; totalQuizAttempts: number; engagementScore: number } },
+  moduleDistribution: Array<{ moduleId: string; moduleName: string; completionRate: number; avgScore: number }>
+): Promise<void> {
+  const { jsPDF } = await import('jspdf');
+  const { autoTable } = await import('jspdf-autotable');
+  const doc = new jsPDF();
+
+  // Title
+  doc.setFontSize(18);
+  doc.text('Аналитический отчёт', 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(150);
+  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')}`, 14, 30);
+
+  // KPIs
+  doc.setTextColor(0);
+  doc.setFontSize(14);
+  doc.text('Ключевые показатели', 14, 45);
+  doc.setFontSize(10);
+  const kpis = summary.kpis;
+  const kpiData = [
+    ['Всего студентов', String(kpis.totalStudents)],
+    ['Активных', `${kpis.activePercentage}%`],
+    ['Ср. завершение', `${kpis.avgCompletionRate}%`],
+    ['Ср. балл квизов', `${kpis.avgQuizScore}%`],
+    ['Модулей завершено', String(kpis.totalModulesCompleted)],
+    ['Попыток квизов', String(kpis.totalQuizAttempts)],
+    ['Вовлечённость', String(kpis.engagementScore)],
+  ];
+
+  let y = 55;
+  kpiData.forEach(([label, value]) => {
+    doc.setFont(undefined, 'bold');
+    doc.text(`${label}:`, 14, y);
+    doc.setFont(undefined, 'normal');
+    doc.text(value, 80, y);
+    y += 8;
+  });
+
+  // Module distribution table
+  doc.setFontSize(14);
+  doc.text('Прогресс по модулям', 14, y + 10);
+  autoTable(doc, {
+    startY: y + 15,
+    head: [['Модуль', 'Завершение (%)', 'Ср. балл (%)']],
+    body: moduleDistribution.map(m => [m.moduleName, String(m.completionRate), String(m.avgScore)]),
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+    styles: { fontSize: 9 },
+  });
+
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 290);
+  }
+
+  const pdfBlob = doc.output('blob');
+  await downloadPDF(pdfBlob, 'analytics-report.pdf');
+}
+
 // Generate gradebook CSV string
 export function generateGradebookCSV(
   students: Array<{ id: string; fullName: string; email: string; group: string; modulesCompleted: number; quizCount: number; avgScore: number; lastActive: string }>,

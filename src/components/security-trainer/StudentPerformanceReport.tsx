@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, AreaChart, Area, Legend,
 } from 'recharts';
 import {
   User, BookOpen, Trophy, Activity, Award, AlertTriangle, Loader2,
-  CheckCircle, XCircle, Clock,
+  CheckCircle, XCircle, Clock, Target, Lightbulb, TrendingUp, TrendingDown, Minus,
 } from 'lucide-react';
 import { getStudentPerformance, type StudentPerformanceData } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
@@ -71,7 +72,8 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
     );
   }
 
-  const { profile, kpis, moduleProgress, quizResults, categoryBreakdown, activityTimeline, achievements } = data;
+  const { profile, kpis, moduleProgress, quizResults, categoryBreakdown, activityTimeline, achievements,
+    moduleCompletionTimeline, quizCategoryTrajectory, loginActivityTimeline, skillsGap, recommendations } = data;
 
   const riskColor = kpis.riskScore >= 70 ? 'text-red-600' : kpis.riskScore >= 30 ? 'text-amber-600' : 'text-emerald-600';
   const riskBg = kpis.riskScore >= 70 ? 'bg-red-50' : kpis.riskScore >= 30 ? 'bg-amber-50' : 'bg-emerald-50';
@@ -151,12 +153,14 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
 
       {/* Tabs */}
       <Tabs defaultValue="overview">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview" className="text-xs">Обзор</TabsTrigger>
           <TabsTrigger value="modules" className="text-xs">Модули</TabsTrigger>
           <TabsTrigger value="quizzes" className="text-xs">Квизы</TabsTrigger>
           <TabsTrigger value="activity" className="text-xs">Активность</TabsTrigger>
-          <TabsTrigger value="achievements" className="text-xs">Достижения</TabsTrigger>
+          <TabsTrigger value="timeline" className="text-xs">Таймлайн</TabsTrigger>
+          <TabsTrigger value="skills-gap" className="text-xs">Разрыв навыков</TabsTrigger>
+          <TabsTrigger value="recommendations" className="text-xs">Рекомендации</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -205,6 +209,26 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                         </p>
                       </div>
                     </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Achievements Summary */}
+          {achievements.length > 0 && (
+            <Card className="border-border">
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-sm mb-4">Достижения</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {achievements.map((achievement) => (
+                    <div key={achievement.id} className={`p-3 rounded-lg border ${achievement.unlocked ? 'border-amber-200 bg-amber-50/50' : 'border-border opacity-60'}`}>
+                      <div className="flex items-center gap-2">
+                        <Award size={16} className={achievement.unlocked ? 'text-amber-600' : 'text-slate-400'} />
+                        <p className="text-xs font-semibold">{achievement.title}</p>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-1">{achievement.description}</p>
+                    </div>
                   ))}
                 </div>
               </CardContent>
@@ -322,39 +346,242 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
           </Card>
         </TabsContent>
 
-        {/* Achievements Tab */}
-        <TabsContent value="achievements" className="mt-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {achievements.map((achievement, i) => (
-              <motion.div
-                key={achievement.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <Card className={`border-border ${achievement.unlocked ? 'bg-amber-50/50' : 'opacity-60'}`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        achievement.unlocked ? 'bg-amber-100' : 'bg-muted'
-                      }`}>
-                        <Award size={20} className={achievement.unlocked ? 'text-amber-600' : 'text-slate-400'} />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold">{achievement.title}</p>
-                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                        {achievement.unlocked && achievement.unlockedAt && (
-                          <p className="text-[10px] text-emerald-600 mt-1">
-                            Получено {new Date(achievement.unlockedAt).toLocaleDateString('ru-RU')}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+        {/* Timeline Tab */}
+        <TabsContent value="timeline" className="mt-4 space-y-4">
+          {/* Module Completion Timeline */}
+          {moduleCompletionTimeline.length > 0 && (
+            <Card className="border-border">
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                  <TrendingUp size={16} className="text-indigo-500" />
+                  Прогресс по модулям
+                </h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart data={moduleCompletionTimeline}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })} />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip labelFormatter={(v) => new Date(v).toLocaleDateString('ru-RU')} />
+                    <Legend />
+                    <Area type="monotone" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.1} name="Балл" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Login Activity Timeline */}
+          {loginActivityTimeline.length > 0 && (
+            <Card className="border-border">
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                  <Activity size={16} className="text-emerald-500" />
+                  Активность входов
+                </h3>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={loginActivityTimeline}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })} />
+                    <YAxis />
+                    <Tooltip labelFormatter={(v) => new Date(v).toLocaleDateString('ru-RU')} />
+                    <Legend />
+                    <Bar dataKey="count" fill="#6366f1" name="Входы" />
+                    <Bar dataKey="successCount" fill="#10b981" name="Успешные" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Quiz Category Trajectory */}
+          {quizCategoryTrajectory.length > 0 && (
+            <Card className="border-border">
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                  <Target size={16} className="text-amber-500" />
+                  Траектория квизов по категориям
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={quizCategoryTrajectory}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="week" tick={{ fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })} />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip labelFormatter={(v) => new Date(v).toLocaleDateString('ru-RU')} />
+                    <Legend />
+                    {Array.from(new Set(quizCategoryTrajectory.map((p) => p.category))).map((category, i) => {
+                      const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+                      return (
+                        <Line key={category} type="monotone" dataKey="avgScore" name={category} stroke={colors[i % colors.length]} dot={false}
+                          data={quizCategoryTrajectory.filter((p) => p.category === category)} />
+                      );
+                    })}
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {moduleCompletionTimeline.length === 0 && loginActivityTimeline.length === 0 && quizCategoryTrajectory.length === 0 && (
+            <Card className="border-border">
+              <CardContent className="p-8 text-center">
+                <Clock size={32} className="text-muted-foreground mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">Нет данных для отображения таймлайна</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* Skills Gap Tab */}
+        <TabsContent value="skills-gap" className="mt-4 space-y-4">
+          {skillsGap.length > 0 && (
+            <>
+              {/* Skills Gap Summary Cards */}
+              <div className="grid grid-cols-3 gap-3">
+                <KPICard
+                  icon={<AlertTriangle size={18} />}
+                  value={skillsGap.filter((g) => g.severity === 'high').length}
+                  label="Критичные"
+                  iconBg="bg-red-100"
+                  iconColor="text-red-600"
+                />
+                <KPICard
+                  icon={<AlertTriangle size={18} />}
+                  value={skillsGap.filter((g) => g.severity === 'medium').length}
+                  label="Средние"
+                  iconBg="bg-amber-100"
+                  iconColor="text-amber-600"
+                />
+                <KPICard
+                  icon={<CheckCircle size={18} />}
+                  value={skillsGap.filter((g) => g.severity === 'low').length}
+                  label="Норма"
+                  iconBg="bg-emerald-100"
+                  iconColor="text-emerald-600"
+                />
+              </div>
+
+              {/* Skills Gap Bar Chart */}
+              <Card className="border-border">
+                <CardContent className="p-5">
+                  <h3 className="font-semibold text-sm mb-4">Сравнение с группой</h3>
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart data={skillsGap}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="moduleId" tick={{ fontSize: 9 }} interval={0} angle={-30} textAnchor="end" height={80}
+                        tickFormatter={(v) => v.startsWith('category:') ? v.replace('category:', '').substring(0, 8) : v.substring(0, 8)} />
+                      <YAxis domain={[0, 100]} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="studentScore" fill="#6366f1" name="Студент" />
+                      <Bar dataKey="cohortAvg" fill="#94a3b8" name="Группа" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Detailed Gap Table */}
+              <Card className="border-border">
+                <CardContent className="p-5">
+                  <h3 className="font-semibold text-sm mb-4">Детальный анализ</h3>
+                  <div className="space-y-2">
+                    {skillsGap.sort((a, b) => a.gap - b.gap).map((gap, i) => {
+                      const severityColor = gap.severity === 'high' ? 'destructive' : gap.severity === 'medium' ? 'secondary' : 'default';
+                      const TrendIcon = gap.gap > 0 ? TrendingUp : gap.gap < 0 ? TrendingDown : Minus;
+                      return (
+                        <motion.div
+                          key={gap.moduleId}
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.02 }}
+                          className="flex items-center justify-between p-3 rounded-lg border border-slate-100"
+                        >
+                          <div className="flex items-center gap-3">
+                            <TrendIcon size={16} className={gap.gap > 0 ? 'text-emerald-500' : gap.gap < 0 ? 'text-red-500' : 'text-slate-400'} />
+                            <div>
+                              <p className="text-sm font-medium">
+                                {gap.moduleId.startsWith('category:') ? `Категория: ${gap.moduleId.replace('category:', '')}` : gap.moduleId}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground">
+                                Студент: {gap.studentScore}% | Группа: {gap.cohortAvg}%
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-xs font-semibold ${gap.gap > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                              {gap.gap > 0 ? '+' : ''}{gap.gap}%
+                            </span>
+                            <Badge variant={severityColor} className="text-[10px]">
+                              {gap.severity === 'high' ? 'Критично' : gap.severity === 'medium' ? 'Средне' : 'Норма'}
+                            </Badge>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {skillsGap.length === 0 && (
+            <Card className="border-border">
+              <CardContent className="p-8 text-center">
+                <Target size={32} className="text-muted-foreground mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">Нет данных для анализа навыков</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* Recommendations Tab */}
+        <TabsContent value="recommendations" className="mt-4 space-y-4">
+          {recommendations.length > 0 ? (
+            <div className="space-y-3">
+              {recommendations.map((rec, i) => {
+                const priorityColor = rec.priority === 'high' ? 'border-red-200 bg-red-50/50' : rec.priority === 'medium' ? 'border-amber-200 bg-amber-50/50' : 'border-emerald-200 bg-emerald-50/50';
+                const priorityBadge = rec.priority === 'high' ? 'destructive' : rec.priority === 'medium' ? 'secondary' : 'default';
+                const TypeIcon = rec.type === 'module' ? BookOpen : rec.type === 'quiz' ? Target : Lightbulb;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Card className={`border ${priorityColor}`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            rec.priority === 'high' ? 'bg-red-100' : rec.priority === 'medium' ? 'bg-amber-100' : 'bg-emerald-100'
+                          }`}>
+                            <TypeIcon size={18} className={
+                              rec.priority === 'high' ? 'text-red-600' : rec.priority === 'medium' ? 'text-amber-600' : 'text-emerald-600'
+                            } />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold">{rec.title}</p>
+                              <Badge variant={priorityBadge} className="text-[10px]">
+                                {rec.priority === 'high' ? 'Высокий' : rec.priority === 'medium' ? 'Средний' : 'Низкий'}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{rec.description}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            <Card className="border-border">
+              <CardContent className="p-8 text-center">
+                <Lightbulb size={32} className="text-muted-foreground mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">Нет рекомендаций — отличная работа!</p>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </div>

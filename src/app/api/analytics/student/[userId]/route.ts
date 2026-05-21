@@ -57,7 +57,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   // Get progress snapshots for timeline
   const snapshots = await prisma.progressSnapshot.findMany({
-    where: { userId, recordedAt: { gte: since } },
+    where: { userId },
     select: { moduleId: true, score: true, completed: true, recordedAt: true },
     orderBy: { recordedAt: 'asc' },
   });
@@ -119,6 +119,227 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     avgScore: 0, // Would need quiz result mapping for accurate scores
   }));
 
+  // ─── Module Completion Timeline ───
+  const moduleCompletionTimeline = progressRecords
+    .filter((p) => p.completed || p.score !== null)
+    .sort((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime())
+    .map((p) => ({
+      date: p.updatedAt.toISOString().split('T')[0],
+      moduleId: p.moduleId,
+      score: p.score,
+      completed: p.completed,
+    }));
+
+  // Also include snapshot data for more granular timeline
+  const snapshotMap = new Map<string, { score: number; completed: boolean; date: string }>();
+  for (const snap of snapshots) {
+    const key = `${snap.moduleId}-${snap.recordedAt.toISOString().split('T')[0]}`;
+    if (!snapshotMap.has(key) || snap.recordedAt > new Date(snapshotMap.get(key)!.date)) {
+      snapshotMap.set(key, {
+        score: snap.score,
+        completed: snap.completed,
+        date: snap.recordedAt.toISOString().split('T')[0],
+      });
+    }
+  }
+
+  // ─── Quiz Category Trajectory (weekly buckets) ───
+  const allQuizAttempts = await prisma.quizAttempt.findMany({
+    where: { userId },
+    select: { category: true, correct: true, attemptedAt: true },
+    orderBy: { attemptedAt: 'asc' },
+  });
+
+  const weekBuckets = new Map<string, Map<string, { correct: number; total: number }>>();
+  for (const attempt of allQuizAttempts) {
+    const attemptDate = new Date(attempt.attemptedAt);
+    const weekStart = new Date(attemptDate);
+    weekStart.setDate(attemptDate.getDate() - attemptDate.getDay());
+    const weekKey = weekStart.toISOString().split('T')[0];
+
+    if (!weekBuckets.has(weekKey)) {
+      weekBuckets.set(weekKey, new Map());
+    }
+    const weekData = weekBuckets.get(weekKey)!;
+    if (!weekData.has(attempt.category)) {
+      weekData.set(attempt.category, { correct: 0, total: 0 });
+    }
+    const catData = weekData.get(attempt.category)!;
+    catData.total++;
+    if (attempt.correct) catData.correct++;
+  }
+
+  const quizCategoryTrajectory: Array<{ week: string; category: string; avgScore: number; attempts: number }> = [];
+  for (const [week, categories] of weekBuckets) {
+    for (const [category, data] of categories) {
+      quizCategoryTrajectory.push({
+        week,
+        category,
+        avgScore: Math.round((data.correct / data.total) * 1000) / 10,
+        attempts: data.total,
+      });
+    }
+  }
+  quizCategoryTrajectory.sort((a, b) => a.week.localeCompare(b.week));
+
+  // ─── Login Activity Timeline (daily aggregation) ───
+  const allLoginActivity = await prisma.loginActivity.findMany({
+    where: { userId },
+    select: { timestamp: true, success: true },
+    orderBy: { timestamp: 'asc' },
+  });
+
+  const loginDayMap = new Map<string, { total: number; success: number }>();
+  for (const login of allLoginActivity) {
+    const dayKey = login.timestamp.toISOString().split('T')[0];
+    if (!loginDayMap.has(dayKey)) {
+      loginDayMap.set(dayKey, { total: 0, success: 0 });
+    }
+    const dayData = loginDayMap.get(dayKey)!;
+    dayData.total++;
+    if (login.success) dayData.success++;
+  }
+
+  const loginActivityTimeline = Array.from(loginDayMap.entries())
+    .map(([date, data]) => ({ date, count: data.total, successCount: data.success }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  // ─── Skills Gap Analysis ───
+  // Get cohort averages for comparison
+  const allUserProgress = await prisma.progress.findMany({
+    select: { moduleId: true, score: true, completed: true },
+  });
+
+  const cohortModuleAverages = new Map<string, { totalScore: number; count: number; completedCount: number; totalCount: number }>();
+  for (const p of allUserProgress) {
+    if (!cohortModuleAverages.has(p.moduleId)) {
+      cohortModuleAverages.set(p.moduleId, { totalScore: 0, count: 0, completedCount: 0, totalCount: 0 });
+    }
+    const avg = cohortModuleAverages.get(p.moduleId)!;
+    avg.totalCount++;
+    if (p.completed) avg.completedCount++;
+    if (p.score !== null) {
+      avg.totalScore += p.score;
+      avg.count++;
+    }
+  }
+
+  const studentModuleScores = new Map<string, number>();
+  for (const p of progressRecords) {
+    if (p.score !== null) {
+      studentModuleScores.set(p.moduleId, p.score);
+    }
+  }
+
+  const skillsGap = Array.from(cohortModuleAverages.entries()).map(([moduleId, avg]) => {
+    const cohortAvg = avg.count > 0 ? Math.round((avg.totalScore / avg.count) * 10) / 10 : 0;
+    const studentScore = studentModuleScores.get(moduleId) ?? 0;
+    const gap = Math.round((studentScore - cohortAvg) * 10) / 10;
+    const severity = gap < -20 ? 'high' : gap < -10 ? 'medium' : 'low';
+    return { moduleId, studentScore, cohortAvg, gap, severity };
+  });
+
+  // Category-level gap analysis
+  const allQuizAttemptsForCohort = await prisma.quizAttempt.findMany({
+    select: { category: true, correct: true },
+  });
+
+  const cohortCategoryAverages = new Map<string, { correct: number; total: number }>();
+  for (const a of allQuizAttemptsForCohort) {
+    if (!cohortCategoryAverages.has(a.category)) {
+      cohortCategoryAverages.set(a.category, { correct: 0, total: 0 });
+    }
+    const cat = cohortCategoryAverages.get(a.category)!;
+    cat.total++;
+    if (a.correct) cat.correct++;
+  }
+
+  const studentCategoryMap = new Map<string, { correct: number; total: number }>();
+  for (const a of quizAttempts) {
+    if (!studentCategoryMap.has(a.category)) {
+      studentCategoryMap.set(a.category, { correct: 0, total: 0 });
+    }
+    const cat = studentCategoryMap.get(a.category)!;
+    cat.total++;
+    if (a.correct) cat.correct++;
+  }
+
+  // Add category gaps to skillsGap array
+  for (const [category, cohortData] of cohortCategoryAverages) {
+    const cohortRate = cohortData.total > 0 ? Math.round((cohortData.correct / cohortData.total) * 1000) / 10 : 0;
+    const studentData = studentCategoryMap.get(category);
+    const studentRate = studentData && studentData.total > 0 ? Math.round((studentData.correct / studentData.total) * 1000) / 10 : 0;
+    const gap = Math.round((studentRate - cohortRate) * 10) / 10;
+    const severity = gap < -20 ? 'high' : gap < -10 ? 'medium' : 'low';
+    skillsGap.push({
+      moduleId: `category:${category}`,
+      studentScore: studentRate,
+      cohortAvg: cohortRate,
+      gap,
+      severity,
+    });
+  }
+
+  // ─── Personalized Recommendations ───
+  const recommendations: Array<{ type: string; title: string; description: string; priority: string }> = [];
+
+  // Module-based recommendations
+  for (const gap of skillsGap.filter((g) => !g.moduleId.startsWith('category:'))) {
+    if (gap.severity === 'high') {
+      recommendations.push({
+        type: 'module',
+        title: `Повторите модуль "${gap.moduleId}"`,
+        description: `Ваш результат (${gap.studentScore}%) значительно ниже среднего (${gap.cohortAvg}%). Рекомендуется повторное изучение материала.`,
+        priority: 'high',
+      });
+    } else if (gap.severity === 'medium' && gap.studentScore < 60) {
+      recommendations.push({
+        type: 'module',
+        title: `Закрепите модуль "${gap.moduleId}"`,
+        description: `Ваш результат (${gap.studentScore}%) ниже среднего (${gap.cohortAvg}%). Рекомендуется дополнительная практика.`,
+        priority: 'medium',
+      });
+    }
+  }
+
+  // Category-based recommendations
+  for (const gap of skillsGap.filter((g) => g.moduleId.startsWith('category:'))) {
+    const category = gap.moduleId.replace('category:', '');
+    if (gap.severity === 'high') {
+      recommendations.push({
+        type: 'quiz',
+        title: `Изучите тему "${category}"`,
+        description: `Правильных ответов: ${gap.studentRate}%, средний по группе: ${gap.cohortAvg}%. Рекомендуется повторить теорию.`,
+        priority: 'high',
+      });
+    }
+  }
+
+  // Completion-based recommendations
+  if (modulesCompleted < totalModules * 0.5) {
+    const remainingModules = totalModules - modulesCompleted;
+    recommendations.push({
+      type: 'practice',
+      title: 'Ускорьте прохождение модулей',
+      description: `Завершено ${modulesCompleted} из ${totalModules} модулей. Осталось ${remainingModules}. Рекомендуется заниматься регулярно.`,
+      priority: modulesCompleted === 0 ? 'high' : 'medium',
+    });
+  }
+
+  // Login-based recommendations
+  if (lastActiveDays > 7) {
+    recommendations.push({
+      type: 'practice',
+      title: 'Вернитесь к обучению',
+      description: `Последняя активность была ${lastActiveDays} дней назад. Регулярные занятия улучшают усвоение материала.`,
+      priority: lastActiveDays > 14 ? 'high' : 'medium',
+    });
+  }
+
+  // Sort by priority
+  const priorityOrder = { high: 0, medium: 1, low: 2 };
+  recommendations.sort((a, b) => (priorityOrder as Record<string, number>)[a.priority] - (priorityOrder as Record<string, number>)[b.priority]);
+
   // Activity timeline (combine login + progress + quiz events)
   const activityTimeline: Array<{ date: string; type: string; details: string }> = [];
 
@@ -178,5 +399,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     categoryBreakdown,
     activityTimeline: activityTimeline.slice(0, 30),
     achievements,
+    // New fields for enhanced student performance report
+    moduleCompletionTimeline,
+    quizCategoryTrajectory,
+    loginActivityTimeline,
+    skillsGap,
+    recommendations,
   });
 }

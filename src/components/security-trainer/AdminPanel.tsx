@@ -90,6 +90,7 @@ import LearningVelocity from './LearningVelocity';
 import QuizSessionAnalytics from './QuizSessionAnalytics';
 import GroupDynamics from './GroupDynamics';
 import LoginPatterns from './LoginPatterns';
+import AdvancedAnalytics from './AdvancedAnalytics';
 
 const roleColors: Record<UserRole, string> = {
   student: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
@@ -803,7 +804,7 @@ function AnalyticsSubTabs({
   selectedStudentId: string;
   setSelectedStudentId: (id: string) => void;
 }) {
-  const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort' | 'competency' | 'weaknesses' | 'predictive' | 'module-deep-dive' | 'certification' | 'velocity' | 'quiz-session' | 'group-dynamics' | 'login-patterns'>('dashboard');
+  const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort' | 'competency' | 'weaknesses' | 'predictive' | 'module-deep-dive' | 'certification' | 'velocity' | 'quiz-session' | 'group-dynamics' | 'login-patterns' | 'advanced'>('dashboard');
   const { groupId, days } = useAnalyticsFilters();
   const [summary, setSummary] = useState<any>(null);
 
@@ -872,6 +873,7 @@ function AnalyticsSubTabs({
           { key: 'quiz-session' as const, label: 'Сессии квизов', icon: Clock },
           { key: 'group-dynamics' as const, label: 'Динамика групп', icon: Heart },
           { key: 'login-patterns' as const, label: 'Входы', icon: LogIn },
+          { key: 'advanced' as const, label: 'Продвинутая', icon: Layers },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -1010,6 +1012,11 @@ function AnalyticsSubTabs({
       {analyticsSubTab === 'login-patterns' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <LoginPatterns groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'advanced' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <AdvancedAnalytics groupId={groupId} days={days} />
         </motion.div>
       )}
     </>
