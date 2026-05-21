@@ -95,10 +95,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Achievements count
-    const progressState: Record<string, any> = {};
-    for (const p of studentProgress) {
-      progressState[p.moduleId] = p;
-    }
+    const completedModuleIds = studentProgress.filter((p) => p.completed).map((p) => p.moduleId);
     const quizState: Record<string, number> = {};
     for (const qr of studentQuizResults) {
       quizState[qr.quizId] = qr.percentage;
@@ -106,7 +103,7 @@ export async function GET(request: NextRequest) {
     let achievementCount = 0;
     const achievements = ['first-steps', 'sql-master', 'xss-hunter', 'security-guard', 'auth-expert', 'code-reviewer', 'quiz-master', 'quiz-perfect', 'crypto-ninja', 'full-completion', 'csrf-shield', 'owasp-half', 'quiz-all', 'crypto-explorer', 'coding-pro', 'headers-guard', 'coding-master', 'network-ninja', 'social-engineer', 'all-headers-correct'];
     for (const achId of achievements) {
-      if (isAchievementUnlocked(achId, progressState, quizState)) achievementCount++;
+      if (isAchievementUnlocked(achId, completedModuleIds, [], quizState)) achievementCount++;
     }
 
     // Readiness score calculation

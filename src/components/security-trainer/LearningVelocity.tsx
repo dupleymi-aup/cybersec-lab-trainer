@@ -130,7 +130,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                 <XAxis dataKey="avgDaysPerModule" name="Дней/модуль" type="number" tick={{ fontSize: 10 }} label={{ value: 'Дней на модуль', position: 'insideBottom', offset: -5, fontSize: 11 }} />
                 <YAxis dataKey="scoreImprovement" name="Улучшение" type="number" tick={{ fontSize: 10 }} label={{ value: 'Улучшение балла', angle: -90, position: 'insideLeft', offset: 5, fontSize: 11 }} />
                 <ZAxis dataKey="velocityScore" range={[30, 100]} />
-                <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value: unknown, name: string) => [`${value}`, name]} />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value, name) => [`${value}`, name ?? '']} />
                 <Scatter name="Студенты" data={studentVelocities.map((v) => ({ ...v, name: v.fullName }))} fill="#6366f1" />
               </ScatterChart>
             </ResponsiveContainer>

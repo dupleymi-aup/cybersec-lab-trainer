@@ -19,7 +19,11 @@ export async function GET(request: NextRequest) {
     orderBy: { dueAt: 'asc' },
   });
 
-  const results = [];
+  const results: Array<{
+    deadline: { id: string; scope: string; scopeId: string; dueAt: Date; title: string; group: string };
+    totalStudents: number; completedCount: number; completionRate: number;
+    studentStatus: Array<{ id: string; fullName: string; email: string; group: string; completed: boolean; progressDate: string | null; isOverdue: boolean }>;
+  }> = [];
 
   for (const deadline of deadlines) {
     // Find target students
@@ -32,7 +36,10 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true, email: true, group: true },
     });
 
-    const studentStatus = [];
+    const studentStatus: Array<{
+      id: string; fullName: string; email: string; group: string;
+      completed: boolean; progressDate: string | null; isOverdue: boolean;
+    }> = [];
 
     for (const student of students) {
       let completed = false;

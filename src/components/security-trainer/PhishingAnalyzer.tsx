@@ -53,7 +53,7 @@ export default function PhishingAnalyzer() {
   const handleVerdict = (verdict: 'phishing' | 'legit') => {
     setUserVerdict(verdict);
     setScore(s => ({
-      correct: s.correct + (verdict === 'phishing' ? currentEmail.isPhishing : !currentEmail.isPhishing ? 1 : 0),
+      correct: s.correct + ((verdict === 'phishing' && currentEmail.isPhishing) || (verdict === 'legit' && !currentEmail.isPhishing) ? 1 : 0),
       total: s.total + 1,
     }));
   };
@@ -80,6 +80,8 @@ export default function PhishingAnalyzer() {
     medium: 'bg-yellow-100 text-yellow-700',
     hard: 'bg-red-100 text-red-700',
   };
+
+  const sanitizedBody = useMemo(() => DOMPurify.sanitize(currentEmail.body), [currentEmail.body]);
 
   return (
     <div className="space-y-6">
@@ -242,7 +244,7 @@ export default function PhishingAnalyzer() {
                   ) : (
                     <div
                       className="prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: useMemo(() => DOMPurify.sanitize(currentEmail.body), [currentEmail.body]) }}
+                      dangerouslySetInnerHTML={{ __html: sanitizedBody }}
                     />
                   )}
                 </div>

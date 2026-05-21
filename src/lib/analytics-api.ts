@@ -216,6 +216,11 @@ export async function getStudentPerformance(userId: string, days = 30): Promise<
       categoryBreakdown: [],
       activityTimeline: [],
       achievements: [],
+      moduleCompletionTimeline: [],
+      quizCategoryTrajectory: [],
+      loginActivityTimeline: [],
+      skillsGap: [],
+      recommendations: [],
     };
   }
 }

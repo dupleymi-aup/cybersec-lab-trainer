@@ -309,7 +309,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       recommendations.push({
         type: 'quiz',
         title: `Изучите тему "${category}"`,
-        description: `Правильных ответов: ${gap.studentRate}%, средний по группе: ${gap.cohortAvg}%. Рекомендуется повторить теорию.`,
+        description: `Правильных ответов: ${gap.studentScore}%, средний по группе: ${gap.cohortAvg}%. Рекомендуется повторить теорию.`,
         priority: 'high',
       });
     }

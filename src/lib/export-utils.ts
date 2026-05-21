@@ -91,9 +91,9 @@ export async function generateStudentReportPDF(
     doc.setFontSize(9);
     recommendations.slice(0, 5).forEach((rec, i) => {
       const y = recY + 20 + i * 15;
-      doc.setFont(undefined, 'bold');
+      doc.setFont('helvetica', 'bold');
       doc.text(`• ${rec.title}`, 14, y);
-      doc.setFont(undefined, 'normal');
+      doc.setFont('helvetica', 'normal');
       const splitDesc = doc.splitTextToSize(rec.description, 170);
       doc.text(splitDesc, 20, y + 5);
     });
@@ -233,9 +233,9 @@ export async function generateAnalyticsPDF(
 
   let y = 55;
   kpiData.forEach(([label, value]) => {
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text(`${label}:`, 14, y);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     doc.text(value, 80, y);
     y += 8;
   });

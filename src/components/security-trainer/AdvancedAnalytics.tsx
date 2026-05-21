@@ -313,7 +313,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                       outerRadius={80}
                       dataKey="count"
                       nameKey="range"
-                      label={({ range, percent }) => `${range} (${(percent * 100).toFixed(0)}%)`}
+                      label={(entry) => `${entry.name} (${((entry.percent ?? 0) * 100).toFixed(0)}%)`}
                     >
                       {retryData.retryDistribution.map((_: any, i: number) => {
                         const colors = ['#10b981', '#6366f1', '#f59e0b', '#ef4444'];

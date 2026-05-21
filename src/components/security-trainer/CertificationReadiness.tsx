@@ -9,7 +9,8 @@ import {
 import {
   Loader2, AlertTriangle, Award, CheckCircle, XCircle, TrendingUp, ChevronDown, ChevronUp,
 } from 'lucide-react';
-import { getCertificationReadiness, type CertificationReadinessData, type CertificationStudentData } from '@/lib/auth-store';
+import { getCertificationReadiness, type CertificationReadinessData } from '@/lib/auth-store';
+import type { CertificationStudentData } from '@/lib/auth-types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 

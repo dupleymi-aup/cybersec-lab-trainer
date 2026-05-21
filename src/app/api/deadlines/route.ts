@@ -10,9 +10,8 @@ export async function GET(request: NextRequest) {
   const scope = searchParams.get('scope');
   const group = searchParams.get('group');
 
-  let where: Record<string, unknown> = {};
-
   // Teachers/admins see deadlines they created; students see deadlines for their group or all
+  let where: Record<string, unknown>;
   if (auth.role === 'student') {
     const student = await prisma.user.findUnique({ where: { id: auth.id }, select: { group: true } });
     const groups = ['', student?.group || ''].filter(Boolean);

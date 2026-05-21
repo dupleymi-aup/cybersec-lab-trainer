@@ -92,7 +92,7 @@ export default function Home() {
   useEffect(() => {
     initAuthBridge(
       () => useAuthStore.getState().user?.id || 'anonymous',
-      saveProgressSnapshot
+      async (moduleId, score, completed) => { await saveProgressSnapshot(moduleId, score, completed); }
     );
   }, []);
 

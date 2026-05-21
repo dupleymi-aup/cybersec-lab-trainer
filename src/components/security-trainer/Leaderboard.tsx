@@ -34,6 +34,15 @@ interface StudentStats {
   xp: number;
 }
 
+function calculateXP(stats: StudentStats): number {
+  return (
+    stats.modulesCompleted * 100 +
+    Math.round(stats.quizAvg * 5) +
+    stats.achievements * 50 +
+    stats.streak * 10
+  );
+}
+
 // Simulated student data (in production, this would come from the API)
 const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
   const students = [
@@ -49,6 +58,12 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     { id: 'usr_10', name: 'Наталья Кузнецова', group: 'ИС-21', modulesCompleted: 3, quizAvg: 55, achievements: 4, streak: 0, lastActive: '2026-05-10' },
   ];
 
+  // Add xp to each simulated student
+  const studentsWithXP = students.map((s: Omit<StudentStats, 'xp'>) => ({
+    ...s,
+    xp: calculateXP(s as StudentStats),
+  }));
+
   // Add current user
   const currentUser: StudentStats = {
     id: currentUserId,
@@ -62,17 +77,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     xp: 0,
   };
 
-  return [...students, currentUser];
+  return [...studentsWithXP, currentUser];
 };
-
-function calculateXP(stats: StudentStats): number {
-  return (
-    stats.modulesCompleted * 100 +
-    Math.round(stats.quizAvg * 5) +
-    stats.achievements * 50 +
-    stats.streak * 10
-  );
-}
 
 const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
 

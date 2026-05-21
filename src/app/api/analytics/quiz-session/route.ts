@@ -59,7 +59,10 @@ export async function GET(request: NextRequest) {
   }
 
   // Calculate duration per session (first attempt to last attempt timestamp)
-  const sessionsWithDuration = [];
+  const sessionsWithDuration: Array<{
+    userId: string; quizId: string; category: string; duration: number;
+    score: number; percentage: number; questionCount: number;
+  }> = [];
   for (const [, session] of sessionMap) {
     if (session.attempts.length < 2) continue;
     const firstTime = session.attempts[0].attemptedAt.getTime();

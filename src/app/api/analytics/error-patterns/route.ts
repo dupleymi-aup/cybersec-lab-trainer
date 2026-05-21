@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   // Get all attempts for context
   const allAttempts = await prisma.quizAttempt.findMany({
     where: { attemptedAt: { gte: since } },
-    select: { questionId: true, category: true, difficulty: true, correct: true },
+    select: { questionId: true, category: true, difficulty: true, correct: true, userId: true, attemptedAt: true },
   });
 
   // Get user info for group filtering

@@ -76,6 +76,27 @@ export default function StudentProgressView({ students: studentList, groupId, on
       .finally(() => setLoading(false));
   }, [selectedId, groupId]);
 
+  const localProgress = getStudentProgressLocal(selectedId || '');
+
+  const radarData = useMemo(() => {
+    if (!selectedId) return [];
+    if (data?.categoryBreakdown) {
+      return data.categoryBreakdown.map((c) => ({
+        category: c.category,
+        student: Math.round(c.avgScore),
+        group: summary?.kpis.avgQuizScore || 0,
+      }));
+    }
+    return quizCategories.map((cat) => {
+      const score = localProgress.quizScores[cat.id] || 0;
+      return {
+        category: cat.name,
+        student: score,
+        group: summary?.kpis.avgQuizScore || 0,
+      };
+    });
+  }, [selectedId, data, summary, localProgress.quizScores]);
+
   if (!selectedId || !selectedStudent) {
     return (
       <div className="space-y-2">
@@ -146,26 +167,6 @@ export default function StudentProgressView({ students: studentList, groupId, on
       </div>
     );
   }
-
-  const localProgress = getStudentProgressLocal(selectedId);
-
-  const radarData = useMemo(() => {
-    if (data?.categoryBreakdown) {
-      return data.categoryBreakdown.map((c) => ({
-        category: c.category,
-        student: Math.round(c.avgScore),
-        group: summary?.kpis.avgQuizScore || 0,
-      }));
-    }
-    return quizCategories.map((cat) => {
-      const score = localProgress.quizScores[cat.id] || 0;
-      return {
-        category: cat.name,
-        student: score,
-        group: summary?.kpis.avgQuizScore || 0,
-      };
-    });
-  }, [data, summary, localProgress.quizScores]);
 
   return (
     <div className="space-y-4">
