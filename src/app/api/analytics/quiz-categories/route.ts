@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       const correctRate = qAttempts.length > 0 ? Math.round((qCorrect / qAttempts.length) * 10000) / 100 : 0;
       return {
         questionId,
-        questionText: `Вопрос ${questionId.slice(0, 8)}...`,
+        questionText: `${CATEGORY_NAMES[attempt.category] || attempt.category} — ${attempt.difficulty} #${questionId.slice(0, 8)}`,
         attempts: qAttempts.length,
         correctRate,
         difficulty: qAttempts[0]?.difficulty || 'medium',
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
   const hardestQuestions = Array.from(allQuestionMap.entries())
     .map(([questionId, data]) => ({
       questionId,
-      questionText: `Вопрос ${questionId.slice(0, 8)}...`,
+      questionText: `${CATEGORY_NAMES[data.category] || data.category} #${questionId.slice(0, 8)}`,
       category: CATEGORY_NAMES[data.category] || data.category,
       correctRate: data.attempts > 0 ? Math.round((data.correct / data.attempts) * 10000) / 100 : 0,
       attempts: data.attempts,

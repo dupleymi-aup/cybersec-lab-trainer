@@ -59,6 +59,12 @@ import {
   Clock,
   Heart,
   ListChecks,
+  Grid,
+  Repeat,
+  AlertOctagon,
+  Calendar,
+  ShieldCheck,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import UserModal from './UserModal';
@@ -91,6 +97,17 @@ import QuizSessionAnalytics from './QuizSessionAnalytics';
 import GroupDynamics from './GroupDynamics';
 import LoginPatterns from './LoginPatterns';
 import AdvancedAnalytics from './AdvancedAnalytics';
+import QuizDifficultyAnalysis from './QuizDifficultyAnalysis';
+import QuizRetryAnalytics from './QuizRetryAnalytics';
+import ErrorPatternsAnalytics from './ErrorPatternsAnalytics';
+import ProgressSankey from './ProgressSankey';
+import StudentHeatmapCalendar from './StudentHeatmapCalendar';
+import PredictiveRiskDashboard from './PredictiveRiskDashboard';
+import ReportScheduler from './ReportScheduler';
+import NotificationBell from './NotificationBell';
+import ExecutiveSummaryExport from './ExecutiveSummaryExport';
+import DataQualityMonitor from './DataQualityMonitor';
+import PeriodComparison from './PeriodComparison';
 
 const roleColors: Record<UserRole, string> = {
   student: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
@@ -301,9 +318,12 @@ export default function AdminPanel() {
         <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
           <Settings size={20} className="text-red-600" />
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl font-bold">Панель администратора</h1>
           <p className="text-xs text-muted-foreground">Управление пользователями и системой</p>
+        </div>
+        <div className="flex-shrink-0">
+          <NotificationBell />
         </div>
       </div>
 
@@ -804,7 +824,7 @@ function AnalyticsSubTabs({
   selectedStudentId: string;
   setSelectedStudentId: (id: string) => void;
 }) {
-  const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort' | 'competency' | 'weaknesses' | 'predictive' | 'module-deep-dive' | 'certification' | 'velocity' | 'quiz-session' | 'group-dynamics' | 'login-patterns' | 'advanced'>('dashboard');
+  const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort' | 'competency' | 'weaknesses' | 'predictive' | 'module-deep-dive' | 'certification' | 'velocity' | 'quiz-session' | 'group-dynamics' | 'login-patterns' | 'advanced' | 'difficulty' | 'heatmap' | 'questions' | 'summary' | 'retry' | 'errors' | 'sankey' | 'calendar' | 'predictive-risk' | 'scheduler' | 'data-quality' | 'period-comparison'>('dashboard');
   const { groupId, days } = useAnalyticsFilters();
   const [summary, setSummary] = useState<any>(null);
 
@@ -874,6 +894,18 @@ function AnalyticsSubTabs({
           { key: 'group-dynamics' as const, label: 'Динамика групп', icon: Heart },
           { key: 'login-patterns' as const, label: 'Входы', icon: LogIn },
           { key: 'advanced' as const, label: 'Продвинутая', icon: Layers },
+          { key: 'difficulty' as const, label: 'Сложность', icon: Target },
+          { key: 'heatmap' as const, label: 'Тепловая карта', icon: Grid },
+          { key: 'questions' as const, label: 'Вопросы', icon: HelpCircle },
+          { key: 'summary' as const, label: 'Сводка', icon: FileBarChart },
+          { key: 'retry' as const, label: 'Повторы', icon: Repeat },
+          { key: 'errors' as const, label: 'Ошибки', icon: AlertOctagon },
+          { key: 'sankey' as const, label: 'Воронка+', icon: GitBranch },
+          { key: 'calendar' as const, label: 'Календарь', icon: Calendar },
+          { key: 'predictive-risk' as const, label: 'Прогноз риска', icon: TrendingUp },
+          { key: 'scheduler' as const, label: 'Расписание', icon: Calendar },
+          { key: 'data-quality' as const, label: 'Качество данных', icon: ShieldCheck },
+          { key: 'period-comparison' as const, label: 'Сравнение периодов', icon: ArrowLeftRight },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -892,6 +924,9 @@ function AnalyticsSubTabs({
 
       {analyticsSubTab === 'dashboard' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <div className="flex items-center justify-end mb-3">
+            <ExecutiveSummaryExport groupId={groupId} days={days} />
+          </div>
           <ComprehensiveDashboard groupId={groupId} days={days} />
         </motion.div>
       )}
@@ -1017,6 +1052,66 @@ function AnalyticsSubTabs({
       {analyticsSubTab === 'advanced' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <AdvancedAnalytics groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'difficulty' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <QuizDifficultyAnalysis groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'heatmap' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <ActivityHeatmap groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'questions' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <QuizQuestionAnalytics />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'summary' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <AdminSummaryReport />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'retry' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <QuizRetryAnalytics groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'errors' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <ErrorPatternsAnalytics groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'sankey' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <ProgressSankey groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'calendar' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <StudentHeatmapCalendar groupId={groupId} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'predictive-risk' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <PredictiveRiskDashboard groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'scheduler' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <ReportScheduler groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'data-quality' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <DataQualityMonitor groupId={groupId} days={days} />
+        </motion.div>
+      )}
+      {analyticsSubTab === 'period-comparison' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <PeriodComparison groupId={groupId} />
         </motion.div>
       )}
     </>

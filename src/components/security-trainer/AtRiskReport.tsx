@@ -7,10 +7,13 @@ import {
 } from 'recharts';
 import {
   AlertTriangle, Loader2, TrendingUp, TrendingDown, Minus, Users, Award,
+  Download, FileText,
 } from 'lucide-react';
 import { getAtRiskStudents, type AtRiskStudent } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { generateAtRiskPDF, generateAtRiskCSV, downloadCSV } from '@/lib/export-utils';
 import RiskScoreBar from './RiskScoreBar';
 import KPICard from './KPICard';
 import StudentDrillDown from './StudentDrillDown';
@@ -79,6 +82,40 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
     count: atRiskStudents.filter((s) => s.riskScore >= b.min && s.riskScore < b.max).length,
   }));
 
+  const [exportStatus, setExportStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+
+  const handlePdfExport = async () => {
+    setExportStatus('loading');
+    try {
+      const pdfData = atRiskStudents.map(s => ({
+        fullName: s.fullName,
+        email: s.email,
+        group: s.group,
+        riskScore: s.riskScore,
+        reasons: s.reasons,
+        lastActiveDays: s.lastActiveDays,
+        modulesCompleted: s.modulesCompleted,
+        avgQuizScore: s.avgQuizScore,
+      }));
+      await generateAtRiskPDF(pdfData);
+      setExportStatus('success');
+    } catch {
+      setExportStatus('idle');
+    }
+    setTimeout(() => setExportStatus('idle'), 4000);
+  };
+
+  const handleCsvExport = () => {
+    const csv = generateAtRiskCSV(atRiskStudents.map(s => ({
+      ...s,
+      trend: s.trend,
+      course: s.course || '',
+      university: s.university || '',
+    })));
+    const date = new Date().toISOString().split('T')[0];
+    downloadCSV(csv, `at-risk-${date}.csv`);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -99,9 +136,10 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
 
   return (
     <div className="space-y-6">
-      {/* Period selector */}
-      {controlledDays === undefined && (
-        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+      {/* Toolbar: Period selector + Export buttons */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        {controlledDays === undefined && (
+        <div className="flex gap-1 p-1 bg-muted rounded-lg">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
@@ -114,7 +152,22 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
             </button>
           ))}
         </div>
-      )}
+        )}
+        <div className="flex gap-2 ml-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePdfExport}
+            disabled={exportStatus === 'loading'}
+            className={exportStatus === 'success' ? 'bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600' : ''}
+          >
+            {exportStatus === 'loading' ? '...' : exportStatus === 'success' ? 'Готово' : <><FileText size={14} className="mr-1" /> PDF</>}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleCsvExport}>
+            <Download size={14} className="mr-1" /> CSV
+          </Button>
+        </div>
+      </div>
 
       {/* Summary KPI cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

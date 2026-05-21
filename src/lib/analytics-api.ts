@@ -6,7 +6,9 @@ import type {
   EngagementData, LearningPathEntry, QuizTrajectoryPoint,
   CohortAnalysisData, QuizAttemptData,
   ModuleDeepDiveData, CertificationReadinessData, LearningVelocityData,
-  QuizSessionData, GroupDynamicsData, LoginPatternsData,
+  QuizSessionData, GroupDynamicsData, LoginPatternsData, QuizDifficultyData,
+  QuizRetryData, ErrorPatternsData, PredictiveRiskData, ScheduledReport,
+  DataQualityData,
 } from './auth-types';
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
@@ -377,5 +379,115 @@ export async function getLoginPatterns(days = 30, groupId?: string): Promise<Log
     return data;
   } catch {
     return { loginFrequency: [], failedLogins: [], dormantAccounts: [], hourlyDistribution: [], dailyDistribution: [] };
+  }
+}
+
+export async function getQuizDifficultyAnalytics(days = 30, groupId?: string): Promise<QuizDifficultyData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/quiz-difficulty?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { difficultyBreakdown: [], categoryByDifficulty: [], studentPerformanceByDifficulty: [], trendByDifficulty: [] };
+  }
+}
+
+export async function getQuizRetryAnalytics(days = 30, groupId?: string): Promise<QuizRetryData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/quiz-retry?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { categoryRetryStats: [], retryDistribution: [], topRetryers: [], improvementByRetries: [], totalRetries: 0, totalUniqueQuizzes: 0 };
+  }
+}
+
+export async function getErrorPatternsAnalytics(days = 30, groupId?: string): Promise<ErrorPatternsData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/error-patterns?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { mostMissedQuestions: [], categoryErrorRates: [], difficultyErrorRates: [], errorTrends: [] };
+  }
+}
+
+export async function getPredictiveRisk(days = 30, groupId?: string): Promise<PredictiveRiskData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/predictive-risk?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { students: [], summary: { totalStudents: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0, avgRisk: 0 } };
+  }
+}
+
+export async function getScheduledReports(): Promise<{ success: boolean; reports: ScheduledReport[]; error?: string }> {
+  try {
+    const res = await apiFetch('/api/scheduled-reports');
+    return res.json();
+  } catch {
+    return { success: false, reports: [], error: 'Failed to fetch scheduled reports' };
+  }
+}
+
+export async function createScheduledReport(data: {
+  reportType: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  dayOfWeek?: number;
+  dayOfMonth?: number;
+  email?: string;
+  groupId?: string;
+  days?: number;
+}): Promise<{ success: boolean; report?: ScheduledReport; error?: string }> {
+  try {
+    const res = await apiFetch('/api/scheduled-reports', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return res.json();
+  } catch {
+    return { success: false, error: 'Failed to create scheduled report' };
+  }
+}
+
+export async function updateScheduledReport(id: string, data: Record<string, any>): Promise<{ success: boolean; report?: ScheduledReport; error?: string }> {
+  try {
+    const res = await apiFetch(`/api/scheduled-reports/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return res.json();
+  } catch {
+    return { success: false, error: 'Failed to update scheduled report' };
+  }
+}
+
+export async function deleteScheduledReport(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await apiFetch(`/api/scheduled-reports/${id}`, { method: 'DELETE' });
+    return res.json();
+  } catch {
+    return { success: false, error: 'Failed to delete scheduled report' };
+  }
+}
+
+export async function getDataQuality(days = 30, groupId?: string): Promise<DataQualityData> {
+  try {
+    const params = new URLSearchParams({ days: String(days) });
+    if (groupId) params.set('groupId', groupId);
+    const res = await apiFetch(`/api/analytics/data-quality?${params}`);
+    const data = await res.json();
+    return data;
+  } catch {
+    return { healthScore: 100, issues: [], summary: { totalStudents: 0, activeStudents: 0, totalModules: 0, completedModules: 0, totalQuizzes: 0 } };
   }
 }

@@ -9,11 +9,14 @@ import {
 import {
   User, BookOpen, Trophy, Activity, Award, AlertTriangle, Loader2,
   CheckCircle, XCircle, Clock, Target, Lightbulb, TrendingUp, TrendingDown, Minus,
+  Download, FileText,
 } from 'lucide-react';
 import { getStudentPerformance, type StudentPerformanceData } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { generateStudentReportPDF, generateStudentReportCSV, downloadCSV } from '@/lib/export-utils';
 import KPICard from './KPICard';
 
 const PERIOD_OPTIONS = [
@@ -78,21 +81,67 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
   const riskColor = kpis.riskScore >= 70 ? 'text-red-600' : kpis.riskScore >= 30 ? 'text-amber-600' : 'text-emerald-600';
   const riskBg = kpis.riskScore >= 70 ? 'bg-red-50' : kpis.riskScore >= 30 ? 'bg-amber-50' : 'bg-emerald-50';
 
+  const [exportStatus, setExportStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+
+  const handlePdfExport = async () => {
+    setExportStatus('loading');
+    try {
+      await generateStudentReportPDF(
+        { fullName: profile.fullName, email: profile.email, group: profile.group, course: profile.course || '', university: profile.university || '' },
+        { modulesCompleted: kpis.modulesCompleted, totalModules: kpis.totalModules, avgQuizScore: kpis.avgQuizScore, engagementScore: kpis.engagementScore, riskScore: kpis.riskScore },
+        moduleProgress.map(p => ({ moduleId: p.moduleName, completed: p.completed, score: p.score })),
+        quizResults.map(q => ({ quizId: q.quizId, score: q.score, total: q.total, percentage: q.percentage })),
+        recommendations
+      );
+      setExportStatus('success');
+    } catch {
+      setExportStatus('idle');
+    }
+    setTimeout(() => setExportStatus('idle'), 4000);
+  };
+
+  const handleCsvExport = () => {
+    const csv = generateStudentReportCSV(
+      { fullName: profile.fullName, email: profile.email, group: profile.group, course: profile.course || '', university: profile.university || '' },
+      moduleProgress.map(p => ({ moduleId: p.moduleName, completed: p.completed, score: p.score })),
+      quizResults.map(q => ({ quizId: q.quizId, score: q.score, total: q.total, percentage: q.percentage }))
+    );
+    const date = new Date().toISOString().split('T')[0];
+    const safeName = profile.fullName.replace(/\s+/g, '-');
+    downloadCSV(csv, `student-${safeName}-${date}.csv`);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Period selector */}
-      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
-        {PERIOD_OPTIONS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setDays(key)}
-            className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-              days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
-            }`}
+      {/* Toolbar: Period selector + Export buttons */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex gap-1 p-1 bg-muted rounded-lg">
+          {PERIOD_OPTIONS.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setDays(key)}
+              className={`px-3 py-1.5 text-xs rounded-md transition-all ${
+                days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePdfExport}
+            disabled={exportStatus === 'loading'}
+            className={exportStatus === 'success' ? 'bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600' : ''}
           >
-            {label}
-          </button>
-        ))}
+            {exportStatus === 'loading' ? '...' : exportStatus === 'success' ? 'Готово' : <><FileText size={14} className="mr-1" /> PDF</>}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleCsvExport}>
+            <Download size={14} className="mr-1" /> CSV
+          </Button>
+        </div>
       </div>
 
       {/* Profile Card */}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { getModuleName } from '@/lib/module-names';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
 
   // Get unique module IDs
   const moduleIds = Array.from(new Set(progressRecords.map((p) => p.moduleId)));
-  const modules = moduleIds.map((id) => ({ moduleId: id, moduleName: id }));
+  const modules = moduleIds.map((id) => ({ moduleId: id, moduleName: getModuleName(id) }));
 
   // Build student data
   const studentData = students.map((student) => {

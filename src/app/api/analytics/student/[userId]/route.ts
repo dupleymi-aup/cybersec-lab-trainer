@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { getModuleName } from '@/lib/module-names';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   const auth = await authenticate(request);
@@ -112,12 +113,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     cat.attempts++;
     if (attempt.correct) cat.correct++;
   }
-  const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, data]) => ({
-    category,
-    attempts: data.attempts,
-    correctRate: data.attempts > 0 ? Math.round((data.correct / data.attempts) * 1000) / 10 : 0,
-    avgScore: 0, // Would need quiz result mapping for accurate scores
-  }));
+  const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, data]) => {
+    const correctRate = data.attempts > 0 ? Math.round((data.correct / data.attempts) * 1000) / 10 : 0;
+    return {
+      category,
+      attempts: data.attempts,
+      correctRate,
+      avgScore: correctRate,
+    };
+  });
 
   // ─── Module Completion Timeline ───
   const moduleCompletionTimeline = progressRecords
@@ -383,7 +387,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     },
     moduleProgress: progressRecords.map((p) => ({
       moduleId: p.moduleId,
-      moduleName: p.moduleId, // Would need module name lookup
+      moduleName: getModuleName(p.moduleId),
       completed: p.completed,
       score: p.score,
       updatedAt: p.updatedAt.toISOString(),

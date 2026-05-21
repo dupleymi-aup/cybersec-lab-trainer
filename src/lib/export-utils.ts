@@ -264,6 +264,146 @@ export async function generateAnalyticsPDF(
   await downloadPDF(pdfBlob, 'analytics-report.pdf');
 }
 
+// Generate module performance PDF
+export async function generateModulePerformancePDF(
+  modules: Array<{ moduleId: string; moduleName: string; totalStudents: number; completedCount: number; completionRate: number; avgScore: number; difficultyIndex: number }>,
+  title: string = 'Производительность модулей'
+): Promise<void> {
+  const { jsPDF } = await import('jspdf');
+  const { autoTable } = await import('jspdf-autotable');
+  const doc = new jsPDF('landscape');
+
+  doc.setFontSize(16);
+  doc.text(title, 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(150);
+  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего модулей: ${modules.length}`, 14, 30);
+
+  autoTable(doc, {
+    startY: 40,
+    head: [['#', 'Модуль', 'Всего студентов', 'Завершили', 'Завершение (%)', 'Ср. балл (%)', 'Сложность']],
+    body: modules.map((m, i) => [
+      String(i + 1), m.moduleName, String(m.totalStudents), String(m.completedCount),
+      String(m.completionRate), String(m.avgScore), String(m.difficultyIndex)
+    ]),
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+    styles: { fontSize: 9 },
+    columnStyles: { 0: { cellWidth: 10 }, 4: { halign: 'center' }, 5: { halign: 'center' } },
+  });
+
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
+  }
+
+  const pdfBlob = doc.output('blob');
+  await downloadPDF(pdfBlob, 'module-performance.pdf');
+}
+
+// Generate group comparison PDF
+export async function generateGroupComparisonPDF(
+  dimensions: Array<{ name: string; studentCount: number; activeStudents: number; activeRate: number; avgModulesCompleted: number; avgCompletionRate: number; avgQuizScore: number; totalQuizAttempts: number; topModule: string; weakestModule: string }>,
+  dimensionType: string = 'group',
+  title: string = 'Сравнение групп'
+): Promise<void> {
+  const { jsPDF } = await import('jspdf');
+  const { autoTable } = await import('jspdf-autotable');
+  const doc = new jsPDF('landscape');
+
+  const label = dimensionType === 'group' ? 'Групп' : dimensionType === 'course' ? 'Курсов' : 'Университетов';
+  doc.setFontSize(16);
+  doc.text(title, 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(150);
+  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего ${label}: ${dimensions.length}`, 14, 30);
+
+  autoTable(doc, {
+    startY: 40,
+    head: [['#', dimensionType === 'group' ? 'Группа' : dimensionType === 'course' ? 'Курс' : 'Университет', 'Студенты', 'Активные', 'Активность (%)', 'Ср. модулей', 'Завершение (%)', 'Ср. балл (%)', 'Попытки квизов']],
+    body: dimensions.map((d, i) => [
+      String(i + 1), d.name, String(d.studentCount), String(d.activeStudents),
+      String(d.activeRate), String(d.avgModulesCompleted), String(d.avgCompletionRate),
+      String(d.avgQuizScore), String(d.totalQuizAttempts)
+    ]),
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+    styles: { fontSize: 9 },
+    columnStyles: { 0: { cellWidth: 10 } },
+  });
+
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
+  }
+
+  const pdfBlob = doc.output('blob');
+  await downloadPDF(pdfBlob, 'group-comparison.pdf');
+}
+
+// Generate quiz retry PDF
+export async function generateQuizRetryPDF(
+  retryData: { categoryRetryStats: Array<{ category: string; totalAttempts: number; uniqueStudents: number }>; topRetryers: Array<{ fullName: string; group: string; retryCount: number }>; totalRetries: number; totalUniqueQuizzes: number },
+  title: string = 'Анализ повторов квизов'
+): Promise<void> {
+  const { jsPDF } = await import('jspdf');
+  const { autoTable } = await import('jspdf-autotable');
+  const doc = new jsPDF('landscape');
+
+  doc.setFontSize(16);
+  doc.text(title, 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(150);
+  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Повторов: ${retryData.totalRetries} | Уникальных квизов: ${retryData.totalUniqueQuizzes}`, 14, 30);
+
+  autoTable(doc, {
+    startY: 40,
+    head: [['#', 'Категория', 'Попытки', 'Студенты']],
+    body: retryData.categoryRetryStats.map((c, i) => [
+      String(i + 1), c.category, String(c.totalAttempts), String(c.uniqueStudents)
+    ]),
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+    styles: { fontSize: 9 },
+    columnStyles: { 0: { cellWidth: 10 } },
+  });
+
+  const retryTableY = (doc as any).lastAutoTable?.finalY || 60;
+  if (retryData.topRetryers.length > 0) {
+    doc.setTextColor(0);
+    doc.setFontSize(14);
+    doc.text('Топ студентов по повторам', 14, retryTableY + 10);
+    autoTable(doc, {
+      startY: retryTableY + 15,
+      head: [['#', 'ФИО', 'Группа', 'Повторы']],
+      body: retryData.topRetryers.slice(0, 20).map((r, i) => [
+        String(i + 1), r.fullName, r.group, String(r.retryCount)
+      ]),
+      theme: 'striped',
+      headStyles: { fillColor: [239, 68, 68] },
+      styles: { fontSize: 9 },
+      columnStyles: { 0: { cellWidth: 10 } },
+    });
+  }
+
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
+  }
+
+  const pdfBlob = doc.output('blob');
+  await downloadPDF(pdfBlob, 'quiz-retry.pdf');
+}
+
 // Generate gradebook CSV string
 export function generateGradebookCSV(
   students: Array<{ id: string; fullName: string; email: string; group: string; modulesCompleted: number; quizCount: number; avgScore: number; lastActive: string }>,

@@ -17,7 +17,7 @@ import type {
   CompetencyRadarData, WeaknessAnalysis, PredictiveAnalyticsData,
   PredictiveInsight, Announcement, ModuleSettings,
   ModuleDeepDiveData, CertificationReadinessData, LearningVelocityData,
-  QuizSessionData, GroupDynamicsData, LoginPatternsData,
+  QuizSessionData, GroupDynamicsData, LoginPatternsData, QuizDifficultyData, QuizRetryData, ErrorPatternsData, PredictiveRiskData, ScheduledReport,
 } from './auth-types';
 
 import {
@@ -42,7 +42,7 @@ export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
   CompetencyRadarData, WeaknessAnalysis, PredictiveAnalyticsData,
   PredictiveInsight, Announcement, ModuleSettings,
   ModuleDeepDiveData, CertificationReadinessData, LearningVelocityData,
-  QuizSessionData, GroupDynamicsData, LoginPatternsData,
+  QuizSessionData, GroupDynamicsData, LoginPatternsData, QuizDifficultyData, QuizRetryData, ErrorPatternsData, PredictiveRiskData, ScheduledReport,
 };
 
 import { hasRole, getRoleLabel } from './auth-types';

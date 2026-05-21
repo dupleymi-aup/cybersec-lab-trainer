@@ -1,0 +1,94 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+
+  try {
+    const report = await prisma.scheduledReport.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!report || report.userId !== auth.userId) {
+      return unauthorized();
+    }
+
+    return NextResponse.json({ success: true, report });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+
+  try {
+    const existing = await prisma.scheduledReport.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing || existing.userId !== auth.userId) {
+      return unauthorized();
+    }
+
+    const body = await request.json();
+    const { isActive, lastGenerated, ...updates } = body;
+
+    const report = await prisma.scheduledReport.update({
+      where: { id: params.id },
+      data: {
+        ...(updates.reportType !== undefined && { reportType: updates.reportType }),
+        ...(updates.frequency !== undefined && { frequency: updates.frequency }),
+        ...(updates.dayOfWeek !== undefined && { dayOfWeek: updates.dayOfWeek }),
+        ...(updates.dayOfMonth !== undefined && { dayOfMonth: updates.dayOfMonth }),
+        ...(updates.email !== undefined && { email: updates.email }),
+        ...(updates.groupId !== undefined && { groupId: updates.groupId }),
+        ...(updates.days !== undefined && { days: updates.days }),
+        ...(isActive !== undefined && { isActive }),
+        ...(lastGenerated !== undefined && { lastGenerated: new Date(lastGenerated) }),
+      },
+    });
+
+    return NextResponse.json({ success: true, report });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+
+  try {
+    const existing = await prisma.scheduledReport.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existing || existing.userId !== auth.userId) {
+      return unauthorized();
+    }
+
+    await prisma.scheduledReport.delete({
+      where: { id: params.id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}

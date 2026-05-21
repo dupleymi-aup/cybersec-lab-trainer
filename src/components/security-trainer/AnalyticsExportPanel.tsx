@@ -6,8 +6,8 @@ import { Download, FileText, Printer, Loader2, CheckCircle2, AlertCircle, Chevro
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getAllUsers, getStudentProgress, getModulePerformance, getAtRiskStudents, getGroupComparison, getComprehensiveSummary, type User } from '@/lib/auth-store';
-import { downloadCSV, generateGradebookCSV, generateStudentReportCSV, generateModulePerformanceCSV, generateAtRiskCSV, generateGroupComparisonCSV, generateAnalyticsCSV } from '@/lib/export-utils';
+import { getAllUsers, getStudentProgress, getModulePerformance, getAtRiskStudents, getGroupComparison, getComprehensiveSummary, getQuizRetryAnalytics, type User } from '@/lib/auth-store';
+import { downloadCSV, generateGradebookCSV, generateStudentReportCSV, generateModulePerformanceCSV, generateAtRiskCSV, generateGroupComparisonCSV, generateAnalyticsCSV, generateGradebookPDF, generateAtRiskPDF, generateAnalyticsPDF, generateModulePerformancePDF, generateGroupComparisonPDF, generateQuizRetryPDF } from '@/lib/export-utils';
 import { modules } from '@/lib/data';
 
 interface AnalyticsExportPanelProps {
@@ -26,6 +26,13 @@ interface ExportState {
   atRisk: ExportStatus;
   groupComparison: ExportStatus;
   modulePerformance: ExportStatus;
+  gradebookPdf: ExportStatus;
+  atRiskPdf: ExportStatus;
+  analyticsPdf: ExportStatus;
+  modulePerformancePdf: ExportStatus;
+  groupComparisonPdf: ExportStatus;
+  studentReportPdf: ExportStatus;
+  quizRetryPdf: ExportStatus;
 }
 
 const PERIOD_OPTIONS = [
@@ -52,6 +59,13 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     atRisk: 'idle',
     groupComparison: 'idle',
     modulePerformance: 'idle',
+    gradebookPdf: 'idle',
+    atRiskPdf: 'idle',
+    analyticsPdf: 'idle',
+    modulePerformancePdf: 'idle',
+    groupComparisonPdf: 'idle',
+    studentReportPdf: 'idle',
+    quizRetryPdf: 'idle',
   });
   const [messages, setMessages] = useState<Record<string, string>>({});
   const [printPreview, setPrintPreview] = useState(false);
@@ -303,6 +317,161 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     setTimeout(() => setStatus('modulePerformance', 'idle'), 4000);
   };
 
+  // Export gradebook PDF
+  const handleGradebookPdfExport = async () => {
+    setStatus('gradebookPdf', 'loading');
+    clearMessage('gradebookPdf');
+    try {
+      const studentData = await Promise.all(
+        students.map(async (s) => {
+          const progressResult = await getStudentProgress(s.id);
+          const progress = (progressResult.progress || []) as Array<{ moduleId?: string; completed?: boolean; score?: number }>;
+          const quizResults = (progressResult.quizResults || []) as Array<{ score?: number }>;
+          const completedModules = progress.filter((p) => p.completed).length;
+          const quizCount = quizResults.length;
+          const scores = quizResults.map((q) => q.score ?? 0);
+          const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+          return {
+            id: s.id,
+            fullName: s.fullName,
+            email: s.email,
+            group: s.group,
+            modulesCompleted: completedModules,
+            quizCount,
+            avgScore,
+          };
+        })
+      );
+      await generateGradebookPDF(studentData);
+      setStatus('gradebookPdf', 'success', `PDF экспортирован: ${studentData.length} студентов`);
+    } catch {
+      setStatus('gradebookPdf', 'error', 'Ошибка при создании PDF');
+    }
+    setTimeout(() => setStatus('gradebookPdf', 'idle'), 4000);
+  };
+
+  // Export at-risk PDF
+  const handleAtRiskPdfExport = async () => {
+    setStatus('atRiskPdf', 'loading');
+    clearMessage('atRiskPdf');
+    try {
+      const data = await getAtRiskStudents(effectiveDays, groupId);
+      const atRiskData = data.atRiskStudents.map(s => ({
+        fullName: s.fullName,
+        email: s.email,
+        group: s.group,
+        riskScore: s.riskScore,
+        reasons: s.reasons,
+        lastActiveDays: s.lastActiveDays,
+        modulesCompleted: s.modulesCompleted,
+        avgQuizScore: s.avgQuizScore,
+      }));
+      await generateAtRiskPDF(atRiskData);
+      setStatus('atRiskPdf', 'success', `PDF экспортирован: ${atRiskData.length} студентов`);
+    } catch {
+      setStatus('atRiskPdf', 'error', 'Ошибка при создании PDF');
+    }
+    setTimeout(() => setStatus('atRiskPdf', 'idle'), 4000);
+  };
+
+  // Export analytics PDF
+  const handleAnalyticsPdfExport = async () => {
+    setStatus('analyticsPdf', 'loading');
+    clearMessage('analyticsPdf');
+    try {
+      const summary = await getComprehensiveSummary(effectiveDays, groupId);
+      await generateAnalyticsPDF(summary, summary.moduleDistribution);
+      setStatus('analyticsPdf', 'success', 'Аналитический PDF экспортирован');
+    } catch {
+      setStatus('analyticsPdf', 'error', 'Ошибка при создании PDF');
+    }
+    setTimeout(() => setStatus('analyticsPdf', 'idle'), 4000);
+  };
+
+  // Export module performance PDF
+  const handleModulePerformancePdfExport = async () => {
+    setStatus('modulePerformancePdf', 'loading');
+    clearMessage('modulePerformancePdf');
+    try {
+      const moduleData = await getModulePerformance(effectiveDays, groupId);
+      await generateModulePerformancePDF(moduleData);
+      setStatus('modulePerformancePdf', 'success', `PDF экспортирован: ${moduleData.length} модулей`);
+    } catch {
+      setStatus('modulePerformancePdf', 'error', 'Ошибка при создании PDF');
+    }
+    setTimeout(() => setStatus('modulePerformancePdf', 'idle'), 4000);
+  };
+
+  // Export group comparison PDF
+  const handleGroupComparisonPdfExport = async () => {
+    setStatus('groupComparisonPdf', 'loading');
+    clearMessage('groupComparisonPdf');
+    try {
+      const data = await getGroupComparison(effectiveDays, 'group');
+      await generateGroupComparisonPDF(data.dimensions, 'group');
+      setStatus('groupComparisonPdf', 'success', `PDF экспортирован: ${data.dimensions.length} групп`);
+    } catch {
+      setStatus('groupComparisonPdf', 'error', 'Ошибка при создании PDF');
+    }
+    setTimeout(() => setStatus('groupComparisonPdf', 'idle'), 4000);
+  };
+
+  // Export student report PDF
+  const handleStudentReportPdfExport = async () => {
+    if (!selectedStudentId) {
+      setStatus('studentReportPdf', 'error', 'Выберите студента');
+      setTimeout(() => setStatus('studentReportPdf', 'idle'), 3000);
+      return;
+    }
+    setStatus('studentReportPdf', 'loading');
+    clearMessage('studentReportPdf');
+    try {
+      const progressResult = await getStudentProgress(selectedStudentId);
+      const progress = (progressResult.progress || []) as Array<{ moduleId?: string; completed?: boolean; score?: number }>;
+      const quizResults = (progressResult.quizResults || []) as Array<{ score?: number; total?: number }>;
+      const moduleProgress = modules.map((m) => {
+        const found = progress.find((p) => p.moduleId === m.id);
+        return { moduleId: m.title, completed: found?.completed ?? false, score: found?.score ?? null };
+      });
+      const quizData = quizResults.map((q, i) => ({
+        quizId: `Квиз ${i + 1}`, score: q.score ?? 0, total: q.total ?? 100, percentage: q.score ?? 0,
+      }));
+      const student = students.find((s) => s.id === selectedStudentId);
+      if (!student) {
+        setStatus('studentReportPdf', 'error', 'Студент не найден');
+        return;
+      }
+      await generateStudentReportPDF(
+        { fullName: student.fullName, email: student.email, group: student.group, course: '', university: '' },
+        { modulesCompleted: progress.filter((p) => p.completed).length, totalModules: modules.length, avgQuizScore: quizResults.length > 0 ? quizResults.reduce((s, q) => s + (q.score ?? 0), 0) / quizResults.length : 0, engagementScore: 0, riskScore: 0 },
+        moduleProgress, quizData, []
+      );
+      setStatus('studentReportPdf', 'success', 'PDF студента экспортирован');
+    } catch {
+      setStatus('studentReportPdf', 'error', 'Ошибка при создании PDF');
+    }
+    setTimeout(() => setStatus('studentReportPdf', 'idle'), 4000);
+  };
+
+  // Export quiz retry PDF
+  const handleQuizRetryPdfExport = async () => {
+    setStatus('quizRetryPdf', 'loading');
+    clearMessage('quizRetryPdf');
+    try {
+      const retryData = await getQuizRetryAnalytics(effectiveDays, groupId);
+      await generateQuizRetryPDF({
+        categoryRetryStats: retryData.categoryRetryStats,
+        topRetryers: retryData.topRetryers,
+        totalRetries: retryData.totalRetries,
+        totalUniqueQuizzes: retryData.totalUniqueQuizzes,
+      });
+      setStatus('quizRetryPdf', 'success', 'PDF повторов экспортирован');
+    } catch {
+      setStatus('quizRetryPdf', 'error', 'Ошибка при создании PDF');
+    }
+    setTimeout(() => setStatus('quizRetryPdf', 'idle'), 4000);
+  };
+
   const exportCards = [
     {
       key: 'gradebook' as keyof ExportState,
@@ -363,6 +532,76 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       color: 'text-amber-600',
       bgColor: 'bg-amber-50',
       borderColor: 'hover:border-amber-300',
+    },
+    {
+      key: 'gradebookPdf' as keyof ExportState,
+      icon: FileText,
+      title: 'Журнал (PDF)',
+      description: 'Скачать журнал успеваемости в формате PDF для печати или отправки',
+      onClick: handleGradebookPdfExport,
+      color: 'text-emerald-700',
+      bgColor: 'bg-emerald-50',
+      borderColor: 'hover:border-emerald-300',
+    },
+    {
+      key: 'atRiskPdf' as keyof ExportState,
+      icon: AlertTriangle,
+      title: 'Студенты риска (PDF)',
+      description: 'Скачать отчёт по студентам в зоне риска в формате PDF',
+      onClick: handleAtRiskPdfExport,
+      color: 'text-red-700',
+      bgColor: 'bg-red-50',
+      borderColor: 'hover:border-red-300',
+    },
+    {
+      key: 'analyticsPdf' as keyof ExportState,
+      icon: BarChart3,
+      title: 'Аналитика (PDF)',
+      description: 'Скачать комплексный аналитический отчёт с KPI и метриками в формате PDF',
+      onClick: handleAnalyticsPdfExport,
+      color: 'text-indigo-700',
+      bgColor: 'bg-indigo-50',
+      borderColor: 'hover:border-indigo-300',
+    },
+    {
+      key: 'modulePerformancePdf' as keyof ExportState,
+      icon: BookOpen,
+      title: 'Модули (PDF)',
+      description: 'Скачать статистику по модулям в формате PDF',
+      onClick: handleModulePerformancePdfExport,
+      color: 'text-amber-700',
+      bgColor: 'bg-amber-50',
+      borderColor: 'hover:border-amber-300',
+    },
+    {
+      key: 'groupComparisonPdf' as keyof ExportState,
+      icon: GitCompare,
+      title: 'Сравнение групп (PDF)',
+      description: 'Скачать сравнительную аналитику групп в формате PDF',
+      onClick: handleGroupComparisonPdfExport,
+      color: 'text-blue-700',
+      bgColor: 'bg-blue-50',
+      borderColor: 'hover:border-blue-300',
+    },
+    {
+      key: 'studentReportPdf' as keyof ExportState,
+      icon: FileText,
+      title: 'Отчёт студента (PDF)',
+      description: 'Выберите студента для экспорта детального отчёта в PDF',
+      onClick: handleStudentReportPdfExport,
+      color: 'text-violet-700',
+      bgColor: 'bg-violet-50',
+      borderColor: 'hover:border-violet-300',
+    },
+    {
+      key: 'quizRetryPdf' as keyof ExportState,
+      icon: Download,
+      title: 'Повторы квизов (PDF)',
+      description: 'Скачать аналитику по повторам квизов в формате PDF',
+      onClick: handleQuizRetryPdfExport,
+      color: 'text-teal-700',
+      bgColor: 'bg-teal-50',
+      borderColor: 'hover:border-teal-300',
     },
     {
       key: 'print' as keyof ExportState,
@@ -427,7 +666,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                   </div>
 
                   {/* Student dropdown for student report */}
-                  {card.key === 'studentReport' && (
+                  {(card.key === 'studentReport' || card.key === 'studentReportPdf') && (
                     <div className="mb-3 relative">
                       <button
                         type="button"
@@ -470,7 +709,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                   {/* Export button */}
                   <Button
                     onClick={card.onClick}
-                    disabled={status === 'loading' || (card.key === 'studentReport' && !selectedStudentId)}
+                    disabled={status === 'loading' || ((card.key === 'studentReport' || card.key === 'studentReportPdf') && !selectedStudentId)}
                     variant={status === 'success' ? 'default' : 'outline'}
                     className={`w-full text-sm ${
                       status === 'success'

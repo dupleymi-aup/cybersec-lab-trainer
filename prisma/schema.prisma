@@ -35,6 +35,7 @@ model User {
   progressSnapshots ProgressSnapshot[]
   createdDeadlines  Deadline[]       @relation("DeadlineCreator")
   reminderLogs      ReminderLog[]
+  scheduledReports  ScheduledReport[]
 
   @@map("users")
 }
@@ -162,4 +163,24 @@ model ReminderLog {
   @@unique([deadlineId, userId, type])
   @@index([userId])
   @@map("reminder_logs")
+}
+
+model ScheduledReport {
+  id             String    @id @default(cuid())
+  userId         String    @map("user_id")
+  user           User      @relation(fields: [userId], references: [id])
+  reportType     String    @map("report_type")  // "gradebook" | "at-risk" | "analytics" | "module-performance" | "quiz-retry" | "student-report"
+  frequency      String    // "daily" | "weekly" | "monthly"
+  dayOfWeek      Int?      @map("day_of_week")  // 0-6 (Sun-Sat), for weekly
+  dayOfMonth     Int?      @map("day_of_month") // 1-31, for monthly
+  email          String    @default("")
+  groupId        String    @default("")          @map("group_id")
+  days           Int       @default(30)          // lookback period
+  isActive       Boolean   @default(true)        @map("is_active")
+  lastGenerated  DateTime? @map("last_generated")
+  createdAt      DateTime  @default(now())       @map("created_at")
+
+  @@index([userId, isActive])
+  @@index([frequency])
+  @@map("scheduled_reports")
 }

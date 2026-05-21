@@ -524,3 +524,106 @@ export interface LoginPatternsData {
   hourlyDistribution: { hour: number; loginCount: number }[];
   dailyDistribution: { day: string; loginCount: number }[];
 }
+
+export interface QuizDifficultyData {
+  difficultyBreakdown: Array<{
+    difficulty: string;
+    totalAttempts: number;
+    correctCount: number;
+    correctRate: number;
+    uniqueStudents: number;
+  }>;
+  categoryByDifficulty: Array<{
+    category: string;
+    difficulty: string;
+    totalAttempts: number;
+    correctRate: number;
+  }>;
+  studentPerformanceByDifficulty: Array<{
+    userId: string;
+    fullName: string;
+    easyRate: number;
+    mediumRate: number;
+    hardRate: number;
+    totalAttempts: number;
+  }>;
+  trendByDifficulty: Array<{
+    week: string;
+    easy: number;
+    medium: number;
+    hard: number;
+  }>;
+}
+
+export interface QuizRetryData {
+  categoryRetryStats: Array<{ category: string; totalAttempts: number; uniqueStudents: number; avgAttemptsPerStudent: number }>;
+  retryDistribution: Array<{ range: string; count: number }>;
+  topRetryers: Array<{ userId: string; fullName: string; group: string; retryCount: number }>;
+  improvementByRetries: Array<{ attempts: string; avgScore: number; count: number }>;
+  totalRetries: number;
+  totalUniqueQuizzes: number;
+}
+
+export interface ErrorPatternsData {
+  mostMissedQuestions: Array<{ questionId: string; category: string; difficulty: string; totalAttempts: number; incorrectCount: number; errorRate: number }>;
+  categoryErrorRates: Array<{ category: string; totalAttempts: number; incorrectCount: number; errorRate: number; uniqueQuestions: number }>;
+  difficultyErrorRates: Array<{ difficulty: string; totalAttempts: number; incorrectCount: number; errorRate: number }>;
+  errorTrends: Array<{ week: string; totalAttempts: number; incorrectCount: number; errorRate: number }>;
+}
+
+export interface PredictiveRiskData {
+  students: Array<{
+    userId: string;
+    fullName: string;
+    group: string;
+    riskScore: number;
+    dropoutProbability: number;
+    riskFactors: Array<{ name: string; weight: number; score: number }>;
+    recommendedInterventions: string[];
+    predictedDropoutWeek?: number;
+  }>;
+  summary: {
+    totalStudents: number;
+    highRisk: number;
+    mediumRisk: number;
+    lowRisk: number;
+    avgRisk: number;
+  };
+}
+
+export interface ScheduledReport {
+  id: string;
+  userId: string;
+  reportType: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  dayOfWeek: number | null;
+  dayOfMonth: number | null;
+  email: string;
+  groupId: string;
+  days: number;
+  isActive: boolean;
+  lastGenerated: string | null;
+  createdAt: string;
+}
+
+export interface DataQualityIssue {
+  type: string;
+  severity: 'critical' | 'warning' | 'info';
+  title: string;
+  description: string;
+  count: number;
+  affectedStudents?: Array<{ id: string; fullName: string; group: string }>;
+  affectedModules?: string[];
+}
+
+export interface DataQualityData {
+  healthScore: number;
+  issues: DataQualityIssue[];
+  summary: {
+    totalStudents: number;
+    activeStudents: number;
+    totalModules: number;
+    completedModules: number;
+    totalQuizzes: number;
+  };
+}
