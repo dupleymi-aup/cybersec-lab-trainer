@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { syncGradesToPlatform } from '@/lib/lti-utils';
+import { modules } from '@/lib/data';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -85,5 +87,30 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  return NextResponse.json({ success: true, progress });
+  // Auto-sync grades to connected LTI platforms when module is completed with a score
+  if (completed && score !== undefined && score !== null) {
+    const activePlatforms = await prisma.ltiPlatform.findMany({
+      where: { isActive: true },
+    });
+
+    const moduleInfo = modules.find((m) => m.id === moduleId);
+    const label = moduleInfo ? `${moduleInfo.title}` : `Module: ${moduleId}`;
+
+    for (const platform of activePlatforms) {
+      if (!platform.privateKey) continue;
+
+      // Fire and forget — log the result
+      syncGradesToPlatform(platform.id, auth.id, moduleId, score, 100, label)
+        .then((result) => {
+          if (!result.success) {
+            console.error(`LTI grade sync failed for ${platform.name}: ${result.error}`);
+          }
+        })
+        .catch((err) => {
+          console.error(`LTI grade sync error for ${platform.name}:`, err);
+        });
+    }
+  }
+
+  return NextResponse.json({ success: true, progress, autoSync: completed && score !== undefined });
 }

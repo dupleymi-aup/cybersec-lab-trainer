@@ -96,6 +96,75 @@ export default function Home() {
     );
   }, []);
 
+  // Handle LTI launch token from URL (Moodle LTI redirect)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const ltiToken = params.get('lti_token');
+    const ltiModule = params.get('module');
+    const ltiQuiz = params.get('quiz');
+
+    if (ltiToken) {
+      // Set the auth token and fetch user profile
+      const { useAuthStore } = require('@/lib/auth-store');
+      const store = useAuthStore.getState();
+
+      // Store the token
+      localStorage.setItem('auth-token', ltiToken);
+
+      // Fetch user profile with the token
+      fetch('/api/auth/profile', {
+        headers: { Authorization: `Bearer ${ltiToken}` },
+      })
+        .then((res) => res.json())
+        .then((user) => {
+          if (user && user.id) {
+            store.setUser(user);
+          }
+        })
+        .catch(() => {
+          // If profile fetch fails, fall back to decoding the JWT
+          try {
+            const parts = ltiToken.split('.');
+            if (parts.length === 3) {
+              const payload = JSON.parse(atob(parts[1]));
+              store.setUser({
+                id: payload.id,
+                email: '',
+                phone: '',
+                fullName: 'LTI User',
+                role: payload.role || 'student',
+              });
+            }
+          } catch {
+            // ignore
+          }
+        });
+
+      // Clean URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('lti_token');
+      url.searchParams.delete('lti_platform');
+      window.history.replaceState({}, '', url.toString());
+
+      // Navigate to specified module/quiz
+      if (ltiModule && pages[ltiModule]) {
+        setCurrentPage(ltiModule);
+      } else if (ltiQuiz) {
+        setCurrentPage('quiz');
+      } else {
+        setCurrentPage('dashboard');
+      }
+    } else if (ltiModule && isAuthenticated) {
+      // Direct module link (from deep linking)
+      if (pages[ltiModule]) {
+        setCurrentPage(ltiModule);
+      }
+    } else if (ltiQuiz && isAuthenticated) {
+      setCurrentPage('quiz');
+    }
+  }, [isAuthenticated, setCurrentPage]);
+
   const roleRestrictedPages: Record<string, UserRole> = {
     'teacher-panel': 'teacher',
     'admin-panel': 'admin',

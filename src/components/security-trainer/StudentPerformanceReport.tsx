@@ -37,6 +37,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [days, setDays] = useState(initialDays);
+  const [exportStatus, setExportStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
   useEffect(() => {
     if (!userId) return;
@@ -80,8 +81,6 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
 
   const riskColor = kpis.riskScore >= 70 ? 'text-red-600' : kpis.riskScore >= 30 ? 'text-amber-600' : 'text-emerald-600';
   const riskBg = kpis.riskScore >= 70 ? 'bg-red-50' : kpis.riskScore >= 30 ? 'bg-amber-50' : 'bg-emerald-50';
-
-  const [exportStatus, setExportStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
   const handlePdfExport = async () => {
     setExportStatus('loading');

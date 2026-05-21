@@ -19,6 +19,11 @@ export function generateToken(userId: string, role: string, rememberMe?: boolean
   );
 }
 
+// Alias for LTI integration compatibility
+export async function signJwt(payload: { id: string; role: string }): Promise<string> {
+  return generateToken(payload.id, payload.role);
+}
+
 export function verifyToken(token: string): TokenPayload | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] }) as jwt.JwtPayload;

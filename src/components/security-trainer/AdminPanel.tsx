@@ -62,7 +62,6 @@ import {
   Grid,
   Repeat,
   AlertOctagon,
-  Calendar,
   ShieldCheck,
   ArrowLeftRight,
 } from 'lucide-react';
@@ -108,6 +107,8 @@ import NotificationBell from './NotificationBell';
 import ExecutiveSummaryExport from './ExecutiveSummaryExport';
 import DataQualityMonitor from './DataQualityMonitor';
 import PeriodComparison from './PeriodComparison';
+import LtiPlatformManager from './LtiPlatformManager';
+import { Link } from 'lucide-react';
 
 const roleColors: Record<UserRole, string> = {
   student: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
@@ -329,7 +330,7 @@ export default function AdminPanel() {
 
       <AnalyticsProvider>
       <Tabs defaultValue="users">
-        <TabsList className="grid w-full grid-cols-9">
+        <TabsList className="grid w-full grid-cols-10">
           <TabsTrigger value="users" className="text-xs">
             <Users size={14} className="mr-1" /> Пользователи
           </TabsTrigger>
@@ -344,6 +345,9 @@ export default function AdminPanel() {
           </TabsTrigger>
           <TabsTrigger value="modules" className="text-xs">
             <BookOpen size={14} className="mr-1" /> Модули
+          </TabsTrigger>
+          <TabsTrigger value="lms" className="text-xs">
+            <Link size={14} className="mr-1" /> LMS
           </TabsTrigger>
           <TabsTrigger value="announcements" className="text-xs">
             <Megaphone size={14} className="mr-1" /> Объявления
@@ -661,6 +665,11 @@ export default function AdminPanel() {
         {/* Module Manager Tab */}
         <TabsContent value="modules" className="mt-4 space-y-4">
           <ModuleManager />
+        </TabsContent>
+
+        {/* LMS Integration Tab */}
+        <TabsContent value="lms" className="mt-4 space-y-4">
+          <LtiPlatformManager />
         </TabsContent>
 
         {/* Announcements Tab */}
