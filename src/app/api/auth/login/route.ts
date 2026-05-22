@@ -22,6 +22,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const logActivity = async (data: { userId?: string; email: string; ip: string; userAgent: string; success: boolean }) => {
+      await prisma.loginActivity.create({
+        data: { id: crypto.randomUUID(), ...data },
+      });
+    };
+
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const userAgent = request.headers.get('user-agent') || '';
+
     // Find user by email or phone
     const user = await prisma.user.findFirst({
       where: {
@@ -33,15 +42,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
+      await logActivity({ email: emailOrPhone, ip, userAgent, success: false });
       return NextResponse.json({ error: 'Неверный email или пароль' }, { status: 401 });
     }
 
     if (user.isBlocked) {
+      await logActivity({ userId: user.id, email: user.email, ip, userAgent, success: false });
       return NextResponse.json({ error: 'Аккаунт заблокирован' }, { status: 403 });
     }
 
     const isValid = await verifyPassword(password, user.passwordHash);
     if (!isValid) {
+      await logActivity({ userId: user.id, email: user.email, ip, userAgent, success: false });
       return NextResponse.json({ error: 'Неверный email или пароль' }, { status: 401 });
     }
 
@@ -55,16 +67,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Log login activity
-    await prisma.loginActivity.create({
-      data: {
-        id: crypto.randomUUID(),
-        userId: user.id,
-        email: user.email,
-        ip: request.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: request.headers.get('user-agent') || '',
-        success: true,
-      },
-    });
+    await logActivity({ userId: user.id, email: user.email, ip, userAgent, success: true });
 
     const token = generateToken(user.id, user.role, rememberMe);
 

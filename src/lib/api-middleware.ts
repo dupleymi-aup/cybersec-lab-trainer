@@ -64,4 +64,14 @@ export function checkRateLimit(key: string, maxAttempts: number, windowMs: numbe
   return { allowed: true };
 }
 
+/** Periodic cleanup: remove expired entries every 5 minutes */
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimitStore.entries()) {
+    if (now > entry.resetAt) {
+      rateLimitStore.delete(key);
+    }
+  }
+}, 5 * 60 * 1000);
+
 export { generateToken };
