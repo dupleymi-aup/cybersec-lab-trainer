@@ -10,3 +10,4 @@ tsconfig.tsbuildinfo
 public/sw.js
 public/workbox-*.js
 public/fallback-*.js
+prisma/dev.db
