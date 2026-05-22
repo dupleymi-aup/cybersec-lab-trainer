@@ -4,18 +4,19 @@ import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return unauthorized();
 
   try {
+    const { id } = await params;
     const report = await prisma.scheduledReport.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
-    if (!report || report.userId !== auth.userId) {
+    if (!report || report.userId !== auth.id) {
       return unauthorized();
     }
 
@@ -27,18 +28,19 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return unauthorized();
 
   try {
+    const { id } = await params;
     const existing = await prisma.scheduledReport.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
-    if (!existing || existing.userId !== auth.userId) {
+    if (!existing || existing.userId !== auth.id) {
       return unauthorized();
     }
 
@@ -46,7 +48,7 @@ export async function PATCH(
     const { isActive, lastGenerated, ...updates } = body;
 
     const report = await prisma.scheduledReport.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(updates.reportType !== undefined && { reportType: updates.reportType }),
         ...(updates.frequency !== undefined && { frequency: updates.frequency }),
@@ -68,23 +70,24 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return unauthorized();
 
   try {
+    const { id } = await params;
     const existing = await prisma.scheduledReport.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
-    if (!existing || existing.userId !== auth.userId) {
+    if (!existing || existing.userId !== auth.id) {
       return unauthorized();
     }
 
     await prisma.scheduledReport.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

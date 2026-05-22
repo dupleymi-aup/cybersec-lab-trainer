@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 const MODULE_NAMES: Record<string, string> = {
   'owasp': 'OWASP Top 10',
@@ -16,7 +16,7 @@ const MODULE_NAMES: Record<string, string> = {
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return unauthorized();
+  if (!requireRole(auth.role, 'admin')) return forbidden('Требуется роль администратора');
 
   const { searchParams } = new URL(request.url);
   const days = parseInt(searchParams.get('days') || '30', 10);

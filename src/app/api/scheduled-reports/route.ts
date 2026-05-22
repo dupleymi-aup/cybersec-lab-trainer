@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const reports = await prisma.scheduledReport.findMany({
-      where: { userId: auth.userId },
+      where: { userId: auth.id },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     const report = await prisma.scheduledReport.create({
       data: {
-        userId: auth.userId,
+        userId: auth.id,
         reportType,
         frequency,
         dayOfWeek: dayOfWeek ?? null,

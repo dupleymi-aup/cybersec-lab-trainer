@@ -848,31 +848,27 @@ function AnalyticsSubTabs({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           <KPICard
             icon={<Users size={18} />}
-            value={summary.totalStudents ?? 0}
+            value={summary.kpis.totalStudents ?? 0}
             label="Всего студентов"
-            trend={summary.totalStudentsTrend ?? 'stable'}
-            delta={summary.totalStudentsDelta ?? 0}
+            trend={summary.trends.students ?? 'stable'}
           />
           <KPICard
             icon={<Activity size={18} />}
-            value={`${summary.activePercentage ?? 0}%`}
+            value={`${summary.kpis.activePercentage ?? 0}%`}
             label="Активных"
-            trend={summary.activePercentageTrend ?? 'stable'}
-            delta={summary.activePercentageDelta ?? 0}
+            trend={summary.trends.activity ?? 'stable'}
           />
           <KPICard
             icon={<BookOpen size={18} />}
-            value={`${summary.avgCompletionRate ?? 0}%`}
+            value={`${summary.kpis.avgCompletionRate ?? 0}%`}
             label="Среднее завершение"
-            trend={summary.avgCompletionRateTrend ?? 'stable'}
-            delta={summary.avgCompletionRateDelta ?? 0}
+            trend={summary.trends.completion ?? 'stable'}
           />
           <KPICard
             icon={<HelpCircle size={18} />}
-            value={`${summary.avgQuizScore ?? 0}%`}
+            value={`${summary.kpis.avgQuizScore ?? 0}%`}
             label="Средний балл quiz"
-            trend={summary.avgQuizScoreTrend ?? 'stable'}
-            delta={summary.avgQuizScoreDelta ?? 0}
+            trend={summary.trends.quizScore ?? 'stable'}
           />
         </div>
       )}
