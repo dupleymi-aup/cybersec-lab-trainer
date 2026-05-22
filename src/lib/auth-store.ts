@@ -233,8 +233,10 @@ export async function addAuditLogEntry(
       method: 'POST',
       body: JSON.stringify({ action, targetId, targetName, details }),
     });
-  } catch {
-    // Silently fail - audit logging is best-effort
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', err);
+    }
   }
 }
 
@@ -452,7 +454,29 @@ export async function assignUsersToGroup(
 }
 
 // Get student progress for teacher panel
-export async function getStudentProgress(userId: string): Promise<{ progress: unknown[]; quizResults: unknown[] }> {
+interface StudentProgress {
+  moduleId: string;
+  completed: boolean;
+  score: number | null;
+  sqlLevels?: unknown;
+  xssLevels?: unknown;
+  csrfSteps?: unknown;
+  secureCodingAnswers?: unknown;
+  secureCodingCorrectCount?: number;
+  studiedOwaspItems?: string[];
+  challengeScores?: unknown;
+  updatedAt: string;
+}
+
+interface StudentQuizResult {
+  quizId: string;
+  score: number;
+  total: number;
+  percentage: number;
+  updatedAt: string;
+}
+
+export async function getStudentProgress(userId: string): Promise<{ progress: StudentProgress[]; quizResults: StudentQuizResult[] }> {
   try {
     const res = await apiFetch(`/api/progress/${userId}`);
     if (!res.ok) return { progress: [], quizResults: [] };

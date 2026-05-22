@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateToken, checkRateLimit } from '@/lib/api-middleware';
 import { verifyPassword } from '@/lib/auth-utils';
+import { loginSchema } from '@/lib/validations/api';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { emailOrPhone, password, rememberMe } = body;
-
-    if (!emailOrPhone || !password) {
-      return NextResponse.json({ error: 'Email/phone and password required' }, { status: 400 });
+    const parsed = loginSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
     }
+    const { emailOrPhone, password, rememberMe } = parsed.data;
 
     // Rate limiting: 5 attempts per 30 seconds per identifier
     const rateKey = `login-${emailOrPhone}`;

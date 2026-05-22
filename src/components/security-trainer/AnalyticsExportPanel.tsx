@@ -6,7 +6,7 @@ import { Download, FileText, Printer, Loader2, CheckCircle2, AlertCircle, Chevro
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getAllUsers, getStudentProgress, getModulePerformance, getAtRiskStudents, getGroupComparison, getComprehensiveSummary, getQuizRetryAnalytics, type User } from '@/lib/auth-store';
+import { getAllUsers, getStudentProgress, getModulePerformance, getAtRiskStudents, getGroupComparison, getComprehensiveSummary, getQuizRetryAnalytics, type User, type StudentProgress, type StudentQuizResult } from '@/lib/auth-store';
 import { downloadCSV, generateGradebookCSV, generateStudentReportCSV, generateModulePerformanceCSV, generateAtRiskCSV, generateGroupComparisonCSV, generateAnalyticsCSV, generateGradebookPDF, generateAtRiskPDF, generateAnalyticsPDF, generateModulePerformancePDF, generateGroupComparisonPDF, generateQuizRetryPDF } from '@/lib/export-utils';
 import { modules } from '@/lib/data';
 
@@ -117,14 +117,16 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     try {
       const studentData = await Promise.all(
         students.map(async (s) => {
-          const progressResult = await getStudentProgress(s.id);
-          const progress = (progressResult.progress || []) as Array<{ moduleId?: string; completed?: boolean; score?: number }>;
-          const quizResults = (progressResult.quizResults || []) as Array<{ score?: number }>;
+          const { progress, quizResults } = await getStudentProgress(s.id);
 
           const completedModules = progress.filter((p) => p.completed).length;
           const quizCount = quizResults.length;
-          const scores = quizResults.map((q) => q.score ?? 0);
-          const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+          const percentages = quizResults.map((q) => {
+            if (typeof q.percentage === 'number') return q.percentage;
+            if (q.score != null && q.total && q.total > 0) return (q.score / q.total) * 100;
+            return q.score ?? 0;
+          });
+          const avgScore = percentages.length > 0 ? percentages.reduce((a, b) => a + b, 0) / percentages.length : 0;
 
           // Compute last active from localStorage
           const key = `security-trainer-progress-${s.id}`;
@@ -165,7 +167,9 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       downloadCSV(csv, `gradebook-${date}.csv`);
 
       setStatus('gradebook', 'success', `Экспортировано ${studentData.length} студентов`);
-    } catch {
+    } catch (error) {
+      console.error('Gradebook export failed:', error);
+      setStatus('gradebook', 'error', 'Ошибка экспорта');
     }
 
     // Reset status after delay
@@ -184,9 +188,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     clearMessage('studentReport');
 
     try {
-      const progressResult = await getStudentProgress(selectedStudentId);
-      const progress = (progressResult.progress || []) as Array<{ moduleId?: string; completed?: boolean; score?: number }>;
-      const quizResults = (progressResult.quizResults || []) as Array<{ score?: number; total?: number }>;
+      const { progress, quizResults } = await getStudentProgress(selectedStudentId);
 
       // Build module progress
       const moduleProgress = modules.map((m) => {
@@ -229,7 +231,9 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       downloadCSV(csv, `student-${safeName}-${date}.csv`);
 
       setStatus('studentReport', 'success', 'Отчёт студента экспортирован');
-    } catch {
+    } catch (error) {
+      console.error('Student report export failed:', error);
+      setStatus('studentReport', 'error', 'Ошибка экспорта');
     }
 
     setTimeout(() => setStatus('studentReport', 'idle'), 4000);
@@ -324,13 +328,15 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     try {
       const studentData = await Promise.all(
         students.map(async (s) => {
-          const progressResult = await getStudentProgress(s.id);
-          const progress = (progressResult.progress || []) as Array<{ moduleId?: string; completed?: boolean; score?: number }>;
-          const quizResults = (progressResult.quizResults || []) as Array<{ score?: number }>;
+          const { progress, quizResults } = await getStudentProgress(s.id);
           const completedModules = progress.filter((p) => p.completed).length;
           const quizCount = quizResults.length;
-          const scores = quizResults.map((q) => q.score ?? 0);
-          const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+          const percentages = quizResults.map((q) => {
+            if (typeof q.percentage === 'number') return q.percentage;
+            if (q.score != null && q.total && q.total > 0) return (q.score / q.total) * 100;
+            return q.score ?? 0;
+          });
+          const avgScore = percentages.length > 0 ? percentages.reduce((a, b) => a + b, 0) / percentages.length : 0;
           return {
             id: s.id,
             fullName: s.fullName,
@@ -426,9 +432,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     setStatus('studentReportPdf', 'loading');
     clearMessage('studentReportPdf');
     try {
-      const progressResult = await getStudentProgress(selectedStudentId);
-      const progress = (progressResult.progress || []) as Array<{ moduleId?: string; completed?: boolean; score?: number }>;
-      const quizResults = (progressResult.quizResults || []) as Array<{ score?: number; total?: number }>;
+      const { progress, quizResults } = await getStudentProgress(selectedStudentId);
       const moduleProgress = modules.map((m) => {
         const found = progress.find((p) => p.moduleId === m.id);
         return { moduleId: m.title, completed: found?.completed ?? false, score: found?.score ?? null };
@@ -443,7 +447,19 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       }
       await generateStudentReportPDF(
         { fullName: student.fullName, email: student.email, group: student.group, course: '', university: '' },
-        { modulesCompleted: progress.filter((p) => p.completed).length, totalModules: modules.length, avgQuizScore: quizResults.length > 0 ? quizResults.reduce((s, q) => s + (q.score ?? 0), 0) / quizResults.length : 0, engagementScore: 0, riskScore: 0 },
+        {
+          modulesCompleted: progress.filter((p) => p.completed).length,
+          totalModules: modules.length,
+          avgQuizScore: quizResults.length > 0
+            ? quizResults.reduce((s, q) => {
+                if (typeof q.percentage === 'number') return s + q.percentage;
+                if (q.score != null && q.total && q.total > 0) return s + (q.score / q.total) * 100;
+                return s + (q.score ?? 0);
+              }, 0) / quizResults.length
+            : 0,
+          engagementScore: 0,
+          riskScore: 0,
+        },
         moduleProgress, quizData, []
       );
       setStatus('studentReportPdf', 'success', 'PDF студента экспортирован');

@@ -56,7 +56,9 @@ function getUserProgress(userId: string): UserProgressData {
     const key = `security-trainer-progress-${userId}`;
     const raw = localStorage.getItem(key);
     if (raw) return JSON.parse(raw);
-  } catch {}
+  } catch (error) {
+    console.warn('Failed to parse user progress from localStorage:', error);
+  }
   return { completedModules: [], quizScores: {}, studiedOwaspItems: [], sqlCompletedLevels: [], xssCompletedLevels: [], csrfCompletedSteps: [], secureCodingAnsweredChallenges: [] };
 }
 

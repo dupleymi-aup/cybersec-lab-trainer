@@ -80,12 +80,13 @@ export async function GET(request: NextRequest) {
     const lastActiveDate = allDates.length > 0 ? new Date(Math.max(...allDates)) : null;
     const lastActiveDays = lastActiveDate ? Math.floor((now.getTime() - lastActiveDate.getTime()) / (24 * 60 * 60 * 1000)) : 999;
 
-    // Engagement score
-    const activityFactor = Math.min(25, Math.round((Math.max(0, 30 - lastActiveDays) / 30) * 25));
-    const completionFactor = Math.round((studentCompletedModules / totalModules) * 25);
-    const quizFactor = Math.round((avgQuizScore / 100) * 25);
-    const attemptsFactor = Math.min(25, Math.round((studentQuizzes.length / 50) * 25));
-    const engagementScore = activityFactor + completionFactor + quizFactor + attemptsFactor;
+    // Engagement score — sum factors first, then round once to avoid accumulated errors
+    const activityFactor = (Math.max(0, 30 - lastActiveDays) / 30) * 25;
+    const completionFactor = (studentCompletedModules / totalModules) * 25;
+    const quizFactor = (avgQuizScore / 100) * 25;
+    const attemptsFactor = Math.min(25, (studentQuizzes.length / 50) * 25);
+    const rawScore = activityFactor + completionFactor + quizFactor + attemptsFactor;
+    const engagementScore = Math.min(100, Math.round(rawScore));
 
     engagementScores.push(engagementScore);
 
@@ -93,9 +94,16 @@ export async function GET(request: NextRequest) {
     const uniqueDays = new Set(allDates.map((t) => new Date(t).toISOString().split('T')[0]));
     let streakDays = 0;
     let currentDate = new Date(now);
+    const todayStr = currentDate.toISOString().split('T')[0];
+
+    // If no activity today, start checking from yesterday
+    if (!uniqueDays.has(todayStr)) {
+      currentDate = new Date(currentDate.getTime() - 86400000);
+    }
+
     while (uniqueDays.has(currentDate.toISOString().split('T')[0])) {
       streakDays++;
-      currentDate.setDate(currentDate.getDate() - 1);
+      currentDate = new Date(currentDate.getTime() - 86400000);
     }
 
     streakData.push({ userId: student.id, fullName: student.fullName, streakDays });
@@ -146,8 +154,8 @@ export async function GET(request: NextRequest) {
   streakData.sort((a, b) => b.streakDays - a.streakDays);
   const streakLeaderboard = streakData.slice(0, 10);
 
-  // Engagement trend over time (daily average)
-  const engagementTrend: Array<{ date: string; avgScore: number }> = [];
+  // Engagement trend over time (daily average logins per student)
+  const engagementTrend: Array<{ date: string; avgLoginsPerStudent: number }> = [];
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
     const dateStr = date.toISOString().split('T')[0];
@@ -155,9 +163,9 @@ export async function GET(request: NextRequest) {
     const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
 
     const dayLogins = loginActivity.filter((l) => l.timestamp >= dayStart && l.timestamp < dayEnd);
-    const avgScore = totalStudents > 0 ? Math.round((dayLogins.length / totalStudents) * 1000) / 10 : 0;
+    const avgLoginsPerStudent = totalStudents > 0 ? Math.round((dayLogins.length / totalStudents) * 1000) / 10 : 0;
 
-    engagementTrend.push({ date: dateStr, avgScore });
+    engagementTrend.push({ date: dateStr, avgLoginsPerStudent });
   }
 
   return NextResponse.json({

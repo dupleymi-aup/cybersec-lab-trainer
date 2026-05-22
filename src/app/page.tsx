@@ -50,6 +50,11 @@ const LazyLeaderboard = dynamic(() => import('@/components/security-trainer/Lead
 const LazyPhishingAnalyzer = dynamic(() => import('@/components/security-trainer/PhishingAnalyzer'), { ssr: false });
 const LazyCareerPaths = dynamic(() => import('@/components/security-trainer/CareerPaths'), { ssr: false });
 
+const roleRestrictedPages: Record<string, UserRole> = {
+  'teacher-panel': 'teacher',
+  'admin-panel': 'admin',
+};
+
 const pages: Record<string, React.ReactNode> = {
   dashboard: <ModuleWrapper name="Dashboard"><Dashboard /></ModuleWrapper>,
   owasp: <ModuleWrapper name="OWASP Top 10" pageId="owasp"><LazyOWASPTop10 /></ModuleWrapper>,
@@ -105,54 +110,64 @@ export default function Home() {
     const ltiQuiz = params.get('quiz');
 
     if (ltiToken) {
-      // Set the auth token and fetch user profile
-      import('@/lib/auth-store').then(({ useAuthStore }) => {
-        const store = useAuthStore.getState();
-
-        // Fetch user profile with the token
-        fetch('/api/auth/profile', {
-          headers: { Authorization: `Bearer ${ltiToken}` },
-        })
-          .then((res) => res.json())
-          .then((user) => {
-            if (user && user.id) {
-              store.setUser(user, ltiToken);
-            }
-          })
-          .catch(() => {
-            // If profile fetch fails, fall back to decoding the JWT
-            try {
-              const parts = ltiToken.split('.');
-              if (parts.length === 3) {
-                const payload = JSON.parse(atob(parts[1]));
-                store.setUser({
-                  id: payload.id,
-                  email: '',
-                  phone: '',
-                  fullName: 'LTI User',
-                  role: payload.role || 'student',
-                }, ltiToken);
-              }
-            } catch {
-              // ignore
-            }
-          });
-      });
-
-      // Clean URL
+      // Clean URL immediately
       const url = new URL(window.location.href);
       url.searchParams.delete('lti_token');
       url.searchParams.delete('lti_platform');
       window.history.replaceState({}, '', url.toString());
 
-      // Navigate to specified module/quiz
-      if (ltiModule && pages[ltiModule]) {
-        setCurrentPage(ltiModule);
-      } else if (ltiQuiz) {
-        setCurrentPage('quiz');
-      } else {
-        setCurrentPage('dashboard');
-      }
+      // Set the auth token and fetch user profile, then navigate
+      import('@/lib/auth-store').then(async ({ useAuthStore }) => {
+        const store = useAuthStore.getState();
+        let authSettled = false;
+
+        try {
+          // Fetch user profile with the token
+          const res = await fetch('/api/auth/profile', {
+            headers: { Authorization: `Bearer ${ltiToken}` },
+          });
+          const user = await res.json();
+
+          if (user && user.id) {
+            store.setUser(user, ltiToken);
+            authSettled = true;
+          }
+        } catch {
+          // If profile fetch fails, fall back to decoding the JWT
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('LTI profile fetch failed, falling back to JWT decode');
+          }
+          try {
+            const parts = ltiToken.split('.');
+            if (parts.length === 3) {
+              const payload = JSON.parse(atob(parts[1]));
+              store.setUser({
+                id: payload.id,
+                email: '',
+                phone: '',
+                fullName: 'LTI User',
+                role: payload.role || 'student',
+              }, ltiToken);
+              authSettled = true;
+            }
+          } catch (err) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('LTI JWT decode failed:', err);
+            }
+          }
+        }
+
+        // Navigate only after auth is established
+        if (authSettled) {
+          if (ltiModule && pages[ltiModule]) {
+            setCurrentPage(ltiModule);
+          } else if (ltiQuiz) {
+            setCurrentPage('quiz');
+          } else {
+            setCurrentPage('dashboard');
+          }
+        }
+      });
     } else if (ltiModule && isAuthenticated) {
       // Direct module link (from deep linking)
       if (pages[ltiModule]) {
@@ -162,11 +177,6 @@ export default function Home() {
       setCurrentPage('quiz');
     }
   }, [isAuthenticated, setCurrentPage]);
-
-  const roleRestrictedPages: Record<string, UserRole> = {
-    'teacher-panel': 'teacher',
-    'admin-panel': 'admin',
-  };
 
   const resolvedPage = useMemo(() => {
     const requiredRole = roleRestrictedPages[currentPage];

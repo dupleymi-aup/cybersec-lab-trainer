@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { hashPassword } from '@/lib/auth-utils';
+import { createUserSchema } from '@/lib/validations/api';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -89,27 +90,11 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { email, phone, fullName, role, password, group, course, university, bio, avatar } = body;
-
-  if (!email || !phone || !fullName || !password) {
-    return NextResponse.json({ error: 'Email, phone, name, and password required' }, { status: 400 });
+  const parsed = createUserSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
   }
-
-  // Validate email format
-  const { validateEmail, validatePhone } = await import('@/lib/auth-utils');
-  if (!validateEmail(email)) {
-    return NextResponse.json({ error: 'Неверный формат email' }, { status: 400 });
-  }
-
-  // Validate phone format
-  if (!validatePhone(phone)) {
-    return NextResponse.json({ error: 'Неверный формат телефона' }, { status: 400 });
-  }
-
-  // Validate role
-  if (role && !['student', 'teacher', 'admin'].includes(role)) {
-    return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
-  }
+  const { email, phone, fullName, role, password, group, course, university, bio, avatar } = parsed.data;
 
   const existing = await prisma.user.findFirst({
     where: { OR: [{ email }, { phone }] },
@@ -123,7 +108,7 @@ export async function POST(request: NextRequest) {
     data: {
       id: crypto.randomUUID(),
       email, phone, fullName,
-      role: role || 'student',
+      role: role ?? 'student',
       passwordHash,
       group: group || '',
       course: course || '',

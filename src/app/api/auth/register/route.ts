@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { hashPassword } from '@/lib/auth-utils';
 import { ADMIN_INVITE_CODE } from '@/lib/auth-store';
+import { registerSchema } from '@/lib/validations/api';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,11 +18,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { email, phone, fullName, role, inviteCode, password } = body;
-
-    if (!email || !phone || !fullName || !password) {
-      return NextResponse.json({ error: 'All fields required' }, { status: 400 });
+    const parsed = registerSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
     }
+    const { email, phone, fullName, role, inviteCode, password } = parsed.data;
 
     // Check if user exists
     const existing = await prisma.user.findFirst({
@@ -31,12 +32,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Пользователь с таким email или телефоном уже существует' }, { status: 409 });
     }
 
-    // Validate role
-    const validRoles = ['student', 'teacher', 'admin'];
-    const userRole = validRoles.includes(role) ? role : 'student';
-
     // Check invite code for admin/teacher
-    if ((userRole === 'admin' || userRole === 'teacher') && inviteCode?.toUpperCase() !== ADMIN_INVITE_CODE) {
+    if ((role === 'admin' || role === 'teacher') && inviteCode?.toUpperCase() !== ADMIN_INVITE_CODE) {
       return NextResponse.json({ error: 'Неверный код приглашения' }, { status: 403 });
     }
 
@@ -48,7 +45,7 @@ export async function POST(request: NextRequest) {
         email,
         phone,
         fullName,
-        role: userRole,
+        role,
         passwordHash,
         lastLoginAt: new Date(),
         loginCount: 1,

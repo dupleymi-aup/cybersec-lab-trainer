@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { updateUserSchema } from '@/lib/validations/api';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -30,19 +31,18 @@ export async function PUT(request: NextRequest) {
   if (!auth) return unauthorized();
 
   const body = await request.json();
-  const { fullName, phone, group, course, university, avatar, bio } = body;
+  const parsed = updateUserSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
+  }
+
+  if (Object.keys(parsed.data).length === 0) {
+    return NextResponse.json({ error: 'Необходимо указать хотя бы одно поле для обновления' }, { status: 400 });
+  }
 
   const user = await prisma.user.update({
     where: { id: auth.id },
-    data: {
-      ...(fullName && { fullName }),
-      ...(phone && { phone }),
-      ...(group !== undefined && { group }),
-      ...(course !== undefined && { course }),
-      ...(university !== undefined && { university }),
-      ...(avatar !== undefined && { avatar }),
-      ...(bio !== undefined && { bio }),
-    },
+    data: parsed.data,
   });
 
   return NextResponse.json({

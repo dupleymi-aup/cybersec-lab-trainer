@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { hashPassword, verifyPassword } from '@/lib/auth-utils';
+import { passwordChangeSchema } from '@/lib/validations/api';
 
 export async function PUT(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
   const body = await request.json();
-  const { currentPassword, newPassword } = body;
-
-  if (!currentPassword || !newPassword) {
-    return NextResponse.json({ error: 'Current and new password required' }, { status: 400 });
+  const parsed = passwordChangeSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
   }
+  const { currentPassword, newPassword } = parsed.data;
 
   const user = await prisma.user.findUnique({ where: { id: auth.id } });
   if (!user) return unauthorized();
@@ -20,6 +21,11 @@ export async function PUT(request: NextRequest) {
   const isValid = await verifyPassword(currentPassword, user.passwordHash);
   if (!isValid) {
     return NextResponse.json({ error: 'Неверный текущий пароль' }, { status: 401 });
+  }
+
+  const isSamePassword = await verifyPassword(newPassword, user.passwordHash);
+  if (isSamePassword) {
+    return NextResponse.json({ error: 'Новый пароль должен отличаться от текущего' }, { status: 400 });
   }
 
   const newHash = await hashPassword(newPassword);

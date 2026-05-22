@@ -5,13 +5,31 @@ import { NotificationHelper } from './notification-store';
 import { getCurrentUserId, saveProgressSnapshotProxy } from './auth-bridge';
 
 // ─── API client ───────────────────────────────────────────────
+let cachedToken: string | null = null;
+let tokenFetchPromise: Promise<string | null> | null = null;
+
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   try {
-    const { useAuthStore } = await import('./auth-store');
-    const { token } = useAuthStore.getState();
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-  } catch {}
+    if (cachedToken !== null) {
+      if (cachedToken) headers['Authorization'] = `Bearer ${cachedToken}`;
+    } else if (!tokenFetchPromise) {
+      tokenFetchPromise = (async () => {
+        const { useAuthStore } = await import('./auth-store');
+        const { token } = useAuthStore.getState();
+        cachedToken = token;
+        tokenFetchPromise = null;
+        return token;
+      })();
+      const token = await tokenFetchPromise;
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Failed to get auth headers:', err);
+    }
+    tokenFetchPromise = null;
+  }
   return headers;
 }
 
@@ -201,7 +219,9 @@ const syncWithDatabase = async (state: AppState, set: (partial: Partial<AppStore
     for (const p of progress) {
       const score = typeof p.score === 'number' ? p.score : 0;
       const completed = p.completed === true;
-      saveProgressSnapshotProxy(p.moduleId as string, score, completed).catch(() => {});
+      saveProgressSnapshotProxy(p.moduleId as string, score, completed).catch((err) => {
+        console.warn('Failed to save progress snapshot:', err);
+      });
     }
 
     set({ syncStatus: 'synced', lastSyncedAt: new Date() });

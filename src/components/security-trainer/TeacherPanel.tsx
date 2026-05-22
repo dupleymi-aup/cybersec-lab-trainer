@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { getAllUsers, useAuthStore } from '@/lib/auth-store';
+import { getAllUsers } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
 import { quizCategories, modules } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
