@@ -92,15 +92,38 @@ export default function QuizSystem() {
     currentQuestionRef.current = currentQuestion;
   }, [currentQuestion]);
 
-  const filterQuestions = (categoryName: string) => quizQuestions.filter((q) => {
-    const catMatch = q.category === categoryName;
-    const diffMatch = difficultyFilter === 'all' || q.difficulty === difficultyFilter;
-    return catMatch && diffMatch;
-  });
+  // Refs to avoid stale closures in callbacks
+  const quizQuestionsRef = useRef(quizQuestions);
+  const difficultyFilterRef = useRef(difficultyFilter);
+  const answersRef = useRef(answers);
+  const categoryQuestionsRef = useRef<typeof quizQuestions>([]);
+  const correctCountRef = useRef(correctCount);
+  const activeCategoryRef = useRef(activeCategory);
+  const startTimeRef = useRef(startTime);
+  const maxStreakRef = useRef(maxStreak);
 
-  const categoryQuestions = useMemo(() => filterQuestions(activeCategory), [activeCategory, difficultyFilter]);
+  useEffect(() => { quizQuestionsRef.current = quizQuestions; }, [quizQuestions]);
+  useEffect(() => { difficultyFilterRef.current = difficultyFilter; }, [difficultyFilter]);
+  useEffect(() => { answersRef.current = answers; }, [answers]);
+  useEffect(() => { categoryQuestionsRef.current = categoryQuestions; }, [categoryQuestions]);
+  useEffect(() => { correctCountRef.current = correctCount; }, [correctCount]);
+  useEffect(() => { activeCategoryRef.current = activeCategory; }, [activeCategory]);
+  useEffect(() => { startTimeRef.current = startTime; }, [startTime]);
+  useEffect(() => { maxStreakRef.current = maxStreak; }, [maxStreak]);
 
-  const startQuiz = (categoryName: string) => {
+  const filterQuestions = useCallback((categoryName: string) => {
+    const q = quizQuestionsRef.current;
+    const diff = difficultyFilterRef.current;
+    return q.filter((qItem) => {
+      const catMatch = qItem.category === categoryName;
+      const diffMatch = diff === 'all' || qItem.difficulty === diff;
+      return catMatch && diffMatch;
+    });
+  }, []);
+
+  const categoryQuestions = useMemo(() => filterQuestions(activeCategory), [activeCategory, filterQuestions]);
+
+  const startQuiz = useCallback((categoryName: string) => {
     const questions = filterQuestions(categoryName);
     if (questions.length === 0) return;
     setActiveCategory(categoryName);
@@ -117,63 +140,67 @@ export default function QuizSystem() {
     setMaxStreak(0);
     setDirection('next');
     setQuizState('playing');
-  };
+  }, [filterQuestions]);
 
-  const nextQuestion = () => {
-    if (currentQuestion < categoryQuestions.length - 1) {
+  const nextQuestion = useCallback(() => {
+    const q = categoryQuestionsRef.current;
+    const idx = currentQuestionRef.current;
+    if (idx < q.length - 1) {
       setDirection('next');
-      setCurrentQuestion((q) => q + 1);
+      setCurrentQuestion((prev) => prev + 1);
       setSelectedAnswer('');
       setShowAnswer(false);
       setTimeLeft(30);
       setTimerActive(true);
     } else {
-      const finalCount = correctCount;
-      const catId = quizCategories.find((c) => c.name === activeCategory)?.id || '';
-      const score = categoryQuestions.length > 0 ? Math.round((finalCount / categoryQuestions.length) * 100) : 0;
+      const finalCount = correctCountRef.current;
+      const catId = quizCategories.find((c) => c.name === activeCategoryRef.current)?.id || '';
+      const score = q.length > 0 ? Math.round((finalCount / q.length) * 100) : 0;
       setQuizScore(catId, score);
-      NotificationHelper.quizCompleted(activeCategory, score);
-      setTotalTimeTaken(Math.round((Date.now() - startTime) / 1000));
+      NotificationHelper.quizCompleted(activeCategoryRef.current, score);
+      setTotalTimeTaken(Math.round((Date.now() - startTimeRef.current) / 1000));
       setTimerActive(false);
 
-      const attempts: QuizAttemptData[] = categoryQuestions.map((q, i) => ({
-        questionId: q.id,
-        difficulty: q.difficulty,
-        category: q.category,
-        correct: answers[i] === true,
+      const currentAnswers = answersRef.current;
+      const attempts: QuizAttemptData[] = q.map((qItem, i) => ({
+        questionId: qItem.id,
+        difficulty: qItem.difficulty,
+        category: qItem.category,
+        correct: currentAnswers[i] === true,
       }));
       saveQuizAttempts(catId, attempts);
 
-      // Save aggregate quiz result to server (QuizResult table)
-      apiClient.saveQuizResults(catId, score, categoryQuestions.length).catch(() => {
+      apiClient.saveQuizResults(catId, score, q.length).catch(() => {
         // Silently fail — data is in localStorage and will sync on next login
       });
 
       setQuizState('result');
     }
-  };
+  }, [setQuizScore]);
 
-  const handleAnswer = () => {
+  const handleAnswer = useCallback(() => {
     if (!selectedAnswer) return;
     setTimerActive(false);
     setShowAnswer(true);
     timedOutRef.current = false;
-    const question = categoryQuestions[currentQuestion];
+    const q = categoryQuestionsRef.current;
+    const idx = currentQuestionRef.current;
+    const question = q[idx];
     const isCorrect = parseInt(selectedAnswer) === question.correctIndex;
     if (isCorrect) {
       setCorrectCount((c) => c + 1);
       setStreak((s) => {
         const newStreak = s + 1;
-        if (newStreak > maxStreak) setMaxStreak(newStreak);
+        if (newStreak > maxStreakRef.current) setMaxStreak(newStreak);
         return newStreak;
       });
     } else {
       setStreak(0);
     }
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = isCorrect;
-    setAnswers(newAnswers);
-  };
+    const currentAnswers = [...answersRef.current];
+    currentAnswers[idx] = isCorrect;
+    setAnswers(currentAnswers);
+  }, [selectedAnswer]);
 
   // Timer
   useEffect(() => {
@@ -237,7 +264,8 @@ export default function QuizSystem() {
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (quizState !== 'playing' || !question) return;
+    if (quizState !== 'playing' || !categoryQuestionsRef.current[currentQuestionRef.current]) return;
+    const question = categoryQuestionsRef.current[currentQuestionRef.current];
 
     if (!showAnswer && e.key >= '1' && e.key <= '4') {
       const idx = parseInt(e.key) - 1;
@@ -278,7 +306,7 @@ export default function QuizSystem() {
     if (e.key === 'Escape') {
       resetQuiz();
     }
-  }, [quizState, showAnswer, selectedAnswer, question]);
+  }, [quizState, showAnswer, selectedAnswer, handleAnswer, nextQuestion]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
