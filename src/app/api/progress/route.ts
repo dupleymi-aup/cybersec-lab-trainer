@@ -26,6 +26,12 @@ export async function GET(request: NextRequest) {
     quizScores[q.quizId] = q.percentage;
   }
 
+  // Helper to safely parse JSON strings back to arrays
+  const parseJsonField = (val: string | null): unknown => {
+    if (!val) return val;
+    try { return JSON.parse(val); } catch { return val; }
+  };
+
   return NextResponse.json({
     completedModules,
     quizScores,
@@ -33,14 +39,14 @@ export async function GET(request: NextRequest) {
       moduleId: p.moduleId,
       completed: p.completed,
       score: p.score,
-      sqlLevels: p.sqlLevels,
-      xssLevels: p.xssLevels,
-      csrfSteps: p.csrfSteps,
-      csrfChallengeScores: p.csrfChallengeScores,
-      secureCodingAnswers: p.secureCodingAnswers,
+      sqlLevels: parseJsonField(p.sqlLevels),
+      xssLevels: parseJsonField(p.xssLevels),
+      csrfSteps: parseJsonField(p.csrfSteps),
+      csrfChallengeScores: parseJsonField(p.csrfChallengeScores),
+      secureCodingAnswers: parseJsonField(p.secureCodingAnswers),
       secureCodingCorrectCount: p.secureCodingCorrectCount,
-      studiedOwaspItems: p.studiedOwaspItems,
-      challengeScores: p.challengeScores,
+      studiedOwaspItems: parseJsonField(p.studiedOwaspItems),
+      challengeScores: parseJsonField(p.challengeScores),
     })),
   });
 }
