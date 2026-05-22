@@ -196,25 +196,16 @@ export default function SQLInjectionLab() {
                     <p className={`text-xs font-semibold mb-1 ${
                       hintLevel === 1 ? 'text-amber-700' : hintLevel === 2 ? 'text-orange-700' : 'text-red-700'
                     }`}>
-                      {hintLevel === 1 ? '💡 Общая идея:' : hintLevel === 2 ? '🔍 Конкретнее:' : '🎯 Решение:'}
+                      {hintLevel === 1 ? '💡 Общая идея:' : hintLevel === 2 ? '🔍 Конкретнее:' : '🎯 Подсказка:'}
                     </p>
                     <p className="text-xs text-amber-800">
-                      {challenge.hint}
+                      {hintLevel === 1
+                        ? 'Попробуйте понять структуру SQL-запроса и найдите точку внедрения.'
+                        : hintLevel === 2
+                          ? 'Обратите внимание на синтаксис кавычек, комментарии и операторы объединения запросов.'
+                          : challenge.hint}
                     </p>
                   </div>
-                  {/* Show previous hints if on higher level */}
-                  {hintLevel >= 2 && (
-                    <div className="rounded-lg p-2 bg-amber-100/30 opacity-70">
-                      <p className="text-xs font-semibold text-amber-700 mb-1">💡 Общая идея:</p>
-                      <p className="text-xs text-amber-800">{challenge.hint}</p>
-                    </div>
-                  )}
-                  {hintLevel >= 3 && (
-                    <div className="rounded-lg p-2 bg-orange-100/30 opacity-70">
-                      <p className="text-xs font-semibold text-orange-700 mb-1">🔍 Конкретнее:</p>
-                      <p className="text-xs text-amber-800">{challenge.hint}</p>
-                    </div>
-                  )}
                   {/* More hints button */}
                   {hintLevel < 3 && (
                     <Button

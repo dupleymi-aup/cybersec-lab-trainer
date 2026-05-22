@@ -22,7 +22,8 @@ type RecoveryStep = 'enter-contact' | 'enter-otp' | 'new-password';
 export default function AuthPages() {
   const [page, setPage] = useState<AuthPage>('login');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
@@ -248,7 +249,7 @@ export default function AuthPages() {
                       <div className="relative">
                         <Input
                           id="login-password"
-                          type={showPassword ? 'text' : 'password'}
+                          type={showLoginPassword ? 'text' : 'password'}
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
                           placeholder="Введите пароль"
@@ -256,10 +257,10 @@ export default function AuthPages() {
                         />
                         <button
                           type="button"
-                          onClick={() => setShowPassword(!showPassword)}
+                          onClick={() => setShowLoginPassword(!showLoginPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
                         >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
@@ -418,7 +419,7 @@ export default function AuthPages() {
                       <div className="relative">
                         <Input
                           id="reg-password"
-                          type={showPassword ? 'text' : 'password'}
+                          type={showRegisterPassword ? 'text' : 'password'}
                           value={regPassword}
                           onChange={(e) => setRegPassword(e.target.value)}
                           placeholder="Минимум 8 символов"
@@ -426,10 +427,10 @@ export default function AuthPages() {
                         />
                         <button
                           type="button"
-                          onClick={() => setShowPassword(!showPassword)}
+                          onClick={() => setShowRegisterPassword(!showRegisterPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
                         >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showRegisterPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                       {regPassword && (

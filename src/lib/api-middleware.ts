@@ -15,6 +15,8 @@ export async function authenticate(request: NextRequest): Promise<{ id: string; 
   const token = getTokenFromRequest(request);
   const payload = getTokenPayload(token);
   if (!payload) return null;
+  // Explicitly check expiration even though jwt.verify does this — defense in depth
+  if (payload.exp < Date.now() / 1000) return null;
   return { id: payload.id, role: payload.role };
 }
 

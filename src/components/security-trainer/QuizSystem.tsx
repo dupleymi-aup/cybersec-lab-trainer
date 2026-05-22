@@ -87,6 +87,7 @@ export default function QuizSystem() {
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
   const currentQuestionRef = useRef(currentQuestion);
   const timedOutRef = useRef(false);
+  const selectedAnswerRef = useRef(selectedAnswer);
 
   useEffect(() => {
     currentQuestionRef.current = currentQuestion;
@@ -110,6 +111,7 @@ export default function QuizSystem() {
   useEffect(() => { activeCategoryRef.current = activeCategory; }, [activeCategory]);
   useEffect(() => { startTimeRef.current = startTime; }, [startTime]);
   useEffect(() => { maxStreakRef.current = maxStreak; }, [maxStreak]);
+  useEffect(() => { selectedAnswerRef.current = selectedAnswer; }, [selectedAnswer]);
 
   const filterQuestions = useCallback((categoryName: string) => {
     const q = quizQuestionsRef.current;
@@ -142,7 +144,7 @@ export default function QuizSystem() {
     setQuizState('playing');
   }, [filterQuestions]);
 
-  const nextQuestion = useCallback(() => {
+  const nextQuestion = useCallback((overrideCorrectCount?: number) => {
     const q = categoryQuestionsRef.current;
     const idx = currentQuestionRef.current;
     if (idx < q.length - 1) {
@@ -153,7 +155,7 @@ export default function QuizSystem() {
       setTimeLeft(30);
       setTimerActive(true);
     } else {
-      const finalCount = correctCountRef.current;
+      const finalCount = overrideCorrectCount !== undefined ? overrideCorrectCount : correctCountRef.current;
       const catId = quizCategories.find((c) => c.name === activeCategoryRef.current)?.id || '';
       const score = q.length > 0 ? Math.round((finalCount / q.length) * 100) : 0;
       setQuizScore(catId, score);
@@ -188,7 +190,13 @@ export default function QuizSystem() {
     const question = q[idx];
     const isCorrect = parseInt(selectedAnswer) === question.correctIndex;
     if (isCorrect) {
-      setCorrectCount((c) => c + 1);
+      const newCorrect = correctCountRef.current + 1;
+      setCorrectCount(newCorrect);
+      // Pass the updated count for the last question scenario
+      if (idx >= q.length - 1) {
+        // Schedule nextQuestion with the correct count after state update
+        setTimeout(() => nextQuestion(newCorrect), 0);
+      }
       setStreak((s) => {
         const newStreak = s + 1;
         if (newStreak > maxStreakRef.current) setMaxStreak(newStreak);
@@ -196,11 +204,15 @@ export default function QuizSystem() {
       });
     } else {
       setStreak(0);
+      // For wrong last answer, pass current ref count (no increment)
+      if (idx >= q.length - 1) {
+        setTimeout(() => nextQuestion(), 0);
+      }
     }
     const currentAnswers = [...answersRef.current];
     currentAnswers[idx] = isCorrect;
     setAnswers(currentAnswers);
-  }, [selectedAnswer]);
+  }, [selectedAnswer, nextQuestion]);
 
   // Timer
   useEffect(() => {
@@ -228,14 +240,18 @@ export default function QuizSystem() {
     return () => clearInterval(interval);
   }, [timerActive, currentQuestion]);
 
-  // Auto-advance after timeout
+  // Auto-advance after timeout — only if timedOut was set for the current question
   useEffect(() => {
     if (!showAnswer || !timedOutRef.current) return;
+    const questionAtTimeout = currentQuestionRef.current;
     const timer = setTimeout(() => {
-      nextQuestion();
+      // Only auto-advance if we're still on the same question
+      if (currentQuestionRef.current === questionAtTimeout && timedOutRef.current) {
+        nextQuestion();
+      }
     }, 2000);
     return () => clearTimeout(timer);
-  }, [showAnswer]);
+  }, [showAnswer, nextQuestion]);
 
   // Pause timer when tab is hidden
   useEffect(() => {
@@ -296,7 +312,8 @@ export default function QuizSystem() {
 
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (!showAnswer && selectedAnswer) {
+      const currentSelected = selectedAnswerRef.current;
+      if (!showAnswer && currentSelected) {
         handleAnswer();
       } else if (showAnswer) {
         nextQuestion();
@@ -304,9 +321,17 @@ export default function QuizSystem() {
     }
 
     if (e.key === 'Escape') {
-      resetQuiz();
+      e.preventDefault();
+      setQuizState('select');
+      setCurrentQuestion(0);
+      setCorrectCount(0);
+      setSelectedAnswer('');
+      setShowAnswer(false);
+      setTimeLeft(30);
+      setAnswers([]);
+      setTimerActive(false);
     }
-  }, [quizState, showAnswer, selectedAnswer, handleAnswer, nextQuestion]);
+  }, [quizState, showAnswer, handleAnswer, nextQuestion]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);

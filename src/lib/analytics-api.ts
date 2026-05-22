@@ -25,10 +25,19 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
   const authHeaders = await getAuthHeaders();
-  return fetch(url, {
+  const res = await fetch(url, {
     ...options,
     headers: { ...authHeaders, ...options.headers },
   });
+  if (!res.ok) {
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || `API error: ${res.status}`);
+    }
+    throw new Error(`API error: ${res.status} ${res.statusText}`);
+  }
+  return res;
 }
 
 export async function getProgressTrends(userId?: string, dateRange: string = '30d', groupId?: string): Promise<TrendPoint[]> {

@@ -151,36 +151,37 @@ export default function Dashboard() {
 
   const visibleAnnouncements = announcements.filter((a) => !dismissedAnnouncements.has(a.id));
 
-  const challengeStats = {
+  const challengeStats = useMemo(() => ({
     owaspCorrect: owaspChallengeScores.correct,
     authCorrect: authChallengeScores.correct,
-  };
+  }), [owaspChallengeScores.correct, authChallengeScores.correct]);
 
   const totalModules = modules.length;
-  const completedCount = completedModules.filter((id) =>
-    modules.some((m) => m.id === id)
-  ).length;
-  const totalProgress = Math.round((completedCount / totalModules) * 100);
+  const completedCount = useMemo(() =>
+    completedModules.filter((id) => modules.some((m) => m.id === id)).length
+  , [completedModules]);
+  const totalProgress = useMemo(() => Math.round((completedCount / totalModules) * 100), [completedCount, totalModules]);
 
-  const avgQuizScore =
-    Object.keys(quizScores).length > 0
-      ? Math.round(
-          Object.values(quizScores).reduce((a, b) => a + b, 0) /
-            Object.values(quizScores).length
-        )
-      : 0;
+  const avgQuizScore = useMemo(() => {
+    const keys = Object.keys(quizScores);
+    return keys.length > 0 ? Math.round(Object.values(quizScores).reduce((a, b) => a + b, 0) / keys.length) : 0;
+  }, [quizScores]);
 
   // Achievements — use centralized achievement-utils
-  const unlockedAchievements = achievements.filter((a) =>
-    getAchievementStatus(a.id, completedModules, quizScores, challengeStats)
-  );
-  const nextAchievement = achievements.find((a) =>
-    !getAchievementStatus(a.id, completedModules, quizScores, challengeStats)
-  );
-  const unlockedCount = countUnlockedAchievements(completedModules, quizScores, challengeStats);
+  const unlockedAchievements = useMemo(() =>
+    achievements.filter((a) => getAchievementStatus(a.id, completedModules, quizScores, challengeStats))
+  , [completedModules, quizScores, challengeStats]);
 
-  // Per-module granular progress
-  const getModuleProgress = (moduleId: string, completed: boolean): { pct: number; label: string } => {
+  const nextAchievement = useMemo(() =>
+    achievements.find((a) => !getAchievementStatus(a.id, completedModules, quizScores, challengeStats))
+  , [completedModules, quizScores, challengeStats]);
+
+  const unlockedCount = useMemo(() =>
+    countUnlockedAchievements(completedModules, quizScores, challengeStats)
+  , [completedModules, quizScores, challengeStats]);
+
+  // Per-module granular progress — memoized function via useCallback
+  const getModuleProgress = useCallback((moduleId: string, completed: boolean): { pct: number; label: string } => {
     const TOTALS: Record<string, number> = {
       'sql-injection': sqlChallenges.length,
       'xss': xssTypes.length,
@@ -201,7 +202,7 @@ export default function Dashboard() {
     })();
     const pct = Math.round((done / total) * 100);
     return { pct, label: `${done}/${total}` };
-  };
+  }, [sqlCompletedLevels.length, xssCompletedLevels.length, csrfCompletedSteps.length, secureCodingAnsweredChallenges.length]);
 
   // Recommendations
 
@@ -222,58 +223,8 @@ export default function Dashboard() {
     }
     prevUnlockedRef.current = current;
   }, [unlockedAchievements]);
-  const getRecommendation = () => {
-    // Role-specific recommendations
-    if (user?.role === 'admin' && completedModules.length === 0) {
-      return { text: 'Управляйте пользователями и настройками системы.', page: 'admin-panel' as PageType };
-    }
-    if (user?.role === 'teacher' && completedModules.length === 0) {
-      return { text: 'Посмотрите аналитику и прогресс студентов.', page: 'teacher-panel' as PageType };
-    }
-
-    // Streak-based recommendations
-    if (streakData.current >= 7) {
-      return { text: `Отличная серия — ${streakData.current} дней подряд! Продолжайте и открывайте новые достижения.`, page: 'achievements' as PageType };
-    }
-    if (streakData.current === 0 && streakData.daysSinceLast >= 3) {
-      return { text: `Вы не занимались ${streakData.daysSinceLast} дн. Вернитесь к обучению — серия ждёт!`, page: modules.find((m) => !completedModules.includes(m.id))?.id as PageType || 'quiz' as PageType };
-    }
-
-    if (completedModules.length === 0) {
-      return { text: 'Начните с OWASP Top 10 — это фундамент веб-безопасности.', page: 'owasp' as PageType };
-    }
-    if (!completedModules.includes('sql-injection')) {
-      return { text: 'Попробуйте SQL-инъекции — самая распространённая уязвимость.', page: 'sql-injection' as PageType };
-    }
-    if (!completedModules.includes('xss')) {
-      return { text: 'Изучите XSS-атаки — они встречаются на каждом третьем сайте.', page: 'xss' as PageType };
-    }
-    if (!completedModules.includes('csrf')) {
-      return { text: 'Изучите CSRF-атаки — подделка запросов от имени пользователя.', page: 'csrf' as PageType };
-    }
-    if (!completedModules.includes('security-headers')) {
-      return { text: 'Освойте Security Headers — CSP, HSTS и другие заголовки безопасности.', page: 'security-headers' as PageType };
-    }
-    if (!completedModules.includes('auth')) {
-      return { text: 'Попробуйте модуль аутентификации — пароли, хеширование и 2FA.', page: 'auth' as PageType };
-    }
-    if (!completedModules.includes('secure-coding')) {
-      return { text: 'Практикуйтесь в безопасном кодировании — 15 задач по ревью кода.', page: 'secure-coding' as PageType };
-    }
-    if (!completedModules.includes('tools')) {
-      return { text: 'Попробуйте инструменты: шифры, кодирование и генератор паролей.', page: 'tools' as PageType };
-    }
-    if (!completedModules.includes('api-security')) {
-      return { text: 'Изучите OWASP API Security Top 10 — уязвимости современных API.', page: 'api-security' as PageType };
-    }
-    if (Object.keys(quizScores).length < 11) {
-      return { text: 'Проверьте свои знания в квизах — 11 категорий с фильтрацией по сложности!', page: 'quiz' as PageType };
-    }
-    if (totalProgress < 100) {
-      return { text: 'Завершите оставшиеся модули для полного прохождения!', page: modules.find((m) => !completedModules.includes(m.id))?.id as PageType || 'dashboard' as PageType };
-    }
-    return { text: 'Великолепно! Вы прошли все модули. Посмотрите достижения!', page: 'achievements' as PageType };
-  };
+  // Recommendations — defined after streakData (see line ~360)
+  const getRecommendation = () => null as ReturnType<typeof buildRecommendation> | null;
 
   const proficiency = getProficiencyLevel(completedCount, totalModules, avgQuizScore);
 
@@ -356,7 +307,65 @@ export default function Dashboard() {
     return { current, longest: Math.max(longest, current), isToday: allDates.has(todayStr), daysSinceLast };
   }, [moduleTimestamps, quizTimestamps]);
 
-  const recommendation = getRecommendation();
+  // Memoized recommendation — depends on streakData which is defined above
+  const recommendation = useMemo(() => {
+    const buildRecommendation = () => {
+      // Role-specific recommendations
+      if (user?.role === 'admin' && completedModules.length === 0) {
+        return { text: 'Управляйте пользователями и настройками системы.', page: 'admin-panel' as PageType };
+      }
+      if (user?.role === 'teacher' && completedModules.length === 0) {
+        return { text: 'Посмотрите аналитику и прогресс студентов.', page: 'teacher-panel' as PageType };
+      }
+
+      // Streak-based recommendations
+      if (streakData.current >= 7) {
+        return { text: `Отличная серия — ${streakData.current} дней подряд! Продолжайте и открывайте новые достижения.`, page: 'achievements' as PageType };
+      }
+      if (streakData.current === 0 && streakData.daysSinceLast >= 3) {
+        const nextModule = modules.find((m) => !completedModules.includes(m.id));
+        return { text: `Вы не занимались ${streakData.daysSinceLast} дн. Вернитесь к обучению — серия ждёт!`, page: (nextModule?.id || 'quiz') as PageType };
+      }
+
+      if (completedModules.length === 0) {
+        return { text: 'Начните с OWASP Top 10 — это фундамент веб-безопасности.', page: 'owasp' as PageType };
+      }
+      if (!completedModules.includes('sql-injection')) {
+        return { text: 'Попробуйте SQL-инъекции — самая распространённая уязвимость.', page: 'sql-injection' as PageType };
+      }
+      if (!completedModules.includes('xss')) {
+        return { text: 'Изучите XSS-атаки — они встречаются на каждом третьем сайте.', page: 'xss' as PageType };
+      }
+      if (!completedModules.includes('csrf')) {
+        return { text: 'Изучите CSRF-атаки — подделка запросов от имени пользователя.', page: 'csrf' as PageType };
+      }
+      if (!completedModules.includes('security-headers')) {
+        return { text: 'Освойте Security Headers — CSP, HSTS и другие заголовки безопасности.', page: 'security-headers' as PageType };
+      }
+      if (!completedModules.includes('auth')) {
+        return { text: 'Попробуйте модуль аутентификации — пароли, хеширование и 2FA.', page: 'auth' as PageType };
+      }
+      if (!completedModules.includes('secure-coding')) {
+        return { text: 'Практикуйтесь в безопасном кодировании — 15 задач по ревью кода.', page: 'secure-coding' as PageType };
+      }
+      if (!completedModules.includes('tools')) {
+        return { text: 'Попробуйте инструменты: шифры, кодирование и генератор паролей.', page: 'tools' as PageType };
+      }
+      if (!completedModules.includes('api-security')) {
+        return { text: 'Изучите OWASP API Security Top 10 — уязвимости современных API.', page: 'api-security' as PageType };
+      }
+      if (Object.keys(quizScores).length < 11) {
+        return { text: 'Проверьте свои знания в квизах — 11 категорий с фильтрацией по сложности!', page: 'quiz' as PageType };
+      }
+      if (totalProgress < 100) {
+        const nextModule = modules.find((m) => !completedModules.includes(m.id));
+        return { text: 'Завершите оставшиеся модули для полного прохождения!', page: (nextModule?.id || 'dashboard') as PageType };
+      }
+      return { text: 'Великолепно! Вы прошли все модулы. Посмотрите достижения!', page: 'achievements' as PageType };
+    };
+    return buildRecommendation();
+  }, [user?.role, completedModules, quizScores, totalProgress, streakData]);
+
   const [showAllActivity, setShowAllActivity] = useState(false);
 
   const handleStartModule = (moduleId: string) => {
