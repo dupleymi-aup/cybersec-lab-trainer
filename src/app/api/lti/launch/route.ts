@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the launch token
-    let claims: LtiClaims;
+    let claims: LtiClaims | null = null;
     try {
       claims = await verifyLtiLaunch(
         idToken,

@@ -198,7 +198,7 @@ export async function DELETE(
         id: crypto.randomUUID(),
         adminId: auth.id,
         adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'user_delete',
+        action: 'user_deleted',
         targetId: id,
         targetName: user.fullName || user.email,
         details: `Admin ${auth.id} deleted user ${user.email} (role: ${user.role}) [IP: ${ip}]`,

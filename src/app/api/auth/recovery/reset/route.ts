@@ -6,14 +6,24 @@ import { checkRateLimit } from '@/lib/api-middleware';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { userId, newPassword, otp } = body;
+  const { emailOrPhone, newPassword, otp } = body;
 
-  if (!userId || !newPassword || !otp) {
-    return NextResponse.json({ error: 'User ID, OTP and new password required' }, { status: 400 });
+  if (!emailOrPhone || !newPassword || !otp) {
+    return NextResponse.json({ error: 'Email/phone, OTP and new password required' }, { status: 400 });
+  }
+
+  // Find user to get the OTP store key
+  const user = await prisma.user.findFirst({
+    where: { OR: [{ email: emailOrPhone }, { phone: emailOrPhone }] },
+    select: { id: true },
+  });
+
+  if (!user) {
+    return NextResponse.json({ error: 'Неверный OTP' }, { status: 400 });
   }
 
   // Rate limiting: 5 attempts per 10 minutes per user
-  const rateKey = `otp-reset-${userId}`;
+  const rateKey = `otp-reset-${user.id}`;
   const rateResult = checkRateLimit(rateKey, 5, 10 * 60 * 1000);
   if (!rateResult.allowed) {
     return NextResponse.json(
@@ -22,13 +32,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const entry = otpStore.get(userId);
+  const entry = otpStore.get(user.id);
   if (!entry) {
     return NextResponse.json({ error: 'OTP not found or expired' }, { status: 400 });
   }
 
   if (Date.now() > entry.expiresAt) {
-    otpStore.delete(userId);
+    otpStore.delete(user.id);
     return NextResponse.json({ error: 'OTP expired' }, { status: 400 });
   }
 
@@ -36,11 +46,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Неверный OTP' }, { status: 400 });
   }
 
-  otpStore.delete(userId);
+  otpStore.delete(user.id);
 
   const hash = await hashPassword(newPassword);
   await prisma.user.update({
-    where: { id: userId },
+    where: { id: user.id },
     data: { passwordHash: hash },
   });
 

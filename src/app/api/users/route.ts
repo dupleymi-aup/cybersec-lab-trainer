@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
         id: crypto.randomUUID(),
         adminId: auth.id,
         adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'user_create',
+        action: 'user_created',
         targetId: user.id,
         targetName: user.fullName || user.email,
         details: `Admin ${auth.id} created user ${user.email} (role: ${user.role}) [IP: ${ip}]`,

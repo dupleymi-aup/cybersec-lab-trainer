@@ -5,25 +5,21 @@ import { NotificationHelper } from './notification-store';
 import { getCurrentUserId, saveProgressSnapshotProxy } from './auth-bridge';
 
 // ─── API client ───────────────────────────────────────────────
-let cachedToken: string | null = null;
 let tokenFetchPromise: Promise<string | null> | null = null;
 
-async function getAuthHeaders(): Promise<Record<string, string>> {
+export async function getAuthHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   try {
-    if (cachedToken !== null) {
-      if (cachedToken) headers['Authorization'] = `Bearer ${cachedToken}`;
-    } else if (!tokenFetchPromise) {
+    if (!tokenFetchPromise) {
       tokenFetchPromise = (async () => {
         const { useAuthStore } = await import('./auth-store');
         const { token } = useAuthStore.getState();
-        cachedToken = token;
         tokenFetchPromise = null;
         return token;
       })();
-      const token = await tokenFetchPromise;
-      if (token) headers['Authorization'] = `Bearer ${token}`;
     }
+    const token = await tokenFetchPromise;
+    if (token) headers['Authorization'] = `Bearer ${token}`;
   } catch (err) {
     if (process.env.NODE_ENV === 'development') {
       console.warn('Failed to get auth headers:', err);
@@ -31,6 +27,11 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     tokenFetchPromise = null;
   }
   return headers;
+}
+
+/** Invalidate token cache after logout/login to prevent stale tokens */
+export function invalidateTokenCache() {
+  tokenFetchPromise = null;
 }
 
 const apiClient = {

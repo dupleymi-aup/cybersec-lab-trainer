@@ -39,7 +39,11 @@ export default function AuthSecurityLab() {
 
   // OTP/2FA state
   const [otpInput, setOtpInput] = useState('');
-  const [otpSecret] = useState(() => Math.random().toString(36).substring(2, 10).toUpperCase());
+  const [otpSecret] = useState(() => {
+    const array = new Uint8Array(8);
+    crypto.getRandomValues(array);
+    return Array.from(array, b => b.toString(36).padStart(2, '0')).join('').substring(0, 8).toUpperCase();
+  });
   const [otpTimeLeft, setOtpTimeLeft] = useState(30);
   const [otpVerified, setOtpVerified] = useState<boolean | null>(null);
 

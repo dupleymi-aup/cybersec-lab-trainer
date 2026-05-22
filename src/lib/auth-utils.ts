@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 export function generateUserId(): string {
-  return 'usr_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  return crypto.randomUUID();
 }
 
 export async function hashPassword(password: string): Promise<string> {

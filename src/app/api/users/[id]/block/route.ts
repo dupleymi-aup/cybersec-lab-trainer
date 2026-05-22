@@ -53,7 +53,7 @@ export async function PUT(
         id: crypto.randomUUID(),
         adminId: auth.id,
         adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: isBlocked ? 'user_block' : 'user_unblock',
+        action: isBlocked ? 'user_blocked' : 'user_unblocked',
         targetId: id,
         targetName: user.fullName || user.email,
         details: `Admin ${auth.id} ${isBlocked ? 'blocked' : 'unblocked'} user ${user.email} [IP: ${ip}]`,

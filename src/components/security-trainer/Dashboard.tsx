@@ -1,8 +1,8 @@
 'use client';
 
-import { useAppStore } from '@/lib/store';
+import { useAppStore, getAuthHeaders } from '@/lib/store';
 import { useAuthStore } from '@/lib/auth-store';
-import { modules, achievements, sqlChallenges, xssTypes, attackSteps, secureCodingChallenges } from '@/lib/data';
+import { modules, achievements, sqlChallenges, xssTypes, attackSteps, secureCodingChallenges, quizCategories } from '@/lib/data';
 import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
 import { NotificationHelper, loadAnnouncementsIntoNotifications } from '@/lib/notification-store';
 import NotificationBell from './NotificationBell';
@@ -129,7 +129,8 @@ export default function Dashboard() {
 
   // Fetch upcoming deadlines on mount
   useEffect(() => {
-    fetch('/api/deadlines/upcoming')
+    getAuthHeaders()
+      .then(headers => fetch('/api/deadlines/upcoming', { headers }))
       .then(r => r.json())
       .then(data => {
         if (data.upcoming) {
@@ -573,7 +574,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         {[
           { label: 'Модули пройдены', value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
-          { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/9`, color: 'text-amber-600' },
+          { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/${quizCategories.length}`, color: 'text-amber-600' },
           { label: 'Средний балл', value: `${avgQuizScore}%`, color: 'text-sky-600' },
           { label: 'Достижения', value: `${unlockedAchievements.length}/${achievements.length}`, color: 'text-violet-600' },
           { label: streakData.current > 0 ? 'Серия дней' : 'Нет серии', value: streakData.current > 0 ? `${streakData.current} дн.` : '—', color: 'text-orange-600', tooltip: streakData.longest > 0 ? `Лучшая серия: ${streakData.longest} дн.` : undefined },

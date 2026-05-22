@@ -550,6 +550,8 @@ export const useAuthStore = create<AuthState>()(
             token: data.token,
           });
 
+          import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache());
+
           // Migrate anonymous progress to user
           const { migrateProgressToUser } = await import('./store');
           migrateProgressToUser(data.user.id);
@@ -594,6 +596,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
+        import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache());
         set({
           user: null,
           isAuthenticated: false,
@@ -673,18 +676,10 @@ export const useAuthStore = create<AuthState>()(
         if (Date.now() > recoveryState.expiresAt) return false;
 
         try {
-          const users = await getAllUsers();
-          const found = users.find(
-            (u) =>
-              u.email.toLowerCase() === recoveryState.emailOrPhone.toLowerCase() ||
-              u.phone.replace(/[\s\-()]/g, '') === recoveryState.emailOrPhone.replace(/[\s\-()]/g, '')
-          );
-          if (!found) return false;
-
           const res = await fetch('/api/auth/recovery/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: found.id, otp }),
+            body: JSON.stringify({ emailOrPhone: recoveryState.emailOrPhone, otp }),
           });
           return res.ok;
         } catch {
@@ -698,18 +693,10 @@ export const useAuthStore = create<AuthState>()(
         if (Date.now() > recoveryState.expiresAt) return { success: false, error: 'Код просрочен' };
 
         try {
-          const users = await getAllUsers();
-          const found = users.find(
-            (u) =>
-              u.email.toLowerCase() === recoveryState.emailOrPhone.toLowerCase() ||
-              u.phone.replace(/[\s\-()]/g, '') === recoveryState.emailOrPhone.replace(/[\s\-()]/g, '')
-          );
-          if (!found) return { success: false, error: 'Аккаунт не найден' };
-
           const res = await fetch('/api/auth/recovery/reset', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: found.id, newPassword, otp }),
+            body: JSON.stringify({ emailOrPhone: recoveryState.emailOrPhone, newPassword, otp }),
           });
           const data = await res.json();
           if (!res.ok) return { success: false, error: data.error };
