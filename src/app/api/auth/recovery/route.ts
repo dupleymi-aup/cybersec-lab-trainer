@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateOTP } from '@/lib/auth-utils';
 import { otpStore, ensureOtpCapacity } from '@/lib/otp-store';
+import { sendOTPRecoveryEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -30,10 +31,9 @@ export async function POST(request: NextRequest) {
   ensureOtpCapacity();
   otpStore.set(user.id, { otp, expiresAt });
 
-  // TODO: Send OTP via email in production
-  // For development, OTP is stored server-side and shown in dev tools
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[DEV] OTP for ${user.email}: ${otp}`);
+  const emailSent = await sendOTPRecoveryEmail(user.email, user.fullName || user.email, otp);
+  if (!emailSent && process.env.NODE_ENV === 'development') {
+    console.warn(`[DEV] OTP for ${user.email}: ${otp} (SMTP not configured)`);
   }
 
   return NextResponse.json(response);

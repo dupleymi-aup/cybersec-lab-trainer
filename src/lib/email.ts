@@ -77,6 +77,69 @@ function renderDeadlineEmail(
   `;
 }
 
+export async function sendOTPRecoveryEmail(
+  to: string,
+  fullName: string,
+  otp: string
+): Promise<boolean> {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return false;
+  }
+
+  const subject = 'CyberSec Lab — Код восстановления пароля';
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f8fafc; }
+        .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header { background: #6366f1; padding: 24px; text-align: center; color: white; }
+        .header h1 { margin: 0; font-size: 20px; }
+        .content { padding: 24px; }
+        .content p { margin: 0 0 12px; color: #334155; line-height: 1.6; }
+        .otp-code { background: #f1f5f9; padding: 20px; border-radius: 8px; margin: 16px 0; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #0f172a; }
+        .warning { background: #fef3c7; padding: 12px; border-radius: 8px; margin: 16px 0; color: #92400e; font-size: 14px; }
+        .footer { padding: 16px 24px; background: #f8fafc; text-align: center; color: #94a3b8; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Восстановление пароля</h1>
+        </div>
+        <div class="content">
+          <p>Здравствуйте, <strong>${fullName}</strong>!</p>
+          <p>Вы запросили восстановление пароля. Используйте следующий код:</p>
+          <div class="otp-code">${otp}</div>
+          <p>Код действителен в течение 10 минут.</p>
+          <div class="warning">
+            Если вы не запрашивали восстановление пароля, проигнорируйте это письмо.
+          </div>
+        </div>
+        <div class="footer">
+          CyberSec Lab Trainer — автоматическое уведомление
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@cyberseclab.com',
+      to,
+      subject,
+      html,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function sendDeadlineReminderEmail(
   to: string,
   fullName: string,
