@@ -1,14 +1,30 @@
 'use client';
 
+import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { useSession } from '@/hooks/use-session';
-import { Cloud, CloudOff, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Cloud, CloudOff, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function SyncIndicator() {
-  const { syncStatus, lastSyncedAt, userId } = useAppStore();
+  const { syncStatus, lastSyncedAt, userId, syncWithDatabase } = useAppStore();
   const { isAuthenticated } = useSession();
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
 
   if (!isAuthenticated || !userId) return null;
+
+  const handleManualSync = async () => {
+    if (isManualSyncing || syncStatus === 'syncing') return;
+    setIsManualSyncing(true);
+    try {
+      await syncWithDatabase();
+      toast.success('Прогресс синхронизирован');
+    } catch {
+      toast.error('Ошибка синхронизации');
+    } finally {
+      setIsManualSyncing(false);
+    }
+  };
 
   const icons = {
     idle: <CloudOff size={14} className="text-muted-foreground" />,
@@ -28,6 +44,14 @@ export default function SyncIndicator() {
     <div className="flex items-center gap-1.5 text-xs text-slate-400">
       {icons[syncStatus]}
       <span>{labels[syncStatus]}</span>
+      <button
+        onClick={handleManualSync}
+        disabled={isManualSyncing || syncStatus === 'syncing'}
+        className="ml-1 p-0.5 rounded hover:bg-slate-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        title="Sync now"
+      >
+        <RefreshCw size={12} className={isManualSyncing ? 'animate-spin' : ''} />
+      </button>
     </div>
   );
 }

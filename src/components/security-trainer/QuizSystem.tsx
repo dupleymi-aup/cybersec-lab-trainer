@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, apiClient } from '@/lib/store';
 import { quizQuestions, quizCategories } from '@/lib/data';
 import { saveQuizAttempts, type QuizAttemptData } from '@/lib/auth-store';
 import { NotificationHelper } from '@/lib/notification-store';
@@ -143,6 +143,11 @@ export default function QuizSystem() {
         correct: answers[i] === true,
       }));
       saveQuizAttempts(catId, attempts);
+
+      // Save aggregate quiz result to server (QuizResult table)
+      apiClient.saveQuizResults(catId, score, categoryQuestions.length).catch(() => {
+        // Silently fail — data is in localStorage and will sync on next login
+      });
 
       setQuizState('result');
     }

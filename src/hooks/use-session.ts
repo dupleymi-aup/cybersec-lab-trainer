@@ -23,11 +23,15 @@ export function useSession() {
   /** Login and sync progress */
   const loginAndSync = useCallback(async (emailOrPhone: string, password: string, rememberMe?: boolean) => {
     const result = await login(emailOrPhone, password, rememberMe);
-    if (result.success && user?.id) {
-      setSessionUserId(user.id);
+    if (result.success) {
+      // Use getState() to get the updated user after login() set it
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser?.id) {
+        setSessionUserId(currentUser.id);
+      }
     }
     return result;
-  }, [login, user?.id, setSessionUserId]);
+  }, [login, setSessionUserId]);
 
   /** Logout and clear session state */
   const logoutAndClear = useCallback(() => {
