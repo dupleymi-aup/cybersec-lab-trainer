@@ -73,14 +73,14 @@ export async function POST(request: NextRequest) {
     const roles = claims.roles || [];
 
     // Determine role from LTI roles
+    // Security: auto-provisioned users are capped to student/teacher only.
+    // Admin role requires manual approval — even if LTI claims say "administrator",
+    // we cap it to teacher to prevent privilege escalation from compromised/misconfigured LMS.
     const isTeacher = roles.some((r) =>
       r.toLowerCase().includes('instructor') ||
       r.toLowerCase().includes('teacher'),
     );
-    const isAdmin = roles.some((r) =>
-      r.toLowerCase().includes('administrator'),
-    );
-    const role = isAdmin ? 'admin' : isTeacher ? 'teacher' : 'student';
+    const role = isTeacher ? 'teacher' : 'student';
 
     // Find or create user
     let user = await prisma.user.findUnique({ where: { email } });

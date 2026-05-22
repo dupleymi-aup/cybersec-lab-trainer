@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { generateToken } from '@/lib/api-middleware';
+import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { hashPassword } from '@/lib/auth-utils';
 import { ADMIN_INVITE_CODE } from '@/lib/auth-store';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 3 registrations per hour per IP
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`register-${ip}`, 3, 3600_000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Слишком много попыток регистрации. Подождите', retryAfter: rateLimit.retryAfter },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { email, phone, fullName, role, inviteCode, password } = body;
 
