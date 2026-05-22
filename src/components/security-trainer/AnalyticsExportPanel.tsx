@@ -459,12 +459,10 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     clearMessage('quizRetryPdf');
     try {
       const retryData = await getQuizRetryAnalytics(effectiveDays, groupId);
-      await generateQuizRetryPDF({
-        categoryRetryStats: retryData.categoryRetryStats,
-        topRetryers: retryData.topRetryers,
-        totalRetries: retryData.totalRetries,
-        totalUniqueQuizzes: retryData.totalUniqueQuizzes,
-      });
+      await generateQuizRetryPDF(
+        retryData.categoryRetryStats,
+        retryData.topRetryers,
+      );
       setStatus('quizRetryPdf', 'success', 'PDF повторов экспортирован');
     } catch {
       setStatus('quizRetryPdf', 'error', 'Ошибка при создании PDF');

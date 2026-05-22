@@ -544,13 +544,13 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateProfile: async (data) => {
-        const { user } = get();
+        const { user, token } = get();
         if (!user) return;
 
         try {
           const res = await fetch('/api/auth/profile', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.id}` },
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify(data),
           });
 

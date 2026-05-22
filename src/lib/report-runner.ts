@@ -68,11 +68,11 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
   },
 
   analytics: async (days, groupId) => {
-    const { getComprehensiveSummary } = await import('./auth-store');
+    const { getComprehensiveSummary } = await import('./analytics-api');
     const summary = await getComprehensiveSummary(days, groupId);
 
     return generateAnalyticsPDF(
-      summary.kpis,
+      summary,
       summary.moduleDistribution || [],
       summary.trends,
       groupId || 'all'
@@ -204,32 +204,19 @@ async function saveReport(
   pdfBlob: Blob,
   now: Date
 ): Promise<void> {
-  // In a browser environment, we trigger a download
-  // In a Node.js environment, we would write to disk
-  if (typeof window !== 'undefined') {
-    const filename = `${report.reportType}_${now.toISOString().split('T')[0]}.pdf`;
-    const url = URL.createObjectURL(pdfBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  } else {
-    // Node.js environment — write to /reports/ directory
-    const fs = await import('fs');
-    const path = await import('path');
-    const reportsDir = path.join(process.cwd(), 'reports');
+  const fs = await import('fs');
+  const path = await import('path');
+  const reportsDir = path.join(process.cwd(), 'reports');
 
-    if (!fs.existsSync(reportsDir)) {
-      fs.mkdirSync(reportsDir, { recursive: true });
-    }
-
-    const filename = `${report.reportType}_${now.toISOString().split('T')[0]}.pdf`;
-    const filePath = path.join(reportsDir, filename);
-
-    const buffer = Buffer.from(await pdfBlob.arrayBuffer());
-    fs.writeFileSync(filePath, buffer);
+  if (!fs.existsSync(reportsDir)) {
+    fs.mkdirSync(reportsDir, { recursive: true });
   }
+
+  const filename = `${report.reportType}_${now.toISOString().split('T')[0]}.pdf`;
+  const filePath = path.join(reportsDir, filename);
+
+  const buffer = Buffer.from(await pdfBlob.arrayBuffer());
+  fs.writeFileSync(filePath, buffer);
 }
 
 async function sendEmailNotification(
@@ -254,7 +241,7 @@ async function sendEmailNotification(
 }
 
 // Run if executed directly
-if (typeof window === 'undefined' && require.main === module) {
+if (typeof process !== 'undefined' && process.argv[1] && (process.argv[1].endsWith('report-runner.ts') || process.argv[1].endsWith('report-runner.js'))) {
   runScheduledReports()
     .then((results) => {
       console.log('Report runner completed:', results);

@@ -115,14 +115,15 @@ export async function generateStudentReportPDF(
 // Generate gradebook PDF
 export async function generateGradebookPDF(
   students: Array<{ id: string; fullName: string; email: string; group: string; modulesCompleted: number; quizCount: number; avgScore: number }>,
-  title: string = 'Журнал успеваемости'
+  _modules: string[] = [],
+  _groupId: string = 'all'
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
 
   doc.setFontSize(16);
-  doc.text(title, 14, 20);
+  doc.text('Журнал успеваемости', 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
   doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего студентов: ${students.length}`, 14, 30);
@@ -154,7 +155,8 @@ export async function generateGradebookPDF(
 
 // Generate at-risk students PDF
 export async function generateAtRiskPDF(
-  atRiskStudents: Array<{ fullName: string; email: string; group: string; riskScore: number; reasons: string[]; lastActiveDays: number; modulesCompleted: number; avgQuizScore: number }>
+  atRiskStudents: Array<{ fullName: string; email: string; group: string; riskScore: number; reasons: string[]; lastActiveDays: number; modulesCompleted: number; avgQuizScore: number }>,
+  _days: number = 30
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
@@ -179,10 +181,10 @@ export async function generateAtRiskPDF(
     theme: 'striped',
     headStyles: { fillColor: [239, 68, 68] },
     styles: { fontSize: 8 },
-    didParseCell: (data: any) => {
-      if (data.column.index === 4 && Number(data.cell.raw) >= 70) {
-        data.cell.styles.textColor = [239, 68, 68];
-        data.cell.styles.fontStyle = 'bold';
+    didParseCell: (cellData: { column: { index: number }; cell: { raw: unknown; styles: Record<string, unknown> } }) => {
+      if (cellData.column.index === 4 && Number(cellData.cell.raw) >= 70) {
+        cellData.cell.styles.textColor = [239, 68, 68];
+        cellData.cell.styles.fontStyle = 'bold';
       }
     },
   });
@@ -201,9 +203,12 @@ export async function generateAtRiskPDF(
 
 // Generate comprehensive analytics PDF
 export async function generateAnalyticsPDF(
-  summary: { kpis: { totalStudents: number; activeStudents: number; activePercentage: number; avgCompletionRate: number; avgQuizScore: number; totalModulesCompleted: number; totalQuizAttempts: number; engagementScore: number } },
-  moduleDistribution: Array<{ moduleId: string; moduleName: string; completionRate: number; avgScore: number }>
+  summary: { kpis: { totalStudents: number; activeStudents: number; activePercentage: number; avgCompletionRate: number; avgQuizScore: number; totalModulesCompleted: number; totalQuizAttempts: number; engagementScore: number }; moduleDistribution?: Array<{ moduleId: string; moduleName: string; completionRate: number; avgScore: number }> },
+  moduleDistribution?: Array<{ moduleId: string; moduleName: string; completionRate: number; avgScore: number }>,
+  _trends?: unknown,
+  _groupId: string = 'all'
 ): Promise<void> {
+  const dist = moduleDistribution || summary.moduleDistribution || [];
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF();
@@ -246,7 +251,7 @@ export async function generateAnalyticsPDF(
   autoTable(doc, {
     startY: y + 15,
     head: [['Модуль', 'Завершение (%)', 'Ср. балл (%)']],
-    body: moduleDistribution.map(m => [m.moduleName, String(m.completionRate), String(m.avgScore)]),
+    body: dist.map(m => [m.moduleName, String(m.completionRate), String(m.avgScore)]),
     theme: 'striped',
     headStyles: { fillColor: [99, 102, 241] },
     styles: { fontSize: 9 },
@@ -267,14 +272,14 @@ export async function generateAnalyticsPDF(
 // Generate module performance PDF
 export async function generateModulePerformancePDF(
   modules: Array<{ moduleId: string; moduleName: string; totalStudents: number; completedCount: number; completionRate: number; avgScore: number; difficultyIndex: number }>,
-  title: string = 'Производительность модулей'
+  _groupId: string = 'all'
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
 
   doc.setFontSize(16);
-  doc.text(title, 14, 20);
+  doc.text('Производительность модулей', 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
   doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего модулей: ${modules.length}`, 14, 30);
@@ -307,23 +312,23 @@ export async function generateModulePerformancePDF(
 // Generate group comparison PDF
 export async function generateGroupComparisonPDF(
   dimensions: Array<{ name: string; studentCount: number; activeStudents: number; activeRate: number; avgModulesCompleted: number; avgCompletionRate: number; avgQuizScore: number; totalQuizAttempts: number; topModule: string; weakestModule: string }>,
-  dimensionType: string = 'group',
-  title: string = 'Сравнение групп'
+  _dimensionType: string = 'group',
+  _groupId: string = 'all'
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
 
-  const label = dimensionType === 'group' ? 'Групп' : dimensionType === 'course' ? 'Курсов' : 'Университетов';
+  const label = 'Групп';
   doc.setFontSize(16);
-  doc.text(title, 14, 20);
+  doc.text('Сравнение групп', 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
   doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего ${label}: ${dimensions.length}`, 14, 30);
 
   autoTable(doc, {
     startY: 40,
-    head: [['#', dimensionType === 'group' ? 'Группа' : dimensionType === 'course' ? 'Курс' : 'Университет', 'Студенты', 'Активные', 'Активность (%)', 'Ср. модулей', 'Завершение (%)', 'Ср. балл (%)', 'Попытки квизов']],
+    head: [['#', 'Группа', 'Студенты', 'Активные', 'Активность (%)', 'Ср. модулей', 'Завершение (%)', 'Ср. балл (%)', 'Попытки квизов']],
     body: dimensions.map((d, i) => [
       String(i + 1), d.name, String(d.studentCount), String(d.activeStudents),
       String(d.activeRate), String(d.avgModulesCompleted), String(d.avgCompletionRate),
@@ -349,23 +354,27 @@ export async function generateGroupComparisonPDF(
 
 // Generate quiz retry PDF
 export async function generateQuizRetryPDF(
-  retryData: { categoryRetryStats: Array<{ category: string; totalAttempts: number; uniqueStudents: number }>; topRetryers: Array<{ fullName: string; group: string; retryCount: number }>; totalRetries: number; totalUniqueQuizzes: number },
-  title: string = 'Анализ повторов квизов'
+  categoryRetryStats: Array<{ category: string; totalAttempts: number; uniqueStudents: number }>,
+  topRetryers: Array<{ fullName: string; group: string; retryCount: number }> = [],
+  _groupId: string = 'all'
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
 
+  const totalRetries = categoryRetryStats.reduce((sum, c) => sum + c.totalAttempts, 0);
+  const totalUniqueQuizzes = categoryRetryStats.length;
+
   doc.setFontSize(16);
-  doc.text(title, 14, 20);
+  doc.text('Анализ повторов квизов', 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
-  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Повторов: ${retryData.totalRetries} | Уникальных квизов: ${retryData.totalUniqueQuizzes}`, 14, 30);
+  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Повторов: ${totalRetries} | Уникальных квизов: ${totalUniqueQuizzes}`, 14, 30);
 
   autoTable(doc, {
     startY: 40,
     head: [['#', 'Категория', 'Попытки', 'Студенты']],
-    body: retryData.categoryRetryStats.map((c, i) => [
+    body: categoryRetryStats.map((c, i) => [
       String(i + 1), c.category, String(c.totalAttempts), String(c.uniqueStudents)
     ]),
     theme: 'striped',
@@ -375,14 +384,14 @@ export async function generateQuizRetryPDF(
   });
 
   const retryTableY = (doc as any).lastAutoTable?.finalY || 60;
-  if (retryData.topRetryers.length > 0) {
+  if (topRetryers.length > 0) {
     doc.setTextColor(0);
     doc.setFontSize(14);
     doc.text('Топ студентов по повторам', 14, retryTableY + 10);
     autoTable(doc, {
       startY: retryTableY + 15,
       head: [['#', 'ФИО', 'Группа', 'Повторы']],
-      body: retryData.topRetryers.slice(0, 20).map((r, i) => [
+      body: topRetryers.slice(0, 20).map((r, i) => [
         String(i + 1), r.fullName, r.group, String(r.retryCount)
       ]),
       theme: 'striped',

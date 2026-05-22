@@ -18,6 +18,75 @@ const PERIOD_OPTIONS = [
   { key: 180, label: '180д' },
 ];
 
+interface ModuleTimeEntry {
+  moduleId: string;
+  avg: number;
+  median: number;
+}
+
+interface StudentSpeedEntry {
+  userId: string;
+  fullName: string;
+  group?: string;
+  modulesCompleted: number;
+  avgHoursPerModule: number;
+}
+
+interface TimeAnalyticsData {
+  moduleTimes: ModuleTimeEntry[];
+  studentSpeeds: StudentSpeedEntry[];
+}
+
+interface ErrorRateEntry {
+  category: string;
+  errorRate: number;
+}
+
+interface MissedQuestionEntry {
+  questionId: string;
+  category: string;
+  difficulty: string;
+  totalAttempts: number;
+  errorRate: number;
+}
+
+interface ErrorTrendEntry {
+  week: string;
+  errorRate: number;
+}
+
+interface ErrorAnalyticsData {
+  categoryErrorRates: ErrorRateEntry[];
+  mostMissedQuestions: MissedQuestionEntry[];
+  errorTrends: ErrorTrendEntry[];
+}
+
+interface RetryDistributionEntry {
+  name: string;
+  count: number;
+  percent: number;
+}
+
+interface ImprovementEntry {
+  attempts: string;
+  avgScore: number;
+}
+
+interface RetryerEntry {
+  userId: string;
+  fullName: string;
+  group?: string;
+  retryCount: number;
+}
+
+interface RetryAnalyticsData {
+  totalRetries: number;
+  totalUniqueQuizzes: number;
+  retryDistribution: RetryDistributionEntry[];
+  improvementByRetries: ImprovementEntry[];
+  topRetryers: RetryerEntry[];
+}
+
 interface Props {
   groupId?: string;
   days?: number;
@@ -26,9 +95,9 @@ interface Props {
 export default function AdvancedAnalytics({ groupId, days: controlledDays }: Props) {
   const [internalDays, setInternalDays] = useState(30);
   const [subTab, setSubTab] = useState<'time' | 'errors' | 'retry'>('time');
-  const [timeData, setTimeData] = useState<any>(null);
-  const [errorData, setErrorData] = useState<any>(null);
-  const [retryData, setRetryData] = useState<any>(null);
+  const [timeData, setTimeData] = useState<TimeAnalyticsData | null>(null);
+  const [errorData, setErrorData] = useState<ErrorAnalyticsData | null>(null);
+  const [retryData, setRetryData] = useState<RetryAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const days = controlledDays ?? internalDays;
@@ -161,7 +230,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                   Быстрые студенты
                 </h3>
                 <div className="space-y-2">
-                  {timeData.studentSpeeds.slice(0, 10).map((s: any, i: number) => (
+                  {timeData.studentSpeeds.slice(0, 10).map((s: StudentSpeedEntry, i: number) => (
                     <motion.div
                       key={s.userId}
                       initial={{ opacity: 0, x: -10 }}
@@ -216,7 +285,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Самые сложные вопросы</h3>
                 <div className="space-y-2">
-                  {errorData.mostMissedQuestions.slice(0, 15).map((q: any, i: number) => (
+                  {errorData.mostMissedQuestions.slice(0, 15).map((q: MissedQuestionEntry, i: number) => (
                     <motion.div
                       key={q.questionId}
                       initial={{ opacity: 0, y: 5 }}
@@ -315,7 +384,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                       nameKey="range"
                       label={(entry) => `${entry.name} (${((entry.percent ?? 0) * 100).toFixed(0)}%)`}
                     >
-                      {retryData.retryDistribution.map((_: any, i: number) => {
+                      {retryData.retryDistribution.map((_entry: RetryDistributionEntry, i: number) => {
                         const colors = ['#10b981', '#6366f1', '#f59e0b', '#ef4444'];
                         return <Cell key={i} fill={colors[i]} />;
                       })}
@@ -354,7 +423,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                   Студенты с наибольшим количеством повторов
                 </h3>
                 <div className="space-y-2">
-                  {retryData.topRetryers.slice(0, 10).map((s: any, i: number) => (
+                  {retryData.topRetryers.slice(0, 10).map((s: RetryerEntry, i: number) => (
                     <motion.div
                       key={s.userId}
                       initial={{ opacity: 0, x: -10 }}
