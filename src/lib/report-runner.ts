@@ -168,7 +168,6 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
       }
 
       results.success++;
-      console.warn(`Report ${report.id} (${report.reportType}) generated successfully`);
     } catch (error) {
       console.error(`Failed to generate report ${report.id}:`, error);
       results.failed++;
@@ -222,7 +221,7 @@ async function sendEmailNotification(
 ): Promise<void> {
   // Placeholder for email sending logic
   // In production, integrate with SendGrid, Resend, or nodemailer
-  console.warn(`Email notification would be sent to ${report.email} for report ${report.id}`);
+  console.log(`[Email] Notification would be sent to ${report.email} for report ${report.id}`);
 
   // Example with nodemailer:
   // const nodemailer = await import('nodemailer');
@@ -240,7 +239,7 @@ async function sendEmailNotification(
 if (typeof process !== 'undefined' && process.argv[1] && (process.argv[1].endsWith('report-runner.ts') || process.argv[1].endsWith('report-runner.js'))) {
   runScheduledReports()
     .then((results) => {
-      console.warn('Report runner completed:', results);
+      console.log('Report runner completed:', results);
       process.exit(0);
     })
     .catch((error) => {

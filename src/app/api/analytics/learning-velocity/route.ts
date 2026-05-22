@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import type { Prisma } from '@prisma/client';
 
 const _MODULE_IDS = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
 
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
   const now = new Date();
   const _since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-  const userFilter: any = { role: 'student' };
+  const userFilter: Prisma.UserWhereInput = { role: 'student' };
   if (groupId) userFilter.group = groupId;
 
   const students = await prisma.user.findMany({
@@ -37,7 +38,19 @@ export async function GET(request: NextRequest) {
     select: { userId: true, percentage: true, updatedAt: true },
   });
 
-  const studentVelocities: any[] = [];
+  interface StudentVelocity {
+    userId: string;
+    fullName: string | null;
+    group: string | null;
+    modulesCompleted: number;
+    avgDaysPerModule: number;
+    firstModuleDate: string;
+    lastModuleDate: string;
+    scoreImprovement: number;
+    velocityScore: number;
+  }
+
+  const studentVelocities: StudentVelocity[] = [];
 
   for (const student of students) {
     const studentProgress = progress.filter((p) => p.userId === student.id);

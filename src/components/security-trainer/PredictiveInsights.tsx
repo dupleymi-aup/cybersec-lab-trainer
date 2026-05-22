@@ -11,10 +11,20 @@ import {
 } from 'lucide-react';
 import {
   getProgressTrends, getComprehensiveSummary, getAtRiskStudents,
-  type TrendPoint,
+  type TrendPoint, type ComprehensiveSummary, type AtRiskStudent,
 } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import CustomDateRangePicker from './CustomDateRangePicker';
+
+interface AtRiskDataResponse {
+  atRiskStudents: AtRiskStudent[];
+  summary: {
+    totalStudents: number;
+    atRiskCount: number;
+    atRiskPercentage: number;
+    criticalCount: number;
+  };
+}
 
 interface Props {
   groupId?: string;
@@ -48,8 +58,8 @@ export default function PredictiveInsights({ groupId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [trendData, setTrendData] = useState<TrendPoint[]>([]);
-  const [summary, setSummary] = useState<any>(null);
-  const [atRiskData, setAtRiskData] = useState<any>(null);
+  const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
+  const [atRiskData, setAtRiskData] = useState<AtRiskDataResponse | null>(null);
 
   useEffect(() => {
     let cancelled = false;

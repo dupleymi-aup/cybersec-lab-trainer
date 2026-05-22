@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useAuthStore, getAllUsers, changeUserRole, deleteUser, toggleUserBlock, createUser, startImpersonation, getComprehensiveSummary, getRoleLabel, type UserRole, type User } from '@/lib/auth-store';
+import { useAuthStore, getAllUsers, changeUserRole, deleteUser, toggleUserBlock, createUser, startImpersonation, getComprehensiveSummary, getRoleLabel, type UserRole, type User, type ComprehensiveSummary } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
 import { AnalyticsProvider, useAnalyticsFilters } from '@/lib/analytics-context';
 import KPICard from './KPICard';
@@ -871,7 +871,7 @@ function AnalyticsSubTabs({
 }) {
   const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort' | 'competency' | 'weaknesses' | 'predictive' | 'module-deep-dive' | 'certification' | 'velocity' | 'quiz-session' | 'group-dynamics' | 'login-patterns' | 'advanced' | 'difficulty' | 'heatmap' | 'questions' | 'summary' | 'retry' | 'errors' | 'sankey' | 'calendar' | 'predictive-risk' | 'scheduler' | 'data-quality' | 'period-comparison'>('dashboard');
   const { groupId, days } = useAnalyticsFilters();
-  const [summary, setSummary] = useState<any>(null);
+  const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
 
   useEffect(() => {
     getComprehensiveSummary(days, groupId).then(setSummary);

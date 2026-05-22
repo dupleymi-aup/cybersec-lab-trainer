@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
 import { getModuleName } from '@/lib/module-names';
+import type { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
   const university = searchParams.get('university');
 
   // Build user filter
-  const userFilter: any = { role: 'student' };
+  const userFilter: Prisma.UserWhereInput = { role: 'student' };
   if (groupId) userFilter.group = groupId;
   if (course) userFilter.course = course;
   if (university) userFilter.university = university;

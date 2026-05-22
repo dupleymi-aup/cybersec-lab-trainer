@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import type { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-  const userFilter: any = { role: 'student' };
+  const userFilter: Prisma.UserWhereInput = { role: 'student' };
   if (groupId) userFilter.group = groupId;
 
   const students = await prisma.user.findMany({
@@ -42,7 +43,18 @@ export async function GET(request: NextRequest) {
   // Get all unique groups
   const groupNames = [...new Set(students.map((s) => s.group).filter(Boolean))];
 
-  const groupsData: any[] = [];
+  interface GroupData {
+    groupName: string;
+    studentCount: number;
+    activityTimeline: Array<{ week: string; activeStudents: number; modulesCompleted: number; quizAttempts: number }>;
+    performanceVariance: number;
+    peerInfluenceScore: number;
+    newMemberIntegrationDays: number;
+    healthScore: number;
+    trend: 'improving' | 'stable' | 'declining';
+  }
+
+  const groupsData: GroupData[] = [];
 
   for (const groupName of groupNames) {
     const groupStudents = students.filter((s) => s.group === groupName);

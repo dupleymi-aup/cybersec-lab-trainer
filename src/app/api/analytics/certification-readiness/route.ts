@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
 import { isAchievementUnlocked } from '@/lib/data/achievements-data';
+import type { Prisma } from '@prisma/client';
 
 const MODULE_IDS = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
 const TOTAL_MODULES = MODULE_IDS.length;
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-  const userFilter: any = { role: 'student' };
+  const userFilter: Prisma.UserWhereInput = { role: 'student' };
   if (groupId) userFilter.group = groupId;
 
   const students = await prisma.user.findMany({
@@ -61,7 +62,23 @@ export async function GET(request: NextRequest) {
     needsWork: 35,
   };
 
-  const studentsData: any[] = [];
+  interface CertificationStudent {
+    userId: string;
+    fullName: string | null;
+    email: string;
+    group: string | null;
+    readinessScore: number;
+    readinessTier: string;
+    categoryReadiness: Array<{ category: string; score: number; ready: boolean }>;
+    modulesCompleted: number;
+    totalModules: number;
+    achievements: number;
+    strengths: string[];
+    weaknesses: string[];
+    recommendations: string[];
+  }
+
+  const studentsData: CertificationStudent[] = [];
 
   for (const student of students) {
     const studentProgress = progress.filter((p) => p.userId === student.id);
