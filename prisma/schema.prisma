@@ -242,3 +242,17 @@ model LtiLaunchLog {
   @@index([userId])
   @@map("lti_launch_logs")
 }
+
+model Announcement {
+  id         String   @id
+  title      String
+  content    String
+  author     String   // author name/email
+  priority   String   @default("normal")  // low, normal, high
+  active     Boolean  @default(true)
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([active, expiresAt])
+  @@map("announcements")
+}

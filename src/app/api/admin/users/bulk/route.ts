@@ -1,0 +1,159 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+
+type BulkAction = 'block' | 'unblock' | 'delete' | 'role_change';
+
+interface BulkRequestBody {
+  userIds: string[];
+  action: BulkAction;
+  role?: string;
+}
+
+// POST /api/admin/users/bulk - bulk operations on users
+export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!requireRole(auth.role, 'admin')) return forbidden();
+
+  // Rate limit: 5 bulk operations per minute
+  const rateLimit = checkRateLimit(`bulk:${auth.id}`, 5, 60_000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimit.retryAfter },
+      { status: 429 }
+    );
+  }
+
+  let body: BulkRequestBody;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const { userIds, action, role } = body;
+
+  // Validation
+  if (!Array.isArray(userIds) || userIds.length === 0) {
+    return NextResponse.json({ error: 'userIds array is required and must not be empty' }, { status: 400 });
+  }
+  if (userIds.length > 100) {
+    return NextResponse.json({ error: 'Maximum 100 users per bulk operation' }, { status: 400 });
+  }
+  if (!['block', 'unblock', 'delete', 'role_change'].includes(action)) {
+    return NextResponse.json({ error: 'Invalid action. Must be: block, unblock, delete, role_change' }, { status: 400 });
+  }
+  if (action === 'role_change' && !role) {
+    return NextResponse.json({ error: 'role is required for role_change action' }, { status: 400 });
+  }
+  if (action === 'role_change' && !['student', 'teacher', 'admin'].includes(role)) {
+    return NextResponse.json({ error: 'Invalid role. Must be: student, teacher, admin' }, { status: 400 });
+  }
+
+  // Prevent self-action
+  if (userIds.includes(auth.id)) {
+    return NextResponse.json({ error: 'Нельзя применить операцию к себе' }, { status: 403 });
+  }
+
+  // Prevent last admin deletion
+  if (action === 'delete') {
+    const adminCount = await prisma.user.count({ where: { role: 'admin' } });
+    const adminsToDelete = await prisma.user.count({
+      where: { id: { in: userIds }, role: 'admin' },
+    });
+    if (adminCount - adminsToDelete < 1) {
+      return NextResponse.json({ error: 'Нельзя удалить последнего администратора' }, { status: 403 });
+    }
+  }
+
+  // Validate UUID format for all IDs
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const invalidIds = userIds.filter(id => !uuidRegex.test(id));
+  if (invalidIds.length > 0) {
+    return NextResponse.json({ error: 'Invalid user ID format', invalidIds: invalidIds.slice(0, 5) }, { status: 400 });
+  }
+
+  // Fetch target users for audit logging
+  const targetUsers = await prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true, email: true, fullName: true, role: true },
+  });
+
+  const foundIds = new Set(targetUsers.map(u => u.id));
+  const missingIds = userIds.filter(id => !foundIds.has(id));
+
+  let resultCount = 0;
+
+  try {
+    switch (action) {
+      case 'block': {
+        await prisma.user.updateMany({
+          where: { id: { in: userIds } },
+          data: { isBlocked: true },
+        });
+        resultCount = userIds.length;
+        break;
+      }
+
+      case 'unblock': {
+        await prisma.user.updateMany({
+          where: { id: { in: userIds } },
+          data: { isBlocked: false },
+        });
+        resultCount = userIds.length;
+        break;
+      }
+
+      case 'delete': {
+        const deleteResult = await prisma.user.deleteMany({
+          where: { id: { in: userIds } },
+        });
+        resultCount = deleteResult.count;
+        break;
+      }
+
+      case 'role_change': {
+        const targetRole = role as string;
+        await prisma.user.updateMany({
+          where: { id: { in: userIds } },
+          data: { role: targetRole },
+        });
+        resultCount = userIds.length;
+        break;
+      }
+    }
+
+    // Audit log the bulk operation
+    try {
+      const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+      const ip = getClientIp(request);
+      await prisma.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          adminId: auth.id,
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: `bulk_${action}`,
+          targetId: userIds.join(','),
+          targetName: `${resultCount} users`,
+          details: `Admin ${auth.id} performed bulk ${action} on ${resultCount} users${missingIds.length > 0 ? ` (${missingIds.length} not found)` : ''} [IP: ${ip}]`,
+        },
+      });
+    } catch {
+      // Audit logging is best-effort
+    }
+
+    return NextResponse.json({
+      success: true,
+      action,
+      processed: resultCount,
+      notFound: missingIds.length,
+      missingIds: missingIds.slice(0, 10),
+    });
+  } catch (error) {
+    return NextResponse.json({
+      error: 'Bulk operation failed',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    }, { status: 500 });
+  }
+}

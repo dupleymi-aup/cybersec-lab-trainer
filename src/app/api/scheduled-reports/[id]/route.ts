@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   try {
     const { id } = await params;
@@ -32,7 +32,7 @@ export async function PATCH(
 ) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   try {
     const { id } = await params;
@@ -74,7 +74,7 @@ export async function DELETE(
 ) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   try {
     const { id } = await params;

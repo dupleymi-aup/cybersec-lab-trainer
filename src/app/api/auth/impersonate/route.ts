@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, generateToken } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, generateToken, getClientIp } from '@/lib/api-middleware';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,6 +18,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'targetUserId required' }, { status: 400 });
     }
 
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(targetUserId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     if (targetUserId === admin.id) {
       return NextResponse.json({ error: 'Нельзя войти как себя' }, { status: 400 });
     }
@@ -27,7 +33,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
     }
 
+    // Prevent impersonating blocked users
+    if (targetUser.isBlocked) {
+      return NextResponse.json({ error: 'Нельзя войти как заблокированный пользователь' }, { status: 403 });
+    }
+
+    // Prevent admin impersonating another admin (privilege escalation concern)
+    if (targetUser.role === 'admin') {
+      return NextResponse.json({ error: 'Нельзя войти как другой администратор' }, { status: 403 });
+    }
+
     const token = generateToken(targetUser.id, targetUser.role);
+
+    // Audit log the impersonation
+    try {
+      const adminUser = await prisma.user.findUnique({ where: { id: admin.id } });
+      const ip = getClientIp(request);
+      await prisma.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          adminId: admin.id,
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: 'impersonation_start',
+          targetId: targetUserId,
+          targetName: targetUser.fullName || targetUser.email,
+          details: `Admin ${adminUser?.fullName || adminUser?.email || admin.id} started impersonating user ${targetUserId} [IP: ${ip}]`,
+        },
+      });
+    } catch {
+      // Audit logging is best-effort
+    }
 
     return NextResponse.json({
       success: true,

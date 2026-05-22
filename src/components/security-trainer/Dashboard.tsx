@@ -100,24 +100,15 @@ function getProficiencyLevel(completedCount: number, totalModules: number, avgSc
   return { label: 'Продвинутый', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-100 dark:bg-violet-900/40', icon: <Star size={14} /> };
 }
 
-function loadActiveAnnouncements(): Announcement[] {
-  if (typeof window === 'undefined') return [];
+async function fetchActiveAnnouncements(): Promise<Announcement[]> {
   try {
-    const raw = localStorage.getItem('cybersec-announcements');
-    if (raw) {
-      const parsed = JSON.parse(raw) as Announcement[];
-      const now = new Date();
-      return parsed.filter((a) => {
-        if (!a.active) return false;
-        if (a.expiresAt && new Date(a.expiresAt) < now) return false;
-        return true;
-      }).sort((a, b) => {
-        const priorityOrder = { high: 0, normal: 1, low: 2 };
-        return priorityOrder[a.priority] - priorityOrder[b.priority];
-      });
-    }
-  } catch { }
-  return [];
+    const res = await fetch('/api/announcements');
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.announcements || []) as Announcement[];
+  } catch {
+    return [];
+  }
 }
 
 export default function Dashboard() {
@@ -127,10 +118,10 @@ export default function Dashboard() {
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set());
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<UpcomingDeadline[]>([]);
   useEffect(() => {
-    setAnnouncements(loadActiveAnnouncements());
+    fetchActiveAnnouncements().then(setAnnouncements);
     loadAnnouncementsIntoNotifications();
     const interval = setInterval(() => {
-      setAnnouncements(loadActiveAnnouncements());
+      fetchActiveAnnouncements().then(setAnnouncements);
       loadAnnouncementsIntoNotifications();
     }, 60000);
     return () => clearInterval(interval);

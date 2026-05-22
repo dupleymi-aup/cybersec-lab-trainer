@@ -143,12 +143,13 @@ export const NotificationHelper = {
   },
 };
 
-/** Load announcements from localStorage into notifications */
-export function loadAnnouncementsIntoNotifications() {
+/** Load announcements from API into notifications */
+export async function loadAnnouncementsIntoNotifications() {
   try {
-    const raw = localStorage.getItem('cybersec-announcements');
-    if (!raw) return;
-    const announcements = JSON.parse(raw) as Array<{
+    const res = await fetch('/api/announcements');
+    if (!res.ok) return;
+    const data = await res.json();
+    const announcements = (data.announcements || []) as Array<{
       id: string; title: string; content: string; priority: string;
     }>;
     const store = useNotificationStore.getState();

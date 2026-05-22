@@ -76,11 +76,19 @@ export default function AuditLogView() {
     return matchAction && matchAdmin && matchSearch;
   });
 
-  const handleClear = () => {
-    if (!confirm('Очистить весь журнал действий?')) return;
-    clearAuditLog();
-    loadData();
-    toast.success('Журнал очищен');
+  const handleClear = async () => {
+    if (!confirm('Очистить записи старше 90 дней?')) return;
+    const result = await clearAuditLog(90);
+    if (result.success) {
+      loadData();
+      if (result.deletedCount > 0) {
+        toast.success(`Удалено ${result.deletedCount} записей`);
+      } else {
+        toast.info('Нет записей для удаления');
+      }
+    } else {
+      toast.error(result.error || 'Ошибка очистки');
+    }
   };
 
   return (

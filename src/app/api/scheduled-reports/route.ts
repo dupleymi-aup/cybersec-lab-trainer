@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   try {
     const reports = await prisma.scheduledReport.findMany({
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   try {
     const body = await request.json();

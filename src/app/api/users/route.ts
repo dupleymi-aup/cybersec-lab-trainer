@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { hashPassword } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
@@ -8,15 +8,56 @@ export async function GET(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const users = await prisma.user.findMany({
-    select: {
-      id: true, email: true, phone: true, fullName: true,
-      group: true, course: true, university: true, avatar: true,
-      bio: true, role: true, createdAt: true, lastLoginAt: true,
-      loginCount: true, isBlocked: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+  const isAdmin = auth.role === 'admin';
+  const { searchParams } = new URL(request.url);
+
+  // Pagination
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '20');
+  const skip = (page - 1) * Math.min(limit, 100);
+
+  // Filters
+  const role = searchParams.get('role') || undefined;
+  const search = searchParams.get('search') || undefined;
+  const sortBy = searchParams.get('sortBy') || 'createdAt';
+  const sortOrder = searchParams.get('sortOrder') || 'desc';
+  const isBlocked = searchParams.get('isBlocked');
+
+  const where: Record<string, unknown> = {};
+  if (role && ['student', 'teacher', 'admin'].includes(role)) {
+    where.role = role;
+  }
+  if (search) {
+    where.OR = [
+      { fullName: { contains: search, mode: 'insensitive' as const } },
+      { email: { contains: search, mode: 'insensitive' as const } },
+      { phone: { contains: search, mode: 'insensitive' as const } },
+      { group: { contains: search, mode: 'insensitive' as const } },
+    ];
+  }
+  if (isBlocked !== undefined && isAdmin) {
+    where.isBlocked = isBlocked === 'true';
+  }
+
+  const validSortFields = ['createdAt', 'fullName', 'email', 'role', 'lastLoginAt', 'loginCount'] as const;
+  const sortField = (validSortFields.includes(sortBy as typeof validSortFields[number]) ? sortBy : 'createdAt') as typeof validSortFields[number];
+  const order = sortOrder === 'asc' ? 'asc' : 'desc';
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      select: {
+        id: true, email: true, phone: true, fullName: true,
+        group: true, course: true, university: true, avatar: true,
+        bio: true, role: true, createdAt: true, lastLoginAt: true,
+        ...(isAdmin && { loginCount: true, isBlocked: true }),
+      },
+      orderBy: { [sortField]: order },
+      skip,
+      take: Math.min(limit, 100),
+    }),
+    prisma.user.count({ where }),
+  ]);
 
   return NextResponse.json({
     users: users.map(u => ({
@@ -24,6 +65,12 @@ export async function GET(request: NextRequest) {
       createdAt: u.createdAt.toISOString(),
       lastLoginAt: u.lastLoginAt?.toISOString(),
     })),
+    pagination: {
+      page,
+      limit: Math.min(limit, 100),
+      total,
+      totalPages: Math.ceil(total / Math.min(limit, 100)),
+    },
   });
 }
 
@@ -32,11 +79,36 @@ export async function POST(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'admin')) return forbidden();
 
+  // Rate limit: 10 user creations per minute per admin
+  const rateLimit = checkRateLimit(`create-user:${auth.id}`, 10, 60_000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimit.retryAfter },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json();
   const { email, phone, fullName, role, password, group, course, university, bio, avatar } = body;
 
   if (!email || !phone || !fullName || !password) {
     return NextResponse.json({ error: 'Email, phone, name, and password required' }, { status: 400 });
+  }
+
+  // Validate email format
+  const { validateEmail, validatePhone } = await import('@/lib/auth-utils');
+  if (!validateEmail(email)) {
+    return NextResponse.json({ error: 'Неверный формат email' }, { status: 400 });
+  }
+
+  // Validate phone format
+  if (!validatePhone(phone)) {
+    return NextResponse.json({ error: 'Неверный формат телефона' }, { status: 400 });
+  }
+
+  // Validate role
+  if (role && !['student', 'teacher', 'admin'].includes(role)) {
+    return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
   }
 
   const existing = await prisma.user.findFirst({
@@ -60,6 +132,25 @@ export async function POST(request: NextRequest) {
       avatar: avatar || '',
     },
   });
+
+  // Audit log the user creation
+  try {
+    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const ip = getClientIp(request);
+    await prisma.auditLog.create({
+      data: {
+        id: crypto.randomUUID(),
+        adminId: auth.id,
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: 'user_create',
+        targetId: user.id,
+        targetName: user.fullName || user.email,
+        details: `Admin ${auth.id} created user ${user.email} (role: ${user.role}) [IP: ${ip}]`,
+      },
+    });
+  } catch {
+    // Audit logging is best-effort
+  }
 
   return NextResponse.json({
     success: true,

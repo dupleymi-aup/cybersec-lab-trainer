@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 
 export async function PUT(
   request: NextRequest,
@@ -10,7 +10,28 @@ export async function PUT(
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'admin')) return forbidden();
 
+  // Rate limit: 20 block/unblock actions per minute per admin
+  const rateLimit = checkRateLimit(`block:${auth.id}`, 20, 60_000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: rateLimit.retryAfter },
+      { status: 429 }
+    );
+  }
+
   const { id } = await params;
+
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+  }
+
+  // Prevent self-block
+  if (id === auth.id) {
+    return NextResponse.json({ error: 'Нельзя заблокировать себя' }, { status: 403 });
+  }
+
   const body = await request.json();
   const { isBlocked } = body;
 
@@ -22,6 +43,25 @@ export async function PUT(
     where: { id },
     data: { isBlocked },
   });
+
+  // Audit log the block/unblock
+  try {
+    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const ip = getClientIp(request);
+    await prisma.auditLog.create({
+      data: {
+        id: crypto.randomUUID(),
+        adminId: auth.id,
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: isBlocked ? 'user_block' : 'user_unblock',
+        targetId: id,
+        targetName: user.fullName || user.email,
+        details: `Admin ${auth.id} ${isBlocked ? 'blocked' : 'unblocked'} user ${user.email} [IP: ${ip}]`,
+      },
+    });
+  } catch {
+    // Audit logging is best-effort
+  }
 
   return NextResponse.json({
     success: true,

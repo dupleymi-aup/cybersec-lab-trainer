@@ -12,97 +12,114 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import type { Announcement } from '@/lib/auth-types';
 
-const STORAGE_KEY = 'cybersec-announcements';
-
-function loadAnnouncements(): Announcement[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Announcement[];
-      return parsed.filter((a) => {
-        if (a.expiresAt && new Date(a.expiresAt) < new Date()) return false;
-        return true;
-      });
-    }
-  } catch { }
-  return [];
-}
-
-function saveAnnouncements(announcements: Announcement[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(announcements));
-}
-
 const PRIORITY_CONFIG = {
   high: { icon: AlertCircle, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', badge: 'bg-red-100 text-red-700' },
   normal: { icon: Info, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700' },
   low: { icon: AlertTriangle, color: 'text-muted-foreground', bg: 'bg-secondary', border: 'border-border', badge: 'bg-muted text-foreground/70' },
 };
 
+async function fetchAnnouncements(activeOnly = false): Promise<Announcement[]> {
+  try {
+    const url = activeOnly ? '/api/admin/announcements?active=true' : '/api/admin/announcements';
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.announcements || [];
+  } catch {
+    return [];
+  }
+}
+
+async function createAnnouncement(
+  title: string,
+  content: string,
+  priority: string,
+  expiresAt: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch('/api/admin/announcements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content, priority, expiresAt: expiresAt || undefined }),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Network error' };
+  }
+}
+
+async function deleteAnnouncement(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch(`/api/admin/announcements?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error };
+    return { success: true };
+  } catch {
+    return { success: false, error: 'Network error' };
+  }
+}
+
 export default function SystemAnnouncements({ currentUser }: { currentUser: string }) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formTitle, setFormTitle] = useState('');
   const [formContent, setFormContent] = useState('');
   const [formPriority, setFormPriority] = useState<'low' | 'normal' | 'high'>('normal');
   const [formExpiry, setFormExpiry] = useState('');
 
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const data = await fetchAnnouncements();
+    // Filter out expired ones client-side too (belt and suspenders)
+    const active = data.filter(a => !a.expiresAt || new Date(a.expiresAt) >= new Date());
+    setAnnouncements(active);
+    setLoading(false);
+  }, []);
+
   useEffect(() => {
-    setAnnouncements(loadAnnouncements());
-  }, []);
+    loadData();
+  }, [loadData]);
 
-  const refresh = useCallback(() => {
-    setAnnouncements(loadAnnouncements());
-  }, []);
-
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!formTitle.trim() || !formContent.trim()) {
       toast.error('Заполните заголовок и содержание');
       return;
     }
 
-    const newAnnouncement: Announcement = {
-      id: `ann-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
-      title: formTitle.trim(),
-      content: formContent.trim(),
-      author: currentUser,
-      createdAt: new Date().toISOString(),
-      expiresAt: formExpiry || undefined,
-      priority: formPriority,
-      active: true,
-    };
+    const result = await createAnnouncement(formTitle.trim(), formContent.trim(), formPriority, formExpiry);
+    if (!result.success) {
+      toast.error(result.error || 'Ошибка создания');
+      return;
+    }
 
-    const updated = [newAnnouncement, ...announcements];
-    saveAnnouncements(updated);
-    setAnnouncements(updated);
     setShowForm(false);
     setFormTitle('');
     setFormContent('');
     setFormPriority('normal');
     setFormExpiry('');
     toast.success('Объявление создано');
+    loadData();
   };
 
-  const handleDelete = (id: string) => {
-    const updated = announcements.filter((a) => a.id !== id);
-    saveAnnouncements(updated);
-    setAnnouncements(updated);
-    toast.success('Объявление удалено');
-  };
-
-  const handleClearExpired = () => {
-    const active = announcements.filter((a) => {
-      if (a.expiresAt && new Date(a.expiresAt) < new Date()) return false;
-      return true;
-    });
-    const removed = announcements.length - active.length;
-    if (removed === 0) {
-      toast.info('Нет просроченных объявлений');
+  const handleDelete = async (id: string) => {
+    const result = await deleteAnnouncement(id);
+    if (!result.success) {
+      toast.error(result.error || 'Ошибка удаления');
       return;
     }
-    saveAnnouncements(active);
-    setAnnouncements(active);
-    toast.success(`Удалено ${removed} просроченных объявлений`);
+    toast.success('Объявление удалено');
+    loadData();
+  };
+
+  const handleClearExpired = async () => {
+    // Reload from server — server already filters expired
+    loadData();
+    toast.info('Список обновлён');
   };
 
   const sorted = [...announcements].sort((a, b) => {
@@ -129,7 +146,7 @@ export default function SystemAnnouncements({ currentUser }: { currentUser: stri
         <div className="flex items-center gap-2">
           {announcements.length > 0 && (
             <Button variant="outline" size="sm" onClick={handleClearExpired}>
-              <X size={14} className="mr-1" /> Очистить
+              <X size={14} className="mr-1" /> Обновить
             </Button>
           )}
           <Button size="sm" onClick={() => setShowForm(!showForm)}>
@@ -201,8 +218,13 @@ export default function SystemAnnouncements({ currentUser }: { currentUser: stri
         )}
       </AnimatePresence>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="text-center py-8 text-muted-foreground text-sm">Загрузка...</div>
+      )}
+
       {/* Announcements list */}
-      {sorted.length === 0 ? (
+      {!loading && sorted.length === 0 ? (
         <div className="text-center py-12">
           <Megaphone size={40} className="text-slate-300 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">Нет активных объявлений</p>
@@ -212,7 +234,7 @@ export default function SystemAnnouncements({ currentUser }: { currentUser: stri
         </div>
       ) : (
         <div className="space-y-2">
-          {sorted.map((ann) => {
+          {!loading && sorted.map((ann) => {
             const pConfig = PRIORITY_CONFIG[ann.priority];
             const Icon = pConfig.icon;
             const isExpiring = ann.expiresAt && new Date(ann.expiresAt).getTime() - Date.now() < 86400000 * 3;

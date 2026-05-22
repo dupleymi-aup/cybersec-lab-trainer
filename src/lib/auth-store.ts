@@ -244,8 +244,41 @@ export async function getAuditLogEntries(): Promise<AuditLogEntry[]> {
   }
 }
 
-export async function clearAuditLog(): Promise<void> {
-  // No API endpoint for clearing - just a no-op for now
+export async function clearAuditLog(daysOld = 90): Promise<{ success: boolean; deletedCount: number; error?: string }> {
+  try {
+    const olderThan = new Date();
+    olderThan.setDate(olderThan.getDate() - daysOld);
+
+    // First do a dry run
+    const dryRunRes = await apiFetch('/api/admin/audit-logs/clear', {
+      method: 'POST',
+      body: JSON.stringify({ olderThan: olderThan.toISOString(), dryRun: true }),
+    });
+    if (!dryRunRes.ok) {
+      const err = await dryRunRes.json();
+      return { success: false, deletedCount: 0, error: err.error };
+    }
+    const dryRunData = await dryRunRes.json();
+
+    // Only proceed if there are records to delete
+    if (dryRunData.totalMatching === 0) {
+      return { success: true, deletedCount: 0 };
+    }
+
+    // Actually delete
+    const res = await apiFetch('/api/admin/audit-logs/clear', {
+      method: 'POST',
+      body: JSON.stringify({ olderThan: olderThan.toISOString(), maxCount: 5000 }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      return { success: false, deletedCount: 0, error: err.error };
+    }
+    const data = await res.json();
+    return { success: true, deletedCount: data.deletedCount };
+  } catch (err) {
+    return { success: false, deletedCount: 0, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
 }
 
 export async function resetUserPassword(
@@ -257,9 +290,9 @@ export async function resetUserPassword(
   if (!pwCheck.valid) return { success: false, error: pwCheck.errors.join(', ') };
 
   try {
-    const res = await apiFetch(`/api/users/${userId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ password: newPassword }),
+    const res = await apiFetch(`/api/admin/users/${userId}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ newPassword }),
     });
     const result = await res.json();
     if (!res.ok) return { success: false, error: result.error };
