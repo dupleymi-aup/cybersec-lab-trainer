@@ -269,6 +269,7 @@ export async function resetUserPassword(
 }
 
 const IMPERSONATION_KEY = 'security-trainer-impersonation';
+const ORIGINAL_TOKEN_KEY = 'security-trainer-original-token';
 
 export async function startImpersonation(
   targetUserId: string,
@@ -276,6 +277,12 @@ export async function startImpersonation(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     if (targetUserId === adminId) return { success: false, error: 'Нельзя войти как себя' };
+
+    // Store the original admin token before impersonation
+    const { token: originalToken } = useAuthStore.getState();
+    if (originalToken) {
+      localStorage.setItem(ORIGINAL_TOKEN_KEY, originalToken);
+    }
 
     const res = await apiFetch('/api/auth/impersonate', {
       method: 'POST',
@@ -306,20 +313,22 @@ export async function stopImpersonation(): Promise<{ success: boolean; error?: s
     const data = JSON.parse(raw);
     if (!data.originalUserId) return { success: false, error: 'Нет активной имперсонации' };
 
-    // Fetch original user data
-    const res = await fetch(`/api/users/${data.originalUserId}`);
-    if (!res.ok) {
-      localStorage.removeItem(IMPERSONATION_KEY);
-      return { success: false, error: 'Не удалось восстановить аккаунт' };
-    }
-
-    const userData = await res.json();
+    // Restore the original admin token
+    const originalToken = localStorage.getItem(ORIGINAL_TOKEN_KEY);
+    localStorage.removeItem(ORIGINAL_TOKEN_KEY);
     localStorage.removeItem(IMPERSONATION_KEY);
 
-    // Restore original user in store
+    // Fetch original user data
+    const res = await fetch(`/api/users/${data.originalUserId}`, {
+      headers: originalToken ? { Authorization: `Bearer ${originalToken}` } : {},
+    });
+    if (!res.ok) return { success: false, error: 'Не удалось восстановить аккаунт' };
+
+    const userData = await res.json();
     useAuthStore.setState({
       user: userData,
       isAuthenticated: true,
+      token: originalToken,
     });
 
     return { success: true };
@@ -454,6 +463,7 @@ interface AuthState {
   resetPassword: (otp: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   clearLoginActivity: () => void;
+  setUser: (user: User, token?: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -682,6 +692,15 @@ export const useAuthStore = create<AuthState>()(
 
       clearLoginActivity: () => {
         set({ loginActivity: [] });
+      },
+
+      setUser: (user, token) => {
+        set({ user, isAuthenticated: true, ...(token && { token }) });
+
+        // Load user's progress from server
+        import('./store').then(({ useAppStore }) => {
+          useAppStore.getState().loadFromDatabase(user.id);
+        });
       },
     }),
     {

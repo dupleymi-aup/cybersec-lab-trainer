@@ -106,40 +106,38 @@ export default function Home() {
 
     if (ltiToken) {
       // Set the auth token and fetch user profile
-      const { useAuthStore } = require('@/lib/auth-store');
-      const store = useAuthStore.getState();
+      import('@/lib/auth-store').then(({ useAuthStore }) => {
+        const store = useAuthStore.getState();
 
-      // Store the token
-      localStorage.setItem('auth-token', ltiToken);
-
-      // Fetch user profile with the token
-      fetch('/api/auth/profile', {
-        headers: { Authorization: `Bearer ${ltiToken}` },
-      })
-        .then((res) => res.json())
-        .then((user) => {
-          if (user && user.id) {
-            store.setUser(user);
-          }
+        // Fetch user profile with the token
+        fetch('/api/auth/profile', {
+          headers: { Authorization: `Bearer ${ltiToken}` },
         })
-        .catch(() => {
-          // If profile fetch fails, fall back to decoding the JWT
-          try {
-            const parts = ltiToken.split('.');
-            if (parts.length === 3) {
-              const payload = JSON.parse(atob(parts[1]));
-              store.setUser({
-                id: payload.id,
-                email: '',
-                phone: '',
-                fullName: 'LTI User',
-                role: payload.role || 'student',
-              });
+          .then((res) => res.json())
+          .then((user) => {
+            if (user && user.id) {
+              store.setUser(user, ltiToken);
             }
-          } catch {
-            // ignore
-          }
-        });
+          })
+          .catch(() => {
+            // If profile fetch fails, fall back to decoding the JWT
+            try {
+              const parts = ltiToken.split('.');
+              if (parts.length === 3) {
+                const payload = JSON.parse(atob(parts[1]));
+                store.setUser({
+                  id: payload.id,
+                  email: '',
+                  phone: '',
+                  fullName: 'LTI User',
+                  role: payload.role || 'student',
+                }, ltiToken);
+              }
+            } catch {
+              // ignore
+            }
+          });
+      });
 
       // Clean URL
       const url = new URL(window.location.href);
