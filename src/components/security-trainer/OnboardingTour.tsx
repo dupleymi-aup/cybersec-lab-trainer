@@ -55,7 +55,9 @@ export default function OnboardingTour() {
   const { user } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
+  const [isComplete, setIsComplete] = useState(() => {
+    return localStorage.getItem('cybersec-onboarding-seen') === 'true';
+  });
 
   useEffect(() => {
     const hasSeenTour = localStorage.getItem('cybersec-onboarding-seen');

@@ -81,6 +81,10 @@ export const useNotificationStore = create<NotificationStore>()(
     {
       name: 'cybersec-notifications',
       version: 1,
+      partialize: (state) => ({
+        notifications: state.notifications.map(({ action: _, ...rest }) => rest),
+        unreadCount: state.unreadCount,
+      }),
     }
   )
 );

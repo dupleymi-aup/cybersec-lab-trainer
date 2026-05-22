@@ -75,9 +75,25 @@ export default function ProfilePage() {
         )
       : 0;
 
+  // Track timestamps for activity feed - use state to trigger re-renders
+  const [timestamps, setTimestamps] = useState({
+    modules: useAppStore.getState().moduleTimestamps || {},
+    quizzes: useAppStore.getState().quizTimestamps || {},
+  });
+
+  useEffect(() => {
+    const unsub = useAppStore.subscribe((state) => {
+      setTimestamps({
+        modules: state.moduleTimestamps || {},
+        quizzes: state.quizTimestamps || {},
+      });
+    });
+    return unsub;
+  }, []);
+
   const challengeStats = {
-    owaspCorrect: 0,
-    authCorrect: 0,
+    owaspCorrect: studiedOwaspItems.length,
+    authCorrect: secureCodingCorrectCount,
   };
 
   const unlockedAchievements = achievements.filter((a) =>
@@ -86,19 +102,19 @@ export default function ProfilePage() {
   const unlockedCount = unlockedAchievements.length;
   const totalAchievements = achievements.length;
 
-  // Build recent activity from store timestamps
+  // Build recent activity from timestamps
   const recentActivity = useMemo(() => {
     const events: Array<{ date: Date; type: string; label: string }> = [];
-    for (const [moduleId, ts] of Object.entries(useAppStore.getState().moduleTimestamps || {})) {
+    for (const [moduleId, ts] of Object.entries(timestamps.modules)) {
       const mod = modules.find((m) => m.id === moduleId);
       if (mod) events.push({ date: new Date(ts), type: 'module', label: mod.title });
     }
-    for (const [quizId, ts] of Object.entries(useAppStore.getState().quizTimestamps || {})) {
+    for (const [quizId, ts] of Object.entries(timestamps.quizzes)) {
       const cat = modules.find((m) => m.id === quizId);
       events.push({ date: new Date(ts), type: 'quiz', label: cat?.title || `Квиз: ${quizId}` });
     }
     return events.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 10);
-  }, []);
+  }, [timestamps]);
 
   const achievementIcons: Record<string, React.ReactNode> = {
     'first-steps': <BookOpen size={20} />,

@@ -13,7 +13,11 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 export function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  const array = new Uint8Array(4);
+  crypto.getRandomValues(array);
+  // Map to 6-digit range [100000, 999999]
+  const num = (array[0] << 24 | array[1] << 16 | array[2] << 8 | array[3]) >>> 0;
+  return (100000 + (num % 900000)).toString();
 }
 
 export function validateEmail(email: string): boolean {

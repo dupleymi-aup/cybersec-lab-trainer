@@ -34,7 +34,7 @@ interface StudentStats {
   xp: number;
 }
 
-function calculateXP(stats: StudentStats): number {
+function calculateXP(stats: Omit<StudentStats, 'xp'>): number {
   return (
     stats.modulesCompleted * 100 +
     Math.round(stats.quizAvg * 5) +
@@ -61,7 +61,7 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
   // Add xp to each simulated student
   const studentsWithXP = students.map((s: Omit<StudentStats, 'xp'>) => ({
     ...s,
-    xp: calculateXP(s as StudentStats),
+    xp: calculateXP(s),
   }));
 
   // Add current user

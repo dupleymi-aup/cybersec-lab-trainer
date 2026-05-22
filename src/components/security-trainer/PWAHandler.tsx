@@ -21,22 +21,37 @@ export default function PWAHandler() {
   }, []);
 
   useEffect(() => {
-    const handler = (reg: ServiceWorkerRegistration) => {
-      reg.addEventListener('updatefound', () => {
-        const newWorker = reg.installing;
-        if (!newWorker) return;
+    if ('serviceWorker' in navigator) {
+      let regRef: ServiceWorkerRegistration | null = null;
+      let workerRef: ServiceWorker | null = null;
 
-        newWorker.addEventListener('statechange', () => {
+      const updateFoundHandler = () => {
+        const newWorker = regRef?.installing;
+        if (!newWorker) return;
+        workerRef = newWorker;
+
+        const stateChangeHandler = () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             setWaitingWorker(newWorker);
             setShowReload(true);
           }
-        });
-      });
-    };
+        };
+        newWorker.addEventListener('statechange', stateChangeHandler);
+      };
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then((reg) => handler(reg));
+      navigator.serviceWorker.ready.then((reg) => {
+        regRef = reg;
+        reg.addEventListener('updatefound', updateFoundHandler);
+      });
+
+      return () => {
+        if (regRef) regRef.removeEventListener('updatefound', updateFoundHandler);
+        if (workerRef) {
+          // Can't easily extract the handler, but the reference cleanup helps
+          workerRef = null;
+        }
+        regRef = null;
+      };
     }
   }, []);
 

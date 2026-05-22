@@ -31,7 +31,7 @@ function randomBetween(min: number, max: number) {
 
 export default function CompletionCelebration() {
   const [event, setEvent] = useState<CelebrationEvent | null>(null);
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; color: string; rotation: number; delay: number; size: number }>>([]);
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; color: string; rotation: number; delay: number; size: number; spinDirection: number; duration: number }>>([]);
   const prevModulesRef = useRef<string[]>(useAppStore.getState().completedModules);
 
   // Subscribe to module completions
@@ -66,6 +66,8 @@ export default function CompletionCelebration() {
         rotation: randomBetween(0, 360),
         delay: randomBetween(0, 0.5),
         size: randomBetween(6, 12),
+        spinDirection: Math.random() > 0.5 ? 1 : -1,
+        duration: randomBetween(1.5, 3),
       }));
       setParticles(newParticles);
       setTimeout(() => {
@@ -101,10 +103,10 @@ export default function CompletionCelebration() {
                 animate={{
                   y: '100vh',
                   opacity: 0,
-                  rotate: p.rotation + 360 * (Math.random() > 0.5 ? 1 : -1),
+                  rotate: p.rotation + 360 * p.spinDirection,
                 }}
                 transition={{
-                  duration: randomBetween(1.5, 3),
+                  duration: p.duration,
                   delay: p.delay,
                   ease: 'easeIn',
                 }}
