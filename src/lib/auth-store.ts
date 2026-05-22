@@ -71,9 +71,19 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const csrfToken = typeof document !== 'undefined'
+    ? document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrf-token='))
+        ?.split('=')[1]
+    : undefined;
   return fetch(url, {
     ...options,
-    headers: { ...getAuthHeaders(), ...options.headers },
+    headers: {
+      ...getAuthHeaders(),
+      ...options.headers,
+      ...(csrfToken && { 'x-csrf-token': csrfToken }),
+    },
   });
 }
 

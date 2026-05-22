@@ -25,9 +25,17 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
   const authHeaders = await getAuthHeaders();
+  const csrfToken = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('csrf-token='))
+    ?.split('=')[1];
   const res = await fetch(url, {
     ...options,
-    headers: { ...authHeaders, ...options.headers },
+    headers: {
+      ...authHeaders,
+      ...options.headers,
+      ...(csrfToken && { 'x-csrf-token': csrfToken }),
+    },
   });
   if (!res.ok) {
     const contentType = res.headers.get('content-type') || '';
