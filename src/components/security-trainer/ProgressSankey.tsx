@@ -16,21 +16,6 @@ const PERIOD_OPTIONS = [
 
 const STAGE_COLORS = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
 
-interface SankeyNode {
-  id: string;
-  label: string;
-  value: number;
-  color: string;
-  x: number;
-  y: number;
-}
-
-interface SankeyLink {
-  source: string;
-  target: string;
-  value: number;
-}
-
 export default function ProgressSankey({ groupId: controlledGroupId, days: controlledDays }: { groupId?: string; days?: number } = {}) {
   const [internalDays, setInternalDays] = useState(30);
   const days = controlledDays !== undefined ? controlledDays : internalDays;
@@ -117,7 +102,7 @@ export default function ProgressSankey({ groupId: controlledGroupId, days: contr
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        {stages.map((stage, i) => (
+        {stages.map((stage) => (
           <KPICard key={stage.label} icon={<stage.icon size={18} />} value={stage.value} label={stage.label}
             iconBg="bg-opacity-20" iconColor="text-white" />
         ))}
@@ -131,12 +116,11 @@ export default function ProgressSankey({ groupId: controlledGroupId, days: contr
             Воронка прогресса студентов
           </h3>
           <div className="space-y-3">
-            {stages.map((stage, i) => {
+            {stages.map((stage, idx) => {
               const widthPercent = totalStudents > 0 ? (stage.value / totalStudents) * 100 : 0;
-              const Icon = stage.icon;
               return (
                 <motion.div key={stage.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }} className="flex items-center gap-4">
+                  transition={{ delay: idx * 0.1 }} className="flex items-center gap-4">
                   <div className="w-40 text-right flex-shrink-0">
                     <p className="text-sm font-medium">{stage.label}</p>
                     <p className="text-xs text-muted-foreground">{stage.value} студ.</p>
@@ -146,15 +130,15 @@ export default function ProgressSankey({ groupId: controlledGroupId, days: contr
                       style={{
                         width: `${Math.max(widthPercent, 5)}%`,
                         backgroundColor: stage.color,
-                        opacity: 0.8 + (i * 0.05),
+                        opacity: 0.8 + (idx * 0.05),
                       }}>
                       <span className="text-white font-bold text-sm">{stage.value}</span>
                     </div>
                   </div>
-                  {i < stages.length - 1 && (
+                  {idx < stages.length - 1 && (
                     <div className="w-16 text-center flex-shrink-0">
-                      <span className={`text-xs font-semibold ${conversions[i].rate >= 70 ? 'text-emerald-600' : conversions[i].rate >= 40 ? 'text-amber-600' : 'text-red-600'}`}>
-                        {conversions[i].rate}%
+                      <span className={`text-xs font-semibold ${conversions[idx].rate >= 70 ? 'text-emerald-600' : conversions[idx].rate >= 40 ? 'text-amber-600' : 'text-red-600'}`}>
+                        {conversions[idx].rate}%
                       </span>
                     </div>
                   )}

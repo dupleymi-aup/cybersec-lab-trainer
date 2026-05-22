@@ -1,18 +1,17 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
   LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts';
 import {
   ArrowLeft, GraduationCap, BookOpen, Brain, Clock, AlertTriangle, TrendingUp,
-  Target, Zap, Calendar, CheckCircle2, XCircle, Activity, Loader2, Users,
+  Target, Zap, CheckCircle2, XCircle, Activity, Loader2, Users,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getStudentPerformance, getComprehensiveSummary, getProgressTrends } from '@/lib/auth-store';
 import { modules, quizCategories } from '@/lib/data';
@@ -35,7 +34,9 @@ function getStudentProgressLocal(userId: string): {
         quizTimestamps: data.quizTimestamps || {},
       };
     }
-  } catch { }
+  } catch {
+    // Intentionally silent — fallback to defaults if localStorage fails
+  }
   return { completedModules: [], quizScores: {}, moduleTimestamps: {}, quizTimestamps: {} };
 }
 
@@ -72,7 +73,9 @@ export default function StudentProgressView({ students: studentList, groupId, on
         setSummary(summ);
         setTrends(trendData);
       })
-      .catch(() => { })
+      .catch(() => {
+        // Intentionally silent — data fetch errors are handled by loading state
+      })
       .finally(() => setLoading(false));
   }, [selectedId, groupId]);
 

@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   );
 
   // Filter attempts
-  const filteredIncorrect = incorrectAttempts.filter((a) => filteredUsers.has(a.userId));
+  const _filteredIncorrect = incorrectAttempts.filter((a) => filteredUsers.has(a.userId));
   const filteredAll = allAttempts; // We need all for question stats
 
   // Calculate question-level error rates
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
   // Error patterns by category
   const categoryErrors = new Map<string, { total: number; incorrect: number; questions: number }>();
-  for (const [qId, data] of questionMap) {
+  for (const [, data] of questionMap) {
     if (!categoryErrors.has(data.category)) {
       categoryErrors.set(data.category, { total: 0, incorrect: 0, questions: 0 });
     }

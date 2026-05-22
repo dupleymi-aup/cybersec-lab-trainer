@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { verifyLtiLaunch, LtiClaims } from '@/lib/lti-utils';
+import { verifyLtiLaunch, type LtiClaims } from '@/lib/lti-utils';
 
 /**
  * POST /api/lti/launch
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const idToken = formData.get('id_token') as string;
-    const state = formData.get('state') as string;
+    const _state = formData.get('state') as string;
 
     if (!idToken) {
       return NextResponse.json({ error: 'Missing id_token' }, { status: 400 });
@@ -175,7 +175,7 @@ export async function GET() {
       select: { id: true, publicKey: true },
     });
 
-    const keys = [];
+    const keys: Array<Record<string, unknown>> = [];
     for (const platform of platforms) {
       try {
         const jwk = await parsePublicKeyToJWK(platform.publicKey, platform.id);

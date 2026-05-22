@@ -5,7 +5,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
 import { validatePassword } from '@/lib/auth-utils';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
-import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
+import { getAchievementStatus } from '@/lib/achievement-utils';
 import { modules, achievements } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Loader2, AlertTriangle, Users, TrendingUp } from 'lucide-react';
-import { getAllUsers, getStudentProgress, type User } from '@/lib/auth-store';
+import { getAllUsers, type User } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
 

@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, Minus, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getComprehensiveSummary, type ComprehensiveSummary } from '@/lib/auth-store';
 import { modules } from '@/lib/data';
-import KPICard from './KPICard';
 
 const PRESETS = [
   { key: '7', label: 'Эта неделя' },

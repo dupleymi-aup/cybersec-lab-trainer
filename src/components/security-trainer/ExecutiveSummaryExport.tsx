@@ -52,9 +52,9 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
 
       const kpiData = [
         ['Всего студентов', String(kpis.totalStudents), trends.students === 'up' ? '+' : trends.students === 'down' ? '-' : ''],
-        ['Активных', `${kpis.activePercentage}%`, trends.activePercentage === 'up' ? '+' : trends.activePercentage === 'down' ? '-' : ''],
-        ['Ср. завершение', `${kpis.avgCompletionRate}%`, trends.avgCompletionRate === 'up' ? '+' : trends.avgCompletionRate === 'down' ? '-' : ''],
-        ['Ср. балл квизов', `${kpis.avgQuizScore}%`, trends.avgQuizScore === 'up' ? '+' : trends.avgQuizScore === 'down' ? '-' : ''],
+        ['Активных', `${kpis.activePercentage}%`, trends.activity === 'up' ? '+' : trends.activity === 'down' ? '-' : ''],
+        ['Ср. завершение', `${kpis.avgCompletionRate}%`, trends.completion === 'up' ? '+' : trends.completion === 'down' ? '-' : ''],
+        ['Ср. балл квизов', `${kpis.avgQuizScore}%`, trends.quizScore === 'up' ? '+' : trends.quizScore === 'down' ? '-' : ''],
         ['Модулей завершено', String(kpis.totalModulesCompleted), ''],
         ['Попыток квизов', String(kpis.totalQuizAttempts), ''],
         ['Вовлечённость', String(kpis.engagementScore), ''],

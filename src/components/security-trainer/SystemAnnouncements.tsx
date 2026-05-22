@@ -63,7 +63,7 @@ async function deleteAnnouncement(id: string): Promise<{ success: boolean; error
   }
 }
 
-export default function SystemAnnouncements({ currentUser }: { currentUser: string }) {
+export default function SystemAnnouncements({ currentUser: _currentUser }: { currentUser: string }) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);

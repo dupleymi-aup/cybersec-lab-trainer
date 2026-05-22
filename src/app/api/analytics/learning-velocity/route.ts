@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
 
-const MODULE_IDS = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
+const _MODULE_IDS = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const groupId = searchParams.get('groupId');
 
   const now = new Date();
-  const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+  const _since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
   const userFilter: any = { role: 'student' };
   if (groupId) userFilter.group = groupId;
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 
   for (const student of students) {
     const studentProgress = progress.filter((p) => p.userId === student.id);
-    const studentQuiz = quizResults.filter((q) => q.userId === student.id);
+    const _studentQuiz = quizResults.filter((q) => q.userId === student.id);
 
     const modulesCompleted = studentProgress.length;
     if (modulesCompleted < 2) continue;

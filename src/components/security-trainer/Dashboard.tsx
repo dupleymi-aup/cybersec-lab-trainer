@@ -226,8 +226,6 @@ export default function Dashboard() {
     }
     prevUnlockedRef.current = current;
   }, [unlockedAchievements]);
-  // Recommendations — defined after streakData (see line ~360)
-  const getRecommendation = (): { text: string; icon: string; type: string } | null => null;
 
   const proficiency = getProficiencyLevel(completedCount, totalModules, avgQuizScore);
 

@@ -70,9 +70,10 @@ export async function GET(request: NextRequest) {
     const questionStats = Array.from(questionMap.entries()).map(([questionId, qAttempts]) => {
       const qCorrect = qAttempts.filter((a) => a.correct).length;
       const correctRate = qAttempts.length > 0 ? Math.round((qCorrect / qAttempts.length) * 10000) / 100 : 0;
+      const first = qAttempts[0];
       return {
         questionId,
-        questionText: `${CATEGORY_NAMES[attempt.category] || attempt.category} — ${attempt.difficulty} #${questionId.slice(0, 8)}`,
+        questionText: `${CATEGORY_NAMES[first.category] || first.category} — ${first.difficulty} #${questionId.slice(0, 8)}`,
         attempts: qAttempts.length,
         correctRate,
         difficulty: qAttempts[0]?.difficulty || 'medium',

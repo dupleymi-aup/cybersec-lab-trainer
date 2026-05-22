@@ -6,9 +6,9 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
 import {
-  AlertTriangle, Loader2, Lightbulb, Target, TrendingUp, Shield,
+  AlertTriangle, Loader2, Lightbulb, Target, TrendingUp,
 } from 'lucide-react';
-import { getModulePerformance, getQuizCategoryAnalytics, type ModulePerformance, type QuizCategoryStat } from '@/lib/auth-store';
+import { getModulePerformance, getQuizCategoryAnalytics } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import CustomDateRangePicker from './CustomDateRangePicker';

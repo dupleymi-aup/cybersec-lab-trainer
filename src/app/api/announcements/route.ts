@@ -4,7 +4,7 @@ import { authenticate } from '@/lib/api-middleware';
 
 // GET /api/announcements - get active announcements (any authenticated user)
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
+  const _auth = await authenticate(request);
   // Allow unauthenticated access too (for public announcements)
   // But only return active, non-expired ones
 

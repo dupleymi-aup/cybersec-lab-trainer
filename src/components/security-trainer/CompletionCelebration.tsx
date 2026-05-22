@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Trophy, Star } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
@@ -32,7 +32,6 @@ function randomBetween(min: number, max: number) {
 export default function CompletionCelebration() {
   const [event, setEvent] = useState<CelebrationEvent | null>(null);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; color: string; rotation: number; delay: number; size: number; spinDirection: number; duration: number }>>([]);
-  const prevModulesRef = useRef<string[]>(useAppStore.getState().completedModules);
 
   // Subscribe to module completions
   useEffect(() => {

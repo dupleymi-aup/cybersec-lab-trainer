@@ -3,14 +3,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
+  PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip,
 } from 'recharts';
 import {
   Loader2, AlertTriangle, Award, CheckCircle, XCircle, TrendingUp, ChevronDown, ChevronUp,
 } from 'lucide-react';
 import { getCertificationReadiness, type CertificationReadinessData } from '@/lib/auth-store';
-import type { CertificationStudentData } from '@/lib/auth-types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -26,14 +24,13 @@ const TIER_CONFIG = {
   'not-ready': { label: 'Не готов', color: 'bg-red-100 text-red-700 border-red-200', icon: XCircle },
 };
 
-const RADAR_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#ec4899', '#14b8a6'];
 
 export default function CertificationReadiness({ groupId: propGroupId, days: propDays }: CertificationReadinessProps = {}) {
   const [data, setData] = useState<CertificationReadinessData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId, setInternalGroupId] = useState('');
+  const [internalGroupId] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const days = propDays ?? internalDays;
@@ -199,7 +196,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                     <h4 className="font-semibold text-sm mb-2">Готовность по категориям</h4>
                     <div className="h-[250px]">
                       <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart data={s.categoryReadiness.map((c, i) => ({ name: c.category, score: c.score, fullMark: 100 }))}>
+                        <RadarChart data={s.categoryReadiness.map((c) => ({ name: c.category, score: c.score, fullMark: 100 }))}>
                           <PolarGrid />
                           <PolarAngleAxis dataKey="name" tick={{ fontSize: 9 }} />
                           <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8 }} />

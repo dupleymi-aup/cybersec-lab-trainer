@@ -1043,7 +1043,7 @@ app.post('/upload', async (req, res) => {
     // Конвертируем в PNG — JavaScript теряется
     await sharp(req.file.buffer)
       .png()
-      .toFile(\`uploads/${req.file.filename}.png\`);
+      .toFile(\`uploads/\${req.file.filename}.png\`);
   }
 });
 
@@ -1198,7 +1198,7 @@ export class SanitizeHtmlPipe implements PipeTransform {
     id: 'template-literal',
     title: 'XSS через Template Literals и String Interpolation',
     description:
-      'JavaScript template literals (\`\${expr}\`) могут выполнять XSS, если используются для генерации HTML с пользовательским вводом.',
+      'JavaScript template literals (`${expr}`) могут выполнять XSS, если используются для генерации HTML с пользовательским вводом.',
     vulnerableCode: `// УЯЗВИМЫЙ КОД
 function renderUserProfile(user) {
   // Template literal + innerHTML = XSS

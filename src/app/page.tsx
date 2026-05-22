@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, type PageType } from '@/lib/store';
 import { useAuthStore, hasRole, getRoleLabel, getImpersonationState, stopImpersonation, saveProgressSnapshot, type UserRole } from '@/lib/auth-store';
 import { initAuthBridge } from '@/lib/auth-bridge';
 import Sidebar from '@/components/security-trainer/Sidebar';
@@ -169,21 +169,21 @@ export default function Home() {
         // Navigate only after auth is established
         if (authSettled) {
           if (ltiModule && pages[ltiModule]) {
-            setCurrentPage(ltiModule as keyof typeof pages);
+            setCurrentPage(ltiModule as PageType);
           } else if (ltiQuiz) {
-            setCurrentPage('quiz' as keyof typeof pages);
+            setCurrentPage('quiz' as PageType);
           } else {
-            setCurrentPage('dashboard' as keyof typeof pages);
+            setCurrentPage('dashboard' as PageType);
           }
         }
       });
     } else if (ltiModule && isAuthenticated) {
       // Direct module link (from deep linking)
       if (pages[ltiModule]) {
-        setCurrentPage(ltiModule as keyof typeof pages);
+        setCurrentPage(ltiModule as PageType);
       }
     } else if (ltiQuiz && isAuthenticated) {
-      setCurrentPage('quiz' as keyof typeof pages);
+      setCurrentPage('quiz' as PageType);
     }
   }, [isAuthenticated, setCurrentPage]);
 

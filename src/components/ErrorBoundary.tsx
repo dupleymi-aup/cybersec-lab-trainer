@@ -47,7 +47,9 @@ export class ErrorBoundary extends Component<Props, State> {
       `Stack: ${error.stack}`,
       errorInfo ? `Component Stack: ${errorInfo.componentStack}` : '',
     ].filter(Boolean).join('\n\n');
-    navigator.clipboard.writeText(text).catch(() => {});
+    navigator.clipboard.writeText(text).catch(() => {
+      // Intentionally silent — clipboard copy is non-critical
+    });
   };
 
   render() {

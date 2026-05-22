@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNotificationStore, type Notification as NotifType } from '@/lib/notification-store';
 import {
   Bell, BellOff, Check, Trash2, X, AlertTriangle, Trophy, BookOpen, Brain, Megaphone, Clock,

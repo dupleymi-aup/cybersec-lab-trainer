@@ -151,12 +151,16 @@ export default function TeacherPanel() {
     fetch('/api/deadlines')
       .then(r => r.json())
       .then(data => { if (data.deadlines) setDeadlines(data.deadlines); })
-      .catch(() => {});
+      .catch(() => {
+        // Intentionally silent — deadline fetch is non-critical
+      });
 
     fetch('/api/deadlines/teacher/reminders')
       .then(r => r.json())
       .then(data => { if (data.results) setDeadlineReminders(data.results); })
-      .catch(() => {});
+      .catch(() => {
+        // Intentionally silent — reminder fetch is non-critical
+      });
   }, []);
 
   const createDeadline = async () => {

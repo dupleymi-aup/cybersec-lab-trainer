@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Send, Users, MessageSquare, CheckCircle2, X, AlertCircle, Info,
+  Send, Users, MessageSquare, X, AlertCircle, Info,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

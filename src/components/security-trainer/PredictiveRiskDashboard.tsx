@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ScatterChart, Scatter, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ScatterChart, Scatter } from 'recharts';
 import { TrendingUp, Loader2, AlertTriangle, AlertCircle, CheckCircle, Target } from 'lucide-react';
 import { getPredictiveRisk, type PredictiveRiskData } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';

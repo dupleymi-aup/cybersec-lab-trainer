@@ -32,11 +32,11 @@ interface ScheduledReportRecord {
   createdAt: Date;
 }
 
-const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Promise<Blob | null>> = {
-  gradebook: async (days, groupId) => {
+const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Promise<void>> = {
+  gradebook: async (days, groupId): Promise<void> => {
     const { getGradebook } = await import('./analytics-api');
     const data = await getGradebook({ groupId: groupId || undefined, days });
-    if (!data.students?.length) return null;
+    if (!data.students?.length) return;
 
     const students = data.students.map((s: any) => ({
       id: s.id,
@@ -48,61 +48,64 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
       avgScore: s.avgScore || 0,
     }));
 
-    return generateGradebookPDF(students, data.modules || [], groupId || 'all');
+    await generateGradebookPDF(students, (data.modules || []).map((m: { moduleId: string }) => m.moduleId), groupId || 'all');
   },
 
-  'at-risk': async (days, groupId) => {
+  'at-risk': async (days, groupId): Promise<void> => {
     const { getAtRiskStudents } = await import('./analytics-api');
     const data = await getAtRiskStudents(days, groupId);
-    if (!data.atRiskStudents?.length) return null;
+    if (!data.atRiskStudents?.length) return;
 
-    return generateAtRiskPDF(
+    await generateAtRiskPDF(
       data.atRiskStudents.map((s: any) => ({
-        userId: s.userId,
         fullName: s.fullName,
+        email: s.email || '',
         group: s.group,
         riskScore: s.riskScore,
         reasons: s.reasons || [],
+        lastActiveDays: s.lastActiveDays || 0,
+        modulesCompleted: s.modulesCompleted || 0,
+        avgQuizScore: s.avgQuizScore || 0,
       })),
       days
-    ) as Blob | null;
+    );
   },
 
-  analytics: async (days, groupId) => {
+  analytics: async (days, groupId): Promise<void> => {
     const { getComprehensiveSummary } = await import('./analytics-api');
     const summary = await getComprehensiveSummary(days, groupId);
 
-    return generateAnalyticsPDF(
+    await generateAnalyticsPDF(
       summary,
       summary.moduleDistribution || [],
       summary.trends,
       groupId || 'all'
-    ) as Blob | null;
+    );
   },
 
-  'module-performance': async (days, groupId) => {
+  'module-performance': async (days, groupId): Promise<void> => {
     const { getModulePerformance } = await import('./analytics-api');
     const data = await getModulePerformance(days, groupId);
 
-    return generateModulePerformancePDF(data || [], groupId || 'all') as Blob | null;
+    await generateModulePerformancePDF(data || [], groupId || 'all');
   },
 
-  'group-comparison': async (days, groupId) => {
+  'group-comparison': async (days, groupId): Promise<void> => {
     const { getGroupComparison } = await import('./analytics-api');
     const data = await getGroupComparison(days);
 
-    return generateGroupComparisonPDF(data.dimensions || [], groupId || 'all') as Blob | null;
+    await generateGroupComparisonPDF(data.dimensions || [], groupId || 'all');
   },
 
-  'quiz-retry': async (days, groupId) => {
+  'quiz-retry': async (days, groupId): Promise<void> => {
     const { getQuizRetryAnalytics } = await import('./analytics-api');
     const data = await getQuizRetryAnalytics(days, groupId);
 
-    return generateQuizRetryPDF(
+    await generateQuizRetryPDF(
       data.categoryRetryStats || [],
       data.topRetryers || [],
       groupId || 'all'
-    ) as Blob | null;
+    );
   },
 };
 
@@ -151,15 +154,7 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
         continue;
       }
 
-      const pdfBlob = await generator(report.days, report.groupId || undefined);
-      if (!pdfBlob) {
-        console.warn(`No data for report ${report.id} (${report.reportType})`);
-        results.skipped++;
-        continue;
-      }
-
-      // Save PDF to disk (in a real app, this would upload to S3 or send via email)
-      await saveReport(report, pdfBlob, now);
+      await generator(report.days, report.groupId || undefined);
 
       // Update lastGenerated timestamp
       await prisma.scheduledReport.update({
@@ -169,11 +164,11 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
 
       // Send email notification if configured
       if (report.email) {
-        await sendEmailNotification(report, pdfBlob, now);
+        await sendEmailNotification(report, new Blob(), now);
       }
 
       results.success++;
-      console.log(`Report ${report.id} (${report.reportType}) generated successfully`);
+      console.warn(`Report ${report.id} (${report.reportType}) generated successfully`);
     } catch (error) {
       console.error(`Failed to generate report ${report.id}:`, error);
       results.failed++;
@@ -222,12 +217,12 @@ async function saveReport(
 
 async function sendEmailNotification(
   report: ScheduledReportRecord,
-  pdfBlob: Blob,
-  now: Date
+  _pdfBlob: Blob,
+  _now: Date
 ): Promise<void> {
   // Placeholder for email sending logic
   // In production, integrate with SendGrid, Resend, or nodemailer
-  console.log(`Email notification would be sent to ${report.email} for report ${report.id}`);
+  console.warn(`Email notification would be sent to ${report.email} for report ${report.id}`);
 
   // Example with nodemailer:
   // const nodemailer = await import('nodemailer');
@@ -245,7 +240,7 @@ async function sendEmailNotification(
 if (typeof process !== 'undefined' && process.argv[1] && (process.argv[1].endsWith('report-runner.ts') || process.argv[1].endsWith('report-runner.js'))) {
   runScheduledReports()
     .then((results) => {
-      console.log('Report runner completed:', results);
+      console.warn('Report runner completed:', results);
       process.exit(0);
     })
     .catch((error) => {

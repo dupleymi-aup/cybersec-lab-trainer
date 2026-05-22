@@ -114,7 +114,9 @@ export default function Sidebar() {
           setDeadlineMap(map);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        // Intentionally silent — deadline fetch is non-critical
+      });
   }, []);
 
   // Count trackable items (excluding dashboard, achievements, profile, and role panels)

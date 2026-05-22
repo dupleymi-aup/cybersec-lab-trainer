@@ -13,7 +13,6 @@ import CohortAnalysis from './CohortAnalysis';
 import CompetencyRadar from './CompetencyRadar';
 import WeaknessAnalyzer from './WeaknessAnalyzer';
 import PredictiveInsights from './PredictiveInsights';
-import CustomDateRangePicker from './CustomDateRangePicker';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

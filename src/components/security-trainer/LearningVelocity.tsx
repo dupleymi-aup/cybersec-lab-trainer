@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ScatterChart, Scatter, ZAxis, LineChart, Line,
@@ -23,7 +22,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(90);
-  const [internalGroupId, setInternalGroupId] = useState('');
+  const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 

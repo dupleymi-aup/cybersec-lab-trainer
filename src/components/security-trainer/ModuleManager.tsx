@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { motion, Reorder } from 'framer-motion';
+import { useState } from 'react';
+import { Reorder } from 'framer-motion';
 import {
-  GripVertical, Eye, EyeOff, Star, ArrowUpDown, BookOpen,
+  GripVertical, Eye, EyeOff, Star, BookOpen,
   Save, RotateCcw,
 } from 'lucide-react';
 import { modules } from '@/lib/data';
@@ -31,7 +31,9 @@ function loadConfig(): StoredConfig {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
-  } catch { }
+  } catch {
+    // Intentionally silent — fallback to defaults if localStorage fails
+  }
   return { modules: {}, order: [] };
 }
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line,
@@ -23,7 +22,7 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId, setInternalGroupId] = useState('');
+  const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 
@@ -58,9 +57,6 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
   const { loginFrequency, failedLogins, dormantAccounts, hourlyDistribution, dailyDistribution } = data;
 
   const totalLogins = loginFrequency.reduce((sum, l) => sum + l.loginCount, 0);
-  const avgSuccessRate = loginFrequency.length > 0
-    ? Math.round(loginFrequency.reduce((sum, l) => sum + l.successRate, 0) / loginFrequency.length * 10) / 10
-    : 0;
 
   return (
     <div className="space-y-4">

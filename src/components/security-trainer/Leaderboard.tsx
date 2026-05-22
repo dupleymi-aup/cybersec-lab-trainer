@@ -5,21 +5,17 @@ import { useAppStore } from '@/lib/store';
 import { useAuthStore } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import {
   Trophy,
-  Medal,
   Star,
   Zap,
   Target,
-  TrendingUp,
   Flame,
   Crown,
   Award,
-  Shield,
 } from 'lucide-react';
 
 interface StudentStats {
@@ -126,14 +122,6 @@ export default function Leaderboard() {
   }, [sortedStudents, user]);
 
   const currentUserStats = allStudents.find(s => s.id === (user?.id || 'current'));
-
-  const topModules = [
-    { name: 'SQL-инъекции', icon: 'Database', completed: completedModules.includes('sql-injection') },
-    { name: 'XSS-атаки', icon: 'FileText', completed: completedModules.includes('xss') },
-    { name: 'OWASP Top 10', icon: 'Shield', completed: completedModules.includes('owasp') },
-    { name: 'Безопасность API', icon: 'Shield', completed: completedModules.includes('api-security') },
-    { name: 'IDOR-атаки', icon: 'Shield', completed: completedModules.includes('idor') },
-  ];
 
   return (
     <motion.div

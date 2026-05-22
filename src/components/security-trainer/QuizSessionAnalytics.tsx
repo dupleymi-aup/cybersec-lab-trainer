@@ -1,18 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  ScatterChart, Scatter, ZAxis,
 } from 'recharts';
 import {
-  Loader2, AlertTriangle, Clock, AlertCircle, TrendingUp,
+  Loader2, AlertTriangle, Clock, AlertCircle,
 } from 'lucide-react';
 import { getQuizSessionAnalytics, type QuizSessionData } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import KPICard from './KPICard';
 
 export interface QuizSessionAnalyticsProps {
   groupId?: string;
@@ -24,7 +21,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId, setInternalGroupId] = useState('');
+  const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 
@@ -57,8 +54,6 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
   }
 
   const { categoryTiming, rushedQuizzes, timeVsPerformance, hourlyPerformance, weekdayVsWeekend } = data;
-
-  const totalSessions = timeVsPerformance.reduce((sum, b) => sum + b.attemptCount, 0);
 
   return (
     <div className="space-y-4">

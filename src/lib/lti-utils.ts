@@ -1,4 +1,4 @@
-import { exportJWK, generateKeyPair, importSPKI, SignJWT, jwtVerify, type JWK } from 'jose';
+import { generateKeyPair, importSPKI, SignJWT, jwtVerify, type JWK } from 'jose';
 import { prisma } from '@/lib/db';
 
 export interface LtiClaims {
@@ -287,6 +287,6 @@ export async function fetchNrpsMembers(
     }));
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    throw new Error(`NRPS sync failed: ${message}`);
+    throw new Error(`NRPS sync failed: ${message}`, { cause: error });
   }
 }

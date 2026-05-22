@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   if (!requireRole(auth.role, 'teacher')) return unauthorized();
 
   const { searchParams } = new URL(request.url);
-  const days = parseInt(searchParams.get('days') || '30', 10);
+  const _days = parseInt(searchParams.get('days') || '30', 10);
   const groupId = searchParams.get('groupId') || '';
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);

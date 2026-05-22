@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const deadlineId = searchParams.get('deadlineId');
   const group = searchParams.get('group');
 
-  let where: Record<string, unknown> = { createdBy: auth.id };
+  const where: Record<string, unknown> = { createdBy: auth.id };
   if (deadlineId) where.id = deadlineId;
 
   const deadlines = await prisma.deadline.findMany({

@@ -3,18 +3,14 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion } from 'framer-motion';
 import {
   Shield,
   Search,
   Copy,
   Check,
-  Code2,
   BookOpen,
-  AlertTriangle,
   CheckCircle2,
   Lock,
   Globe,
@@ -87,7 +83,7 @@ const cheatSheets: CheatSheet[] = [
     title: 'Защита от XSS',
     icon: 'FileText',
     items: [
-      { title: 'Output Encoding', content: 'Экранируйте HTML-сущности при выводе пользовательских данных.', code: 'function escapeHtml(str) {\n  return str.replace(/[&<>"\'\/]/g, s => ({\n    "&": "&amp;", "<": "&lt;", ">": "&gt;",\n    \'"": "&quot;", "\'": "&#x27;", "/": "&#x2F;"\n  })[s]);\n}' },
+      { title: 'Output Encoding', content: 'Экранируйте HTML-сущности при выводе пользовательских данных.', code: 'function escapeHtml(str) {\n  return str.replace(/[&<>"\'/]/g, s => ({\n    "&": "&amp;", "<": "&lt;", ">": "&gt;",\n    \'"": "&quot;", "\'": "&#x27;", "/": "&#x2F;"\n  })[s]);\n}' },
       { title: 'DOMPurify', content: 'Библиотека для санитизации HTML.', code: 'import DOMPurify from "dompurify";\nconst clean = DOMPurify.sanitize(userInput);' },
       { title: 'textContent вместо innerHTML', content: 'textContent не интерпретирует HTML.', code: '// Безопасно:\nelement.textContent = userInput;\n\n// Опасно:\nelement.innerHTML = userInput;' },
       { title: 'CSP (Content Security Policy)', content: 'Блокирует inline-скрипты и внешние источники.', code: "Content-Security-Policy: script-src 'self'" },

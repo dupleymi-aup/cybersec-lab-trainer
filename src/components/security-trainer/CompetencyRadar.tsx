@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ResponsiveContainer, Tooltip, Legend,
 } from 'recharts';
-import { motion } from 'framer-motion';
 import { Shield, Loader2, AlertTriangle } from 'lucide-react';
 import { getComprehensiveSummary, getAllUsers, type User } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,8 +15,6 @@ import CustomDateRangePicker from './CustomDateRangePicker';
 interface Props {
   groupId?: string;
 }
-
-const COMPETENCY_COLORS = ['#6366f1', '#10b981', '#f59e0b'];
 
 export default function CompetencyRadar({ groupId }: Props) {
   const [days, setDays] = useState(90);

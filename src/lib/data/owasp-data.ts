@@ -403,7 +403,7 @@ const deserialize = require('node-serialize');
 
 app.post('/api/data', (req, res) => {
   // Данные от пользователя десериализуются напрямую
-  // Злоумышленник может внедрить IIFE: _\$\$ND_FUNC\$\$_function(){require('child_process').exec('whoami')}()
+  // Злоумышленник может внедрить IIFE: $$ND_FUNC$$function(){require('child_process').exec('whoami')}()
   const data = deserialize.unserialize(req.body.data);
   res.json({ result: processData(data) });
 });

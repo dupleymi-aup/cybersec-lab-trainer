@@ -14,7 +14,6 @@ import {
   type TrendPoint,
 } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import CustomDateRangePicker from './CustomDateRangePicker';
 
 interface Props {

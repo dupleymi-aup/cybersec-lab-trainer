@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
@@ -10,7 +9,6 @@ import {
 } from 'lucide-react';
 import { getModuleDeepDive, type ModuleDeepDiveData } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export interface ModuleDeepDiveProps {
@@ -23,7 +21,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId, setInternalGroupId] = useState('');
+  const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 

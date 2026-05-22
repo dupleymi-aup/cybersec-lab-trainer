@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { modules } from '@/lib/data';
 
@@ -20,7 +19,7 @@ export async function POST(request: NextRequest) {
     // type can be: 'all', 'modules', 'quizzes'
     const contentType = type || 'all';
 
-    let contentItems: Array<{
+    const contentItems: Array<{
       type: string;
       title: string;
       url: string;
@@ -88,7 +87,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'all';
 
-    let items: Array<{
+    const items: Array<{
       id: string;
       type: string;
       title: string;

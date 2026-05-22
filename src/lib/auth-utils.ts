@@ -25,7 +25,7 @@ export function validateEmail(email: string): boolean {
 }
 
 export function validatePhone(phone: string): boolean {
-  const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+  const cleaned = phone.replace(/[\s-()]/g, '');
   return /^\+?\d{10,15}$/.test(cleaned);
 }
 
@@ -35,6 +35,6 @@ export function validatePassword(password: string): { valid: boolean; errors: st
   if (!/[a-z]/.test(password)) errors.push('Хотя бы одна строчная буква');
   if (!/[A-Z]/.test(password)) errors.push('Хотя бы одна заглавная буква');
   if (!/[0-9]/.test(password)) errors.push('Хотя бы одна цифра');
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) errors.push('Хотя бы один спецсимвол');
+  if (!/[!@#$%^&*()_+\-[\]{};':"\\|,.<>/?]/.test(password)) errors.push('Хотя бы один спецсимвол');
   return { valid: errors.length === 0, errors };
 }
