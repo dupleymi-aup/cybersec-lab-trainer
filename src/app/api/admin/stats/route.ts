@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
 
     // Quiz stats
     prisma.quizResult.count(),
-    prisma.quizResult.count({ where: { completedAt: { gte: dateFrom } } }),
+    prisma.quizResult.count({ where: { createdAt: { gte: dateFrom } } }),
     prisma.quizResult.aggregate({
       _avg: { score: true },
     }),

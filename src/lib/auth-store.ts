@@ -48,10 +48,15 @@ export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
 
 import { hasRole, getRoleLabel } from './auth-types';
 
-export const ADMIN_INVITE_CODE = process.env.ADMIN_INVITE_CODE || (process.env.NODE_ENV === 'development' ? 'CYBERSEC-ADMIN-2024' : '');
+function getExpectedInviteCode(): string {
+  return process.env.ADMIN_INVITE_CODE || (process.env.NODE_ENV === 'development' ? 'CYBERSEC-ADMIN-2024' : '');
+}
+
+export const ADMIN_INVITE_CODE = getExpectedInviteCode();
 
 export function validateAdminInviteCode(code: string): boolean {
-  const expected = process.env.ADMIN_INVITE_CODE || 'CYBERSEC-ADMIN-2024';
+  const expected = getExpectedInviteCode();
+  if (!expected) return false;
   return code.trim().toUpperCase() === expected;
 }
 

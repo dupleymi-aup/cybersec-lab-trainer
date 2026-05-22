@@ -92,8 +92,8 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
     const pwCheck = validatePassword(password);
     if (!pwCheck.valid) { toast.error(pwCheck.errors.join(', ')); return; }
 
-    if (role === 'admin' && !validateAdminInviteCode(inviteCode)) {
-      toast.error('Неверный код приглашения для администратора'); return;
+    if ((role === 'admin' || role === 'teacher') && !validateAdminInviteCode(inviteCode)) {
+      toast.error('Неверный код приглашения'); return;
     }
 
     const result = await createUser(
