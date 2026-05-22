@@ -34,16 +34,17 @@ interface ScheduledReportRecord {
 
 const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Promise<Blob | null>> = {
   gradebook: async (days, groupId) => {
-    // Fetch gradebook data and generate PDF
     const { getGradebook } = await import('./analytics-api');
-    const data = await getGradebook(days, groupId);
+    const data = await getGradebook({ groupId: groupId || undefined, days });
     if (!data.students?.length) return null;
 
     const students = data.students.map((s: any) => ({
+      id: s.id,
       fullName: s.fullName,
       email: s.email,
       group: s.group,
-      modules: s.modules || [],
+      modulesCompleted: s.modulesCompleted || 0,
+      quizCount: s.quizCount || 0,
       avgScore: s.avgScore || 0,
     }));
 
@@ -53,10 +54,10 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
   'at-risk': async (days, groupId) => {
     const { getAtRiskStudents } = await import('./analytics-api');
     const data = await getAtRiskStudents(days, groupId);
-    if (!data.students?.length) return null;
+    if (!data.atRiskStudents?.length) return null;
 
     return generateAtRiskPDF(
-      data.students.map((s: any) => ({
+      data.atRiskStudents.map((s: any) => ({
         userId: s.userId,
         fullName: s.fullName,
         group: s.group,
@@ -64,7 +65,7 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
         reasons: s.reasons || [],
       })),
       days
-    );
+    ) as Blob | null;
   },
 
   analytics: async (days, groupId) => {
@@ -76,21 +77,21 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
       summary.moduleDistribution || [],
       summary.trends,
       groupId || 'all'
-    );
+    ) as Blob | null;
   },
 
   'module-performance': async (days, groupId) => {
     const { getModulePerformance } = await import('./analytics-api');
     const data = await getModulePerformance(days, groupId);
 
-    return generateModulePerformancePDF(data || [], groupId || 'all');
+    return generateModulePerformancePDF(data || [], groupId || 'all') as Blob | null;
   },
 
   'group-comparison': async (days, groupId) => {
     const { getGroupComparison } = await import('./analytics-api');
     const data = await getGroupComparison(days);
 
-    return generateGroupComparisonPDF(data || [], groupId || 'all');
+    return generateGroupComparisonPDF(data.dimensions || [], groupId || 'all') as Blob | null;
   },
 
   'quiz-retry': async (days, groupId) => {
@@ -101,7 +102,7 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
       data.categoryRetryStats || [],
       data.topRetryers || [],
       groupId || 'all'
-    );
+    ) as Blob | null;
   },
 };
 

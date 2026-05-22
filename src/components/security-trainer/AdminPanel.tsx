@@ -1066,7 +1066,7 @@ function AnalyticsSubTabs({
       )}
       {analyticsSubTab === 'heatmap' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-          <ActivityHeatmap groupId={groupId} days={days} />
+          <ActivityHeatmap />
         </motion.div>
       )}
       {analyticsSubTab === 'questions' && (

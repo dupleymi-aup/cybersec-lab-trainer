@@ -179,7 +179,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="difficulty" tick={{ fontSize: 12 }} />
               <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
-              <Tooltip formatter={(value: number) => `${value}%`} />
+              <Tooltip formatter={(value) => `${value ?? 0}%`} />
               <Bar dataKey="correctRate" fill="#6366f1" name="Правильных (%)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -196,7 +196,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="category" tick={{ fontSize: 10 }} angle={-45} textAnchor="end" height={60} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
-                <Tooltip formatter={(value: number) => `${value}%`} />
+                <Tooltip formatter={(value) => `${value ?? 0}%`} />
                 <Legend />
                 {Object.entries(DIFFICULTY_LABELS).map(([key, label]) => (
                   <Bar key={key} dataKey={label} fill={DIFFICULTY_COLORS[key]} name={label} radius={[2, 2, 0, 0]} />
@@ -217,7 +217,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="week" tick={{ fontSize: 10 }} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
-                <Tooltip formatter={(value: number) => `${value}%`} />
+                <Tooltip formatter={(value) => `${value ?? 0}%`} />
                 <Legend />
                 <Line type="monotone" dataKey="easy" stroke={DIFFICULTY_COLORS.easy} strokeWidth={2} dot={false} name="Лёгкие" />
                 <Line type="monotone" dataKey="medium" stroke={DIFFICULTY_COLORS.medium} strokeWidth={2} dot={false} name="Средние" />

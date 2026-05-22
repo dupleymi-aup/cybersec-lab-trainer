@@ -12,8 +12,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { toast } from 'sonner';
 import {
   Shield,
@@ -143,7 +143,9 @@ export default function Dashboard() {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        // Silently ignore errors (e.g., network issues, endpoint not available)
+      });
   }, []);
 
   const dismissAnnouncement = (id: string) => {
@@ -225,7 +227,7 @@ export default function Dashboard() {
     prevUnlockedRef.current = current;
   }, [unlockedAchievements]);
   // Recommendations — defined after streakData (see line ~360)
-  const getRecommendation = () => null as ReturnType<typeof buildRecommendation> | null;
+  const getRecommendation = (): { text: string; icon: string; type: string } | null => null;
 
   const proficiency = getProficiencyLevel(completedCount, totalModules, avgQuizScore);
 
@@ -272,7 +274,7 @@ export default function Dashboard() {
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-    let checkDate = allDates.has(todayStr) ? today : allDates.has(yesterdayStr) ? yesterday : null;
+    const checkDate = allDates.has(todayStr) ? today : allDates.has(yesterdayStr) ? yesterday : null;
     if (checkDate) {
       while (checkDate) {
         const dateStr = checkDate.toISOString().split('T')[0];

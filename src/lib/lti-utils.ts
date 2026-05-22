@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 
 export interface LtiClaims {
   sub: string;
+  iss: string;
   name: string;
   email: string;
   roles: string[];

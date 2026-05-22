@@ -114,10 +114,12 @@ export async function DELETE(
   try {
     await prisma.ltiPlatform.delete({ where: { id } });
 
+    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
     await prisma.auditLog.create({
       data: {
+        id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: auth.email,
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
         action: 'lti_platform_deleted',
         targetId: id,
         targetName: id,

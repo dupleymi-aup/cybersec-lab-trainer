@@ -6,8 +6,8 @@ import { Download, FileText, Printer, Loader2, CheckCircle2, AlertCircle, Chevro
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getAllUsers, getStudentProgress, getModulePerformance, getAtRiskStudents, getGroupComparison, getComprehensiveSummary, getQuizRetryAnalytics, type User, type StudentProgress, type StudentQuizResult } from '@/lib/auth-store';
-import { downloadCSV, generateGradebookCSV, generateStudentReportCSV, generateModulePerformanceCSV, generateAtRiskCSV, generateGroupComparisonCSV, generateAnalyticsCSV, generateGradebookPDF, generateAtRiskPDF, generateAnalyticsPDF, generateModulePerformancePDF, generateGroupComparisonPDF, generateQuizRetryPDF } from '@/lib/export-utils';
+import { getAllUsers, getStudentProgress, getModulePerformance, getAtRiskStudents, getGroupComparison, getComprehensiveSummary, getQuizRetryAnalytics, type User } from '@/lib/auth-store';
+import { downloadCSV, generateGradebookCSV, generateStudentReportCSV, generateStudentReportPDF, generateModulePerformanceCSV, generateAtRiskCSV, generateGroupComparisonCSV, generateAnalyticsCSV, generateGradebookPDF, generateAtRiskPDF, generateAnalyticsPDF, generateModulePerformancePDF, generateGroupComparisonPDF, generateQuizRetryPDF } from '@/lib/export-utils';
 import { modules } from '@/lib/data';
 
 interface AnalyticsExportPanelProps {

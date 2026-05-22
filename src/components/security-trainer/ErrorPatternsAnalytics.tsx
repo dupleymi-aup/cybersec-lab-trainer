@@ -93,7 +93,7 @@ export default function ErrorPatternsAnalytics({ groupId: controlledGroupId, day
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="category" tick={{ fontSize: 11 }} angle={-30} textAnchor="end" height={60} />
                 <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(v: number) => [`${v}%`, 'Ошибка']} />
+                <Tooltip formatter={(v) => [`${v ?? 0}%`, 'Ошибка']} />
                 <Bar dataKey="errorRate" fill="#ef4444" name="%" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -111,7 +111,7 @@ export default function ErrorPatternsAnalytics({ groupId: controlledGroupId, day
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="difficulty" tick={{ fontSize: 12 }} tickFormatter={(v) => DIFFICULTY_LABELS[v] || v} />
                 <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(v: number) => [`${v}%`, 'Ошибка']} />
+                <Tooltip formatter={(v) => [`${v ?? 0}%`, 'Ошибка']} />
                 <Bar dataKey="errorRate" name="%" radius={[4, 4, 0, 0]}>
                   {difficultyErrorRates.map((entry, i) => (
                     <Bar key={i} dataKey="errorRate" fill={DIFFICULTY_COLORS[entry.difficulty] || '#6366f1'} />

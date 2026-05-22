@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { getAllUsers } from '@/lib/auth-store';
+import { getAllUsers, useAuthStore } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
 import { quizCategories, modules } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,7 +35,6 @@ import {
   Calendar,
   Trash2,
   Plus,
-  Edit,
   CheckCircle,
   XCircle,
   FileBarChart,
@@ -117,10 +116,11 @@ export default function TeacherPanel() {
   const { setCurrentPage } = useAppStore();
   const { user } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [groupFilter, setGroupFilter] = useState('');
+  // TODO: Add group filter dropdown UI
+  const [groupFilter, _setGroupFilter] = useState('');
   const [gradebookSort, setGradebookSort] = useState<'name' | 'modules' | 'score'>('name');
   const [analyticsSubTab, setAnalyticsSubTab] = useState<'overview' | 'trends' | 'questions' | 'achievements' | 'competency' | 'weaknesses' | 'predictive' | 'export' | 'module-deep-dive' | 'certification' | 'quiz-session'>('overview');
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [_selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; email: string; group: string; avatar: string }>>([]);
 
   useEffect(() => {
@@ -146,7 +146,6 @@ export default function TeacherPanel() {
     description: '',
     group: '',
   });
-  const [editingDeadlineId, setEditingDeadlineId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/deadlines')
@@ -205,7 +204,7 @@ export default function TeacherPanel() {
   }), [students, searchTerm, groupFilter]);
 
   // Get unique groups
-  const groups = [...new Set(students.map((s) => s.group).filter(Boolean))];
+  const groups = useMemo(() => [...new Set(students.map((s) => s.group).filter(Boolean))], [students]);
 
   // Memoize student progress to avoid repeated localStorage reads
   const progressMap = useMemo(() => {
@@ -404,7 +403,7 @@ export default function TeacherPanel() {
               </thead>
               <tbody>
                 {(() => {
-                  let sorted = [...filteredStudents];
+                  const sorted = [...filteredStudents];
                   if (gradebookSort === 'modules') sorted.sort((a, b) => getStudentProgress(b.id).completedModules.length - getStudentProgress(a.id).completedModules.length);
                   if (gradebookSort === 'score') sorted.sort((a, b) => {
                     const aScores = Object.values(getStudentProgress(a.id).quizScores);
@@ -1255,7 +1254,7 @@ export default function TeacherPanel() {
                   Студенты с признаками риска ({atRiskStudents.length})
                 </h3>
                 <div className="space-y-2">
-                  {atRiskStudents.slice(0, 5).map(({ student, progress, avgScore, daysSinceActive, reasons }) => (
+                  {atRiskStudents.slice(0, 5).map(({ student, progress: _progress, avgScore: _avgScore, daysSinceActive: _daysSinceActive, reasons }) => (
                     <div key={student.id} className="flex items-center justify-between p-2 rounded-lg bg-red-50/50">
                       <div className="flex items-center gap-2">
                         <AlertTriangle size={14} className="text-red-500" />

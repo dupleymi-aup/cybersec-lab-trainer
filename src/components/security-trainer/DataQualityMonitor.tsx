@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { ResponsiveContainer, RadialBarChart, RadialBar, Cell } from 'recharts';
+import { ResponsiveContainer, RadialBarChart, RadialBar } from 'recharts';
 import { ShieldCheck, AlertCircle, AlertTriangle, Info, RefreshCw, ChevronDown, ChevronRight, Loader2, Mail } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { getDataQuality, type DataQualityData, type DataQualityIssue } from '@/lib/analytics-api';
+import { getDataQuality } from '@/lib/analytics-api';
+import type { DataQualityData, DataQualityIssue } from '@/lib/auth-types';
 import { useNotificationStore } from '@/lib/notification-store';
 import { toast } from 'sonner';
 
@@ -35,15 +36,15 @@ export default function DataQualityMonitor({ groupId, days }: { groupId?: string
   const [expandedIssues, setExpandedIssues] = useState<Set<string>>(new Set());
   const { addNotification } = useNotificationStore();
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     setLoading(true);
     getDataQuality(days || 30, groupId).then((d) => {
       setData(d);
       setLoading(false);
     });
-  };
+  }, [days, groupId]);
 
-  useEffect(() => { loadData(); }, [days, groupId]);
+  useEffect(() => { loadData(); }, [loadData]);
 
   const toggleIssue = (type: string) => {
     const next = new Set(expandedIssues);

@@ -84,10 +84,12 @@ export async function POST(request: NextRequest) {
     });
 
     // Log audit
+    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
     await prisma.auditLog.create({
       data: {
+        id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: auth.email,
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
         action: 'lti_platform_created',
         targetId: platform.id,
         targetName: platform.name,

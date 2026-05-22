@@ -26,12 +26,14 @@ export const ROLE_HIERARCHY: Record<string, number> = {
   admin: 2,
 };
 
-export function requireRole(userRole: string, requiredRole: string): boolean {
+export function requireRole(userRole: string, ...requiredRoles: string[]): boolean {
   const userLevel = ROLE_HIERARCHY[userRole];
-  const requiredLevel = ROLE_HIERARCHY[requiredRole];
-  // Deny access if either role is unknown
-  if (userLevel === undefined || requiredLevel === undefined) return false;
-  return userLevel >= requiredLevel;
+  if (userLevel === undefined) return false;
+  return requiredRoles.some(requiredRole => {
+    const requiredLevel = ROLE_HIERARCHY[requiredRole];
+    if (requiredLevel === undefined) return false;
+    return userLevel >= requiredLevel;
+  });
 }
 
 export function unauthorized(message = 'Unauthorized') {
@@ -48,7 +50,7 @@ export function getClientIp(request: NextRequest): string {
   if (forwarded) return forwarded.split(',')[0].trim();
   const realIp = request.headers.get('x-real-ip');
   if (realIp) return realIp;
-  return request.ip || 'unknown';
+  return 'unknown';
 }
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();

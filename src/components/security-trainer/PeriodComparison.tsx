@@ -162,7 +162,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="module" tick={{ fontSize: 10 }} angle={-30} textAnchor="end" height={60} />
               <YAxis tick={{ fontSize: 11 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-              <Tooltip formatter={(value: number) => [`${value}%`, '']} />
+              <Tooltip formatter={(value) => [`${value ?? 0}%`, '']} />
               <Legend />
               <Bar dataKey="periodA" name="Период A" fill="#6366f1" radius={[4, 4, 0, 0]} />
               <Bar dataKey="periodB" name="Период B" fill="#8b5cf6" radius={[4, 4, 0, 0]} />

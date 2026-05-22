@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   if (action === 'role_change' && !role) {
     return NextResponse.json({ error: 'role is required for role_change action' }, { status: 400 });
   }
-  if (action === 'role_change' && !['student', 'teacher', 'admin'].includes(role)) {
+  if (action === 'role_change' && role && !['student', 'teacher', 'admin'].includes(role)) {
     return NextResponse.json({ error: 'Invalid role. Must be: student, teacher, admin' }, { status: 400 });
   }
 

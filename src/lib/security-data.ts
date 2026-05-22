@@ -1043,7 +1043,7 @@ app.post('/upload', async (req, res) => {
     // Конвертируем в PNG — JavaScript теряется
     await sharp(req.file.buffer)
       .png()
-      .toFile(\`uploads/\${req.file.filename}.png\`);
+      .toFile(\`uploads/${req.file.filename}.png\`);
   }
 });
 

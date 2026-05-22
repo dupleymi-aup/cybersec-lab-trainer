@@ -181,7 +181,7 @@ export async function generateAtRiskPDF(
     theme: 'striped',
     headStyles: { fillColor: [239, 68, 68] },
     styles: { fontSize: 8 },
-    didParseCell: (cellData: { column: { index: number }; cell: { raw: unknown; styles: Record<string, unknown> } }) => {
+    didParseCell: (cellData) => {
       if (cellData.column.index === 4 && Number(cellData.cell.raw) >= 70) {
         cellData.cell.styles.textColor = [239, 68, 68];
         cellData.cell.styles.fontStyle = 'bold';

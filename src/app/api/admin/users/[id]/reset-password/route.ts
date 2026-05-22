@@ -63,7 +63,7 @@ export async function POST(
         adminId: auth.id,
         adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
         action: 'password_reset',
-        targetId,
+        targetId: id,
         targetName: targetUser.fullName || targetUser.email,
         details: `Admin ${auth.id} reset password for user ${targetUser.email} [IP: ${ip}]`,
       },

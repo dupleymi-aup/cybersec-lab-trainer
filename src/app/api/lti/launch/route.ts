@@ -194,11 +194,13 @@ export async function GET() {
 async function parsePublicKeyToJWK(pem: string, kid: string) {
   const { importSPKI, exportJWK } = await import('jose');
   const key = await importSPKI(pem, 'RS256');
-  const jwk = await exportJWK(key);
+  const exported = await exportJWK(key);
   return {
-    ...jwk,
+    kty: exported.kty,
+    n: exported.n,
+    e: exported.e,
     kid,
-    use: 'sig',
-    alg: 'RS256',
+    use: 'sig' as const,
+    alg: 'RS256' as const,
   };
 }

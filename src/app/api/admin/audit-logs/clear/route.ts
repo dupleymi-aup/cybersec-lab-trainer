@@ -104,6 +104,7 @@ export async function POST(request: NextRequest) {
         adminId: auth.id,
         adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
         action: 'audit_logs_cleared',
+        targetId: 'audit-logs',
         targetName: `${deletedCount} logs deleted`,
         details: `Admin ${auth.id} cleared ${deletedCount} audit logs older than ${olderThan}${action ? ` with action="${action}"` : ''} [IP: ${ip}]`,
       },

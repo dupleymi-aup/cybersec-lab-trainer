@@ -86,11 +86,6 @@ export async function GET(request: NextRequest) {
 
   const syncs = await prisma.ltiGradeSync.findMany({
     where: { platformId },
-    include: {
-      user: {
-        select: { id: true, email: true, fullName: true },
-      },
-    },
     orderBy: { createdAt: 'desc' },
     take: 50,
   });

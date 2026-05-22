@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, Mail, BookOpen, BarChart3, AlertTriangle, GitCompare, FileText, Trash2, ToggleLeft, ToggleRight, Loader2, Plus, X } from 'lucide-react';
+import { Calendar, Clock, BookOpen, BarChart3, AlertTriangle, GitCompare, FileText, Trash2, ToggleLeft, ToggleRight, Loader2, Plus, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { getScheduledReports, createScheduledReport, updateScheduledReport, deleteScheduledReport, type ScheduledReport } from '@/lib/analytics-api';
-import { getAllUsers, type User } from '@/lib/auth-store';
+import { getScheduledReports, createScheduledReport, updateScheduledReport, deleteScheduledReport } from '@/lib/analytics-api';
+import type { ScheduledReport } from '@/lib/auth-types';
+import { getAllUsers } from '@/lib/auth-store';
 
 const REPORT_TYPES = [
   { value: 'gradebook', label: 'Ведомость', icon: FileText, color: 'bg-blue-100 text-blue-700' },
@@ -28,11 +29,10 @@ const FREQUENCY_OPTIONS = [
 
 const WEEKDAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
-export default function ReportScheduler({ groupId, days }: { groupId?: string; days?: number }) {
+export default function ReportScheduler({ groupId, days: _days }: { groupId?: string; days?: number }) {
   const [reports, setReports] = useState<ScheduledReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [groups, setGroups] = useState<string[]>([]);
 
   // Form state
@@ -47,7 +47,6 @@ export default function ReportScheduler({ groupId, days }: { groupId?: string; d
   useEffect(() => {
     loadReports();
     getAllUsers().then((users) => {
-      setAllUsers(users);
       const uniqueGroups = [...new Set(users.map((u) => u.group).filter(Boolean))];
       setGroups(uniqueGroups);
     });

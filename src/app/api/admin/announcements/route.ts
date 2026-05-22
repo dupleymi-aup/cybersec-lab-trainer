@@ -248,8 +248,8 @@ export async function PUT(request: NextRequest) {
     data: {
       ...(title !== undefined ? { title } : {}),
       ...(content !== undefined ? { content } : {}),
-      ...(priority !== undefined ? { priority } : {}),
-      ...(active !== undefined ? { active } : {}),
+      ...(priority !== undefined && typeof priority === 'string' ? { priority } : {}),
+      ...(active !== undefined && typeof active === 'boolean' ? { active } : {}),
       ...(parsedExpiresAt !== undefined ? { expiresAt: parsedExpiresAt } : {}),
     },
   });

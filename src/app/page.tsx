@@ -146,7 +146,16 @@ export default function Home() {
                 email: '',
                 phone: '',
                 fullName: 'LTI User',
+                group: '',
+                course: '',
+                university: '',
+                avatar: '',
+                bio: '',
                 role: payload.role || 'student',
+                createdAt: new Date().toISOString(),
+                lastLoginAt: new Date().toISOString(),
+                loginCount: 0,
+                isBlocked: false,
               }, ltiToken);
               authSettled = true;
             }
@@ -160,21 +169,21 @@ export default function Home() {
         // Navigate only after auth is established
         if (authSettled) {
           if (ltiModule && pages[ltiModule]) {
-            setCurrentPage(ltiModule);
+            setCurrentPage(ltiModule as keyof typeof pages);
           } else if (ltiQuiz) {
-            setCurrentPage('quiz');
+            setCurrentPage('quiz' as keyof typeof pages);
           } else {
-            setCurrentPage('dashboard');
+            setCurrentPage('dashboard' as keyof typeof pages);
           }
         }
       });
     } else if (ltiModule && isAuthenticated) {
       // Direct module link (from deep linking)
       if (pages[ltiModule]) {
-        setCurrentPage(ltiModule);
+        setCurrentPage(ltiModule as keyof typeof pages);
       }
     } else if (ltiQuiz && isAuthenticated) {
-      setCurrentPage('quiz');
+      setCurrentPage('quiz' as keyof typeof pages);
     }
   }, [isAuthenticated, setCurrentPage]);
 

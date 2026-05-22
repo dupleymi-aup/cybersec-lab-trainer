@@ -30,8 +30,6 @@ import {
   Globe,
   Users,
   Flame,
-  Zap,
-  AlertTriangle,
   ChevronRight,
 } from 'lucide-react';
 
@@ -61,11 +59,6 @@ const DIFF_COLORS: Record<string, string> = {
   easy: 'bg-emerald-100 text-emerald-700',
   medium: 'bg-amber-100 text-amber-700',
   hard: 'bg-red-100 text-red-700',
-};
-const DIFF_BG: Record<string, string> = {
-  easy: 'bg-emerald-500',
-  medium: 'bg-amber-500',
-  hard: 'bg-red-400',
 };
 
 export default function QuizSystem() {
@@ -103,10 +96,8 @@ export default function QuizSystem() {
   const startTimeRef = useRef(startTime);
   const maxStreakRef = useRef(maxStreak);
 
-  useEffect(() => { quizQuestionsRef.current = quizQuestions; }, [quizQuestions]);
   useEffect(() => { difficultyFilterRef.current = difficultyFilter; }, [difficultyFilter]);
   useEffect(() => { answersRef.current = answers; }, [answers]);
-  useEffect(() => { categoryQuestionsRef.current = categoryQuestions; }, [categoryQuestions]);
   useEffect(() => { correctCountRef.current = correctCount; }, [correctCount]);
   useEffect(() => { activeCategoryRef.current = activeCategory; }, [activeCategory]);
   useEffect(() => { startTimeRef.current = startTime; }, [startTime]);
@@ -643,7 +634,7 @@ export default function QuizSystem() {
 
                       <Button
                         className="w-full bg-emerald-600 hover:bg-emerald-700"
-                        onClick={nextQuestion}
+                        onClick={() => nextQuestion()}
                       >
                         {currentQuestion < categoryQuestions.length - 1 ? (
                           <>Следующий вопрос <ChevronRight size={14} className="ml-1" /></>

@@ -120,7 +120,7 @@ export default function PredictiveRiskDashboard({ groupId: controlledGroupId, da
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="riskScore" name="Риск" domain={[0, 100]} tick={{ fontSize: 11 }} label={{ value: 'Риск-скор', position: 'insideBottom', offset: -5 }} />
               <YAxis dataKey="dropoutProbability" name="Отсев" domain={[0, 100]} tick={{ fontSize: 11 }} label={{ value: 'Вероятность отсева (%)', angle: -90, position: 'insideLeft' }} />
-              <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v: number) => [`${v}%`]} />
+              <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v) => [`${v ?? 0}%`]} />
               <Legend />
               <Scatter name="Студенты" data={scatterData} fill="#6366f1" />
             </ScatterChart>

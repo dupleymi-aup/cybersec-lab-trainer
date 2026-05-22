@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
       _avg: { score: true },
     }),
     prisma.quizAttempt.count(),
-    prisma.quizAttempt.count({ where: { createdAt: { gte: dateFrom } } }),
+    prisma.quizAttempt.count({ where: { attemptedAt: { gte: dateFrom } } }),
 
     // Login stats
     prisma.loginActivity.count(),
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     // LTI stats
     prisma.ltiPlatform.count(),
     prisma.ltiLaunchLog.count(),
-    prisma.ltiLaunchLog.count({ where: { timestamp: { gte: dateFrom } } }),
+    prisma.ltiLaunchLog.count({ where: { launchedAt: { gte: dateFrom } } }),
   ]);
 
   // Build role breakdown
