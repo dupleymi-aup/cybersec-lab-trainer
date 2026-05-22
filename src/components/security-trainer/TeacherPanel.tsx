@@ -298,30 +298,35 @@ export default function TeacherPanel() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
-          <ChevronLeft size={20} />
-        </Button>
-        <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-          <Users size={20} className="text-amber-600" />
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+            <ChevronLeft size={20} />
+          </Button>
+          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+            <Users size={20} className="text-amber-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">Панель преподавателя</h1>
+            <p className="text-xs text-muted-foreground">Отслеживайте прогресс и управляйте группами</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-bold">Панель преподавателя</h1>
-          <p className="text-xs text-muted-foreground">Отслеживайте прогресс и управляйте группами</p>
-        </div>
+        <AnalyticsExportPanel students={students} />
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {[
-          { label: 'Всего студентов', value: totalStudents, icon: Users, color: 'text-sky-600' },
-          { label: 'Активных', value: activeStudents, icon: GraduationCap, color: 'text-emerald-600' },
-          { label: 'Ср. модулей', value: avgCompletion, icon: BookOpen, color: 'text-violet-600' },
-          { label: 'Ср. балл квизов', value: `${avgQuizScore}%`, icon: Trophy, color: 'text-amber-600' },
+          { label: 'Всего студентов', value: totalStudents, icon: Users, color: 'text-sky-600', bg: 'bg-sky-50' },
+          { label: 'Активных', value: activeStudents, icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Ср. модулей', value: avgCompletion, icon: BookOpen, color: 'text-violet-600', bg: 'bg-violet-50' },
+          { label: 'Ср. балл', value: `${avgQuizScore}%`, icon: Trophy, color: 'text-amber-600', bg: 'bg-amber-50' },
         ].map((stat) => (
-          <Card key={stat.label} className="border-none shadow-sm bg-card">
-            <CardContent className="p-4 text-center">
-              <stat.icon size={20} className={`mx-auto mb-2 ${stat.color}`} />
+          <Card key={stat.label} className="border-none shadow-sm bg-card hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center mb-2`}>
+                <stat.icon size={18} className={stat.color} />
+              </div>
               <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
               <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
             </CardContent>
@@ -330,35 +335,37 @@ export default function TeacherPanel() {
       </div>
 
       <Tabs defaultValue="progress">
-        <TabsList className="grid w-full grid-cols-9">
-          <TabsTrigger value="progress" className="text-xs">
-            <BarChart3 size={14} className="mr-1" /> Прогресс
-          </TabsTrigger>
-          <TabsTrigger value="gradebook" className="text-xs">
-            <Table2 size={14} className="mr-1" /> Журнал
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs">
-            <Filter size={14} className="mr-1" /> Аналитика
-          </TabsTrigger>
-          <TabsTrigger value="messages" className="text-xs">
-            <MessageSquare size={14} className="mr-1" /> Сообщения
-          </TabsTrigger>
-          <TabsTrigger value="deadlines" className="text-xs">
-            <Calendar size={14} className="mr-1" /> Дедлайны
-          </TabsTrigger>
-          <TabsTrigger value="groups" className="text-xs">
-            <Users size={14} className="mr-1" /> Группы
-          </TabsTrigger>
-          <TabsTrigger value="compare" className="text-xs">
-            <GitCompare size={14} className="mr-1" /> Сравнение
-          </TabsTrigger>
-          <TabsTrigger value="at-risk" className="text-xs">
-            <AlertTriangle size={14} className="mr-1" /> Внимание
-          </TabsTrigger>
-          <TabsTrigger value="reports" className="text-xs">
-            <FileBarChart size={14} className="mr-1" /> Отчёты
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-2 scrollbar-thin">
+          <TabsList className="grid w-full grid-cols-5 md:grid-cols-9 min-w-[640px] md:min-w-0">
+            <TabsTrigger value="progress" className="text-xs">
+              <BarChart3 size={14} className="mr-1" /> Прогресс
+            </TabsTrigger>
+            <TabsTrigger value="gradebook" className="text-xs">
+              <Table2 size={14} className="mr-1" /> Журнал
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs">
+              <Filter size={14} className="mr-1" /> Аналитика
+            </TabsTrigger>
+            <TabsTrigger value="deadlines" className="text-xs">
+              <Calendar size={14} className="mr-1" /> Дедлайны
+            </TabsTrigger>
+            <TabsTrigger value="groups" className="text-xs">
+              <Users size={14} className="mr-1" /> Группы
+            </TabsTrigger>
+            <TabsTrigger value="compare" className="text-xs hidden md:block">
+              <GitCompare size={14} className="mr-1" /> Сравнение
+            </TabsTrigger>
+            <TabsTrigger value="at-risk" className="text-xs hidden md:block">
+              <AlertTriangle size={14} className="mr-1" /> Внимание
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="text-xs hidden lg:block">
+              <MessageSquare size={14} className="mr-1" /> Сообщения
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="text-xs hidden lg:block">
+              <FileBarChart size={14} className="mr-1" /> Отчёты
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Progress Tab */}
         <TabsContent value="progress" className="mt-4 space-y-4">

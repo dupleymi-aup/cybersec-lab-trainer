@@ -311,56 +311,93 @@ export default function AdminPanel() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
-          <ChevronLeft size={20} />
-        </Button>
-        <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-          <Settings size={20} className="text-red-600" />
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+            <ChevronLeft size={20} />
+          </Button>
+          <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+            <Settings size={20} className="text-red-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">Панель администратора</h1>
+            <p className="text-xs text-muted-foreground">Управление пользователями и системой</p>
+          </div>
         </div>
-        <div className="flex-1">
-          <h1 className="text-xl font-bold">Панель администратора</h1>
-          <p className="text-xs text-muted-foreground">Управление пользователями и системой</p>
-        </div>
-        <div className="flex-shrink-0">
+        <div className="flex items-center gap-2">
           <NotificationBell />
+          <AnalyticsExportPanel />
         </div>
+      </div>
+
+      {/* KPI Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <KPICard
+          label="Всего пользователей"
+          value={totalUsers}
+          icon={<Users size={18} />}
+          iconColor="text-sky-600"
+          iconBg="bg-sky-50"
+        />
+        <KPICard
+          label="Студенты"
+          value={studentCount}
+          icon={<Users size={18} />}
+          iconColor="text-violet-600"
+          iconBg="bg-violet-50"
+        />
+        <KPICard
+          label="Преподаватели"
+          value={teacherCount}
+          icon={<Users size={18} />}
+          iconColor="text-amber-600"
+          iconBg="bg-amber-50"
+        />
+        <KPICard
+          label="Заблокировано"
+          value={blockedCount}
+          icon={<Shield size={18} />}
+          iconColor="text-red-600"
+          iconBg="bg-red-50"
+        />
       </div>
 
       <AnalyticsProvider>
       <Tabs defaultValue="users">
-        <TabsList className="grid w-full grid-cols-10">
-          <TabsTrigger value="users" className="text-xs">
-            <Users size={14} className="mr-1" /> Пользователи
-          </TabsTrigger>
-          <TabsTrigger value="groups" className="text-xs">
-            <Database size={14} className="mr-1" /> Группы
-          </TabsTrigger>
-          <TabsTrigger value="database" className="text-xs">
-            <Database size={14} className="mr-1" /> Статистика
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="text-xs">
-            <Settings size={14} className="mr-1" /> Настройки
-          </TabsTrigger>
-          <TabsTrigger value="modules" className="text-xs">
-            <BookOpen size={14} className="mr-1" /> Модули
-          </TabsTrigger>
-          <TabsTrigger value="lms" className="text-xs">
-            <Link size={14} className="mr-1" /> LMS
-          </TabsTrigger>
-          <TabsTrigger value="announcements" className="text-xs">
-            <Megaphone size={14} className="mr-1" /> Объявления
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs">
-            <LineChart size={14} className="mr-1" /> Аналитика
-          </TabsTrigger>
-          <TabsTrigger value="audit" className="text-xs">
-            <Activity size={14} className="mr-1" /> Журнал
-          </TabsTrigger>
-          <TabsTrigger value="report" className="text-xs">
-            <FileBarChart size={14} className="mr-1" /> Отчёт
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-2 scrollbar-thin">
+          <TabsList className="grid w-full grid-cols-5 md:grid-cols-10 min-w-[700px] md:min-w-0">
+            <TabsTrigger value="users" className="text-xs">
+              <Users size={14} className="mr-1" /> Пользователи
+            </TabsTrigger>
+            <TabsTrigger value="groups" className="text-xs">
+              <Database size={14} className="mr-1" /> Группы
+            </TabsTrigger>
+            <TabsTrigger value="database" className="text-xs hidden md:block">
+              <Database size={14} className="mr-1" /> Статистика
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs hidden md:block">
+              <Settings size={14} className="mr-1" /> Настройки
+            </TabsTrigger>
+            <TabsTrigger value="modules" className="text-xs hidden lg:block">
+              <BookOpen size={14} className="mr-1" /> Модули
+            </TabsTrigger>
+            <TabsTrigger value="lms" className="text-xs hidden lg:block">
+              <Link size={14} className="mr-1" /> LMS
+            </TabsTrigger>
+            <TabsTrigger value="announcements" className="text-xs hidden xl:block">
+              <Megaphone size={14} className="mr-1" /> Объявления
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs hidden xl:block">
+              <LineChart size={14} className="mr-1" /> Аналитика
+            </TabsTrigger>
+            <TabsTrigger value="audit" className="text-xs hidden xl:block">
+              <Activity size={14} className="mr-1" /> Журнал
+            </TabsTrigger>
+            <TabsTrigger value="report" className="text-xs hidden xl:block">
+              <FileBarChart size={14} className="mr-1" /> Отчёт
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Users Tab */}
         <TabsContent value="users" className="mt-4 space-y-4">

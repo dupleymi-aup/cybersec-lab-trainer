@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { sqlChallenges } from '@/lib/data';
 import CodeBlock from './CodeBlock';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,7 +30,6 @@ export default function SQLInjectionLab() {
     if (!input) return;
     setShowResult(true);
 
-    // Validate: input must contain SQLi-specific patterns
     const hasQuote = /'/.test(input);
     const hasSqlKeyword = /\b(OR|UNION|SELECT|DROP|INSERT|UPDATE|DELETE|ALTER|EXEC|SLEEP|WAITFOR|BENCHMARK|LOAD_FILE|xp_cmdshell|CHAR|CONCAT|SUBSTRING|VERSION|information_schema|NULL|--|;|\/\*|0x)\b/i.test(input);
     const valid = (hasQuote || hasSqlKeyword) && input.length > 2;
@@ -86,27 +85,34 @@ export default function SQLInjectionLab() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
-          <ChevronLeft size={20} />
-        </Button>
-        <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-          <Zap size={20} className="text-emerald-600" />
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+            <ChevronLeft size={20} />
+          </Button>
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <Zap size={20} className="text-emerald-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">Лаборатория SQL-инъекций</h1>
+            <p className="text-xs text-muted-foreground">Интерактивная среда для изучения уязвимостей SQL</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-bold">Лаборатория SQL-инъекций</h1>
-          <p className="text-xs text-muted-foreground">Интерактивная среда для изучения уязвимостей SQL</p>
-        </div>
+        {allCompleted && (
+          <Badge className="bg-emerald-600 text-white shrink-0">
+            <CheckCircle2 size={14} className="mr-1" />
+            Модуль завершён!
+          </Badge>
+        )}
       </div>
 
-      {/* Progress */}
+      {/* Progress bar */}
       <Card className="border-none shadow-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium">Прогресс: {sqlCompletedLevels.length}/{sqlChallenges.length}</span>
-            {allCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             {sqlChallenges.map((c, i) => (
               <button
                 key={c.id}
@@ -118,128 +124,138 @@ export default function SQLInjectionLab() {
                       ? 'bg-emerald-300'
                       : 'bg-slate-200'
                 }`}
+                title={`Задание ${i + 1}: ${c.title}`}
               />
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Challenge info */}
-      <Card className="border-border">
-        <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Badge className={`text-[11px] ${levelColors[challenge.level]}`}>
-                {challenge.level}
-              </Badge>
-              <span className="text-xs text-slate-400">
-                Задание {activeChallenge + 1} из {sqlChallenges.length}
-              </span>
-            </div>
-            {isCompleted && (
-              <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-                <CheckCircle2 size={14} /> Пройдено
-              </span>
-            )}
-          </div>
-          <h2 className="font-semibold mb-2">{challenge.title}</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">{challenge.description}</p>
-        </CardContent>
-      </Card>
-
-      {/* Simulated form */}
-      <Card className="border-border">
-        <CardContent className="p-5 space-y-4">
-          <h3 className="text-sm font-semibold flex items-center gap-2">
-            <Play size={16} className="text-emerald-600" />
-            Симуляция — введите payload
-          </h3>
-
-          <div>
-            <label className="text-xs text-muted-foreground mb-1 block">SQL-инъекция:</label>
-            <div className="flex gap-2">
-              <Input
-                value={userInput}
-                onChange={(e) => { setUserInput(e.target.value); setShowResult(false); }}
-                placeholder="Введите вредоносный код..."
-                className="font-mono text-sm"
-                onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
-              />
-              <Button onClick={checkAnswer} className="bg-emerald-600 hover:bg-emerald-700 shrink-0">
-                <Play size={16} />
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={tryExample}>
-              <Lightbulb size={14} className="mr-1" /> Пример ответа
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => { setShowHint(true); setHintLevel(1); }}>
-              <Lightbulb size={14} className="mr-1" />
-              {showHint ? (hintLevel < 3 ? `Подсказка ${hintLevel + 1}/3` : 'Все подсказки показаны') : 'Подсказка'}
-            </Button>
-          </div>
-
-          <AnimatePresence>
-            {showHint && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-              >
-                <div className="bg-amber-50 rounded-lg p-3 space-y-2">
-                  {/* Current hint */}
-                  <div className={`rounded-lg p-2 ${
-                    hintLevel === 1 ? 'bg-amber-100/50' : hintLevel === 2 ? 'bg-orange-100/50' : 'bg-red-100/50'
-                  }`}>
-                    <p className={`text-xs font-semibold mb-1 ${
-                      hintLevel === 1 ? 'text-amber-700' : hintLevel === 2 ? 'text-orange-700' : 'text-red-700'
-                    }`}>
-                      {hintLevel === 1 ? '💡 Общая идея:' : hintLevel === 2 ? '🔍 Конкретнее:' : '🎯 Подсказка:'}
-                    </p>
-                    <p className="text-xs text-amber-800">
-                      {hintLevel === 1
-                        ? 'Попробуйте понять структуру SQL-запроса и найдите точку внедрения.'
-                        : hintLevel === 2
-                          ? 'Обратите внимание на синтаксис кавычек, комментарии и операторы объединения запросов.'
-                          : challenge.hint}
-                    </p>
-                  </div>
-                  {/* More hints button */}
-                  {hintLevel < 3 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs text-amber-700 hover:text-amber-800 h-auto py-1 px-2"
-                      onClick={() => setHintLevel(hintLevel + 1)}
-                    >
-                      Показать следующую подсказку ({hintLevel + 1}/3) →
-                    </Button>
-                  )}
+      {/* Main content grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left column: Challenge info + Input */}
+        <div className="space-y-6">
+          {/* Challenge info */}
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between mb-2">
+                <Badge className={`text-[11px] ${levelColors[challenge.level]}`}>
+                  {challenge.level}
+                </Badge>
+                <span className="text-xs text-slate-400">
+                  Задание {activeChallenge + 1} из {sqlChallenges.length}
+                </span>
+              </div>
+              <CardTitle className="text-lg">{challenge.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground leading-relaxed">{challenge.description}</p>
+              {isCompleted && (
+                <div className="mt-3 flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                  <CheckCircle2 size={14} /> Пройдено
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </CardContent>
-      </Card>
+              )}
+            </CardContent>
+          </Card>
 
-      {/* Query visualization */}
-      <Card className="border-border">
-        <CardContent className="p-5">
-          <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-            <Eye size={16} className="text-emerald-600" />
-            Визуализация запроса
-          </h3>
-          <CodeBlock
-            code={getModifiedQuery()}
-            language="sql"
-            title="SQL Query"
-          />
-        </CardContent>
-      </Card>
+          {/* Input section */}
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Play size={16} className="text-emerald-600" />
+                Симуляция — введите payload
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">SQL-инъекция:</label>
+                <div className="flex gap-2">
+                  <Input
+                    value={userInput}
+                    onChange={(e) => { setUserInput(e.target.value); setShowResult(false); }}
+                    placeholder="Введите вредоносный код..."
+                    className="font-mono text-sm"
+                    onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
+                  />
+                  <Button onClick={checkAnswer} className="bg-emerald-600 hover:bg-emerald-700 shrink-0">
+                    <Play size={16} />
+                  </Button>
+                </div>
+              </div>
 
-      {/* Result */}
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={tryExample}>
+                  <Lightbulb size={14} className="mr-1" /> Пример
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => { setShowHint(true); setHintLevel(1); }}>
+                  <Lightbulb size={14} className="mr-1" />
+                  {showHint ? (hintLevel < 3 ? `Подсказка ${hintLevel + 1}/3` : 'Все показаны') : 'Подсказка'}
+                </Button>
+              </div>
+
+              <AnimatePresence>
+                {showHint && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
+                    <div className="bg-amber-50 rounded-lg p-3 space-y-2">
+                      <div className={`rounded-lg p-2 ${
+                        hintLevel === 1 ? 'bg-amber-100/50' : hintLevel === 2 ? 'bg-orange-100/50' : 'bg-red-100/50'
+                      }`}>
+                        <p className={`text-xs font-semibold mb-1 ${
+                          hintLevel === 1 ? 'text-amber-700' : hintLevel === 2 ? 'text-orange-700' : 'text-red-700'
+                        }`}>
+                          {hintLevel === 1 ? 'Общая идея:' : hintLevel === 2 ? 'Конкретнее:' : 'Подсказка:'}
+                        </p>
+                        <p className="text-xs text-amber-800">
+                          {hintLevel === 1
+                            ? 'Попробуйте понять структуру SQL-запроса и найдите точку внедрения.'
+                            : hintLevel === 2
+                              ? 'Обратите внимание на синтаксис кавычек, комментарии и операторы объединения запросов.'
+                              : challenge.hint}
+                        </p>
+                      </div>
+                      {hintLevel < 3 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-amber-700 hover:text-amber-800 h-auto py-1 px-2"
+                          onClick={() => setHintLevel(hintLevel + 1)}
+                        >
+                          Показать следующую подсказку ({hintLevel + 1}/3) →
+                        </Button>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right column: Visualization */}
+        <div className="space-y-6">
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Eye size={16} className="text-emerald-600" />
+                Визуализация запроса
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CodeBlock
+                code={getModifiedQuery()}
+                language="sql"
+                title="SQL Query"
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Result section */}
       <AnimatePresence>
         {showResult && (
           <motion.div
@@ -248,7 +264,7 @@ export default function SQLInjectionLab() {
             exit={{ opacity: 0 }}
           >
             <Card className={isSuccess ? 'border-emerald-300 bg-emerald-50' : 'border-red-300 bg-red-50'}>
-              <CardContent className="p-5 space-y-3">
+              <CardContent className="p-5 space-y-4">
                 <div className="flex items-center gap-2">
                   {isSuccess ? (
                     <>
@@ -276,12 +292,12 @@ export default function SQLInjectionLab() {
                     <p className="text-xs text-muted-foreground">
                       Для SQL-инъекции попробуйте использовать: одинарные кавычки (<code className="font-mono">'</code>),
                       SQL-ключевые слова (<code className="font-mono">OR</code>, <code className="font-mono">UNION SELECT</code>, <code className="font-mono">--</code>),
-                      или другие конструкции. Нажмите «Пример ответа» для подсказки.
+                      или другие конструкции. Нажмите «Пример» для подсказки.
                     </p>
                   </div>
                 )}
 
-                <div className="flex gap-2">
+                <div>
                   <Button
                     variant="outline"
                     size="sm"
@@ -298,14 +314,14 @@ export default function SQLInjectionLab() {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                     >
-                      <div className="bg-white dark:bg-card rounded-lg p-4 mt-2">
-                        <h4 className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
+                      <div className="bg-white dark:bg-card rounded-lg p-4 mt-2 space-y-3">
+                        <h4 className="text-xs font-semibold text-emerald-700 flex items-center gap-1.5">
                           <BookOpen size={14} /> Объяснение
                         </h4>
                         <p className="text-xs text-muted-foreground leading-relaxed">
                           {challenge.explanation}
                         </p>
-                        <div className="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                        <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
                           <h4 className="text-xs font-semibold text-emerald-700 mb-1 flex items-center gap-1.5">
                             <ShieldCheck size={14} /> Как защититься?
                           </h4>

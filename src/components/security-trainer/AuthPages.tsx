@@ -205,12 +205,12 @@ export default function AuthPages() {
         className="relative w-full max-w-md"
       >
         {/* Logo */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-600 rounded-2xl mb-3">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-600 rounded-2xl mb-3 shadow-lg shadow-violet-600/20">
             <Shield className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">CyberSec Lab</h1>
-          <p className="text-slate-400 text-sm">Тренажёр по информационной безопасности</p>
+          <p className="text-slate-400 text-sm mt-1">Тренажёр по информационной безопасности</p>
         </div>
 
         <AnimatePresence mode="wait">
@@ -221,9 +221,9 @@ export default function AuthPages() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
             >
-              <Card className="border-slate-700/50 bg-slate-800 dark:bg-slate-700/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="text-white">Вход в аккаунт</CardTitle>
+              <Card className="border-slate-700/50 bg-slate-800/80 dark:bg-slate-700/50 backdrop-blur-xl shadow-xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-white text-xl">Вход в аккаунт</CardTitle>
                   <CardDescription className="text-slate-400">
                     Введите email или телефон и пароль
                   </CardDescription>
@@ -264,31 +264,34 @@ export default function AuthPages() {
                         </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="remember-me"
-                        checked={rememberMe}
-                        onCheckedChange={(checked) => setRememberMe(!!checked)}
-                      />
-                      <Label htmlFor="remember-me" className="text-sm text-slate-300 cursor-pointer">
-                        Запомнить меня
-                      </Label>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="remember-me"
+                          checked={rememberMe}
+                          onCheckedChange={(checked) => setRememberMe(!!checked)}
+                        />
+                        <Label htmlFor="remember-me" className="text-sm text-slate-300 cursor-pointer">
+                          Запомнить меня
+                        </Label>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setPage('recovery')}
+                        className="text-sm text-violet-400 hover:text-violet-300"
+                      >
+                        Забыли пароль?
+                      </button>
                     </div>
                     <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
                       {loading ? 'Вход...' : 'Войти'}
                     </Button>
                   </form>
 
-                  <div className="mt-4 space-y-2 text-sm text-center">
-                    <button
-                      onClick={() => setPage('recovery')}
-                      className="text-violet-400 hover:text-violet-300 block w-full"
-                    >
-                      Забыли пароль?
-                    </button>
+                  <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm">
                     <p className="text-slate-400">
                       Нет аккаунта?{' '}
-                      <button onClick={() => setPage('register')} className="text-violet-400 hover:text-violet-300">
+                      <button onClick={() => setPage('register')} className="text-violet-400 hover:text-violet-300 font-medium">
                         Зарегистрироваться
                       </button>
                     </p>
@@ -306,9 +309,9 @@ export default function AuthPages() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.2 }}
             >
-              <Card className="border-slate-700/50 bg-slate-800 dark:bg-slate-700/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="text-white">Регистрация</CardTitle>
+              <Card className="border-slate-700/50 bg-slate-800/80 dark:bg-slate-700/50 backdrop-blur-xl shadow-xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-white text-xl">Регистрация</CardTitle>
                   <CardDescription className="text-slate-400">
                     Создайте аккаунт для начала обучения
                   </CardDescription>
@@ -327,31 +330,33 @@ export default function AuthPages() {
                         className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="reg-email" className="text-slate-300">
-                        Email
-                      </Label>
-                      <Input
-                        id="reg-email"
-                        type="email"
-                        value={regEmail}
-                        onChange={(e) => setRegEmail(e.target.value)}
-                        placeholder="example@mail.com"
-                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="reg-phone" className="text-slate-300">
-                        Телефон
-                      </Label>
-                      <Input
-                        id="reg-phone"
-                        type="tel"
-                        value={regPhone}
-                        onChange={(e) => setRegPhone(e.target.value)}
-                        placeholder="+7 (999) 123-45-67"
-                        className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="reg-email" className="text-slate-300">
+                          Email
+                        </Label>
+                        <Input
+                          id="reg-email"
+                          type="email"
+                          value={regEmail}
+                          onChange={(e) => setRegEmail(e.target.value)}
+                          placeholder="example@mail.com"
+                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="reg-phone" className="text-slate-300">
+                          Телефон
+                        </Label>
+                        <Input
+                          id="reg-phone"
+                          type="tel"
+                          value={regPhone}
+                          onChange={(e) => setRegPhone(e.target.value)}
+                          placeholder="+7 (999)..."
+                          className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-3">
                       <Label className="text-slate-300">Роль</Label>
@@ -447,13 +452,6 @@ export default function AuthPages() {
                             }`}>{regPwStrength.label}</span>
                           </div>
                           <Progress value={regPwStrength.score} className="h-1.5" />
-                          <div className="h-1.5 rounded-full overflow-hidden bg-slate-700">
-                            <div
-                              className={`h-full ${regPwStrength.color} rounded-full transition-all duration-500`}
-                              style={{ width: `${regPwStrength.score}%` }}
-                            />
-                          </div>
-                          <Separator className="bg-slate-700" />
                           <div className="space-y-1">
                             {regPwStrength.checks.map((check, i) => (
                               <div key={i} className="flex items-center gap-2 text-xs">
@@ -501,9 +499,9 @@ export default function AuthPages() {
                     </Button>
                   </form>
 
-                  <div className="mt-4 text-sm text-center text-slate-400">
+                  <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm text-slate-400">
                     Уже есть аккаунт?{' '}
-                    <button onClick={() => setPage('login')} className="text-violet-400 hover:text-violet-300">
+                    <button onClick={() => setPage('login')} className="text-violet-400 hover:text-violet-300 font-medium">
                       Войти
                     </button>
                   </div>
@@ -519,9 +517,9 @@ export default function AuthPages() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
             >
-              <Card className="border-slate-700/50 bg-slate-800 dark:bg-slate-700/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="text-white">Восстановление пароля</CardTitle>
+              <Card className="border-slate-700/50 bg-slate-800/80 dark:bg-slate-700/50 backdrop-blur-xl shadow-xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-white text-xl">Восстановление пароля</CardTitle>
                   <CardDescription className="text-slate-400">
                     {recoveryStep === 'enter-contact' && 'Укажите email или телефон для восстановления'}
                     {recoveryStep === 'enter-otp' && 'Введите код подтверждения'}
@@ -531,11 +529,11 @@ export default function AuthPages() {
                 <CardContent>
                   {recoveryStep === 'enter-contact' && (
                     <div className="space-y-4">
-                      <div className="flex gap-2 mb-4">
+                      <div className="grid grid-cols-2 gap-2 mb-4">
                         <button
                           type="button"
                           onClick={() => setRecoveryMethod('email')}
-                          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 transition ${
+                          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 transition ${
                             recoveryMethod === 'email'
                               ? 'border-violet-500 bg-violet-500/10 text-violet-400'
                               : 'border-slate-600 text-slate-400 hover:border-slate-500'
@@ -547,7 +545,7 @@ export default function AuthPages() {
                         <button
                           type="button"
                           onClick={() => setRecoveryMethod('phone')}
-                          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 transition ${
+                          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 transition ${
                             recoveryMethod === 'phone'
                               ? 'border-violet-500 bg-violet-500/10 text-violet-400'
                               : 'border-slate-600 text-slate-400 hover:border-slate-500'
@@ -672,13 +670,6 @@ export default function AuthPages() {
                               }`}>{recoveryPwStrength.label}</span>
                             </div>
                             <Progress value={recoveryPwStrength.score} className="h-1.5" />
-                            <div className="h-1.5 rounded-full overflow-hidden bg-slate-700">
-                              <div
-                                className={`h-full ${recoveryPwStrength.color} rounded-full transition-all duration-500`}
-                                style={{ width: `${recoveryPwStrength.score}%` }}
-                              />
-                            </div>
-                            <Separator className="bg-slate-700" />
                             <div className="space-y-1">
                               {recoveryPwStrength.checks.map((check, i) => (
                                 <div key={i} className="flex items-center gap-2 text-xs">
@@ -736,8 +727,8 @@ export default function AuthPages() {
                   )}
 
                   {recoveryStep !== 'enter-otp' && (
-                    <div className="mt-4 text-sm text-center text-slate-400">
-                      <button onClick={() => { setPage('login'); setRecoveryStep('enter-contact'); }} className="text-violet-400 hover:text-violet-300">
+                    <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm text-slate-400">
+                      <button onClick={() => { setPage('login'); setRecoveryStep('enter-contact'); }} className="text-violet-400 hover:text-violet-300 font-medium">
                         Вернуться ко входу
                       </button>
                     </div>

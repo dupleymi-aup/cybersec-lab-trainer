@@ -8,7 +8,7 @@ import { NotificationHelper, loadAnnouncementsIntoNotifications } from '@/lib/no
 import NotificationBell from './NotificationBell';
 import ActivityCalendar from './ActivityCalendar';
 import { triggerCelebration } from './CompletionCelebration';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -127,7 +127,6 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch upcoming deadlines on mount
   useEffect(() => {
     getAuthHeaders()
       .then(headers => fetch('/api/deadlines/upcoming', { headers }))
@@ -135,7 +134,6 @@ export default function Dashboard() {
       .then(data => {
         if (data.upcoming) {
           setUpcomingDeadlines(data.upcoming);
-          // Create in-app notifications for overdue or imminent deadlines
           for (const d of data.upcoming) {
             if (d.daysLeft <= 2) {
               NotificationHelper.deadlineWarning(d.title, d.daysLeft);
@@ -144,7 +142,7 @@ export default function Dashboard() {
         }
       })
       .catch(() => {
-        // Silently ignore errors (e.g., network issues, endpoint not available)
+        // Silently ignore errors
       });
   }, []);
 
@@ -170,7 +168,6 @@ export default function Dashboard() {
     return keys.length > 0 ? Math.round(Object.values(quizScores).reduce((a, b) => a + b, 0) / keys.length) : 0;
   }, [quizScores]);
 
-  // Achievements — use centralized achievement-utils
   const unlockedAchievements = useMemo(() =>
     achievements.filter((a) => getAchievementStatus(a.id, completedModules, quizScores, challengeStats))
   , [completedModules, quizScores, challengeStats]);
@@ -183,7 +180,6 @@ export default function Dashboard() {
     countUnlockedAchievements(completedModules, quizScores, challengeStats)
   , [completedModules, quizScores, challengeStats]);
 
-  // Per-module granular progress — memoized function via useCallback
   const getModuleProgress = useCallback((moduleId: string, completed: boolean): { pct: number; label: string } => {
     const TOTALS: Record<string, number> = {
       'sql-injection': sqlChallenges.length,
@@ -207,9 +203,6 @@ export default function Dashboard() {
     return { pct, label: `${done}/${total}` };
   }, [sqlCompletedLevels.length, xssCompletedLevels.length, csrfCompletedSteps.length, secureCodingAnsweredChallenges.length]);
 
-  // Recommendations
-
-  // Detect newly unlocked achievements and show toasts
   const prevUnlockedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     const current = new Set(unlockedAchievements.map((a) => a.id));
@@ -229,7 +222,6 @@ export default function Dashboard() {
 
   const proficiency = getProficiencyLevel(completedCount, totalModules, avgQuizScore);
 
-  // Build activity timeline from store data (needed by recommendation engine)
   const activityTimeline = useMemo(() => {
     const events: Array<{ date: Date; type: 'module' | 'quiz'; label: string }> = [];
     for (const [moduleId, ts] of Object.entries(moduleTimestamps)) {
@@ -245,13 +237,11 @@ export default function Dashboard() {
     return events;
   }, [moduleTimestamps, quizTimestamps]);
 
-  // Calculate current and longest streak from activity timestamps
   const streakData = useMemo(() => {
     const allDates = new Set<string>();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Collect all unique activity dates (YYYY-MM-DD)
     for (const ts of Object.values(moduleTimestamps)) {
       const d = new Date(ts);
       d.setHours(0, 0, 0, 0);
@@ -265,7 +255,6 @@ export default function Dashboard() {
 
     if (allDates.size === 0) return { current: 0, longest: 0, isToday: false, daysSinceLast: 999 };
 
-    // Current streak: count consecutive days starting from today (or yesterday if today has no activity)
     let current = 0;
     const todayStr = today.toISOString().split('T')[0];
     const yesterday = new Date(today);
@@ -285,7 +274,6 @@ export default function Dashboard() {
       }
     }
 
-    // Longest streak: find the longest consecutive sequence
     let longest = 0;
     let currentLongest = 0;
     const sortedAsc = Array.from(allDates).sort();
@@ -301,17 +289,14 @@ export default function Dashboard() {
       longest = Math.max(longest, currentLongest);
     }
 
-    // Days since last activity
     const lastDate = new Date(sortedAsc[sortedAsc.length - 1]);
     const daysSinceLast = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
 
     return { current, longest: Math.max(longest, current), isToday: allDates.has(todayStr), daysSinceLast };
   }, [moduleTimestamps, quizTimestamps]);
 
-  // Memoized recommendation — depends on streakData which is defined above
   const recommendation = useMemo(() => {
     const buildRecommendation = () => {
-      // Role-specific recommendations
       if (user?.role === 'admin' && completedModules.length === 0) {
         return { text: 'Управляйте пользователями и настройками системы.', page: 'admin-panel' as PageType };
       }
@@ -319,7 +304,6 @@ export default function Dashboard() {
         return { text: 'Посмотрите аналитику и прогресс студентов.', page: 'teacher-panel' as PageType };
       }
 
-      // Streak-based recommendations
       if (streakData.current >= 7) {
         return { text: `Отличная серия — ${streakData.current} дней подряд! Продолжайте и открывайте новые достижения.`, page: 'achievements' as PageType };
       }
@@ -362,7 +346,7 @@ export default function Dashboard() {
         const nextModule = modules.find((m) => !completedModules.includes(m.id));
         return { text: 'Завершите оставшиеся модули для полного прохождения!', page: (nextModule?.id || 'dashboard') as PageType };
       }
-      return { text: 'Великолепно! Вы прошли все модулы. Посмотрите достижения!', page: 'achievements' as PageType };
+      return { text: 'Великолепно! Вы прошли все модули. Посмотрите достижения!', page: 'achievements' as PageType };
     };
     return buildRecommendation();
   }, [user?.role, completedModules, quizScores, totalProgress, streakData]);
@@ -373,7 +357,6 @@ export default function Dashboard() {
     setCurrentPage(moduleId as PageType);
   };
 
-  // Role-based quick actions
   const quickActions = [
     ...(user?.role === 'admin' || user?.role === 'teacher'
       ? [{ label: 'Панель администратора' as const, page: 'admin-panel' as PageType, icon: Shield, color: 'bg-red-100 text-red-600' }]
@@ -384,17 +367,17 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Top bar mobile */}
+    <div className="space-y-6">
+      {/* Mobile top bar */}
       <div className="flex items-center gap-3 md:hidden">
-          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-            <Menu size={22} />
-          </Button>
-          <Shield size={22} className="text-emerald-600" />
-          <span className="font-bold text-lg">CyberSec Lab</span>
-          <div className="ml-auto">
-            <NotificationBell />
-          </div>
+        <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+          <Menu size={22} />
+        </Button>
+        <Shield size={22} className="text-emerald-600" />
+        <span className="font-bold text-lg">CyberSec Lab</span>
+        <div className="ml-auto">
+          <NotificationBell />
+        </div>
       </div>
 
       {/* Announcements */}
@@ -422,7 +405,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-semibold text-foreground/80">{ann.title}</p>
                         {ann.priority === 'high' && (
-                          <Badge className="bg-red-100 text-red-700 text-[10px] border-0">Важно</Badge>
+                          <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">Важно</Badge>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">{ann.content}</p>
@@ -441,16 +424,16 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Hero */}
+      {/* Hero section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-white p-8 md:p-10"
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-white p-6 md:p-10"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
             <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-600/30">
               09.03.04 Программная инженерия
             </Badge>
@@ -458,15 +441,14 @@ export default function Dashboard() {
               {proficiency.icon} {proficiency.label}
             </Badge>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-3">
+          <h1 className="text-xl md:text-3xl font-bold mb-3">
             Добро пожаловать{user?.fullName ? `, ${user.fullName.split(' ')[0]}` : ''}!
           </h1>
-          <p className="text-slate-300 max-w-2xl leading-relaxed">
+          <p className="text-sm md:text-base text-slate-300 max-w-2xl leading-relaxed">
             Интерактивная платформа для изучения уязвимостей веб-приложений, методов атак и защитных
-            механизмов. Практикуйтесь в безопасной среде: находите уязвимости, экспериментируйте с
-            атаками и учитесь писать защищённый код.
+            механизмов. Практикуйтесь в безопасной среде.
           </p>
-          <div className="flex flex-wrap gap-4 mt-6">
+          <div className="flex flex-wrap gap-3 md:gap-4 mt-6">
             <div className="flex items-center gap-2 text-sm">
               <BookOpen size={16} className="text-emerald-400" />
               <span className="text-slate-300">{totalModules} модулей</span>
@@ -478,7 +460,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 text-sm">
               <Trophy size={16} className="text-emerald-400" />
               <span className="text-slate-300">
-                {avgQuizScore > 0 ? `Средний балл квизов: ${avgQuizScore}%` : 'Пройдите квиз для оценки'}
+                {avgQuizScore > 0 ? `Средний балл: ${avgQuizScore}%` : 'Пройдите квиз'}
               </span>
             </div>
             <div className="flex items-center gap-2 text-sm">
@@ -489,8 +471,108 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      {/* Activity Calendar */}
-      <ActivityCalendar />
+      {/* Stats grid - key metrics first */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+        {[
+          { label: 'Модули', value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
+          { label: 'Квизы', value: `${Object.keys(quizScores).length}/${quizCategories.length}`, color: 'text-amber-600' },
+          { label: 'Средний балл', value: `${avgQuizScore}%`, color: 'text-sky-600' },
+          { label: 'Достижения', value: `${unlockedCount}/${achievements.length}`, color: 'text-violet-600' },
+          { label: streakData.current > 0 ? 'Серия' : 'Нет серии', value: streakData.current > 0 ? `${streakData.current} дн.` : '—', color: 'text-orange-600', tooltip: streakData.longest > 0 ? `Лучшая: ${streakData.longest} дн.` : undefined },
+          { label: 'Уровень', value: proficiency.label, color: proficiency.color },
+        ].map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+          >
+            <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow">
+              <CardContent className="p-4 text-center">
+                {stat.label.includes('Серия') || stat.label.includes('Нет') ? (
+                  <>
+                    <Flame size={20} className={`mx-auto mb-1 ${streakData.current > 0 ? 'text-orange-500' : 'text-slate-300'}`} />
+                    <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                    {stat.tooltip && streakData.longest > 0 && (
+                      <p className="text-[10px] text-orange-500 mt-0.5">{stat.tooltip}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className={`text-xl md:text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Quick actions */}
+      {quickActions.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {quickActions.map((action) => (
+            <Button
+              key={action.label}
+              variant="outline"
+              onClick={() => setCurrentPage(action.page)}
+              className={`flex items-center gap-2 ${action.color} border-border`}
+            >
+              <action.icon size={16} />
+              {action.label}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {/* Recommendation + Next Achievement side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 cursor-pointer hover:shadow-md transition-shadow h-full"
+            onClick={() => setCurrentPage(recommendation.page)}>
+            <CardContent className="p-5 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shrink-0">
+                  <ArrowRight size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-emerald-600 font-medium">Рекомендация</p>
+                  <p className="text-sm font-semibold text-foreground/80">{recommendation.text}</p>
+                </div>
+              </div>
+              <ChevronRight size={18} className="text-emerald-400 shrink-0" />
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {nextAchievement && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 h-full">
+              <CardContent className="p-5 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 shrink-0">
+                  {achievementIcons[nextAchievement.id]}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-amber-600">Следующее достижение</p>
+                  <p className="text-sm font-semibold text-amber-900">{nextAchievement.title}</p>
+                  <p className="text-[11px] text-amber-700">{nextAchievement.condition}</p>
+                </div>
+                <Trophy size={20} className="text-amber-300 shrink-0" />
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </div>
 
       {/* Upcoming Deadlines */}
       {upcomingDeadlines.length > 0 && (
@@ -570,170 +652,10 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        {[
-          { label: 'Модули пройдены', value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
-          { label: 'Квизов завершено', value: `${Object.keys(quizScores).length}/${quizCategories.length}`, color: 'text-amber-600' },
-          { label: 'Средний балл', value: `${avgQuizScore}%`, color: 'text-sky-600' },
-          { label: 'Достижения', value: `${unlockedAchievements.length}/${achievements.length}`, color: 'text-violet-600' },
-          { label: streakData.current > 0 ? 'Серия дней' : 'Нет серии', value: streakData.current > 0 ? `${streakData.current} дн.` : '—', color: 'text-orange-600', tooltip: streakData.longest > 0 ? `Лучшая серия: ${streakData.longest} дн.` : undefined },
-          { label: 'Уровень', value: proficiency.label, color: proficiency.color },
-        ].map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <Card className="border-none shadow-sm bg-card">
-              <CardContent className="p-4 text-center">
-                {stat.label.includes('Серия') || stat.label.includes('Нет') ? (
-                  <>
-                    <Flame size={20} className={`mx-auto mb-1 ${streakData.current > 0 ? 'text-orange-500' : 'text-slate-300'}`} />
-                    <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
-                    {stat.tooltip && streakData.longest > 0 && (
-                      <p className="text-[10px] text-orange-500 mt-0.5">{stat.tooltip}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
-                  </>
-                ) : (
-                  <>
-                    <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Quick actions for role-based users */}
-      {quickActions.length > 0 && (
-        <div className="flex gap-3">
-          {quickActions.map((action) => (
-            <Button
-              key={action.label}
-              variant="outline"
-              onClick={() => setCurrentPage(action.page)}
-              className={`flex items-center gap-2 ${action.color} border-border`}
-            >
-              <action.icon size={16} />
-              {action.label}
-            </Button>
-          ))}
-        </div>
-      )}
-
-      {/* Recommendation banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <Card className="bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 cursor-pointer hover:shadow-md transition-shadow"
-          onClick={() => setCurrentPage(recommendation.page)}>
-          <CardContent className="p-5 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shrink-0">
-                <ArrowRight size={20} />
-              </div>
-              <div>
-                <p className="text-xs text-emerald-600 font-medium">Рекомендация</p>
-                <p className="text-sm font-semibold text-foreground/80">{recommendation.text}</p>
-              </div>
-            </div>
-            <ChevronRight size={18} className="text-emerald-400 shrink-0" />
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Next achievement */}
-      {nextAchievement && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-        >
-          <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-500 shrink-0">
-                {achievementIcons[nextAchievement.id]}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-amber-600">Следующее достижение</p>
-                <p className="text-sm font-semibold text-amber-900">{nextAchievement.title}</p>
-                <p className="text-[11px] text-amber-700">{nextAchievement.condition}</p>
-              </div>
-              <Trophy size={20} className="text-amber-300 shrink-0" />
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Activity Timeline */}
-      {activityTimeline.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Card className="border-border">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm flex items-center gap-2">
-                  <Activity size={16} className="text-indigo-500" />
-                  Хронология активности
-                </h3>
-                {activityTimeline.length > 5 && (
-                  <button
-                    onClick={() => setShowAllActivity(!showAllActivity)}
-                    className="text-xs text-indigo-600 hover:text-indigo-800"
-                  >
-                    {showAllActivity ? 'Свернуть' : 'Показать все'}
-                  </button>
-                )}
-              </div>
-              <div className="space-y-1">
-                {(showAllActivity ? activityTimeline : activityTimeline.slice(0, 5)).map((event, i) => (
-                  <motion.div
-                    key={`${event.type}-${event.label}-${i}`}
-                    initial={{ opacity: 0, x: -5 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.03 }}
-                    className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0"
-                  >
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
-                      event.type === 'module' ? 'bg-emerald-100' : 'bg-amber-100'
-                    }`}>
-                      {event.type === 'module' ? (
-                        <CheckCircle2 size={14} className="text-emerald-600" />
-                      ) : (
-                        <Trophy size={14} className="text-amber-600" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{event.label}</p>
-                      <p className="text-[10px] text-slate-400">
-                        {event.date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="text-[10px]">
-                      {event.type === 'module' ? 'Модуль' : 'Квиз'}
-                    </Badge>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
       {/* Module Cards */}
       <div>
-        <h2 className="text-xl font-bold mb-4">Модули обучения</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h2 className="text-lg md:text-xl font-bold mb-4">Модули обучения</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {modules.map((mod, i) => {
             const isCompleted = completedModules.includes(mod.id);
             return (
@@ -741,16 +663,16 @@ export default function Dashboard() {
                 key={mod.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06 }}
+                transition={{ delay: i * 0.04 }}
               >
                 <Card
-                  className="group cursor-pointer border-border hover:border-emerald-300 hover:shadow-md transition-all duration-300 overflow-hidden"
+                  className="group cursor-pointer border-border hover:border-emerald-300 hover:shadow-md transition-all duration-300 overflow-hidden h-full"
                   onClick={() => handleStartModule(mod.id)}
                 >
                   <CardContent className="p-0">
                     <div className="flex">
                       <div
-                        className={`w-20 shrink-0 flex items-center justify-center ${
+                        className={`w-16 md:w-20 shrink-0 flex items-center justify-center ${
                           isCompleted ? 'bg-emerald-50' : 'bg-secondary'
                         }`}
                       >
@@ -773,7 +695,7 @@ export default function Dashboard() {
                             className="text-slate-300 group-hover:text-emerald-500 transition-colors mt-1 shrink-0"
                           />
                         </div>
-                        <div className="flex items-center gap-2 mt-3">
+                        <div className="flex items-center gap-2 mt-3 flex-wrap">
                           <Badge variant="secondary" className={`text-[10px] ${mod.difficultyColor}`}>
                             {mod.difficulty}
                           </Badge>
@@ -796,11 +718,7 @@ export default function Dashboard() {
                           </div>
                           {label && <p className="text-[10px] text-slate-400 mt-1">{label}</p>}
                         </div>
-                      ) : (
-                        <div className="h-1 bg-muted">
-                          <div className="h-full bg-slate-200 w-0 transition-all duration-500" />
-                        </div>
-                      );
+                      ) : null;
                     })()}
                   </CardContent>
                 </Card>
@@ -810,19 +728,19 @@ export default function Dashboard() {
         </div>
 
         {/* Quiz + Achievements cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: modules.length * 0.06 }}
+            transition={{ delay: modules.length * 0.04 }}
           >
             <Card
-              className="group cursor-pointer border-amber-200 hover:border-amber-400 hover:shadow-md transition-all duration-300 overflow-hidden"
+              className="group cursor-pointer border-amber-200 hover:border-amber-400 hover:shadow-md transition-all duration-300 overflow-hidden h-full"
               onClick={() => setCurrentPage('quiz')}
             >
               <CardContent className="p-0">
                 <div className="flex">
-                  <div className="w-20 shrink-0 flex items-center justify-center bg-amber-50">
+                  <div className="w-16 md:w-20 shrink-0 flex items-center justify-center bg-amber-50">
                     <span className="text-amber-500"><HelpCircle size={28} /></span>
                   </div>
                   <div className="flex-1 p-4">
@@ -833,7 +751,7 @@ export default function Dashboard() {
                       </div>
                       <ChevronRight size={16} className="text-slate-300 group-hover:text-amber-500 transition-colors mt-1 shrink-0" />
                     </div>
-                    <div className="flex items-center gap-2 mt-3">
+                    <div className="flex items-center gap-2 mt-3 flex-wrap">
                       <Badge className="bg-amber-100 text-amber-700 border-0 text-[10px]">9 категорий</Badge>
                       <span className="text-[11px] text-slate-400">136+ вопросов</span>
                     </div>
@@ -846,15 +764,15 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: (modules.length + 1) * 0.06 }}
+            transition={{ delay: (modules.length + 1) * 0.04 }}
           >
             <Card
-              className="group cursor-pointer border-violet-200 hover:border-violet-400 hover:shadow-md transition-all duration-300 overflow-hidden"
+              className="group cursor-pointer border-violet-200 hover:border-violet-400 hover:shadow-md transition-all duration-300 overflow-hidden h-full"
               onClick={() => setCurrentPage('achievements')}
             >
               <CardContent className="p-0">
                 <div className="flex">
-                  <div className="w-20 shrink-0 flex items-center justify-center bg-violet-50">
+                  <div className="w-16 md:w-20 shrink-0 flex items-center justify-center bg-violet-50">
                     <span className="text-violet-500"><Trophy size={28} /></span>
                   </div>
                   <div className="flex-1 p-4">
@@ -865,9 +783,9 @@ export default function Dashboard() {
                       </div>
                       <ChevronRight size={16} className="text-slate-300 group-hover:text-violet-500 transition-colors mt-1 shrink-0" />
                     </div>
-                    <div className="flex items-center gap-2 mt-3">
+                    <div className="flex items-center gap-2 mt-3 flex-wrap">
                       <Badge className="bg-violet-100 text-violet-700 border-0 text-[10px]">
-                        {unlockedAchievements.length}/{achievements.length} разблокировано
+                        {unlockedCount}/{achievements.length} разблокировано
                       </Badge>
                       <span className="text-[11px] text-slate-400">80+ терминов</span>
                     </div>
@@ -877,6 +795,68 @@ export default function Dashboard() {
             </Card>
           </motion.div>
         </div>
+      </div>
+
+      {/* Activity Calendar + Timeline side by side on large screens */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <ActivityCalendar />
+        
+        {activityTimeline.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Card className="border-border h-full">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <Activity size={16} className="text-indigo-500" />
+                    Хронология активности
+                  </h3>
+                  {activityTimeline.length > 5 && (
+                    <button
+                      onClick={() => setShowAllActivity(!showAllActivity)}
+                      className="text-xs text-indigo-600 hover:text-indigo-800"
+                    >
+                      {showAllActivity ? 'Свернуть' : 'Показать все'}
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  {(showAllActivity ? activityTimeline : activityTimeline.slice(0, 5)).map((event, i) => (
+                    <motion.div
+                      key={`${event.type}-${event.label}-${i}`}
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.03 }}
+                      className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0"
+                    >
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                        event.type === 'module' ? 'bg-emerald-100' : 'bg-amber-100'
+                      }`}>
+                        {event.type === 'module' ? (
+                          <CheckCircle2 size={14} className="text-emerald-600" />
+                        ) : (
+                          <Trophy size={14} className="text-amber-600" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate">{event.label}</p>
+                        <p className="text-[10px] text-slate-400">
+                          {event.date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px]">
+                        {event.type === 'module' ? 'Модуль' : 'Квиз'}
+                      </Badge>
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </div>
 
       {/* Overall progress */}
