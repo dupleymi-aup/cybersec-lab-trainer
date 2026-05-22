@@ -30,6 +30,7 @@ import {
   getCohortAnalysis,
   getModuleDeepDive, getCertificationReadiness, getLearningVelocity,
   getQuizSessionAnalytics, getGroupDynamics, getLoginPatterns,
+  getQuizRetryAnalytics, getErrorPatternsAnalytics, getPredictiveRisk,
 } from './analytics-api';
 
 export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
@@ -724,4 +725,5 @@ export {
   getCohortAnalysis,
   getModuleDeepDive, getCertificationReadiness, getLearningVelocity,
   getQuizSessionAnalytics, getGroupDynamics, getLoginPatterns,
+  getQuizRetryAnalytics, getErrorPatternsAnalytics, getPredictiveRisk,
 };
