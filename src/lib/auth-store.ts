@@ -190,32 +190,21 @@ export async function toggleUserBlock(userId: string): Promise<{ success: boolea
 
 export async function bulkDeleteUsers(userIds: string[], currentUserId: string): Promise<{ success: boolean; error?: string; count: number }> {
   if (userIds.includes(currentUserId)) return { success: false, error: 'Нельзя удалить себя', count: 0 };
-  let count = 0;
-  for (const id of userIds) {
-    const result = await deleteUser(id);
-    if (result.success) count++;
-  }
+  const results = await Promise.allSettled(userIds.map((id) => deleteUser(id)));
+  const count = results.filter((r) => r.status === 'fulfilled' && r.value.success).length;
   return { success: count > 0, count };
 }
 
 export async function bulkChangeRole(userIds: string[], newRole: UserRole): Promise<{ success: boolean; error?: string; count: number }> {
-  let count = 0;
-  for (const id of userIds) {
-    const result = await changeUserRole(id, newRole);
-    if (result.success) count++;
-  }
+  const results = await Promise.allSettled(userIds.map((id) => changeUserRole(id, newRole)));
+  const count = results.filter((r) => r.status === 'fulfilled' && r.value.success).length;
   return { success: count > 0, count };
 }
 
 export async function bulkToggleBlock(userIds: string[], currentUserId: string, _blocked: boolean): Promise<{ success: boolean; error?: string; count: number }> {
   if (userIds.includes(currentUserId)) return { success: false, error: 'Нельзя заблокировать себя', count: 0 };
-  let count = 0;
-  for (const id of userIds) {
-    if (id !== currentUserId) {
-      const result = await toggleUserBlock(id);
-      if (result.success) count++;
-    }
-  }
+  const results = await Promise.allSettled(userIds.filter((id) => id !== currentUserId).map((id) => toggleUserBlock(id)));
+  const count = results.filter((r) => r.status === 'fulfilled' && r.value.success).length;
   return { success: count > 0, count };
 }
 

@@ -81,7 +81,14 @@ export default function PhishingAnalyzer() {
     hard: 'bg-red-100 text-red-700',
   };
 
-  const sanitizedBody = useMemo(() => DOMPurify.sanitize(currentEmail.body), [currentEmail.body]);
+  const sanitizedBody = useMemo(() => DOMPurify.sanitize(currentEmail.body, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'table', 'tr', 'td', 'th', 'div', 'span', 'blockquote', 'code', 'pre', 'hr', 'b', 'i'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style', 'target', 'rel'],
+    ADD_ATTR: ['rel'],
+    ALLOW_DATA_ATTR: false,
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea', 'select', 'video', 'audio', 'source', 'link', 'meta', 'base'],
+    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|about):|[^a-z]|[#]?)/i,
+  }), [currentEmail.body]);
 
   return (
     <div className="space-y-6">

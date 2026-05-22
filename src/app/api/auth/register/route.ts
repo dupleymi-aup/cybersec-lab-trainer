@@ -33,8 +33,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Check invite code for admin/teacher
-    if ((role === 'admin' || role === 'teacher') && inviteCode?.toUpperCase() !== ADMIN_INVITE_CODE) {
-      return NextResponse.json({ error: 'Неверный код приглашения' }, { status: 403 });
+    if (role === 'admin' || role === 'teacher') {
+      if (!ADMIN_INVITE_CODE) {
+        return NextResponse.json({ error: 'Регистрация с этой ролью отключена' }, { status: 403 });
+      }
+      if (!inviteCode || inviteCode.toUpperCase() !== ADMIN_INVITE_CODE) {
+        return NextResponse.json({ error: 'Неверный код приглашения' }, { status: 403 });
+      }
     }
 
     const passwordHash = await hashPassword(password);

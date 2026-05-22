@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateOTP } from '@/lib/auth-utils';
-import { otpStore } from '@/lib/otp-store';
+import { otpStore, ensureOtpCapacity } from '@/lib/otp-store';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
 
   const otp = generateOTP();
   const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+  ensureOtpCapacity();
   otpStore.set(user.id, { otp, expiresAt });
 
   // TODO: Send OTP via email in production

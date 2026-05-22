@@ -207,19 +207,28 @@ export default function TeacherPanel() {
   // Get unique groups
   const groups = [...new Set(students.map((s) => s.group).filter(Boolean))];
 
+  // Memoize student progress to avoid repeated localStorage reads
+  const progressMap = useMemo(() => {
+    const map = new Map<string, StudentProgress>();
+    for (const s of students) {
+      map.set(s.id, getStudentProgress(s.id));
+    }
+    return map;
+  }, [students]);
+
   // Calculate stats
   const totalStudents = students.length;
   const activeStudents = students.filter((s) => {
-    const progress = getStudentProgress(s.id);
-    return progress.completedModules.length > 0;
+    const progress = progressMap.get(s.id);
+    return progress && progress.completedModules.length > 0;
   }).length;
 
   const avgCompletion =
     totalStudents > 0
       ? Math.round(
           students.reduce((acc, s) => {
-            const progress = getStudentProgress(s.id);
-            return acc + progress.completedModules.length;
+            const progress = progressMap.get(s.id);
+            return acc + (progress ? progress.completedModules.length : 0);
           }, 0) / totalStudents
         )
       : 0;
@@ -228,7 +237,8 @@ export default function TeacherPanel() {
     totalStudents > 0
       ? Math.round(
           students.reduce((acc, s) => {
-            const progress = getStudentProgress(s.id);
+            const progress = progressMap.get(s.id);
+            if (!progress) return acc;
             const scores = Object.values(progress.quizScores);
             if (scores.length === 0) return acc;
             return acc + scores.reduce((a, b) => a + b, 0) / scores.length;
@@ -240,7 +250,7 @@ export default function TeacherPanel() {
   const atRiskStudents = useMemo(() => {
     const now = new Date();
     return students.map((s) => {
-      const progress = getStudentProgress(s.id);
+      const progress = progressMap.get(s.id)!;
       const scores = Object.values(progress.quizScores);
       const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
       const daysSinceActive = progress.lastActive
@@ -255,7 +265,7 @@ export default function TeacherPanel() {
       return { student: s, progress, avgScore, daysSinceActive, reasons };
     }).filter((s) => s.reasons.length > 0)
       .sort((a, b) => b.reasons.length - a.reasons.length || b.daysSinceActive - a.daysSinceActive);
-  }, [students]);
+  }, [students, progressMap]);
 
   // Group comparison data
   const groupComparisonData = useMemo(() => {

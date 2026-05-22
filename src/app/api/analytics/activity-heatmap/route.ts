@@ -3,7 +3,8 @@ import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
+  try {
+    const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
@@ -129,8 +130,11 @@ export async function GET(request: NextRequest) {
     ? dailyActivity.reduce((max, curr) => (curr.count > max.count ? curr : max))
     : null;
 
-  // Most active hour
-  const mostActiveHourEntry = hourlyActivity.reduce((max, curr) => (curr.count > max.count ? curr : max));
+  // Most active hour — only if there's actual activity
+  const maxHourCount = Math.max(...hourlyActivity.map((h) => h.count));
+  const mostActiveHourEntry = maxHourCount > 0
+    ? hourlyActivity.reduce((max, curr) => (curr.count > max.count ? curr : max))
+    : null;
 
   // Streak: count consecutive days with activity going back from today
   const activeDaysSet = new Set(dailyActivity.map((d) => d.date));
@@ -156,7 +160,11 @@ export async function GET(request: NextRequest) {
     weeklyActivity,
     totalActivities,
     mostActiveDay: mostActiveDayEntry ? mostActiveDayEntry.date : null,
-    mostActiveHour: mostActiveHourEntry.hour,
+    mostActiveHour: mostActiveHourEntry ? mostActiveHourEntry.hour : null,
     streakDays,
   });
+  } catch (error) {
+    console.error('Activity heatmap error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

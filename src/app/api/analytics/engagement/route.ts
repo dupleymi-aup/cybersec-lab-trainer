@@ -3,7 +3,8 @@ import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
+  try {
+    const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'admin')) return unauthorized();
 
@@ -175,4 +176,8 @@ export async function GET(request: NextRequest) {
     streakLeaderboard,
     engagementTrend,
   });
+  } catch (error) {
+    console.error('Engagement analytics error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

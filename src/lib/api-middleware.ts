@@ -25,7 +25,11 @@ export const ROLE_HIERARCHY: Record<string, number> = {
 };
 
 export function requireRole(userRole: string, requiredRole: string): boolean {
-  return (ROLE_HIERARCHY[userRole] || 0) >= (ROLE_HIERARCHY[requiredRole] || 0);
+  const userLevel = ROLE_HIERARCHY[userRole];
+  const requiredLevel = ROLE_HIERARCHY[requiredRole];
+  // Deny access if either role is unknown
+  if (userLevel === undefined || requiredLevel === undefined) return false;
+  return userLevel >= requiredLevel;
 }
 
 export function unauthorized(message = 'Unauthorized') {
@@ -46,12 +50,24 @@ export function getClientIp(request: NextRequest): string {
 }
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const MAX_RATE_LIMIT_ENTRIES = 10000;
 
 export function checkRateLimit(key: string, maxAttempts: number, windowMs: number): { allowed: boolean; retryAfter?: number } {
   const now = Date.now();
   const entry = rateLimitStore.get(key);
 
   if (!entry || now > entry.resetAt) {
+    // Clean expired entries inline instead of relying on setInterval
+    if (rateLimitStore.size >= MAX_RATE_LIMIT_ENTRIES) {
+      for (const [k, e] of rateLimitStore.entries()) {
+        if (now > e.resetAt) rateLimitStore.delete(k);
+      }
+    }
+    // If still at max after cleanup, evict oldest
+    if (rateLimitStore.size >= MAX_RATE_LIMIT_ENTRIES) {
+      const firstKey = rateLimitStore.keys().next().value;
+      if (firstKey) rateLimitStore.delete(firstKey);
+    }
     rateLimitStore.set(key, { count: 1, resetAt: now + windowMs });
     return { allowed: true };
   }
@@ -63,15 +79,5 @@ export function checkRateLimit(key: string, maxAttempts: number, windowMs: numbe
 
   return { allowed: true };
 }
-
-/** Periodic cleanup: remove expired entries every 5 minutes */
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of rateLimitStore.entries()) {
-    if (now > entry.resetAt) {
-      rateLimitStore.delete(key);
-    }
-  }
-}, 5 * 60 * 1000);
 
 export { generateToken };
