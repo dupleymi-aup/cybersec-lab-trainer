@@ -156,20 +156,18 @@
 
 ---
 
-## 10. 🎮 Система уровней и прогрессии (RPG-геймификация)
+## 10. ~~🎮 Система уровней и прогрессии (RPG-геймификация)~~ ✅ ВЫПОЛНЕНО
 
-**Проблема:** Есть достижения и лидерборд, но нет глубокой прогрессии. Студентам не хватает долгосрочной мотивации.
+**Статус:** Реализовано 2026-05-22
 
-**Что сделать:**
-- Система уровней (Junior → Mid → Senior → Lead) с XP
-- Skill tree: визуальная карта навыков (MITRE ATT&CK style)
-- Ежедневные streaks и серии достижений
-- Сертификационные треки (OSCP, CEH prep) с прогресс-барами
-- Портфолио экспорта: PDF с навыками для резюме
-
-**Влияние:** Резкое повышение retention и engagement. Студенты возвращаются ради прогрессии, а не контента.
-
-**Сложность:** 🟡 Средняя | **Время:** 2-3 недели
+**Что сделано:**
+- Prisma: поля xp, level, streak, lastActivityAt в User model
+- XP Calculator (xp-utils.ts): 50 уровней, 4 ранга (Junior → Mid → Senior → Lead), таблица 0-125000 XP
+- XP Rewards: module complete (100), quiz pass (50), perfect (100), assignment submit (25), assignment passed (50)
+- Daily login: 10 XP + streak bonus (5 XP за каждый день серии)
+- API: GET /api/gamification/level, POST /api/gamification/xp, GET /api/gamification/leaderboard
+- Leaderboard с фильтрацией по группе, ranking position, rankTitle
+- Streak system: автоматический подсчёт дней + reset при пропуске
 
 ---
 
