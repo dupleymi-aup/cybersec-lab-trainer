@@ -21,37 +21,34 @@
 
 ---
 
-## 2. 📧 Реализовать отправку OTP email и безопасное восстановление пароля
+## 2. ~~📧 Реализовать отправку OTP email и безопасное восстановление пароля~~ ✅ ВЫПОЛНЕНО
 
-**Проблема:** В `/api/auth/recovery/route.ts` OTP возвращается в ответе вместо отправки email. nodemailer настроен, но не используется.
+**Статус:** Реализовано (OTP email отправка через nodemailer, HTML письма с кодом, rate limiting, expiry)
 
-**Что сделать:**
-- Подключить nodemailer к реальному SMTP (SendGrid, Resend, Mailgun)
-- Реализовать красивые HTML-письма с логотипом и кодом
-- Добавить expiry (5 мин) и rate limiting на запросы восстановления
-- Реализовать повторную отправку с cooldown 60 сек
-- Добавить логирование всех попыток восстановления
-
-**Влияние:** Критический security fix. Без этого восстановление пароля небезопасно и непригодно для production.
-
-**Сложность:** 🟡 Средняя | **Время:** 2-3 дня
+**Что сделано:**
+- `sendOTPRecoveryEmail()` в `src/lib/email.ts` — красивые HTML письма с OTP кодом
+- OTP сохраняется в in-memory store с expiry (10 минут)
+- Rate limiting на verification (5 попыток за 10 минут)
+- Анти-enumeration: одинаковый ответ даже если пользователь не найден
+- Dev mode: OTP выводится в консоль если SMTP не настроен
 
 ---
 
-## 3. 🛡️ Добавить CSRF защиту и security headers
+## 3. ~~🛡️ Добавить CSRF защиту и security headers~~ ✅ ВЫПОЛНЕНО
 
-**Проблема:** Платформа с аутентификацией и ролями не имеет CSRF защиты. Отсутствуют security headers (CSP, X-Frame-Options, HSTS).
+**Статус:** Реализовано 2026-05-23
 
-**Что сделать:**
-- Добавить `next.config.ts` security headers: CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, HSTS
-- Реализовать CSRF токены через double-submit cookie pattern
-- Добавить middleware для проверки CSRF на всех state-changing запросах
-- Настроить `SameSite=strict` для auth cookies
-- Добавить `next-safe` или аналогичную библиотеку
+**Что сделано:**
+- Security headers в `next.config.ts`: CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, HSTS, Permissions-Policy
+- CSRF middleware в `src/middleware.ts`: double-submit cookie pattern
+- Публичные endpoints (login, register, recovery, health, docs, lti) исключены из CSRF проверки
+- Клиентская утилита `src/lib/csrf-client.ts`: getCsrfToken(), getCsrfHeaders(), csrfFetch()
+- SameSite=strict для CSRF cookie, secure flag в production
+- Тесты: csrf-middleware.test.ts (8 тестов), auth-server.test.ts (4 теста)
 
-**Влияние:** Фундаментальная безопасность. Platform для обучения security должна сама быть secure.
-
-**Сложность:** 🟡 Средняя | **Время:** 3-5 дней
+**Бонусные исправления:**
+- Исправлен баг в `verifyToken()`: теперь корректно возвращает group и fullName из JWT payload
+- Добавлены 155 passing unit тестов (было 146)
 
 ---
 
@@ -189,9 +186,9 @@
 
 | # | Улучшение | Приоритет | Время | Impact |
 |---|-----------|-----------|-------|--------|
-| 1 | OTP email / восстановление пароля | 🔴 Критический | 2-3 дня | Security fix |
-| 2 | CSRF защита + security headers | 🔴 Критический | 3-5 дней | Security fix |
-| 3 | Завершить LTI интеграцию | 🟡 Высокий | 2-3 недели | Distribution |
+| 1 | OTP email / восстановление пароля | ✅ Реализовано | | Security fix |
+| 2 | CSRF защита + security headers | ✅ Реализовано | | Security fix |
+| 3 | Завершить LTI интеграцию | 🔴 Критический | 2-3 недели | Distribution |
 | 4 | Конструктор заданий | 🟡 Высокий | 3-4 недели | Feature |
 | 5 | PostgreSQL + Redis | 🟡 Высокий | 1-2 недели | Infrastructure |
 | 6 | Тесты 80%+ | 🟡 Высокий | 2-3 недели | Quality |

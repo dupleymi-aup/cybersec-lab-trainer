@@ -31,7 +31,13 @@ export function verifyToken(token: string): TokenPayload | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] }) as jwt.JwtPayload;
     if (!decoded.id || !decoded.role || !decoded.exp) return null;
-    return { id: decoded.id as string, role: decoded.role as string, exp: decoded.exp };
+    return {
+      id: decoded.id as string,
+      role: decoded.role as string,
+      group: decoded.group as string | undefined,
+      fullName: decoded.fullName as string | undefined,
+      exp: decoded.exp,
+    };
   } catch {
     return null;
   }
