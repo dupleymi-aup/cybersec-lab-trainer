@@ -140,3 +140,44 @@ export const batchProgressSchema = z.object({
 });
 
 export type BatchProgressInput = z.infer<typeof batchProgressSchema>;
+
+// Assignment creation validation
+export const createAssignmentSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional().default(""),
+  type: z.enum(["quiz", "code-review", "attack", "writeup", "custom"]),
+  moduleId: z.string().optional().default(""),
+  content: z.string().optional().default(""),  // JSON string
+  maxScore: z.number().int().min(1).max(1000).optional().default(100),
+  passScore: z.number().int().min(0).max(100).optional().default(60),
+  autoGrade: z.boolean().optional().default(false),
+  timeLimit: z.number().int().min(1).optional(),  // minutes, undefined = no limit
+  attempts: z.number().int().min(0).max(10).optional().default(1),
+  group: z.string().optional().default(""),
+  dueAt: z.string().datetime().optional(),  // ISO date string
+  published: z.boolean().optional().default(false),
+});
+
+export type CreateAssignmentInput = z.infer<typeof createAssignmentSchema>;
+
+// Assignment update validation
+export const updateAssignmentSchema = createAssignmentSchema.partial().extend({
+  published: z.boolean().optional(),
+});
+
+export type UpdateAssignmentInput = z.infer<typeof updateAssignmentSchema>;
+
+// Assignment submission validation
+export const submitAssignmentSchema = z.object({
+  content: z.string().min(1, "Submission content required"),  // JSON string
+});
+
+export type SubmitAssignmentInput = z.infer<typeof submitAssignmentSchema>;
+
+// Grade submission validation
+export const gradeSubmissionSchema = z.object({
+  score: z.number().int().min(0),
+  passed: z.boolean(),
+});
+
+export type GradeSubmissionInput = z.infer<typeof gradeSubmissionSchema>;

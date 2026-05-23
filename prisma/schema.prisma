@@ -36,6 +36,8 @@ model User {
   createdDeadlines  Deadline[]       @relation("DeadlineCreator")
   reminderLogs      ReminderLog[]
   scheduledReports  ScheduledReport[]
+  createdAssignments Assignment[] @relation("AssignmentCreator")
+  assignmentSubmissions AssignmentSubmission[]
 
   @@map("users")
 }
@@ -255,4 +257,55 @@ model Announcement {
 
   @@index([active, expiresAt])
   @@map("announcements")
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  type        String   // "quiz" | "code-review" | "attack" | "writeup" | "custom"
+  moduleId    String   @default("") @map("module_id")  // optional: tie to existing module
+  content     String   @default("")  // JSON: quiz questions, code samples, instructions
+  maxScore    Int      @default(100) @map("max_score")
+  passScore   Int      @default(60) @map("pass_score")  // percentage to pass
+  autoGrade   Boolean  @default(false) @map("auto_grade")  // enable auto-grading
+  timeLimit   Int?     @map("time_limit")  // minutes, null = no limit
+  attempts    Int      @default(1)   // max attempts, 0 = unlimited
+  group       String   @default("")  // "" = all students
+  dueAt       DateTime? @map("due_at")
+  published   Boolean  @default(false)
+  createdBy   String   @map("created_by")
+  creator     User     @relation("AssignmentCreator", fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  submissions AssignmentSubmission[]
+
+  @@index([createdBy, published])
+  @@index([group])
+  @@index([dueAt])
+  @@map("assignments")
+}
+
+model AssignmentSubmission {
+  id           String   @id @default(cuid())
+  assignmentId String   @map("assignment_id")
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id])
+  content      String   @default("")  // JSON: answers, code, writeup
+  score        Int?     // auto or manual grade
+  maxScore     Int      @map("max_score")  // snapshot from assignment
+  passed       Boolean? // whether they passed
+  attempt      Int      @default(1)   // attempt number
+  startedAt    DateTime @default(now()) @map("started_at")
+  submittedAt  DateTime? @map("submitted_at")
+  gradedAt     DateTime? @map("graded_at")
+  gradedBy     String?  @map("graded_by")  // teacher who graded
+
+  @@unique([assignmentId, userId, attempt])
+  @@index([userId])
+  @@index([assignmentId])
+  @@index([submittedAt])
+  @@map("assignment_submissions")
 }
