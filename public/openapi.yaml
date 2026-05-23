@@ -1,0 +1,1378 @@
+openapi: 3.0.3
+info:
+  title: CyberSec Lab Trainer API
+  description: |
+    REST API for CyberSec Lab Trainer — an interactive cybersecurity training platform.
+    Supports student learning modules, quizzes, progress tracking, teacher analytics, admin management, and LTI 1.3 integration.
+
+    ## Authentication
+    Most endpoints require a JWT token passed in the `Authorization` header:
+    ```
+    Authorization: Bearer <token>
+    ```
+
+    ## Roles
+    - **student** — access own progress, quizzes, modules
+    - **teacher** — access analytics, group management, deadlines
+    - **admin** — full access including user management, audit logs, system settings
+
+    ## Rate Limiting
+    API endpoints implement rate limiting. Responses with status `429` include `retryAfter` field.
+  version: 0.2.0
+  contact:
+    name: CyberSec Lab Team
+    url: https://github.com/dupleymi/cybersec-lab-trainer
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+  - url: https://cybersec-lab-trainer.vercel.app
+    description: Production deployment
+
+tags:
+  - name: Auth
+    description: Authentication, registration, password recovery
+  - name: Profile
+    description: User profile management
+  - name: Progress
+    description: Module progress and quiz results
+  - name: Quiz
+    description: Quiz taking and results
+  - name: Analytics
+    description: Learning analytics and statistics
+  - name: Admin
+    description: Admin panel — user management, audit logs, announcements
+  - name: Users
+    description: User management (admin/teacher)
+  - name: Deadlines
+    description: Assignment deadlines and reminders
+  - name: LTI
+    description: LTI 1.3 integration with LMS (Moodle, Canvas)
+  - name: Export
+    description: Data export (gradebooks, reports)
+  - name: Reports
+    description: Scheduled reports
+  - name: Health
+    description: System health checks
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: User login
+      description: Authenticate user by email or phone. Returns JWT token and user profile.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [emailOrPhone, password]
+              properties:
+                emailOrPhone:
+                  type: string
+                  description: Email address or phone number
+                password:
+                  type: string
+                  format: password
+                rememberMe:
+                  type: boolean
+                  default: false
+            example:
+              emailOrPhone: "student@example.com"
+              password: "SecurePass123!"
+              rememberMe: true
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+        '400':
+          description: Invalid request body
+        '401':
+          description: Invalid credentials
+        '403':
+          description: Account blocked
+        '429':
+          description: Rate limit exceeded (5 attempts per 30 seconds)
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: User registration
+      description: Create a new user account. Admin/teacher roles require an invite code.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, phone, fullName, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                fullName:
+                  type: string
+                role:
+                  type: string
+                  enum: [student, teacher, admin]
+                  default: student
+                inviteCode:
+                  type: string
+                  description: Required for teacher/admin registration
+                password:
+                  type: string
+                  format: password
+            example:
+              email: "student@example.com"
+              phone: "+79001234567"
+              fullName: "Ivan Petrov"
+              role: "student"
+              password: "SecurePass123!"
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+        '400':
+          description: Invalid request body
+        '403':
+          description: Invalid invite code or registration disabled
+        '409':
+          description: User already exists
+        '429':
+          description: Rate limit exceeded (3 per hour per IP)
+
+  /api/auth/password:
+    put:
+      tags: [Auth]
+      summary: Change password
+      description: Change the current user's password. Requires authentication.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Invalid request
+        '401':
+          description: Invalid current password
+        '403':
+          description: Not authenticated
+
+  /api/auth/recovery:
+    post:
+      tags: [Auth]
+      summary: Request password recovery OTP
+      description: Send a one-time password to the user's email for password recovery.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: OTP sent (or user not found — silent failure for security)
+        '429':
+          description: Rate limit exceeded
+
+  /api/auth/recovery/verify:
+    post:
+      tags: [Auth]
+      summary: Verify password recovery OTP
+      description: Verify the OTP code sent during recovery request.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, otp]
+              properties:
+                email:
+                  type: string
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: OTP verified, reset token returned
+        '400':
+          description: Invalid OTP
+
+  /api/auth/recovery/reset:
+    post:
+      tags: [Auth]
+      summary: Reset password with token
+      description: Set a new password using the reset token received after OTP verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, newPassword]
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Password reset successfully
+        '400':
+          description: Invalid token or password
+
+  /api/auth/delete:
+    delete:
+      tags: [Auth]
+      summary: Delete account
+      description: Delete the current user's account. Requires authentication.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Account deleted
+        '401':
+          description: Not authenticated
+
+  /api/auth/impersonate:
+    post:
+      tags: [Auth]
+      summary: Impersonate user (admin only)
+      description: Admin temporarily assumes another user's identity for debugging/support.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Impersonation token returned
+        '403':
+          description: Admin only
+        '404':
+          description: User not found
+
+  /api/auth/profile:
+    get:
+      tags: [Profile]
+      summary: Get current user profile
+      description: Return the authenticated user's profile data.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+    put:
+      tags: [Profile]
+      summary: Update profile
+      description: Update the current user's profile information.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                phone:
+                  type: string
+                group:
+                  type: string
+                course:
+                  type: string
+                university:
+                  type: string
+                bio:
+                  type: string
+                avatar:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated
+        '400':
+          description: Invalid request
+
+  /api/progress:
+    get:
+      tags: [Progress]
+      summary: Get current user progress
+      description: Return progress for all modules and quiz scores for the authenticated user.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Progress data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  completedModules:
+                    type: array
+                    items:
+                      type: string
+                  quizScores:
+                    type: object
+                    additionalProperties:
+                      type: number
+                  progress:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Progress'
+        '401':
+          description: Not authenticated
+    post:
+      tags: [Progress]
+      summary: Update module progress
+      description: Create or update progress for a specific module. Auto-syncs grades to LTI platforms on completion.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [moduleId]
+              properties:
+                moduleId:
+                  type: string
+                completed:
+                  type: boolean
+                score:
+                  type: number
+                sqlLevels:
+                  type: array
+                  items:
+                    type: integer
+                xssLevels:
+                  type: array
+                  items:
+                    type: integer
+                csrfSteps:
+                  type: array
+                  items:
+                    type: integer
+                challengeScores:
+                  type: object
+      responses:
+        '200':
+          description: Progress updated
+        '400':
+          description: Missing moduleId
+
+  /api/progress/batch:
+    post:
+      tags: [Progress]
+      summary: Batch update progress
+      description: Update multiple progress entries in a single transaction.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                updates:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Batch update complete
+
+  /api/progress/{userId}:
+    get:
+      tags: [Progress]
+      summary: Get user progress by ID (teacher/admin)
+      description: Return progress for a specific user. Requires teacher or admin role.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User progress
+        '403':
+          description: Insufficient permissions
+
+  /api/quiz:
+    get:
+      tags: [Quiz]
+      summary: Get quiz results
+      description: Return quiz results for the authenticated user.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: quizId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Quiz results
+    post:
+      tags: [Quiz]
+      summary: Submit quiz answers
+      description: Submit answers for a quiz and receive graded results.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quizId, answers]
+              properties:
+                quizId:
+                  type: string
+                answers:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Quiz graded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: number
+                  percentage:
+                    type: number
+                  passed:
+                    type: boolean
+
+  /api/users:
+    get:
+      tags: [Users]
+      summary: List all users (admin/teacher)
+      description: Return a list of all users. Filterable by role.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [student, teacher, admin]
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Insufficient permissions
+    post:
+      tags: [Users]
+      summary: Create user (admin)
+      description: Create a new user account (admin only).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, fullName, password]
+              properties:
+                email:
+                  type: string
+                fullName:
+                  type: string
+                role:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: User created
+        '403':
+          description: Admin only
+
+  /api/users/{id}:
+    get:
+      tags: [Users]
+      summary: Get user by ID
+      description: Return detailed information about a specific user.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User details
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: User not found
+    put:
+      tags: [Users]
+      summary: Update user
+      description: Update a user's information.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User updated
+    delete:
+      tags: [Users]
+      summary: Delete user
+      description: Delete a user account. Admin only.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User deleted
+
+  /api/users/{id}/role:
+    put:
+      tags: [Users]
+      summary: Change user role
+      description: Change a user's role (admin only).
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  type: string
+                  enum: [student, teacher, admin]
+      responses:
+        '200':
+          description: Role changed
+
+  /api/users/{id}/block:
+    put:
+      tags: [Users]
+      summary: Block/unblock user
+      description: Toggle a user's blocked status (admin only).
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Block status changed
+
+  /api/admin/health:
+    get:
+      tags: [Health]
+      summary: System health check
+      description: Return system health status including database connectivity.
+      responses:
+        '200':
+          description: System healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded, down]
+                  database:
+                    type: boolean
+                  uptime:
+                    type: number
+
+  /api/admin/stats:
+    get:
+      tags: [Admin]
+      summary: Get admin dashboard stats
+      description: Return aggregated statistics for the admin dashboard.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                  activeUsers:
+                    type: integer
+                  totalModules:
+                    type: integer
+                  avgCompletionRate:
+                    type: number
+
+  /api/admin/announcements:
+    get:
+      tags: [Admin]
+      summary: List announcements
+      description: Return all system announcements.
+      responses:
+        '200':
+          description: List of announcements
+    post:
+      tags: [Admin]
+      summary: Create announcement
+      description: Create a new system announcement (admin only).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, content]
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                priority:
+                  type: string
+                  enum: [low, medium, high]
+      responses:
+        '201':
+          description: Announcement created
+
+  /api/admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: Get audit logs
+      description: Return system audit logs. Admin only.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Audit logs
+        '403':
+          description: Admin only
+
+  /api/admin/audit-logs/clear:
+    post:
+      tags: [Admin]
+      summary: Clear audit logs
+      description: Delete all audit logs older than a specified date. Admin only.
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                olderThan:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Logs cleared
+
+  /api/admin/users/export:
+    get:
+      tags: [Admin]
+      summary: Export users
+      description: Export user data as CSV. Admin only.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: CSV file
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  /api/admin/users/import:
+    post:
+      tags: [Admin]
+      summary: Import users
+      description: Bulk import users from CSV. Admin only.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Users imported
+        '400':
+          description: Invalid CSV
+
+  /api/admin/users/bulk:
+    post:
+      tags: [Admin]
+      summary: Bulk user operations
+      description: Perform bulk operations on users (delete, change role, etc). Admin only.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userIds, action]
+              properties:
+                userIds:
+                  type: array
+                  items:
+                    type: string
+                action:
+                  type: string
+                  enum: [delete, block, unblock, changeRole]
+      responses:
+        '200':
+          description: Bulk operation complete
+
+  /api/admin/users/{id}/reset-password:
+    post:
+      tags: [Admin]
+      summary: Reset user password (admin)
+      description: Force-reset a user's password and generate a temporary one. Admin only.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Password reset, temporary password returned
+
+  /api/analytics/progress-snapshot:
+    get:
+      tags: [Analytics]
+      summary: Progress snapshot
+      description: Return a snapshot of overall student progress across all modules.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Progress snapshot data
+
+  /api/analytics/module-performance:
+    get:
+      tags: [Analytics]
+      summary: Module performance
+      description: Return performance statistics per module.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Module performance data
+
+  /api/analytics/engagement:
+    get:
+      tags: [Analytics]
+      summary: Engagement analytics
+      description: Return student engagement metrics (login frequency, session duration).
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Engagement data
+
+  /api/analytics/gradebook:
+    get:
+      tags: [Analytics]
+      summary: Gradebook
+      description: Return grade data for all students. Teacher/admin access.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Gradebook data
+
+  /api/analytics/at-risk:
+    get:
+      tags: [Analytics]
+      summary: At-risk students
+      description: Identify students at risk of falling behind.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: At-risk student list
+
+  /api/analytics/activity-heatmap:
+    get:
+      tags: [Analytics]
+      summary: Activity heatmap
+      description: Return activity data for heatmap visualization.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Heatmap data
+
+  /api/analytics/student/{userId}:
+    get:
+      tags: [Analytics]
+      summary: Individual student analytics
+      description: Return detailed analytics for a specific student.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Student analytics
+
+  /api/deadlines:
+    get:
+      tags: [Deadlines]
+      summary: List deadlines
+      description: Return all deadlines. Filterable by user/group.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Deadline list
+    post:
+      tags: [Deadlines]
+      summary: Create deadline
+      description: Create a new assignment deadline. Teacher/admin access.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [moduleId, dueDate]
+              properties:
+                moduleId:
+                  type: string
+                dueDate:
+                  type: string
+                  format: date-time
+                group:
+                  type: string
+      responses:
+        '201':
+          description: Deadline created
+
+  /api/deadlines/{id}:
+    put:
+      tags: [Deadlines]
+      summary: Update deadline
+      description: Update a deadline's due date or group.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deadline updated
+    delete:
+      tags: [Deadlines]
+      summary: Delete deadline
+      description: Delete a deadline. Teacher/admin access.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deadline deleted
+
+  /api/deadlines/upcoming:
+    get:
+      tags: [Deadlines]
+      summary: Upcoming deadlines
+      description: Return upcoming deadlines for the current user.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Upcoming deadlines
+
+  /api/deadlines/check:
+    get:
+      tags: [Deadlines]
+      summary: Check deadline status
+      description: Check if current time is past any deadlines.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Deadline check result
+
+  /api/lti/platforms:
+    get:
+      tags: [LTI]
+      summary: List LTI platforms
+      description: Return configured LTI platforms.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Platform list
+    post:
+      tags: [LTI]
+      summary: Register LTI platform
+      description: Register a new LTI 1.3 platform (Moodle, Canvas).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, clientId, issuer]
+              properties:
+                name:
+                  type: string
+                clientId:
+                  type: string
+                issuer:
+                  type: string
+                authUrl:
+                  type: string
+                tokenUrl:
+                  type: string
+                publicKey:
+                  type: string
+      responses:
+        '201':
+          description: Platform registered
+
+  /api/lti/platforms/{id}:
+    get:
+      tags: [LTI]
+      summary: Get LTI platform details
+      description: Return details for a specific LTI platform.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Platform details
+    put:
+      tags: [LTI]
+      summary: Update LTI platform
+      description: Update an LTI platform configuration.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Platform updated
+    delete:
+      tags: [LTI]
+      summary: Delete LTI platform
+      description: Remove an LTI platform.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Platform deleted
+
+  /api/lti/oidc-login:
+    post:
+      tags: [LTI]
+      summary: LTI OIDC login initiation
+      description: First step of LTI 1.3 OIDC login flow.
+      responses:
+        '302':
+          description: Redirect to LMS authorization
+
+  /api/lti/launch:
+    post:
+      tags: [LTI]
+      summary: LTI launch callback
+      description: Handle LTI launch from LMS after OIDC login.
+      responses:
+        '200':
+          description: Launch successful
+
+  /api/lti/deep-link:
+    post:
+      tags: [LTI]
+      summary: Deep linking response
+      description: Handle Deep Linking response from LMS.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Deep link processed
+
+  /api/lti/sync-grades:
+    post:
+      tags: [LTI]
+      summary: Sync grades to LMS
+      description: Manually trigger grade sync to connected LTI platforms.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Grade sync initiated
+
+  /api/export/gradebook:
+    get:
+      tags: [Export]
+      summary: Export gradebook
+      description: Export the full gradebook as CSV/PDF.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [csv, pdf]
+            default: csv
+      responses:
+        '200':
+          description: File download
+
+  /api/export/student-report/{userId}:
+    get:
+      tags: [Export]
+      summary: Export student report
+      description: Generate and export a detailed student report.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Report file
+
+  /api/announcements:
+    get:
+      tags: [Admin]
+      summary: Get active announcements
+      description: Return currently active announcements for display.
+      responses:
+        '200':
+          description: Active announcements
+
+  /api/audit-log:
+    get:
+      tags: [Admin]
+      summary: Get audit log entries
+      description: Return audit log entries for the authenticated user's actions.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Audit log entries
+
+  /api/login-activity/{userId}:
+    get:
+      tags: [Analytics]
+      summary: Get login activity
+      description: Return login activity history for a specific user.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Login activity data
+
+  /api/scheduled-reports:
+    get:
+      tags: [Reports]
+      summary: List scheduled reports
+      description: Return all configured scheduled reports.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Scheduled report list
+    post:
+      tags: [Reports]
+      summary: Create scheduled report
+      description: Configure a new scheduled report.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, schedule]
+              properties:
+                type:
+                  type: string
+                schedule:
+                  type: string
+      responses:
+        '201':
+          description: Report scheduled
+
+  /api/scheduled-reports/{id}:
+    delete:
+      tags: [Reports]
+      summary: Delete scheduled report
+      description: Cancel a scheduled report.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Report cancelled
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from `/api/auth/login`
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [student, teacher, admin]
+        group:
+          type: string
+        course:
+          type: string
+        university:
+          type: string
+        avatar:
+          type: string
+        bio:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastLoginAt:
+          type: string
+          format: date-time
+        loginCount:
+          type: integer
+        isBlocked:
+          type: boolean
+
+    Progress:
+      type: object
+      properties:
+        moduleId:
+          type: string
+        completed:
+          type: boolean
+        score:
+          type: number
+        sqlLevels:
+          type: array
+          items:
+            type: integer
+        xssLevels:
+          type: array
+          items:
+            type: integer
+        csrfSteps:
+          type: array
+          items:
+            type: integer
+        challengeScores:
+          type: object
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        retryAfter:
+          type: integer

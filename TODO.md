@@ -140,20 +140,17 @@
 
 ---
 
-## 9. 📖 API документация (Swagger/OpenAPI)
+## 9. ~~📖 API документация (Swagger/OpenAPI)~~ ✅ ВЫПОЛНЕНО
 
-**Проблема:** 70+ API endpoints без документации. Разработчики и преподаватели не могут интегрироваться.
+**Статус:** Реализовано 2026-05-22
 
-**Что сделать:**
-- Добавить `next-swagger-doc` или ручной OpenAPI 3.0 spec
-- Swagger UI на `/api/docs`
-- Примеры запросов/ответов для всех endpoints
-- Автоматическая генерация из Zod схем
-- Postman collection для тестирования
-
-**Влияние:** Разблокирует интеграции, contributions, и использование platform как backend для других проектов.
-
-**Сложность:** 🟢 Низкая | **Время:** 1 неделя
+**Что сделано:**
+- Создана полная OpenAPI 3.0 спецификация (`/public/openapi.yaml`) для 70+ endpoints
+- Swagger UI доступен по адресу `/api/docs`
+- Документация покрывает все категории: Auth, Progress, Quiz, Analytics, Admin, Users, Deadlines, LTI, Export, Reports
+- Поддержка авторизации через JWT Bearer token прямо в UI
+- Try-it-out функциональность для тестирования endpoints
+- Добавлен скрипт `npm run docs` для быстрого доступа
 
 ---
 
