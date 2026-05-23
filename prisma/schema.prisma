@@ -26,6 +26,10 @@ model User {
   lastLoginAt  DateTime?                       @map("last_login_at")
   loginCount   Int       @default(0)           @map("login_count")
   isBlocked    Boolean   @default(false)       @map("is_blocked")
+  xp           Int       @default(0)           // experience points
+  level        Int       @default(1)           // 1-50: Junior(1-10) → Mid(11-20) → Senior(21-35) → Lead(36-50)
+  streak       Int       @default(0)           // consecutive days active
+  lastActivityAt DateTime?                     @map("last_activity_at")  // for streak calculation
 
   progress          Progress[]
   quizResults       QuizResult[]
