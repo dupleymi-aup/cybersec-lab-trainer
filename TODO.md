@@ -55,20 +55,24 @@
 
 ---
 
-## 4. 📊 Конструктор заданий для преподавателей
+## 4. ~~📊 Конструктор заданий для преподавателей~~ ✅ API ВЫПОЛНЕНО
 
-**Проблема:** Преподаватели могут только просматривать прогресс, но не создавать кастомные задания. TODO в TeacherPanel: конструктор заданий.
+**Статус:** API реализовано 2026-05-22. UI-билдер — следующий шаг.
 
-**Что сделать:**
-- UI-билдер для создания лабораторных работ (выбор типа: квиз, код-ревью, атака)
-- Редактор квизов с preview и автопроверкой
-- Система шаблонов (reuse из существующих модулей)
-- Привязка заданий к группам и дедлайнам
-- Auto-grading с настраиваемыми критериями
+**Что сделано (API слой):**
+- Prisma модели: Assignment + AssignmentSubmission с relations к User
+- CRUD API: GET/POST /api/assignments, GET/PUT/DELETE /api/assignments/[id]
+- Submission API: POST /api/assignments/[id]/submit с лимитами попыток
+- Grading API: POST /api/assignments/[id]/submissions/[submissionId]/grade
+- Список submissions: GET /api/assignments/[id]/submissions с фильтрами
+- Zod валидация: createAssignmentSchema, submitAssignmentSchema, gradeSubmissionSchema
+- Role-based access: teacher создаёт/оценивает, student отправляет
+- Функции: auto-grade flag, time limits, max attempts, group targeting, deadlines
 
-**Влияние:** Превращает платформу из набора модулей в полноценную LMS. Главный selling point для преподавателей.
-
-**Сложность:** 🔴 Высокая | **Время:** 3-4 недели
+**Осталось (UI слой):**
+- UI-билдер для создания заданий в TeacherPanel
+- Редактор квизов с preview
+- Страница прохождения заданий для студентов
 
 ---
 
