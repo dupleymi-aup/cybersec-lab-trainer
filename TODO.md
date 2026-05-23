@@ -55,9 +55,9 @@
 
 ---
 
-## 4. ~~📊 Конструктор заданий для преподавателей~~ ✅ API ВЫПОЛНЕНО
+## 4. ~~📊 Конструктор заданий для преподавателей~~ ✅ ВЫПОЛНЕНО
 
-**Статус:** API реализовано 2026-05-22. UI-билдер — следующий шаг.
+**Статус:** Полностью реализовано 2026-05-22 (API + UI)
 
 **Что сделано (API слой):**
 - Prisma модели: Assignment + AssignmentSubmission с relations к User
@@ -69,10 +69,22 @@
 - Role-based access: teacher создаёт/оценивает, student отправляет
 - Функции: auto-grade flag, time limits, max attempts, group targeting, deadlines
 
-**Осталось (UI слой):**
-- UI-билдер для создания заданий в TeacherPanel
-- Редактор квизов с preview
-- Страница прохождения заданий для студентов
+**Что сделано (UI слой):**
+- AssignmentBuilder компонент: форма создания/редактирования с полями title, type, module, description, content, maxScore, passScore, timeLimit, attempts, dueAt, group, autoGrade, published
+- Список заданий с фильтрами (Все/Опубликованные/Черновики)
+- Детальный просмотр задания с метриками (баллы, попытки, submission'ы, дедлайн)
+- One-click publish/unpublish toggle
+- Delete с подтверждением
+- Интеграция в TeacherPanel как отдельная вкладка "Задания"
+- StudentAssignments страница: список доступных заданий, форма submission с таймером, отслеживание попыток, история результатов, прогресс-бар
+- Sidebar: добавлен пункт "Задания" (ClipboardList icon)
+- PageType: добавлен 'assignments' в store
+
+**Бонусные исправления:**
+- TokenPayload расширен: добавлены group, fullName
+- authenticate() возвращает group/fullName из JWT
+- generateToken() принимает options { rememberMe, group, fullName }
+- Исправлены TS2339 ошибки в assignments и gamification API routes
 
 ---
 
