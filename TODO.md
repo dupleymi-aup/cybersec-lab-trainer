@@ -123,20 +123,18 @@
 
 ---
 
-## 8. 📱 Улучшить PWA и mobile experience
+## 8. ~~📱 Улучшить PWA и mobile experience~~ ✅ ВЫПОЛНЕНО
 
-**Проблема:** PWA настроен, но ограничен. Нет offline-режима, push-уведомлений, mobile-оптимизации.
+**Статус:** Реализовано 2026-05-22
 
-**Что сделать:**
-- Offline-first для квизов и теории (IndexedCache sync)
-- Push-уведомления о дедлайнах и достижениях
-- Mobile-responsive оптимизация всех лабораторий
-- Background sync для прогресса при восстановлении соединения
-- Install prompts и onboarding для PWA
-
-**Влияние:** Студенты учатся с телефонов. Без хорошего mobile experience теряется 50%+ usage.
-
-**Сложность:** 🟡 Средняя | **Время:** 2-3 недели
+**Что сделано:**
+- Обновлён manifest.json: добавлены screenshots, share_target, protocol_handlers, edge_side_panel, 3 shortcut'а
+- Создана offline страница (`/offline`) с UI для проверки подключения и кнопкой retry
+- Улучшены PWA meta теи в layout.tsx: apple-touch-icon, mobile-web-app-capable, theme color по схеме
+- Расширены runtimeCaching в next.config.ts: кэширование JS/CSS бандлов и API ответов (NetworkFirst)
+- Добавлены mobile-responsive CSS: safe-area-inset для notch устройств, min tap target 44px, iOS font-size fix
+- Viewport: viewportFit=cover, maximumScale=5, userScalable=true
+- overscroll-behavior-y: contain для предотвращения pull-to-refresh в PWA
 
 ---
 

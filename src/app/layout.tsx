@@ -30,20 +30,39 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: "/logo.svg",
-    apple: "/logo.svg",
+    apple: "/icons/icon-192.svg",
+    other: [
+      {
+        rel: "apple-touch-icon",
+        url: "/icons/icon-192.svg",
+      },
+    ],
   },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "CyberSec Lab",
+    startupImage: "/icons/icon-512.svg",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "msapplication-TileColor": "#0f172a",
+    "msapplication-tap-highlight": "no",
   },
 };
 
 export const viewport = {
-  themeColor: "#0f172a",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

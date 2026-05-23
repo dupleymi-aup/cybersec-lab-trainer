@@ -118,7 +118,68 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
+    /* Better text rendering on mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Support for notch devices */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
+}
+
+/* PWA and Mobile Optimizations */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+  
+  /* Improve tap targets on mobile */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prevent zoom on input focus for iOS */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area support for notch devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Better scrolling on mobile */
+@media (hover: none) and (pointer: coarse) {
+  /* Hide scrollbars on touch devices */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  /* Improve touch feedback */
+  button:active, a:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+/* Landscape mode optimizations */
+@media (orientation: landscape) and (max-height: 500px) {
+  header, nav {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Prevent pull-to-refresh on mobile PWA */
+html {
+  overscroll-behavior-y: contain;
 }
 
 /* Smooth theme transitions */

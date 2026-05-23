@@ -7,6 +7,7 @@ const withPWA = withPWAInit({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
+  mode: "production",
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
@@ -30,6 +31,23 @@ const withPWA = withPWAInit({
       options: {
         cacheName: "image-assets",
         expiration: { maxEntries: 50, maxAgeSeconds: 30 * 24 * 60 * 60 },
+      },
+    },
+    {
+      urlPattern: /^https?:\/\/.*\.(?:js|css)$/,
+      handler: "StaleWhileRevalidate",
+      options: {
+        cacheName: "static-resources",
+        expiration: { maxEntries: 50, maxAgeSeconds: 7 * 24 * 60 * 60 },
+      },
+    },
+    {
+      urlPattern: /^https?:\/\/.*\/api\/.*/i,
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "api-responses",
+        networkTimeoutSeconds: 10,
+        expiration: { maxEntries: 20, maxAgeSeconds: 5 * 60 },
       },
     },
   ],
