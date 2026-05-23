@@ -129,6 +129,16 @@ cd cybersec-lab-trainer
 # Install dependencies
 npm install
 
+# Setup database (PostgreSQL)
+# Option 1: Use Docker (recommended)
+docker compose up -d postgres
+
+# Option 2: Use cloud PostgreSQL (Neon, Supabase)
+# Copy .env.example to .env.local and set DATABASE_URL
+
+# Apply migrations
+npm run db:migrate
+
 # Run in development mode
 npm run dev
 ```

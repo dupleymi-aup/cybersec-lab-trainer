@@ -6,12 +6,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("SQLITE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String    @id
+  id           String    @id @default(cuid())
   email        String    @unique
   phone        String    @unique
   fullName     String
@@ -47,7 +47,7 @@ model User {
 }
 
 model Progress {
-  id                     String   @id
+  id                     String   @id @default(cuid())
   userId                 String   @map("user_id")
   user                   User     @relation(fields: [userId], references: [id])
   moduleId               String   @map("module_id")  // owasp, sql-injection, xss, csrf, auth, secure-coding, tools, security-headers
@@ -68,7 +68,7 @@ model Progress {
 }
 
 model QuizResult {
-  id         String   @id
+  id         String   @id @default(cuid())
   userId     String   @map("user_id")
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   quizId     String   @map("quiz_id")  // category: sql, xss, csrf, auth, general, owasp, coding, network, social
@@ -83,7 +83,7 @@ model QuizResult {
 }
 
 model LoginActivity {
-  id        String   @id
+  id        String   @id @default(cuid())
   userId    String?  @map("user_id")
   user      User?    @relation(fields: [userId], references: [id])
   email     String?
@@ -96,7 +96,7 @@ model LoginActivity {
 }
 
 model AuditLog {
-  id         String   @id
+  id         String   @id @default(cuid())
   adminId    String   @map("admin_id")
   admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id])
   adminName  String   @map("admin_name")
@@ -250,7 +250,7 @@ model LtiLaunchLog {
 }
 
 model Announcement {
-  id         String   @id
+  id         String   @id @default(cuid())
   title      String
   content    String
   author     String   // author name/email
