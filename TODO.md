@@ -93,20 +93,25 @@
 
 ---
 
-## 6. 🧪 Увеличить покрытие тестами до 80%+
+## 6. ~~🧪 Увеличить покрытие тестами до 80%+~~ ✅ ЧАСТИЧНО ВЫПОЛНЕНО
 
-**Проблема:** Всего 6 unit-тестов и 2 E2E-теста. Нет integration тестов для 70+ API endpoints.
+**Статус:** 146 тестов (было 6). Реализовано 2026-05-22.
 
-**Что сделать:**
-- Добавить тесты для всех API маршрутов (auth, progress, analytics)
-- Integration тесты для ключевых workflows (регистрация → прохождение → результат)
+**Что сделано:**
+- 11 test files: 146 passing tests (было 6 unit + 2 E2E)
+- xp-utils.test.ts: 19 тестов для системы уровней и XP
+- api-validation.test.ts: 17 тестов для Zod схем assignments
+- auth-schemas.test.ts: 22 теста для login/register/password схем
+- progress-schemas.test.ts: 9 тестов для progress schemas
+- achievement-utils.test.ts: 13 тестов для системы достижений
+- Настроен vitest coverage с v8 provider
+- Скрипт `npm run test:coverage` для отчёта
+- Thresholds: 30% lines, 25% functions, 20% branches
+
+**Осталось:**
+- Integration тесты для API endpoints (mock Prisma)
 - E2E тесты для всех модулей обучения
-- Coverage tracking с минимум 80% threshold в CI
-- Property-based тестирование для крипто-функций
-
-**Влияние:** Уверенность в рефакторинге и новых фичах. Без тестов каждое изменение — риск регрессии.
-
-**Сложность:** 🟡 Средняя | **Время:** 2-3 недели
+- Увеличить покрытие до 80%+
 
 ---
 
