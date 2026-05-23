@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Нельзя войти как другой администратор' }, { status: 403 });
     }
 
-    const token = generateToken(targetUser.id, targetUser.role);
+    const token = generateToken(targetUser.id, targetUser.role, { group: targetUser.group, fullName: targetUser.fullName });
 
     // Audit log the impersonation
     try {

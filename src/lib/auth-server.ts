@@ -4,24 +4,27 @@ import { env } from '@/lib/env';
 export interface TokenPayload {
   id: string;
   role: string;
+  group?: string;
+  fullName?: string;
   exp: number;
 }
 
 const JWT_SECRET = env.tokenSecret;
 const JWT_ALGORITHM = 'HS256';
 
-export function generateToken(userId: string, role: string, rememberMe?: boolean): string {
+export function generateToken(userId: string, role: string, options?: { rememberMe?: boolean; group?: string; fullName?: string }): string {
+  const { rememberMe, group, fullName } = options || {};
   const expiry = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
   return jwt.sign(
-    { id: userId, role },
+    { id: userId, role, group, fullName },
     JWT_SECRET,
     { algorithm: JWT_ALGORITHM, expiresIn: expiry }
   );
 }
 
 // Alias for LTI integration compatibility
-export async function signJwt(payload: { id: string; role: string }): Promise<string> {
-  return generateToken(payload.id, payload.role);
+export async function signJwt(payload: { id: string; role: string; group?: string; fullName?: string }): Promise<string> {
+  return generateToken(payload.id, payload.role, { group: payload.group, fullName: payload.fullName });
 }
 
 export function verifyToken(token: string): TokenPayload | null {

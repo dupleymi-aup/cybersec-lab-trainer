@@ -292,7 +292,8 @@ export type PageType =
   | 'profile'
   | 'teacher-panel'
   | 'admin-panel'
-  | 'leaderboard';
+  | 'leaderboard'
+  | 'assignments';
 
 interface AppState {
   currentPage: PageType;

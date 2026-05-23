@@ -11,13 +11,13 @@ export function getTokenFromRequest(request: NextRequest): string | null {
   return request.cookies.get('auth-token')?.value || null;
 }
 
-export async function authenticate(request: NextRequest): Promise<{ id: string; role: string } | null> {
+export async function authenticate(request: NextRequest): Promise<{ id: string; role: string; group?: string; fullName?: string } | null> {
   const token = getTokenFromRequest(request);
   const payload = getTokenPayload(token);
   if (!payload) return null;
   // Explicitly check expiration even though jwt.verify does this — defense in depth
   if (payload.exp < Date.now() / 1000) return null;
-  return { id: payload.id, role: payload.role };
+  return { id: payload.id, role: payload.role, group: payload.group, fullName: payload.fullName };
 }
 
 export const ROLE_HIERARCHY: Record<string, number> = {

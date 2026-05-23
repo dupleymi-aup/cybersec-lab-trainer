@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const token = generateToken(user.id, user.role, false);
+    const token = generateToken(user.id, user.role, { group: user.group, fullName: user.fullName });
 
     return NextResponse.json({
       success: true,

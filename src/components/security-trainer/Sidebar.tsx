@@ -30,6 +30,7 @@ import {
   Target,
   Clock,
   ChevronDown,
+  ClipboardList,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Progress } from '@/components/ui/progress';
@@ -61,6 +62,7 @@ const iconMap: Record<string, React.ReactNode> = {
   Key: <Key size={18} />,
   TrendingUp: <TrendingUp size={18} />,
   Target: <Target size={18} />,
+  ClipboardList: <ClipboardList size={18} />,
 };
 
 // Navigation structure with grouping
@@ -74,6 +76,7 @@ const moduleNavItems: { id: PageType; label: string; iconKey: string }[] = [
 
 const toolNavItems: { id: PageType; label: string; iconKey: string }[] = [
   { id: 'quiz', label: 'Квизы', iconKey: 'HelpCircle' },
+  { id: 'assignments' as PageType, label: 'Задания', iconKey: 'ClipboardList' },
   { id: 'achievements', label: 'Достижения', iconKey: 'Trophy' },
   { id: 'cheat-sheets' as PageType, label: 'Шпаргалки', iconKey: 'BookOpen' },
   { id: 'password-checker' as PageType, label: 'Проверка пароля', iconKey: 'Key' },

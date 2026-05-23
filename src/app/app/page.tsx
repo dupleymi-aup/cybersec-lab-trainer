@@ -49,6 +49,7 @@ const LazyPasswordStrengthChecker = dynamic(() => import('@/components/security-
 const LazyLeaderboard = dynamic(() => import('@/components/security-trainer/Leaderboard'), { ssr: false });
 const LazyPhishingAnalyzer = dynamic(() => import('@/components/security-trainer/PhishingAnalyzer'), { ssr: false });
 const LazyCareerPaths = dynamic(() => import('@/components/security-trainer/CareerPaths'), { ssr: false });
+const LazyStudentAssignments = dynamic(() => import('@/components/security-trainer/StudentAssignments'), { ssr: false });
 
 const roleRestrictedPages: Record<string, UserRole> = {
   'teacher-panel': 'teacher',
@@ -86,6 +87,7 @@ const pages: Record<string, React.ReactNode> = {
     </ModuleWrapper>
   ),
   leaderboard: <ModuleWrapper name="Leaderboard"><LazyLeaderboard /></ModuleWrapper>,
+  assignments: <ModuleWrapper name="Assignments"><LazyStudentAssignments /></ModuleWrapper>,
 };
 
 export default function AppPage() {

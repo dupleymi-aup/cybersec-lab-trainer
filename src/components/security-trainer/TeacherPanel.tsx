@@ -38,6 +38,7 @@ import {
   CheckCircle,
   XCircle,
   FileBarChart,
+  ClipboardList,
 } from 'lucide-react';
 import ProgressTrendsChart from './ProgressTrendsChart';
 import QuizQuestionAnalytics from './QuizQuestionAnalytics';
@@ -51,6 +52,7 @@ import StudentProgressView from './StudentProgressView';
 import ModuleDeepDive from './ModuleDeepDive';
 import CertificationReadiness from './CertificationReadiness';
 import QuizSessionAnalytics from './QuizSessionAnalytics';
+import AssignmentBuilder from './AssignmentBuilder';
 
 interface StudentProgress {
   userId: string;
@@ -363,6 +365,9 @@ export default function TeacherPanel() {
             </TabsTrigger>
             <TabsTrigger value="reports" className="text-xs hidden lg:block">
               <FileBarChart size={14} className="mr-1" /> Отчёты
+            </TabsTrigger>
+            <TabsTrigger value="assignments" className="text-xs hidden md:block">
+              <ClipboardList size={14} className="mr-1" /> Задания
             </TabsTrigger>
           </TabsList>
         </div>
@@ -1283,6 +1288,11 @@ export default function TeacherPanel() {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        {/* Assignments Tab */}
+        <TabsContent value="assignments" className="mt-4 space-y-4">
+          <AssignmentBuilder />
         </TabsContent>
       </Tabs>
     </div>
