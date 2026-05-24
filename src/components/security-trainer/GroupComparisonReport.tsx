@@ -173,7 +173,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                 <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                 <Tooltip formatter={(value, name) => {
                   const labels: Record<string, string> = { avgCompletionRate: 'Завершение', avgQuizScore: 'Ср. балл', activeRate: 'Активность' };
-                  return [`${value}%`, labels[name] || name];
+                  return [`${value}%`, name ? (labels[name] || name) : ''];
                 }} />
                 <Legend wrapperStyle={{ fontSize: 12 }} formatter={(value) => {
                   const labels: Record<string, string> = { avgCompletionRate: 'Завершение', avgQuizScore: 'Ср. балл', activeRate: 'Активность' };

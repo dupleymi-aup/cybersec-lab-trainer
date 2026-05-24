@@ -230,7 +230,8 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
                 <Tooltip
                   contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
                   formatter={(value, name) => {
-                    if (name.endsWith('_attempts')) return [value, 'Попытки'];
+                    const nameStr = String(name || '');
+                    if (nameStr.endsWith('_attempts')) return [value, 'Попытки'];
                     return [`${value}%`, name];
                   }}
                   labelFormatter={(label) => formatDate(String(label))}
