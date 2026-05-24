@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { authenticate, unauthorized, checkRateLimit } from '@/lib/api-middleware';
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
+
+  // Rate limit: 10 quiz submissions per 5 minutes per user
+  const rateKey = `quiz-submit-${auth.id}`;
+  const rateResult = checkRateLimit(rateKey, 10, 5 * 60 * 1000);
+  if (!rateResult.allowed) {
+    return NextResponse.json(
+      { error: 'Слишком много попыток. Подождите', retryAfter: rateResult.retryAfter },
+      { status: 429 }
+    );
+  }
 
   const body = await request.json();
   const { quizId, score, total, attempts } = body;

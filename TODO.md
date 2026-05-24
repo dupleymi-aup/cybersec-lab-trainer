@@ -4,6 +4,21 @@
 
 ---
 
+## -1. ~~🔐 Account deletion security, LTI token fix, quiz rate limiting~~ ✅ ВЫПОЛНЕНО
+
+**Статус:** Реализовано 2026-05-24
+
+**Что сделано:**
+- **Account deletion без password confirmation**: `DELETE /api/auth/delete` удалял аккаунт только по токену — stolen token = удаление аккаунта. Добавлена обязательная проверка `currentPassword` через `verifyPassword()`
+- **Rate limiting на удаление аккаунта**: 3 попытки за час на пользователя + 5 на IP — предотвращает массовое удаление
+- **LTI token leakage**: JWT токен был в URL query (`?lti_token=...`) — попадал в логи, историю браузера, referer. Токен теперь в теле ответа, redirect на `/lti-callback` без токена
+- **LTI error message leakage**: внутренние ошибки (stack traces, crypto errors) возвращались клиенту. Заменено на generic сообщение
+- **Quiz submission rate limiting**: `POST /api/quiz` без лимита — возможен спам/DoS. Добавлено: 10 попыток за 5 минут
+- Тесты: security-deletion.test.ts (9 тестов)
+- Всего тестов: 195 (было 186)
+
+---
+
 ## 0. ~~🐛 Critical bug fixes: assignment submit, teacher panel, password change~~ ✅ ВЫПОЛНЕНО
 
 **Статус:** Реализовано 2026-05-24
