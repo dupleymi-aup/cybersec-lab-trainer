@@ -55,7 +55,7 @@ export default function ProfilePage() {
       setUniversity(user.university || '');
       setBio(user.bio || '');
     }
-  }, [user?.fullName, user?.group, user?.course, user?.university, user?.bio]);
+  }, [user]);
 
   const profileCompletion = useMemo(() => {
     const fields = [fullName, group, course, university, bio];

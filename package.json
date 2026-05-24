@@ -7,7 +7,7 @@
     "build": "next build && node scripts/copy-assets.js",
     "start": "node scripts/start-server.js",
     "docs": "echo 'Open http://localhost:3000/api/docs after running npm run dev'",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test:e2e": "playwright test",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",

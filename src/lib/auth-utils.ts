@@ -21,7 +21,7 @@ export function generateOTP(): string {
 }
 
 export function validateEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+[.][^\s@]+$/.test(email);
 }
 
 export function validatePhone(phone: string): boolean {
