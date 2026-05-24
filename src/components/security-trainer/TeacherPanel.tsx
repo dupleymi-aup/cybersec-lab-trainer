@@ -92,9 +92,9 @@ async function getStudentProgress(userId: string): Promise<StudentProgress> {
           timestamps.push(p.updatedAt);
         }
         if (p.studiedOwaspItems) studiedOwaspItems = [...new Set([...studiedOwaspItems, ...p.studiedOwaspItems])];
-        if (p.sqlLevels) sqlCompletedLevels = [...sqlCompletedLevels, ...(p.sqlLevels.completed || [])];
-        if (p.xssLevels) xssCompletedLevels = [...xssCompletedLevels, ...(p.xssLevels.completed || [])];
-        if (p.csrfSteps) csrfCompletedSteps = [...csrfCompletedSteps, ...(p.csrfSteps.completed || [])];
+        if (p.sqlLevels) sqlCompletedLevels = [...sqlCompletedLevels, ...(Array.isArray(p.sqlLevels) ? p.sqlLevels : [])];
+        if (p.xssLevels) xssCompletedLevels = [...xssCompletedLevels, ...(Array.isArray(p.xssLevels) ? p.xssLevels : [])];
+        if (p.csrfSteps) csrfCompletedSteps = [...csrfCompletedSteps, ...(Array.isArray(p.csrfSteps) ? p.csrfSteps : [])];
         if (p.secureCodingCorrectCount) secureCodingCorrectCount += p.secureCodingCorrectCount;
       }
 
@@ -191,19 +191,25 @@ export default function TeacherPanel() {
   });
 
   useEffect(() => {
-    fetch('/api/deadlines')
-      .then(r => r.json())
-      .then(data => { if (data.deadlines) setDeadlines(data.deadlines); })
-      .catch(() => {
-        // Intentionally silent — deadline fetch is non-critical
-      });
+    (async () => {
+      try {
+        const headers = await getAuthHeaders();
+        const r1 = await fetch('/api/deadlines', { headers });
+        if (r1.ok) {
+          const data = await r1.json();
+          if (data.deadlines) setDeadlines(data.deadlines);
+        }
+      } catch { /* silent — non-critical */ }
 
-    fetch('/api/deadlines/teacher/reminders')
-      .then(r => r.json())
-      .then(data => { if (data.results) setDeadlineReminders(data.results); })
-      .catch(() => {
-        // Intentionally silent — reminder fetch is non-critical
-      });
+      try {
+        const headers = await getAuthHeaders();
+        const r2 = await fetch('/api/deadlines/teacher/reminders', { headers });
+        if (r2.ok) {
+          const data = await r2.json();
+          if (data.results) setDeadlineReminders(data.results);
+        }
+      } catch { /* silent — non-critical */ }
+    })();
   }, []);
 
   const createDeadline = async () => {

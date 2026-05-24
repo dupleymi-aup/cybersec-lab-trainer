@@ -4,6 +4,20 @@
 
 ---
 
+## -2. ~~🐛 TeacherPanel data loss, deadline auth, timer fix, XP grinding~~ ✅ ВЫПОЛНЕНО
+
+**Статус:** Реализовано 2026-05-24
+
+**Что сделано:**
+- **TeacherPanel type mismatch — lab progress silently dropped**: `getStudentProgress()` читал `p.sqlLevels.completed`, `p.xssLevels.completed`, `p.csrfSteps.completed` — но API возвращает эти поля как массивы, а не объекты с `.completed`. Все lab-данные терялись. Заменено на `Array.isArray(p.sqlLevels) ? p.sqlLevels : []` (и аналогично для xssLevels, csrfSteps)
+- **TeacherPanel deadline fetch без auth headers**: `fetch('/api/deadlines')` и `fetch('/api/deadlines/teacher/reminders')` не отправляли Bearer токен — преподаватель получал 401, UI дедлайнов молча пустой. Обёрнуто в async IIFE с `getAuthHeaders()`
+- **StudentAssignments timer interval recreation**: `useEffect` таймера имел `timer` в dependency array `[timerRunning, timer]` — interval пересоздавался каждую секунду, приводя к toast-спаму и некорректному отсчёту. Убран `timer` из зависимостей: `}, [timerRunning])`
+- **XP endpoint rate limiting**: `POST /api/gamification/xp` без лимита — бот мог бесконечно фармить XP. Добавлено: 20 запросов за час на пользователя через `checkRateLimit()`
+- Тесты: bugfixes-round5.test.ts (6 тестов)
+- Всего тестов: 201 (было 195)
+
+---
+
 ## -1. ~~🔐 Account deletion security, LTI token fix, quiz rate limiting~~ ✅ ВЫПОЛНЕНО
 
 **Статус:** Реализовано 2026-05-24

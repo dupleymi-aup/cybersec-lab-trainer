@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, checkRateLimit } from '@/lib/api-middleware';
 import { getLevel, XP_REWARDS } from '@/lib/xp-utils';
+
+const XP_RATE_LIMIT_MAX = 20; // max XP awards per window
+const XP_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (auth.role !== 'student') return forbidden();
+
+  // Rate limit XP awards to prevent grinding
+  const rateLimit = checkRateLimit(`xp:${auth.id}`, XP_RATE_LIMIT_MAX, XP_RATE_LIMIT_WINDOW_MS);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many XP requests', retryAfter: rateLimit.retryAfter },
+      { status: 429 },
+    );
+  }
 
   const body = await request.json();
   const { action } = body as { action: string };
