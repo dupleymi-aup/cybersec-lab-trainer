@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { getAllUsers, useAuthStore } from '@/lib/auth-store';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, getAuthHeaders } from '@/lib/store';
 import { quizCategories, modules } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -68,32 +68,59 @@ interface StudentProgress {
   lastActive?: string;
 }
 
-function getStudentProgress(userId: string): StudentProgress {
+async function getStudentProgress(userId: string): Promise<StudentProgress> {
   try {
-    const key = `security-trainer-progress-${userId}`;
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const data = JSON.parse(raw);
-      // Compute lastActive from the most recent timestamp
-      const allTimestamps = [
-        ...Object.values(data.moduleTimestamps || {}),
-        ...Object.values(data.quizTimestamps || {}),
-      ].filter(Boolean) as string[];
-      const lastActive = allTimestamps.length > 0
-        ? allTimestamps.sort().reverse()[0]
-        : undefined;
+    const headers = await getAuthHeaders();
+    const res = await fetch(`/api/progress/${userId}`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+
+      // Compute completed modules, quiz scores, and last active from API response
+      const completedModules: string[] = [];
+      const moduleTimestamps: Record<string, string> = {};
+      let studiedOwaspItems: string[] = [];
+      let sqlCompletedLevels: string[] = [];
+      let xssCompletedLevels: string[] = [];
+      let csrfCompletedSteps: number[] = [];
+      let secureCodingCorrectCount = 0;
+      const timestamps: string[] = [];
+
+      for (const p of data.progress || []) {
+        completedModules.push(p.moduleId);
+        if (p.updatedAt) {
+          moduleTimestamps[p.moduleId] = p.updatedAt;
+          timestamps.push(p.updatedAt);
+        }
+        if (p.studiedOwaspItems) studiedOwaspItems = [...new Set([...studiedOwaspItems, ...p.studiedOwaspItems])];
+        if (p.sqlLevels) sqlCompletedLevels = [...sqlCompletedLevels, ...(p.sqlLevels.completed || [])];
+        if (p.xssLevels) xssCompletedLevels = [...xssCompletedLevels, ...(p.xssLevels.completed || [])];
+        if (p.csrfSteps) csrfCompletedSteps = [...csrfCompletedSteps, ...(p.csrfSteps.completed || [])];
+        if (p.secureCodingCorrectCount) secureCodingCorrectCount += p.secureCodingCorrectCount;
+      }
+
+      const quizScores: Record<string, number> = {};
+      const quizTimestamps: Record<string, string> = {};
+      for (const q of data.quizResults || []) {
+        quizScores[q.quizId] = q.percentage;
+        if (q.updatedAt) {
+          quizTimestamps[q.quizId] = q.updatedAt;
+          timestamps.push(q.updatedAt);
+        }
+      }
+
+      const lastActive = timestamps.length > 0 ? timestamps.sort().reverse()[0] : undefined;
 
       return {
         userId,
-        completedModules: data.completedModules || [],
-        quizScores: data.quizScores || {},
-        moduleTimestamps: data.moduleTimestamps || {},
-        quizTimestamps: data.quizTimestamps || {},
-        studiedOwaspItems: data.studiedOwaspItems || [],
-        sqlCompletedLevels: data.sqlCompletedLevels || [],
-        xssCompletedLevels: data.xssCompletedLevels || [],
-        csrfCompletedSteps: data.csrfCompletedSteps || [],
-        secureCodingCorrectCount: data.secureCodingCorrectCount || 0,
+        completedModules,
+        quizScores,
+        moduleTimestamps,
+        quizTimestamps,
+        studiedOwaspItems,
+        sqlCompletedLevels,
+        xssCompletedLevels,
+        csrfCompletedSteps,
+        secureCodingCorrectCount,
         lastActive,
       };
     }
@@ -124,10 +151,24 @@ export default function TeacherPanel() {
   const [analyticsSubTab, setAnalyticsSubTab] = useState<'overview' | 'trends' | 'questions' | 'achievements' | 'competency' | 'weaknesses' | 'predictive' | 'export' | 'module-deep-dive' | 'certification' | 'quiz-session'>('overview');
   const [_selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; email: string; group: string; avatar: string }>>([]);
+  const [studentProgress, setStudentProgress] = useState<Record<string, StudentProgress>>({});
 
   useEffect(() => {
     getAllUsers().then((users) => setStudents(users.filter((u) => u.role === 'student')));
   }, []);
+
+  // Load all student progress from API
+  useEffect(() => {
+    if (students.length === 0) return;
+    const loadProgress = async () => {
+      const progressMap: Record<string, StudentProgress> = {};
+      await Promise.all(students.map(async (s) => {
+        progressMap[s.id] = await getStudentProgress(s.id);
+      }));
+      setStudentProgress(progressMap);
+    };
+    loadProgress();
+  }, [students]);
 
   // Deadlines state
   const [deadlines, setDeadlines] = useState<Array<{
@@ -216,7 +257,7 @@ export default function TeacherPanel() {
   const progressMap = useMemo(() => {
     const map = new Map<string, StudentProgress>();
     for (const s of students) {
-      map.set(s.id, getStudentProgress(s.id));
+      map.set(s.id, studentProgress[s.id]);
     }
     return map;
   }, [students]);
@@ -278,7 +319,7 @@ export default function TeacherPanel() {
       const groupStudents = students.filter((s) => s.group === group);
       let totalMods = 0, totalScore = 0, scoreCount = 0, activeCount = 0;
       groupStudents.forEach((s) => {
-        const p = getStudentProgress(s.id);
+        const p = studentProgress[s.id];
         totalMods += p.completedModules.length;
         const scores = Object.values(p.quizScores);
         if (scores.length > 0) {
@@ -420,17 +461,17 @@ export default function TeacherPanel() {
               <tbody>
                 {(() => {
                   const sorted = [...filteredStudents];
-                  if (gradebookSort === 'modules') sorted.sort((a, b) => getStudentProgress(b.id).completedModules.length - getStudentProgress(a.id).completedModules.length);
+                  if (gradebookSort === 'modules') sorted.sort((a, b) => studentProgress[b.id].completedModules.length - studentProgress[a.id].completedModules.length);
                   if (gradebookSort === 'score') sorted.sort((a, b) => {
-                    const aScores = Object.values(getStudentProgress(a.id).quizScores);
-                    const bScores = Object.values(getStudentProgress(b.id).quizScores);
+                    const aScores = Object.values(studentProgress[a.id].quizScores);
+                    const bScores = Object.values(studentProgress[b.id].quizScores);
                     const aAvg = aScores.length > 0 ? aScores.reduce((x, y) => x + y, 0) / aScores.length : 0;
                     const bAvg = bScores.length > 0 ? bScores.reduce((x, y) => x + y, 0) / bScores.length : 0;
                     return bAvg - aAvg;
                   });
 
                   return sorted.map((student) => {
-                    const progress = getStudentProgress(student.id);
+                    const progress = studentProgress[student.id];
                     const scores = Object.entries(progress.quizScores);
                     const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, [, v]) => a + v, 0) / scores.length) : 0;
 
@@ -745,7 +786,7 @@ export default function TeacherPanel() {
                   <BarChart data={(() => {
                     return quizCategories.map((cat) => {
                       const scores = students
-                        .map((s) => getStudentProgress(s.id).quizScores[cat.id])
+                        .map((s) => studentProgress[s.id].quizScores[cat.id])
                         .filter((v) => v !== undefined && v > 0);
                       const avg = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
                       return { name: cat.name.replace(' квизы', ''), avg, attempted: scores.length };
@@ -769,7 +810,7 @@ export default function TeacherPanel() {
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Распределение оценок</h3>
                 {(() => {
-                  const allScores = students.flatMap((s) => Object.values(getStudentProgress(s.id).quizScores));
+                  const allScores = students.flatMap((s) => Object.values(studentProgress[s.id].quizScores));
                   const excellent = allScores.filter((s) => s >= 80).length;
                   const good = allScores.filter((s) => s >= 60 && s < 80).length;
                   const average = allScores.filter((s) => s >= 40 && s < 60).length;
@@ -805,7 +846,7 @@ export default function TeacherPanel() {
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Активность студентов</h3>
                 {(() => {
-                  const active = students.filter((s) => getStudentProgress(s.id).completedModules.length > 0).length;
+                  const active = students.filter((s) => studentProgress[s.id].completedModules.length > 0).length;
                   const inactive = students.length - active;
                   const data = [
                     { name: 'Активные', value: active, color: '#10b981' },
@@ -836,7 +877,7 @@ export default function TeacherPanel() {
               {(() => {
                 const studentRankings = students
                   .map((s) => {
-                    const p = getStudentProgress(s.id);
+                    const p = studentProgress[s.id];
                     const mods = p.completedModules.length;
                     const scores = Object.values(p.quizScores);
                     const avgQ = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
@@ -1163,7 +1204,7 @@ export default function TeacherPanel() {
                 const distribution = ranges.map((range) => {
                   let count = 0;
                   students.forEach((s) => {
-                    const progress = getStudentProgress(s.id);
+                    const progress = studentProgress[s.id];
                     const scores = Object.values(progress.quizScores);
                     if (scores.length > 0) {
                       const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
@@ -1208,7 +1249,7 @@ export default function TeacherPanel() {
                   const now = new Date();
                   const engagementData = students
                     .map((s) => {
-                      const progress = getStudentProgress(s.id);
+                      const progress = studentProgress[s.id];
                       const scores = Object.values(progress.quizScores);
                       const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
                       const daysSinceActive = progress.lastActive

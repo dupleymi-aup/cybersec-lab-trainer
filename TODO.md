@@ -4,6 +4,19 @@
 
 ---
 
+## 0. ~~🐛 Critical bug fixes: assignment submit, teacher panel, password change~~ ✅ ВЫПОЛНЕНО
+
+**Статус:** Реализовано 2026-05-24
+
+**Что сделано:**
+- **Assignment submit без auth headers**: `StudentAssignments.tsx` не отправлял Bearer токен — студенты получали 401 при отправке заданий. Добавлен `getAuthHeaders()` для всех fetch запросов
+- **TeacherPanel читал прогресс из localStorage**: преподаватель видел только данные из своего браузера, а не студентов. Заменено на API вызов `/api/progress/[userId]` с загрузкой всех данных в state
+- **Password validation на смену пароля**: `PUT /api/auth/password` принимал слабые пароли (только min 8 символов). Добавлена `validatePassword()` с требованиями к верхним/строчным, цифрам, спецсимволам
+- Тесты: security-fixes.test.ts (13 тестов)
+- Всего тестов: 186 (было 173)
+
+---
+
 ## 1. ~~🔒 Security fixes: rate limiting, password validation, CSV injection~~ ✅ ВЫПОЛНЕНО
 
 **Статус:** Реализовано 2026-05-24
@@ -182,6 +195,7 @@
 
 | # | Улучшение | Приоритет | Время | Impact |
 |---|-----------|-----------|-------|--------|
+| 0 | Critical bug fixes (auth, teacher panel, password) | ✅ Реализовано | | Bug fixes |
 | 1 | Security fixes (rate limit, password, CSV) | ✅ Реализовано | | Security fix |
 | 2 | OTP email / восстановление пароля | ✅ Реализовано | | Security fix |
 | 3 | CSRF защита + security headers | ✅ Реализовано | | Security fix |

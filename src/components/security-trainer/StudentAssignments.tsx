@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/auth-store';
+import { getAuthHeaders } from '@/lib/store';
 import { modules } from '@/lib/data';
 
 interface Assignment {
@@ -72,8 +73,9 @@ export default function StudentAssignments() {
 
   const fetchData = useCallback(async () => {
     try {
+      const headers = await getAuthHeaders();
       const [assignmentsRes] = await Promise.all([
-        fetch('/api/assignments?published=true'),
+        fetch('/api/assignments?published=true', { headers }),
       ]);
 
       if (assignmentsRes.ok) {
@@ -83,7 +85,7 @@ export default function StudentAssignments() {
         // Fetch submissions for each assignment
         const submissionPromises = data.map(async (a: Assignment) => {
           try {
-            const res = await fetch(`/api/assignments/${a.id}/submissions`);
+            const res = await fetch(`/api/assignments/${a.id}/submissions`, { headers });
             if (res.ok) {
               const subs = await res.json();
               const mySubs = subs.filter((s: Submission) => s.userId === user?.id);
@@ -147,9 +149,10 @@ export default function StudentAssignments() {
 
     setSubmitting(true);
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`/api/assignments/${a.id}/submit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ content: submissionText }),
       });
 
