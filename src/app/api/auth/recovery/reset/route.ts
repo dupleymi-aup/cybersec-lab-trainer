@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { hashPassword } from '@/lib/auth-utils';
+import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
 
@@ -10,6 +10,15 @@ export async function POST(request: NextRequest) {
 
   if (!emailOrPhone || !newPassword || !otp) {
     return NextResponse.json({ error: 'Email/phone, OTP and new password required' }, { status: 400 });
+  }
+
+  // Validate password strength
+  const passwordValidation = validatePassword(newPassword);
+  if (!passwordValidation.valid) {
+    return NextResponse.json(
+      { error: 'Пароль не соответствует требованиям', details: passwordValidation.errors },
+      { status: 400 }
+    );
   }
 
   // Find user to get the OTP store key

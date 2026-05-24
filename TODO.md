@@ -4,20 +4,16 @@
 
 ---
 
-## 1. 🔒 Завершить LTI 1.3 интеграцию с Moodle
+## 1. ~~🔒 Security fixes: rate limiting, password validation, CSV injection~~ ✅ ВЫПОЛНЕНО
 
-**Проблема:** LTI интеграция заявлена в README, но не завершена. Преподаватели не могут полноценно использовать платформу из LMS.
+**Статус:** Реализовано 2026-05-24
 
-**Что сделать:**
-- Завершить OIDC login flow и Deep Linking
-- Реализовать Assignment and Grade Services (AGS) для автоматической отправки оценок
-- Добавить поддержку Names Role Provisioning Service (NRPS) для синхронизации списков групп
-- Протестировать с Moodle 4.x и Canvas
-- Добавить UI для привязки модулей к курсам LMS
-
-**Влияние:** Откроет платформу для всех университетов, использующих Moodle/Canvas. Главный канал распространения.
-
-**Сложность:** 🔴 Высокая | **Время:** 2-3 недели
+**Что сделано:**
+- Rate limiting на `POST /api/auth/recovery`: 3 запроса за 10 минут на email/phone + 10 на IP
+- Password validation на `POST /api/auth/recovery/reset`: новый пароль проверяется через `validatePassword()` (минимум 8 символов, верхние/строчные, цифры, спецсимволы)
+- CSV injection prevention в `POST /api/admin/users/export`: поля с `=`, `+`, `-`, `@`, `\t`, `\r` оборачиваются в кавычки
+- Тесты: recovery-validation.test.ts (8 тестов), csv-export.test.ts (10 тестов)
+- Всего тестов: 173 (было 155)
 
 ---
 
@@ -186,16 +182,16 @@
 
 | # | Улучшение | Приоритет | Время | Impact |
 |---|-----------|-----------|-------|--------|
-| 1 | OTP email / восстановление пароля | ✅ Реализовано | | Security fix |
-| 2 | CSRF защита + security headers | ✅ Реализовано | | Security fix |
-| 3 | Завершить LTI интеграцию | 🔴 Критический | 2-3 недели | Distribution |
-| 4 | Конструктор заданий | 🟡 Высокий | 3-4 недели | Feature |
-| 5 | PostgreSQL + Redis | 🟡 Высокий | 1-2 недели | Infrastructure |
-| 6 | Тесты 80%+ | 🟡 Высокий | 2-3 недели | Quality |
-| 7 | PWA + mobile | 🟡 Высокий | 2-3 недели | UX |
-| 8 | API документация | 🟢 Средний | 1 неделя | Developer exp |
-| 9 | i18n (RU/EN) | 🟢 Средний | 4-6 недель | Growth |
-| 10 | RPG-геймификация | 🟢 Средний | 2-3 недели | Retention |
+| 1 | Security fixes (rate limit, password, CSV) | ✅ Реализовано | | Security fix |
+| 2 | OTP email / восстановление пароля | ✅ Реализовано | | Security fix |
+| 3 | CSRF защита + security headers | ✅ Реализовано | | Security fix |
+| 4 | Завершить LTI интеграцию | 🔴 Критический | 2-3 недели | Distribution |
+| 5 | Конструктор заданий | 🟡 Высокий | 3-4 недели | Feature |
+| 6 | PostgreSQL + Redis | 🟡 Высокий | 1-2 недели | Infrastructure |
+| 7 | Тесты 80%+ | 🟡 Высокий | 2-3 недели | Quality |
+| 8 | PWA + mobile | 🟡 Высокий | 2-3 недели | UX |
+| 9 | API документация | 🟢 Средний | 1 неделя | Developer exp |
+| 10 | i18n (RU/EN) | 🟢 Средний | 4-6 недель | Growth |
 
 **Первые 2 — mandatory для production.** Без них platform небезопасна.
 

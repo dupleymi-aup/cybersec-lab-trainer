@@ -13,7 +13,10 @@ interface ExportRequestBody {
 function escapeCsvField(value: string | number | boolean | null | undefined): string {
   if (value == null) return '';
   const str = String(value);
-  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+  // Prevent CSV formula injection: fields starting with =, +, -, @, tab, or CR can execute formulas
+  const dangerousPrefixes = ['=', '+', '-', '@', '\t', '\r'];
+  const needsPrefixEscape = dangerousPrefixes.some(prefix => str.startsWith(prefix));
+  if (needsPrefixEscape || str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;

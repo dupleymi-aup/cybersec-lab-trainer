@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { generateOTP } from '@/lib/auth-utils';
 import { otpStore, ensureOtpCapacity } from '@/lib/otp-store';
 import { sendOTPRecoveryEmail } from '@/lib/email';
+import { checkRateLimit, getClientIp } from '@/lib/api-middleware';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -10,6 +11,26 @@ export async function POST(request: NextRequest) {
 
   if (!emailOrPhone) {
     return NextResponse.json({ error: 'Email or phone required' }, { status: 400 });
+  }
+
+  // Rate limit: 3 OTP requests per 10 minutes per email/phone to prevent email flooding
+  const rateKey = `otp-request-${emailOrPhone.toLowerCase()}`;
+  const rateResult = checkRateLimit(rateKey, 3, 10 * 60 * 1000);
+  if (!rateResult.allowed) {
+    return NextResponse.json(
+      { error: 'Слишком много запросов. Подождите', retryAfter: rateResult.retryAfter },
+      { status: 429 }
+    );
+  }
+
+  // Also rate limit by IP to prevent distributed attacks
+  const ipRateKey = `otp-request-ip-${getClientIp(request)}`;
+  const ipRateResult = checkRateLimit(ipRateKey, 10, 10 * 60 * 1000);
+  if (!ipRateResult.allowed) {
+    return NextResponse.json(
+      { error: 'Слишком много запросов. Подождите', retryAfter: ipRateResult.retryAfter },
+      { status: 429 }
+    );
   }
 
   const user = await prisma.user.findFirst({
