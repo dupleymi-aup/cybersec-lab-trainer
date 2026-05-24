@@ -1,67 +1,64 @@
 import { describe, it, expect } from 'vitest';
-
-// Replicate the escapeCsvField function from export/route.ts for testing
-function escapeCsvField(value: string | number | boolean | null | undefined): string {
-  if (value == null) return '';
-  const str = String(value);
-  const dangerousPrefixes = ['=', '+', '-', '@', '\t', '\r'];
-  const needsPrefixEscape = dangerousPrefixes.some(prefix => str.startsWith(prefix));
-  if (needsPrefixEscape || str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
-    return `"${str.replace(/"/g, '""')}"`;
-  }
-  return str;
-}
+import { buildCSV } from '@/lib/export-utils';
 
 describe('CSV export - formula injection prevention', () => {
-  it('should escape fields starting with =', () => {
-    const result = escapeCsvField('=cmd|"/C calc"!A0');
-    expect(result).toBe('"=cmd|""/C calc""!A0"');
+  it('should sanitize fields starting with = by prefixing with single quote', () => {
+    const csv = buildCSV(['Formula'], [['=cmd|"/C calc"!A0']]);
+    expect(csv).toContain("'=cmd|\"\"/C calc\"\"!A0");
   });
 
-  it('should escape fields starting with +', () => {
-    const result = escapeCsvField('+12345678');
-    expect(result).toBe('"+12345678"');
+  it('should sanitize fields starting with + by prefixing with single quote', () => {
+    const csv = buildCSV(['Value'], [['+12345678']]);
+    expect(csv).toContain("'+12345678");
   });
 
-  it('should escape fields starting with -', () => {
-    const result = escapeCsvField('-cmd');
-    expect(result).toBe('"-cmd"');
+  it('should sanitize fields starting with - by prefixing with single quote', () => {
+    const csv = buildCSV(['Value'], [['-cmd']]);
+    expect(csv).toContain("'-cmd");
   });
 
-  it('should escape fields starting with @', () => {
-    const result = escapeCsvField('@SUM(A1:A10)');
-    expect(result).toBe('"@SUM(A1:A10)"');
+  it('should sanitize fields starting with @ by prefixing with single quote', () => {
+    const csv = buildCSV(['Email'], [['@SUM(A1:A10)']]);
+    expect(csv).toContain("'@SUM(A1:A10)");
   });
 
-  it('should escape fields starting with tab', () => {
-    const result = escapeCsvField('\tmalicious');
-    expect(result).toBe('"\tmalicious"');
+  it('should sanitize fields starting with tab by prefixing with single quote', () => {
+    const csv = buildCSV(['Value'], [['\tmalicious']]);
+    expect(csv).toContain("'\tmalicious");
   });
 
   it('should escape fields with commas', () => {
-    const result = escapeCsvField('Doe, John');
-    expect(result).toBe('"Doe, John"');
+    const csv = buildCSV(['Name'], [['Doe, John']]);
+    expect(csv).toContain('"Doe, John"');
   });
 
   it('should escape fields with double quotes', () => {
-    const result = escapeCsvField('He said "hello"');
-    expect(result).toBe('"He said ""hello"""');
+    const csv = buildCSV(['Quote'], [['He said "hello"']]);
+    expect(csv).toContain('"He said ""hello"""');
   });
 
   it('should not escape normal fields', () => {
-    expect(escapeCsvField('John Doe')).toBe('John Doe');
-    expect(escapeCsvField('john@example.com')).toBe('john@example.com');
-    expect(escapeCsvField('student')).toBe('student');
+    const csv1 = buildCSV(['Name'], [['John Doe']]);
+    expect(csv1).toContain('"John Doe"');
+    const csv2 = buildCSV(['Email'], [['john@example.com']]);
+    expect(csv2).toContain('"john@example.com"');
+    const csv3 = buildCSV(['Role'], [['student']]);
+    expect(csv3).toContain('"student"');
   });
 
   it('should handle null and undefined', () => {
-    expect(escapeCsvField(null)).toBe('');
-    expect(escapeCsvField(undefined)).toBe('');
+    const csv1 = buildCSV(['Value'], [[null as any]]);
+    expect(csv1).toContain('""');
+    const csv2 = buildCSV(['Value'], [[undefined as any]]);
+    expect(csv2).toContain('""');
   });
 
   it('should handle numbers and booleans', () => {
-    expect(escapeCsvField(123)).toBe('123');
-    expect(escapeCsvField(true)).toBe('true');
-    expect(escapeCsvField(false)).toBe('false');
+    const csv1 = buildCSV(['Num'], [[123 as any]]);
+    expect(csv1).toContain('"123"');
+    const csv2 = buildCSV(['Bool'], [[true as any]]);
+    expect(csv2).toContain('"true"');
+    const csv3 = buildCSV(['Bool'], [[false as any]]);
+    expect(csv3).toContain('"false"');
   });
 });

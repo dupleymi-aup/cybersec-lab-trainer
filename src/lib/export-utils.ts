@@ -1,6 +1,18 @@
 // Build CSV from headers and rows
 export function buildCSV(headers: string[], rows: string[][]): string {
-  const escape = (v: string) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  // Sanitize value to prevent CSV injection attacks (formula injection)
+  // Characters like =, +, -, @, \t, \r can start formulas in Excel/Google Sheets
+  const sanitize = (v: string): string => {
+    const value = String(v ?? '');
+    if (value.match(/^[=+\-@\t\r]/)) {
+      return "'" + value; // Prefix with single quote to prevent formula execution
+    }
+    return value;
+  };
+  const escape = (v: string) => {
+    const sanitized = sanitize(v);
+    return `"${sanitized.replace(/"/g, '""')}"`;
+  };
   return [headers.map(escape).join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
 }
 
