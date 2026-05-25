@@ -48,18 +48,6 @@ export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
 
 import { hasRole, getRoleLabel } from './auth-types';
 
-function getExpectedInviteCode(): string {
-  return process.env.ADMIN_INVITE_CODE || (process.env.NODE_ENV === 'development' ? 'CYBERSEC-ADMIN-2024' : '');
-}
-
-export const ADMIN_INVITE_CODE = getExpectedInviteCode();
-
-export function validateAdminInviteCode(code: string): boolean {
-  const expected = getExpectedInviteCode();
-  if (!expected) return false;
-  return code.trim().toUpperCase() === expected;
-}
-
 export { hasRole, getRoleLabel };
 
 // ─── API helpers ──────────────────────────────────────────────
@@ -140,10 +128,6 @@ export async function createUser(
 
   const pwCheck = validatePassword(password);
   if (!pwCheck.valid) return { success: false, error: pwCheck.errors.join(', ') };
-
-  if (data.role === 'admin' && !validateAdminInviteCode(data.inviteCode || '')) {
-    return { success: false, error: 'Неверный код приглашения' };
-  }
 
   try {
     const res = await apiFetch('/api/users', {
@@ -577,10 +561,6 @@ export const useAuthStore = create<AuthState>()(
       },
 
       register: async (data, password) => {
-        if (data.role === 'admin' && !validateAdminInviteCode(data.inviteCode || '')) {
-          return { success: false, error: 'Неверный код приглашения для роли администратора' };
-        }
-
         try {
           const res = await fetch('/api/auth/register', {
             method: 'POST',

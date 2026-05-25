@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { type User, type UserRole, getRoleLabel, createUser, updateUser, validateAdminInviteCode } from '@/lib/auth-store';
+import { type User, type UserRole, getRoleLabel, createUser, updateUser } from '@/lib/auth-store';
 import { validateEmail, validatePhone, validatePassword } from '@/lib/auth-utils';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
 import { Button } from '@/components/ui/button';
@@ -91,10 +91,6 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
 
     const pwCheck = validatePassword(password);
     if (!pwCheck.valid) { toast.error(pwCheck.errors.join(', ')); return; }
-
-    if ((role === 'admin' || role === 'teacher') && !validateAdminInviteCode(inviteCode)) {
-      toast.error('Неверный код приглашения'); return;
-    }
 
     const result = await createUser(
       { email, phone, fullName, role, group, course, university, inviteCode },
@@ -259,7 +255,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                   className="space-y-1.5"
                 >
                   <Label>Код приглашения администратора *</Label>
-                  <Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="CYBERSEC-ADMIN-2024" />
+                  <Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Введите код приглашения" />
                 </motion.div>
               )}
             </AnimatePresence>

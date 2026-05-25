@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { hashPassword } from '@/lib/auth-utils';
-import { ADMIN_INVITE_CODE } from '@/lib/auth-store';
+import { getAdminInviteCode } from '@/lib/auth-server-secrets';
 import { registerSchema } from '@/lib/validations/api';
 
 export async function POST(request: NextRequest) {
@@ -33,11 +33,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Check invite code for admin/teacher
+    const adminInviteCode = getAdminInviteCode();
     if (role === 'admin' || role === 'teacher') {
-      if (!ADMIN_INVITE_CODE) {
+      if (!adminInviteCode) {
         return NextResponse.json({ error: 'Регистрация с этой ролью отключена' }, { status: 403 });
       }
-      if (!inviteCode || inviteCode.toUpperCase() !== ADMIN_INVITE_CODE) {
+      if (!inviteCode || inviteCode.toUpperCase() !== adminInviteCode) {
         return NextResponse.json({ error: 'Неверный код приглашения' }, { status: 403 });
       }
     }
