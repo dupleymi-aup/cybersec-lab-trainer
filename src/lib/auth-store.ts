@@ -523,7 +523,7 @@ interface AuthState {
   sendRecoveryOTP: (emailOrPhone: string) => Promise<{ success: boolean; error?: string; otp?: string }>;
   verifyRecoveryOTP: (otp: string) => Promise<boolean>;
   resetPassword: (otp: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
-  deleteAccount: () => Promise<{ success: boolean; error?: string }>;
+  deleteAccount: (currentPassword: string) => Promise<{ success: boolean; error?: string }>;
   clearLoginActivity: () => void;
   setUser: (user: User, token?: string) => void;
 }

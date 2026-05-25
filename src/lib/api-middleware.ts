@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateToken, getTokenPayload, type TokenPayload } from '@/lib/auth-server';
+import { ROLE_HIERARCHY } from './auth-types';
 
 export type { TokenPayload };
 
@@ -20,17 +21,12 @@ export async function authenticate(request: NextRequest): Promise<{ id: string; 
   return { id: payload.id, role: payload.role, group: payload.group, fullName: payload.fullName };
 }
 
-export const ROLE_HIERARCHY: Record<string, number> = {
-  student: 0,
-  teacher: 1,
-  admin: 2,
-};
-
 export function requireRole(userRole: string, ...requiredRoles: string[]): boolean {
-  const userLevel = ROLE_HIERARCHY[userRole];
+  const hierarchy = ROLE_HIERARCHY as Record<string, number>;
+  const userLevel = hierarchy[userRole];
   if (userLevel === undefined) return false;
   return requiredRoles.some(requiredRole => {
-    const requiredLevel = ROLE_HIERARCHY[requiredRole];
+    const requiredLevel = hierarchy[requiredRole];
     if (requiredLevel === undefined) return false;
     return userLevel >= requiredLevel;
   });
