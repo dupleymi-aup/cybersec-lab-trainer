@@ -37,16 +37,25 @@ interface GradebookStudent {
   fullName: string;
   email: string;
   group: string;
-  modulesCompleted: number;
-  quizCount: number;
-  avgScore: number;
+  moduleScores: Record<string, { completed: boolean; score: number | null }>;
+  avgQuizScore: number;
+  lastActive: string | null;
 }
 
 interface AtRiskStudent {
+  userId: string;
   fullName: string;
   email: string;
   group: string;
+  course: string;
+  university: string;
   riskScore: number;
+  reasons: string[];
+  lastActiveDays: number;
+  modulesCompleted: number;
+  avgQuizScore: number;
+  quizAttempts: number;
+  trend: 'improving' | 'declining' | 'stable';
 }
 
 const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Promise<void>> = {
@@ -60,9 +69,9 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
       fullName: s.fullName,
       email: s.email,
       group: s.group,
-      modulesCompleted: s.modulesCompleted || 0,
-      quizCount: s.quizCount || 0,
-      avgScore: s.avgScore || 0,
+      modulesCompleted: Object.values(s.moduleScores || {}).filter(m => m.completed).length,
+      quizCount: 0, // API doesn't provide quiz count separately
+      avgScore: s.avgQuizScore || 0,
     }));
 
     await generateGradebookPDF(students, (data.modules || []).map((m: { moduleId: string }) => m.moduleId), groupId || 'all');

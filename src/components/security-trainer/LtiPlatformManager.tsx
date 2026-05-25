@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
+import { getAuthHeaders } from '@/lib/store';
 import {
   Plus,
   Pencil,
@@ -81,7 +82,8 @@ export default function LtiPlatformManager() {
   const loadPlatforms = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/lti/platforms');
+      const headers = await getAuthHeaders();
+      const res = await fetch('/api/lti/platforms', { headers });
       if (res.ok) {
         const data = await res.json();
         setPlatforms(data);
@@ -102,7 +104,8 @@ export default function LtiPlatformManager() {
   const loadGradeSyncs = async (platformId: string) => {
     setLoadingSyncs(true);
     try {
-      const res = await fetch(`/api/lti/sync-grades?platformId=${platformId}`);
+      const headers = await getAuthHeaders();
+      const res = await fetch(`/api/lti/sync-grades?platformId=${platformId}`, { headers });
       if (res.ok) {
         const data = await res.json();
         setGradeSyncs(data);
@@ -126,10 +129,11 @@ export default function LtiPlatformManager() {
         ? `/api/lti/platforms/${editingPlatform.id}`
         : '/api/lti/platforms';
       const method = editingPlatform ? 'PUT' : 'POST';
+      const authHeaders = await getAuthHeaders();
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...authHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
@@ -151,7 +155,8 @@ export default function LtiPlatformManager() {
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`Удалить LTI платформу "${name}"?`)) return;
     try {
-      const res = await fetch(`/api/lti/platforms/${id}`, { method: 'DELETE' });
+      const headers = await getAuthHeaders();
+      const res = await fetch(`/api/lti/platforms/${id}`, { method: 'DELETE', headers });
       if (res.ok) {
         toast.success('Платформа удалена');
         if (selectedPlatformId === id) {
@@ -169,9 +174,10 @@ export default function LtiPlatformManager() {
 
   const handleToggleActive = async (platform: LtiPlatform) => {
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`/api/lti/platforms/${platform.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !platform.isActive }),
       });
       if (res.ok) {

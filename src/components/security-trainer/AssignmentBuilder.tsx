@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { modules } from '@/lib/data';
+import { getAuthHeaders } from '@/lib/store';
 
 interface Assignment {
   id: string;
@@ -124,7 +125,8 @@ export default function AssignmentBuilder() {
 
   const fetchAssignments = useCallback(async () => {
     try {
-      const res = await fetch('/api/assignments');
+      const headers = await getAuthHeaders();
+      const res = await fetch('/api/assignments', { headers });
       if (res.ok) {
         const data = await res.json();
         setAssignments(data);
@@ -190,10 +192,11 @@ export default function AssignmentBuilder() {
 
       const url = editingId ? `/api/assignments/${editingId}` : '/api/assignments';
       const method = editingId ? 'PUT' : 'POST';
+      const authHeaders = await getAuthHeaders();
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...authHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
@@ -216,7 +219,8 @@ export default function AssignmentBuilder() {
   const handleDelete = async (id: string) => {
     if (!confirm('Удалить это задание? Все submissions тоже будут удалены.')) return;
     try {
-      const res = await fetch(`/api/assignments/${id}`, { method: 'DELETE' });
+      const headers = await getAuthHeaders();
+      const res = await fetch(`/api/assignments/${id}`, { method: 'DELETE', headers });
       if (res.ok) {
         toast.success('Задание удалено');
         fetchAssignments();
@@ -230,9 +234,10 @@ export default function AssignmentBuilder() {
 
   const togglePublished = async (a: Assignment) => {
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`/api/assignments/${a.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({ published: !a.published }),
       });
       if (res.ok) {

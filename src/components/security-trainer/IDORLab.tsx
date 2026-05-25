@@ -81,7 +81,7 @@ export default function IDORLab() {
     setSelectedOption(null);
     setOptionSubmitted(false);
     setCorrectCount(0);
-    setShowDefense(false);
+    setShowAllDefenses(false);
   };
 
   return (

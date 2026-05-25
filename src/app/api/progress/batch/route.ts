@@ -15,12 +15,12 @@ export async function POST(request: NextRequest) {
   }
 
   const results = { progressSaved: 0, quizSaved: 0 };
-  const operations: Array<{ where: object; create: object; update: object }> = [];
+  const promises: Promise<void>[] = [];
 
   // Build progress operations
   if (progress && Array.isArray(progress)) {
     for (const p of progress) {
-      operations.push(
+      promises.push(
         prisma.progress.upsert({
           where: { userId_moduleId: { userId: auth.id, moduleId: p.moduleId } },
           create: {
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
   if (quizResults && Array.isArray(quizResults)) {
     for (const q of quizResults) {
       const percentage = q.total > 0 ? Math.round((q.score / q.total) * 100) : 0;
-      operations.push(
+      promises.push(
         prisma.quizResult.upsert({
           where: { userId_quizId: { userId: auth.id, quizId: q.quizId } },
           create: {
@@ -80,10 +80,10 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  if (operations.length === 0) {
+  if (promises.length === 0) {
     return NextResponse.json({ error: 'No data to save' }, { status: 400 });
   }
 
-  await prisma.$transaction(operations);
+  await Promise.all(promises);
   return NextResponse.json({ success: true, ...results });
 }

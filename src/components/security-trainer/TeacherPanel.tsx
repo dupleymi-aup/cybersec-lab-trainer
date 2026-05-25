@@ -215,9 +215,10 @@ export default function TeacherPanel() {
   const createDeadline = async () => {
     if (!newDeadline.title || !newDeadline.dueAt || !newDeadline.scopeId) return;
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch('/api/deadlines', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify(newDeadline),
       });
       if (res.ok) {
@@ -226,9 +227,12 @@ export default function TeacherPanel() {
         setNewDeadline({ scope: 'module', scopeId: '', dueAt: '', title: '', description: '', group: '' });
         setShowCreateForm(false);
         // Refresh reminders
-        const r2 = await fetch('/api/deadlines/teacher/reminders');
-        const d2 = await r2.json();
-        if (d2.results) setDeadlineReminders(d2.results);
+        const r2Headers = await getAuthHeaders();
+        const r2 = await fetch('/api/deadlines/teacher/reminders', { headers: r2Headers });
+        if (r2.ok) {
+          const d2 = await r2.json();
+          if (d2.results) setDeadlineReminders(d2.results);
+        }
       }
     } catch (err) {
       console.error('Failed to create deadline:', err);
@@ -237,7 +241,11 @@ export default function TeacherPanel() {
 
   const deleteDeadline = async (id: string) => {
     try {
-      const res = await fetch(`/api/deadlines/${id}`, { method: 'DELETE' });
+      const headers = await getAuthHeaders();
+      const res = await fetch(`/api/deadlines/${id}`, {
+        method: 'DELETE',
+        headers,
+      });
       if (res.ok) {
         setDeadlines(prev => prev.filter(d => d.id !== id));
         setDeadlineReminders(prev => prev.filter(r => r.deadline.id !== id));
