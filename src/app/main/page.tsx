@@ -128,69 +128,67 @@ export default function AppPage() {
       window.history.replaceState({}, '', url.toString());
 
       // Set the auth token and fetch user profile, then navigate
-      import('@/lib/auth-store').then(async ({ useAuthStore }) => {
-        const store = useAuthStore.getState();
-        let authSettled = false;
+      const store = useAuthStore.getState();
+      let authSettled = false;
 
+      try {
+        // Fetch user profile with the token
+        const res = await fetch('/api/auth/profile', {
+          headers: { Authorization: `Bearer ${ltiToken}` },
+        });
+        const userData = await res.json();
+
+        if (userData && userData.id) {
+          store.setUser(userData, ltiToken);
+          authSettled = true;
+        }
+      } catch {
+        // If profile fetch fails, fall back to decoding the JWT
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('LTI profile fetch failed, falling back to JWT decode');
+        }
         try {
-          // Fetch user profile with the token
-          const res = await fetch('/api/auth/profile', {
-            headers: { Authorization: `Bearer ${ltiToken}` },
-          });
-          const userData = await res.json();
-
-          if (userData && userData.id) {
-            store.setUser(userData, ltiToken);
+          const parts = ltiToken.split('.');
+          if (parts.length === 3) {
+            const payload = JSON.parse(atob(parts[1]));
+            store.setUser({
+              id: payload.id,
+              email: '',
+              phone: '',
+              fullName: 'LTI User',
+              group: '',
+              course: '',
+              university: '',
+              avatar: '',
+              bio: '',
+              role: payload.role || 'student',
+              createdAt: new Date().toISOString(),
+              lastLoginAt: new Date().toISOString(),
+              loginCount: 0,
+              isBlocked: false,
+            }, ltiToken);
             authSettled = true;
           }
-        } catch {
-          // If profile fetch fails, fall back to decoding the JWT
+        } catch (err) {
           if (process.env.NODE_ENV === 'development') {
-            console.warn('LTI profile fetch failed, falling back to JWT decode');
-          }
-          try {
-            const parts = ltiToken.split('.');
-            if (parts.length === 3) {
-              const payload = JSON.parse(atob(parts[1]));
-              store.setUser({
-                id: payload.id,
-                email: '',
-                phone: '',
-                fullName: 'LTI User',
-                group: '',
-                course: '',
-                university: '',
-                avatar: '',
-                bio: '',
-                role: payload.role || 'student',
-                createdAt: new Date().toISOString(),
-                lastLoginAt: new Date().toISOString(),
-                loginCount: 0,
-                isBlocked: false,
-              }, ltiToken);
-              authSettled = true;
-            }
-          } catch (err) {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn('LTI JWT decode failed:', err);
-            }
+            console.warn('LTI JWT decode failed:', err);
           }
         }
+      }
 
-        // Navigate only after auth is established
-        if (authSettled) {
-          if (ltiModule && pages[ltiModule]) {
-            setCurrentPage(ltiModule as PageType);
-          } else if (ltiQuiz) {
-            setCurrentPage('quiz' as PageType);
-          } else {
-            setCurrentPage('dashboard' as PageType);
-          }
+      // Navigate only after auth is established
+      if (authSettled) {
+        if (ltiModule && Object.prototype.hasOwnProperty.call(pages, ltiModule)) {
+          setCurrentPage(ltiModule as PageType);
+        } else if (ltiQuiz) {
+          setCurrentPage('quiz' as PageType);
+        } else {
+          setCurrentPage('dashboard' as PageType);
         }
-      });
+      }
     } else if (ltiModule) {
       // Direct module link (from deep linking)
-      if (pages[ltiModule]) {
+      if (Object.prototype.hasOwnProperty.call(pages, ltiModule)) {
         setCurrentPage(ltiModule as PageType);
       }
     } else if (ltiQuiz) {

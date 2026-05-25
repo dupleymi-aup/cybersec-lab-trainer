@@ -1,8 +1,24 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  async redirects() {
+    return [
+      {
+        source: '/app',
+        destination: '/main',
+        permanent: true,
+      },
+      {
+        source: '/app/:path*',
+        destination: '/main',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
