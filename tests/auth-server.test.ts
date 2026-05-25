@@ -13,10 +13,10 @@ describe('auth-server', () => {
       const payload = verifyToken(token);
 
       expect(payload).not.toBeNull();
-      expect(payload!.id).toBe(userId);
-      expect(payload!.role).toBe(role);
-      expect(payload!.group).toBe(group);
-      expect(payload!.fullName).toBe(fullName);
+      expect(payload?.id).toBe(userId);
+      expect(payload?.role).toBe(role);
+      expect(payload?.group).toBe(group);
+      expect(payload?.fullName).toBe(fullName);
     });
 
     it('should work without optional fields', () => {
@@ -27,10 +27,10 @@ describe('auth-server', () => {
       const payload = verifyToken(token);
 
       expect(payload).not.toBeNull();
-      expect(payload!.id).toBe(userId);
-      expect(payload!.role).toBe(role);
-      expect(payload!.group).toBeUndefined();
-      expect(payload!.fullName).toBeUndefined();
+      expect(payload?.id).toBe(userId);
+      expect(payload?.role).toBe(role);
+      expect(payload?.group).toBeUndefined();
+      expect(payload?.fullName).toBeUndefined();
     });
 
     it('should reject invalid tokens', () => {

@@ -47,18 +47,18 @@ describe('CSV export - formula injection prevention', () => {
   });
 
   it('should handle null and undefined', () => {
-    const csv1 = buildCSV(['Value'], [[null as any]]);
+    const csv1 = buildCSV(['Value'], [[null as unknown as string]]);
     expect(csv1).toContain('""');
-    const csv2 = buildCSV(['Value'], [[undefined as any]]);
+    const csv2 = buildCSV(['Value'], [[undefined as unknown as string]]);
     expect(csv2).toContain('""');
   });
 
   it('should handle numbers and booleans', () => {
-    const csv1 = buildCSV(['Num'], [[123 as any]]);
+    const csv1 = buildCSV(['Num'], [[123 as unknown as string]]);
     expect(csv1).toContain('"123"');
-    const csv2 = buildCSV(['Bool'], [[true as any]]);
+    const csv2 = buildCSV(['Bool'], [[true as unknown as string]]);
     expect(csv2).toContain('"true"');
-    const csv3 = buildCSV(['Bool'], [[false as any]]);
+    const csv3 = buildCSV(['Bool'], [[false as unknown as string]]);
     expect(csv3).toContain('"false"');
   });
 });

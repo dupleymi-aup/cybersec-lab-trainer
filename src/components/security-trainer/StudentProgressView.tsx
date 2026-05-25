@@ -127,6 +127,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden shrink-0">
                         {student.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img src={student.avatar} alt="" className="w-full h-full object-cover" />
                         ) : (
                           <GraduationCap size={16} className="text-violet-600" />
@@ -184,6 +185,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
         <div className="flex items-center gap-3 flex-1">
           <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden">
             {selectedStudent.avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img src={selectedStudent.avatar} alt="" className="w-full h-full object-cover" />
             ) : (
               <GraduationCap size={20} className="text-violet-600" />

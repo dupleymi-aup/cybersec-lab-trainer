@@ -1,14 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
-import { achievements, modules } from '@/lib/data';
+import { modules } from '@/lib/data';
 
 describe('getAchievementStatus', () => {
-  const emptyState = {
-    completedModules: [] as string[],
-    quizScores: {} as Record<string, number>,
-    challengeStats: { owaspCorrect: 0, authCorrect: 0 },
-  };
-
   describe('first-steps', () => {
     it('should be unlocked when at least 1 module is completed', () => {
       expect(getAchievementStatus('first-steps', ['owasp'], {})).toBe(true);

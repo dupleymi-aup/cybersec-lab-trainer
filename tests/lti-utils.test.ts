@@ -131,7 +131,13 @@ describe('LTI Utilities', () => {
         privateKey: null,
         tokenUrl: 'https://example.com/token.php',
         clientId: 'client123',
-      } as any);
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        name: 'Test Platform',
+        issuer: 'test-issuer',
+        authServer: 'https://example.com/auth',
+        deploymentId: 'deploy1',
+      });
 
       const { syncGradesToPlatform } = await import('@/lib/lti-utils');
       const result = await syncGradesToPlatform('platform1', 'user1', 'module1', 80, 100, 'Test');

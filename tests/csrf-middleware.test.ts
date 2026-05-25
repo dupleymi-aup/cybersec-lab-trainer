@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 // Mock NextRequest and NextResponse for middleware testing
-const mockNextRequest = (path: string, method: string, headers: Record<string, string> = {}, cookies: Record<string, string> = {}) => {
+const _mockNextRequest = (path: string, method: string, headers: Record<string, string> = {}, cookies: Record<string, string> = {}) => {
   const cookieStore = Object.entries(cookies).map(([name, value]) => ({ name, value }));
   return {
     nextUrl: new URL(`http://localhost:3000${path}`),

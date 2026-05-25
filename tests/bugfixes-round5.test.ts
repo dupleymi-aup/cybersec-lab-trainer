@@ -4,7 +4,7 @@ import { checkRateLimit } from '@/lib/api-middleware';
 describe('XP rate limiting', () => {
   beforeEach(() => {
     // Clean up any existing rate limit entries for our test keys
-    for (const key of ['xp:test-user', 'xp:test-user-2']) {
+    for (const _key of ['xp:test-user', 'xp:test-user-2']) {
       // Access internal store indirectly — we'll just use unique keys
     }
   });

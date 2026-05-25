@@ -328,6 +328,7 @@ export default function Sidebar() {
             >
               <div className="w-7 h-7 rounded-full bg-violet-600/30 dark:bg-violet-600/20 flex items-center justify-center overflow-hidden shrink-0">
                 {user.avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={user.avatar} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <User size={14} className="text-violet-600 dark:text-violet-400" />

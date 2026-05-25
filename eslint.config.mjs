@@ -7,7 +7,7 @@ import reactHooksPlugin from "eslint-plugin-react-hooks";
 /** @type {import("eslint").Linter.FlatConfig[]} */
 const eslintConfig = [
   {
-    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "public/**"],
+    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "public/**", "scripts/*.js"],
   },
   js.configs.recommended,
   {
@@ -52,6 +52,19 @@ const eslintConfig = [
       // Suppress in data files
       "no-unused-vars": "off",
       "no-undef": "off",
+    },
+  },
+  {
+    files: ["**/*.js"],
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: { jsx: false },
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
     },
   },
 ];

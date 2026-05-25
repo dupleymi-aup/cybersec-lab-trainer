@@ -2,8 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
 
 describe('getAchievementStatus', () => {
-  const emptyProgress = { completedModules: [], quizScores: {}, challengeStats: undefined };
-
   it('should return false for first-steps with no modules', () => {
     expect(getAchievementStatus('first-steps', [], {}, undefined)).toBe(false);
   });
