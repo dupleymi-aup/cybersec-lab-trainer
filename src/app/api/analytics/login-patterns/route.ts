@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
   const dormantAccounts = students
     .filter((s) => !activeUserIds.has(s.id) && s.lastLoginAt)
     .map((s) => {
-      const lastLogin = s.lastLoginAt!;
+      const lastLogin = s.lastLoginAt ?? new Date(0);
       const daysInactive = Math.floor((now.getTime() - lastLogin.getTime()) / (24 * 60 * 60 * 1000));
       return {
         userId: s.id,

@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
       }));
 
     // Performance variance (std dev of scores)
-    const scores = groupProgress.filter((p) => p.score != null).map((p) => p.score!);
+    const scores = groupProgress.filter((p) => p.score != null).map((p) => p.score ?? 0);
     const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
     const variance = scores.length > 1
       ? scores.reduce((sum, s) => sum + Math.pow(s - avgScore, 2), 0) / scores.length
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
     // Peer influence score (correlation between top 25% and group average)
     const studentScores = groupStudents.map((s) => {
       const sProgress = groupProgress.filter((p) => p.userId === s.id);
-      const sScores = sProgress.filter((p) => p.score != null).map((p) => p.score!);
+      const sScores = sProgress.filter((p) => p.score != null).map((p) => p.score ?? 0);
       return sScores.length > 0 ? sScores.reduce((a, b) => a + b, 0) / sScores.length : 0;
     }).sort((a, b) => b - a);
 

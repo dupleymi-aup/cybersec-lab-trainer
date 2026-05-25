@@ -30,6 +30,7 @@ export default function ProfilePage() {
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
 
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [group, setGroup] = useState(user?.group || '');
@@ -273,7 +274,7 @@ export default function ProfilePage() {
       toast.error('Введите "УДАЛИТЬ" для подтверждения');
       return;
     }
-    const result = await deleteAccount();
+    const result = await deleteAccount(deletePassword);
     if (result.success) {
       toast.success('Аккаунт удалён');
       window.location.reload();
@@ -783,10 +784,20 @@ export default function ProfilePage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); }}
+                  onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); setDeletePassword(''); }}
                 >
                   Отмена
                 </Button>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs text-red-600">Введите пароль для подтверждения удаления:</p>
+                <Input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  placeholder="Текущий пароль"
+                  className="border-red-300"
+                />
               </div>
             </div>
           )}

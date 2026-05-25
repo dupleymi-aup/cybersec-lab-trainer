@@ -65,7 +65,15 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
       return;
     }
 
-    const data: any = {
+    const data: {
+      reportType: string;
+      frequency: 'daily' | 'weekly' | 'monthly';
+      email?: string;
+      groupId?: string;
+      days?: number;
+      dayOfWeek?: number;
+      dayOfMonth?: number;
+    } = {
       reportType,
       frequency,
       email,

@@ -220,7 +220,7 @@ export async function bulkToggleBlock(userIds: string[], currentUserId: string, 
 
 // Audit log - now API-based
 export async function addAuditLogEntry(
-  adminId: string,
+  _adminId: string,
   adminName: string,
   action: AuditAction,
   targetId: string,
@@ -718,14 +718,19 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      deleteAccount: async () => {
+      deleteAccount: async (currentPassword: string) => {
         const { user, token } = get();
         if (!user) return { success: false, error: 'Пользователь не найден' };
+        if (!currentPassword) return { success: false, error: 'Требуется подтверждение пароля' };
 
         try {
           const res = await fetch('/api/auth/delete', {
             method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ currentPassword }),
           });
           if (!res.ok) {
             const data = await res.json();

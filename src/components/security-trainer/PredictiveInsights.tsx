@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area, Legend, LineChart, Line,
+  AreaChart, Area, Legend,
 } from 'recharts';
 import {
   TrendingUp, TrendingDown, Loader2, AlertTriangle, Lightbulb, BarChart3,

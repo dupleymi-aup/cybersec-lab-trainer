@@ -123,7 +123,7 @@ export default function StudentAssignments() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [timerRunning]);
+  }, [timerRunning, timer]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);

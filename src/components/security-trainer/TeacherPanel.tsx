@@ -145,7 +145,6 @@ export default function TeacherPanel() {
   const { setCurrentPage } = useAppStore();
   const { user } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
-  // TODO: Add group filter dropdown UI
   const [groupFilter, _setGroupFilter] = useState('');
   const [gradebookSort, setGradebookSort] = useState<'name' | 'modules' | 'score'>('name');
   const [analyticsSubTab, setAnalyticsSubTab] = useState<'overview' | 'trends' | 'questions' | 'achievements' | 'competency' | 'weaknesses' | 'predictive' | 'export' | 'module-deep-dive' | 'certification' | 'quiz-session'>('overview');
@@ -310,7 +309,8 @@ export default function TeacherPanel() {
   const atRiskStudents = useMemo(() => {
     const now = new Date();
     return students.map((s) => {
-      const progress = progressMap.get(s.id)!;
+      const progress = progressMap.get(s.id);
+      if (!progress) return { ...s, riskScore: 0, riskFactors: [] };
       const scores = Object.values(progress.quizScores);
       const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
       const daysSinceActive = progress.lastActive
@@ -350,7 +350,7 @@ export default function TeacherPanel() {
         activityRate: groupStudents.length > 0 ? Math.round(activeCount / groupStudents.length * 100) : 0,
       };
     });
-  }, [groups, students]);
+  }, [groups, students, studentProgress]);
 
   return (
     <div className="space-y-6">
