@@ -1,60 +1,5 @@
 import type { NextConfig } from "next";
 import path from "path";
-import withPWAInit from "next-pwa";
-
-const withPWA = withPWAInit({
-  dest: "public",
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === "development",
-  mode: "production",
-  runtimeCaching: [
-    {
-      urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
-      handler: "CacheFirst",
-      options: {
-        cacheName: "google-fonts-webfonts",
-        expiration: { maxEntries: 4, maxAgeSeconds: 365 * 24 * 60 * 60 },
-      },
-    },
-    {
-      urlPattern: /\.(?:eot|woff|woff2|ttf|svg)$/,
-      handler: "StaleWhileRevalidate",
-      options: {
-        cacheName: "font-assets",
-        expiration: { maxEntries: 30, maxAgeSeconds: 30 * 24 * 60 * 60 },
-      },
-    },
-    {
-      urlPattern: /\.(?:png|jpg|jpeg|webp|svg|gif)$/,
-      handler: "StaleWhileRevalidate",
-      options: {
-        cacheName: "image-assets",
-        expiration: { maxEntries: 50, maxAgeSeconds: 30 * 24 * 60 * 60 },
-      },
-    },
-    {
-      urlPattern: /^https?:\/\/.*\.(?:js|css)$/,
-      handler: "StaleWhileRevalidate",
-      options: {
-        cacheName: "static-resources",
-        expiration: { maxEntries: 50, maxAgeSeconds: 7 * 24 * 60 * 60 },
-      },
-    },
-    {
-      urlPattern: /^https?:\/\/.*\/api\/.*/i,
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "api-responses",
-        networkTimeoutSeconds: 10,
-        expiration: { maxEntries: 20, maxAgeSeconds: 5 * 60 },
-      },
-    },
-  ],
-  fallbacks: {
-    document: "/offline",
-  },
-});
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -89,7 +34,7 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' https://unpkg.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob:",
               "font-src 'self' data: https://fonts.gstatic.com",
@@ -100,7 +45,28 @@ const nextConfig: NextConfig = {
               "base-uri 'self'",
               "form-action 'self'",
               "frame-ancestors 'none'",
+              "worker-src 'self'",
               "upgrade-insecure-requests",
+            ].join("; "),
+          },
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' https://unpkg.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob:",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "connect-src 'self'",
+              "media-src 'self'",
+              "object-src 'none'",
+              "frame-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "worker-src 'self'",
+              "upgrade-insecure-requests",
+              "report-uri /api/csp-report",
             ].join("; "),
           },
         ],
@@ -109,4 +75,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;

@@ -1,5 +1,3 @@
-declare module 'next-pwa';
-
 declare module 'react-syntax-highlighter' {
   import { ComponentType, CSSProperties } from 'react';
 
