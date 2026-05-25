@@ -310,7 +310,7 @@ export default function TeacherPanel() {
     const now = new Date();
     return students.map((s) => {
       const progress = progressMap.get(s.id);
-      if (!progress) return { ...s, riskScore: 0, riskFactors: [] };
+      if (!progress) return { student: s, progress: null, avgScore: 0, daysSinceActive: 999, reasons: [] as string[] };
       const scores = Object.values(progress.quizScores);
       const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
       const daysSinceActive = progress.lastActive
@@ -1095,15 +1095,15 @@ export default function TeacherPanel() {
                         <div className="flex items-center gap-4 text-right">
                           <div>
                             <p className="text-xs text-muted-foreground">Модули</p>
-                            <p className="text-sm font-bold">{progress.completedModules.length}</p>
+                            <p className="text-sm font-bold">{progress ? progress.completedModules.length : 0}</p>
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground">Ср. балл</p>
-                            <p className="text-sm font-bold">{Object.values(progress.quizScores).length > 0 ? `${Math.round(avgScore)}%` : '—'}</p>
+                            <p className="text-sm font-bold">{progress && Object.values(progress.quizScores).length > 0 ? `${Math.round(avgScore)}%` : '—'}</p>
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground">Последняя активность</p>
-                            <p className="text-sm font-bold">{progress.lastActive ? `${daysSinceActive} дн. назад` : 'Никогда'}</p>
+                            <p className="text-sm font-bold">{progress ? (progress.lastActive ? `${daysSinceActive} дн. назад` : 'Никогда') : 'Никогда'}</p>
                           </div>
                         </div>
                       </div>
