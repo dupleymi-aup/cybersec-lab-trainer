@@ -35,10 +35,12 @@ export async function GET(request: NextRequest) {
     if (!diffMap.has(attempt.difficulty)) {
       diffMap.set(attempt.difficulty, { total: 0, correct: 0, students: new Set() });
     }
-    const d = diffMap.get(attempt.difficulty)!;
-    d.total++;
-    if (attempt.correct) d.correct++;
-    d.students.add(attempt.userId);
+    const d = diffMap.get(attempt.difficulty);
+    if (d) {
+      d.total++;
+      if (attempt.correct) d.correct++;
+      d.students.add(attempt.userId);
+    }
   }
 
   const difficultyBreakdown = Array.from(diffMap.entries())
@@ -59,9 +61,11 @@ export async function GET(request: NextRequest) {
   for (const attempt of attempts) {
     const key = `${attempt.category}|${attempt.difficulty}`;
     if (!catDiffMap.has(key)) catDiffMap.set(key, { total: 0, correct: 0 });
-    const entry = catDiffMap.get(key)!;
-    entry.total++;
-    if (attempt.correct) entry.correct++;
+    const entry = catDiffMap.get(key);
+    if (entry) {
+      entry.total++;
+      if (attempt.correct) entry.correct++;
+    }
   }
 
   const categoryByDifficulty = Array.from(catDiffMap.entries())
@@ -82,7 +86,8 @@ export async function GET(request: NextRequest) {
     if (!studentDiffMap.has(attempt.userId)) {
       studentDiffMap.set(attempt.userId, { easy: { total: 0, correct: 0 }, medium: { total: 0, correct: 0 }, hard: { total: 0, correct: 0 } });
     }
-    const studentDiffs = studentDiffMap.get(attempt.userId)!;
+    const studentDiffs = studentDiffMap.get(attempt.userId);
+    if (!studentDiffs) continue;
     if (!studentDiffs[attempt.difficulty]) studentDiffs[attempt.difficulty] = { total: 0, correct: 0 };
     studentDiffs[attempt.difficulty].total++;
     if (attempt.correct) studentDiffs[attempt.difficulty].correct++;
@@ -115,11 +120,13 @@ export async function GET(request: NextRequest) {
         hard: { total: 0, correct: 0 },
       });
     }
-    const week = weekMap.get(weekKey)!;
-    const diff = week[attempt.difficulty as keyof typeof week];
-    if (diff) {
-      diff.total++;
-      if (attempt.correct) diff.correct++;
+    const week = weekMap.get(weekKey);
+    if (week) {
+      const diff = week[attempt.difficulty as keyof typeof week];
+      if (diff) {
+        diff.total++;
+        if (attempt.correct) diff.correct++;
+      }
     }
   }
 

@@ -266,7 +266,7 @@ export default function TeacherPanel() {
       map.set(s.id, studentProgress[s.id]);
     }
     return map;
-  }, [students]);
+  }, [students, studentProgress]);
 
   // Calculate stats
   const totalStudents = students.length;

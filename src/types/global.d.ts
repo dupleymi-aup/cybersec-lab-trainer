@@ -3,7 +3,7 @@ declare module 'react-syntax-highlighter' {
 
   export interface SyntaxHighlighterProps {
     language?: string;
-    style?: any;
+    style?: Record<string, CSSProperties>;
     children?: string;
     customStyle?: CSSProperties;
     codeTagProps?: CSSProperties;

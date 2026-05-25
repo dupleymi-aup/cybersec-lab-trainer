@@ -164,10 +164,12 @@ export async function GET(request: NextRequest) {
       if (!groups.has(key)) {
         groups.set(key, { totalStudents: 0, activeStudents: 0, progressRecords: [], quizResults: [] });
       }
-      const g = groups.get(key)!;
-      g.totalStudents++;
-      if (s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo) {
-        g.activeStudents++;
+      const g = groups.get(key);
+      if (g) {
+        g.totalStudents++;
+        if (s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo) {
+          g.activeStudents++;
+        }
       }
     }
 

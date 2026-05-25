@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import {
   FileText, Clock, Award, Send, AlertCircle, CheckCircle,
-  Loader2, ChevronLeft, Calendar, Users, Timer,
+  Loader2, ChevronLeft, Calendar, Timer,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/auth-store';
@@ -183,7 +183,7 @@ export default function StudentAssignments() {
     }, mySubs[0]);
   };
 
-  const getMyAttemptCount = (a: Assignment) => (submissions[a.id] || []).length;
+  const _getMyAttemptCount = (a: Assignment) => (submissions[a.id] || []).length;
 
   // View single assignment
   if (viewingId) {
@@ -352,7 +352,6 @@ export default function StudentAssignments() {
             const mySubs = submissions[a.id] || [];
             const bestSub = getMyBestSubmission(a);
             const attemptCount = mySubs.length;
-            const maxAttempts = a.attempts === 0 ? Infinity : a.attempts;
             const isCompleted = mySubs.some((s) => s.passed === true);
             const isPending = mySubs.some((s) => s.submittedAt && s.score === null);
 
@@ -399,9 +398,9 @@ export default function StudentAssignments() {
                         {a.timeLimit && <span className="flex items-center gap-1"><Clock size={12} /> {a.timeLimit} мин</span>}
                         <span>Попытки: {attemptCount}/{a.attempts === 0 ? '∞' : a.attempts}</span>
                         {a.autoGrade && <span>Автопроверка</span>}
-                        {dueDate && (
-                          <span className={isOverdue ? 'text-red-500 font-medium' : daysLeft! <= 3 ? 'text-orange-500' : ''}>
-                            {isOverdue ? `Просрочен (${Math.abs(daysLeft!)} дн.)` : daysLeft === 0 ? 'Сегодня' : daysLeft === 1 ? 'Завтра' : `Дедлайн: ${daysLeft} дн.`}
+                        {dueDate && daysLeft !== null && (
+                          <span className={isOverdue ? 'text-red-500 font-medium' : daysLeft <= 3 ? 'text-orange-500' : ''}>
+                            {isOverdue ? `Просрочен (${Math.abs(daysLeft)} дн.)` : daysLeft === 0 ? 'Сегодня' : daysLeft === 1 ? 'Завтра' : `Дедлайн: ${daysLeft} дн.`}
                           </span>
                         )}
                       </div>

@@ -109,9 +109,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!categoryMap.has(attempt.category)) {
       categoryMap.set(attempt.category, { attempts: 0, correct: 0, scores: [] });
     }
-    const cat = categoryMap.get(attempt.category)!;
-    cat.attempts++;
-    if (attempt.correct) cat.correct++;
+    const cat = categoryMap.get(attempt.category);
+    if (cat) {
+      cat.attempts++;
+      if (attempt.correct) cat.correct++;
+    }
   }
   const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, data]) => {
     const correctRate = data.attempts > 0 ? Math.round((data.correct / data.attempts) * 1000) / 10 : 0;
@@ -138,7 +140,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const snapshotMap = new Map<string, { score: number; completed: boolean; date: string }>();
   for (const snap of snapshots) {
     const key = `${snap.moduleId}-${snap.recordedAt.toISOString().split('T')[0]}`;
-    if (!snapshotMap.has(key) || snap.recordedAt > new Date(snapshotMap.get(key)!.date)) {
+    const existing = snapshotMap.get(key);
+    if (!existing || snap.recordedAt > new Date(existing.date)) {
       snapshotMap.set(key, {
         score: snap.score,
         completed: snap.completed,
@@ -164,13 +167,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!weekBuckets.has(weekKey)) {
       weekBuckets.set(weekKey, new Map());
     }
-    const weekData = weekBuckets.get(weekKey)!;
+    const weekData = weekBuckets.get(weekKey);
+    if (!weekData) continue;
     if (!weekData.has(attempt.category)) {
       weekData.set(attempt.category, { correct: 0, total: 0 });
     }
-    const catData = weekData.get(attempt.category)!;
-    catData.total++;
-    if (attempt.correct) catData.correct++;
+    const catData = weekData.get(attempt.category);
+    if (catData) {
+      catData.total++;
+      if (attempt.correct) catData.correct++;
+    }
   }
 
   const quizCategoryTrajectory: Array<{ week: string; category: string; avgScore: number; attempts: number }> = [];
@@ -199,9 +205,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!loginDayMap.has(dayKey)) {
       loginDayMap.set(dayKey, { total: 0, success: 0 });
     }
-    const dayData = loginDayMap.get(dayKey)!;
-    dayData.total++;
-    if (login.success) dayData.success++;
+    const dayData = loginDayMap.get(dayKey);
+    if (dayData) {
+      dayData.total++;
+      if (login.success) dayData.success++;
+    }
   }
 
   const loginActivityTimeline = Array.from(loginDayMap.entries())
@@ -219,12 +227,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!cohortModuleAverages.has(p.moduleId)) {
       cohortModuleAverages.set(p.moduleId, { totalScore: 0, count: 0, completedCount: 0, totalCount: 0 });
     }
-    const avg = cohortModuleAverages.get(p.moduleId)!;
-    avg.totalCount++;
-    if (p.completed) avg.completedCount++;
-    if (p.score !== null) {
-      avg.totalScore += p.score;
-      avg.count++;
+    const avg = cohortModuleAverages.get(p.moduleId);
+    if (avg) {
+      avg.totalCount++;
+      if (p.completed) avg.completedCount++;
+      if (p.score !== null) {
+        avg.totalScore += p.score;
+        avg.count++;
+      }
     }
   }
 
@@ -253,9 +263,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!cohortCategoryAverages.has(a.category)) {
       cohortCategoryAverages.set(a.category, { correct: 0, total: 0 });
     }
-    const cat = cohortCategoryAverages.get(a.category)!;
-    cat.total++;
-    if (a.correct) cat.correct++;
+    const cat = cohortCategoryAverages.get(a.category);
+    if (cat) {
+      cat.total++;
+      if (a.correct) cat.correct++;
+    }
   }
 
   const studentCategoryMap = new Map<string, { correct: number; total: number }>();
@@ -263,9 +275,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!studentCategoryMap.has(a.category)) {
       studentCategoryMap.set(a.category, { correct: 0, total: 0 });
     }
-    const cat = studentCategoryMap.get(a.category)!;
-    cat.total++;
-    if (a.correct) cat.correct++;
+    const cat = studentCategoryMap.get(a.category);
+    if (cat) {
+      cat.total++;
+      if (a.correct) cat.correct++;
+    }
   }
 
   // Add category gaps to skillsGap array

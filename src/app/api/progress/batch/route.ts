@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   }
 
   const results = { progressSaved: 0, quizSaved: 0 };
-  const operations: any[] = [];
+  const operations: Array<{ where: object; create: object; update: object }> = [];
 
   // Build progress operations
   if (progress && Array.isArray(progress)) {

@@ -58,10 +58,12 @@ export async function GET(request: NextRequest) {
       if (!failedMap.has(activity.userId)) {
         failedMap.set(activity.userId, { fullName: student.fullName, count: 0, recentAttempts: [] });
       }
-      const entry = failedMap.get(activity.userId)!;
-      entry.count++;
-      if (entry.recentAttempts.length < 5) {
-        entry.recentAttempts.push({ timestamp: activity.timestamp.toISOString(), ip: activity.ip });
+      const entry = failedMap.get(activity.userId);
+      if (entry) {
+        entry.count++;
+        if (entry.recentAttempts.length < 5) {
+          entry.recentAttempts.push({ timestamp: activity.timestamp.toISOString(), ip: activity.ip });
+        }
       }
     }
   }

@@ -28,7 +28,6 @@ import {
 export default function IDORLab() {
   const { completedModules, completeModule } = useAppStore();
   const [currentScenario, setCurrentScenario] = useState(0);
-  const [showDefense, setShowDefense] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [optionSubmitted, setOptionSubmitted] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);

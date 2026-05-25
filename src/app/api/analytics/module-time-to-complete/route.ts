@@ -38,9 +38,12 @@ export async function GET(request: NextRequest) {
     if (!userModuleTimelines.has(p.userId)) {
       userModuleTimelines.set(p.userId, new Map());
     }
-    const timeline = userModuleTimelines.get(p.userId)!;
-    if (!timeline.has(p.moduleId) || p.updatedAt < timeline.get(p.moduleId)!) {
-      timeline.set(p.moduleId, p.updatedAt);
+    const timeline = userModuleTimelines.get(p.userId);
+    if (timeline) {
+      const existingDate = timeline.get(p.moduleId);
+      if (!existingDate || p.updatedAt < existingDate) {
+        timeline.set(p.moduleId, p.updatedAt);
+      }
     }
   }
 
@@ -56,9 +59,12 @@ export async function GET(request: NextRequest) {
     if (!userModuleStarts.has(snap.userId)) {
       userModuleStarts.set(snap.userId, new Map());
     }
-    const starts = userModuleStarts.get(snap.userId)!;
-    if (!starts.has(snap.moduleId) || snap.recordedAt < starts.get(snap.moduleId)!) {
-      starts.set(snap.moduleId, snap.recordedAt);
+    const starts = userModuleStarts.get(snap.userId);
+    if (starts) {
+      const existingDate = starts.get(snap.moduleId);
+      if (!existingDate || snap.recordedAt < existingDate) {
+        starts.set(snap.moduleId, snap.recordedAt);
+      }
     }
   }
 
@@ -82,7 +88,10 @@ export async function GET(request: NextRequest) {
       if (!moduleTimes.has(moduleId)) {
         moduleTimes.set(moduleId, []);
       }
-      moduleTimes.get(moduleId)!.push(hours);
+      const times = moduleTimes.get(moduleId);
+      if (times) {
+        times.push(hours);
+      }
       userTimes.push(hours);
     }
 
@@ -90,7 +99,10 @@ export async function GET(request: NextRequest) {
       if (!studentSpeeds.has(userId)) {
         studentSpeeds.set(userId, { userId, fullName: user.fullName, group: user.group, times: [] });
       }
-      studentSpeeds.get(userId)!.times.push(...userTimes);
+      const speed = studentSpeeds.get(userId);
+      if (speed) {
+        speed.times.push(...userTimes);
+      }
     }
   }
 

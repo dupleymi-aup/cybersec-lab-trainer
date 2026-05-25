@@ -49,7 +49,10 @@ export async function GET(request: NextRequest) {
   for (const attempt of quizAttempts) {
     const cat = attempt.category;
     if (!categoriesMap.has(cat)) categoriesMap.set(cat, []);
-    categoriesMap.get(cat)!.push(attempt);
+    const attempts = categoriesMap.get(cat);
+    if (attempts) {
+      attempts.push(attempt);
+    }
   }
 
   const categories = Array.from(categoriesMap.entries()).map(([catId, attempts]) => {
@@ -64,7 +67,10 @@ export async function GET(request: NextRequest) {
     const questionMap = new Map<string, typeof attempts>();
     for (const a of attempts) {
       if (!questionMap.has(a.questionId)) questionMap.set(a.questionId, []);
-      questionMap.get(a.questionId)!.push(a);
+      const qAttempts = questionMap.get(a.questionId);
+      if (qAttempts) {
+        qAttempts.push(a);
+      }
     }
 
     const questionStats = Array.from(questionMap.entries()).map(([questionId, qAttempts]) => {

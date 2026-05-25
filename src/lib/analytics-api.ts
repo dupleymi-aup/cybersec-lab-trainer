@@ -476,7 +476,7 @@ export async function createScheduledReport(data: {
   }
 }
 
-export async function updateScheduledReport(id: string, data: Record<string, any>): Promise<{ success: boolean; report?: ScheduledReport; error?: string }> {
+export async function updateScheduledReport(id: string, data: Partial<ScheduledReport>): Promise<{ success: boolean; report?: ScheduledReport; error?: string }> {
   try {
     const res = await apiFetch(`/api/scheduled-reports/${id}`, {
       method: 'PATCH',

@@ -76,9 +76,11 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
       if (!weekMap.has(t.week)) {
         weekMap.set(t.week, { week: t.week });
       }
-      const row = weekMap.get(t.week)!;
-      row[t.category] = t.avgScore;
-      row[`${t.category}_attempts`] = t.attempts;
+      const row = weekMap.get(t.week);
+      if (row) {
+        row[t.category] = t.avgScore;
+        row[`${t.category}_attempts`] = t.attempts;
+      }
     }
 
     return Array.from(weekMap.values()).sort(

@@ -53,7 +53,10 @@ export async function GET(request: NextRequest) {
   for (const s of students) {
     const key = s[field] || '(не указано)';
     if (!groups.has(key)) groups.set(key, { students: [], progress: [], quizResults: [], quizAttempts: [] });
-    groups.get(key)!.students.push(s);
+    const group = groups.get(key);
+    if (group) {
+      group.students.push(s);
+    }
   }
 
   for (const p of progressRecords) {

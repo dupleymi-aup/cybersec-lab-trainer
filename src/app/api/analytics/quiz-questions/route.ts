@@ -35,9 +35,11 @@ export async function GET(request: NextRequest) {
     if (!questionStats.has(key)) {
       questionStats.set(key, { totalAttempts: 0, correctCount: 0, category: a.category, difficulty: a.difficulty });
     }
-    const stat = questionStats.get(key)!;
-    stat.totalAttempts++;
-    if (a.correct) stat.correctCount++;
+    const stat = questionStats.get(key);
+    if (stat) {
+      stat.totalAttempts++;
+      if (a.correct) stat.correctCount++;
+    }
   }
 
   // Build result with question text from quiz-data.ts

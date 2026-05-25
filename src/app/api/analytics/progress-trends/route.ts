@@ -76,10 +76,12 @@ export async function GET(request: NextRequest) {
     if (!dailyMap.has(dateKey)) {
       dailyMap.set(dateKey, { modulesCompleted: [], quizScores: [], activeUserIds: new Set() });
     }
-    const entry = dailyMap.get(dateKey)!;
-    entry.activeUserIds.add(p.userId);
-    if (p.completed) {
-      entry.modulesCompleted.push(1);
+    const entry = dailyMap.get(dateKey);
+    if (entry) {
+      entry.activeUserIds.add(p.userId);
+      if (p.completed) {
+        entry.modulesCompleted.push(1);
+      }
     }
   }
 
@@ -89,9 +91,11 @@ export async function GET(request: NextRequest) {
     if (!dailyMap.has(dateKey)) {
       dailyMap.set(dateKey, { modulesCompleted: [], quizScores: [], activeUserIds: new Set() });
     }
-    const entry = dailyMap.get(dateKey)!;
-    entry.activeUserIds.add(q.userId);
-    entry.quizScores.push(q.percentage);
+    const entry = dailyMap.get(dateKey);
+    if (entry) {
+      entry.activeUserIds.add(q.userId);
+      entry.quizScores.push(q.percentage);
+    }
   }
 
   // Compute aggregate per-day values

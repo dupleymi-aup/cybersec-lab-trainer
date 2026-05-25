@@ -622,10 +622,10 @@ export default function AssignmentBuilder() {
                         <span className="flex items-center gap-1"><Clock size={12} /> {a.timeLimit ? `${a.timeLimit} мин` : 'Без лимита'}</span>
                         {a.attempts > 0 && <span>Попытки: {a.attempts}</span>}
                         {a.group && <span className="flex items-center gap-1"><Users size={12} /> {a.group}</span>}
-                        {dueDate && (
-                          <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : daysLeft! <= 3 ? 'text-orange-500' : ''}`}>
+                        {dueDate && daysLeft !== null && (
+                          <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : daysLeft <= 3 ? 'text-orange-500' : ''}`}>
                             <Calendar size={12} />
-                            {isOverdue ? `Просрочен (${Math.abs(daysLeft!)} дн.)` : daysLeft === 0 ? 'Сегодня' : daysLeft === 1 ? 'Завтра' : `${daysLeft} дн.`}
+                            {isOverdue ? `Просрочен (${Math.abs(daysLeft)} дн.)` : daysLeft === 0 ? 'Сегодня' : daysLeft === 1 ? 'Завтра' : `${daysLeft} дн.`}
                           </span>
                         )}
                       </div>

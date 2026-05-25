@@ -239,7 +239,7 @@ export default function SSRFLab() {
                   <Card className="mt-3 border-none bg-secondary">
                     <CardContent className="p-3">
                       <p className="text-sm font-medium">
-                        {scenario.options[selectedOption!]?.correct ? (
+                        {selectedOption !== null && scenario.options[selectedOption]?.correct ? (
                           <span className="text-emerald-600">Правильно! {scenario.fixExplanation}</span>
                         ) : (
                           <span className="text-red-600">Неверно. {scenario.fixExplanation}</span>

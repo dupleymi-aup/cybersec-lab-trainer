@@ -43,9 +43,11 @@ export async function GET(request: NextRequest) {
     if (!questionMap.has(attempt.questionId)) {
       questionMap.set(attempt.questionId, { total: 0, incorrect: 0, category: attempt.category, difficulty: attempt.difficulty });
     }
-    const q = questionMap.get(attempt.questionId)!;
-    q.total++;
-    if (!attempt.correct) q.incorrect++;
+    const q = questionMap.get(attempt.questionId);
+    if (q) {
+      q.total++;
+      if (!attempt.correct) q.incorrect++;
+    }
   }
 
   // Top missed questions
@@ -68,10 +70,12 @@ export async function GET(request: NextRequest) {
     if (!categoryErrors.has(data.category)) {
       categoryErrors.set(data.category, { total: 0, incorrect: 0, questions: 0 });
     }
-    const cat = categoryErrors.get(data.category)!;
-    cat.total += data.total;
-    cat.incorrect += data.incorrect;
-    cat.questions++;
+    const cat = categoryErrors.get(data.category);
+    if (cat) {
+      cat.total += data.total;
+      cat.incorrect += data.incorrect;
+      cat.questions++;
+    }
   }
 
   const categoryErrorRates = Array.from(categoryErrors.entries())
@@ -90,9 +94,11 @@ export async function GET(request: NextRequest) {
     if (!difficultyErrors.has(data.difficulty)) {
       difficultyErrors.set(data.difficulty, { total: 0, incorrect: 0 });
     }
-    const d = difficultyErrors.get(data.difficulty)!;
-    d.total += data.total;
-    d.incorrect += data.incorrect;
+    const d = difficultyErrors.get(data.difficulty);
+    if (d) {
+      d.total += data.total;
+      d.incorrect += data.incorrect;
+    }
   }
 
   const difficultyErrorRates = Array.from(difficultyErrors.entries())
@@ -115,9 +121,11 @@ export async function GET(request: NextRequest) {
     if (!weekMap.has(weekKey)) {
       weekMap.set(weekKey, { total: 0, incorrect: 0 });
     }
-    const week = weekMap.get(weekKey)!;
-    week.total++;
-    if (!attempt.correct) week.incorrect++;
+    const week = weekMap.get(weekKey);
+    if (week) {
+      week.total++;
+      if (!attempt.correct) week.incorrect++;
+    }
   }
 
   const errorTrends = Array.from(weekMap.entries())

@@ -67,7 +67,17 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const results: any[] = [];
+  const results: Array<{
+    moduleId: string;
+    moduleName: string;
+    levels: Array<{ level: number; started: number; completed: number; completionRate: number }>;
+    challengeScores: Array<{ range: string; min: number; max: number; count: number }>;
+    totalStudents: number;
+    avgScore: number;
+    completionRate: number;
+    studiedItemsCoverage?: Array<{ item: string; studiedCount: number; studiedRate: number }>;
+    secureCodingDistribution?: Array<{ correctRange: string; min: number; max: number; count: number }>;
+  }> = [];
 
   for (const [moduleId, levelCount] of Object.entries(MODULE_LEVEL_COUNTS)) {
     const moduleProgress = progress.filter((p) => p.moduleId === moduleId);
@@ -77,7 +87,7 @@ export async function GET(request: NextRequest) {
       : 0;
 
     // Level-by-level analysis
-    const levels: any[] = [];
+    const levels: Array<{ level: number; started: number; completed: number; completionRate: number }> = [];
     for (let level = 1; level <= levelCount; level++) {
       let startedCount = 0;
       let completedCountForLevel = 0;
@@ -139,7 +149,7 @@ export async function GET(request: NextRequest) {
       if (p.challengeScores) {
         try {
           const scores = JSON.parse(p.challengeScores);
-          const values = Object.values(scores).filter((v: any) => typeof v === 'number');
+          const values = Object.values(scores).filter((v): v is number => typeof v === 'number');
           for (const v of values) {
             for (const r of challengeRanges) {
               if (v >= r.min && v <= r.max) { r.count++; break; }
@@ -150,7 +160,7 @@ export async function GET(request: NextRequest) {
     }
 
     // OWASP studied items coverage
-    let studiedItemsCoverage: any[] | undefined;
+    let studiedItemsCoverage: Array<{ item: string; studiedCount: number; studiedRate: number }> | undefined;
     if (moduleId === 'owasp') {
       const allItems = new Set<string>();
       const itemCounts: Record<string, number> = {};
@@ -171,7 +181,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Secure coding distribution
-    let secureCodingDistribution: any[] | undefined;
+    let secureCodingDistribution: Array<{ correctRange: string; min: number; max: number; count: number }> | undefined;
     if (moduleId === 'secure-coding') {
       const ranges = [
         { correctRange: '0-5', min: 0, max: 5, count: 0 },

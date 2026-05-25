@@ -278,7 +278,7 @@ export default function SecurityCheatSheets() {
                           <code>{item.code}</code>
                         </pre>
                         <button
-                          onClick={() => handleCopy(item.code!, `${sheet.id}-${idx}`)}
+                          onClick={() => item.code && handleCopy(item.code, `${sheet.id}-${idx}`)}
                           className="absolute top-1.5 right-1.5 p-1 rounded bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-slate-400 hover:text-white transition"
                           title="Копировать"
                         >

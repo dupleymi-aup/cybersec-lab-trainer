@@ -211,7 +211,7 @@ export default function StudentComparisonView(props: Props = {}) {
                     ].map((row, i) => (
                       <tr key={i} className="border-b border-slate-100 hover:bg-secondary">
                         <td className="p-2 font-medium">{row.label}</td>
-                        {data!.students.map((student) => (
+                        {(data?.students ?? []).map((student) => (
                           <td key={student.id} className="text-center p-2">
                             {row.getValue(student)}
                           </td>

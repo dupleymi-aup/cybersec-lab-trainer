@@ -50,13 +50,16 @@ export async function GET(request: NextRequest) {
   });
 
   // Group attempts by (userId, quizId) to calculate session durations
-  const sessionMap = new Map<string, { userId: string; quizId: string; category: string; attempts: any[] }>();
+  const sessionMap = new Map<string, { userId: string; quizId: string; category: string; attempts: Array<{ userId: string; quizId: string; category: string; correct: boolean; attemptedAt: Date }> }>();
   for (const attempt of quizAttempts) {
     const key = `${attempt.userId}-${attempt.quizId}`;
     if (!sessionMap.has(key)) {
       sessionMap.set(key, { userId: attempt.userId, quizId: attempt.quizId, category: attempt.category, attempts: [] });
     }
-    sessionMap.get(key)!.attempts.push(attempt);
+    const session = sessionMap.get(key);
+    if (session) {
+      session.attempts.push(attempt);
+    }
   }
 
   // Calculate duration per session (first attempt to last attempt timestamp)
@@ -92,7 +95,10 @@ export async function GET(request: NextRequest) {
   const categoryTimingMap = new Map<string, number[]>();
   for (const s of sessionsWithDuration) {
     if (!categoryTimingMap.has(s.category)) categoryTimingMap.set(s.category, []);
-    categoryTimingMap.get(s.category)!.push(s.duration);
+    const durations = categoryTimingMap.get(s.category);
+    if (durations) {
+      durations.push(s.duration);
+    }
   }
 
   const categoryTiming = Array.from(categoryTimingMap.entries()).map(([cat, durations]) => {

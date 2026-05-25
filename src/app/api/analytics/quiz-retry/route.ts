@@ -37,15 +37,19 @@ export async function GET(request: NextRequest) {
     if (!userQuizMap.has(attempt.userId)) {
       userQuizMap.set(attempt.userId, new Map());
     }
-    const userQuizzes = userQuizMap.get(attempt.userId)!;
+    const userQuizzes = userQuizMap.get(attempt.userId);
+    if (!userQuizzes) continue;
     if (!userQuizzes.has(attempt.quizId)) {
       userQuizzes.set(attempt.quizId, []);
     }
-    userQuizzes.get(attempt.quizId)!.push({
-      correct: attempt.correct,
-      attemptedAt: attempt.attemptedAt,
-      category: attempt.category,
-    });
+    const attemptList = userQuizzes.get(attempt.quizId);
+    if (attemptList) {
+      attemptList.push({
+        correct: attempt.correct,
+        attemptedAt: attempt.attemptedAt,
+        category: attempt.category,
+      });
+    }
   }
 
   // Calculate retry metrics per user per quiz
@@ -97,10 +101,12 @@ export async function GET(request: NextRequest) {
     if (!categoryRetryMap.has(r.category)) {
       categoryRetryMap.set(r.category, { totalAttempts: 0, uniqueQuizzes: 0, avgAttempts: 0, avgScore: 0, count: 0 });
     }
-    const cat = categoryRetryMap.get(r.category)!;
-    cat.totalAttempts += r.attempts;
-    cat.count++;
-    cat.uniqueQuizzes++;
+    const cat = categoryRetryMap.get(r.category);
+    if (cat) {
+      cat.totalAttempts += r.attempts;
+      cat.count++;
+      cat.uniqueQuizzes++;
+    }
   }
 
   const categoryRetryStats = Array.from(categoryRetryMap.entries()).map(([category, data]) => ({
@@ -116,7 +122,8 @@ export async function GET(request: NextRequest) {
     if (!userRetryCounts.has(r.userId)) {
       userRetryCounts.set(r.userId, 0);
     }
-    userRetryCounts.set(r.userId, userRetryCounts.get(r.userId)! + (r.attempts - 1));
+    const currentCount = userRetryCounts.get(r.userId) ?? 0;
+    userRetryCounts.set(r.userId, currentCount + (r.attempts - 1));
   }
 
   const retryDistribution = [

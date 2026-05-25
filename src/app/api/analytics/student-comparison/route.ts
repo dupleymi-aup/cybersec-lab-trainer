@@ -95,9 +95,11 @@ export async function GET(request: NextRequest) {
       if (!categoryMap.has(attempt.category)) {
         categoryMap.set(attempt.category, { correct: 0, total: 0 });
       }
-      const cat = categoryMap.get(attempt.category)!;
-      cat.total++;
-      if (attempt.correct) cat.correct++;
+      const cat = categoryMap.get(attempt.category);
+      if (cat) {
+        cat.total++;
+        if (attempt.correct) cat.correct++;
+      }
     }
     const categoryScores: Record<string, number> = {};
     for (const [category, data] of categoryMap) {

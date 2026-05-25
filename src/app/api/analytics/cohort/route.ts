@@ -131,7 +131,8 @@ export async function GET(request: NextRequest) {
 
   // Calculate retention for each cohort
   const cohorts = sortedCohortKeys.map((ym) => {
-    const cohortStudents = cohortMap.get(ym)!;
+    const cohortStudents = cohortMap.get(ym);
+    if (!cohortStudents) return null;
     const totalStudents = cohortStudents.length;
 
     // Aggregate retention across all students in this cohort
@@ -168,7 +169,7 @@ export async function GET(request: NextRequest) {
       totalStudents,
       retention: retentionPercentages,
     };
-  });
+  }).filter((c): c is NonNullable<typeof c> => c !== null);
 
   // Calculate overall retention across all cohorts
   const overallAggregate: RetentionWeeks = { week1: 0, week2: 0, week4: 0, week8: 0, week12: 0 };

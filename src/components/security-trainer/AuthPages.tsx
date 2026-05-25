@@ -14,7 +14,6 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 
 type AuthPage = 'login' | 'register' | 'recovery';
 type RecoveryStep = 'enter-contact' | 'enter-otp' | 'new-password';

@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from 'next/server';
  * Wraps an API route handler in try/catch to prevent unhandled 500 errors.
  * If the handler throws, returns a proper 500 JSON response and logs the error.
  */
-export function withErrorHandler<T extends (req: NextRequest, ...args: any[]) => Promise<NextResponse>>(
+export function withErrorHandler<T extends (req: NextRequest, ...args: unknown[]) => Promise<NextResponse>>(
   handler: T
 ): T {
-  return (async (req: NextRequest, ...args: any[]) => {
+  return (async (req: NextRequest, ...args: unknown[]) => {
     try {
       return await handler(req, ...args);
     } catch (error) {

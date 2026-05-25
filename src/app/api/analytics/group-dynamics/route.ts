@@ -71,16 +71,22 @@ export async function GET(request: NextRequest) {
       weekStart.setDate(weekStart.getDate() - weekStart.getDay());
       const weekKey = weekStart.toISOString().split('T')[0];
       if (!weekMap.has(weekKey)) weekMap.set(weekKey, { activeStudents: new Set(), modulesCompleted: 0, quizAttempts: 0 });
-      weekMap.get(weekKey)!.activeStudents.add(p.userId);
-      if (p.completed) weekMap.get(weekKey)!.modulesCompleted++;
+      const weekEntry = weekMap.get(weekKey);
+      if (weekEntry) {
+        weekEntry.activeStudents.add(p.userId);
+        if (p.completed) weekEntry.modulesCompleted++;
+      }
     }
     for (const q of groupQuizAttempts) {
       const weekStart = new Date(q.attemptedAt);
       weekStart.setDate(weekStart.getDate() - weekStart.getDay());
       const weekKey = weekStart.toISOString().split('T')[0];
       if (!weekMap.has(weekKey)) weekMap.set(weekKey, { activeStudents: new Set(), modulesCompleted: 0, quizAttempts: 0 });
-      weekMap.get(weekKey)!.activeStudents.add(q.userId);
-      weekMap.get(weekKey)!.quizAttempts++;
+      const weekEntry = weekMap.get(weekKey);
+      if (weekEntry) {
+        weekEntry.activeStudents.add(q.userId);
+        weekEntry.quizAttempts++;
+      }
     }
 
     const activityTimeline = Array.from(weekMap.entries())
@@ -171,8 +177,10 @@ export async function GET(request: NextRequest) {
   for (const g of groupsData) {
     for (const w of g.activityTimeline) {
       if (!allWeeks.has(w.week)) allWeeks.set(w.week, { healthScores: [], activeCount: new Set() });
-      allWeeks.get(w.week)!.healthScores.push(g.healthScore);
-      allWeeks.get(w.week)!.activeCount; // Already counted in group
+      const weekEntry = allWeeks.get(w.week);
+      if (weekEntry) {
+        weekEntry.healthScores.push(g.healthScore);
+      }
     }
   }
   const overallTrends = Array.from(allWeeks.entries())

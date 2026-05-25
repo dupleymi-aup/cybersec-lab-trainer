@@ -16,6 +16,10 @@ export function buildCSV(headers: string[], rows: string[][]): string {
   return [headers.map(escape).join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
 }
 
+interface JsPdfWithAutoTable {
+  lastAutoTable?: { finalY?: number };
+}
+
 // Trigger browser download of CSV
 export function downloadCSV(csv: string, filename: string): void {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -83,7 +87,7 @@ export async function generateStudentReportPDF(
   });
 
   // Quiz results
-  const finalY = (doc as any).lastAutoTable?.finalY || 150;
+  const finalY = (doc as JsPdfWithAutoTable).lastAutoTable?.finalY || 150;
   doc.setFontSize(14);
   doc.text('Результаты квизов', 14, finalY + 10);
   autoTable(doc, {
@@ -97,7 +101,7 @@ export async function generateStudentReportPDF(
 
   // Recommendations
   if (recommendations && recommendations.length > 0) {
-    const recY = (doc as any).lastAutoTable?.finalY || 200;
+    const recY = (doc as JsPdfWithAutoTable).lastAutoTable?.finalY || 200;
     doc.setFontSize(14);
     doc.text('Рекомендации', 14, recY + 10);
     doc.setFontSize(9);
@@ -395,7 +399,7 @@ export async function generateQuizRetryPDF(
     columnStyles: { 0: { cellWidth: 10 } },
   });
 
-  const retryTableY = (doc as any).lastAutoTable?.finalY || 60;
+  const retryTableY = (doc as JsPdfWithAutoTable).lastAutoTable?.finalY || 60;
   if (topRetryers.length > 0) {
     doc.setTextColor(0);
     doc.setFontSize(14);

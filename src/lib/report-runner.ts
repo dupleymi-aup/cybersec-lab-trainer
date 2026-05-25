@@ -32,13 +32,30 @@ interface ScheduledReportRecord {
   createdAt: Date;
 }
 
+interface GradebookStudent {
+  id: string;
+  fullName: string;
+  email: string;
+  group: string;
+  modulesCompleted: number;
+  quizCount: number;
+  avgScore: number;
+}
+
+interface AtRiskStudent {
+  fullName: string;
+  email: string;
+  group: string;
+  riskScore: number;
+}
+
 const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Promise<void>> = {
   gradebook: async (days, groupId): Promise<void> => {
     const { getGradebook } = await import('./analytics-api');
     const data = await getGradebook({ groupId: groupId || undefined, days });
     if (!data.students?.length) return;
 
-    const students = data.students.map((s: any) => ({
+    const students = data.students.map((s: GradebookStudent) => ({
       id: s.id,
       fullName: s.fullName,
       email: s.email,
@@ -57,7 +74,7 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
     if (!data.atRiskStudents?.length) return;
 
     await generateAtRiskPDF(
-      data.atRiskStudents.map((s: any) => ({
+      data.atRiskStudents.map((s: AtRiskStudent) => ({
         fullName: s.fullName,
         email: s.email || '',
         group: s.group,
@@ -194,7 +211,7 @@ function shouldExecuteReport(
   }
 }
 
-async function saveReport(
+async function _saveReport(
   report: ScheduledReportRecord,
   pdfBlob: Blob,
   now: Date
@@ -221,7 +238,7 @@ async function sendEmailNotification(
 ): Promise<void> {
   // Placeholder for email sending logic
   // In production, integrate with SendGrid, Resend, or nodemailer
-  console.log(`[Email] Notification would be sent to ${report.email} for report ${report.id}`);
+  console.warn(`[Email] Notification would be sent to ${report.email} for report ${report.id}`);
 
   // Example with nodemailer:
   // const nodemailer = await import('nodemailer');
@@ -239,7 +256,7 @@ async function sendEmailNotification(
 if (typeof process !== 'undefined' && process.argv[1] && (process.argv[1].endsWith('report-runner.ts') || process.argv[1].endsWith('report-runner.js'))) {
   runScheduledReports()
     .then((results) => {
-      console.log('Report runner completed:', results);
+      console.warn('Report runner completed:', results);
       process.exit(0);
     })
     .catch((error) => {
