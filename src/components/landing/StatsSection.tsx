@@ -32,7 +32,7 @@ const stats = [
 
 export default function StatsSection() {
   return (
-    <section className="py-16 bg-gradient-to-r from-violet-950/50 via-slate-950 to-emerald-950/50">
+    <section className="py-16 bg-gradient-to-r from-violet-950/50 via-slate-950 to-emerald-950/50" aria-label="Statistics">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
           {stats.map((stat, index) => (
@@ -45,7 +45,7 @@ export default function StatsSection() {
               className="text-center"
             >
               <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 ${stat.color}`}>
-                <stat.icon className="w-6 h-6" />
+                <stat.icon className="w-6 h-6" aria-hidden="true" />
               </div>
               <div className="text-3xl md:text-4xl font-bold text-white mb-1">{stat.value}</div>
               <div className="text-sm text-slate-400">{stat.label}</div>

@@ -68,7 +68,7 @@ const iconColors: Record<string, string> = {
 
 export default function FeaturesSection() {
   return (
-    <section className="py-20 bg-slate-950">
+    <section className="py-20 bg-slate-950" aria-label="Features">
       <div className="container mx-auto px-4">
         {/* Section header */}
         <div className="text-center mb-16">
@@ -92,7 +92,7 @@ export default function FeaturesSection() {
             >
               <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all h-full">
                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 ${iconColors[feature.color]}`}>
-                  <feature.icon className="w-6 h-6" />
+                  <feature.icon className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
                 <p className="text-slate-400 text-sm">{feature.description}</p>

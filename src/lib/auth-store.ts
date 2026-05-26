@@ -32,6 +32,7 @@ import {
   getQuizSessionAnalytics, getGroupDynamics, getLoginPatterns,
   getQuizRetryAnalytics, getErrorPatternsAnalytics, getPredictiveRisk,
 } from './analytics-api';
+import { getCsrfHeaders } from './csrf-client';
 
 export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
   TrendPoint, QuizQuestionStat, AchievementStat, AdminSummary,
@@ -344,7 +345,10 @@ export async function stopImpersonation(): Promise<{ success: boolean; error?: s
 
     // Fetch original user data
     const res = await fetch(`/api/users/${data.originalUserId}`, {
-      headers: originalToken ? { Authorization: `Bearer ${originalToken}` } : {},
+      headers: {
+        ...(originalToken ? { Authorization: `Bearer ${originalToken}` } : {}),
+        ...getCsrfHeaders(),
+      },
     });
     if (!res.ok) return { success: false, error: 'Не удалось восстановить аккаунт' };
 
@@ -605,7 +609,11 @@ export const useAuthStore = create<AuthState>()(
         try {
           const res = await fetch('/api/auth/profile', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              ...getCsrfHeaders(),
+            },
             body: JSON.stringify(data),
           });
 
@@ -626,7 +634,11 @@ export const useAuthStore = create<AuthState>()(
         try {
           const res = await fetch('/api/auth/password', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              ...getCsrfHeaders(),
+            },
             body: JSON.stringify({ currentPassword: oldPassword, newPassword }),
           });
           const data = await res.json();
@@ -709,6 +721,7 @@ export const useAuthStore = create<AuthState>()(
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
+              ...getCsrfHeaders(),
             },
             body: JSON.stringify({ currentPassword }),
           });

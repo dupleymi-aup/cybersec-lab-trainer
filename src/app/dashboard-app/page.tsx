@@ -227,7 +227,7 @@ export default function DashboardAppPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div id="main-content" className="min-h-screen flex bg-background">
       <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
         <OfflineBanner />
