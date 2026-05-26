@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);

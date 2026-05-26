@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { sendDeadlineReminderEmail } from '@/lib/email';
 import { authenticate } from '@/lib/api-middleware';
+import { timingSafeEqual } from 'crypto';
 
 export async function POST(request: NextRequest) {
   // Verify cron secret or admin auth using timing-safe comparison
@@ -9,9 +10,9 @@ export async function POST(request: NextRequest) {
   const expectedSecret = process.env.CRON_SECRET || '';
 
   const isCronValid = cronSecret && expectedSecret
-    ? crypto.subtle.timingSafeEqual(
-        new TextEncoder().encode(cronSecret),
-        new TextEncoder().encode(expectedSecret)
+    ? timingSafeEqual(
+        Buffer.from(cronSecret),
+        Buffer.from(expectedSecret)
       )
     : false;
 

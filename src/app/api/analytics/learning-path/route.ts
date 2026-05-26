@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 const LEARNING_PATH: Array<{ id: string; name: string }> = [
   { id: 'owasp-top-10', name: 'OWASP Top 10' },

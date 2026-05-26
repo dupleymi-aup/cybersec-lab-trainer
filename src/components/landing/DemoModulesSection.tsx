@@ -68,9 +68,16 @@ const difficultyLabels: Record<string, string> = {
   Advanced: 'Продвинутый',
 };
 
+const iconColorClasses: Record<string, { bg: string; text: string }> = {
+  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  violet: { bg: 'bg-violet-500/10', text: 'text-violet-400' },
+  cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
+  amber: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
+};
+
 export default function DemoModulesSection() {
   return (
-    <section className="py-20 bg-slate-950/50">
+    <section className="py-20 bg-slate-950/50" aria-label="Demo modules">
       <div className="container mx-auto px-4">
         {/* Section header */}
         <div className="text-center mb-12">
@@ -95,8 +102,8 @@ export default function DemoModulesSection() {
               <Card className="h-full bg-slate-900/50 border-slate-800 hover:border-slate-700 transition-all hover:shadow-lg hover:shadow-violet-500/5 group">
                 <CardHeader>
                   <div className="flex items-start justify-between mb-4">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-${module.color}-500/10`}>
-                      <module.icon className={`w-6 h-6 text-${module.color}-400`} />
+                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${iconColorClasses[module.color]?.bg}`}>
+                      <module.icon className={`w-6 h-6 ${iconColorClasses[module.color]?.text}`} aria-hidden="true" />
                     </div>
                     <Badge variant="outline" className={difficultyColors[module.difficulty]}>
                       {difficultyLabels[module.difficulty]}
@@ -109,16 +116,16 @@ export default function DemoModulesSection() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-500">
+                    <span className="text-sm text-slate-400">
                       {module.lessons} уроков
                     </span>
-                    <Link href="/register">
+                    <Link href="/register" aria-label={`Try module ${module.title}`}>
                       <Button
                         variant="ghost"
                         className="text-violet-400 hover:text-violet-300 hover:bg-violet-500/10 gap-2"
                       >
                         Попробовать
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                       </Button>
                     </Link>
                   </div>
@@ -135,7 +142,7 @@ export default function DemoModulesSection() {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <Link href="/register">
+          <Link href="/register" aria-label="Register to access all modules">
             <Button className="bg-violet-600 hover:bg-violet-700 text-white px-8">
               Зарегистрироваться и получить доступ ко всем модулям
             </Button>

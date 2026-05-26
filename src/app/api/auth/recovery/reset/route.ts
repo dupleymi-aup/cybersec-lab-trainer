@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
+import { timingSafeEqual } from 'crypto';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -53,9 +54,9 @@ export async function POST(request: NextRequest) {
 
   // Use timing-safe comparison to prevent timing attacks
   const isValid = entry.otp.length === otp.length &&
-    crypto.subtle.timingSafeEqual(
-      new TextEncoder().encode(entry.otp),
-      new TextEncoder().encode(otp)
+    timingSafeEqual(
+      Buffer.from(entry.otp),
+      Buffer.from(otp)
     );
 
   if (!isValid) {

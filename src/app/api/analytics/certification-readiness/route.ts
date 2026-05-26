@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { isAchievementUnlocked } from '@/lib/data/achievements-data';
 import type { Prisma } from '@prisma/client';
 

@@ -123,8 +123,6 @@
     /* Better text rendering on mobile */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Support for notch devices */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 }
 
@@ -177,17 +175,16 @@
   }
 }
 
-/* Prevent pull-to-refresh on mobile PWA */
+/* Prevent pull-to-refresh on mobile PWA + smooth scroll */
+/* Smooth transitions for interactive elements only (performance optimization) */
 html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
   overscroll-behavior-y: contain;
-}
-
-/* Smooth theme transitions */
-html {
   transition: background-color 0.2s ease, color 0.15s ease;
 }
-html *, html *::before, html *::after {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+button, a, input, select, [role="button"] {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
 }
 
 @media print {
