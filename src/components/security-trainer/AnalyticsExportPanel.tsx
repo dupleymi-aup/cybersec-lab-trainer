@@ -144,7 +144,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                 lastActive = new Date(allTimestamps[allTimestamps.length - 1]).toLocaleDateString('ru-RU');
               }
             } catch {
-              // ignore
+              // Intentionally empty — non-critical localStorage parse, fallback to default values
             }
           }
 
@@ -810,7 +810,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                       moduleCount = (data.completedModules || []).length;
                       quizCount = Object.keys(data.quizScores || {}).length;
                     } catch {
-                      // ignore
+                      // Intentionally empty — non-critical localStorage parse, defaults to zero
                     }
                   }
 

@@ -64,7 +64,7 @@ export default function RegisterPage() {
     if (!result.success) {
       toast.error(result.error);
     } else {
-      router.push('/app');
+      router.push('/dashboard-app');
     }
   };
 

@@ -35,7 +35,7 @@ export default function LoginPage() {
     if (!result.success) {
       toast.error(result.error);
     } else {
-      router.push('/app');
+      router.push('/dashboard-app');
     }
   };
 

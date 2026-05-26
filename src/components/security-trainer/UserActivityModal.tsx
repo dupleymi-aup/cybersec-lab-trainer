@@ -67,6 +67,7 @@ function getLoginActivity(): LoginActivityEntry[] {
     const raw = localStorage.getItem('security-trainer-login-activity');
     return raw ? JSON.parse(raw) : [];
   } catch {
+    // Intentionally empty — non-critical localStorage parse, return empty array as fallback
     return [];
   }
 }

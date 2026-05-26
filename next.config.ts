@@ -3,18 +3,18 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   async redirects() {
     return [
       {
         source: '/app',
-        destination: '/main',
+        destination: '/dashboard-app',
         permanent: true,
       },
       {
         source: '/app/:path*',
-        destination: '/main',
+        destination: '/dashboard-app/:path*',
         permanent: true,
       },
     ];

@@ -15,7 +15,7 @@ export default function LandingPage() {
   // Redirect authenticated users to the app
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/app');
+      router.push('/dashboard-app');
     }
   }, [isAuthenticated, router]);
 

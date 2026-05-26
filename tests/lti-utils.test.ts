@@ -129,13 +129,16 @@ describe('LTI Utilities', () => {
       vi.mocked(prisma.ltiPlatform.findUnique).mockResolvedValue({
         id: 'platform1',
         privateKey: null,
+        publicKey: '',
         tokenUrl: 'https://example.com/token.php',
+        authUrl: 'https://example.com/auth',
+        keysetUrl: 'https://example.com/keys',
         clientId: 'client123',
         createdAt: new Date(),
         updatedAt: new Date(),
+        isActive: true,
         name: 'Test Platform',
         issuer: 'test-issuer',
-        authServer: 'https://example.com/auth',
         deploymentId: 'deploy1',
       });
 
