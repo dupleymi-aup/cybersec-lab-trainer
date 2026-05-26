@@ -39,33 +39,33 @@ export function validateApiInput(data: unknown): ApiRequest {
 
 // Auth validation schemas
 export const loginSchema = z.object({
-  emailOrPhone: z.string().min(1, 'Email or phone is required'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  emailOrPhone: z.string().min(1, 'Email or phone is required').max(255),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(128),
   rememberMe: z.boolean().optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
 export const registerSchema = z.object({
-  email: z.string().email('Invalid email'),
-  phone: z.string().min(10, 'Invalid phone number'),
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email').max(255),
+  phone: z.string().min(10, 'Invalid phone number').max(20),
+  fullName: z.string().min(2, 'Name must be at least 2 characters').max(200),
   role: z.enum(['student', 'teacher', 'admin']),
-  inviteCode: z.string().optional(),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  inviteCode: z.string().max(100).optional(),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(128),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 // User update validation
 export const updateUserSchema = z.object({
-  fullName: z.string().min(2).optional(),
-  phone: z.string().min(10).optional(),
-  group: z.string().optional(),
-  course: z.string().optional(),
-  university: z.string().optional(),
-  avatar: z.string().optional(),
-  bio: z.string().optional(),
+  fullName: z.string().min(2).max(200).optional(),
+  phone: z.string().min(10).max(20).optional(),
+  group: z.string().max(100).optional(),
+  course: z.string().max(100).optional(),
+  university: z.string().max(200).optional(),
+  avatar: z.string().max(500).optional(),
+  bio: z.string().max(1000).optional(),
 });
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
@@ -86,34 +86,34 @@ export type BlockUserInput = z.infer<typeof blockUserSchema>;
 
 // Password change validation
 export const passwordChangeSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password required'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+  currentPassword: z.string().min(1, 'Current password required').max(128),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters').max(128),
 });
 
 export type PasswordChangeInput = z.infer<typeof passwordChangeSchema>;
 
 // User creation validation (admin)
 export const createUserSchema = z.object({
-  email: z.string().email('Invalid email'),
-  phone: z.string().min(10, 'Invalid phone number'),
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email').max(255),
+  phone: z.string().min(10, 'Invalid phone number').max(20),
+  fullName: z.string().min(2, 'Name must be at least 2 characters').max(200),
   role: z.enum(['student', 'teacher', 'admin']).optional(),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  group: z.string().optional(),
-  course: z.string().optional(),
-  university: z.string().optional(),
-  bio: z.string().optional(),
-  avatar: z.string().optional(),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(128),
+  group: z.string().max(100).optional(),
+  course: z.string().max(100).optional(),
+  university: z.string().max(200).optional(),
+  bio: z.string().max(1000).optional(),
+  avatar: z.string().max(500).optional(),
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 // Audit log creation validation
 export const auditLogSchema = z.object({
-  action: z.string().min(1),
-  targetId: z.string().min(1),
-  targetName: z.string().optional(),
-  details: z.string().optional(),
+  action: z.string().min(1).max(100),
+  targetId: z.string().min(1).max(100),
+  targetName: z.string().max(200).optional(),
+  details: z.string().max(2000).optional(),
 });
 
 export type AuditLogInput = z.infer<typeof auditLogSchema>;
@@ -121,19 +121,19 @@ export type AuditLogInput = z.infer<typeof auditLogSchema>;
 // Batch progress save validation
 export const batchProgressSchema = z.object({
   progress: z.array(z.object({
-    moduleId: z.string(),
+    moduleId: z.string().max(100),
     completed: z.boolean().optional(),
     score: z.number().optional(),
-    sqlLevels: z.array(z.string()).optional(),
-    xssLevels: z.array(z.string()).optional(),
+    sqlLevels: z.array(z.string().max(100)).optional(),
+    xssLevels: z.array(z.string().max(100)).optional(),
     csrfSteps: z.array(z.number()).optional(),
     secureCodingAnswers: z.array(z.number()).optional(),
     secureCodingCorrectCount: z.number().optional(),
-    studiedOwaspItems: z.array(z.string()).optional(),
+    studiedOwaspItems: z.array(z.string().max(100)).optional(),
     challengeScores: z.unknown().optional(),
   })).optional(),
   quizResults: z.array(z.object({
-    quizId: z.string(),
+    quizId: z.string().max(100),
     score: z.number(),
     total: z.number(),
   })).optional(),
@@ -143,17 +143,17 @@ export type BatchProgressInput = z.infer<typeof batchProgressSchema>;
 
 // Assignment creation validation
 export const createAssignmentSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional().default(""),
+  title: z.string().min(1, "Title is required").max(200),
+  description: z.string().max(2000).optional().default(""),
   type: z.enum(["quiz", "code-review", "attack", "writeup", "custom"]),
-  moduleId: z.string().optional().default(""),
-  content: z.string().optional().default(""),  // JSON string
+  moduleId: z.string().max(100).optional().default(""),
+  content: z.string().max(50000).optional().default(""),  // JSON string
   maxScore: z.number().int().min(1).max(1000).optional().default(100),
   passScore: z.number().int().min(0).max(100).optional().default(60),
   autoGrade: z.boolean().optional().default(false),
   timeLimit: z.number().int().min(1).optional(),  // minutes, undefined = no limit
   attempts: z.number().int().min(0).max(10).optional().default(1),
-  group: z.string().optional().default(""),
+  group: z.string().max(100).optional().default(""),
   dueAt: z.string().datetime().optional(),  // ISO date string
   published: z.boolean().optional().default(false),
 });
@@ -169,7 +169,7 @@ export type UpdateAssignmentInput = z.infer<typeof updateAssignmentSchema>;
 
 // Assignment submission validation
 export const submitAssignmentSchema = z.object({
-  content: z.string().min(1, "Submission content required"),  // JSON string
+  content: z.string().min(1, "Submission content required").max(50000),  // JSON string
 });
 
 export type SubmitAssignmentInput = z.infer<typeof submitAssignmentSchema>;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateToken, getTokenPayload, type TokenPayload } from '@/lib/auth-server';
 import { ROLE_HIERARCHY } from './auth-types';
+import { prisma } from '@/lib/db';
 
 export type { TokenPayload };
 
@@ -12,13 +13,25 @@ export function getTokenFromRequest(request: NextRequest): string | null {
   return request.cookies.get('auth-token')?.value || null;
 }
 
-export async function authenticate(request: NextRequest): Promise<{ id: string; role: string; group?: string; fullName?: string } | null> {
+
+export async function authenticate(request: NextRequest): Promise<{ id: string; role: string; group?: string; fullName?: string; tokenVersion?: number } | null> {
   const token = getTokenFromRequest(request);
   const payload = getTokenPayload(token);
   if (!payload) return null;
   // Explicitly check expiration even though jwt.verify does this — defense in depth
   if (payload.exp < Date.now() / 1000) return null;
-  return { id: payload.id, role: payload.role, group: payload.group, fullName: payload.fullName };
+
+  // Fetch user from database to validate tokenVersion and blocked status
+  const user = await prisma.user.findUnique({
+    where: { id: payload.id },
+    select: { tokenVersion: true, isBlocked: true, role: true },
+  });
+
+  // Reject if user doesn't exist, is blocked, or tokenVersion mismatch
+  if (!user || user.isBlocked) return null;
+  if (payload.tokenVersion !== undefined && user.tokenVersion !== payload.tokenVersion) return null;
+
+  return { id: payload.id, role: payload.role, group: payload.group, fullName: payload.fullName, tokenVersion: user.tokenVersion };
 }
 
 export function requireRole(userRole: string, ...requiredRoles: string[]): boolean {
@@ -32,13 +45,16 @@ export function requireRole(userRole: string, ...requiredRoles: string[]): boole
   });
 }
 
+
 export function unauthorized(message = 'Unauthorized') {
   return NextResponse.json({ error: message }, { status: 401 });
 }
 
+
 export function forbidden(message = 'Forbidden') {
   return NextResponse.json({ error: message }, { status: 403 });
 }
+
 
 /** Extract client IP from request, validating proxy headers to prevent spoofing */
 export function getClientIp(request: NextRequest): string {
@@ -61,6 +77,7 @@ export function getClientIp(request: NextRequest): string {
 
   return 'unknown';
 }
+
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 const MAX_RATE_LIMIT_ENTRIES = 10000;
@@ -92,5 +109,6 @@ export function checkRateLimit(key: string, maxAttempts: number, windowMs: numbe
 
   return { allowed: true };
 }
+
 
 export { generateToken };

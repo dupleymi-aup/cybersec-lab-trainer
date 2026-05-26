@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { verifyPassword } from '@/lib/auth-utils';
 import { loginSchema } from '@/lib/validations/api';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
       token,
     });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login failed', { ip: getClientIp(request), error: error instanceof Error ? error.message : 'Unknown' });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

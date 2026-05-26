@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
-import { hashPassword } from '@/lib/auth-utils';
+import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { createUserSchema } from '@/lib/validations/api';
 
 export async function GET(request: NextRequest) {
@@ -95,6 +95,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
   const { email, phone, fullName, role, password, group, course, university, bio, avatar } = parsed.data;
+
+  // Enforce password strength requirements server-side
+  const pwValidation = validatePassword(password);
+  if (!pwValidation.valid) {
+    return NextResponse.json({ error: 'Пароль недостаточно надёжный', details: pwValidation.errors }, { status: 400 });
+  }
 
   const existing = await prisma.user.findFirst({
     where: { OR: [{ email }, { phone }] },

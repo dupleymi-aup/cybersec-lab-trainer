@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware';
-import { hashPassword } from '@/lib/auth-utils';
+import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { getAdminInviteCode } from '@/lib/auth-server-secrets';
 import { registerSchema } from '@/lib/validations/api';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +24,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
     const { email, phone, fullName, role, inviteCode, password } = parsed.data;
+
+    // Enforce password strength requirements server-side
+    const pwValidation = validatePassword(password);
+    if (!pwValidation.valid) {
+      return NextResponse.json({ error: 'Пароль недостаточно надёжный', details: pwValidation.errors }, { status: 400 });
+    }
 
     // Check if user exists
     const existing = await prisma.user.findFirst({
@@ -81,7 +88,7 @@ export async function POST(request: NextRequest) {
       token,
     });
   } catch (error) {
-    console.error('Register error:', error);
+    logger.error('Registration failed', { ip: getClientIp(request), error: error instanceof Error ? error.message : 'Unknown' });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
