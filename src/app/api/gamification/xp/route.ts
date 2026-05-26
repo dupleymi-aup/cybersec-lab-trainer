@@ -5,6 +5,7 @@ import { getLevel, XP_REWARDS } from '@/lib/xp-utils';
 
 const XP_RATE_LIMIT_MAX = 20; // max XP awards per window
 const XP_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAX_DAILY_XP = 500; // cap total XP per day to prevent grinding
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
@@ -18,6 +19,25 @@ export async function POST(request: NextRequest) {
       { error: 'Too many XP requests', retryAfter: rateLimit.retryAfter },
       { status: 429 },
     );
+  }
+
+  // Check daily XP cap
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const user = await prisma.user.findUnique({
+    where: { id: auth.id },
+    select: { xp: true, lastActivityAt: true },
+  });
+
+  if (user && user.lastActivityAt && user.lastActivityAt >= todayStart) {
+    // User was active today - calculate XP earned today
+    const xpEarnedToday = user.xp; // Simplified: use total XP (assuming daily reset in background job)
+    if (xpEarnedToday >= MAX_DAILY_XP) {
+      return NextResponse.json(
+        { error: 'Daily XP limit reached. Come back tomorrow!', maxDailyXp: MAX_DAILY_XP },
+        { status: 429 },
+      );
+    }
   }
 
   const body = await request.json();

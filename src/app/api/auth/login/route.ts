@@ -58,12 +58,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Неверный email или пароль' }, { status: 401 });
     }
 
-    // Update login stats
+    // Update login stats atomically to prevent race condition
     await prisma.user.update({
       where: { id: user.id },
       data: {
         lastLoginAt: new Date(),
-        loginCount: user.loginCount + 1,
+        loginCount: { increment: 1 },
       },
     });
 
