@@ -3,11 +3,19 @@ import { prisma } from '@/lib/db';
 import { sendDeadlineReminderEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
-  // Verify cron secret or admin auth
+  // Verify cron secret or admin auth using timing-safe comparison
   const authHeader = request.headers.get('authorization');
   const cronSecret = request.headers.get('x-cron-secret');
+  const expectedSecret = process.env.CRON_SECRET || '';
 
-  if (cronSecret !== process.env.CRON_SECRET && !authHeader?.startsWith('Bearer ')) {
+  const isCronValid = cronSecret && expectedSecret
+    ? crypto.subtle.timingSafeEqual(
+        new TextEncoder().encode(cronSecret),
+        new TextEncoder().encode(expectedSecret)
+      )
+    : false;
+
+  if (!isCronValid && !authHeader?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -93,8 +101,11 @@ export async function POST(request: NextRequest) {
             new Date(deadline.dueAt),
             isOverdue
           );
-        } catch {
-          // Email failed, but continue
+        } catch (error) {
+          console.error(
+            `[Deadline Checker] Failed to send email to ${student.email} for deadline "${deadline.title}":`,
+            error instanceof Error ? error.message : 'Unknown error'
+          );
         }
 
         await prisma.reminderLog.create({
