@@ -70,7 +70,12 @@ export async function POST(request: NextRequest) {
     // Log login activity
     await logActivity({ userId: user.id, email: user.email, ip, userAgent, success: true });
 
-    const token = generateToken(user.id, user.role, { rememberMe, group: user.group, fullName: user.fullName });
+    const token = generateToken(user.id, user.role, {
+      rememberMe,
+      group: user.group,
+      fullName: user.fullName,
+      tokenVersion: user.tokenVersion,
+    });
 
     return NextResponse.json({
       success: true,

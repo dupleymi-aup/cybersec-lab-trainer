@@ -4,6 +4,7 @@ import { env } from '@/lib/env';
 export interface TokenPayload {
   id: string;
   role: string;
+  tokenVersion?: number;  // incremented on role/password change to revoke old tokens
   group?: string;
   fullName?: string;
   exp: number;
@@ -12,11 +13,11 @@ export interface TokenPayload {
 const JWT_SECRET = env.tokenSecret;
 const JWT_ALGORITHM = 'HS256';
 
-export function generateToken(userId: string, role: string, options?: { rememberMe?: boolean; group?: string; fullName?: string }): string {
-  const { rememberMe, group, fullName } = options || {};
+export function generateToken(userId: string, role: string, options?: { rememberMe?: boolean; group?: string; fullName?: string; tokenVersion?: number }): string {
+  const { rememberMe, group, fullName, tokenVersion } = options || {};
   const expiry = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
   return jwt.sign(
-    { id: userId, role, group, fullName },
+    { id: userId, role, group, fullName, tokenVersion },
     JWT_SECRET,
     { algorithm: JWT_ALGORITHM, expiresIn: expiry }
   );
@@ -34,6 +35,7 @@ export function verifyToken(token: string): TokenPayload | null {
     return {
       id: decoded.id as string,
       role: decoded.role as string,
+      tokenVersion: decoded.tokenVersion as number | undefined,
       group: decoded.group as string | undefined,
       fullName: decoded.fullName as string | undefined,
       exp: decoded.exp,

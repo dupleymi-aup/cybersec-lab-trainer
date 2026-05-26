@@ -21,6 +21,7 @@ model User {
   avatar       String    @default("")
   bio          String    @default("")
   role         String    @default("student")  // student, teacher, admin
+  tokenVersion Int       @default(1)          // incremented on role/password change to revoke old tokens
   passwordHash String    @map("password_hash")
   createdAt    DateTime  @default(now())       @map("created_at")
   lastLoginAt  DateTime?                       @map("last_login_at")

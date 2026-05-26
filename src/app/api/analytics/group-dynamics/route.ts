@@ -6,7 +6,7 @@ import type { Prisma } from '@prisma/client';
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
   const days = parseInt(searchParams.get('days') || '90', 10);

@@ -62,6 +62,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Module ID required' }, { status: 400 });
   }
 
+  // Validate score if provided - must be between 0 and 100
+  if (score !== undefined && score !== null) {
+    if (typeof score !== 'number' || score < 0 || score > 100) {
+      return NextResponse.json(
+        { error: 'Score must be between 0 and 100' },
+        { status: 400 }
+      );
+    }
+  }
+
   const progress = await prisma.progress.upsert({
     where: { userId_moduleId: { userId: auth.id, moduleId } },
     create: {

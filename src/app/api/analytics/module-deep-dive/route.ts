@@ -32,7 +32,7 @@ const MODULE_LEVEL_COUNTS: Record<string, number> = {
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return unauthorized();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
   const days = parseInt(searchParams.get('days') || '30', 10);

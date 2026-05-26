@@ -21,6 +21,20 @@ export async function POST(request: NextRequest) {
 
   // Mode 1: Save quiz result (score/total) — backward compatible
   if (quizId && score !== undefined && total !== undefined) {
+    // Validate score cannot exceed total and both must be non-negative
+    if (typeof score !== 'number' || typeof total !== 'number' || score < 0 || total <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid score or total' },
+        { status: 400 }
+      );
+    }
+    if (score > total) {
+      return NextResponse.json(
+        { error: 'Score cannot exceed total' },
+        { status: 400 }
+      );
+    }
+
     const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
     const result = await prisma.quizResult.upsert({

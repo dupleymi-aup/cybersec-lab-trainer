@@ -40,7 +40,10 @@ export async function PUT(request: NextRequest) {
   const newHash = await hashPassword(newPassword);
   await prisma.user.update({
     where: { id: auth.id },
-    data: { passwordHash: newHash },
+    data: {
+      passwordHash: newHash,
+      tokenVersion: { increment: 1 },  // Revoke all existing tokens
+    },
   });
 
   return NextResponse.json({ success: true });
