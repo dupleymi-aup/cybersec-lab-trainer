@@ -99,6 +99,7 @@ export async function PUT(
       ...(bio !== undefined && { bio }),
       ...(role !== undefined && { role }),
       ...(body.email !== undefined && { email: body.email }),
+      ...(role !== undefined && { tokenVersion: { increment: 1 } }),  // Revoke tokens on role change
     },
   });
 

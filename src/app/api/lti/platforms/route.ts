@@ -69,6 +69,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate URL schemes to prevent javascript:/data: URLs
+    const urlFields = { authUrl, tokenUrl, keysetUrl };
+    for (const [fieldName, urlValue] of Object.entries(urlFields)) {
+      try {
+        const parsed = new URL(urlValue as string);
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          return NextResponse.json(
+            { error: `${fieldName} must use http: or https: protocol` },
+            { status: 400 }
+          );
+        }
+      } catch {
+        return NextResponse.json(
+          { error: `${fieldName} is not a valid URL` },
+          { status: 400 }
+        );
+      }
+    }
+
     const platform = await prisma.ltiPlatform.create({
       data: {
         name,

@@ -41,7 +41,10 @@ export async function PUT(
 
   const user = await prisma.user.update({
     where: { id },
-    data: { isBlocked },
+    data: {
+      isBlocked,
+      tokenVersion: { increment: 1 },  // Revoke all existing tokens
+    },
   });
 
   // Audit log the block/unblock

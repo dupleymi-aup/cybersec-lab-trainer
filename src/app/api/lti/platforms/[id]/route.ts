@@ -19,7 +19,20 @@ export async function GET(
 
   const platform = await prisma.ltiPlatform.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      issuer: true,
+      clientId: true,
+      authUrl: true,
+      tokenUrl: true,
+      keysetUrl: true,
+      deploymentId: true,
+      publicKey: true,
+      // privateKey is intentionally excluded - security sensitive
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
       gradeSyncs: {
         select: {
           id: true,
@@ -52,6 +65,16 @@ export async function GET(
 
   if (!platform) {
     return NextResponse.json({ error: 'Platform not found' }, { status: 404 });
+  }
+
+  // For teachers, exclude sensitive fields even from select
+  if (auth.role !== 'admin') {
+    const { gradeSyncs, launchLogs, ...safePlatform } = platform;
+    return NextResponse.json({
+      ...safePlatform,
+      gradeSyncs,
+      launchLogs,
+    });
   }
 
   return NextResponse.json(platform);

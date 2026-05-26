@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       case 'block': {
         await prisma.user.updateMany({
           where: { id: { in: userIds } },
-          data: { isBlocked: true },
+          data: { isBlocked: true, tokenVersion: { increment: 1 } },
         });
         resultCount = userIds.length;
         break;
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       case 'unblock': {
         await prisma.user.updateMany({
           where: { id: { in: userIds } },
-          data: { isBlocked: false },
+          data: { isBlocked: false, tokenVersion: { increment: 1 } },
         });
         resultCount = userIds.length;
         break;
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
         const targetRole = role as string;
         await prisma.user.updateMany({
           where: { id: { in: userIds } },
-          data: { role: targetRole },
+          data: { role: targetRole, tokenVersion: { increment: 1 } },
         });
         resultCount = userIds.length;
         break;
