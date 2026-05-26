@@ -40,34 +40,42 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No XP awarded' }, { status: 400 });
   }
 
-  const user = await prisma.user.update({
-    where: { id: auth.id },
-    data: {
-      xp: { increment: xpAmount },
-      lastActivityAt: new Date(),
-    },
-    select: { id: true, xp: true, level: true, streak: true },
-  });
+  // Use transaction to prevent race condition: both XP increment and level update
+  // must succeed together, preventing stale reads from concurrent requests
+  const result = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.update({
+      where: { id: auth.id },
+      data: {
+        xp: { increment: xpAmount },
+        lastActivityAt: new Date(),
+      },
+      select: { id: true, xp: true, level: true, streak: true },
+    });
 
-  const newLevel = getLevel(user.xp);
-  const leveledUp = newLevel.level > user.level;
+    const newLevel = getLevel(user.xp);
+    const leveledUp = newLevel.level > user.level;
 
-  const updated = await prisma.user.update({
-    where: { id: auth.id },
-    data: {
-      level: newLevel.level,
-    },
+    const updated = await tx.user.update({
+      where: { id: auth.id },
+      data: {
+        level: newLevel.level,
+      },
+    });
+
+    return {
+      xpAwarded: xpAmount,
+      totalXp: updated.xp,
+      level: updated.level,
+      rank: newLevel.rank,
+      leveledUp,
+      newLevel: leveledUp ? newLevel.level : null,
+      streak: user.streak,
+    };
   });
 
   return NextResponse.json({
     success: true,
-    xpAwarded: xpAmount,
-    totalXp: updated.xp,
-    level: updated.level,
-    rank: newLevel.rank,
-    leveledUp,
-    newLevel: leveledUp ? newLevel.level : null,
-    streak: user.streak,
+    ...result,
   });
 }
 

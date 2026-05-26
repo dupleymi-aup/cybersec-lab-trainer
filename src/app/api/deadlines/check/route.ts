@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { sendDeadlineReminderEmail } from '@/lib/email';
+import { authenticate } from '@/lib/api-middleware';
 
 export async function POST(request: NextRequest) {
   // Verify cron secret or admin auth using timing-safe comparison
-  const authHeader = request.headers.get('authorization');
   const cronSecret = request.headers.get('x-cron-secret');
   const expectedSecret = process.env.CRON_SECRET || '';
 
@@ -15,8 +15,16 @@ export async function POST(request: NextRequest) {
       )
     : false;
 
-  if (!isCronValid && !authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // If cron secret is invalid, verify Bearer token is a valid admin/teacher token
+  if (!isCronValid) {
+    const auth = await authenticate(request);
+    if (!auth) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    // Only allow teachers/admins to trigger deadline checks
+    if (auth.role !== 'teacher' && auth.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
   }
 
   const now = new Date();

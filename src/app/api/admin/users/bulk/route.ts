@@ -151,9 +151,11 @@ export async function POST(request: NextRequest) {
       missingIds: missingIds.slice(0, 10),
     });
   } catch (error) {
+    // Log detailed error server-side, return generic message to client
+    console.error('[Bulk Users Operation] Error:', error);
     return NextResponse.json({
       error: 'Bulk operation failed',
-      details: error instanceof Error ? error.message : 'Unknown error',
+      details: 'An internal error occurred. Please try again later.',
     }, { status: 500 });
   }
 }

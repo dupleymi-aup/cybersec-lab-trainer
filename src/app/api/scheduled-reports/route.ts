@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, reports });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    console.error('[Scheduled Reports GET] Error:', error);
+    return NextResponse.json({ success: false, error: 'Failed to load reports' }, { status: 500 });
   }
 }
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, report });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    console.error('[Scheduled Reports POST] Error:', error);
+    return NextResponse.json({ success: false, error: 'Failed to create report' }, { status: 500 });
   }
 }

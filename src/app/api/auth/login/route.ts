@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { generateToken, checkRateLimit } from '@/lib/api-middleware';
+import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { verifyPassword } from '@/lib/auth-utils';
 import { loginSchema } from '@/lib/validations/api';
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       });
     };
 
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = getClientIp(request);
     const userAgent = request.headers.get('user-agent') || '';
 
     // Find user by email or phone
