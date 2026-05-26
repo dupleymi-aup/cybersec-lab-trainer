@@ -41,7 +41,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'OTP expired' }, { status: 400 });
   }
 
-  if (entry.otp !== otp) {
+  // Use timing-safe comparison to prevent timing attacks
+  const isValid = entry.otp.length === otp.length &&
+    crypto.subtle.timingSafeEqual(
+      new TextEncoder().encode(entry.otp),
+      new TextEncoder().encode(otp)
+    );
+
+  if (!isValid) {
     return NextResponse.json({ error: 'Неверный OTP' }, { status: 400 });
   }
 

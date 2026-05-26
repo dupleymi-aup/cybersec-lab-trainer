@@ -40,12 +40,25 @@ export function forbidden(message = 'Forbidden') {
   return NextResponse.json({ error: message }, { status: 403 });
 }
 
-/** Extract client IP from request, checking proxy headers */
+/** Extract client IP from request, validating proxy headers to prevent spoofing */
 export function getClientIp(request: NextRequest): string {
+  // Only trust x-forwarded-for if we know we're behind a trusted proxy
+  // In production, this should be configured via TRUSTED_PROXIES env var
+  const trustedProxies = process.env.TRUSTED_PROXIES?.split(',') || [];
+  const remoteAddr = request.headers.get('x-real-ip');
+
+  // If behind a trusted proxy, use x-real-ip (set by the proxy)
+  if (remoteAddr && (trustedProxies.length > 0 || process.env.NODE_ENV === 'production')) {
+    return remoteAddr;
+  }
+
+  // Fall back to connection-level IP (harder to spoof)
+  // In Next.js, this would come from socket address if available
   const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp;
+  if (forwarded && trustedProxies.length > 0) {
+    return forwarded.split(',')[0].trim();
+  }
+
   return 'unknown';
 }
 

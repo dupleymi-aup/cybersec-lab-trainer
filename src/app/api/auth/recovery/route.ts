@@ -53,8 +53,9 @@ export async function POST(request: NextRequest) {
   otpStore.set(user.id, { otp, expiresAt });
 
   const emailSent = await sendOTPRecoveryEmail(user.email, user.fullName || user.email, otp);
-  if (!emailSent && process.env.NODE_ENV === 'development') {
-    console.warn(`[DEV] OTP for ${user.email}: ${otp} (SMTP not configured)`);
+  if (!emailSent) {
+    // In development, check console for email delivery issues
+    // OTP is still stored in memory for verification
   }
 
   return NextResponse.json(response);
