@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     if (!platform) {
       return NextResponse.json(
-        { error: `No active LTI platform found for issuer: ${iss}` },
+        { error: 'No active LTI platform found for the provided issuer' },
         { status: 404 },
       );
     }
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
 
     if (!platform) {
       return NextResponse.json(
-        { error: `No active LTI platform found for issuer: ${body.iss}` },
+        { error: 'No active LTI platform found for the provided issuer' },
         { status: 404 },
       );
     }

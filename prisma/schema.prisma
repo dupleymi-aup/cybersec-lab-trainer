@@ -49,7 +49,7 @@ model User {
 model Progress {
   id                     String   @id @default(cuid())
   userId                 String   @map("user_id")
-  user                   User     @relation(fields: [userId], references: [id])
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   moduleId               String   @map("module_id")  // owasp, sql-injection, xss, csrf, auth, secure-coding, tools, security-headers
   completed              Boolean  @default(false)
   score                  Int?     // 0-100
@@ -85,7 +85,7 @@ model QuizResult {
 model LoginActivity {
   id        String   @id @default(cuid())
   userId    String?  @map("user_id")
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   email     String?
   ip        String
   userAgent String   @map("user_agent")
@@ -98,7 +98,7 @@ model LoginActivity {
 model AuditLog {
   id         String   @id @default(cuid())
   adminId    String   @map("admin_id")
-  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id])
+  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id], onDelete: Cascade)
   adminName  String   @map("admin_name")
   action     String   // role_change, user_created, user_deleted, user_blocked, impersonation, bulk_operation
   targetId   String   @map("target_id")
@@ -112,7 +112,7 @@ model AuditLog {
 model QuizAttempt {
   id          String   @id @default(cuid())
   userId      String   @map("user_id")
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   quizId      String   @map("quiz_id")
   questionId  String   @map("question_id")
   difficulty  String
@@ -128,7 +128,7 @@ model QuizAttempt {
 model ProgressSnapshot {
   id         String   @id @default(cuid())
   userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   moduleId   String   @map("module_id")
   score      Int
   completed  Boolean
@@ -148,7 +148,7 @@ model Deadline {
   group       String   @default("")  // "" = all students
   createdAt   DateTime @default(now()) @map("created_at")
   createdBy   String   @map("created_by")
-  creator     User     @relation("DeadlineCreator", fields: [createdBy], references: [id])
+  creator     User     @relation("DeadlineCreator", fields: [createdBy], references: [id], onDelete: Cascade)
   reminderLog ReminderLog[]
 
   @@index([scope, scopeId])
@@ -162,7 +162,7 @@ model ReminderLog {
   deadlineId String   @map("deadline_id")
   deadline   Deadline @relation(fields: [deadlineId], references: [id], onDelete: Cascade)
   userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   type       String   // "email" | "in-app"
   sentAt     DateTime @default(now()) @map("sent_at")
 
@@ -174,7 +174,7 @@ model ReminderLog {
 model ScheduledReport {
   id             String    @id @default(cuid())
   userId         String    @map("user_id")
-  user           User      @relation(fields: [userId], references: [id])
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   reportType     String    @map("report_type")  // "gradebook" | "at-risk" | "analytics" | "module-performance" | "quiz-retry" | "student-report"
   frequency      String    // "daily" | "weekly" | "monthly"
   dayOfWeek      Int?      @map("day_of_week")  // 0-6 (Sun-Sat), for weekly
@@ -296,7 +296,7 @@ model AssignmentSubmission {
   assignmentId String   @map("assignment_id")
   assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   userId       String   @map("user_id")
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   content      String   @default("")  // JSON: answers, code, writeup
   score        Int?     // auto or manual grade
   maxScore     Int      @map("max_score")  // snapshot from assignment
