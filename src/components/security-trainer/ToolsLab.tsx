@@ -116,7 +116,8 @@ function xorDecrypt(hex: string, key: string): string {
       .filter((h) => h.length > 0)
       .map((h, i) => String.fromCharCode(parseInt(h, 16) ^ key.charCodeAt(i % key.length)))
       .join('');
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[ToolsLab.tsx] xorDecrypt failed:", e);
     return 'Ошибка декодирования';
   }
 }
@@ -126,11 +127,17 @@ function xorDecrypt(hex: string, key: string): string {
 // ============================================================
 function base64Encode(text: string): string {
   try { return btoa(unescape(encodeURIComponent(text))); }
-  catch { return 'Ошибка кодирования'; }
+  catch (e) {
+    if (process.env.NODE_ENV === 'development') console.warn('[ToolsLab] base64Encode failed:', e);
+    return 'Ошибка кодирования';
+  }
 }
 function base64Decode(text: string): string {
   try { return decodeURIComponent(escape(atob(text))); }
-  catch { return 'Ошибка декодирования'; }
+  catch (e) {
+    if (process.env.NODE_ENV === 'development') console.warn('[ToolsLab] base64Decode failed:', e);
+    return 'Ошибка декодирования';
+  }
 }
 
 // ============================================================
@@ -141,7 +148,10 @@ function urlEncode(text: string): string {
 }
 function urlDecode(text: string): string {
   try { return decodeURIComponent(text); }
-  catch { return 'Ошибка декодирования'; }
+  catch (e) {
+    if (process.env.NODE_ENV === 'development') console.warn('[ToolsLab] urlDecode failed:', e);
+    return 'Ошибка декодирования';
+  }
 }
 
 // ============================================================
@@ -185,7 +195,8 @@ function CopyButton({ text }: { text: string }) {
         document.execCommand('copy');
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
-      } catch {
+      } catch (e) {
+        if (process.env.NODE_ENV === "development") console.warn("[ToolsLab.tsx] CopyButton failed:", e);
         // Silently fail
       }
       document.body.removeChild(ta);
@@ -283,7 +294,8 @@ export default function ToolsLab() {
         keyHash = ((keyHash << 7) - keyHash + i) | 0;
       }
       return new TextDecoder().decode(result);
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[ToolsLab.tsx] ToolsLab failed:", e);
       return '❌ Ошибка: неверный ключ или повреждённые данные';
     }
   };

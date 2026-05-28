@@ -164,7 +164,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                 allTimestamps.sort();
                 lastActive = new Date(allTimestamps[allTimestamps.length - 1]).toLocaleDateString('ru-RU');
               }
-            } catch {
+            } catch (e) {
+              if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleGradebookExport failed:", e);
               // Intentionally empty — non-critical localStorage parse, fallback to default values
             }
           }
@@ -283,7 +284,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `analytics-${effectiveDays}d-${date}.csv`);
       setStatus('analytics', 'success', 'Аналитика экспортирована');
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleAnalyticsExport failed:", e);
       setStatus('analytics', 'error', 'Ошибка при экспорте аналитики');
     }
     scheduleReset('analytics', 4000);
@@ -301,7 +303,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `at-risk-${effectiveDays}d-${date}.csv`);
       setStatus('atRisk', 'success', `Экспортировано ${data.atRiskStudents.length} студентов`);
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleAtRiskExport failed:", e);
       setStatus('atRisk', 'error', 'Ошибка при экспорте');
     }
     scheduleReset('atRisk', 4000);
@@ -322,7 +325,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `group-comparison-${effectiveDays}d-${date}.csv`);
       setStatus('groupComparison', 'success', `Экспортировано ${data.dimensions.length} групп`);
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleGroupComparisonExport failed:", e);
       setStatus('groupComparison', 'error', 'Ошибка при экспорте');
     }
     scheduleReset('groupComparison', 4000);
@@ -338,7 +342,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `module-performance-${effectiveDays}d-${date}.csv`);
       setStatus('modulePerformance', 'success', `Экспортировано ${moduleData.length} модулей`);
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleModulePerformanceExport failed:", e);
       setStatus('modulePerformance', 'error', 'Ошибка при экспорте');
     }
     scheduleReset('modulePerformance', 4000);
@@ -373,7 +378,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       );
       await generateGradebookPDF(studentData);
       setStatus('gradebookPdf', 'success', `PDF экспортирован: ${studentData.length} студентов`);
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleGradebookPdfExport failed:", e);
       setStatus('gradebookPdf', 'error', 'Ошибка при создании PDF');
     }
     scheduleReset('gradebookPdf', 4000);
@@ -397,7 +403,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       }));
       await generateAtRiskPDF(atRiskData);
       setStatus('atRiskPdf', 'success', `PDF экспортирован: ${atRiskData.length} студентов`);
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleAtRiskPdfExport failed:", e);
       setStatus('atRiskPdf', 'error', 'Ошибка при создании PDF');
     }
     scheduleReset('atRiskPdf', 4000);
@@ -411,7 +418,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const summary = await getComprehensiveSummary(effectiveDays, groupId);
       await generateAnalyticsPDF(summary, summary.moduleDistribution);
       setStatus('analyticsPdf', 'success', 'Аналитический PDF экспортирован');
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleAnalyticsPdfExport failed:", e);
       setStatus('analyticsPdf', 'error', 'Ошибка при создании PDF');
     }
     scheduleReset('analyticsPdf', 4000);
@@ -425,7 +433,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const moduleData = await getModulePerformance(effectiveDays, groupId);
       await generateModulePerformancePDF(moduleData);
       setStatus('modulePerformancePdf', 'success', `PDF экспортирован: ${moduleData.length} модулей`);
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleModulePerformancePdfExport failed:", e);
       setStatus('modulePerformancePdf', 'error', 'Ошибка при создании PDF');
     }
     scheduleReset('modulePerformancePdf', 4000);
@@ -439,7 +448,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const data = await getGroupComparison(effectiveDays, 'group');
       await generateGroupComparisonPDF(data.dimensions, 'group');
       setStatus('groupComparisonPdf', 'success', `PDF экспортирован: ${data.dimensions.length} групп`);
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleGroupComparisonPdfExport failed:", e);
       setStatus('groupComparisonPdf', 'error', 'Ошибка при создании PDF');
     }
     scheduleReset('groupComparisonPdf', 4000);
@@ -486,7 +496,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
         moduleProgress, quizData, []
       );
       setStatus('studentReportPdf', 'success', 'PDF студента экспортирован');
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleStudentReportPdfExport failed:", e);
       setStatus('studentReportPdf', 'error', 'Ошибка при создании PDF');
     }
     scheduleReset('studentReportPdf', 4000);
@@ -503,7 +514,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
         retryData.topRetryers,
       );
       setStatus('quizRetryPdf', 'success', 'PDF повторов экспортирован');
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleQuizRetryPdfExport failed:", e);
       setStatus('quizRetryPdf', 'error', 'Ошибка при создании PDF');
     }
     scheduleReset('quizRetryPdf', 4000);
@@ -832,7 +844,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                       const data = JSON.parse(raw);
                       moduleCount = (data.completedModules || []).length;
                       quizCount = Object.keys(data.quizScores || {}).length;
-                    } catch {
+                    } catch (e) {
+                      if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleQuizRetryPdfExport failed:", e);
                       // Intentionally empty — non-critical localStorage parse, defaults to zero
                     }
                   }

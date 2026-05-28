@@ -25,7 +25,8 @@ async function fetchAnnouncements(activeOnly = false): Promise<Announcement[]> {
     if (!res.ok) return [];
     const data = await res.json();
     return data.announcements || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[SystemAnnouncements.tsx] fetchAnnouncements failed:", e);
     return [];
   }
 }
@@ -45,7 +46,8 @@ async function createAnnouncement(
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error };
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[SystemAnnouncements.tsx] createAnnouncement failed:", e);
     return { success: false, error: 'Network error' };
   }
 }
@@ -58,7 +60,8 @@ async function deleteAnnouncement(id: string): Promise<{ success: boolean; error
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error };
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[SystemAnnouncements.tsx] deleteAnnouncement failed:", e);
     return { success: false, error: 'Network error' };
   }
 }

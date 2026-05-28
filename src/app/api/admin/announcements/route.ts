@@ -71,7 +71,8 @@ export async function POST(request: NextRequest) {
   let body: Record<string, unknown>;
   try {
     body = await request.json();
-  } catch {
+  } catch (e) {
+    console.error("[api] POST failed:", e);
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
@@ -178,7 +179,8 @@ export async function PUT(request: NextRequest) {
   let body: Record<string, unknown>;
   try {
     body = await request.json();
-  } catch {
+  } catch (e) {
+    console.error("[api] PUT failed:", e);
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
@@ -323,7 +325,8 @@ export async function DELETE(request: NextRequest) {
     try {
       const body = await request.json();
       id = body?.id;
-    } catch {
+    } catch (e) {
+      console.error("[api] DELETE failed:", e);
       // No JSON body
     }
   }

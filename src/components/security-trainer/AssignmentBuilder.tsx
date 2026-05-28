@@ -133,7 +133,8 @@ export default function AssignmentBuilder() {
       } else {
         toast.error('Не удалось загрузить задания');
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AssignmentBuilder.tsx] AssignmentBuilder failed:", e);
       toast.error('Ошибка сети при загрузке заданий');
     } finally {
       setLoading(false);
@@ -209,7 +210,8 @@ export default function AssignmentBuilder() {
         const err = await res.json().catch(() => ({ error: 'Unknown error' }));
         toast.error(err.error || 'Ошибка сохранения');
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AssignmentBuilder.tsx] handleSubmit failed:", e);
       toast.error('Ошибка сети');
     } finally {
       setSaving(false);
@@ -227,7 +229,8 @@ export default function AssignmentBuilder() {
       } else {
         toast.error('Не удалось удалить');
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AssignmentBuilder.tsx] handleDelete failed:", e);
       toast.error('Ошибка сети');
     }
   };
@@ -244,7 +247,8 @@ export default function AssignmentBuilder() {
         toast.success(a.published ? 'Скрыто из публикации' : 'Опубликовано');
         fetchAssignments();
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AssignmentBuilder.tsx] togglePublished failed:", e);
       toast.error('Ошибка');
     }
   };

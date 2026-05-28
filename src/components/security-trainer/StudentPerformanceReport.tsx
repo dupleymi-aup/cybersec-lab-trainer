@@ -93,7 +93,8 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
         recommendations
       );
       setExportStatus('success');
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[StudentPerformanceReport.tsx] handlePdfExport failed:", e);
       setExportStatus('idle');
     }
     setTimeout(() => setExportStatus('idle'), 4000);

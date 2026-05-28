@@ -40,7 +40,8 @@ export function verifyToken(token: string): TokenPayload | null {
       fullName: decoded.fullName as string | undefined,
       exp: decoded.exp,
     };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-server.ts] verifyToken failed:", e);
     return null;
   }
 }

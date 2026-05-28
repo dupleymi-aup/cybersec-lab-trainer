@@ -31,7 +31,8 @@ function loadConfig(): StoredConfig {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[ModuleManager.tsx] loadConfig failed:", e);
     // Intentionally silent — fallback to defaults if localStorage fails
   }
   return { modules: {}, order: [] };

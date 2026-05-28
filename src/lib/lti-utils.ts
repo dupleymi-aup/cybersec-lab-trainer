@@ -96,7 +96,8 @@ export async function verifyLtiLaunch(
       result = await jwtVerify(idToken, key);
       verified = true;
       break;
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[lti-utils.ts] verifyLtiLaunch failed:", e);
       // Try next key
     }
   }

@@ -577,7 +577,8 @@ app.get('/api/fetch-url', async (req, res) => {
 
     const response = await fetch(parsedUrl.href);
     res.send(await response.text());
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[security-data.ts] verifyPassword failed:", e);
     res.status(400).json({ error: 'Некорректный URL' });
   }
 });`,
@@ -1294,7 +1295,8 @@ function isValidURL(str) {
     const url = new URL(str);
     return url.protocol === 'https:' &&
            url.hostname === 'myapp.com';
-  } catch { return false; }
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[security-data.ts] isValidURL failed:", e);
 }`,
     attackDemo: 'localStorage.setItem(\'lastRedirect\', \'javascript:alert(document.cookie)\');',
     mitigation: 'Никогда не вставляйте данные из localStorage через innerHTML без санитизации. Используйте textContent или createElement с установкой свойств.',

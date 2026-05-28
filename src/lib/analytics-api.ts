@@ -18,7 +18,8 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     return headers;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') console.warn('[analytics-api] getAuthHeaders failed:', e);
     return { 'Content-Type': 'application/json' };
   }
 }
@@ -58,7 +59,8 @@ export async function getProgressTrends(userId?: string, dateRange: string = '30
     const res = await apiFetch(`/api/analytics/progress-trends?${params}`);
     const data = await res.json();
     return data.trends || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getProgressTrends failed:", e);
     return [];
   }
 }
@@ -71,7 +73,8 @@ export async function getQuizQuestionAnalytics(category?: string, difficulty?: s
     const res = await apiFetch(`/api/analytics/quiz-questions?${params}`);
     const data = await res.json();
     return data.questions || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') console.warn('[analytics-api] getProgressTrends failed:', e);
     return [];
   }
 }
@@ -83,7 +86,8 @@ export async function getAchievementAnalytics(groupId?: string): Promise<Achieve
     const res = await apiFetch(`/api/analytics/achievements?${params}`);
     const data = await res.json();
     return data.achievements || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') console.warn('[analytics-api] getAchievementAnalytics failed:', e);
     return [];
   }
 }
@@ -95,7 +99,8 @@ export async function getAdminSummary(groupBy?: string): Promise<AdminSummary> {
     const res = await apiFetch(`/api/analytics/admin-summary?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getAdminSummary failed:", e);
     return {
       current: { totalStudents: 0, activeStudents: 0, activePercentage: 0, avgCompletionRate: 0, avgQuizScore: 0, totalQuizAttempts: 0, totalLoginAttempts: 0 },
       previous: { totalStudents: 0, activeStudents: 0, activePercentage: 0, avgCompletionRate: 0, avgQuizScore: 0, totalQuizAttempts: 0, totalLoginAttempts: 0 },
@@ -111,7 +116,8 @@ export async function getActivityHeatmap(userId?: string, dateRange: string = '9
     const res = await apiFetch(`/api/analytics/activity-heatmap?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getActivityHeatmap failed:", e);
     return { dailyActivity: [], hourlyActivity: [], weeklyActivity: [], totalActivities: 0, mostActiveDay: '', mostActiveHour: 0, streakDays: 0 };
   }
 }
@@ -125,7 +131,8 @@ export async function saveProgressSnapshot(moduleId: string, score: number, comp
       body: JSON.stringify(body),
     });
     return await res.json();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] saveProgressSnapshot failed:", e);
     return { success: false };
   }
 }
@@ -137,7 +144,8 @@ export async function saveQuizAttempts(quizId: string, attempts: QuizAttemptData
       body: JSON.stringify({ quizId, attempts }),
     });
     return await res.json();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] saveQuizAttempts failed:", e);
     return { success: false };
   }
 }
@@ -149,7 +157,8 @@ export async function getModulePerformance(days = 30, groupId?: string): Promise
     const res = await apiFetch(`/api/analytics/module-performance?${params}`);
     const data = await res.json();
     return data.modules || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getModulePerformance failed:", e);
     return [];
   }
 }
@@ -161,7 +170,8 @@ export async function getProgressDynamics(days = 30, groupId?: string): Promise<
     const res = await apiFetch(`/api/analytics/progress-dynamics?${params}`);
     const data = await res.json();
     return { daily: data.daily || [], summary: data.summary || { totalModulesCompleted: 0, totalQuizAttempts: 0, avgDailyActive: 0, trend: 'stable' as const } };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getProgressDynamics failed:", e);
     return { daily: [], summary: { totalModulesCompleted: 0, totalQuizAttempts: 0, avgDailyActive: 0, trend: 'stable' as const } };
   }
 }
@@ -173,7 +183,8 @@ export async function getAtRiskStudents(days = 30, groupId?: string): Promise<{ 
     const res = await apiFetch(`/api/analytics/at-risk?${params}`);
     const data = await res.json();
     return { atRiskStudents: data.atRiskStudents || [], summary: data.summary || { totalStudents: 0, atRiskCount: 0, atRiskPercentage: 0, criticalCount: 0 } };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getAtRiskStudents failed:", e);
     return { atRiskStudents: [], summary: { totalStudents: 0, atRiskCount: 0, atRiskPercentage: 0, criticalCount: 0 } };
   }
 }
@@ -185,7 +196,8 @@ export async function getGroupComparison(days = 30, dimension = 'group', groupId
     const res = await apiFetch(`/api/analytics/group-comparison?${params}`);
     const data = await res.json();
     return { dimensions: data.dimensions || [], rankings: data.rankings || { byCompletion: [], byQuizScore: [], byActivity: [] } };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getGroupComparison failed:", e);
     return { dimensions: [], rankings: { byCompletion: [], byQuizScore: [], byActivity: [] } };
   }
 }
@@ -197,7 +209,8 @@ export async function getQuizCategoryAnalytics(days = 30, groupId?: string): Pro
     const res = await apiFetch(`/api/analytics/quiz-categories?${params}`);
     const data = await res.json();
     return { categories: data.categories || [], hardestQuestions: data.hardestQuestions || [] };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizCategoryAnalytics failed:", e);
     return { categories: [], hardestQuestions: [] };
   }
 }
@@ -209,7 +222,8 @@ export async function getComprehensiveSummary(days = 30, groupId?: string): Prom
     const res = await apiFetch(`/api/analytics/comprehensive-summary?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getComprehensiveSummary failed:", e);
     return {
       kpis: { totalStudents: 0, activeStudents: 0, activePercentage: 0, avgCompletionRate: 0, avgQuizScore: 0, totalModulesCompleted: 0, totalQuizAttempts: 0, engagementScore: 0 },
       trends: { students: 'stable', activity: 'stable', completion: 'stable', quizScore: 'stable' },
@@ -228,7 +242,8 @@ export async function getStudentPerformance(userId: string, days = 30): Promise<
     const res = await apiFetch(`/api/analytics/student/${userId}?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getStudentPerformance failed:", e);
     return {
       profile: { id: '', fullName: '', email: '', group: '', course: '', university: '', avatar: '', role: '', createdAt: '', lastLoginAt: null, loginCount: 0 },
       kpis: { modulesCompleted: 0, totalModules: 0, avgQuizScore: 0, totalQuizAttempts: 0, lastActiveDays: 0, engagementScore: 0, riskScore: 0 },
@@ -252,7 +267,8 @@ export async function getStudentComparison(userIds: string[], days = 30): Promis
     const res = await apiFetch(`/api/analytics/student-comparison?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getStudentComparison failed:", e);
     return { students: [] };
   }
 }
@@ -267,7 +283,8 @@ export async function getGradebook(filters?: { groupId?: string; course?: string
     const res = await apiFetch(`/api/analytics/gradebook?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getGradebook failed:", e);
     return { students: [], modules: [] };
   }
 }
@@ -279,7 +296,8 @@ export async function getEngagementAnalytics(days = 30, groupId?: string): Promi
     const res = await apiFetch(`/api/analytics/engagement?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getEngagementAnalytics failed:", e);
     return {
       scoreDistribution: [],
       hourlyActivity: [],
@@ -297,7 +315,8 @@ export async function getLearningPathAnalytics(days = 30, groupId?: string): Pro
     const res = await apiFetch(`/api/analytics/learning-path?${params}`);
     const data = await res.json();
     return { path: data.path || [], totalStudents: data.totalStudents || 0 };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getLearningPathAnalytics failed:", e);
     return { path: [], totalStudents: 0 };
   }
 }
@@ -309,7 +328,8 @@ export async function getQuizTrajectory(days = 30, groupId?: string): Promise<{ 
     const res = await apiFetch(`/api/analytics/quiz-trajectory?${params}`);
     const data = await res.json();
     return { trajectories: data.trajectories || [], categories: data.categories || [] };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizTrajectory failed:", e);
     return { trajectories: [], categories: [] };
   }
 }
@@ -321,7 +341,8 @@ export async function getCohortAnalysis(groupId?: string): Promise<CohortAnalysi
     const res = await apiFetch(`/api/analytics/cohort?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getCohortAnalysis failed:", e);
     return {
       cohorts: [],
       overallRetention: { week1: 0, week2: 0, week4: 0, week8: 0, week12: 0 },
@@ -336,7 +357,8 @@ export async function getModuleDeepDive(days = 30, groupId?: string): Promise<Mo
     const res = await apiFetch(`/api/analytics/module-deep-dive?${params}`);
     const data = await res.json();
     return data.modules || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getModuleDeepDive failed:", e);
     return [];
   }
 }
@@ -348,7 +370,8 @@ export async function getCertificationReadiness(days = 30, groupId?: string): Pr
     const res = await apiFetch(`/api/analytics/certification-readiness?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getCertificationReadiness failed:", e);
     return { students: [], summary: { ready: 0, almost: 0, needsWork: 0, notReady: 0, avgReadinessScore: 0 } };
   }
 }
@@ -360,7 +383,8 @@ export async function getLearningVelocity(days = 90, groupId?: string): Promise<
     const res = await apiFetch(`/api/analytics/learning-velocity?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getLearningVelocity failed:", e);
     return { studentVelocities: [], velocityDistribution: [], avgVelocityByGroup: [], velocityOverTime: [] };
   }
 }
@@ -372,7 +396,8 @@ export async function getQuizSessionAnalytics(days = 30, groupId?: string): Prom
     const res = await apiFetch(`/api/analytics/quiz-session?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizSessionAnalytics failed:", e);
     return { categoryTiming: [], rushedQuizzes: [], timeVsPerformance: [], hourlyPerformance: [], weekdayVsWeekend: [] };
   }
 }
@@ -384,7 +409,8 @@ export async function getGroupDynamics(days = 90, groupId?: string): Promise<Gro
     const res = await apiFetch(`/api/analytics/group-dynamics?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getGroupDynamics failed:", e);
     return { groups: [], overallTrends: [] };
   }
 }
@@ -396,7 +422,8 @@ export async function getLoginPatterns(days = 30, groupId?: string): Promise<Log
     const res = await apiFetch(`/api/analytics/login-patterns?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getLoginPatterns failed:", e);
     return { loginFrequency: [], failedLogins: [], dormantAccounts: [], hourlyDistribution: [], dailyDistribution: [] };
   }
 }
@@ -408,7 +435,8 @@ export async function getQuizDifficultyAnalytics(days = 30, groupId?: string): P
     const res = await apiFetch(`/api/analytics/quiz-difficulty?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizDifficultyAnalytics failed:", e);
     return { difficultyBreakdown: [], categoryByDifficulty: [], studentPerformanceByDifficulty: [], trendByDifficulty: [] };
   }
 }
@@ -420,7 +448,8 @@ export async function getQuizRetryAnalytics(days = 30, groupId?: string): Promis
     const res = await apiFetch(`/api/analytics/quiz-retry?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizRetryAnalytics failed:", e);
     return { categoryRetryStats: [], retryDistribution: [], topRetryers: [], improvementByRetries: [], totalRetries: 0, totalUniqueQuizzes: 0 };
   }
 }
@@ -432,7 +461,8 @@ export async function getErrorPatternsAnalytics(days = 30, groupId?: string): Pr
     const res = await apiFetch(`/api/analytics/error-patterns?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getErrorPatternsAnalytics failed:", e);
     return { mostMissedQuestions: [], categoryErrorRates: [], difficultyErrorRates: [], errorTrends: [] };
   }
 }
@@ -444,7 +474,8 @@ export async function getPredictiveRisk(days = 30, groupId?: string): Promise<Pr
     const res = await apiFetch(`/api/analytics/predictive-risk?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getPredictiveRisk failed:", e);
     return { students: [], summary: { totalStudents: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0, avgRisk: 0 } };
   }
 }
@@ -453,7 +484,8 @@ export async function getScheduledReports(): Promise<{ success: boolean; reports
   try {
     const res = await apiFetch('/api/scheduled-reports');
     return res.json();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getScheduledReports failed:", e);
     return { success: false, reports: [], error: 'Failed to fetch scheduled reports' };
   }
 }
@@ -473,7 +505,8 @@ export async function createScheduledReport(data: {
       body: JSON.stringify(data),
     });
     return res.json();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] createScheduledReport failed:", e);
     return { success: false, error: 'Failed to create scheduled report' };
   }
 }
@@ -485,7 +518,8 @@ export async function updateScheduledReport(id: string, data: Partial<ScheduledR
       body: JSON.stringify(data),
     });
     return res.json();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] updateScheduledReport failed:", e);
     return { success: false, error: 'Failed to update scheduled report' };
   }
 }
@@ -494,7 +528,8 @@ export async function deleteScheduledReport(id: string): Promise<{ success: bool
   try {
     const res = await apiFetch(`/api/scheduled-reports/${id}`, { method: 'DELETE' });
     return res.json();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] deleteScheduledReport failed:", e);
     return { success: false, error: 'Failed to delete scheduled report' };
   }
 }
@@ -506,7 +541,8 @@ export async function getDataQuality(days = 30, groupId?: string): Promise<DataQ
     const res = await apiFetch(`/api/analytics/data-quality?${params}`);
     const data = await res.json();
     return data;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getDataQuality failed:", e);
     return { healthScore: 100, issues: [], summary: { totalStudents: 0, activeStudents: 0, totalModules: 0, completedModules: 0, totalQuizzes: 0 } };
   }
 }

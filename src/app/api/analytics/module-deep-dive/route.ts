@@ -155,7 +155,8 @@ export async function GET(request: NextRequest) {
               if (v >= r.min && v <= r.max) { r.count++; break; }
             }
           }
-        } catch { /* ignore */ }
+        } catch (e) {
+          console.error("[api] GET failed:", e);
       }
     }
 

@@ -42,7 +42,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (e) {
+    console.error("[api] POST failed:", e);
     return NextResponse.json({ error: 'Failed to create progress snapshot' }, { status: 500 });
   }
 }

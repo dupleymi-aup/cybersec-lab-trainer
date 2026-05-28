@@ -17,7 +17,8 @@ function loadAll(): Announcement[] {
   if (typeof window === 'undefined') return [];
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  } catch { return []; }
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[TeacherMessaging.tsx] loadAll failed:", e);
 }
 
 function saveAll(items: Announcement[]) {

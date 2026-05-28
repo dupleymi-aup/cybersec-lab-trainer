@@ -346,7 +346,8 @@ app.use('/api', (req, res, next) => {
   try {
     req.user = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
     next();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[api-security-data.ts] getUserResponse failed:", e);
     res.status(401).json({ error: 'Invalid token' });
   }
 });`,

@@ -85,7 +85,8 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
         }
 
         max = Math.max(1, ...Object.values(data));
-      } catch {
+      } catch (e) {
+        if (process.env.NODE_ENV === "development") console.warn("[StudentHeatmapCalendar.tsx] loadStudents failed:", e);
         // ignore
       }
     }

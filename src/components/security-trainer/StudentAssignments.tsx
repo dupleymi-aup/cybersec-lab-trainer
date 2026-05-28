@@ -91,7 +91,8 @@ export default function StudentAssignments() {
               const mySubs = subs.filter((s: Submission) => s.userId === user?.id);
               return { id: a.id, subs: mySubs };
             }
-          } catch { /* silent */ }
+          } catch (e) {
+            if (process.env.NODE_ENV === "development") console.warn("[StudentAssignments.tsx] StudentAssignments failed:", e);
           return { id: a.id, subs: [] };
         });
 
@@ -100,7 +101,8 @@ export default function StudentAssignments() {
         results.forEach((r) => { subMap[r.id] = r.subs; });
         setSubmissions(subMap);
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[StudentAssignments.tsx] StudentAssignments failed:", e);
       toast.error('Ошибка загрузки заданий');
     } finally {
       setLoading(false);
@@ -166,7 +168,8 @@ export default function StudentAssignments() {
         const err = await res.json().catch(() => ({ error: 'Ошибка' }));
         toast.error(err.error || 'Не удалось отправить');
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[StudentAssignments.tsx] handleSubmit failed:", e);
       toast.error('Ошибка сети');
     } finally {
       setSubmitting(false);

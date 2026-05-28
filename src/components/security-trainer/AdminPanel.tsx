@@ -275,7 +275,8 @@ export default function AdminPanel() {
 
         toast.success(`Импортировано: ${created}, пропущено: ${skipped}`);
         refresh();
-      } catch {
+      } catch (e) {
+        if (process.env.NODE_ENV === "development") console.warn("[AdminPanel.tsx] handleToggleBlock failed:", e);
         toast.error('Ошибка parsing CSV');
       }
     };

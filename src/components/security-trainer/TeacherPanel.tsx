@@ -125,7 +125,8 @@ async function getStudentProgress(userId: string): Promise<StudentProgress> {
         lastActive,
       };
     }
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[TeacherPanel.tsx] getStudentProgress failed:", e);
     // ignore
   }
   return {
@@ -201,7 +202,8 @@ export default function TeacherPanel() {
           const data = await r1.json();
           if (data.deadlines) setDeadlines(data.deadlines);
         }
-      } catch { /* silent — non-critical */ }
+      } catch (e) {
+        if (process.env.NODE_ENV === "development") console.warn("[TeacherPanel.tsx] loadProgress failed:", e);
 
       try {
         const headers = await getAuthHeaders();
@@ -210,7 +212,8 @@ export default function TeacherPanel() {
           const data = await r2.json();
           if (data.results) setDeadlineReminders(data.results);
         }
-      } catch { /* silent — non-critical */ }
+      } catch (e) {
+        if (process.env.NODE_ENV === "development") console.warn("[TeacherPanel.tsx] loadProgress failed:", e);
     })();
   }, []);
 

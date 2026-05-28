@@ -619,7 +619,8 @@ function authenticate(req, res, next) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[AuthSecurityLab.tsx] authenticate failed:", e);
     return res.status(401).json({ error: 'Невалидный токен' });
   }
 }`}

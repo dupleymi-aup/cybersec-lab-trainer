@@ -99,7 +99,8 @@ export default function AtRiskReport({ groupId: controlledGroupId, days: control
       }));
       await generateAtRiskPDF(pdfData);
       setExportStatus('success');
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[AtRiskReport.tsx] handlePdfExport failed:", e);
       setExportStatus('idle');
     }
     setTimeout(() => setExportStatus('idle'), 4000);

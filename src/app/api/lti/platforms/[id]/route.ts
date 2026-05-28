@@ -114,7 +114,8 @@ export async function PUT(
     });
 
     return NextResponse.json(platform);
-  } catch {
+  } catch (e) {
+    console.error("[api] PUT failed:", e);
     return NextResponse.json({ error: 'Platform not found' }, { status: 404 });
   }
 }
@@ -151,7 +152,8 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (e) {
+    console.error("[api] DELETE failed:", e);
     return NextResponse.json({ error: 'Platform not found' }, { status: 404 });
   }
 }

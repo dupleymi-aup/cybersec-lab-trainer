@@ -80,7 +80,8 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
-      } catch {
+      } catch (e) {
+        console.error("[api] POST failed:", e);
         return NextResponse.json(
           { error: `${fieldName} is not a valid URL` },
           { status: 400 }

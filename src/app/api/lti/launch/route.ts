@@ -22,7 +22,8 @@ export async function POST(request: NextRequest) {
       const parts = idToken.split('.');
       const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
       issuer = payload.iss || '';
-    } catch {
+    } catch (e) {
+      console.error("[api] POST failed:", e);
       return NextResponse.json({ error: 'Invalid token format' }, { status: 400 });
     }
 
@@ -186,13 +187,15 @@ export async function GET() {
       try {
         const jwk = await parsePublicKeyToJWK(platform.publicKey, platform.id);
         keys.push(jwk);
-      } catch {
+      } catch (e) {
+        console.error("[api] GET failed:", e);
         // Skip invalid keys
       }
     }
 
     return NextResponse.json({ keys });
-  } catch {
+  } catch (e) {
+    console.error("[api] GET failed:", e);
     return NextResponse.json({ keys: [] });
   }
 }

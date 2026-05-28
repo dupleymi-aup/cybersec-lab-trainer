@@ -420,7 +420,8 @@ function isValidURL(str) {
     const url = new URL(str);
     return url.protocol === 'https:' &&
            url.hostname === 'myapp.com';
-  } catch { return false; }
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[xss-data.ts] isValidURL failed:", e);
 }`,
     attackDemo: 'localStorage.setItem(\'lastRedirect\', \'javascript:alert(document.cookie)\');',
     mitigation: 'Никогда не вставляйте данные из localStorage через innerHTML без санитизации. Используйте textContent или createElement с установкой свойств.',

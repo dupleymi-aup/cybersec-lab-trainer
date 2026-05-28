@@ -19,7 +19,8 @@ function validateEnv(): EnvConfig {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   try {
     new URL(appUrl);
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[env.ts] validateEnv failed:", e);
     throw new Error(`Invalid NEXT_PUBLIC_APP_URL: ${appUrl}. Must be a valid URL.`);
   }
 

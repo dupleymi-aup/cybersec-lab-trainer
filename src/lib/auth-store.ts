@@ -84,7 +84,8 @@ export async function getAllUsers(): Promise<User[]> {
     if (!res.ok) return [];
     const data = await res.json();
     return data.users || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] getAllUsers failed:", e);
     return [];
   }
 }
@@ -98,7 +99,8 @@ export async function changeUserRole(userId: string, newRole: UserRole): Promise
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error };
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] changeUserRole failed:", e);
     return { success: false, error: 'Network error' };
   }
 }
@@ -109,7 +111,8 @@ export async function deleteUser(userId: string): Promise<{ success: boolean; er
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error };
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] deleteUser failed:", e);
     return { success: false, error: 'Network error' };
   }
 }
@@ -142,7 +145,8 @@ export async function createUser(
     const result = await res.json();
     if (!res.ok) return { success: false, error: result.error };
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] createUser failed:", e);
     return { success: false, error: 'Network error' };
   }
 }
@@ -159,7 +163,8 @@ export async function updateUser(
     const result = await res.json();
     if (!res.ok) return { success: false, error: result.error };
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] updateUser failed:", e);
     return { success: false, error: 'Network error' };
   }
 }
@@ -182,7 +187,8 @@ export async function toggleUserBlock(userId: string): Promise<{ success: boolea
     const result = await res.json();
     if (!res.ok) return { success: false, error: result.error };
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] toggleUserBlock failed:", e);
     return { success: false, error: 'Network error' };
   }
 }
@@ -234,7 +240,8 @@ export async function getAuditLogEntries(): Promise<AuditLogEntry[]> {
     if (!res.ok) return [];
     const data = await res.json();
     return data.logs || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] getAuditLogEntries failed:", e);
     return [];
   }
 }
@@ -292,7 +299,8 @@ export async function resetUserPassword(
     const result = await res.json();
     if (!res.ok) return { success: false, error: result.error };
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] resetUserPassword failed:", e);
     return { success: false, error: 'Network error' };
   }
 }
@@ -329,7 +337,8 @@ export async function startImpersonation(
 
     useAuthStore.setState({ user: data.user, isAuthenticated: true, token: data.token });
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] startImpersonation failed:", e);
     return { success: false, error: 'Network error' };
   }
 }
@@ -364,7 +373,8 @@ export async function stopImpersonation(): Promise<{ success: boolean; error?: s
     });
 
     return { success: true };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] stopImpersonation failed:", e);
     return { success: false, error: 'Ошибка завершения имперсонации' };
   }
 }
@@ -381,7 +391,8 @@ export function getImpersonationState(): { isImpersonating: boolean; originalUse
       impersonatingUserId: data.impersonatingUserId || null,
       startedAt: data.startedAt || null,
     };
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] stopImpersonation failed:", e);
     return { isImpersonating: false, originalUserId: null, impersonatingUserId: null, startedAt: null };
   }
 }
@@ -472,7 +483,8 @@ export async function getStudentProgress(userId: string): Promise<{ progress: St
     const res = await apiFetch(`/api/progress/${userId}`);
     if (!res.ok) return { progress: [], quizResults: [] };
     return await res.json();
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] getStudentProgress failed:", e);
     return { progress: [], quizResults: [] };
   }
 }
@@ -484,7 +496,8 @@ export async function getLoginActivity(userId: string): Promise<LoginActivityEnt
     if (!res.ok) return [];
     const data = await res.json();
     return data.activities || [];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] getLoginActivity failed:", e);
     return [];
   }
 }
@@ -563,7 +576,8 @@ export const useAuthStore = create<AuthState>()(
           useAppStore.getState().loadFromDatabase(data.user.id).catch(() => {});
 
           return { success: true };
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[auth-store] login failed:", e);
           return { success: false, error: 'Network error' };
         }
       },
@@ -588,7 +602,8 @@ export const useAuthStore = create<AuthState>()(
           });
 
           return { success: true };
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[auth-store] register failed:", e);
           return { success: false, error: 'Network error' };
         }
       },
@@ -625,7 +640,8 @@ export const useAuthStore = create<AuthState>()(
             const result = await res.json();
             set({ user: { ...user, ...data, ...result.user } });
           }
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[auth-store] updateProfile failed:", e);
           // Update locally even if API fails
           set({ user: { ...user, ...data } });
         }
@@ -648,7 +664,8 @@ export const useAuthStore = create<AuthState>()(
           const data = await res.json();
           if (!res.ok) return { success: false, error: data.error };
           return { success: true };
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[auth-store] updatePassword failed:", e);
           return { success: false, error: 'Network error' };
         }
       },
@@ -671,7 +688,8 @@ export const useAuthStore = create<AuthState>()(
             },
           });
           return { success: true, otp: data.otp };
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[auth-store] sendRecoveryOTP failed:", e);
           return { success: false, error: 'Network error' };
         }
       },
@@ -688,7 +706,8 @@ export const useAuthStore = create<AuthState>()(
             body: JSON.stringify({ emailOrPhone: recoveryState.emailOrPhone, otp }),
           });
           return res.ok;
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[auth-store] verifyRecoveryOTP failed:", e);
           return false;
         }
       },
@@ -709,7 +728,8 @@ export const useAuthStore = create<AuthState>()(
 
           set({ recoveryState: null });
           return { success: true };
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[auth-store] resetPassword failed:", e);
           return { success: false, error: 'Network error' };
         }
       },
@@ -736,7 +756,8 @@ export const useAuthStore = create<AuthState>()(
 
           set({ user: null, isAuthenticated: false, token: null });
           return { success: true };
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[auth-store] deleteAccount failed:", e);
           return { success: false, error: 'Network error' };
         }
       },

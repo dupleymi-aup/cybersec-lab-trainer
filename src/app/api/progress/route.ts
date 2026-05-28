@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
   // Helper to safely parse JSON strings back to arrays
   const parseJsonField = (val: string | null): unknown => {
     if (!val) return val;
-    try { return JSON.parse(val); } catch { return val; }
+    try { return JSON.parse(val); } catch (e) {
+      if (process.env.NODE_ENV === 'development') console.warn('[progress] parseJsonField failed:', e);
+      return val;
+    }
   };
 
   return NextResponse.json({

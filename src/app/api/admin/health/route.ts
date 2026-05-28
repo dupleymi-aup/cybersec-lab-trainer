@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
       status: latency > 500 ? 'warn' : 'ok',
       details: { latencyMs: latency },
     };
-  } catch {
+  } catch (e) {
+    console.error("[api] GET failed:", e);
     checks.database = { status: 'error', details: 'Database connection failed' };
     overallStatus = 'error';
   }
@@ -48,7 +49,8 @@ export async function GET(request: NextRequest) {
       status: 'ok',
       details: { users, auditLogs, quizResults, progress, loginActivity, announcements },
     };
-  } catch {
+  } catch (e) {
+    console.error("[api] GET failed:", e);
     checks.tables = { status: 'error', details: 'Could not read table counts' };
     if (overallStatus !== 'error') overallStatus = 'warn';
   }
@@ -97,7 +99,8 @@ export async function GET(request: NextRequest) {
       details: { failedLoginsLastHour: failedLogins },
     };
     if (failedLogins > 20 && overallStatus !== 'error') overallStatus = 'warn';
-  } catch {
+  } catch (e) {
+    console.error("[api] GET failed:", e);
     checks.security = { status: 'warn', details: 'Could not check login activity' };
   }
 

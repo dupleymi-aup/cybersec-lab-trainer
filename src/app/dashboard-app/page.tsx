@@ -146,7 +146,8 @@ export default function DashboardAppPage() {
             store.setUser(userData, ltiToken);
             authSettled = true;
           }
-        } catch {
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") console.warn("[page.tsx] processLTIToken failed:", e);
           // If profile fetch fails, fall back to decoding the JWT
           if (process.env.NODE_ENV === 'development') {
             console.warn('LTI profile fetch failed, falling back to JWT decode');

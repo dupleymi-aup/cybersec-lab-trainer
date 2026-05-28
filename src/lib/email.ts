@@ -144,7 +144,8 @@ export async function sendOTPRecoveryEmail(
       html,
     });
     return true;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[email.ts] sendOTPRecoveryEmail failed:", e);
     return false;
   }
 }
@@ -173,7 +174,8 @@ export async function sendDeadlineReminderEmail(
       html: renderDeadlineEmail(fullName, deadlineTitle, dueAt, isOverdue),
     });
     return true;
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[email.ts] sendDeadlineReminderEmail failed:", e);
     return false;
   }
 }

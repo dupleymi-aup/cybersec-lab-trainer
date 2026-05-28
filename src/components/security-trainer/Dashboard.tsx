@@ -106,7 +106,8 @@ async function fetchActiveAnnouncements(): Promise<Announcement[]> {
     if (!res.ok) return [];
     const data = await res.json();
     return (data.announcements || []) as Announcement[];
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[Dashboard.tsx] fetchActiveAnnouncements failed:", e);
     return [];
   }
 }

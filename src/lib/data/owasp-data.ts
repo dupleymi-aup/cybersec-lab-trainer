@@ -577,7 +577,8 @@ app.get('/api/fetch-url', async (req, res) => {
 
     const response = await fetch(parsedUrl.href);
     res.send(await response.text());
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[owasp-data.ts] verifyPassword failed:", e);
     res.status(400).json({ error: 'Некорректный URL' });
   }
 });`,

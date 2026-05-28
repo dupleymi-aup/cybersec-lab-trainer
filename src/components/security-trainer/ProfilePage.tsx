@@ -155,7 +155,8 @@ export default function ProfilePage() {
   const formatDate = (iso: string) => {
     try {
       return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-    } catch { return iso; }
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[ProfilePage.tsx] ProfilePage failed:", e);
   };
 
   if (!user) return null;
@@ -272,7 +273,8 @@ export default function ProfilePage() {
           secureCodingCorrectCount: p.secureCodingCorrectCount || 0,
         });
         toast.success('Прогресс импортирован');
-      } catch {
+      } catch (e) {
+        if (process.env.NODE_ENV === "development") console.warn("[ProfilePage.tsx] handlePasswordChange failed:", e);
         toast.error('Ошибка при чтении файла');
       }
     };

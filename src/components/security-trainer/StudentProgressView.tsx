@@ -34,7 +34,8 @@ function getStudentProgressLocal(userId: string): {
         quizTimestamps: data.quizTimestamps || {},
       };
     }
-  } catch {
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[StudentProgressView.tsx] getStudentProgressLocal failed:", e);
     // Intentionally silent — fallback to defaults if localStorage fails
   }
   return { completedModules: [], quizScores: {}, moduleTimestamps: {}, quizTimestamps: {} };

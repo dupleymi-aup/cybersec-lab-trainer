@@ -90,7 +90,8 @@ export default function LtiPlatformManager() {
       } else {
         toast.error('Failed to load platforms');
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[LtiPlatformManager.tsx] loadPlatforms failed:", e);
       toast.error('Network error');
     } finally {
       setLoading(false);
@@ -110,7 +111,8 @@ export default function LtiPlatformManager() {
         const data = await res.json();
         setGradeSyncs(data);
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[LtiPlatformManager.tsx] loadGradeSyncs failed:", e);
       // ignore
     } finally {
       setLoadingSyncs(false);
@@ -147,7 +149,8 @@ export default function LtiPlatformManager() {
         const error = await res.json();
         toast.error(error.error || 'Ошибка сохранения');
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[LtiPlatformManager.tsx] handleSubmit failed:", e);
       toast.error('Network error');
     }
   };
@@ -167,7 +170,8 @@ export default function LtiPlatformManager() {
       } else {
         toast.error('Ошибка удаления');
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[LtiPlatformManager.tsx] handleDelete failed:", e);
       toast.error('Network error');
     }
   };
@@ -184,7 +188,8 @@ export default function LtiPlatformManager() {
         toast.success(platform.isActive ? 'Платформа отключена' : 'Платформа активирована');
         loadPlatforms();
       }
-    } catch {
+    } catch (e) {
+      if (process.env.NODE_ENV === "development") console.warn("[LtiPlatformManager.tsx] handleToggleActive failed:", e);
       toast.error('Network error');
     }
   };
