@@ -204,6 +204,7 @@ export default function TeacherPanel() {
         }
       } catch (e) {
         if (process.env.NODE_ENV === "development") console.warn("[TeacherPanel.tsx] loadProgress failed:", e);
+      }
 
       try {
         const headers = await getAuthHeaders();
@@ -213,7 +214,8 @@ export default function TeacherPanel() {
           if (data.results) setDeadlineReminders(data.results);
         }
       } catch (e) {
-        if (process.env.NODE_ENV === "development") console.warn("[TeacherPanel.tsx] loadProgress failed:", e);
+        if (process.env.NODE_ENV === "development") console.warn("[TeacherPanel.tsx] loadReminders failed:", e);
+      }
     })();
   }, []);
 
@@ -911,7 +913,7 @@ export default function TeacherPanel() {
                     const scores = Object.values(p.quizScores);
                     const avgQ = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
                     const lastActive = p.lastActive ? new Date(p.lastActive).toLocaleDateString('ru-RU') : '—';
-                    return { fullName: s.fullName, group: s.group, mods, avgQ, total: mods * 10 + avgQ, lastActive };
+                    return { userId: s.id, fullName: s.fullName, group: s.group, mods, avgQ, total: mods * 10 + avgQ, lastActive };
                   })
                   .sort((a, b) => b.total - a.total);
 

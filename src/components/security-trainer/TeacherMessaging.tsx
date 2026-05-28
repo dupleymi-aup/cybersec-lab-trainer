@@ -19,6 +19,8 @@ function loadAll(): Announcement[] {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   } catch (e) {
     if (process.env.NODE_ENV === "development") console.warn("[TeacherMessaging.tsx] loadAll failed:", e);
+  }
+  return [];
 }
 
 function saveAll(items: Announcement[]) {

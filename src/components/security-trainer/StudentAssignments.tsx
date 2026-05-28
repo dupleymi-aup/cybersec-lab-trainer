@@ -93,7 +93,8 @@ export default function StudentAssignments() {
             }
           } catch (e) {
             if (process.env.NODE_ENV === "development") console.warn("[StudentAssignments.tsx] StudentAssignments failed:", e);
-          return { id: a.id, subs: [] };
+            return { id: a.id, subs: [] };
+          }
         });
 
         const results = await Promise.all(submissionPromises);

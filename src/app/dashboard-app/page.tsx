@@ -140,6 +140,9 @@ export default function DashboardAppPage() {
           const res = await fetch('/api/auth/profile', {
             headers: { Authorization: `Bearer ${ltiToken}` },
           });
+          if (!res.ok) {
+            throw new Error(`Profile fetch failed: ${res.status}`);
+          }
           const userData = await res.json();
 
           if (userData && userData.id) {

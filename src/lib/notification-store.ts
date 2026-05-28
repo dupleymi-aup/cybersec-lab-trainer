@@ -170,4 +170,5 @@ export async function loadAnnouncementsIntoNotifications() {
     }
   } catch (e) {
     if (process.env.NODE_ENV === "development") console.warn("[notification-store.ts] loadAnnouncementsIntoNotifications failed:", e);
+  }
 }

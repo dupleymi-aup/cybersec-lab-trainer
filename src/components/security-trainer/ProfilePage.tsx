@@ -157,6 +157,8 @@ export default function ProfilePage() {
       return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
     } catch (e) {
       if (process.env.NODE_ENV === "development") console.warn("[ProfilePage.tsx] ProfilePage failed:", e);
+      return iso;
+    }
   };
 
   if (!user) return null;

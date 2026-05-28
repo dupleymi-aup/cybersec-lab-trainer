@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
   const quizResultsByUser = new Map<string, typeof allQuizResults>();
 
   for (const l of loginActivity) {
+    if (!l.userId) continue;
     if (!loginByUser.has(l.userId)) loginByUser.set(l.userId, []);
     loginByUser.get(l.userId)!.push(l);
   }

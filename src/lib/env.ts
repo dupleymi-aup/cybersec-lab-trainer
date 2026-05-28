@@ -21,7 +21,7 @@ function validateEnv(): EnvConfig {
     new URL(appUrl);
   } catch (e) {
     if (process.env.NODE_ENV === "development") console.warn("[env.ts] validateEnv failed:", e);
-    throw new Error(`Invalid NEXT_PUBLIC_APP_URL: ${appUrl}. Must be a valid URL.`);
+    throw new Error(`Invalid NEXT_PUBLIC_APP_URL: ${appUrl}. Must be a valid URL.`, { cause: e });
   }
 
   const databaseUrl = process.env.DATABASE_URL || '';
