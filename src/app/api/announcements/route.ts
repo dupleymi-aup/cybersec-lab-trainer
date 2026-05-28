@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 // GET /api/announcements - get active announcements (public access)
 export async function GET(_request: NextRequest) {
@@ -30,7 +31,7 @@ export async function GET(_request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error('Error fetching announcements:', error);
+    logger.error('Failed to fetch announcements', { error: String(error) });
     return NextResponse.json({ error: 'Failed to fetch announcements' }, { status: 500 });
   }
 }

@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
 import { submitAssignmentSchema } from '@/lib/validations/api';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const auth = await authenticate(request);
-    if (!auth) return unauthorized();
-    if (auth.role !== 'student') return forbidden();
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (auth.role !== 'student') return forbidden();
 
+  try {
     const { id } = await params;
 
     const assignment = await prisma.assignment.findUnique({
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       maxAttempts: assignment.attempts === 0 ? 'unlimited' : assignment.attempts,
     });
   } catch (error) {
-    console.error('Error submitting assignment:', error);
+    logger.error('Failed to submit assignment', { error: String(error), userId: auth?.id });
     return NextResponse.json({ error: 'Failed to submit assignment' }, { status: 500 });
   }
 }

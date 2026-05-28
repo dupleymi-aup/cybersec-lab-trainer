@@ -19,6 +19,8 @@ const PUBLIC_PATHS = [
   '/api/lti/oidc-login',
   '/api/lti/deep-link',
   '/api/lti/sync-grades',
+  // CSP reports from browsers (cannot include CSRF token)
+  '/api/csp-report',
   // Note: /api/lti/platforms IS CSRF-protected (internal admin CRUD)
 ];
 

@@ -8,6 +8,7 @@ import {
   checkRateLimit,
   getClientIp,
 } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 // GET /api/admin/announcements - List all announcements
 export async function GET(request: NextRequest) {
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch (e) {
-    console.error("[api] POST failed:", e);
+    logger.error('Invalid JSON body in announcements POST', { error: String(e) });
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
@@ -180,7 +181,7 @@ export async function PUT(request: NextRequest) {
   try {
     body = await request.json();
   } catch (e) {
-    console.error("[api] PUT failed:", e);
+    logger.error('Invalid JSON body in announcements PUT', { error: String(e) });
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
@@ -326,7 +327,7 @@ export async function DELETE(request: NextRequest) {
       const body = await request.json();
       id = body?.id;
     } catch (e) {
-      console.error("[api] DELETE failed:", e);
+      logger.error('Invalid JSON body in announcements DELETE', { error: String(e) });
       // No JSON body
     }
   }

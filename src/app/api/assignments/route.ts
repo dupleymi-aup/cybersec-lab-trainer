@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
 import { createAssignmentSchema } from '@/lib/validations/api';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(assignments);
   } catch (error) {
-    console.error('Error fetching assignments:', error);
+    logger.error('Failed to fetch assignments', { error: String(error) });
     return NextResponse.json({ error: 'Failed to fetch assignments' }, { status: 500 });
   }
 }
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(assignment, { status: 201 });
   } catch (error) {
-    console.error('Error creating assignment:', error);
+    logger.error('Failed to create assignment', { error: String(error) });
     return NextResponse.json({ error: 'Failed to create assignment' }, { status: 500 });
   }
 }

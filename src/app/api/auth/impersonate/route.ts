@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, generateToken, getClientIp } from '@/lib/api-middleware';
 import { setAuthCookie } from '@/lib/cookie-auth';
 import { validateUuid } from '@/lib/validate-uuid';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Impersonation error:', error);
+    logger.error('Impersonation failed', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

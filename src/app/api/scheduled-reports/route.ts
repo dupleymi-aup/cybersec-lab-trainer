@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, reports });
   } catch (error: unknown) {
-    console.error('[Scheduled Reports GET] Error:', error);
+    logger.error('Failed to load scheduled reports', { error: String(error) });
     return NextResponse.json({ success: false, error: 'Failed to load reports' }, { status: 500 });
   }
 }
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, report });
   } catch (error: unknown) {
-    console.error('[Scheduled Reports POST] Error:', error);
+    logger.error('Failed to create scheduled report', { error: String(error) });
     return NextResponse.json({ success: false, error: 'Failed to create report' }, { status: 500 });
   }
 }

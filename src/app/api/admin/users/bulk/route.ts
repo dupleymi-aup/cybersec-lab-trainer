@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { validateUuid } from '@/lib/validate-uuid';
+import { logger } from '@/lib/logger';
 
 type BulkAction = 'block' | 'unblock' | 'delete' | 'role_change';
 
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch (e) {
-    console.error("[api] POST failed:", e);
+    logger.error('Invalid JSON in bulk users operation', { error: String(e) });
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
@@ -155,8 +156,7 @@ export async function POST(request: NextRequest) {
       missingIds: missingIds.slice(0, 10),
     });
   } catch (error) {
-    // Log detailed error server-side, return generic message to client
-    console.error('[Bulk Users Operation] Error:', error);
+    logger.error('Bulk users operation failed', { error: String(error), action: body?.action });
     return NextResponse.json({
       error: 'Bulk operation failed',
       details: 'An internal error occurred. Please try again later.',
