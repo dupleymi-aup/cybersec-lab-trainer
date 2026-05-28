@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, checkRateLimit } from '@/lib/api-middleware';
+import { quizCategories } from '@/lib/data';
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
@@ -18,6 +19,12 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const { quizId, score, total, attempts } = body;
+
+  // Validate quizId against known quiz categories to prevent fabricated results
+  const validQuizIds = quizCategories.map(c => c.id);
+  if (quizId && !validQuizIds.includes(quizId)) {
+    return NextResponse.json({ error: 'Invalid quiz ID' }, { status: 400 });
+  }
 
   // Mode 1: Save quiz result (score/total) — backward compatible
   if (quizId && score !== undefined && total !== undefined) {
@@ -73,9 +80,18 @@ async function saveQuizAttempts(userId: string, quizId: string, attempts: Array<
   category: string;
   correct: boolean;
 }>): Promise<void> {
+  // Validate difficulty values and category names against known values
+  const validDifficulties = ['easy', 'medium', 'hard'];
+  const validCategories = quizCategories.map(c => c.name);
+
   // Validate and sanitize attempt records
   const validAttempts = attempts
-    .filter(a => a.questionId && a.difficulty && a.category && typeof a.correct === 'boolean')
+    .filter(a =>
+      a.questionId &&
+      validDifficulties.includes(a.difficulty) &&
+      validCategories.includes(a.category) &&
+      typeof a.correct === 'boolean'
+    )
     .map(a => ({
       id: crypto.randomUUID(),
       userId,

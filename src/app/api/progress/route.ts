@@ -65,6 +65,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Module ID required' }, { status: 400 });
   }
 
+  // Validate moduleId against known modules to prevent fake progress records
+  const validModuleIds = modules.map(m => m.id);
+  if (!validModuleIds.includes(moduleId)) {
+    return NextResponse.json({ error: 'Invalid module ID' }, { status: 400 });
+  }
+
   // Validate score if provided - must be between 0 and 100
   if (score !== undefined && score !== null) {
     if (typeof score !== 'number' || score < 0 || score > 100) {
