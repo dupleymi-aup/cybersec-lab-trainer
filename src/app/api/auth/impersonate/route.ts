@@ -43,7 +43,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Нельзя войти как другой администратор' }, { status: 403 });
     }
 
-    const token = generateToken(targetUser.id, targetUser.role, { group: targetUser.group, fullName: targetUser.fullName });
+    const token = generateToken(targetUser.id, targetUser.role, {
+      group: targetUser.group,
+      fullName: targetUser.fullName,
+      tokenVersion: targetUser.tokenVersion,
+    });
 
     // Audit log the impersonation
     try {
@@ -60,8 +64,11 @@ export async function POST(request: NextRequest) {
           details: `Admin ${adminUser?.fullName || adminUser?.email || admin.id} started impersonating user ${targetUserId} [IP: ${ip}]`,
         },
       });
-    } catch {
+    } catch (error) {
       // Audit logging is best-effort
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Audit logging failed:', error);
+      }
     }
 
     return NextResponse.json({

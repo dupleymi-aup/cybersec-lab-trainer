@@ -222,14 +222,20 @@ export async function POST(request: NextRequest) {
     rowsToImport.push({ ...row, rowNum });
   }
 
-  // Import users
-  for (const row of rowsToImport) {
-    try {
-      const password = generateRandomPassword();
-      const passwordHash = await hashPassword(password);
+  // Import users in batches using createMany for better performance
+  const BATCH_SIZE = 50;
+  for (let i = 0; i < rowsToImport.length; i += BATCH_SIZE) {
+    const batchRows = rowsToImport.slice(i, i + BATCH_SIZE);
+    const passwords = batchRows.map(() => generateRandomPassword());
+    const passwordHashes = await Promise.all(passwords.map((p) => hashPassword(p)));
 
-      await prisma.user.create({
-        data: {
+    batchRows.forEach((row, idx) => {
+      tempPasswords.push({ email: row.email, password: passwords[idx] });
+    });
+
+    try {
+      await prisma.user.createMany({
+        data: batchRows.map((row, idx) => ({
           id: crypto.randomUUID(),
           email: row.email,
           phone: row.phone,
@@ -238,20 +244,20 @@ export async function POST(request: NextRequest) {
           course: row.course || defaultCourse,
           university: row.university || defaultUniversity,
           bio: row.bio,
-          role: role || 'student',
-          passwordHash,
-        },
+          role: (role || 'student') as 'student' | 'teacher' | 'admin',
+          passwordHash: passwordHashes[idx],
+        })),
       });
-
-      tempPasswords.push({ email: row.email, password });
-      imported++;
+      imported += batchRows.length;
     } catch (error) {
-      errors.push({
-        row: row.rowNum,
-        email: row.email,
-        error: error instanceof Error ? error.message : 'Failed to create user',
-      });
-      skipped++;
+      for (const row of batchRows) {
+        errors.push({
+          row: row.rowNum,
+          email: row.email,
+          error: error instanceof Error ? error.message : 'Failed to create user',
+        });
+        skipped++;
+      }
     }
   }
 
@@ -270,8 +276,11 @@ export async function POST(request: NextRequest) {
         details: `Admin ${auth.id} imported ${imported} users from CSV, ${skipped} skipped [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit logging is best-effort
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({

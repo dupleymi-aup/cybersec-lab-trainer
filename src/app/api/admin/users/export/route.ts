@@ -137,8 +137,11 @@ export async function POST(request: NextRequest) {
         details: `Admin ${auth.id} exported ${users.length} users as CSV [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit logging is best-effort
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return new NextResponse(csvContent, {

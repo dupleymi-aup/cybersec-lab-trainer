@@ -129,8 +129,11 @@ export async function PUT(
         details: `Admin ${auth.id} updated user ${user.email}: ${appliedFields.join(', ') || 'none'} [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit logging is best-effort
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({
@@ -205,8 +208,11 @@ export async function DELETE(
         details: `Admin ${auth.id} deleted user ${user.email} (role: ${user.role}) [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit logging is best-effort
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({ success: true });

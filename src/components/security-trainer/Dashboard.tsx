@@ -118,10 +118,10 @@ export default function Dashboard() {
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set());
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<UpcomingDeadline[]>([]);
   useEffect(() => {
-    fetchActiveAnnouncements().then(setAnnouncements);
+    fetchActiveAnnouncements().then(setAnnouncements).catch(() => {});
     loadAnnouncementsIntoNotifications();
     const interval = setInterval(() => {
-      fetchActiveAnnouncements().then(setAnnouncements);
+      fetchActiveAnnouncements().then(setAnnouncements).catch(() => {});
       loadAnnouncementsIntoNotifications();
     }, 60000);
     return () => clearInterval(interval);

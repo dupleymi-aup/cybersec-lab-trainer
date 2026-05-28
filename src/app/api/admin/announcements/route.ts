@@ -134,8 +134,11 @@ export async function POST(request: NextRequest) {
         details: `Admin ${auth.id} created announcement "${announcement.title}" [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit log failure should not block the response
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json(
@@ -267,8 +270,11 @@ export async function PUT(request: NextRequest) {
         details: `Admin ${auth.id} updated announcement "${announcement.title}" [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit log failure should not block the response
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({
@@ -355,8 +361,11 @@ export async function DELETE(request: NextRequest) {
         details: `Admin ${auth.id} deleted announcement "${existing.title}" [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit log failure should not block the response
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({ success: true });

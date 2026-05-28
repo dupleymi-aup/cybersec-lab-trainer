@@ -68,8 +68,11 @@ export async function POST(
         details: `Admin ${auth.id} reset password for user ${targetUser.email} [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit logging is best-effort
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({ success: true });

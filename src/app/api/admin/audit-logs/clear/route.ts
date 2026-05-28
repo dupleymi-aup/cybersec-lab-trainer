@@ -109,8 +109,11 @@ export async function POST(request: NextRequest) {
         details: `Admin ${auth.id} cleared ${deletedCount} audit logs older than ${olderThan}${action ? ` with action="${action}"` : ''} [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit logging is best-effort
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({

@@ -139,8 +139,11 @@ export async function POST(request: NextRequest) {
           details: `Admin ${auth.id} performed bulk ${action} on ${resultCount} users${missingIds.length > 0 ? ` (${missingIds.length} not found)` : ''} [IP: ${ip}]`,
         },
       });
-    } catch {
+    } catch (error) {
       // Audit logging is best-effort
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Audit logging failed:', error);
+      }
     }
 
     return NextResponse.json({

@@ -139,8 +139,11 @@ export async function POST(request: NextRequest) {
         details: `Admin ${auth.id} created user ${user.email} (role: ${user.role}) [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit logging is best-effort
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({

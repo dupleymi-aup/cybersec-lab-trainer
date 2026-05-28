@@ -25,10 +25,12 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
   const authHeaders = await getAuthHeaders();
-  const csrfToken = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('csrf-token='))
-    ?.split('=')[1];
+  const csrfToken = typeof document !== 'undefined'
+    ? document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrf-token='))
+        ?.split('=')[1]
+    : undefined;
   const res = await fetch(url, {
     ...options,
     headers: {

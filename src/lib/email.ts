@@ -1,5 +1,14 @@
 import nodemailer from 'nodemailer';
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function getTransporter() {
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -56,13 +65,13 @@ function renderDeadlineEmail(
           <h1>${subject}</h1>
         </div>
         <div class="content">
-          <p>Здравствуйте, <strong>${fullName}</strong>!</p>
+          <p>Здравствуйте, <strong>${escapeHtml(fullName)}</strong>!</p>
           ${isOverdue
             ? `<p>К сожалению, срок выполнения дедлайна истёк.</p>`
             : `<p>Напоминаем о предстоящем дедлайне.</p>`
           }
           <div class="deadline-info">
-            <p><strong>${deadlineTitle}</strong></p>
+            <p><strong>${escapeHtml(deadlineTitle)}</strong></p>
             <p>Срок: ${formatDate(dueAt)}</p>
           </div>
           <p>Пожалуйста, завершите задание как можно скорее.</p>
@@ -110,7 +119,7 @@ export async function sendOTPRecoveryEmail(
           <h1>Восстановление пароля</h1>
         </div>
         <div class="content">
-          <p>Здравствуйте, <strong>${fullName}</strong>!</p>
+          <p>Здравствуйте, <strong>${escapeHtml(fullName)}</strong>!</p>
           <p>Вы запросили восстановление пароля. Используйте следующий код:</p>
           <div class="otp-code">${otp}</div>
           <p>Код действителен в течение 10 минут.</p>
@@ -155,13 +164,16 @@ export async function sendDeadlineReminderEmail(
     ? `Просрочен дедлайн: ${deadlineTitle}`
     : `Напоминание: ${deadlineTitle} — ${formatDate(dueAt)}`;
 
-  const transporter = getTransporter();
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || 'noreply@cyberseclab.com',
-    to,
-    subject,
-    html: renderDeadlineEmail(fullName, deadlineTitle, dueAt, isOverdue),
-  });
-
-  return true;
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'noreply@cyberseclab.com',
+      to,
+      subject,
+      html: renderDeadlineEmail(fullName, deadlineTitle, dueAt, isOverdue),
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }

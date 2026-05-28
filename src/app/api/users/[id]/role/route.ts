@@ -62,8 +62,11 @@ export async function PUT(
         details: `Admin ${auth.id} changed role to '${role}' for user ${user.email} [IP: ${ip}]`,
       },
     });
-  } catch {
+  } catch (error) {
     // Audit logging is best-effort
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Audit logging failed:', error);
+    }
   }
 
   return NextResponse.json({
