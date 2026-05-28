@@ -21,23 +21,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Check daily XP cap
+  // Check daily XP cap using XpLog table
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
-  const user = await prisma.user.findUnique({
-    where: { id: auth.id },
-    select: { xp: true, lastActivityAt: true },
+  const xpToday = await prisma.xpLog.aggregate({
+    where: { userId: auth.id, createdAt: { gte: todayStart } },
+    _sum: { amount: true },
   });
+  const dailyXpEarned = xpToday._sum.amount ?? 0;
 
-  if (user && user.lastActivityAt && user.lastActivityAt >= todayStart) {
-    // User was active today - calculate XP earned today
-    const xpEarnedToday = user.xp; // Simplified: use total XP (assuming daily reset in background job)
-    if (xpEarnedToday >= MAX_DAILY_XP) {
-      return NextResponse.json(
-        { error: 'Daily XP limit reached. Come back tomorrow!', maxDailyXp: MAX_DAILY_XP },
-        { status: 429 },
-      );
-    }
+  if (dailyXpEarned >= MAX_DAILY_XP) {
+    return NextResponse.json(
+      { error: 'Daily XP limit reached. Come back tomorrow!', maxDailyXp: MAX_DAILY_XP },
+      { status: 429 },
+    );
   }
 
   const body = await request.json();
@@ -60,7 +57,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No XP awarded' }, { status: 400 });
   }
 
-  // Use transaction to prevent race condition: both XP increment and level update
+  // Check if awarding this XP would exceed daily cap
+  if (dailyXpEarned + xpAmount > MAX_DAILY_XP) {
+    return NextResponse.json(
+      { error: 'Daily XP limit would be exceeded. Come back tomorrow!', maxDailyXp: MAX_DAILY_XP },
+      { status: 429 },
+    );
+  }
+
+  // Use transaction to prevent race condition: XP increment, level update, and XP log
   // must succeed together, preventing stale reads from concurrent requests
   const result = await prisma.$transaction(async (tx) => {
     const user = await tx.user.update({
@@ -70,6 +75,15 @@ export async function POST(request: NextRequest) {
         lastActivityAt: new Date(),
       },
       select: { id: true, xp: true, level: true, streak: true },
+    });
+
+    // Log the XP award for accurate daily cap tracking
+    await tx.xpLog.create({
+      data: {
+        userId: auth.id,
+        amount: xpAmount,
+        action,
+      },
     });
 
     const newLevel = getLevel(user.xp);

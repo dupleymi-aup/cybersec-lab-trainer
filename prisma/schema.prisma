@@ -43,6 +43,7 @@ model User {
   scheduledReports  ScheduledReport[]
   createdAssignments Assignment[] @relation("AssignmentCreator")
   assignmentSubmissions AssignmentSubmission[]
+  xpLogs            XpLog[]
 
   @@index([role])
   @@map("users")
@@ -319,4 +320,17 @@ model AssignmentSubmission {
   @@index([assignmentId])
   @@index([submittedAt])
   @@map("assignment_submissions")
+}
+
+model XpLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int      // positive for earned, negative for deducted
+  action    String   // daily_login, module_complete, quiz_pass, quiz_perfect, assignment_submit, assignment_passed
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("xp_logs")
 }

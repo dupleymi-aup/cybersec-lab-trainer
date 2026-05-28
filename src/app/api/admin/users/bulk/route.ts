@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { validateUuid } from '@/lib/validate-uuid';
 
 type BulkAction = 'block' | 'unblock' | 'delete' | 'role_change';
 
@@ -69,8 +70,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Validate UUID format for all IDs
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const invalidIds = userIds.filter(id => !uuidRegex.test(id));
+  const invalidIds = userIds.filter(id => !validateUuid(id));
   if (invalidIds.length > 0) {
     return NextResponse.json({ error: 'Invalid user ID format', invalidIds: invalidIds.slice(0, 5) }, { status: 400 });
   }
