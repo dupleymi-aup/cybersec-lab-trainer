@@ -14,7 +14,12 @@ const PUBLIC_PATHS = [
   '/api/health',
   '/api/admin/health',
   '/api/docs',
-  '/api/lti',
+  // LTI callbacks from external LMS (cannot include CSRF token)
+  '/api/lti/launch',
+  '/api/lti/oidc-login',
+  '/api/lti/deep-link',
+  '/api/lti/sync-grades',
+  // Note: /api/lti/platforms IS CSRF-protected (internal admin CRUD)
 ];
 
 function generateCsrfToken(): string {

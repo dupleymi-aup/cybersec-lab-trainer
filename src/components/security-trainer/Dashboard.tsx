@@ -130,10 +130,14 @@ export default function Dashboard() {
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set());
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<UpcomingDeadline[]>([]);
   useEffect(() => {
-    fetchActiveAnnouncements().then(setAnnouncements).catch(() => {});
+    fetchActiveAnnouncements().then(setAnnouncements).catch((e) => {
+      if (process.env.NODE_ENV === 'development') console.warn('[Dashboard] fetchActiveAnnouncements failed:', e);
+    });
     loadAnnouncementsIntoNotifications();
     const interval = setInterval(() => {
-      fetchActiveAnnouncements().then(setAnnouncements).catch(() => {});
+      fetchActiveAnnouncements().then(setAnnouncements).catch((e) => {
+        if (process.env.NODE_ENV === 'development') console.warn('[Dashboard] fetchActiveAnnouncements failed:', e);
+      });
       loadAnnouncementsIntoNotifications();
     }, 60000);
     return () => clearInterval(interval);

@@ -565,7 +565,9 @@ export const useAuthStore = create<AuthState>()(
             token: data.token,
           });
 
-          import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache()).catch(() => {});
+          import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache()).catch((e) => {
+            if (process.env.NODE_ENV === 'development') console.warn('[auth-store] invalidateTokenCache failed:', e);
+          });
 
           // Migrate anonymous progress to user
           const { migrateProgressToUser } = await import('./store');
@@ -573,7 +575,9 @@ export const useAuthStore = create<AuthState>()(
 
           // Load user's progress from server
           const { useAppStore } = await import('./store');
-          useAppStore.getState().loadFromDatabase(data.user.id).catch(() => {});
+          useAppStore.getState().loadFromDatabase(data.user.id).catch((e) => {
+            if (process.env.NODE_ENV === 'development') console.warn('[auth-store] loadFromDatabase failed:', e);
+          });
 
           return { success: true };
         } catch (e) {
@@ -609,7 +613,9 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache()).catch(() => {});
+        import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache()).catch((e) => {
+          if (process.env.NODE_ENV === 'development') console.warn('[auth-store] invalidateTokenCache failed:', e);
+        });
         set({
           user: null,
           isAuthenticated: false,
@@ -618,7 +624,9 @@ export const useAuthStore = create<AuthState>()(
         });
         import('./store').then(({ useAppStore }) => {
           useAppStore.getState().setUserId(null);
-        }).catch(() => {});
+        }).catch((e) => {
+          if (process.env.NODE_ENV === 'development') console.warn('[auth-store] setUserId failed:', e);
+        });
       },
 
       updateProfile: async (data) => {
@@ -772,7 +780,9 @@ export const useAuthStore = create<AuthState>()(
         // Load user's progress from server
         import('./store').then(({ useAppStore }) => {
           useAppStore.getState().loadFromDatabase(user.id);
-        }).catch(() => {});
+        }).catch((e) => {
+          if (process.env.NODE_ENV === 'development') console.warn('[auth-store] loadFromDatabase failed:', e);
+        });
       },
     }),
     {
