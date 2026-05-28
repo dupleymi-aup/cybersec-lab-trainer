@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, generateToken, getClientIp } from '@/lib/api-middleware';
+import { setAuthCookie } from '@/lib/cookie-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user: {
         id: targetUser.id,
@@ -89,8 +90,12 @@ export async function POST(request: NextRequest) {
         loginCount: targetUser.loginCount,
         isBlocked: targetUser.isBlocked,
       },
-      token,
     });
+
+    // Set httpOnly cookie for impersonated session
+    setAuthCookie(response, token);
+
+    return response;
   } catch (error) {
     console.error('Impersonation error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

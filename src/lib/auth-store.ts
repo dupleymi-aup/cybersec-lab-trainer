@@ -53,10 +53,8 @@ export { hasRole, getRoleLabel };
 
 // ─── API helpers ──────────────────────────────────────────────
 function getAuthHeaders(): Record<string, string> {
-  const { token } = useAuthStore.getState();
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return headers;
+  // Auth is now handled via httpOnly cookies sent automatically by the browser
+  return { 'Content-Type': 'application/json' };
 }
 
 async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
@@ -306,7 +304,6 @@ export async function resetUserPassword(
 }
 
 const IMPERSONATION_KEY = 'security-trainer-impersonation';
-const ORIGINAL_TOKEN_KEY = 'security-trainer-original-token';
 
 export async function startImpersonation(
   targetUserId: string,
@@ -315,12 +312,6 @@ export async function startImpersonation(
   try {
     if (targetUserId === adminId) return { success: false, error: 'Нельзя войти как себя' };
 
-    // Store the original admin token before impersonation
-    const { token: originalToken } = useAuthStore.getState();
-    if (originalToken) {
-      localStorage.setItem(ORIGINAL_TOKEN_KEY, originalToken);
-    }
-
     const res = await apiFetch('/api/auth/impersonate', {
       method: 'POST',
       body: JSON.stringify({ targetUserId }),
@@ -328,6 +319,7 @@ export async function startImpersonation(
     const data = await res.json();
     if (!res.ok) return { success: false, error: data.error };
 
+    // The server sets the impersonation token in httpOnly cookie
     localStorage.setItem(IMPERSONATION_KEY, JSON.stringify({
       isImpersonating: true,
       originalUserId: adminId,
@@ -335,7 +327,7 @@ export async function startImpersonation(
       startedAt: new Date().toISOString(),
     }));
 
-    useAuthStore.setState({ user: data.user, isAuthenticated: true, token: data.token });
+    useAuthStore.setState({ user: data.user, isAuthenticated: true });
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development") console.warn("[auth-store] startImpersonation failed:", e);
@@ -351,17 +343,11 @@ export async function stopImpersonation(): Promise<{ success: boolean; error?: s
     const data = JSON.parse(raw);
     if (!data.originalUserId) return { success: false, error: 'Нет активной имперсонации' };
 
-    // Restore the original admin token
-    const originalToken = localStorage.getItem(ORIGINAL_TOKEN_KEY);
-    localStorage.removeItem(ORIGINAL_TOKEN_KEY);
     localStorage.removeItem(IMPERSONATION_KEY);
 
-    // Fetch original user data
+    // Fetch original user data — cookie auth will handle authentication
     const res = await fetch(`/api/users/${data.originalUserId}`, {
-      headers: {
-        ...(originalToken ? { Authorization: `Bearer ${originalToken}` } : {}),
-        ...getCsrfHeaders(),
-      },
+      headers: getCsrfHeaders(),
     });
     if (!res.ok) return { success: false, error: 'Не удалось восстановить аккаунт' };
 
@@ -369,7 +355,6 @@ export async function stopImpersonation(): Promise<{ success: boolean; error?: s
     useAuthStore.setState({
       user: userData,
       isAuthenticated: true,
-      token: originalToken,
     });
 
     return { success: true };
@@ -562,7 +547,6 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: data.user,
             isAuthenticated: true,
-            token: data.token,
           });
 
           import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache()).catch((e) => {
@@ -602,7 +586,6 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: result.user,
             isAuthenticated: true,
-            token: result.token,
           });
 
           return { success: true };
@@ -616,6 +599,17 @@ export const useAuthStore = create<AuthState>()(
         import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache()).catch((e) => {
           if (process.env.NODE_ENV === 'development') console.warn('[auth-store] invalidateTokenCache failed:', e);
         });
+
+        // Clear server-side httpOnly cookie
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: getCsrfHeaders(),
+          });
+        } catch (e) {
+          if (process.env.NODE_ENV === 'development') console.warn('[auth-store] logout API call failed:', e);
+        }
+
         set({
           user: null,
           isAuthenticated: false,
@@ -630,7 +624,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateProfile: async (data) => {
-        const { user, token } = get();
+        const { user } = get();
         if (!user) return;
 
         try {
@@ -638,7 +632,6 @@ export const useAuthStore = create<AuthState>()(
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
               ...getCsrfHeaders(),
             },
             body: JSON.stringify(data),
@@ -656,7 +649,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updatePassword: async (oldPassword, newPassword) => {
-        const { user, token } = get();
+        const { user } = get();
         if (!user) return { success: false, error: 'Пользователь не найден' };
 
         try {
@@ -664,7 +657,6 @@ export const useAuthStore = create<AuthState>()(
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
               ...getCsrfHeaders(),
             },
             body: JSON.stringify({ currentPassword: oldPassword, newPassword }),
@@ -743,7 +735,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       deleteAccount: async (currentPassword: string) => {
-        const { user, token } = get();
+        const { user } = get();
         if (!user) return { success: false, error: 'Пользователь не найден' };
         if (!currentPassword) return { success: false, error: 'Требуется подтверждение пароля' };
 
@@ -751,7 +743,6 @@ export const useAuthStore = create<AuthState>()(
           const res = await fetch('/api/auth/delete', {
             method: 'DELETE',
             headers: {
-              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
               ...getCsrfHeaders(),
             },
@@ -790,7 +781,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
-        token: state.token,
+        // token is no longer persisted — it's stored in httpOnly cookies
       }),
     }
   )

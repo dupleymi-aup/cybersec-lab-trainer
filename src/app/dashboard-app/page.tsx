@@ -114,85 +114,45 @@ export default function DashboardAppPage() {
     );
   }, [isAuthenticated]);
 
-  // Handle LTI launch token from URL (Moodle LTI redirect)
+  // Handle LTI launch from URL params (LTI redirect after cookie is set by server)
   useEffect(() => {
     if (typeof window === 'undefined' || !isAuthenticated) return;
 
-    const processLTIToken = async () => {
+    const processLTI = async () => {
       const params = new URLSearchParams(window.location.search);
-      const ltiToken = params.get('lti_token');
+      const ltiPlatform = params.get('lti_platform');
       const ltiModule = params.get('module');
       const ltiQuiz = params.get('quiz');
 
-      if (ltiToken) {
-        // Clean URL immediately
+      if (ltiPlatform) {
+        // Clean URL
         const url = new URL(window.location.href);
-        url.searchParams.delete('lti_token');
         url.searchParams.delete('lti_platform');
+        url.searchParams.delete('module');
+        url.searchParams.delete('quiz');
         window.history.replaceState({}, '', url.toString());
 
-        // Set the auth token and fetch user profile, then navigate
+        // Auth cookie is already set by server — fetch user profile
         const store = useAuthStore.getState();
-        let authSettled = false;
-
         try {
-          // Fetch user profile with the token
-          const res = await fetch('/api/auth/profile', {
-            headers: { Authorization: `Bearer ${ltiToken}` },
-          });
-          if (!res.ok) {
-            throw new Error(`Profile fetch failed: ${res.status}`);
-          }
-          const userData = await res.json();
-
-          if (userData && userData.id) {
-            store.setUser(userData, ltiToken);
-            authSettled = true;
+          const res = await fetch('/api/auth/profile');
+          if (res.ok) {
+            const userData = await res.json();
+            if (userData && userData.id) {
+              store.setUser(userData);
+            }
           }
         } catch (e) {
-          if (process.env.NODE_ENV === "development") console.warn("[page.tsx] processLTIToken failed:", e);
-          // If profile fetch fails, fall back to decoding the JWT
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('LTI profile fetch failed, falling back to JWT decode');
-          }
-          try {
-            const parts = ltiToken.split('.');
-            if (parts.length === 3) {
-              const payload = JSON.parse(atob(parts[1]));
-              store.setUser({
-                id: payload.id,
-                email: '',
-                phone: '',
-                fullName: 'LTI User',
-                group: '',
-                course: '',
-                university: '',
-                avatar: '',
-                bio: '',
-                role: payload.role || 'student',
-                createdAt: new Date().toISOString(),
-                lastLoginAt: new Date().toISOString(),
-                loginCount: 0,
-                isBlocked: false,
-              }, ltiToken);
-              authSettled = true;
-            }
-          } catch (err) {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn('LTI JWT decode failed:', err);
-            }
-          }
+          if (process.env.NODE_ENV === "development") console.warn("[page.tsx] processLTI profile fetch failed:", e);
         }
 
-        // Navigate only after auth is established
-        if (authSettled) {
-          if (ltiModule && Object.prototype.hasOwnProperty.call(pages, ltiModule)) {
-            setCurrentPage(ltiModule as PageType);
-          } else if (ltiQuiz) {
-            setCurrentPage('quiz' as PageType);
-          } else {
-            setCurrentPage('dashboard' as PageType);
-          }
+        // Navigate to requested module or dashboard
+        if (ltiModule && Object.prototype.hasOwnProperty.call(pages, ltiModule)) {
+          setCurrentPage(ltiModule as PageType);
+        } else if (ltiQuiz) {
+          setCurrentPage('quiz' as PageType);
+        } else {
+          setCurrentPage('dashboard' as PageType);
         }
       } else if (ltiModule) {
         // Direct module link (from deep linking)
@@ -204,7 +164,7 @@ export default function DashboardAppPage() {
       }
     };
 
-    processLTIToken();
+    processLTI();
   }, [isAuthenticated, setCurrentPage]);
 
   const resolvedPage = useMemo(() => {

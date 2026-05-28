@@ -6,31 +6,15 @@ import { getCurrentUserId, saveProgressSnapshotProxy } from './auth-bridge';
 import { logger } from './logger';
 
 // ─── API client ───────────────────────────────────────────────
-let tokenFetchPromise: Promise<string | null> | null = null;
 
 export async function getAuthHeaders(): Promise<Record<string, string>> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  try {
-    if (!tokenFetchPromise) {
-      tokenFetchPromise = (async () => {
-        const { useAuthStore } = await import('./auth-store');
-        const { token } = useAuthStore.getState();
-        tokenFetchPromise = null;
-        return token;
-      })();
-    }
-    const token = await tokenFetchPromise;
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-  } catch (err) {
-    logger.warn('Failed to get auth headers', { error: err instanceof Error ? err.message : String(err) });
-    tokenFetchPromise = null;
-  }
-  return headers;
+  // Auth is now handled via httpOnly cookies sent automatically by the browser
+  return { 'Content-Type': 'application/json' };
 }
 
-/** Invalidate token cache after logout/login to prevent stale tokens */
+/** No-op kept for backwards compatibility */
 export function invalidateTokenCache() {
-  tokenFetchPromise = null;
+  // No longer needed — tokens are in httpOnly cookies
 }
 
 const apiClient = {

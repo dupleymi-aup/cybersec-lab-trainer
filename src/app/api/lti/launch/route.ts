@@ -145,15 +145,13 @@ export async function POST(request: NextRequest) {
     const { signJwt } = await import('@/lib/auth-server');
     const token = await signJwt({ id: user.id, role: user.role });
 
-    // Build redirect URL WITHOUT token in query string to prevent token leakage
-    // The token is returned in the response body; the frontend will store it securely
+    // Build redirect URL without token in query string to prevent token leakage
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const redirectUrl = `${appUrl}/lti-callback?platform=${platform.id}`;
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       redirectUrl,
-      token,
       user: {
         id: user.id,
         email: user.email,
@@ -161,6 +159,17 @@ export async function POST(request: NextRequest) {
         role: user.role,
       },
     });
+
+    // Set httpOnly cookie for XSS protection
+    response.cookies.set('auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60,
+    });
+
+    return response;
   } catch (error) {
     console.error('LTI launch error:', error);
     return NextResponse.json(

@@ -17,16 +17,8 @@ function apiWarn(fnName: string, error: unknown) {
 }
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
-  try {
-    const { useAuthStore } = await import('./auth-store');
-    const { token } = useAuthStore.getState();
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    return headers;
-  } catch (e) {
-    apiWarn('getAuthHeaders', e);
-    return { 'Content-Type': 'application/json' };
-  }
+  // Auth is now handled via httpOnly cookies sent automatically by the browser
+  return { 'Content-Type': 'application/json' };
 }
 
 async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {

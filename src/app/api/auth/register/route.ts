@@ -5,6 +5,7 @@ import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { getAdminInviteCode } from '@/lib/auth-server-secrets';
 import { registerSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
+import { setAuthCookie } from '@/lib/cookie-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     const token = generateToken(user.id, user.role, { group: user.group, fullName: user.fullName });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user: {
         id: user.id,
@@ -85,8 +86,12 @@ export async function POST(request: NextRequest) {
         loginCount: user.loginCount,
         isBlocked: user.isBlocked,
       },
-      token,
     });
+
+    // Set httpOnly cookie for XSS protection
+    setAuthCookie(response, token);
+
+    return response;
   } catch (error) {
     logger.error('Registration failed', { ip: getClientIp(request), error: error instanceof Error ? error.message : 'Unknown' });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

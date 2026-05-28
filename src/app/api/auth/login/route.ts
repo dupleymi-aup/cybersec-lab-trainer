@@ -4,6 +4,7 @@ import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware
 import { verifyPassword } from '@/lib/auth-utils';
 import { loginSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
+import { setAuthCookie } from '@/lib/cookie-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
       tokenVersion: user.tokenVersion,
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user: {
         id: user.id,
@@ -96,8 +97,12 @@ export async function POST(request: NextRequest) {
         loginCount: user.loginCount + 1,
         isBlocked: user.isBlocked,
       },
-      token,
     });
+
+    // Set httpOnly cookie for XSS protection
+    setAuthCookie(response, token, rememberMe);
+
+    return response;
   } catch (error) {
     logger.error('Login failed', { ip: getClientIp(request), error: error instanceof Error ? error.message : 'Unknown' });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
