@@ -92,8 +92,10 @@ const pages: Record<string, React.ReactNode> = {
 
 export default function DashboardAppPage() {
   const router = useRouter();
-  const { currentPage, setCurrentPage } = useAppStore();
-  const { isAuthenticated, user } = useAuthStore();
+  const currentPage = useAppStore(s => s.currentPage);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated);
+  const user = useAuthStore(s => s.user);
   const impersonation = getImpersonationState();
 
   // Redirect to landing page if not authenticated

@@ -21,7 +21,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
-  const { login } = useAuthStore();
+  const login = useAuthStore(s => s.login);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

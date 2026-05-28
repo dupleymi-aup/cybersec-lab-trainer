@@ -16,7 +16,7 @@ import LandingFooter from '@/components/landing/LandingFooter';
 
 export default function LandingPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore(s => s.isAuthenticated);
 
   // Redirect authenticated users to the app
   useEffect(() => {

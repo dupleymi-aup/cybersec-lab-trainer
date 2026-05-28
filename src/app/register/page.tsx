@@ -29,7 +29,7 @@ export default function RegisterPage() {
   const [selectedRole, setSelectedRole] = useState<UserRole>('student');
   const [adminInviteCode, setAdminInviteCode] = useState('');
 
-  const { register } = useAuthStore();
+  const register = useAuthStore(s => s.register);
   const pwStrength = usePasswordStrength(password);
 
   const handleRegister = async (e: React.FormEvent) => {
