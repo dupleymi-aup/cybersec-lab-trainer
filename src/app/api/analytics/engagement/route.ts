@@ -59,15 +59,44 @@ export async function GET(request: NextRequest) {
     select: { userId: true, percentage: true },
   });
 
+  // Pre-index records by userId for O(1) lookups
+  const loginByUser = new Map<string, typeof loginActivity>();
+  const progressByUser = new Map<string, typeof progressRecords>();
+  const attemptsByUser = new Map<string, typeof quizAttempts>();
+  const completedByUser = new Map<string, number>();
+  const quizResultsByUser = new Map<string, typeof allQuizResults>();
+
+  for (const l of loginActivity) {
+    if (!loginByUser.has(l.userId)) loginByUser.set(l.userId, []);
+    loginByUser.get(l.userId)!.push(l);
+  }
+  for (const p of progressRecords) {
+    if (!progressByUser.has(p.userId)) progressByUser.set(p.userId, []);
+    progressByUser.get(p.userId)!.push(p);
+  }
+  for (const q of quizAttempts) {
+    if (!attemptsByUser.has(q.userId)) attemptsByUser.set(q.userId, []);
+    attemptsByUser.get(q.userId)!.push(q);
+  }
+  for (const p of allProgress) {
+    if (p.completed) {
+      completedByUser.set(p.userId, (completedByUser.get(p.userId) || 0) + 1);
+    }
+  }
+  for (const q of allQuizResults) {
+    if (!quizResultsByUser.has(q.userId)) quizResultsByUser.set(q.userId, []);
+    quizResultsByUser.get(q.userId)!.push(q);
+  }
+
   const engagementScores: number[] = [];
   const streakData: Array<{ userId: string; fullName: string; streakDays: number }> = [];
 
   for (const student of students) {
-    const studentLogins = loginActivity.filter((l) => l.userId === student.id);
-    const studentProgress = progressRecords.filter((p) => p.userId === student.id);
-    const studentQuizzes = quizAttempts.filter((q) => q.userId === student.id);
-    const studentCompletedModules = allProgress.filter((p) => p.userId === student.id && p.completed).length;
-    const studentQuizResults = allQuizResults.filter((q) => q.userId === student.id);
+    const studentLogins = loginByUser.get(student.id) || [];
+    const studentProgress = progressByUser.get(student.id) || [];
+    const studentQuizzes = attemptsByUser.get(student.id) || [];
+    const studentCompletedModules = completedByUser.get(student.id) || 0;
+    const studentQuizResults = quizResultsByUser.get(student.id) || [];
 
     const avgQuizScore = studentQuizResults.length > 0
       ? studentQuizResults.reduce((sum, q) => sum + q.percentage, 0) / studentQuizResults.length

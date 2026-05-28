@@ -70,6 +70,8 @@ export async function GET(request: NextRequest) {
   if (groupBy === 'group' || groupBy === 'course' || groupBy === 'university') {
     const field = groupBy as 'group' | 'course' | 'university';
     const groups = new Map<string, typeof progressRecords>();
+    // Pre-index students by id for O(1) lookup
+    const studentById = new Map(students.map(s => [s.id, s]));
 
     for (const s of students) {
       const key = s[field] || '(не указано)';
@@ -77,7 +79,7 @@ export async function GET(request: NextRequest) {
     }
 
     for (const p of progressRecords) {
-      const student = students.find((s) => s.id === p.userId);
+      const student = studentById.get(p.userId);
       if (student) {
         const key = student[field] || '(не указано)';
         groups.get(key)?.push(p);

@@ -57,10 +57,28 @@ export async function GET(request: NextRequest) {
     trend: 'improving' | 'declining' | 'stable';
   }> = [];
 
+  // Pre-index records by userId for O(1) lookups
+  const progressByUser = new Map<string, typeof progressRecords>();
+  const quizByUser = new Map<string, typeof quizResults>();
+  const attemptsByUser = new Map<string, typeof quizAttempts>();
+
+  for (const p of progressRecords) {
+    if (!progressByUser.has(p.userId)) progressByUser.set(p.userId, []);
+    progressByUser.get(p.userId)!.push(p);
+  }
+  for (const q of quizResults) {
+    if (!quizByUser.has(q.userId)) quizByUser.set(q.userId, []);
+    quizByUser.get(q.userId)!.push(q);
+  }
+  for (const q of quizAttempts) {
+    if (!attemptsByUser.has(q.userId)) attemptsByUser.set(q.userId, []);
+    attemptsByUser.get(q.userId)!.push(q);
+  }
+
   for (const student of students) {
-    const studentProgress = progressRecords.filter((p) => p.userId === student.id);
-    const studentQuizResults = quizResults.filter((q) => q.userId === student.id);
-    const studentQuizAttempts = quizAttempts.filter((q) => q.userId === student.id);
+    const studentProgress = progressByUser.get(student.id) || [];
+    const studentQuizResults = quizByUser.get(student.id) || [];
+    const studentQuizAttempts = attemptsByUser.get(student.id) || [];
 
     const modulesCompleted = studentProgress.filter((p) => p.completed).length;
     const avgQuizScore = studentQuizResults.length > 0

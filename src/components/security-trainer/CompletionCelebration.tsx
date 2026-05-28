@@ -69,10 +69,11 @@ export default function CompletionCelebration() {
         duration: randomBetween(1.5, 3),
       }));
       setParticles(newParticles);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setEvent(null);
         setParticles([]);
       }, 3000);
+      return () => clearTimeout(timer);
     };
     celebrationListeners.push(handler);
     return () => {

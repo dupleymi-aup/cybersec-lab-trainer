@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAppStore, type PageType } from '@/lib/store';
+import { useAppStore, type PageType, getAuthHeaders } from '@/lib/store';
 import { useAuthStore, hasRole, type UserRole } from '@/lib/auth-store';
 import { modules } from '@/lib/data';
 import {
@@ -116,10 +116,15 @@ export default function Sidebar() {
   const [deadlineMap, setDeadlineMap] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    fetch('/api/deadlines/upcoming')
-      .then(r => r.json())
+    const controller = new AbortController();
+    getAuthHeaders()
+      .then(headers => {
+        if (controller.signal.aborted) return;
+        return fetch('/api/deadlines/upcoming', { headers, signal: controller.signal });
+      })
+      .then(r => r?.json())
       .then(data => {
-        if (data.upcoming) {
+        if (data?.upcoming) {
           const map: Record<string, number> = {};
           for (const d of data.upcoming) {
             if (d.scope === 'module' || d.scope === 'quiz') {
@@ -134,6 +139,7 @@ export default function Sidebar() {
       .catch(() => {
         // Intentionally silent
       });
+    return () => controller.abort();
   }, []);
 
   // Progress calculation

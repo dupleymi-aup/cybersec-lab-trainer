@@ -79,10 +79,14 @@ async function apiFetch(url: string, options: RequestInit = {}): Promise<Respons
 // ─── Exported helper functions (used by AdminPanel, TeacherPanel, etc.) ──
 
 export async function getAllUsers(): Promise<User[]> {
-  const res = await apiFetch('/api/users');
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.users || [];
+  try {
+    const res = await apiFetch('/api/users');
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.users || [];
+  } catch {
+    return [];
+  }
 }
 
 export async function changeUserRole(userId: string, newRole: UserRole): Promise<{ success: boolean; error?: string }> {
@@ -548,7 +552,7 @@ export const useAuthStore = create<AuthState>()(
             token: data.token,
           });
 
-          import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache());
+          import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache()).catch(() => {});
 
           // Migrate anonymous progress to user
           const { migrateProgressToUser } = await import('./store');
@@ -556,7 +560,7 @@ export const useAuthStore = create<AuthState>()(
 
           // Load user's progress from server
           const { useAppStore } = await import('./store');
-          useAppStore.getState().loadFromDatabase(data.user.id);
+          useAppStore.getState().loadFromDatabase(data.user.id).catch(() => {});
 
           return { success: true };
         } catch {
@@ -590,7 +594,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache());
+        import('./store').then(({ invalidateTokenCache }) => invalidateTokenCache()).catch(() => {});
         set({
           user: null,
           isAuthenticated: false,
@@ -599,7 +603,7 @@ export const useAuthStore = create<AuthState>()(
         });
         import('./store').then(({ useAppStore }) => {
           useAppStore.getState().setUserId(null);
-        });
+        }).catch(() => {});
       },
 
       updateProfile: async (data) => {
@@ -747,7 +751,7 @@ export const useAuthStore = create<AuthState>()(
         // Load user's progress from server
         import('./store').then(({ useAppStore }) => {
           useAppStore.getState().loadFromDatabase(user.id);
-        });
+        }).catch(() => {});
       },
     }),
     {

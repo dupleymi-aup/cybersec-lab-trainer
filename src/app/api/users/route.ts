@@ -12,10 +12,10 @@ export async function GET(request: NextRequest) {
   const isAdmin = auth.role === 'admin';
   const { searchParams } = new URL(request.url);
 
-  // Pagination
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '20');
-  const skip = (page - 1) * Math.min(limit, 100);
+  // Pagination with validation
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')));
+  const skip = (page - 1) * limit;
 
   // Filters
   const role = searchParams.get('role') || undefined;

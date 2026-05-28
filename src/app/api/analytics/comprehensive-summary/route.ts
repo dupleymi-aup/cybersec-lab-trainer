@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
+// In-memory response cache with 30s TTL
+const cache = new Map<string, { data: unknown; expiresAt: number }>();
+const CACHE_TTL = 30_000; // 30 seconds
+
 const MODULE_NAMES: Record<string, string> = {
   'owasp': 'OWASP Top 10',
   'sql-injection': 'SQL-инъекции',
@@ -21,6 +25,14 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const days = parseInt(searchParams.get('days') || '30', 10);
   const groupId = searchParams.get('groupId');
+
+  // Check cache
+  const cacheKey = `${days}-${groupId || ''}`;
+  const cached = cache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    return NextResponse.json(cached.data);
+  }
+
   const userWhere = groupId ? { role: 'student' as const, group: groupId } : { role: 'student' as const };
 
   const now = new Date();
@@ -133,9 +145,27 @@ export async function GET(request: NextRequest) {
     quizScore: ti(avgQuizScore, prevAvgQuizScore),
   };
 
-  // Module distribution
+  // Pre-index records by userId for O(1) lookups
+  const progressByUser = new Map<string, typeof progressRecords>();
+  const quizByUser = new Map<string, typeof quizResults>();
+  for (const p of progressRecords) {
+    if (!progressByUser.has(p.userId)) progressByUser.set(p.userId, []);
+    progressByUser.get(p.userId)!.push(p);
+  }
+  for (const q of quizResults) {
+    if (!quizByUser.has(q.userId)) quizByUser.set(q.userId, []);
+    quizByUser.get(q.userId)!.push(q);
+  }
+
+  // Module distribution - index by moduleId first
+  const progressByModule = new Map<string, typeof progressRecords>();
+  for (const p of progressRecords) {
+    if (!progressByModule.has(p.moduleId)) progressByModule.set(p.moduleId, []);
+    progressByModule.get(p.moduleId)!.push(p);
+  }
+
   const moduleDistribution = Object.keys(MODULE_NAMES).map((moduleId) => {
-    const mp = progressRecords.filter((p) => p.moduleId === moduleId);
+    const mp = progressByModule.get(moduleId) || [];
     const completed = mp.filter((p) => p.completed).length;
     const completionRate = totalStudents > 0 ? Math.round((completed / totalStudents) * 10000) / 100 : 0;
     const scores = mp.filter((p) => p.score != null).map((p) => p.score as number);
@@ -145,7 +175,7 @@ export async function GET(request: NextRequest) {
 
   // Score distribution
   const studentScores = students.map((student) => {
-    const studentQuizzes = quizResults.filter((q) => q.userId === student.id);
+    const studentQuizzes = quizByUser.get(student.id) || [];
     return studentQuizzes.length > 0
       ? studentQuizzes.reduce((sum, q) => sum + q.percentage, 0) / studentQuizzes.length
       : -1; // not attempted
@@ -161,11 +191,11 @@ export async function GET(request: NextRequest) {
 
   // Top performers
   const studentPerformance = students.map((student) => {
-    const studentQuizzes = quizResults.filter((q) => q.userId === student.id);
+    const studentQuizzes = quizByUser.get(student.id) || [];
     const avgScore = studentQuizzes.length > 0
       ? studentQuizzes.reduce((sum, q) => sum + q.percentage, 0) / studentQuizzes.length
       : 0;
-    const studentProgress = progressRecords.filter((p) => p.userId === student.id && p.completed).length;
+    const studentProgress = (progressByUser.get(student.id) || []).filter((p) => p.completed).length;
     const compositeScore = Math.round((avgScore * 0.6 + (studentProgress / totalModules) * 100 * 0.4) * 10) / 10;
     return { userId: student.id, fullName: student.fullName, group: student.group, score: compositeScore };
   });
@@ -201,7 +231,7 @@ export async function GET(request: NextRequest) {
 
   recentActivity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  return NextResponse.json({
+  const response = {
     kpis,
     trends,
     previousKpis,
@@ -209,5 +239,10 @@ export async function GET(request: NextRequest) {
     scoreDistribution,
     topPerformers,
     recentActivity: recentActivity.slice(0, 20),
-  });
+  };
+
+  // Store in cache
+  cache.set(cacheKey, { data: response, expiresAt: Date.now() + CACHE_TTL });
+
+  return NextResponse.json(response);
 }

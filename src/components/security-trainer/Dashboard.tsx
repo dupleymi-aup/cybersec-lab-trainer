@@ -150,7 +150,9 @@ export default function Dashboard() {
     setDismissedAnnouncements((prev) => new Set([...prev, id]));
   };
 
-  const visibleAnnouncements = announcements.filter((a) => !dismissedAnnouncements.has(a.id));
+  const visibleAnnouncements = useMemo(() =>
+    announcements.filter((a) => !dismissedAnnouncements.has(a.id))
+  , [announcements, dismissedAnnouncements]);
 
   const challengeStats = useMemo(() => ({
     owaspCorrect: owaspChallengeScores.correct,
