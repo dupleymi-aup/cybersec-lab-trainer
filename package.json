@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/find-port.js",
+    "dev:auto": "node scripts/auto-start.js",
     "build": "next build && node scripts/copy-assets.js",
     "start": "node scripts/start-server.js",
     "docs": "echo 'Open http://localhost:3000/api/docs after running npm run dev'",
