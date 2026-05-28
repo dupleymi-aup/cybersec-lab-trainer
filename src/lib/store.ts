@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { quizCategories, modules } from '@/lib/data';
 import { NotificationHelper } from './notification-store';
 import { getCurrentUserId, saveProgressSnapshotProxy } from './auth-bridge';
+import { logger } from './logger';
 
 // ─── API client ───────────────────────────────────────────────
 let tokenFetchPromise: Promise<string | null> | null = null;
@@ -21,9 +22,7 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
     const token = await tokenFetchPromise;
     if (token) headers['Authorization'] = `Bearer ${token}`;
   } catch (err) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('Failed to get auth headers:', err);
-    }
+    logger.warn('Failed to get auth headers', { error: err instanceof Error ? err.message : String(err) });
     tokenFetchPromise = null;
   }
   return headers;
@@ -221,13 +220,13 @@ const syncWithDatabase = async (state: AppState, set: (partial: Partial<AppStore
       const score = typeof p.score === 'number' ? p.score : 0;
       const completed = p.completed === true;
       saveProgressSnapshotProxy(p.moduleId as string, score, completed).catch((err) => {
-        console.warn('Failed to save progress snapshot:', err);
+        logger.warn('Failed to save progress snapshot', { moduleId: p.moduleId, error: err instanceof Error ? err.message : String(err) });
       });
     }
 
     set({ syncStatus: 'synced', lastSyncedAt: new Date() });
   } catch (e) {
-    console.error('Sync error:', e);
+    logger.error('Sync error', { error: e instanceof Error ? e.message : String(e) });
     set({ syncStatus: 'error' });
   }
 };
@@ -265,7 +264,7 @@ const loadFromDatabase = async (
       lastSyncedAt: new Date(),
     }));
   } catch (e) {
-    console.error('Load error:', e);
+    logger.error('Load error', { error: e instanceof Error ? e.message : String(e) });
     set({ syncStatus: 'error', userId });
   }
 };

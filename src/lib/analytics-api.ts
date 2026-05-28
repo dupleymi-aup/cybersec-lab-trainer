@@ -10,6 +10,11 @@ import type {
   QuizRetryData, ErrorPatternsData, PredictiveRiskData, ScheduledReport,
   DataQualityData,
 } from './auth-types';
+import { logger } from './logger';
+
+function apiWarn(fnName: string, error: unknown) {
+  logger.warn(`[analytics-api] ${fnName} failed`, { error: error instanceof Error ? error.message : String(error) });
+}
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
   try {
@@ -19,7 +24,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     if (token) headers['Authorization'] = `Bearer ${token}`;
     return headers;
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') console.warn('[analytics-api] getAuthHeaders failed:', e);
+    apiWarn('getAuthHeaders', e);
     return { 'Content-Type': 'application/json' };
   }
 }
@@ -60,7 +65,7 @@ export async function getProgressTrends(userId?: string, dateRange: string = '30
     const data = await res.json();
     return data.trends || [];
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getProgressTrends failed:", e);
+    apiWarn('getProgressTrends', e);
     return [];
   }
 }
@@ -74,7 +79,7 @@ export async function getQuizQuestionAnalytics(category?: string, difficulty?: s
     const data = await res.json();
     return data.questions || [];
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') console.warn('[analytics-api] getProgressTrends failed:', e);
+    apiWarn('getQuizQuestionAnalytics', e);
     return [];
   }
 }
@@ -87,7 +92,7 @@ export async function getAchievementAnalytics(groupId?: string): Promise<Achieve
     const data = await res.json();
     return data.achievements || [];
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') console.warn('[analytics-api] getAchievementAnalytics failed:', e);
+    apiWarn('getAchievementAnalytics', e);
     return [];
   }
 }
@@ -100,7 +105,7 @@ export async function getAdminSummary(groupBy?: string): Promise<AdminSummary> {
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getAdminSummary failed:", e);
+    apiWarn('getAdminSummary', e);
     return {
       current: { totalStudents: 0, activeStudents: 0, activePercentage: 0, avgCompletionRate: 0, avgQuizScore: 0, totalQuizAttempts: 0, totalLoginAttempts: 0 },
       previous: { totalStudents: 0, activeStudents: 0, activePercentage: 0, avgCompletionRate: 0, avgQuizScore: 0, totalQuizAttempts: 0, totalLoginAttempts: 0 },
@@ -117,7 +122,7 @@ export async function getActivityHeatmap(userId?: string, dateRange: string = '9
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getActivityHeatmap failed:", e);
+    apiWarn('getActivityHeatmap', e);
     return { dailyActivity: [], hourlyActivity: [], weeklyActivity: [], totalActivities: 0, mostActiveDay: '', mostActiveHour: 0, streakDays: 0 };
   }
 }
@@ -132,7 +137,7 @@ export async function saveProgressSnapshot(moduleId: string, score: number, comp
     });
     return await res.json();
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] saveProgressSnapshot failed:", e);
+    apiWarn('saveProgressSnapshot', e);
     return { success: false };
   }
 }
@@ -145,7 +150,7 @@ export async function saveQuizAttempts(quizId: string, attempts: QuizAttemptData
     });
     return await res.json();
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] saveQuizAttempts failed:", e);
+    apiWarn('saveQuizAttempts', e);
     return { success: false };
   }
 }
@@ -158,7 +163,7 @@ export async function getModulePerformance(days = 30, groupId?: string): Promise
     const data = await res.json();
     return data.modules || [];
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getModulePerformance failed:", e);
+    apiWarn('getModulePerformance', e);
     return [];
   }
 }
@@ -171,7 +176,7 @@ export async function getProgressDynamics(days = 30, groupId?: string): Promise<
     const data = await res.json();
     return { daily: data.daily || [], summary: data.summary || { totalModulesCompleted: 0, totalQuizAttempts: 0, avgDailyActive: 0, trend: 'stable' as const } };
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getProgressDynamics failed:", e);
+    apiWarn('getProgressDynamics', e);
     return { daily: [], summary: { totalModulesCompleted: 0, totalQuizAttempts: 0, avgDailyActive: 0, trend: 'stable' as const } };
   }
 }
@@ -184,7 +189,7 @@ export async function getAtRiskStudents(days = 30, groupId?: string): Promise<{ 
     const data = await res.json();
     return { atRiskStudents: data.atRiskStudents || [], summary: data.summary || { totalStudents: 0, atRiskCount: 0, atRiskPercentage: 0, criticalCount: 0 } };
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getAtRiskStudents failed:", e);
+    apiWarn('getAtRiskStudents', e);
     return { atRiskStudents: [], summary: { totalStudents: 0, atRiskCount: 0, atRiskPercentage: 0, criticalCount: 0 } };
   }
 }
@@ -197,7 +202,7 @@ export async function getGroupComparison(days = 30, dimension = 'group', groupId
     const data = await res.json();
     return { dimensions: data.dimensions || [], rankings: data.rankings || { byCompletion: [], byQuizScore: [], byActivity: [] } };
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getGroupComparison failed:", e);
+    apiWarn('getGroupComparison', e);
     return { dimensions: [], rankings: { byCompletion: [], byQuizScore: [], byActivity: [] } };
   }
 }
@@ -210,7 +215,7 @@ export async function getQuizCategoryAnalytics(days = 30, groupId?: string): Pro
     const data = await res.json();
     return { categories: data.categories || [], hardestQuestions: data.hardestQuestions || [] };
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizCategoryAnalytics failed:", e);
+    apiWarn('getQuizCategoryAnalytics', e);
     return { categories: [], hardestQuestions: [] };
   }
 }
@@ -223,7 +228,7 @@ export async function getComprehensiveSummary(days = 30, groupId?: string): Prom
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getComprehensiveSummary failed:", e);
+    apiWarn('getComprehensiveSummary', e);
     return {
       kpis: { totalStudents: 0, activeStudents: 0, activePercentage: 0, avgCompletionRate: 0, avgQuizScore: 0, totalModulesCompleted: 0, totalQuizAttempts: 0, engagementScore: 0 },
       trends: { students: 'stable', activity: 'stable', completion: 'stable', quizScore: 'stable' },
@@ -243,7 +248,7 @@ export async function getStudentPerformance(userId: string, days = 30): Promise<
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getStudentPerformance failed:", e);
+    apiWarn('getStudentPerformance', e);
     return {
       profile: { id: '', fullName: '', email: '', group: '', course: '', university: '', avatar: '', role: '', createdAt: '', lastLoginAt: null, loginCount: 0 },
       kpis: { modulesCompleted: 0, totalModules: 0, avgQuizScore: 0, totalQuizAttempts: 0, lastActiveDays: 0, engagementScore: 0, riskScore: 0 },
@@ -268,7 +273,7 @@ export async function getStudentComparison(userIds: string[], days = 30): Promis
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getStudentComparison failed:", e);
+    apiWarn('getStudentComparison', e);
     return { students: [] };
   }
 }
@@ -284,7 +289,7 @@ export async function getGradebook(filters?: { groupId?: string; course?: string
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getGradebook failed:", e);
+    apiWarn('getGradebook', e);
     return { students: [], modules: [] };
   }
 }
@@ -297,7 +302,7 @@ export async function getEngagementAnalytics(days = 30, groupId?: string): Promi
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getEngagementAnalytics failed:", e);
+    apiWarn('getEngagementAnalytics', e);
     return {
       scoreDistribution: [],
       hourlyActivity: [],
@@ -316,7 +321,7 @@ export async function getLearningPathAnalytics(days = 30, groupId?: string): Pro
     const data = await res.json();
     return { path: data.path || [], totalStudents: data.totalStudents || 0 };
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getLearningPathAnalytics failed:", e);
+    apiWarn('getLearningPathAnalytics', e);
     return { path: [], totalStudents: 0 };
   }
 }
@@ -329,7 +334,7 @@ export async function getQuizTrajectory(days = 30, groupId?: string): Promise<{ 
     const data = await res.json();
     return { trajectories: data.trajectories || [], categories: data.categories || [] };
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizTrajectory failed:", e);
+    apiWarn('getQuizTrajectory', e);
     return { trajectories: [], categories: [] };
   }
 }
@@ -342,7 +347,7 @@ export async function getCohortAnalysis(groupId?: string): Promise<CohortAnalysi
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getCohortAnalysis failed:", e);
+    apiWarn('getCohortAnalysis', e);
     return {
       cohorts: [],
       overallRetention: { week1: 0, week2: 0, week4: 0, week8: 0, week12: 0 },
@@ -358,7 +363,7 @@ export async function getModuleDeepDive(days = 30, groupId?: string): Promise<Mo
     const data = await res.json();
     return data.modules || [];
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getModuleDeepDive failed:", e);
+    apiWarn('getModuleDeepDive', e);
     return [];
   }
 }
@@ -371,7 +376,7 @@ export async function getCertificationReadiness(days = 30, groupId?: string): Pr
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getCertificationReadiness failed:", e);
+    apiWarn('getCertificationReadiness', e);
     return { students: [], summary: { ready: 0, almost: 0, needsWork: 0, notReady: 0, avgReadinessScore: 0 } };
   }
 }
@@ -384,7 +389,7 @@ export async function getLearningVelocity(days = 90, groupId?: string): Promise<
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getLearningVelocity failed:", e);
+    apiWarn('getLearningVelocity', e);
     return { studentVelocities: [], velocityDistribution: [], avgVelocityByGroup: [], velocityOverTime: [] };
   }
 }
@@ -397,7 +402,7 @@ export async function getQuizSessionAnalytics(days = 30, groupId?: string): Prom
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizSessionAnalytics failed:", e);
+    apiWarn('getQuizSessionAnalytics', e);
     return { categoryTiming: [], rushedQuizzes: [], timeVsPerformance: [], hourlyPerformance: [], weekdayVsWeekend: [] };
   }
 }
@@ -410,7 +415,7 @@ export async function getGroupDynamics(days = 90, groupId?: string): Promise<Gro
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getGroupDynamics failed:", e);
+    apiWarn('getGroupDynamics', e);
     return { groups: [], overallTrends: [] };
   }
 }
@@ -423,7 +428,7 @@ export async function getLoginPatterns(days = 30, groupId?: string): Promise<Log
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getLoginPatterns failed:", e);
+    apiWarn('getLoginPatterns', e);
     return { loginFrequency: [], failedLogins: [], dormantAccounts: [], hourlyDistribution: [], dailyDistribution: [] };
   }
 }
@@ -436,7 +441,7 @@ export async function getQuizDifficultyAnalytics(days = 30, groupId?: string): P
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizDifficultyAnalytics failed:", e);
+    apiWarn('getQuizDifficultyAnalytics', e);
     return { difficultyBreakdown: [], categoryByDifficulty: [], studentPerformanceByDifficulty: [], trendByDifficulty: [] };
   }
 }
@@ -449,7 +454,7 @@ export async function getQuizRetryAnalytics(days = 30, groupId?: string): Promis
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getQuizRetryAnalytics failed:", e);
+    apiWarn('getQuizRetryAnalytics', e);
     return { categoryRetryStats: [], retryDistribution: [], topRetryers: [], improvementByRetries: [], totalRetries: 0, totalUniqueQuizzes: 0 };
   }
 }
@@ -462,7 +467,7 @@ export async function getErrorPatternsAnalytics(days = 30, groupId?: string): Pr
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getErrorPatternsAnalytics failed:", e);
+    apiWarn('getErrorPatternsAnalytics', e);
     return { mostMissedQuestions: [], categoryErrorRates: [], difficultyErrorRates: [], errorTrends: [] };
   }
 }
@@ -475,7 +480,7 @@ export async function getPredictiveRisk(days = 30, groupId?: string): Promise<Pr
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getPredictiveRisk failed:", e);
+    apiWarn('getPredictiveRisk', e);
     return { students: [], summary: { totalStudents: 0, highRisk: 0, mediumRisk: 0, lowRisk: 0, avgRisk: 0 } };
   }
 }
@@ -485,7 +490,7 @@ export async function getScheduledReports(): Promise<{ success: boolean; reports
     const res = await apiFetch('/api/scheduled-reports');
     return res.json();
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getScheduledReports failed:", e);
+    apiWarn('getScheduledReports', e);
     return { success: false, reports: [], error: 'Failed to fetch scheduled reports' };
   }
 }
@@ -506,7 +511,7 @@ export async function createScheduledReport(data: {
     });
     return res.json();
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] createScheduledReport failed:", e);
+    apiWarn('createScheduledReport', e);
     return { success: false, error: 'Failed to create scheduled report' };
   }
 }
@@ -519,7 +524,7 @@ export async function updateScheduledReport(id: string, data: Partial<ScheduledR
     });
     return res.json();
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] updateScheduledReport failed:", e);
+    apiWarn('updateScheduledReport', e);
     return { success: false, error: 'Failed to update scheduled report' };
   }
 }
@@ -529,7 +534,7 @@ export async function deleteScheduledReport(id: string): Promise<{ success: bool
     const res = await apiFetch(`/api/scheduled-reports/${id}`, { method: 'DELETE' });
     return res.json();
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] deleteScheduledReport failed:", e);
+    apiWarn('deleteScheduledReport', e);
     return { success: false, error: 'Failed to delete scheduled report' };
   }
 }
@@ -542,7 +547,7 @@ export async function getDataQuality(days = 30, groupId?: string): Promise<DataQ
     const data = await res.json();
     return data;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[analytics-api] getDataQuality failed:", e);
+    apiWarn('getDataQuality', e);
     return { healthScore: 100, issues: [], summary: { totalStudents: 0, activeStudents: 0, totalModules: 0, completedModules: 0, totalQuizzes: 0 } };
   }
 }
