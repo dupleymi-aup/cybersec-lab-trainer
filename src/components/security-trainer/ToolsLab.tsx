@@ -177,14 +177,13 @@ function simpleHash(text: string): { md5Like: string; shaLike: string; djb2: str
 // ============================================================
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      });
-    } else {
-      // Fallback for non-HTTPS contexts
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Fallback for non-HTTPS contexts or older browsers
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.position = 'fixed';
@@ -195,8 +194,7 @@ function CopyButton({ text }: { text: string }) {
         document.execCommand('copy');
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
-      } catch (e) {
-        if (process.env.NODE_ENV === "development") console.warn("[ToolsLab.tsx] CopyButton failed:", e);
+      } catch {
         // Silently fail
       }
       document.body.removeChild(ta);

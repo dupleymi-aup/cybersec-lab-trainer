@@ -153,6 +153,19 @@ export default function TeacherPanel() {
   const [_selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; email: string; group: string; avatar: string }>>([]);
   const [studentProgress, setStudentProgress] = useState<Record<string, StudentProgress>>({});
+  const EMPTY_PROGRESS: StudentProgress = {
+    userId: '',
+    completedModules: [],
+    quizScores: {},
+    moduleTimestamps: {},
+    quizTimestamps: {},
+    studiedOwaspItems: [],
+    sqlCompletedLevels: [],
+    xssCompletedLevels: [],
+    csrfCompletedSteps: [],
+    secureCodingCorrectCount: 0,
+  };
+  const getSp = (id: string) => studentProgress[id] ?? EMPTY_PROGRESS;
   const [loadingStudents, setLoadingStudents] = useState(true);
 
   useEffect(() => {
@@ -278,7 +291,7 @@ export default function TeacherPanel() {
   const progressMap = useMemo(() => {
     const map = new Map<string, StudentProgress>();
     for (const s of students) {
-      map.set(s.id, studentProgress[s.id]);
+      map.set(s.id, getSp(s.id));
     }
     return map;
   }, [students, studentProgress]);
@@ -341,7 +354,7 @@ export default function TeacherPanel() {
       const groupStudents = students.filter((s) => s.group === group);
       let totalMods = 0, totalScore = 0, scoreCount = 0, activeCount = 0;
       groupStudents.forEach((s) => {
-        const p = studentProgress[s.id];
+        const p = getSp(s.id);
         totalMods += p.completedModules.length;
         const scores = Object.values(p.quizScores);
         if (scores.length > 0) {
@@ -490,17 +503,17 @@ export default function TeacherPanel() {
               <tbody>
                 {(() => {
                   const sorted = [...filteredStudents];
-                  if (gradebookSort === 'modules') sorted.sort((a, b) => studentProgress[b.id].completedModules.length - studentProgress[a.id].completedModules.length);
+                  if (gradebookSort === 'modules') sorted.sort((a, b) => getSp(b.id).completedModules.length - getSp(a.id).completedModules.length);
                   if (gradebookSort === 'score') sorted.sort((a, b) => {
-                    const aScores = Object.values(studentProgress[a.id].quizScores);
-                    const bScores = Object.values(studentProgress[b.id].quizScores);
+                    const aScores = Object.values(getSp(a.id).quizScores);
+                    const bScores = Object.values(getSp(b.id).quizScores);
                     const aAvg = aScores.length > 0 ? aScores.reduce((x, y) => x + y, 0) / aScores.length : 0;
                     const bAvg = bScores.length > 0 ? bScores.reduce((x, y) => x + y, 0) / bScores.length : 0;
                     return bAvg - aAvg;
                   });
 
                   return sorted.map((student) => {
-                    const progress = studentProgress[student.id];
+                    const progress = getSp(student.id);
                     const scores = Object.entries(progress.quizScores);
                     const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, [, v]) => a + v, 0) / scores.length) : 0;
 
@@ -817,7 +830,7 @@ export default function TeacherPanel() {
                   <BarChart data={(() => {
                     return quizCategories.map((cat) => {
                       const scores = students
-                        .map((s) => studentProgress[s.id].quizScores[cat.id])
+                        .map((s) => getSp(s.id).quizScores[cat.id])
                         .filter((v) => v !== undefined && v > 0);
                       const avg = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
                       return { name: cat.name.replace(' квизы', ''), avg, attempted: scores.length };
@@ -841,7 +854,7 @@ export default function TeacherPanel() {
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Распределение оценок</h3>
                 {(() => {
-                  const allScores = students.flatMap((s) => Object.values(studentProgress[s.id].quizScores));
+                  const allScores = students.flatMap((s) => Object.values(getSp(s.id).quizScores));
                   const excellent = allScores.filter((s) => s >= 80).length;
                   const good = allScores.filter((s) => s >= 60 && s < 80).length;
                   const average = allScores.filter((s) => s >= 40 && s < 60).length;
@@ -877,7 +890,7 @@ export default function TeacherPanel() {
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-4">Активность студентов</h3>
                 {(() => {
-                  const active = students.filter((s) => studentProgress[s.id].completedModules.length > 0).length;
+                  const active = students.filter((s) => getSp(s.id).completedModules.length > 0).length;
                   const inactive = students.length - active;
                   const data = [
                     { name: 'Активные', value: active, color: '#10b981' },
@@ -908,7 +921,7 @@ export default function TeacherPanel() {
               {(() => {
                 const studentRankings = students
                   .map((s) => {
-                    const p = studentProgress[s.id];
+                    const p = getSp(s.id);
                     const mods = p.completedModules.length;
                     const scores = Object.values(p.quizScores);
                     const avgQ = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
@@ -1235,7 +1248,7 @@ export default function TeacherPanel() {
                 const distribution = ranges.map((range) => {
                   let count = 0;
                   students.forEach((s) => {
-                    const progress = studentProgress[s.id];
+                    const progress = getSp(s.id);
                     const scores = Object.values(progress.quizScores);
                     if (scores.length > 0) {
                       const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
@@ -1280,7 +1293,7 @@ export default function TeacherPanel() {
                   const now = new Date();
                   const engagementData = students
                     .map((s) => {
-                      const progress = studentProgress[s.id];
+                      const progress = getSp(s.id);
                       const scores = Object.values(progress.quizScores);
                       const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
                       const daysSinceActive = progress.lastActive
