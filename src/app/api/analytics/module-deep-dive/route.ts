@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
 
 const MODULE_NAMES: Record<string, string> = {
@@ -156,7 +157,7 @@ export async function GET(request: NextRequest) {
             }
           }
         } catch (e) {
-          console.error("[api] GET failed:", e);
+          logger.error('Module deep dive failed', { error: String(e) });
       }
     }
 

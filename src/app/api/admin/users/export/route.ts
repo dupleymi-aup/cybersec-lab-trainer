@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 interface ExportRequestBody {
   role?: string;
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch (e) {
-    console.error("[api] POST failed:", e);
+    logger.error('Users export failed', { error: String(e) });
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 

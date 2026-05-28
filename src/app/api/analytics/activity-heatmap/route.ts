@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -164,7 +165,7 @@ export async function GET(request: NextRequest) {
     streakDays,
   });
   } catch (error) {
-    console.error('Activity heatmap error:', error);
+    logger.error('Activity heatmap failed', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

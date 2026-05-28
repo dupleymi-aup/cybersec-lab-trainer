@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/lti/oidc-login
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
       state: authUrl.searchParams.get('state'),
     });
   } catch (error) {
-    console.error('OIDC login error:', error);
+    logger.error('LTI OIDC login error', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },
@@ -128,7 +129,7 @@ export async function GET(request: NextRequest) {
       state: authUrl.searchParams.get('state'),
     });
   } catch (error) {
-    console.error('OIDC login error:', error);
+    logger.error('LTI OIDC login error', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

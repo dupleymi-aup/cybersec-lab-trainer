@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { sendDeadlineReminderEmail } from '@/lib/email';
 import { authenticate } from '@/lib/api-middleware';
 import { timingSafeEqual } from 'crypto';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   // Verify cron secret or admin auth using timing-safe comparison
@@ -111,10 +112,11 @@ export async function POST(request: NextRequest) {
             isOverdue
           );
         } catch (error) {
-          console.error(
-            `[Deadline Checker] Failed to send email to ${student.email} for deadline "${deadline.title}":`,
-            error instanceof Error ? error.message : 'Unknown error'
-          );
+          logger.error('Failed to send deadline reminder email', {
+            email: student.email,
+            deadlineTitle: deadline.title,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
         }
 
         await prisma.reminderLog.create({

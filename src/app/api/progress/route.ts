@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { syncGradesToPlatform } from '@/lib/lti-utils';
 import { modules } from '@/lib/data';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -128,11 +129,11 @@ export async function POST(request: NextRequest) {
       syncGradesToPlatform(platform.id, auth.id, moduleId, score, 100, label)
         .then((result) => {
           if (!result.success) {
-            console.error(`LTI grade sync failed for ${platform.name}: ${result.error}`);
+            logger.error('LTI grade sync failed', { platformName: platform.name, error: result.error });
           }
         })
         .catch((err) => {
-          console.error(`LTI grade sync error for ${platform.name}:`, err);
+          logger.error('LTI grade sync error', { platformName: platform.name, error: String(err) });
         });
     }
   }

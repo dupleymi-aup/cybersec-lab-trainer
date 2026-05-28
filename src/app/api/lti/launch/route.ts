@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifyLtiLaunch, type LtiClaims } from '@/lib/lti-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/lti/launch
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
       const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
       issuer = payload.iss || '';
     } catch (e) {
-      console.error("[api] POST failed:", e);
+      logger.error('LTI launch failed', { error: String(e) });
       return NextResponse.json({ error: 'Invalid token format' }, { status: 400 });
     }
 
@@ -171,7 +172,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('LTI launch error:', error);
+    logger.error('LTI launch error', { error: String(error) });
     return NextResponse.json(
       { error: 'LTI launch failed. Contact your instructor if this persists.' },
       { status: 500 },
@@ -197,14 +198,14 @@ export async function GET() {
         const jwk = await parsePublicKeyToJWK(platform.publicKey, platform.id);
         keys.push(jwk);
       } catch (e) {
-        console.error("[api] GET failed:", e);
+        logger.error('Failed to parse public key to JWK', { error: String(e), platformId: platform.id });
         // Skip invalid keys
       }
     }
 
     return NextResponse.json({ keys });
   } catch (e) {
-    console.error("[api] GET failed:", e);
+    logger.error('Failed to get LTI platforms keys', { error: String(e) });
     return NextResponse.json({ keys: [] });
   }
 }

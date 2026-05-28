@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { prisma } from '@/lib/db';
 import { syncGradesToPlatform } from '@/lib/lti-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/lti/sync-grades
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ status: 'synced' });
   } catch (error) {
-    console.error('Grade sync error:', error);
+    logger.error('LTI grade sync error', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

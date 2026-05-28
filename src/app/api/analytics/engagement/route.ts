@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
@@ -208,7 +209,7 @@ export async function GET(request: NextRequest) {
     engagementTrend,
   });
   } catch (error) {
-    console.error('Engagement analytics error:', error);
+    logger.error('Engagement analytics failed', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

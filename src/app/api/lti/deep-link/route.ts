@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { modules } from '@/lib/data';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/lti/deep-link
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       platformId,
     });
   } catch (error) {
-    console.error('Deep link error:', error);
+    logger.error('LTI deep link error', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },
@@ -135,7 +136,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(items);
   } catch (error) {
-    console.error('Deep link GET error:', error);
+    logger.error('LTI deep link GET error', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

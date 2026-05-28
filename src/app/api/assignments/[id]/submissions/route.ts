@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json(submissions);
   } catch (error) {
-    console.error('Error fetching submissions:', error);
+    logger.error('Failed to fetch submissions', { error: String(error) });
     return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 });
   }
 }

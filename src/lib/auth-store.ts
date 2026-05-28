@@ -58,18 +58,12 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  const csrfToken = typeof document !== 'undefined'
-    ? document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('csrf-token='))
-        ?.split('=')[1]
-    : undefined;
   return fetch(url, {
     ...options,
     headers: {
       ...getAuthHeaders(),
       ...options.headers,
-      ...(csrfToken && { 'x-csrf-token': csrfToken }),
+      ...getCsrfHeaders(),
     },
   });
 }
@@ -376,7 +370,7 @@ export function getImpersonationState(): { isImpersonating: boolean; originalUse
       startedAt: data.startedAt || null,
     };
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[auth-store] stopImpersonation failed:", e);
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] getImpersonationState failed:", e);
     return { isImpersonating: false, originalUserId: null, impersonatingUserId: null, startedAt: null };
   }
 }

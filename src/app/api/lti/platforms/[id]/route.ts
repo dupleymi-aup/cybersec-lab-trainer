@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/lti/platforms/[id]
@@ -115,7 +116,7 @@ export async function PUT(
 
     return NextResponse.json(platform);
   } catch (e) {
-    console.error("[api] PUT failed:", e);
+    logger.error('Failed to update LTI platform', { error: String(e) });
     return NextResponse.json({ error: 'Platform not found' }, { status: 404 });
   }
 }
@@ -153,7 +154,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (e) {
-    console.error("[api] DELETE failed:", e);
+    logger.error('Failed to delete LTI platform', { error: String(e) });
     return NextResponse.json({ error: 'Platform not found' }, { status: 404 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (e) {
-    console.error("[api] POST failed:", e);
+    logger.error('Progress snapshot failed', { error: String(e) });
     return NextResponse.json({ error: 'Failed to create progress snapshot' }, { status: 500 });
   }
 }

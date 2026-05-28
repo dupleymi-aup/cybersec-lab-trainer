@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 import { hashPassword, validateEmail, validatePhone } from '@/lib/auth-utils';
 
 interface RequestBody {
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch (e) {
-    console.error("[api] POST failed:", e);
+    logger.error('Invalid JSON in users import', { error: String(e) });
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 

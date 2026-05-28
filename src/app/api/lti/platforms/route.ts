@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/lti/platforms
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
           );
         }
       } catch (e) {
-        console.error("[api] POST failed:", e);
+        logger.error('Invalid JSON in platforms POST', { error: String(e) });
         return NextResponse.json(
           { error: `${fieldName} is not a valid URL` },
           { status: 400 }
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
         { status: 409 },
       );
     }
-    console.error('Create LTI platform error:', error);
+    logger.error('Failed to create LTI platform', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },
