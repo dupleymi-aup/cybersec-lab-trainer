@@ -112,8 +112,19 @@ async function fetchActiveAnnouncements(): Promise<Announcement[]> {
 }
 
 export default function Dashboard() {
-  const { setCurrentPage, completedModules, quizScores, toggleSidebar, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, owaspChallengeScores, authChallengeScores, moduleTimestamps, quizTimestamps } = useAppStore();
-  const { user } = useAuthStore();
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const completedModules = useAppStore(s => s.completedModules);
+  const quizScores = useAppStore(s => s.quizScores);
+  const toggleSidebar = useAppStore(s => s.toggleSidebar);
+  const sqlCompletedLevels = useAppStore(s => s.sqlCompletedLevels);
+  const xssCompletedLevels = useAppStore(s => s.xssCompletedLevels);
+  const csrfCompletedSteps = useAppStore(s => s.csrfCompletedSteps);
+  const secureCodingAnsweredChallenges = useAppStore(s => s.secureCodingAnsweredChallenges);
+  const owaspChallengeScores = useAppStore(s => s.owaspChallengeScores);
+  const authChallengeScores = useAppStore(s => s.authChallengeScores);
+  const moduleTimestamps = useAppStore(s => s.moduleTimestamps);
+  const quizTimestamps = useAppStore(s => s.quizTimestamps);
+  const user = useAuthStore(s => s.user);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set());
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<UpcomingDeadline[]>([]);
@@ -167,7 +178,9 @@ export default function Dashboard() {
 
   const avgQuizScore = useMemo(() => {
     const keys = Object.keys(quizScores);
-    return keys.length > 0 ? Math.round(Object.values(quizScores).reduce((a, b) => a + b, 0) / keys.length) : 0;
+    if (keys.length === 0) return 0;
+    const values = Object.values(quizScores).filter((v) => typeof v === 'number' && !Number.isNaN(v));
+    return values.length > 0 ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;
   }, [quizScores]);
 
   const unlockedAchievements = useMemo(() =>
@@ -372,7 +385,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Mobile top bar */}
       <div className="flex items-center gap-3 md:hidden">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+        <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Открыть меню">
           <Menu size={22} />
         </Button>
         <Shield size={22} className="text-emerald-600" />
@@ -416,6 +429,7 @@ export default function Dashboard() {
                   <button
                     onClick={() => dismissAnnouncement(ann.id)}
                     className="text-slate-400 hover:text-muted-foreground shrink-0"
+                    aria-label={`Скрыть объявление: ${ann.title}`}
                   >
                     <X size={16} />
                   </button>
@@ -828,7 +842,7 @@ export default function Dashboard() {
                 <div className="space-y-1">
                   {(showAllActivity ? activityTimeline : activityTimeline.slice(0, 5)).map((event, i) => (
                     <motion.div
-                      key={`${event.type}-${event.label}-${i}`}
+                      key={`${event.type}-${event.label}-${event.date.getTime()}-${i}`}
                       initial={{ opacity: 0, x: -5 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.03 }}

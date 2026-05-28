@@ -19,11 +19,22 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
   const [cooldown, setCooldown] = useState(30);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
+  const cooldownRef = useRef(cooldown);
+  useEffect(() => { cooldownRef.current = cooldown; }, [cooldown]);
+
   useEffect(() => {
     if (cooldown <= 0) return;
-    const timer = setInterval(() => setCooldown((c) => c - 1), 1000);
+    const timer = setInterval(() => {
+      setCooldown((c) => {
+        if (c <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
     return () => clearInterval(timer);
-  }, [cooldown]);
+  }, []);
 
   useEffect(() => {
     inputsRef.current[0]?.focus();

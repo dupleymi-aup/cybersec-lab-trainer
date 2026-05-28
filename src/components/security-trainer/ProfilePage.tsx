@@ -23,8 +23,20 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
-  const { user, updateProfile, updatePassword, deleteAccount, loginActivity } = useAuthStore();
-  const { completedModules, quizScores, studiedOwaspItems, sqlCompletedLevels, xssCompletedLevels, csrfCompletedSteps, secureCodingAnsweredChallenges, secureCodingCorrectCount, resetProgress } = useAppStore();
+  const user = useAuthStore(s => s.user);
+  const updateProfile = useAuthStore(s => s.updateProfile);
+  const updatePassword = useAuthStore(s => s.updatePassword);
+  const deleteAccount = useAuthStore(s => s.deleteAccount);
+  const loginActivity = useAuthStore(s => s.loginActivity);
+  const completedModules = useAppStore(s => s.completedModules);
+  const quizScores = useAppStore(s => s.quizScores);
+  const studiedOwaspItems = useAppStore(s => s.studiedOwaspItems);
+  const sqlCompletedLevels = useAppStore(s => s.sqlCompletedLevels);
+  const xssCompletedLevels = useAppStore(s => s.xssCompletedLevels);
+  const csrfCompletedSteps = useAppStore(s => s.csrfCompletedSteps);
+  const secureCodingAnsweredChallenges = useAppStore(s => s.secureCodingAnsweredChallenges);
+  const secureCodingCorrectCount = useAppStore(s => s.secureCodingCorrectCount);
+  const resetProgress = useAppStore(s => s.resetProgress);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
 
@@ -69,12 +81,12 @@ export default function ProfilePage() {
   const completedCount = completedModules.filter((id) => modules.some((m) => m.id === id)).length;
   const totalProgress = Math.round((completedCount / totalModules) * 100);
 
-  const avgQuizScore =
-    Object.keys(quizScores).length > 0
-      ? Math.round(
-          Object.values(quizScores).reduce((a, b) => a + b, 0) / Object.values(quizScores).length
-        )
-      : 0;
+  const avgQuizScore = useMemo(() => {
+    const keys = Object.keys(quizScores);
+    if (keys.length === 0) return 0;
+    const values = Object.values(quizScores).filter((v) => typeof v === 'number' && !Number.isNaN(v));
+    return values.length > 0 ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;
+  }, [quizScores]);
 
   // Track timestamps for activity feed - use state to trigger re-renders
   const [timestamps, setTimestamps] = useState({

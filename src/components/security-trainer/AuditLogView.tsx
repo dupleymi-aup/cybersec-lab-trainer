@@ -56,7 +56,7 @@ export default function AuditLogView() {
 
   const loadData = async () => {
     const result = await getAuditLogEntries();
-    setEntries(result.reverse());
+    setEntries([...result].reverse());
   };
 
   useEffect(() => {

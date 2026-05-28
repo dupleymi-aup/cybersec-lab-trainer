@@ -90,14 +90,13 @@ const roleNavItems: { id: PageType; label: string; iconKey: string; requiredRole
 ];
 
 export default function Sidebar() {
-  const {
-    currentPage,
-    sidebarOpen,
-    setSidebarOpen,
-    setCurrentPage,
-    completedModules,
-  } = useAppStore();
-  const { user, logout } = useAuthStore();
+  const currentPage = useAppStore(s => s.currentPage);
+  const sidebarOpen = useAppStore(s => s.sidebarOpen);
+  const setSidebarOpen = useAppStore(s => s.setSidebarOpen);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const completedModules = useAppStore(s => s.completedModules);
+  const user = useAuthStore(s => s.user);
+  const logout = useAuthStore(s => s.logout);
 
   // Expandable sections
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -234,6 +233,7 @@ export default function Sidebar() {
             size="icon"
             className="text-sidebar-foreground/50 hover:text-sidebar-foreground md:hidden"
             onClick={() => setSidebarOpen(false)}
+            aria-label="Закрыть боковую панель"
           >
             <X size={18} />
           </Button>

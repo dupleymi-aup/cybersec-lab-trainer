@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Download, FileText, Printer, Loader2, CheckCircle2, AlertCircle, ChevronDown, BarChart3, AlertTriangle, GitCompare, BookOpen } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -48,6 +48,21 @@ const isControlled = (props: AnalyticsExportPanelProps): props is AnalyticsExpor
 
 export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = {}) {
   const { students: propStudents, groupId } = props;
+  const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const scheduleReset = useCallback((key: keyof ExportState, ms: number) => {
+    const timer = setTimeout(() => {
+      setExportState(prev => ({ ...prev, [key]: 'idle' }));
+      timersRef.current.delete(timer);
+    }, ms);
+    timersRef.current.add(timer);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+    };
+  }, []);
+
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; email: string; group: string }>>([]);
   const [selectedStudentId, setSelectedStudentId] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -173,14 +188,14 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     }
 
     // Reset status after delay
-    setTimeout(() => setStatus('gradebook', 'idle'), 4000);
+    scheduleReset('gradebook', 4000);
   };
 
   // Export student report CSV
   const handleStudentReportExport = async () => {
     if (!selectedStudentId) {
       setStatus('studentReport', 'error', 'Выберите студента');
-      setTimeout(() => setStatus('studentReport', 'idle'), 3000);
+      scheduleReset('studentReport', 3000);
       return;
     }
 
@@ -236,7 +251,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       setStatus('studentReport', 'error', 'Ошибка экспорта');
     }
 
-    setTimeout(() => setStatus('studentReport', 'idle'), 4000);
+    scheduleReset('studentReport', 4000);
   };
 
   // Print report
@@ -246,7 +261,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     setTimeout(() => {
       window.print();
       setPrintPreview(false);
-      setTimeout(() => setStatus('print', 'idle'), 2000);
+      scheduleReset('print', 2000);
     }, 500);
   };
 
@@ -263,7 +278,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('analytics', 'error', 'Ошибка при экспорте аналитики');
     }
-    setTimeout(() => setStatus('analytics', 'idle'), 4000);
+    scheduleReset('analytics', 4000);
   };
 
   // Export at-risk students CSV
@@ -281,7 +296,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('atRisk', 'error', 'Ошибка при экспорте');
     }
-    setTimeout(() => setStatus('atRisk', 'idle'), 4000);
+    scheduleReset('atRisk', 4000);
   };
 
   // Export group comparison CSV
@@ -302,7 +317,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('groupComparison', 'error', 'Ошибка при экспорте');
     }
-    setTimeout(() => setStatus('groupComparison', 'idle'), 4000);
+    scheduleReset('groupComparison', 4000);
   };
 
   // Export module performance CSV
@@ -318,7 +333,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('modulePerformance', 'error', 'Ошибка при экспорте');
     }
-    setTimeout(() => setStatus('modulePerformance', 'idle'), 4000);
+    scheduleReset('modulePerformance', 4000);
   };
 
   // Export gradebook PDF
@@ -353,7 +368,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('gradebookPdf', 'error', 'Ошибка при создании PDF');
     }
-    setTimeout(() => setStatus('gradebookPdf', 'idle'), 4000);
+    scheduleReset('gradebookPdf', 4000);
   };
 
   // Export at-risk PDF
@@ -377,7 +392,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('atRiskPdf', 'error', 'Ошибка при создании PDF');
     }
-    setTimeout(() => setStatus('atRiskPdf', 'idle'), 4000);
+    scheduleReset('atRiskPdf', 4000);
   };
 
   // Export analytics PDF
@@ -391,7 +406,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('analyticsPdf', 'error', 'Ошибка при создании PDF');
     }
-    setTimeout(() => setStatus('analyticsPdf', 'idle'), 4000);
+    scheduleReset('analyticsPdf', 4000);
   };
 
   // Export module performance PDF
@@ -405,7 +420,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('modulePerformancePdf', 'error', 'Ошибка при создании PDF');
     }
-    setTimeout(() => setStatus('modulePerformancePdf', 'idle'), 4000);
+    scheduleReset('modulePerformancePdf', 4000);
   };
 
   // Export group comparison PDF
@@ -419,14 +434,14 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('groupComparisonPdf', 'error', 'Ошибка при создании PDF');
     }
-    setTimeout(() => setStatus('groupComparisonPdf', 'idle'), 4000);
+    scheduleReset('groupComparisonPdf', 4000);
   };
 
   // Export student report PDF
   const handleStudentReportPdfExport = async () => {
     if (!selectedStudentId) {
       setStatus('studentReportPdf', 'error', 'Выберите студента');
-      setTimeout(() => setStatus('studentReportPdf', 'idle'), 3000);
+      scheduleReset('studentReportPdf', 3000);
       return;
     }
     setStatus('studentReportPdf', 'loading');
@@ -466,7 +481,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('studentReportPdf', 'error', 'Ошибка при создании PDF');
     }
-    setTimeout(() => setStatus('studentReportPdf', 'idle'), 4000);
+    scheduleReset('studentReportPdf', 4000);
   };
 
   // Export quiz retry PDF
@@ -483,7 +498,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch {
       setStatus('quizRetryPdf', 'error', 'Ошибка при создании PDF');
     }
-    setTimeout(() => setStatus('quizRetryPdf', 'idle'), 4000);
+    scheduleReset('quizRetryPdf', 4000);
   };
 
   const exportCards = [

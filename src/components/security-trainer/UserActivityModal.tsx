@@ -108,7 +108,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
     setProgress(getUserProgress(user.id));
     const allActivity = getLoginActivity();
     const userActivity = allActivity.filter((a) => a.userId === user.id);
-    setLoginActivity(userActivity.reverse().slice(0, 50));
+    setLoginActivity([...userActivity].reverse().slice(0, 50));
   }, [user.id]);
 
   const handleEscape = useCallback(
@@ -147,7 +147,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
             <h2 className="text-lg font-bold">Активность пользователя</h2>
             <p className="text-xs text-muted-foreground">{user.fullName} • {user.email}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Закрыть">
             <X size={18} />
           </Button>
         </div>
@@ -323,8 +323,8 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                 <p className="text-xs text-slate-400 mt-1">Записи появляются после каждого входа в систему</p>
               </div>
             ) : (
-              loginActivity.slice(0, 20).map((entry, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-slate-100">
+              loginActivity.slice(0, 20).map((entry) => (
+                <div key={entry.timestamp} className="flex items-center justify-between p-3 rounded-lg border border-slate-100">
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${entry.success ? 'bg-emerald-500' : 'bg-red-500'}`} />
                     <div>

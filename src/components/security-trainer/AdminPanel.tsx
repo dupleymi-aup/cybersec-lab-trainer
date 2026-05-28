@@ -62,6 +62,7 @@ import {
   Repeat,
   AlertOctagon,
   ShieldCheck,
+  Loader2,
   ArrowLeftRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -136,8 +137,11 @@ export default function AdminPanel() {
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   // Load users from API
+  const [loadingUsers, setLoadingUsers] = useState(true);
   useEffect(() => {
-    getAllUsers().then(setAllUsers);
+    getAllUsers()
+      .then(setAllUsers)
+      .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
   const filteredUsers = allUsers.filter((u) => {
     const matchesSearch =
@@ -439,7 +443,13 @@ export default function AdminPanel() {
           </div>
 
           <div className="space-y-2">
-            {filteredUsers.map((u, i) => (
+            {loadingUsers ? (
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <Loader2 size={32} className="mb-3 animate-spin opacity-50" />
+                <p className="text-sm">Загрузка пользователей...</p>
+              </div>
+            ) : (
+            filteredUsers.map((u, i) => (
               <motion.div
                 key={u.id}
                 initial={{ opacity: 0, y: 5 }}
@@ -560,7 +570,8 @@ export default function AdminPanel() {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            ))
+            )}
           </div>
         </TabsContent>
 

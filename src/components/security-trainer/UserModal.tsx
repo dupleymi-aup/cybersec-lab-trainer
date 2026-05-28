@@ -141,7 +141,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
           <h2 className="text-lg font-bold">
             {mode === 'create' ? 'Создание пользователя' : 'Редактирование профиля'}
           </h2>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Закрыть">
             <X size={18} />
           </Button>
         </div>

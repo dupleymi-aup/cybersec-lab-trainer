@@ -39,6 +39,7 @@ import {
   XCircle,
   FileBarChart,
   ClipboardList,
+  Loader2,
 } from 'lucide-react';
 import ProgressTrendsChart from './ProgressTrendsChart';
 import QuizQuestionAnalytics from './QuizQuestionAnalytics';
@@ -151,9 +152,12 @@ export default function TeacherPanel() {
   const [_selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; email: string; group: string; avatar: string }>>([]);
   const [studentProgress, setStudentProgress] = useState<Record<string, StudentProgress>>({});
+  const [loadingStudents, setLoadingStudents] = useState(true);
 
   useEffect(() => {
-    getAllUsers().then((users) => setStudents(users.filter((u) => u.role === 'student')));
+    getAllUsers()
+      .then((users) => setStudents(users.filter((u) => u.role === 'student')))
+      .finally(() => setLoadingStudents(false));
   }, []);
 
   // Load all student progress from API
@@ -438,6 +442,13 @@ export default function TeacherPanel() {
 
         {/* Gradebook Tab */}
         <TabsContent value="gradebook" className="mt-4 space-y-4">
+          {loadingStudents ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <Loader2 size={32} className="mb-3 animate-spin opacity-50" />
+              <p className="text-sm">Загрузка данных студентов...</p>
+            </div>
+          ) : (
+            <>
           <div className="flex gap-3 items-center">
             <div className="relative flex-1">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -519,6 +530,8 @@ export default function TeacherPanel() {
               </tbody>
             </table>
           </div>
+            </>
+          )}
         </TabsContent>
 
         {/* Messages Tab */}
@@ -903,7 +916,7 @@ export default function TeacherPanel() {
                 return (
                   <div className="space-y-2">
                     {studentRankings.slice(0, 10).map((s, i) => (
-                      <div key={i} className="flex items-center justify-between text-sm">
+                      <div key={s.userId} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-3">
                           <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                             i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'bg-slate-200 text-muted-foreground' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-muted text-muted-foreground'

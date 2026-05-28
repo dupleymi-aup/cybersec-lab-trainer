@@ -85,7 +85,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
             <KeyRound size={20} className="text-sky-600" />
             <h2 className="text-lg font-bold">Сброс пароля</h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Закрыть">
             <X size={18} />
           </Button>
         </div>
@@ -179,7 +179,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
               <p className="text-sm font-medium text-emerald-700 mb-2">Пароль успешно сброшен!</p>
               <div className="flex items-center gap-2 bg-card rounded-lg p-3 border border-emerald-200">
                 <code className="text-sm font-mono flex-1">{newPassword}</code>
-                <Button variant="ghost" size="icon" onClick={handleCopy} className="shrink-0">
+                <Button variant="ghost" size="icon" onClick={handleCopy} className="shrink-0" aria-label="Копировать пароль">
                   <Copy size={16} className={copied ? 'text-emerald-600' : 'text-slate-400'} />
                 </Button>
               </div>

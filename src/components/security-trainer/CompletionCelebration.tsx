@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Trophy, Star } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
@@ -55,6 +55,8 @@ export default function CompletionCelebration() {
     return unsub;
   }, []);
 
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     const handler = (e: CelebrationEvent) => {
       setEvent(e);
@@ -69,15 +71,16 @@ export default function CompletionCelebration() {
         duration: randomBetween(1.5, 3),
       }));
       setParticles(newParticles);
-      const timer = setTimeout(() => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
         setEvent(null);
         setParticles([]);
       }, 3000);
-      return () => clearTimeout(timer);
     };
     celebrationListeners.push(handler);
     return () => {
       celebrationListeners = celebrationListeners.filter((l) => l !== handler);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
 

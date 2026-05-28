@@ -61,7 +61,7 @@ const typeLabels: Record<Assignment['type'], string> = {
 };
 
 export default function StudentAssignments() {
-  const { user } = useAuthStore();
+  const user = useAuthStore(s => s.user);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submissions, setSubmissions] = useState<Record<string, Submission[]>>({});
   const [loading, setLoading] = useState(true);
@@ -123,7 +123,7 @@ export default function StudentAssignments() {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [timerRunning, timer]);
+  }, [timerRunning]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
