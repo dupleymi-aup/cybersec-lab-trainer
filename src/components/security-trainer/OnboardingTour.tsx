@@ -52,7 +52,7 @@ const tourSteps: TourStep[] = [
 ];
 
 export default function OnboardingTour() {
-  const { user } = useAuthStore();
+  const user = useAuthStore(s => s.user);
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [isComplete, setIsComplete] = useState(() => {

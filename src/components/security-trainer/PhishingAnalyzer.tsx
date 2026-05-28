@@ -32,7 +32,9 @@ const severityColors: Record<string, string> = {
 type PageType = import('@/lib/store').PageType;
 
 export default function PhishingAnalyzer() {
-  const { setCurrentPage, completedModules, completeModule } = useAppStore();
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const completedModules = useAppStore(s => s.completedModules);
+  const completeModule = useAppStore(s => s.completeModule);
   const [currentPhase, setCurrentPhase] = useState<'education' | 'practice'>('education');
   const [currentEmailIndex, setCurrentEmailIndex] = useState(0);
   const [userVerdict, setUserVerdict] = useState<'phishing' | 'legit' | null>(null);

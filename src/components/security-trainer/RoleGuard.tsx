@@ -13,8 +13,8 @@ interface RoleGuardProps {
 }
 
 export default function RoleGuard({ requiredRole, fallback, children }: RoleGuardProps) {
-  const { user } = useAuthStore();
-  const { setCurrentPage } = useAppStore();
+  const user = useAuthStore(s => s.user);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
 
   if (!user || !hasRole(user.role, requiredRole)) {
     if (fallback) return <>{fallback}</>;

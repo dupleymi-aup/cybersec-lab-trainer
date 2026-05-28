@@ -7,7 +7,10 @@ import { Cloud, CloudOff, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-re
 import { toast } from 'sonner';
 
 export default function SyncIndicator() {
-  const { syncStatus, lastSyncedAt, userId, syncWithDatabase } = useAppStore();
+  const syncStatus = useAppStore(s => s.syncStatus);
+  const lastSyncedAt = useAppStore(s => s.lastSyncedAt);
+  const userId = useAppStore(s => s.userId);
+  const syncWithDatabase = useAppStore(s => s.syncWithDatabase);
   const { isAuthenticated } = useSession();
   const [isManualSyncing, setIsManualSyncing] = useState(false);
 

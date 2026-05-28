@@ -27,7 +27,10 @@ import {
 type LessonView = 'overview' | 'lesson' | 'complete';
 
 export default function OWASPTop10() {
-  const { studiedOwaspItems, addStudiedOwasp, completeModule, setCurrentPage } = useAppStore();
+  const studiedOwaspItems = useAppStore(s => s.studiedOwaspItems);
+  const addStudiedOwasp = useAppStore(s => s.addStudiedOwasp);
+  const completeModule = useAppStore(s => s.completeModule);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const [view, setView] = useState<LessonView>('overview');
   const [currentLesson, setCurrentLesson] = useState(0);
   const [lessonStep, setLessonStep] = useState<'description' | 'example' | 'vulnerable' | 'secure' | 'mitigations' | 'resources'>('description');

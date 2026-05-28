@@ -62,7 +62,9 @@ const DIFF_COLORS: Record<string, string> = {
 };
 
 export default function QuizSystem() {
-  const { quizScores, setQuizScore, setCurrentPage } = useAppStore();
+  const quizScores = useAppStore(s => s.quizScores);
+  const setQuizScore = useAppStore(s => s.setQuizScore);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const [quizState, setQuizState] = useState<QuizState>('select');
   const [activeCategory, setActiveCategory] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');

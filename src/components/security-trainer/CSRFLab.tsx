@@ -22,7 +22,12 @@ const mappedAttackSteps = attackSteps.map(step => ({
 }));
 
 export default function CSRFLab() {
-  const { completedModules, completeModule, setCurrentPage, addCsrfStep, addCsrfChallengeAnswer, csrfChallengeScores } = useAppStore();
+  const completedModules = useAppStore(s => s.completedModules);
+  const completeModule = useAppStore(s => s.completeModule);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const addCsrfStep = useAppStore(s => s.addCsrfStep);
+  const addCsrfChallengeAnswer = useAppStore(s => s.addCsrfChallengeAnswer);
+  const csrfChallengeScores = useAppStore(s => s.csrfChallengeScores);
   const [currentStep, setCurrentStep] = useState(0);
   const [showDefense, setShowDefense] = useState(false);
   const [activeDefense, setActiveDefense] = useState(0);

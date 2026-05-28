@@ -36,7 +36,9 @@ const categoryColors: Record<string, string> = {
 };
 
 export default function SecurityHeadersLab() {
-  const { completedModules, completeModule, setCurrentPage } = useAppStore();
+  const completedModules = useAppStore(s => s.completedModules);
+  const completeModule = useAppStore(s => s.completeModule);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const [currentHeader, setCurrentHeader] = useState(0);
   const [step, setStep] = useState<HeaderStep>('description');
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);

@@ -24,7 +24,10 @@ import {
 } from 'lucide-react';
 
 export default function XSSLab() {
-  const { xssCompletedLevels, addXssLevel, completeModule, setCurrentPage } = useAppStore();
+  const xssCompletedLevels = useAppStore(s => s.xssCompletedLevels);
+  const addXssLevel = useAppStore(s => s.addXssLevel);
+  const completeModule = useAppStore(s => s.completeModule);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sanitized, setSanitized] = useState(false);
   const [showAttack, setShowAttack] = useState(false);

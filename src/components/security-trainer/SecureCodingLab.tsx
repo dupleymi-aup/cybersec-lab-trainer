@@ -19,7 +19,14 @@ import {
 } from 'lucide-react';
 
 export default function SecureCodingLab() {
-  const { completeModule, setCurrentPage, completedModules, secureCodingAnsweredChallenges, addSecureCodingAnswer, removeSecureCodingAnswer, secureCodingCorrectCount, setSecureCodingCorrectCount } = useAppStore();
+  const completeModule = useAppStore(s => s.completeModule);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const completedModules = useAppStore(s => s.completedModules);
+  const secureCodingAnsweredChallenges = useAppStore(s => s.secureCodingAnsweredChallenges);
+  const addSecureCodingAnswer = useAppStore(s => s.addSecureCodingAnswer);
+  const removeSecureCodingAnswer = useAppStore(s => s.removeSecureCodingAnswer);
+  const secureCodingCorrectCount = useAppStore(s => s.secureCodingCorrectCount);
+  const setSecureCodingCorrectCount = useAppStore(s => s.setSecureCodingCorrectCount);
   const [activeChallenge, setActiveChallenge] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);

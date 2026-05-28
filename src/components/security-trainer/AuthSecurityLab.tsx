@@ -28,7 +28,9 @@ import {
 } from 'lucide-react';
 
 export default function AuthSecurityLab() {
-  const { completeModule, setCurrentPage, completedModules } = useAppStore();
+  const completeModule = useAppStore(s => s.completeModule);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const completedModules = useAppStore(s => s.completedModules);
   const isCompleted = completedModules.includes('auth');
 
   const [password, setPassword] = useState('');

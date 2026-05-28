@@ -117,8 +117,8 @@ const roleColors: Record<UserRole, string> = {
 };
 
 export default function AdminPanel() {
-  const { user } = useAuthStore();
-  const { setCurrentPage } = useAppStore();
+  const user = useAuthStore(s => s.user);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const { groupId: analyticsGroupId, days: analyticsDays } = useAnalyticsFilters();
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');

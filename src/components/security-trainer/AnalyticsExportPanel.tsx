@@ -49,6 +49,10 @@ const isControlled = (props: AnalyticsExportPanelProps): props is AnalyticsExpor
 export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = {}) {
   const { students: propStudents, groupId } = props;
   const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const exportingKeys = useRef(new Set<string>());
+  const isExporting = useCallback((key: string) => exportingKeys.current.has(key), []);
+  const startExport = useCallback((key: string) => exportingKeys.current.add(key), []);
+  const endExport = useCallback((key: string) => exportingKeys.current.delete(key), []);
   const scheduleReset = useCallback((key: keyof ExportState, ms: number) => {
     const timer = setTimeout(() => {
       setExportState(prev => ({ ...prev, [key]: 'idle' }));
@@ -126,6 +130,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
 
   // Export gradebook CSV
   const handleGradebookExport = async () => {
+    if (isExporting('gradebook')) return;
+    startExport('gradebook');
     setStatus('gradebook', 'loading');
     clearMessage('gradebook');
 
@@ -185,6 +191,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     } catch (error) {
       console.error('Gradebook export failed:', error);
       setStatus('gradebook', 'error', 'Ошибка экспорта');
+    } finally {
+      endExport('gradebook');
     }
 
     // Reset status after delay

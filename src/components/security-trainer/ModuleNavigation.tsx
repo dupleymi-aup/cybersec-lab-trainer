@@ -8,7 +8,8 @@ import { modules } from '@/lib/data';
 const modulePageIds: PageType[] = modules.map((m) => m.id as PageType);
 
 export default function ModuleNavigation({ currentId }: { currentId: string }) {
-  const { setCurrentPage, completedModules } = useAppStore();
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const completedModules = useAppStore(s => s.completedModules);
 
   const idx = modulePageIds.indexOf(currentId as PageType);
   if (idx === -1) return null;

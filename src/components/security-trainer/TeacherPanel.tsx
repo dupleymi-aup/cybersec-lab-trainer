@@ -143,8 +143,8 @@ async function getStudentProgress(userId: string): Promise<StudentProgress> {
 }
 
 export default function TeacherPanel() {
-  const { setCurrentPage } = useAppStore();
-  const { user } = useAuthStore();
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const user = useAuthStore(s => s.user);
   const [searchTerm, setSearchTerm] = useState('');
   const [groupFilter, _setGroupFilter] = useState('');
   const [gradebookSort, setGradebookSort] = useState<'name' | 'modules' | 'score'>('name');
@@ -164,11 +164,10 @@ export default function TeacherPanel() {
   useEffect(() => {
     if (students.length === 0) return;
     const loadProgress = async () => {
-      const progressMap: Record<string, StudentProgress> = {};
-      await Promise.all(students.map(async (s) => {
-        progressMap[s.id] = await getStudentProgress(s.id);
+      const results = await Promise.all(students.map(async (s) => {
+        return [s.id, await getStudentProgress(s.id)] as const;
       }));
-      setStudentProgress(progressMap);
+      setStudentProgress(Object.fromEntries(results));
     };
     loadProgress();
   }, [students]);

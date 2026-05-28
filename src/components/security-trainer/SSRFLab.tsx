@@ -26,7 +26,8 @@ import {
 } from 'lucide-react';
 
 export default function SSRFLab() {
-  const { completedModules, completeModule } = useAppStore();
+  const completedModules = useAppStore(s => s.completedModules);
+  const completeModule = useAppStore(s => s.completeModule);
   const [currentScenario, setCurrentScenario] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [optionSubmitted, setOptionSubmitted] = useState(false);

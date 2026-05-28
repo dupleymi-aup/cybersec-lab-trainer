@@ -6,7 +6,8 @@ import { motion } from 'framer-motion';
 import { Flame, CalendarDays } from 'lucide-react';
 
 export default function ActivityCalendar() {
-  const { moduleTimestamps, quizTimestamps } = useAppStore();
+  const moduleTimestamps = useAppStore(s => s.moduleTimestamps);
+  const quizTimestamps = useAppStore(s => s.quizTimestamps);
 
   const { dailyData, currentStreak, longestStreak, totalActiveDays } = useMemo(() => {
     const dayMap = new Map<string, { count: number; types: Set<string> }>();

@@ -37,7 +37,8 @@ const iconMap: Record<string, React.ReactNode> = {
 export default function APISecurityLab() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
-  const { completeModule, addStudiedOwasp } = useAppStore();
+  const completeModule = useAppStore(s => s.completeModule);
+  const addStudiedOwasp = useAppStore(s => s.addStudiedOwasp);
 
   const topic = apiSecurityTopics[currentIndex];
   const isCompleted = completedTopics.has(topic.id);

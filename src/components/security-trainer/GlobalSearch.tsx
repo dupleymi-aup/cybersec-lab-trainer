@@ -32,7 +32,7 @@ const pageNavItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
 ];
 
 export default function GlobalSearch() {
-  const { setCurrentPage } = useAppStore();
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);

@@ -79,8 +79,9 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
 const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
 
 export default function Leaderboard() {
-  const { completedModules, quizScores } = useAppStore();
-  const { user } = useAuthStore();
+  const completedModules = useAppStore(s => s.completedModules);
+  const quizScores = useAppStore(s => s.quizScores);
+  const user = useAuthStore(s => s.user);
   const [sortBy, setSortBy] = useState<'xp' | 'modules' | 'quiz' | 'streak'>('xp');
 
   const allStudents = useMemo(() => {

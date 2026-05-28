@@ -28,7 +28,8 @@ const demandColors: Record<string, string> = {
 };
 
 export default function CareerPaths() {
-  const { setCurrentPage, completedModules } = useAppStore();
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const completedModules = useAppStore(s => s.completedModules);
 
   const getCareerProgress = (pathModules: string[]) => {
     const completed = pathModules.filter(m => completedModules.includes(m)).length;

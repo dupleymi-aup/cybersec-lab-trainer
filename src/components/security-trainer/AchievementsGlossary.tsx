@@ -169,7 +169,11 @@ const achievementIcons: Record<string, React.ReactNode> = {
 };
 
 export default function AchievementsAndGlossary() {
-  const { setCurrentPage, completedModules, quizScores, owaspChallengeScores, authChallengeScores } = useAppStore();
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const completedModules = useAppStore(s => s.completedModules);
+  const quizScores = useAppStore(s => s.quizScores);
+  const owaspChallengeScores = useAppStore(s => s.owaspChallengeScores);
+  const authChallengeScores = useAppStore(s => s.authChallengeScores);
   const [activeTab, setActiveTab] = useState<'achievements' | 'glossary'>('achievements');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');

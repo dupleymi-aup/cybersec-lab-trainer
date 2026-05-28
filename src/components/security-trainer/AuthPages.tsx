@@ -60,7 +60,12 @@ export default function AuthPages() {
     }
   }, [countdown]);
 
-  const { login, register, sendRecoveryOTP, verifyRecoveryOTP, resetPassword, recoveryState } = useAuthStore();
+  const login = useAuthStore(s => s.login);
+  const register = useAuthStore(s => s.register);
+  const sendRecoveryOTP = useAuthStore(s => s.sendRecoveryOTP);
+  const verifyRecoveryOTP = useAuthStore(s => s.verifyRecoveryOTP);
+  const resetPassword = useAuthStore(s => s.resetPassword);
+  const recoveryState = useAuthStore(s => s.recoveryState);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

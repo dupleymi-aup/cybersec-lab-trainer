@@ -12,7 +12,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, CheckCircle2, Play, Eye, Lightbulb, AlertTriangle, Zap, ShieldCheck, BookOpen } from 'lucide-react';
 
 export default function SQLInjectionLab() {
-  const { sqlCompletedLevels, addSqlLevel, completeModule, setCurrentPage } = useAppStore();
+  const sqlCompletedLevels = useAppStore(s => s.sqlCompletedLevels);
+  const addSqlLevel = useAppStore(s => s.addSqlLevel);
+  const completeModule = useAppStore(s => s.completeModule);
+  const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const [activeChallenge, setActiveChallenge] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [showResult, setShowResult] = useState(false);
