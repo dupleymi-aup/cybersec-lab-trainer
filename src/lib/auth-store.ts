@@ -204,8 +204,9 @@ export async function bulkChangeRole(userIds: string[], newRole: UserRole): Prom
   return { success: count > 0, count };
 }
 
-export async function bulkToggleBlock(userIds: string[], currentUserId: string, _blocked: boolean): Promise<{ success: boolean; error?: string; count: number }> {
-  if (userIds.includes(currentUserId)) return { success: false, error: 'Нельзя заблокировать себя', count: 0 };
+export async function bulkToggleBlock(userIds: string[], currentUserId: string, blocked: boolean): Promise<{ success: boolean; error?: string; count: number }> {
+  const action = blocked ? 'заблокировать' : 'разблокировать';
+  if (userIds.includes(currentUserId)) return { success: false, error: `Нельзя ${action} себя`, count: 0 };
   const results = await Promise.allSettled(userIds.filter((id) => id !== currentUserId).map((id) => toggleUserBlock(id)));
   const count = results.filter((r) => r.status === 'fulfilled' && r.value.success).length;
   return { success: count > 0, count };
@@ -213,7 +214,6 @@ export async function bulkToggleBlock(userIds: string[], currentUserId: string, 
 
 // Audit log - now API-based
 export async function addAuditLogEntry(
-  _adminId: string,
   adminName: string,
   action: AuditAction,
   targetId: string,
@@ -223,7 +223,7 @@ export async function addAuditLogEntry(
   try {
     await apiFetch('/api/audit-log', {
       method: 'POST',
-      body: JSON.stringify({ action, targetId, targetName, details }),
+      body: JSON.stringify({ adminName, action, targetId, targetName, details }),
     });
   } catch (err) {
     if (process.env.NODE_ENV === 'development') {
@@ -283,8 +283,7 @@ export async function clearAuditLog(daysOld = 90): Promise<{ success: boolean; d
 
 export async function resetUserPassword(
   userId: string,
-  newPassword: string,
-  _adminId: string
+  newPassword: string
 ): Promise<{ success: boolean; error?: string }> {
   const pwCheck = validatePassword(newPassword);
   if (!pwCheck.valid) return { success: false, error: pwCheck.errors.join(', ') };
@@ -390,8 +389,7 @@ export async function getAllGroups(): Promise<string[]> {
 
 export async function renameGroup(
   oldName: string,
-  newName: string,
-  _adminId: string
+  newName: string
 ): Promise<{ success: boolean; error?: string; count: number }> {
   if (!newName.trim()) return { success: false, error: 'Название группы не может быть пустым', count: 0 };
 
@@ -412,8 +410,7 @@ export async function renameGroup(
 }
 
 export async function deleteGroup(
-  groupName: string,
-  _adminId: string
+  groupName: string
 ): Promise<{ success: boolean; error?: string; count: number }> {
   const users = await getAllUsers();
   const usersInGroup = users.filter(u => u.group === groupName);
@@ -427,8 +424,7 @@ export async function deleteGroup(
 
 export async function assignUsersToGroup(
   userIds: string[],
-  groupName: string,
-  _adminId: string
+  groupName: string
 ): Promise<{ success: boolean; error?: string; count: number }> {
   if (!groupName.trim()) return { success: false, error: 'Название группы не может быть пустым', count: 0 };
 

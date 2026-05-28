@@ -50,10 +50,10 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
     const pwCheck = validatePassword(password);
     if (!pwCheck.valid) { toast.error(pwCheck.errors.join(', ')); return; }
 
-    const { user: admin } = useAuthStore.getState();
-    if (!admin) { toast.error('Не авторизован'); return; }
+    const { user: _currentUser } = useAuthStore.getState();
+    if (!_currentUser) { toast.error('Не авторизован'); return; }
 
-    const result = await resetUserPassword(user.id, password, admin.id);
+    const result = await resetUserPassword(user.id, password);
     if (result.success) {
       setNewPassword(password);
       setResetDone(true);

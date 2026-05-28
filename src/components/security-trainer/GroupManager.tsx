@@ -9,11 +9,10 @@ import { toast } from 'sonner';
 import { Pencil, Trash2, Users, Plus, Check, X } from 'lucide-react';
 
 interface GroupManagerProps {
-  adminId: string;
   onRefresh: () => void;
 }
 
-export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) {
+export default function GroupManager({ onRefresh }: GroupManagerProps) {
   const [groups, setGroups] = useState<string[]>([]);
   const [groupCounts, setGroupCounts] = useState<Record<string, number>>({});
   const [editingGroup, setEditingGroup] = useState<string | null>(null);
@@ -37,7 +36,7 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
 
   const handleRename = async (oldName: string) => {
     if (!editValue.trim()) { toast.error('Название не может быть пустым'); return; }
-    const result = await renameGroup(oldName, editValue, adminId);
+    const result = await renameGroup(oldName, editValue);
     if (result.success) {
       toast.success(`Группа переименована, ${result.count} пользователей обновлено`);
       setEditingGroup(null);
@@ -52,7 +51,7 @@ export default function GroupManager({ adminId, onRefresh }: GroupManagerProps) 
   const handleDelete = async (name: string) => {
     const count = groupCounts[name] || 0;
     if (!confirm(`Удалить группу "${name}"? ${count} пользователей потеряют привязку к группе.`)) return;
-    const result = await deleteGroup(name, adminId);
+    const result = await deleteGroup(name);
     if (result.success) {
       toast.success(`Группа удалена, ${result.count} пользователей отвязано`);
       loadData();

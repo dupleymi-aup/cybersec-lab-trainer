@@ -56,7 +56,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
 
   const handleGroupAssign = async (groupName: string) => {
     if (!groupName.trim()) { toast.error('Введите название группы'); return; }
-    const result = await assignUsersToGroup(selectedIds, groupName, currentUserId);
+    const result = await assignUsersToGroup(selectedIds, groupName);
     if (result.success) {
       toast.success(`Группа "${groupName.trim()}" назначена ${result.count} пользователям`);
       setShowGroupPicker(false);

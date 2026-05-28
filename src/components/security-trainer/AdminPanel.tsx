@@ -707,7 +707,7 @@ export default function AdminPanel() {
               <p className="text-xs text-muted-foreground">Создание, переименование и удаление групп</p>
             </div>
           </div>
-          <GroupManager adminId={user?.id || ''} onRefresh={refresh} />
+          <GroupManager onRefresh={refresh} />
         </TabsContent>
 
         {/* Module Manager Tab */}
