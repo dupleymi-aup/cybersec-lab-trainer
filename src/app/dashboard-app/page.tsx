@@ -17,6 +17,7 @@ import KeyboardShortcuts from '@/components/security-trainer/KeyboardShortcuts';
 import CompletionCelebration from '@/components/security-trainer/CompletionCelebration';
 import OfflineBanner from '@/components/security-trainer/OfflineBanner';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 const modulePageIds = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf', 'api-security', 'phishing-analyzer', 'career-paths'];
 
@@ -27,29 +28,35 @@ const ModuleWrapper = ({ name, children, pageId }: { name: string; children: Rea
   </ErrorBoundary>
 );
 
-const LazyOWASPTop10 = dynamic(() => import('@/components/security-trainer/OWASPTop10'), { ssr: false });
-const LazySQLInjectionLab = dynamic(() => import('@/components/security-trainer/SQLInjectionLab'), { ssr: false });
-const LazyXSSLab = dynamic(() => import('@/components/security-trainer/XSSLab'), { ssr: false });
-const LazyCSRFLab = dynamic(() => import('@/components/security-trainer/CSRFLab'), { ssr: false });
-const LazyAuthSecurityLab = dynamic(() => import('@/components/security-trainer/AuthSecurityLab'), { ssr: false });
-const LazySecureCodingLab = dynamic(() => import('@/components/security-trainer/SecureCodingLab'), { ssr: false });
-const LazyToolsLab = dynamic(() => import('@/components/security-trainer/ToolsLab'), { ssr: false });
-const LazyQuizSystem = dynamic(() => import('@/components/security-trainer/QuizSystem'), { ssr: false });
-const LazyAchievementsGlossary = dynamic(() => import('@/components/security-trainer/AchievementsGlossary'), { ssr: false });
-const LazyProfilePage = dynamic(() => import('@/components/security-trainer/ProfilePage'), { ssr: false });
-const LazySecurityHeadersLab = dynamic(() => import('@/components/security-trainer/SecurityHeadersLab'), { ssr: false });
-const LazyIDORLab = dynamic(() => import('@/components/security-trainer/IDORLab'), { ssr: false });
-const LazySSRFLab = dynamic(() => import('@/components/security-trainer/SSRFLab'), { ssr: false });
-const LazyAPISecurityLab = dynamic(() => import('@/components/security-trainer/APISecurityLab'), { ssr: false });
-const LazyTeacherPanel = dynamic(() => import('@/components/security-trainer/TeacherPanel'), { ssr: false });
-const LazyAdminPanel = dynamic(() => import('@/components/security-trainer/AdminPanel'), { ssr: false });
-const LazyRoleGuard = dynamic(() => import('@/components/security-trainer/RoleGuard'), { ssr: false });
-const LazySecurityCheatSheets = dynamic(() => import('@/components/security-trainer/SecurityCheatSheets'), { ssr: false });
-const LazyPasswordStrengthChecker = dynamic(() => import('@/components/security-trainer/PasswordStrengthChecker'), { ssr: false });
-const LazyLeaderboard = dynamic(() => import('@/components/security-trainer/Leaderboard'), { ssr: false });
-const LazyPhishingAnalyzer = dynamic(() => import('@/components/security-trainer/PhishingAnalyzer'), { ssr: false });
-const LazyCareerPaths = dynamic(() => import('@/components/security-trainer/CareerPaths'), { ssr: false });
-const LazyStudentAssignments = dynamic(() => import('@/components/security-trainer/StudentAssignments'), { ssr: false });
+const ModuleLoader = () => (
+  <div className="flex items-center justify-center min-h-[200px] py-12">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
+
+const LazyOWASPTop10 = dynamic(() => import('@/components/security-trainer/OWASPTop10'), { ssr: false, loading: ModuleLoader });
+const LazySQLInjectionLab = dynamic(() => import('@/components/security-trainer/SQLInjectionLab'), { ssr: false, loading: ModuleLoader });
+const LazyXSSLab = dynamic(() => import('@/components/security-trainer/XSSLab'), { ssr: false, loading: ModuleLoader });
+const LazyCSRFLab = dynamic(() => import('@/components/security-trainer/CSRFLab'), { ssr: false, loading: ModuleLoader });
+const LazyAuthSecurityLab = dynamic(() => import('@/components/security-trainer/AuthSecurityLab'), { ssr: false, loading: ModuleLoader });
+const LazySecureCodingLab = dynamic(() => import('@/components/security-trainer/SecureCodingLab'), { ssr: false, loading: ModuleLoader });
+const LazyToolsLab = dynamic(() => import('@/components/security-trainer/ToolsLab'), { ssr: false, loading: ModuleLoader });
+const LazyQuizSystem = dynamic(() => import('@/components/security-trainer/QuizSystem'), { ssr: false, loading: ModuleLoader });
+const LazyAchievementsGlossary = dynamic(() => import('@/components/security-trainer/AchievementsGlossary'), { ssr: false, loading: ModuleLoader });
+const LazyProfilePage = dynamic(() => import('@/components/security-trainer/ProfilePage'), { ssr: false, loading: ModuleLoader });
+const LazySecurityHeadersLab = dynamic(() => import('@/components/security-trainer/SecurityHeadersLab'), { ssr: false, loading: ModuleLoader });
+const LazyIDORLab = dynamic(() => import('@/components/security-trainer/IDORLab'), { ssr: false, loading: ModuleLoader });
+const LazySSRFLab = dynamic(() => import('@/components/security-trainer/SSRFLab'), { ssr: false, loading: ModuleLoader });
+const LazyAPISecurityLab = dynamic(() => import('@/components/security-trainer/APISecurityLab'), { ssr: false, loading: ModuleLoader });
+const LazyTeacherPanel = dynamic(() => import('@/components/security-trainer/TeacherPanel'), { ssr: false, loading: ModuleLoader });
+const LazyAdminPanel = dynamic(() => import('@/components/security-trainer/AdminPanel'), { ssr: false, loading: ModuleLoader });
+const LazyRoleGuard = dynamic(() => import('@/components/security-trainer/RoleGuard'), { ssr: false, loading: ModuleLoader });
+const LazySecurityCheatSheets = dynamic(() => import('@/components/security-trainer/SecurityCheatSheets'), { ssr: false, loading: ModuleLoader });
+const LazyPasswordStrengthChecker = dynamic(() => import('@/components/security-trainer/PasswordStrengthChecker'), { ssr: false, loading: ModuleLoader });
+const LazyLeaderboard = dynamic(() => import('@/components/security-trainer/Leaderboard'), { ssr: false, loading: ModuleLoader });
+const LazyPhishingAnalyzer = dynamic(() => import('@/components/security-trainer/PhishingAnalyzer'), { ssr: false, loading: ModuleLoader });
+const LazyCareerPaths = dynamic(() => import('@/components/security-trainer/CareerPaths'), { ssr: false, loading: ModuleLoader });
+const LazyStudentAssignments = dynamic(() => import('@/components/security-trainer/StudentAssignments'), { ssr: false, loading: ModuleLoader });
 
 const roleRestrictedPages: Record<string, UserRole> = {
   'teacher-panel': 'teacher',
