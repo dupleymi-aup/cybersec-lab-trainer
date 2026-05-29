@@ -53,7 +53,9 @@ export const BRUTE_FORCE_COMPLEXITY_LEVELS: ComplexityOption[] = [
   { value: 4, charsetSize: 94, description: '94 (+спецсимволы)' },
 ] as const;
 
-export const BRUTE_FORCE_ATTEMPTS_PER_SECOND = 1e10; // 10 billion attempts/sec
+// Note: Modern GPU clusters can exceed 100B attempts/sec for weak hashes (MD5, SHA1).
+// bcrypt with cost factor 12 reduces this to ~1 attempt/sec per core.
+export const BRUTE_FORCE_ATTEMPTS_PER_SECOND = 1e10; // 10 billion attempts/sec (modern GPU baseline)
 export const BRUTE_FORCE_MIN_LENGTH = 4;
 export const BRUTE_FORCE_MAX_LENGTH = 20;
 export const BRUTE_FORCE_DEFAULT_LENGTH = 8;
@@ -61,10 +63,12 @@ export const BRUTE_FORCE_DEFAULT_COMPLEXITY = 1;
 
 // --- Hashing ---
 
+// WARNING: This is a static salt for DEMONSTRATION ONLY. In production, always use bcrypt.genSalt() to generate unique per-user salts.
+// NEVER use a hardcoded static salt in real applications!
 export const HASH_SALT = 'a1b2c3d4e5f6';
 export const HASH_ALGORITHM_PREFIX = '$2b$12$';
 export const HASH_ALGORITHM_DESCRIPTION = 'алгоритм (bcrypt) и стоимость (12 раундов)';
-export const HASH_SALT_DESCRIPTION = 'соль (уникальная для каждого пользователя)';
+export const HASH_SALT_DESCRIPTION = 'соль (ДЕМО: в реальном приложении используйте bcrypt.genSalt() для уникальной соли)';
 export const HASH_VALUE_DESCRIPTION = 'собственно хеш пароля';
 
 export const BCRYPT_CODE_EXAMPLE = `// Пример использования bcrypt в Node.js

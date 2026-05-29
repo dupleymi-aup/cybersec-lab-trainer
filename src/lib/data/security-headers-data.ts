@@ -108,7 +108,7 @@ app.use((req, res, next) => {
     name: 'X-Frame-Options',
     category: 'Защита от кликджекинга',
     description:
-      'X-Frame-Options запрещает встраивание страницы в iframe, frame или object. Это защита от clickjacking — атаки, при которой невидимый iframe с целевым сайтом накладывается на видимую страницу, заставляя пользователя нажать на кнопку, которую он не видит.',
+      'X-Frame-Options запрещает (DEPRECATED: современные браузеры рекомендуют использовать CSP frame-ancestors вместо X-Frame-Options).  встраивание страницы в iframe, frame или object. Это защита от clickjacking — атаки, при которой невидимый iframe с целевым сайтом накладывается на видимую страницу, заставляя пользователя нажать на кнопку, которую он не видит.',
     attackDemo:
       'Без X-Frame-Options: злоумышленник создаёт страницу с прозрачным iframe, содержащим bank.com/transfer. Пользователь думает, что нажимает на кнопку «Получить приз», но на самом деле подтверждает перевод денег.',
     vulnerableConfig: `// Нет X-Frame-Options
@@ -133,7 +133,7 @@ res.setHeader('X-Frame-Options', 'DENY');
 // SAMEORIGIN — разрешить iframe только с того же домена
 // DENY — полностью запретить встраивание
 
-// Современная альтернатива через CSP:
+// РЕКОМЕНДУЕТСЯ: Современный подход через CSP (X-Frame-Options deprecated в Chrome 94+, Firefox 131+):
 app.use(helmet.contentSecurityPolicy({
   directives: {
     frameAncestors: ["'self'"], // Или 'none'
@@ -143,7 +143,7 @@ app.use(helmet.contentSecurityPolicy({
       question: 'Какое значение X-Frame-Options полностью запрещает встраивание страницы в iframe?',
       options: ['SAMEORIGIN', 'ALLOW-FROM', 'DENY', 'BLOCK'],
       correctIndex: 2,
-      explanation: 'DENY полностью запрещает встраивание страницы в iframe. SAMEORIGIN разрешает встраивание только с того же домена. ALLOW-FROM (deprecated) разрешал указание конкретного домена.',
+      explanation: 'DENY полностью запрещает встраивание. SAMEORIGIN — только с того же домена. ALLOW-FROM deprecated. Примечание: X-Frame-Options сам считается устаревшим — используйте CSP frame-ancestors как основную защиту.',
     },
   },
   {

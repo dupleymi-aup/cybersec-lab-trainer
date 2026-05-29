@@ -81,7 +81,33 @@ export const careerPaths: CareerPath[] = [
     learningPath: ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'security-headers', 'api-security', 'secure-coding', 'tools'],
     certifications: ['CISSP (Certified Information Systems Security Professional)', 'CISM (Certified Information Security Manager)', 'SABSA (Sherwood Applied Business Security Architecture)', 'TOGAF + Security'],
     roles: ['Security Architect', 'Chief Information Security Officer (CISO)', 'Security Consultant'],
+  },  {
+    id: 'cloud-security',
+    title: 'Облачная безопасность',
+    icon: 'Cloud',
+    color: 'from-cyan-500 to-blue-600',
+    description: 'Защита облачных инфраструктур: AWS, Azure, GCP. Управление доступом, шифрование, мониторинг конфигураций.',
+    salaryRange: '160 000 — 350 000 ₽',
+    demandLevel: 'very-high',
+    skills: ['Cloud IAM', 'SSRF', 'Security Headers', 'Криптография', 'Сетевая безопасность', 'Конфигурации'],
+    learningPath: ['owasp', 'auth', 'ssrf', 'security-headers', 'tools', 'api-security'],
+    certifications: ['CCSP (Certified Cloud Security Professional)', 'AWS Security Specialty', 'Azure Security Engineer (AZ-500)', 'GCP Cloud Security', 'CKS (Kubernetes Security)'],
+    roles: ['Cloud Security Engineer', 'Cloud Security Architect', 'DevSecOps Engineer (Cloud)'],
   },
+  {
+    id: 'devsecops',
+    title: 'DevSecOps',
+    icon: 'Settings',
+    color: 'from-amber-500 to-orange-600',
+    description: 'Интеграция безопасности в CI/CD: автоматизация SAST/DAST, сканирование зависимостей, security as code.',
+    salaryRange: '170 000 — 320 000 ₽',
+    demandLevel: 'very-high',
+    skills: ['Безопасное кодирование', 'SAST/DAST', 'Инструменты', 'OWASP Top 10', 'CI/CD Security', 'Контейнеры'],
+    learningPath: ['owasp', 'secure-coding', 'tools', 'sql-injection', 'xss', 'csrf', 'api-security'],
+    certifications: ['DevSecOps Professional (DSOP)', 'Certified DevSecOps Professional (CDP)', 'GWAPT (для DAST)', 'CKS (Kubernetes Security)', 'OSSP+'],
+    roles: ['DevSecOps Engineer', 'Security Automation Engineer', 'Platform Security Engineer'],
+  },
+
 ];
 
 export const skillLevels = [
