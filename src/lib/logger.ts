@@ -35,6 +35,7 @@ function sanitize(obj: Record<string, unknown>): Record<string, unknown> {
 }
 
 function log(level: LogLevel, message: string, context?: Record<string, unknown>) {
+  /* eslint-disable no-console -- intentional console use for structured logging */
   const entry = formatLog(level, message, context);
   if (process.env.NODE_ENV === 'production') {
     // Structured JSON output for production log aggregators
@@ -48,6 +49,7 @@ function log(level: LogLevel, message: string, context?: Record<string, unknown>
       console[level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log'](prefix, message);
     }
   }
+  /* eslint-enable no-console */
 }
 
 export const logger = {

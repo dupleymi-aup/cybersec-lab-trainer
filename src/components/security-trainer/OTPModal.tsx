@@ -34,7 +34,7 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [cooldown]);
 
   useEffect(() => {
     inputsRef.current[0]?.focus();

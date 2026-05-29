@@ -294,7 +294,7 @@ export default function TeacherPanel() {
       map.set(s.id, getSp(s.id));
     }
     return map;
-  }, [students, studentProgress]);
+  }, [students, getSp]);
 
   // Calculate stats
   const totalStudents = students.length;
@@ -371,7 +371,7 @@ export default function TeacherPanel() {
         activityRate: groupStudents.length > 0 ? Math.round(activeCount / groupStudents.length * 100) : 0,
       };
     });
-  }, [groups, students, studentProgress]);
+  }, [groups, students, getSp]);
 
   return (
     <div className="space-y-6">
