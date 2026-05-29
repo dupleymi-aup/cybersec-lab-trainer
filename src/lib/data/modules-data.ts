@@ -22,12 +22,12 @@ export const modules = [
   {
     id: 'xss',
     title: 'XSS-атаки',
-    description: 'Изучите 6 типов XSS: отражённый, хранимый, DOM-based, SVG, Markdown и PDF. Интерактивные демонстрации атак.',
+    description: 'Изучите 9 типов XSS: отражённый, хранимый, DOM-based, SVG, Markdown, PDF, Angular, template literals и localStorage. Интерактивные демонстрации атак.',
     icon: 'FileText',
     difficulty: 'Средний',
     difficultyColor: 'bg-yellow-100 text-yellow-800',
-    lessons: 6,
-    totalSteps: 6,
+    lessons: 9,
+    totalSteps: 9,
   },
   {
     id: 'csrf',
@@ -52,12 +52,12 @@ export const modules = [
   {
     id: 'secure-coding',
     title: 'Безопасное кодирование',
-    description: '25 задач по ревью кода: найдите уязвимость (SQLi, XSS, IDOR, SSRF, XXE, SSTI, Prototype Pollution, LDAP Injection, Mass Assignment) и выберите правильное решение.',
+    description: '34 задачи по ревью кода: найдите уязвимость (SQLi, XSS, IDOR, SSRF, XXE, SSTI, Prototype Pollution, LDAP Injection, Mass Assignment) и выберите правильное решение.',
     icon: 'Code',
     difficulty: 'Продвинутый',
     difficultyColor: 'bg-red-100 text-red-800',
-    lessons: 25,
-    totalSteps: 25,
+    lessons: 34,
+    totalSteps: 34,
   },
   {
     id: 'tools',

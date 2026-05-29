@@ -24,7 +24,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Использование HTTPS',
       'Скрытие названий таблиц',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Параметризованные запросы разделяют SQL-код и данные, что полностью исключает возможность инъекции. Данные передаются как параметры и не могут изменить структуру запроса, даже если содержат SQL-команды.',
   },
@@ -54,7 +54,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Для обхода фаервола',
       'Для шифрования запроса',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'SQL-комментарий (-- ) превращает всё после него в комментарий. Это позволяет злоумышленнику «обрезать» ненужную часть запроса (например, проверку пароля), оставляя только нужное условие.',
   },
@@ -64,7 +64,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'medium',
     question: 'Какой оператор позволяет объединить результаты двух SELECT-запросов?',
     options: ['JOIN', 'UNION', 'MERGE', 'COMBINE'],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'UNION объединяет результаты двух или более SELECT-запросов в один набор. При SQL-инъекции злоумышленник может использовать UNION SELECT для извлечения данных из других таблиц.',
   },
@@ -79,7 +79,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Инъекция через аудиоканал',
       'Атака на мобильные приложения',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'При слепой SQL-инъекции сервер не отображает результаты запроса, но злоумышленник может делать логические выводы по поведению приложения (оно показывает разные страницы при истинных и ложных условиях). Это позволяет постепенно извлекать данные посимвольно.',
   },
@@ -120,7 +120,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Ускоряет загрузку страницы',
       'Включает сжатие данных',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'CSP позволяет указать допустимые источники для скриптов, стилей, изображений и других ресурсов. Например, Content-Security-Policy: script-src \\\'self\\\' запрещает загрузку скриптов из любых источников, кроме текущего домена, что блокирует большинство XSS-атак.',
   },
@@ -130,7 +130,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'medium',
     question: 'Какой тип XSS наиболее опасный?',
     options: ['Отражённый', 'DOM-based', 'Хранимый (Stored)', 'Все одинаково опасны'],
-    correctIndex: 2,
+    correctIndex: 0,
     explanation:
       'Хранимый XSS наиболее опасен, потому что вредоносный код сохраняется на сервере и выполняется для каждого пользователя, открывающего страницу. Злоумышленнику достаточно один раз внедрить скрипт, и он будет работать постоянно.',
   },
@@ -140,7 +140,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'medium',
     question: 'Какой атрибут HTML-тега чаще всего используется для XSS-атак?',
     options: ['style', 'class', 'onerror / onload / onclick', 'href'],
-    correctIndex: 2,
+    correctIndex: 1,
     explanation:
       'Обработчики событий (onerror, onload, onclick и др.) позволяют выполнить JavaScript при определённых событиях. Например, <img src=x onerror=alert(1)> выполнит alert при ошибке загрузки изображения. Атрибут style может использоваться для CSS-инъекций, но менее опасен.',
   },
@@ -156,7 +156,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Перехват сетевого трафика',
       'DDoS-атака на сервер',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'CSRF (Cross-Site Request Forgery) — это атака, при которой злоумышленник заставляет браузер жертвы отправить HTTP-запрос к уязвимому сайту. Поскольку браузер автоматически прикрепляет куки аутентификации, сервер воспринимает запрос как легитимный.',
   },
@@ -171,7 +171,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Сложные пароли',
       'Rate Limiting',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'CSRF-токены — это уникальные случайные значения, сервер генерирует их для каждой сессии или формы. При отправке запроса токен должен быть включён, и сервер проверяет его валидность. Злоумышленник не может получить токен из-за политики одного источника (Same-Origin Policy).',
   },
@@ -181,7 +181,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'easy',
     question: 'Какое значение cookie-атрибута SameSite обеспечивает лучшую защиту?',
     options: ['None', 'Lax', 'Strict', 'Off'],
-    correctIndex: 2,
+    correctIndex: 0,
     explanation:
       'SameSite=Strict запрещает отправку куки с любыми кросс-сайтовыми запросами. SameSite=Lax разрешает куки для навигации (GET-запросов по ссылке), но блокирует для POST-запросов из форм. None не ограничивает отправку и требует Secure-атрибут.',
   },
@@ -211,7 +211,7 @@ export const quizQuestions: QuizQuestion[] = [
       'AJAX-запросы не используют куки',
       'CORS нужен только для WebSocket',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'HTML-формы (<form>) могут отправлять POST-запросы к любому домену без проверки CORS. CORS (и preflight-запросы) применяется только к определённым типам AJAX-запросов. Поэтому CSRF-атака через скрытую HTML-форму полностью обходит CORS.',
   },
@@ -222,7 +222,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'easy',
     question: 'Какой алгоритм рекомендуется для хеширования паролей?',
     options: ['MD5', 'SHA-256', 'bcrypt', 'Base64'],
-    correctIndex: 2,
+    correctIndex: 3,
     explanation:
       'bcrypt специально разработан для хеширования паролей. Он включает соль (salt) для защиты от rainbow-таблиц и настраиваемый фактор сложности (cost), который замедляет перебор. MD5 устарел и уязвим, SHA-256 слишком быстрый, Base64 — это кодировка, не хеширование.',
   },
@@ -237,7 +237,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Ключ для расшифровки хеша',
       'Второй фактор аутентификации',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Соль — это случайное значение, уникальное для каждого пользователя, которое добавляется к паролю перед хешированием. Это предотвращает использование заранее вычисленных таблиц (rainbow tables) и обеспечивает, что одинаковые пароли имеют разные хеши.',
   },
@@ -252,7 +252,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Защита от перечисления пользователей (user enumeration)',
       'Разделение обязанностей',
     ],
-    correctIndex: 2,
+    correctIndex: 1,
     explanation:
       'Разные сообщения позволяют злоумышленнику определить, существует ли аккаунт с указанным email. Злоумышленник может перебирать email-адреса и собирать список пользователей для последующих атак. Правильный подход — единое сообщение: «Неверные учётные данные».',
   },
@@ -282,7 +282,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Минимум 12 символов',
       'Минимум 4 символа',
     ],
-    correctIndex: 2,
+    correctIndex: 3,
     explanation:
       'Современные рекомендации NIST и других организаций предполагают минимум 12 символов для пароля. Длина является критически важным фактором безопасности — каждый дополнительный символ экспоненциально увеличивает время перебора. Пароль из 12+ символов с разными типами символов обеспечивает надёжную защиту.',
   },
@@ -297,7 +297,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Взлом сервера авторизации',
       'Подделка JWT-токена',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'При Authorization Code Interception злоумышленник регистрирует вредоносное приложение или использует открытый редирект для перехвата кода авторизации. Если redirect_uri не валидируется строго, код может быть перенаправлен на сервер злоумышленника. Защита: PKCE (Proof Key for Code Exchange), строгая валидация redirect_uri, использование state-параметра.',
   },
@@ -327,7 +327,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Кража куки сессии',
       'Фишинговая атака для получения паролей',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Credential Stuffing использует тот факт, что люди повторно используют пароли. Злоумышленник берёт утечку из одного сервиса (миллионы логинов/паролей) и автоматически проверяет их на других сайтах. Защита: обязательная 2FA, мониторинг утечек паролей (Have I Been Pwned API), rate limiting, CAPTCHA, проверка по IP-репутации.',
   },
@@ -342,7 +342,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Токены слишком длинные',
       'Токены хранятся в базе данных',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Токены сброса пароля часто уязвимы: основаны на MD5(email + timestamp), не имеют срока действия, не инвалидируются после смены пароля, или отправляются по email (который может быть скомпрометирован). Защита: криптографически случайный токен (min 32 bytes), срок действия 1 час, однократное использование, инвалидация при смене email/пароля.',
   },
@@ -357,7 +357,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Перехват SMS-кодов',
       'Блокировка MFA-сервера',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'MFA Fatigue (Push Bombing): злоумышленник с логином и паролем жертвы многократно инициирует вход, отправляя push-уведомления на устройство жертвы. Устав от уведомлений, пользователь может случайно нажать «Approve». Пример: атака на Uber (2022). Защита: number matching (ввести число из push), ограничение частоты push-запросов, FIDO2/WebAuthn вместо push.',
   },
@@ -388,7 +388,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Только администратор может получать доступ к данным',
       'Все пользователи равны в правах',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Принцип наименьших привилегий означает, что каждому пользователю, процессу и системе должны предоставляться только те права, которые необходимы для выполнения их задач. Это ограничивает потенциальный ущерб при компрометации аккаунта или уязвимости.',
   },
@@ -403,7 +403,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Включает фреймворк JavaScript',
       'Настройка анимации',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'X-Frame-Options указывает браузеру, можно ли встраивать страницу в <frame> или <iframe>. Значение DENY полностью запрещает встраивание, SAMEORIGIN разрешает только с того же домена. Это защита от кликджекинга — атаки, при которой невидимый iframe с целевым сайтом накладывается на видимые элементы.',
   },
@@ -418,7 +418,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Атака на DNS-сервер',
       'Подмена IP-адреса',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'SSRF позволяет злоумышленнику заставить серверное приложение делать HTTP-запросы к указанным URL. Это может быть использовано для доступа к внутренним ресурсам, облачным метаданным (например, AWS 169.254.169.254) или для сканирования внутренней сети.',
   },
@@ -433,7 +433,7 @@ export const quizQuestions: QuizQuestion[] = [
       'HyperText Transfer Protocol Server',
       'HyperText Transfer Protocol Standard',
     ],
-    correctIndex: 0,
+    correctIndex: 1,
     explanation:
       'HTTPS (HyperText Transfer Protocol Secure) — это расширение протокола HTTP, использующее шифрование TLS/SSL для защиты передаваемых данных. Это обеспечивает конфиденциальность (данные нельзя прочитать), целостность (данные нельзя изменить) и аутентификацию (сервер — это тот, за кого он себя выдаёт).',
   },
@@ -449,7 +449,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Шифрование данных на нескольких уровнях OSI',
       'Многофакторная аутентификация',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Defense in Depth — это стратегия, при которой используются несколько уровней защиты (фаерволы, IDS/IPS, шифрование, контроль доступа, мониторинг). Если один уровень будет преодолён, остальные продолжат защищать систему.',
   },
@@ -464,7 +464,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Strict-Transport-Security',
       'X-XSS-Protection',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'X-Frame-Options: DENY полностью запрещает браузеру отображать страницу в iframe, frame или object. Это предотвращает кликджекинг-атаки. Альтернатива — CSP-директива frame-ancestors.',
   },
@@ -479,7 +479,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Уязвимость, существующая менее одного дня',
       'Уязвимость только в мобильных приложениях',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Zero Day — уязвимость, о которой разработчик ещё не знает (или не выпустил патч). Злоумышленники могут эксплуатировать её до того, как будет выпущено исправление. Название происходит от количества дней, прошедших с момента обнаружения.',
   },
@@ -509,7 +509,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Использование только платных инструментов защиты',
       'Тестирование безопасности перед релизом',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Security by Design — подход, при котором безопасность встроена в процесс разработки с самого начала (требования, проектирование, кодирование, тестирование, деплой). Это дешевле и эффективнее, чем добавление безопасности после завершения разработки.',
   },
@@ -525,7 +525,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Две инъекции одновременно',
       'Инъекция через ORDER BY',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Second-order SQLi происходит в два этапа: вредоносный payload сохраняется в БД через кажущийся безобидный ввод (например, регистрация), а затем активируется при использовании этих данных в другом запросе. Многие разработчики санитизируют ввод, но забывают о выходе данных.',
   },
@@ -540,7 +540,7 @@ export const quizQuestions: QuizQuestion[] = [
       'DESCRIBE table',
       'SHOW COLUMNS FROM table',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'ORDER BY N — стандартный метод определения числа столбцов. Злоумышленник увеличивает N (ORDER BY 1, ORDER BY 2, ...) до тех пор, пока не появится ошибка «Unknown column». Предыдущее значение N равно количеству столбцов, что необходимо для UNION SELECT.',
   },
@@ -570,7 +570,7 @@ export const quizQuestions: QuizQuestion[] = [
       'information_schema.databases',
       'information_schema.schema',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'information_schema.tables — мета-таблица MySQL, содержащая информацию обо всех табрах во всех базах данных. Злоумышленник может использовать SELECT table_name FROM information_schema.tables для получения списка таблиц.',
   },
@@ -585,7 +585,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Экранирование кавычек ( addslashes / mysqli_real_escape_string )',
       'ORM с параметризированными запросами',
     ],
-    correctIndex: 2,
+    correctIndex: 3,
     explanation:
       'Экранирование кавычек недостаточно, так как SQL-инъекции возможны без кавычек (числовые поля, ORDER BY, LIMIT и т.д.). Кроме того, экранирование зависит от кодировки и может быть обойдено. Параметризованные запросы — надёжный метод защиты.',
   },
@@ -600,7 +600,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Инъекция через второй параметр формы',
       'Атака на реплику базы данных',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Second-order SQL injection — вредоносный payload сохраняется в базе данных (например, при регистрации пользователя с именем \' OR 1=1--). Он не срабатывает сразу, но выполняется позже, когда приложение использует сохранённые данные в SQL-запросе без санитизации. Это сложнее обнаружить, так как атака и выполнение разделены по времени.',
   },
@@ -625,7 +625,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Только через XSS',
       'Через модификацию HTTP-заголовков',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Параметры LIMIT и OFFSET часто считаются безопасными, но в MySQL они могут содержать UNION SELECT: LIMIT 10 UNION SELECT username,password FROM users--. Также можно использовать PROCEDURE ANALYSE() для извлечения данных. Защита — параметризация даже для числовых параметров.',
   },
@@ -640,7 +640,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Увеличение размера запроса',
       'Использование IPv6 вместо IPv4',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'WAF bypass для SQLi включает: HEX-кодирование строк (0x414243 вместо \'ABC\'()), функция CHAR() для посимвольного создания строк, комментарии /**/ для разрыва ключевых слов (UN/**/ION SEL/**/ECT), нестандартный регистр (UnIoN sElEcT), дублирование ключевых слов (UNIONunionSELECT). Защита: WAF + параметризованные запросы.',
   },
@@ -655,7 +655,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Вложенные подзапросы (subqueries)',
       'Каскадное удаление записей',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Stacked queries позволяют выполнить несколько независимых SQL-команд через разделитель «;»: \' ; DROP TABLE users; --. Это крайне опасно, так как позволяет не только читать, но и модифицировать данные (INSERT, UPDATE, DELETE, DROP). Поддерживается в PostgreSQL, SQL Server, SQLite, но НЕ в MySQL (через mysql_query).',
   },
@@ -686,7 +686,7 @@ export const quizQuestions: QuizQuestion[] = [
       'XSS через CSS-анимации',
       'XSS в мобильном приложении',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Mutation XSS возникает, когда браузер модифицирует HTML после санитизации (например, закрывает незакрытые теги), и результирующий DOM содержит вредоносный код, которого не было в оригинальном санитизированном HTML.',
   },
@@ -701,7 +701,7 @@ export const quizQuestions: QuizQuestion[] = [
       '<svg><script>...</script></svg> или <img src=x onerror=...>',
       '<p>',
     ],
-    correctIndex: 2,
+    correctIndex: 3,
     explanation:
       'SVG поддерживает тег <script>, который выполняется при рендеринге изображения. Также <img src=x onerror=...> и <body onload=...> выполняют JavaScript. <iframe srcdoc=...> тоже может содержать скрипты.',
   },
@@ -716,7 +716,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Через заголовок X-XSS-Protection',
       'Используя CSS-инъекцию',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Если сервер помещает JSON-данные в тег <script> без экранирования: <script>var data = {"name": "${userInput}"}</script>, злоумышленник может закрыть строку и выполнить код: "}; alert(1); // — CSP не блокирует, так как скрипт загружен с \'self\', а выполнение происходит внутри разрешённого тега.',
   },
@@ -746,7 +746,7 @@ export const quizQuestions: QuizQuestion[] = [
       'WebSocket шифрует все сообщения',
       'CSP блокирует WebSocket по умолчанию',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Данные из WebSocket обрабатываются клиентским JavaScript через ws.onmessage. CSP контролирует загрузку ресурсов (скрипты, стили), но не данные, передаваемые через WebSocket. Если сообщение из WS вставляется в DOM без санитизации (el.innerHTML = event.data), возникает XSS.',
   },
@@ -761,7 +761,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Использование CSS-стилей для скрытия кода',
       'Отправка запросов через iframe',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Некоторые браузеры нормализуют Unicode-символы перед выполнением. Например, U+FF1C (полноширинный <) может быть нормализован в <. Злоумышленник использует это для обхода WAF/фильтров, которые проверяют ASCII, но не Unicode. Также используется URL-encoding, HTML-entity encoding и смешанные техники.',
   },
@@ -776,7 +776,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Через CSS background-image',
       'Через <img src="data:...">',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'data:-URL позволяет встроить HTML/JS прямо в ссылку: <a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg>">Click</a>. При клике браузер загружает и выполняет содержимое. Защита: CSP с директивой default-src, которая блокирует data: для скриптов, и санитизация href-атрибутов.',
   },
@@ -807,7 +807,7 @@ export const quizQuestions: QuizQuestion[] = [
       'GET-запросы всегда безопасны',
       'GET-запросы не поддерживают CSRF-токены',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'GET-запросы можно инициировать без JavaScript: через <img src="http://victim.com/action">, <link>, <script src> или простую ссылку. Это делает GET-запросы особенно уязвимыми. Поэтому важные действия (удаление, перевод денег) должны использовать POST/PUT/DELETE.',
   },
@@ -822,7 +822,7 @@ export const quizQuestions: QuizQuestion[] = [
       'SameSite=Strict',
       'SameSite=Block',
     ],
-    correctIndex: 2,
+    correctIndex: 3,
     explanation:
       'SameSite=Strict запрещает отправку куки с ЛЮБЫМИ кросс-сайтовыми запросами (даже при переходе по ссылке). SameSite=Lax разрешает куки для безопасных GET-навигаций (переход по ссылке). SameSite=None разрешает все, но требует Secure (HTTPS).',
   },
@@ -837,7 +837,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Content-Type проверяется только на клиенте',
       'JSON не поддерживает CSRF-токены',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Некоторые API проверяют Content-Type: application/json как защиту от CSRF. Но злоумышленник может отправить POST с Content-Type: text/plain и телом {"action":"transfer"}. Если сервер парсит body до проверки Content-Type, атака сработает. Также можно использовать <form enctype="text/plain"> или Flash для отправки кастомных заголовков.',
   },
@@ -867,7 +867,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Через подмену IP-адреса',
       'Через изменение User-Agent',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'SameSite=Strict защищает от кросс-сайтовых запросов, но если на целевом сайте есть XSS, злоумышленник может выполнить запрос из того же источника — куки будут отправлены. Также DNS Rebinding может создать Same-Origin контекст. Поэтому SameSite — дополнительный слой защиты, а не единственная защита.',
   },
@@ -882,7 +882,7 @@ export const quizQuestions: QuizQuestion[] = [
       'PUT и DELETE не используют куки',
       'Только POST уязвим к CSRF',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Хотя HTML-формы не поддерживают PUT/DELETE, JavaScript (fetch/XMLHttpRequest) может отправлять такие запросы. Если есть XSS на сайте, злоумышленник выполняет fetch(url, {method: \'DELETE\', credentials: \'include\'}). Куки автоматически отправляются с credentialed запросами. Поэтому все state-changing методы нуждаются в CSRF-защите.',
   },
@@ -898,7 +898,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Отсутствие шифрования на клиенте',
       'Уязвимость в заголовках HTTP',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'IDOR — это уязвимость контроля доступа, при которой злоумышленник изменяет идентификатор объекта в URL или параметрах запроса (например, /api/users/100 вместо /api/users/50) и получает доступ к данным другого пользователя. Сервер не проверяет, имеет ли текущий пользователь права на этот объект.',
   },
@@ -929,7 +929,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Небезопасный дизайн — только в мобильных приложениях',
       'Баг реализации легче исправить',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Insecure Design — это недостатки, заложенные на этапе проектирования: отсутствие rate limiting, слабые бизнес-правила, отсутствие учёта злоупотреблений. Их нельзя исправить простой правкой кода — требуется изменение архитектуры. Implementation bugs — ошибки в коде (SQLi, XSS), исправляемые изменением реализации.',
   },
@@ -944,7 +944,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Настройка фаервола',
       'Обучение пользователей безопасности',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Threat Modeling — процесс идентификации, оценки и смягчения угроз безопасности на этапе проектирования системы. Используются методологии STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation of Privilege), DREAD и PASTA.',
   },
@@ -960,7 +960,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Content-Security-Policy',
       'X-XSS-Protection',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'X-Content-Type-Options: nosniff запрещает браузеру определять MIME-тип файла по содержимому (sniffing). Без этого заголовка браузер может интерпретировать .jpg-файл как JavaScript, что создаёт XSS-уязвимость.',
   },
@@ -991,7 +991,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Зависимость, которая обновляется автоматически',
       'Зависимость, которая работает только в production',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Транзитивная зависимость — это зависимость вашей зависимости. Например, вы используете пакет A, который зависит от пакета B. Вы не указывали B напрямую, но он установлен. Уязвимость в B может затронуть вас, даже если вы не знаете о его существовании.',
   },
@@ -1007,7 +1007,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Валидация JSON-ответов API',
       'Проверка целостности cookies',
     ],
-    correctIndex: 0,
+    correctIndex: 3,
     explanation:
       'SRI позволяет браузеру проверить целостность загружаемых ресурсов (скрипты, стили) с CDN по хешу. Атрибут integrity="sha384-..." в теге <script> гарантирует, что файл не был модифицирован. Если хеш не совпадает, браузер не выполнит скрипт.',
   },
@@ -1023,7 +1023,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Пароли и токены аутентификации',
       'User-Agent браузера',
     ],
-    correctIndex: 2,
+    correctIndex: 0,
     explanation:
       'Пароли, токены, сессионные куки и другие секреты никогда не должны попадать в логи. Если логи будут скомпрометированы (а это случается), злоумышленник получит все учётные данные. Логируйте IP, timestamp, ID пользователя, но никогда секреты.',
   },
@@ -1069,7 +1069,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Переименование DNS-сервера',
       'Кэширование DNS-ответов',
     ],
-    correctIndex: 0,
+    correctIndex: 3,
     explanation:
       'DNS Rebinding — атака на SSRF-защиту. Злоумышленник регистрирует домен, который сначала разрешается во внешний IP (проходит валидацию), а затем — в приватный IP (127.0.0.1 или 10.0.0.1). Когда сервер делает запрос к этому домену, DNS-ответ указывает на внутренний ресурс.',
   },
@@ -1084,7 +1084,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Слишком частые запросы к API',
       'Отсутствие документации API',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'BOLA (также IDOR для API) — #1 в OWASP API Security Top 10. API эндпоинт принимает ID объекта, но не проверяет авторизацию. Пример: GET /api/orders/123 возвращает заказ любого пользователя. Защита: проверять ownership объекта, использовать GUID вместо sequential IDs, middleware авторизации.',
   },
@@ -1114,7 +1114,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Только сетевые атаки',
       'Только DDoS на orchestrator',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Container/K8s threats: (1) Vulnerable images — base images с CVE. (2) RBAC misconfiguration —过度 permissions для service accounts. (3) Exposed K8s dashboard — публичный доступ без auth. (4) Container escape — breakout из контейнера к host (CVE в runc/containerd). (5) Secrets в env vars вместо vault. Защита: image scanning, Pod Security Policies, network policies, sealed secrets.',
   },
@@ -1129,7 +1129,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Сертификация по облачной безопасности',
       'Стандарт для IoT-устройств',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'OWASP MASVS (Mobile App Security Verification Standard) — comprehensive framework для оценки безопасности мобильных приложений. Включает уровни: L1 (baseline), L2 (defense-in-depth), L3+R (reverse engineering protection). Покрывает: storage, crypto, auth, network comm, platform interaction, code quality, resiliency.',
   },
@@ -1144,7 +1144,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Только производительность моделей',
       'Только стоимость обучения',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'AI/ML risks: (1) Data poisoning — malicious training data. (2) Model inversion — извлечение training data из модели. (3) Membership inference — определить, был ли конкретный datapoint в training set. (4) Prompt injection — манипуляция LLM через crafted prompts. (5) Adversarial examples — inputs designed to cause misclassification. Защита: input sanitization, differential privacy, model monitoring.',
   },
@@ -1170,7 +1170,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Чёрный список (запретить известные опасные символы)',
       'Валидация только на сервере без учёта клиентской',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Белый список (allowlist) — разрешать только то, что явно ожидается. Чёрные списки (blocklist) всегда неполны и могут быть обойдены. Валидация должна быть и на клиенте (UX), и на сервере (безопасность). Белый список для email, телефона, имени — гораздо надёжнее чёрного.',
   },
@@ -1185,7 +1185,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Атака через таймер браузера; защита — отключить setTimeout',
       'DDoS через таймауты; защита — rate limiting',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Timing Attack использует разницу во времени выполнения для извлечения секретов. Например, посимвольное сравнение строк останавливается при первом несовпадении — по времени ответа можно определить количество совпавших символов. Защита: crypto.timingSafeEqual() в Node.js или bcrypt.compare().',
   },
@@ -1230,7 +1230,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Разрешить все типы файлов',
       'Хранить файлы в базе данных',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Secure file upload: (1) Whitelist расширений (.jpg, .png, .pdf). (2) Проверка MIME-type (не только client-side). (3) Magic bytes verification. (4) Ограничение размера. (5) Случайное имя файла (UUID). (6) Хранение вне web-root или через CDN. (7) Антивирусное сканирование. (8) Content-Disposition: attachment для скачивания.',
   },
@@ -1245,7 +1245,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Переполнение прототипа',
       'Удаление прототипа из объекта',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Prototype Pollution: злоумышленник передаёт {"__proto__":{"isAdmin":true}} в JSON.parse или merge-функцию. Это добавляет isAdmin ко ВСЕМ объектам. Или через constructor.prototype. Защита: Object.freeze(Object.prototype), Object.create(null) для dictionary, sanitize input keys (блокировать __proto__, constructor, prototype), использовать safe merge (lodash.merge с prototype protection).',
   },
@@ -1260,7 +1260,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Хранить JWT в localStorage',
       'Не проверять signature на клиенте',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Secure JWT: (1) Всегда verify signature — reject algorithm: none attack. (2) White-list allowed algorithms. (3) Проверять exp (expiration), nbf (not before), iat (issued at). (4) Для HS256 использовать 256-bit+ секрет. Для RS256 — verify с public key. (5) Хранить в httpOnly cookie (не localStorage). (6) Короткий TTL + refresh token.',
   },
@@ -1290,7 +1290,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Замедление сервера',
       'Проблемы с CORS',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'GraphQL introspection позволяет запросить полную схему (__schema, __type). Злоумышленник использует это для reconnaissance: найти скрытые мутации, sensitive поля, admin endpoints. Защита: отключить introspection в production (graphql-validation-complexity), использовать allowlist queries (persisted queries), rate limiting, depth limiting, query complexity analysis.',
   },
@@ -1306,7 +1306,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Фишинговая атака на поставщиков',
       'DDoS на CDN-провайдера',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Supply Chain Attack — атака через компрометацию компонентов разработки: библиотек (npm, PyPI), CI/CD-систем, инструментов сборки. Пример: атака на SolarWinds (2020), внедрение вредоносного кода в обновления пакета event-stream (2018). Защита: аудит зависимостей, lock-файлы, проверка пакетов.',
   },
@@ -1321,7 +1321,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Бесплатный хостинг для security-инструментов',
       'Сертификация по безопасности',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Bug Bounty — программа, в которой организация выплачивает вознаграждение исследователям безопасности за обнаружение и ответственный disclosure уязвимостей. Примеры: HackerOne, Bugcrowd, Google VRP. Это позволяет привлекать сообщество к улучшению безопасности.',
   },
@@ -1351,7 +1351,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Атака на микросервисную архитектуру',
       'Атака через промежуточное ПО',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'MITM-атака — злоумышленник располагается между двумя сторонами (клиентом и сервером), перехватывая и потенциально модифицируя передаваемые данные. Защита: HTTPS/TLS, проверка сертификатов, Certificate Pinning, HSTS.',
   },
@@ -1366,7 +1366,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Публикация → эксплуатация → патч',
       'Обнаружение → публикация → исправление',
     ],
-    correctIndex: 0,
+    correctIndex: 3,
     explanation:
       'Zero-day lifecycle: (1) Уязвимость существует, но неизвестна (0-day). (2) Злоумышленники эксплуатируют её скрытно (n-day). (3) Исследователи обнаруживают эксплойт или атаку. (4) Разработчик выпускает патч. (5) Публикуется CVE. Ключевой риск — время между началом эксплуатации и выпуском патча, когда у защиты нет сигнатуры.',
   },
@@ -1381,7 +1381,7 @@ export const quizQuestions: QuizQuestion[] = [
       'По стоимости исправления',
       'По дате обнаружения',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'CVSS v3.1 оценивает: Attack Vector (Network/Adjacent/Local/Physical), Complexity (Low/High), Privileges Required (None/Low/High), User Interaction (None/Required), и Impact на Confidentiality, Integrity, Availability. Базовый скор 0.0–10.0: 0.1–3.9 Low, 4.0–6.9 Medium, 7.0–8.9 High, 9.0–10.0 Critical.',
   },
@@ -1411,7 +1411,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Анализ → исправление → тестирование',
       'Мониторинг → алерт → блокировка',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'NIST Incident Response: (1) Preparation — политики, инструменты, команда. (2) Identification — обнаружение и классификация. (3) Containment — изоляция affected систем. (4) Eradication — удаление угрозы. (5) Recovery — восстановление систем. (6) Lessons Learned — анализ и улучшение процессов. Каждый шаг документируется.',
   },
@@ -1426,7 +1426,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Только ручное тестирование',
       'Тестирование только на production',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'PTES включает 7 фаз: Pre-engagement, Intelligence Gathering, Threat Modeling, Vulnerability Analysis, Exploitation, Post-exploitation, Reporting. OWASP Testing Guide — специфичен для веб-приложений. NIST SP 800-115 — государственные стандарты. Комбинация обеспечивает полное покрытие: от разведки до отчёта с рекомендациями.',
   },
@@ -1442,7 +1442,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Переполнение ARP-таблицы',
       'Блокировка ARP-запросов',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'ARP Spoofing: злоумышленник отправляет фальшивые ARP-ответы, связывая свой MAC с IP шлюза. Трафик жертвы перенаправляется к злоумышленнику (MITM). Инструменты: arpspoof, Ettercap. Защита: Static ARP entries, DHCP snooping, Dynamic ARP Inspection (DAI) на свитчах, ARP monitoring.',
   },
@@ -1472,7 +1472,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Только UDP-порты',
       'Только ICMP-ответы',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'SYN scan (stealth scan): Nmap отправляет SYN, если получает SYN/ACK — порт открыт, RST — закрыт. Полное соединение не устанавливается (не отправляется ACK), что делает сканирование менее заметным в логах. Требует root/admin привилегий.',
   },
@@ -1487,7 +1487,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Взлом пароля VLAN',
       'Использование SNMP для переключения VLAN',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'VLAN Hopping через Double Tagging: злоумышленник отправляет кадр с двумя 802.1Q тегами. Первый тег совпадает с native VLAN свитча и удаляется, второй тег остаётся и направляет кадр в целевой VLAN. Защита: не использовать VLAN 1 как native, явно задать native VLAN (non-user), port security.',
   },
@@ -1502,7 +1502,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Перехват пакетов через promiscuous mode',
       'Deauthentication attack для отключения клиентов',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Evil Twin: злоумышленник создаёт rogue AP с тем же SSID и более сильным сигналом. Клиенты подключаются к ней, думая, что это легитимная сеть. Весь трафик проходит через злоумышленника (MITM). Защита: WPA2-Enterprise с EAP-TLS (сертификаты), проверка BSSID, отключение автоподключения к известным SSID.',
   },
@@ -1532,7 +1532,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Шифрование BGP-сессий',
       'DDoS на BGP-серверы',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'BGP Hijacking: злоумышленник (или недобросовестный ISP) анонсирует IP-префиксы, которые ему не принадлежат. BGP (Border Gateway Protocol) не имеет встроенной аутентификации префиксов. Трафик перенаправляется через сеть злоумышленника. Пример: hijacking YouTube-трафика (2008), перехват криптобирж (2018). Защита: RPKI, BGPsec, мониторинг префиксов.',
   },
@@ -1547,7 +1547,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Перехват 4-way handshake',
       'Использование уязвимости в WPS',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'KRACK эксплуатирует 4-way handshake WPA2: злоумышленник перехватывает и повторно отправляет Message 3, заставляя клиента переустановить тот же ключ (nonce reset). Это позволяет расшифровать или внедрить пакеты. Затронуты почти все WPA2-клиенты. Исправлено в обновлениях 2017. WPA3 решает проблему.',
   },
@@ -1562,7 +1562,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Шифрование DNS-запросов',
       'Блокировка DNS-серверов',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'DNS Cache Poisoning: злоумышленник отправляет фальшивые DNS-ответы с правильным transaction ID до легитимного ответа. DNS-сервер кеширует фальшивую запись. Все пользователи получают неверный IP. Пример: атака Каминского (2008). Защита: DNSSEC (подписанные записи), случайные transaction IDs, port randomization, DNS over HTTPS/TLS.',
   },
@@ -1588,7 +1588,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Spear Phishing использует только SMS',
       'Spear Phishing — это телефонный обман',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Spear Phishing — целевая атака: злоумышленник изучает жертву (соцсети, LinkedIn, корпоративный сайт) и создаёт персонализированное письмо. Пример: письмо «от коллеги» с ссылкой на «документ проекта». Обычный фишинг массовый и безличный. Spear Phishing значительно эффективнее — до 30% успешных открытий.',
   },
@@ -1603,7 +1603,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Взлом через SQL-инъекцию',
       'Подбор пароля',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Pretexting: злоумышленник создаёт правдоподобный сценарий — представляется IT-специалистом, аудитором, партнёром. Использует заранее собранную информацию для убедительности. Пример: звонок «из службы безопасности банка» с просьбой подтвердить данные. Защита: верификация личности через обратный звонок по официальному номеру, обучение сотрудников.',
   },
@@ -1618,7 +1618,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Копирование пропуска',
       'Обход камеры видеонаблюдения',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Tailgating (Piggybacking): злоумышленник проходит за сотрудником через дверь контроля доступа. Часто использует социальный инжиниринг — «придержите дверь, пожалуйста», руки заняты коробками. Защита: турникеты, шлюз-кабины (mantrap), обучение сотрудников не пропускать без пропуска, охрана на входе.',
   },
@@ -1648,7 +1648,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Взлом через Bluetooth',
       'Звонки с подменой номера',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Smishing — фишинг через SMS. Сообщение выглядит как от банка, службы доставки или госоргана: «Ваш платёж отклонён. Перейдите по ссылке». Ссылка ведёт на фишинговый сайт или загружает malware. Люди более доверчивы к SMS, чем к email. Защита: не переходить по ссылкам из неизвестных SMS, проверять через официальный сайт.',
   },
@@ -1663,7 +1663,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Фишинг через общественные WiFi',
       'Отправка вредоносных USB-накопителей',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Watering Hole: злоумышленник определяет, какие сайты посещает целевая группа (форум, ассоциация, новостной сайт), и заражает их эксплойтами. Когда жертва посещает «водопой», её устройство компрометируется. Пример: атака на сайты европейских организаций для заражения правительственных систем. Защита: обновление браузеров/плагинов, EDR, network monitoring.',
   },
@@ -1678,7 +1678,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Знание языков программирования',
       'Физическая сила',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Социальная инженерия эксплуатирует: (1) Срочность — «срочно подтвердите аккаунт, иначе он будет удалён». (2) Авторитет — «это звонок из службы безопасности». (3) Любопытство — «посмотрите, кто вас отметил на фото». (4) Страх — «ваш компьютер заражён». (5) Жадность — «вы выиграли приз». Обучение осознанности — лучшая защита.',
   },
@@ -1708,7 +1708,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Дублирование email-адреса',
       'Копирование DNS-записей',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Clone Phishing: злоумышленник берёт настоящее письмо (например, с вложением), копирует его, заменяет вложение на вредоносное и отправляет заново с адресом, похожим на оригинал. Жертва видит знакомое письмо и доверяет. «Отправляю обновлённую версию документа». Защита: проверка email-заголовков, SPF/DKIM/DMARC, внимательность к вложениям.',
   },
@@ -1723,7 +1723,7 @@ export const quizQuestions: QuizQuestion[] = [
       'DDoS на сайт CEO',
       'Публикация компрометирующих данных CEO',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'CEO Fraud (Whaling): злоумышленник изучает структуру компании, имена руководителей, стиль общения. Отправляет email/SMS от имени CEO сотруднику финансов: «Срочно переведите $X на счёт поставщика, детали позже». Использует срочность и авторитет. FBI: потери > $26 млрд (2016–2022). Защита: процедура верификации платежей, 2FA для переводов, обучение.',
   },
@@ -1769,7 +1769,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Туннель между DNS-серверами',
       'Ускорение DNS-разрешения',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'DNS Tunneling — техника обхода сетевых ограничений: данные кодируются в DNS-запросах (например, data.evil.com). DNS-сервер декодирует данные и возвращает ответ. Поскольку DNS обычно разрешён через фаервол, это позволяет передавать данные или установить C2-канал. Инструменты: iodine, dnstt. Защита: мониторинг необычных DNS-запросов, DNS-inspection, блокировка неизвестных DNS-серверов.',
   },
@@ -1779,7 +1779,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'easy',
     question: 'Какой порт по умолчанию использует HTTPS?',
     options: ['80', '443', '8080', '22'],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'HTTPS использует порт 443 по умолчанию. Порт 80 — HTTP (без шифрования), 8080 — альтернативный HTTP, 22 — SSH. При доступе к https://example.com браузер автоматически подключается к порту 443 и устанавливает TLS-соединение.',
   },
@@ -1794,7 +1794,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Удаление маршрутов из таблицы',
       'Шифрование протокола маршрутизации',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Routing Table Poisoning: злоумышленник внедряет ложные записи в таблицу маршрутизации через уязвимый протокол (RIP, OSPF, EIGRP) или физический доступ к роутеру. Трафик перенаправляется через контролируемую сеть. В BGP это называется BGP Hijacking. Защита: аутентификация протоколов маршрутизации (RIPv2 authentication, OSPF MD5), контроль физического доступа, мониторинг маршрутов.',
   },
@@ -1824,7 +1824,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Удаление SSL-сертификата с сервера',
       'Блокировка HTTPS-портов',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'SSL Stripping (Moxie Marlinspike, 2009): злоумышленник MITM перехватывает HTTP→HTTPS редирект. Клиент думает, что подключается по HTTP, в то время как злоумышленник общается с сервером по HTTPS. Защита: HSTS (browser preloaded list), HTTPS Everywhere, запрет HTTP для критических сайтов, мониторин certificate transparency logs.',
   },
@@ -1839,7 +1839,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Блокировка всей сети',
       'Использование пустых пакетов',
     ],
-    correctIndex: 0,
+    correctIndex: 3,
     explanation:
       'Zero-Width Space и другие Unicode-символы могут быть использованы для homograph attacks: домены выглядят идентично, но содержат невидимые символы. Также используется для обхода WAF/фильтров, которые не нормализуют Unicode. Защита: Punycode normalization, strict domain validation, Unicode-aware WAF rules.',
   },
@@ -1849,7 +1849,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'easy',
     question: 'Какой протокол обеспечивает безопасную удалённую замену SSH?',
     options: ['Telnet', 'SSH (Secure Shell)', 'FTP', 'HTTP'],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'SSH (Secure Shell) — криптографически защищённый протокол для удалённого управления сервером. В отличие от Telnet (передача в открытом виде), SSH шифрует весь трафик, включая аутентификацию. Порт 22. Использует асимметричную криптографию для обмена ключами и симметричную для шифрования данных. Рекомендации: отключить root login, использовать key-based auth, обновлять версию.',
   },
@@ -1880,7 +1880,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Звонок с просьбой о пароле',
       'Взлом через WiFi',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Baiting: злоумышленник оставляет USB-флешку с вредоносным ПО в парковке, лифте или lobby компании. Сотрудник подключает её из любопытства. Автозапуск (autorun) устанавливает malware. Пример: атака на оборонные подрядчики США (2008). Защита: отключение autorun, обучение сотрудников не подключать неизвестные устройства, USB-порт контроль.',
   },
@@ -1895,7 +1895,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Визуальный фишинг через видео',
       'Фишинг через виртуальную реальность',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Vishing — фишинг по телефону. Злоумышленник использует spoofing для отображения легитимного номера, представляется сотрудником банка или IT-поддержки, просит «подтвердить» данные или установить удалённый доступ. Пример: «Ваш аккаунт взломан, продиктуйте код из SMS». Защита: не сообщать данные по телефону, перезвонить по официальному номеру, обучение.',
   },
@@ -1910,7 +1910,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Создание фальшивых документов',
       'Обход биометрической аутентификации через фотографии',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Deepfake SE: злоумышленник использует AI для клонирования голоса CEO или создания реалистичного видео. Пример (2019): CEO британской энергетической компании перевёл €220,000 после звонка с AI-клонированным голосом руководителя. Защита: процедура верификации платежей через multiple channels, passphrase для финансовых операций, обучение о новых угрозах.',
   },
@@ -1940,7 +1940,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Фишинг через социальные сети',
       'Фишинг через мессенджеры только',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Smishing — фишинг через SMS. Сообщение выглядит как от банка, службы доставки или госоргана: «Ваш платёж отклонён. Перейдите по ссылке». Ссылка ведёт на фишинговый сайт или загружает malware. Высокая эффективность — люди доверяют SMS больше, чем email. Защита: не переходить по ссылкам из неожиданных SMS, проверять через официальный сайт/приложение.',
   },
@@ -1955,7 +1955,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Взлом сервера технической поддержки',
       'Создание фальшивого антивируса',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Tech Support Scam: pop-up в браузере «Ваш компьютер заражён! Позвоните в Microsoft» или телефонный звонок «мы обнаружили вирусы». Злоумышленник убеждает установить remote access (AnyDesk, TeamViewer), показывает фальшивые «вирусы», просит оплату за «лечение». Потери: миллионы долларов ежегодно. Защита: Microsoft никогда не звонит, не устанавливать ПО по просьбе звонящего, блокировать pop-ups.',
   },
@@ -1970,7 +1970,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Атака на водные ресурсы',
       'Фишинг через публичные WiFi',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Watering Hole: злоумышленник изучает, какие сайты посещает целевая группа (например, форум разработчиков, сайт отрасли) и заражает их exploit kit. Когда сотрудник целевой компании посещает сайт, происходит drive-by download. Пример: атака на правительственные организации через заражённые отраслевые сайты. Защита: sandboxing, endpoint protection, network segmentation.',
   },
@@ -2000,7 +2000,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Увольнение сотрудников',
       'Кража резюме',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'HR SE: злоумышленник изучает LinkedIn, находит кандидатов на рынке труда и отправляет «оффер» от имени компании. Вложение — «договор» или «тестовое задание» — содержит malware. Высокая эффективность — кандидаты мотивированы открыть документы от «работодателя». Защита: верификация email-домена отправителя, не открывать вложения без проверки через официальный сайт компании.',
   },
@@ -2015,7 +2015,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Принцип взаимности — «я сделал вам одолжение»',
       'Принцип симпатии — «мы же друзья»',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Принцип авторитета (Authority) — один из 6 принципов влияния Cialdini. Люди склонны подчиняться авторитетам без критического анализа. SE-атаки часто используют: форму IT-специалиста, бейдж «руководителя», юридический жаргон, поддельные письма от «CEO». Пример: CEO Fraud. Защита: процедура верификации запросов от «руководства», обучение о принципе авторитета.',
   },
@@ -2031,7 +2031,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Слишком частые запросы к API',
       'Отсутствие документации API',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'BOLA (также IDOR для API) — #1 в OWASP API Security Top 10. API эндпоинт принимает ID объекта, но не проверяет авторизацию. Пример: GET /api/orders/123 возвращает заказ любого пользователя. Защита: проверять ownership объекта, использовать GUID вместо sequential IDs, middleware авторизации.',
   },
@@ -2061,7 +2061,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Массовая регистрация пользователей',
       'Автоматическое назначение ролей',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Mass Assignment: пользователь отправляет {"name":"John","role":"admin"} при обновлении профиля, и API сохраняет поле role. Защита: использовать allowlist разрешённых полей для каждого эндпоинта, DTO для сериализации.',
   },
@@ -2076,7 +2076,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Облачные API не используют HTTPS',
       'SSRF работает только в AWS',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'В облачных средах (AWS, GCP, Azure) каждый инстанс имеет metadata service на 169.254.169.254. Через SSRF можно получить IAM credentials, конфигурацию, user data. Это может привести к полной компрометации аккаунта.',
   },
@@ -2091,7 +2091,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Ограничение скорости интернета',
       'Ограничение числа пользователей',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Rate Limiting ограничивает количество запросов (например, 5 попыток входа за 15 минут). Защищает от брутфорса, credential stuffing, DoS. Реализуется через express-rate-limit, Redis-based counters, API Gateway quotas.',
   },
@@ -2121,7 +2121,7 @@ export const quizQuestions: QuizQuestion[] = [
       'API, использующий шифрование',
       'Анонимный API',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Shadow API — эндпоинты, не задокументированные в OpenAPI/Swagger, не прошедшие security review. Часто создаются разработчиками для быстрого решения задач. Могут содержать уязвимости. Защита: полный реестр API, автоматическое обнаружение, API Gateway.',
   },
@@ -2136,7 +2136,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Он не поддерживает шифрование',
       'Он работает только в development',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Algorithm none attack: злоумышленник создаёт JWT с header {"alg":"none"} и пустой подписью. Если сервер не проверяет алгоритм, он примет токен без верификации. Защита: явно указывать algorithms: ["HS256"] при верификации, reject unknown algorithms.',
   },
@@ -2151,7 +2151,7 @@ export const quizQuestions: QuizQuestion[] = [
       'CORS шифрует данные',
       'CORS нужен только для WebSocket',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'CORS (Cross-Origin Resource Sharing) контролирует запросы между доменами. origin: "*" с credentials: true — опасная комбинация, позволяющая любому сайту делать запросы с куками. Защита: конкретный список разрешённых доменов, минимальные методы.',
   },
@@ -2181,7 +2181,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Это метод оптимизации запросов',
       'Это система аутентификации',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'GraphQL introspection позволяет запросить полную схему через __schema и __type. Злоумышленник использует это для reconnaissance: найти скрытые мутации, sensitive поля, admin endpoints. Защита: отключить introspection в production, persisted queries, depth limiting.',
   },
@@ -2191,7 +2191,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'medium',
     question: 'Какой HTTP-заголовок используется для информирования о депрекации API?',
     options: ['X-Deprecated', 'Deprecation', 'Sunset-Header', 'X-API-Version'],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Заголовок Deprecation: true указывает клиенту, что эндпоинт будет удалён. Sunset: 2024-01-01T00:00:00Z указывает дату удаления. Link: </api/v2>; rel="successor-version" указывает новую версию. Это помогает клиентам мигрировать.',
   },
@@ -2206,7 +2206,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Система кеширования API',
       'Метод аутентификации API',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'API Quotas ограничивают общее число запросов за более длительный период (в отличие от rate limiting). Например, 10,000 запросов/день для free tier, 1,000,000 для enterprise. Защита от excessive consumption, billing abuse, resource exhaustion.',
   },
@@ -2236,7 +2236,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Атака через глубокие пагинации',
       'Внедрение кода в GraphQL-запрос',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Query Depth Attack: злоумышленник отправляет запрос с глубиной вложенности 100+ (user { friends { friends { friends {...} } } }). Каждый уровень умножает количество записей, вызывая DoS. Защита: depth limiting (graphql-depth-limit), complexity analysis, query timeout.',
   },
@@ -2252,7 +2252,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Небезопасная прямая загрузка файлов',
       'Отсутствие защиты от XSS',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'IDOR возникает, когда приложение использует идентификатор объекта (например, /api/orders/123) без проверки, имеет ли текущий пользователь права на этот объект. Изменив 123 на 124, можно получить доступ к чужим данным.',
   },
@@ -2267,7 +2267,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Шифрование URL',
       'Скрытие URL от пользователя',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'GUID усложняет угадывание ID, но не заменяет проверку авторизации. Единственная надёжная защита — проверять на сервере, что текущий пользователь владеет запрошенным объектом: if (order.userId !== req.user.id) return 403.',
   },
@@ -2297,7 +2297,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Reflected IDOR',
       'Stored IDOR',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Write IDOR позволяет не только читать, но и изменять/удалять чужие данные. Например, PUT /api/users/123/profile с телом {"role":"admin"}. Это ещё опаснее Read IDOR, так как приводит к модификации данных.',
   },
@@ -2312,7 +2312,7 @@ export const quizQuestions: QuizQuestion[] = [
       'IDOR через cookie',
       'IDOR через JavaScript',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Indirect IDOR: идентификатор передаётся в POST-теле, JSON body или HTTP-заголовке. Например: {"targetUserId": "123", "action": "grantAccess"}. Многие разработчики проверяют авторизацию для URL-параметров, но забывают про body-параметры.',
   },
@@ -2367,7 +2367,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Использовать только сканеры уязвимостей',
       'IDOR невозможно тестировать автоматически',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Автоматические IDOR-тесты: создать двух пользователей, получить ресурс A, затем запросить его от имени B. Ожидается 403. Такие тесты должны быть в CI/CD для каждого нового эндпоинта. Инструменты: Burp Suite Autorize, OWASP ZAP, кастомные integration tests.',
   },
@@ -2382,7 +2382,7 @@ export const quizQuestions: QuizQuestion[] = [
       'IDOR через GraphQL batch',
       'IDOR при экспорте данных',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Bulk IDOR: POST /api/documents/delete {ids: [1, 2, 3, 4, 5]}. Если сервер не проверяет ownership для каждого ID, пользователь может удалить чужие документы. Защита: проверять каждый ID в массиве, возвращать частичный результат с ошибками для unauthorized IDs.',
   },
@@ -2423,7 +2423,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Через модификацию заголовков',
       'Только через прокси',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'Чёрные списки легко обойти: 0.0.0.0 → 127.0.0.1, 2130706433 (decimal) → 127.0.0.1, [::1] → IPv6 localhost, 127.0.0.1.nip.io → DNS rebinding. Правильная защита: allowlist доменов + DNS resolution + проверка IP после resolution.',
   },
@@ -2438,7 +2438,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Микросервисы не имеют аутентификации',
       'SSRF работает только с монолитами',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'В микросервисной архитектуре внутренние сервисы (базы данных, кэши, admin panels) обычно доступны только из внутренней сети. SSRF на публичном API может дать доступ к этим внутренним сервисам через внутренние IP (10.0.x.x, 172.16.x.x).',
   },
@@ -2463,7 +2463,7 @@ export const quizQuestions: QuizQuestion[] = [
     difficulty: 'medium',
     question: 'Какой протокол может быть использован для SSRF помимо HTTP?',
     options: ['Только HTTP/HTTPS', 'FTP, Gopher, Dict, File, Redis — зависит от HTTP-клиента сервера', 'Только WebSocket', 'Только TCP'],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Многие HTTP-клиенты поддерживают другие протоколы: file:///etc/passwd (чтение файлов), gopher:// (произвольные TCP-соединения), dict:// (отправка команд Redis/Memcached). Защита: разрешать только http/https протоколы.',
   },
@@ -2478,7 +2478,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Разрешить только GET-запросы',
       'Использовать только HTTPS',
     ],
-    correctIndex: 1,
+    correctIndex: 3,
     explanation:
       'SSRF через редирект: сервер валидирует initial URL (внешний), но после редиректа (302) идёт на внутренний IP. Защита: (1) отключить автоматические редиректы (followRedirect: false), (2) валидировать Location header перед переходом, (3) проверять IP после каждого редиректа.',
   },
@@ -2493,7 +2493,7 @@ export const quizQuestions: QuizQuestion[] = [
       'Только 192.168.x.x',
       'Только localhost',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
     explanation:
       'Все приватные диапазоны: 10.0.0.0/8 (Class A private), 172.16.0.0/12 (Class B private), 192.168.0.0/16 (Class C private), 127.0.0.0/8 (loopback), 169.254.0.0/16 (link-local, cloud metadata), 0.0.0.0 (all interfaces).',
   },
@@ -2523,9 +2523,290 @@ export const quizQuestions: QuizQuestion[] = [
       'Content-Type',
       'Accept-Encoding',
     ],
-    correctIndex: 1,
+    correctIndex: 2,
     explanation:
       'Ответы от внутренних сервисов могут содержать чувствительные заголовки: Server: InternalAPI/2.1, X-Powered-By: Express, X-Internal-Debug: true, X-Forwarded-For: 10.0.0.5. Эта информация помогает злоумышленнику понять архитектуру.',
+  },
+// === Фишинг ===
+  {
+    id: 'ph-1',
+    category: 'Фишинг',
+    difficulty: 'easy',
+    question: 'Какой признак наиболее вероятно указывает на фишинговое письмо?',
+    options: [
+      'Письмо содержит логотип компании',
+      'Письмо отправлено в рабочее время',
+      'Срочное требование ввести учётные данные по ссылке',
+      'В письме указан номер телефона поддержки',
+    ],
+    correctIndex: 3,
+    explanation: 'Фишинговые письма создают срочность и требуют ввести конфиденциальные данные.',
+  },
+  {
+    id: 'ph-2',
+    category: 'Фишинг',
+    difficulty: 'easy',
+    question: 'Что такое SPF запись?',
+    options: [
+      'Протокол шифрования почты',
+      'DNS-запись, указывающая авторизованные почтовые серверы домена',
+      'Сертификат безопасности email',
+      'Тип SSL-сертификата',
+    ],
+    correctIndex: 0,
+    explanation: 'SPF определяет, какие серверы могут отправлять почту от домена.',
+  },
+  {
+    id: 'ph-3',
+    category: 'Фишинг',
+    difficulty: 'medium',
+    question: 'Что такое BEC (Business Email Compromise)?',
+    options: [
+      'Массовая рассылка вложений',
+      'Целевой фишинг от имени руководителя для мошеннических платежей',
+      'Взлом сервера через SQL',
+      'Поддельный сайт банка',
+    ],
+    correctIndex: 1,
+    explanation: 'BEC — атака, где злоумышленник выдаёт себя за руководителя.',
+  },
+  {
+    id: 'ph-4',
+    category: 'Фишинг',
+    difficulty: 'medium',
+    question: 'Что такое quishing?',
+    options: [
+      'Фишинг через QR-коды',
+      'Фишинг через голосовые сообщения',
+      'Атака через PDF',
+      'Спам в мессенджерах',
+    ],
+    correctIndex: 2,
+    explanation: 'Quishing — фишинг через QR-коды, ведущие на вредоносные сайты.',
+  },
+  {
+    id: 'ph-5',
+    category: 'Фишинг',
+    difficulty: 'hard',
+    question: 'Какой заголовок email проверяет целостность письма?',
+    options: [
+      'X-Mailer',
+      'Return-Path',
+      'DKIM-Signature',
+      'Message-ID',
+    ],
+    correctIndex: 3,
+    explanation: 'DKIM содержит криптографическую подпись для проверки целостности.',
+  },
+  {
+    id: 'ph-6',
+    category: 'Фишинг',
+    difficulty: 'hard',
+    question: 'Почему домен paypa1.com эффективен для фишинга?',
+    options: [
+      'IDN homograph',
+      'Тайпосквоттинг — визуальное сходство',
+      'Подмена DNS',
+      'Поддомен легитимного сайта',
+    ],
+    correctIndex: 0,
+    explanation: 'Тайпосквоттинг — регистрация похожего домена заменой символов.',
+  },
+  {
+    id: 'ph-7',
+    category: 'Фишинг',
+    difficulty: 'easy',
+    question: 'Что такое smishing?',
+    options: [
+      'Фишинг через SMS',
+      'Фишинг через соцсети',
+      'Фишинг через поиск',
+      'Фишинг через ПО',
+    ],
+    correctIndex: 1,
+    explanation: 'Smishing — фишинг через SMS с вредоносными ссылками.',
+  },
+  {
+    id: 'ph-8',
+    category: 'Фишинг',
+    difficulty: 'medium',
+    question: 'Какая DMARC-политика защищает от спуфинга?',
+    options: [
+      'p=none',
+      'p=quarantine или p=reject',
+      'p=monitor',
+      'DMARC не защищает',
+    ],
+    correctIndex: 2,
+    explanation: 'p=quarantine — в спам, p=reject — полное отклонение.',
+  },
+  {
+    id: 'ph-9',
+    category: 'Фишинг',
+    difficulty: 'hard',
+    question: 'Атакующий использует example.evil.com. Какой тип фишинга?',
+    options: [
+      'Тайпосквоттинг',
+      'Субдоменная имперсонация',
+      'IDN homograph',
+      'Открытый редирект',
+    ],
+    correctIndex: 3,
+    explanation: 'Субдоменная имперсонация — поддомен с названием бренда.',
+  },
+  {
+    id: 'ph-10',
+    category: 'Фишинг',
+    difficulty: 'medium',
+    question: 'Что такое vishing?',
+    options: [
+      'Голосовой фишинг',
+      'Визуальный фишинг',
+      'Видео-фишинг',
+      'Фишинг через VM',
+    ],
+    correctIndex: 0,
+    explanation: 'Vishing — голосовой фишинг через звонки.',
+  },
+  {
+    id: 'tool-1',
+    category: 'Инструменты безопасности',
+    difficulty: 'easy',
+    question: 'Какой инструмент для сканирования веб-приложений на уязвимости?',
+    options: [
+      'Wireshark',
+      'OWASP ZAP',
+      'Nmap',
+      'Metasploit',
+    ],
+    correctIndex: 1,
+    explanation: 'OWASP ZAP — сканер уязвимостей для веб-приложений.',
+  },
+  {
+    id: 'tool-2',
+    category: 'Инструменты безопасности',
+    difficulty: 'easy',
+    question: 'Для чего используется Nmap?',
+    options: [
+      'Сканирование портов и сервисов',
+      'Анализ SQL-инъекций',
+      'Генерация паролей',
+      'Шифрование',
+    ],
+    correctIndex: 2,
+    explanation: 'Nmap — сканер хостов, портов и сервисов.',
+  },
+  {
+    id: 'tool-3',
+    category: 'Инструменты безопасности',
+    difficulty: 'medium',
+    question: 'Какой инструмент анализирует HTTP-трафик?',
+    options: [
+      'John the Ripper',
+      'Burp Suite',
+      'Aircrack-ng',
+      'Snort',
+    ],
+    correctIndex: 3,
+    explanation: 'Burp Suite — прокси для анализа HTTP-запросов.',
+  },
+  {
+    id: 'tool-4',
+    category: 'Инструменты безопасности',
+    difficulty: 'medium',
+    question: 'Что делает sqlmap?',
+    options: [
+      'Сканирует порты',
+      'Автообнаружение SQL-инъекций',
+      'Кеширует запросы',
+      'Оптимизирует БД',
+    ],
+    correctIndex: 0,
+    explanation: 'sqlmap — автообнаружение и эксплуатация SQLi.',
+  },
+  {
+    id: 'tool-5',
+    category: 'Инструменты безопасности',
+    difficulty: 'medium',
+    question: 'Какой инструмент для анализа сетевого трафика?',
+    options: [
+      'Nikto',
+      'Hydra',
+      'Wireshark',
+      'Gobuster',
+    ],
+    correctIndex: 1,
+    explanation: 'Wireshark — анализатор трафика с захватом пакетов.',
+  },
+  {
+    id: 'tool-6',
+    category: 'Инструменты безопасности',
+    difficulty: 'hard',
+    question: 'Какой флаг nmap сканирует версии сервисов?',
+    options: [
+      '-sS',
+      '-sV',
+      '-O',
+      '-A',
+    ],
+    correctIndex: 2,
+    explanation: 'Флаг -sV определяет версии сервисов.',
+  },
+  {
+    id: 'tool-7',
+    category: 'Инструменты безопасности',
+    difficulty: 'hard',
+    question: 'Что делает Gobuster?',
+    options: [
+      'Перебор директорий и DNS',
+      'Сканирует SQLi',
+      'Анализирует XSS',
+      'Декомпилирует JS',
+    ],
+    correctIndex: 3,
+    explanation: 'Gobuster — брутфорс директорий и DNS-субдоменов.',
+  },
+  {
+    id: 'tool-8',
+    category: 'Инструменты безопасности',
+    difficulty: 'easy',
+    question: 'Какой инструмент для брутфорса паролей?',
+    options: [
+      'Nmap',
+      'Hydra',
+      'Wireshark',
+      'Nikto',
+    ],
+    correctIndex: 0,
+    explanation: 'Hydra — онлайн-брутфорс учётных данных.',
+  },
+  {
+    id: 'tool-9',
+    category: 'Инструменты безопасности',
+    difficulty: 'medium',
+    question: 'Что делает Nikto?',
+    options: [
+      'Сканирует опасные файлы',
+      'Анализирует бинарники',
+      'Декодирует JWT',
+      'Генерирует SSL',
+    ],
+    correctIndex: 1,
+    explanation: 'Nikto — сканер серверов на опасные файлы.',
+  },
+  {
+    id: 'tool-10',
+    category: 'Инструменты безопасности',
+    difficulty: 'hard',
+    question: 'Какой режим Burp Suite автоматически модифицирует запросы?',
+    options: [
+      'Proxy',
+      'Intruder',
+      'Repeater',
+      'Sequencer',
+    ],
+    correctIndex: 2,
+    explanation: 'Intruder — автоматизированная модификация запросов.',
   },
 ];
 
