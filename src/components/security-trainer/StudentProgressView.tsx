@@ -74,8 +74,8 @@ export default function StudentProgressView({ students: studentList, groupId, on
         setSummary(summ);
         setTrends(trendData);
       })
-      .catch(() => {
-        // Intentionally silent — data fetch errors are handled by loading state
+      .catch((err) => {
+        console.error('StudentProgressView: Failed to load student data:', err);
       })
       .finally(() => setLoading(false));
   }, [selectedId, groupId]);

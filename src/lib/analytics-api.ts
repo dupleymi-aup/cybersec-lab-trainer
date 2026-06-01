@@ -21,7 +21,9 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   return { 'Content-Type': 'application/json' };
 }
 
-async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
+async function apiFetch(url: string, options: RequestInit = {}, timeoutMs = 10000): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   const authHeaders = await getAuthHeaders();
   const csrfToken = typeof document !== 'undefined'
     ? document.cookie
@@ -29,14 +31,16 @@ async function apiFetch(url: string, options: RequestInit = {}): Promise<Respons
         .find((row) => row.startsWith('csrf-token='))
         ?.split('=')[1]
     : undefined;
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      ...authHeaders,
-      ...options.headers,
-      ...(csrfToken && { 'x-csrf-token': csrfToken }),
-    },
-  });
+  try {
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        ...authHeaders,
+        ...options.headers,
+        ...(csrfToken && { 'x-csrf-token': csrfToken }),
+      },
+    });
   if (!res.ok) {
     const contentType = res.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
@@ -45,6 +49,7 @@ async function apiFetch(url: string, options: RequestInit = {}): Promise<Respons
     }
     throw new Error(`API error: ${res.status} ${res.statusText}`);
   }
+  } finally { clearTimeout(timeoutId); }
   return res;
 }
 

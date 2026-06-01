@@ -325,7 +325,7 @@ export default function ProfilePage() {
             <div className="w-20 h-20 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden border-2 border-violet-200">
               {user.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.avatar} alt="Аватар" className="w-full h-full object-cover" />
+                <img src={user.avatar} alt={`Аватар: ${user.fullName || "Пользователь"}`} className="w-full h-full object-cover" />
               ) : (
                 <User className="w-10 h-10 text-violet-500" />
               )}

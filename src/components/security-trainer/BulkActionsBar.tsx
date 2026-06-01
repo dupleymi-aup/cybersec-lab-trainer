@@ -21,7 +21,13 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
   const [groups, setGroups] = useState<string[]>([]);
 
   useEffect(() => {
-    getAllGroups().then(setGroups);
+    const controller = new AbortController();
+    getAllGroups().then((g) => {
+      setGroups(g);
+    }).catch((err) => {
+      console.error('BulkActionsBar: Failed to load groups:', err);
+    });
+    return () => { controller.abort(); };
   }, []);
 
   const handleBulkDelete = async () => {

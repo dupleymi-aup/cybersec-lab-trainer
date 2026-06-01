@@ -124,7 +124,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={tierData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 10 }}>
-                    {tierData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                    {tierData.map((entry) => <Cell key={entry.tier} fill={entry.color} />)}
                   </Pie>
                   <Tooltip />
                 </PieChart>
@@ -212,7 +212,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                       <div>
                         <h4 className="font-semibold text-sm text-emerald-700 mb-1">Сильные стороны</h4>
                         <div className="flex flex-wrap gap-1">
-                          {s.strengths.map((w, i) => <Badge key={i} className="bg-emerald-100 text-emerald-700 text-[10px]">{w}</Badge>)}
+                          {s.strengths.map((w) => <Badge key={w} className="bg-emerald-100 text-emerald-700 text-[10px]">{w}</Badge>)}
                         </div>
                       </div>
                     )}
@@ -220,7 +220,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                       <div>
                         <h4 className="font-semibold text-sm text-amber-700 mb-1">Зоны роста</h4>
                         <div className="flex flex-wrap gap-1">
-                          {s.weaknesses.map((w, i) => <Badge key={i} className="bg-amber-100 text-amber-700 text-[10px]">{w}</Badge>)}
+                          {s.weaknesses.map((w) => <Badge key={w} className="bg-amber-100 text-amber-700 text-[10px]">{w}</Badge>)}
                         </div>
                       </div>
                     )}
@@ -228,8 +228,8 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                       <div>
                         <h4 className="font-semibold text-sm text-indigo-700 mb-1">Рекомендации</h4>
                         <ul className="space-y-1">
-                          {s.recommendations.map((r, i) => (
-                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1">
+                          {s.recommendations.map((r, _i) => (
+                            <li key={s.certLevel + r} className="text-xs text-muted-foreground flex items-start gap-1">
                               <span className="text-indigo-500 mt-0.5">•</span> {r}
                             </li>
                           ))}

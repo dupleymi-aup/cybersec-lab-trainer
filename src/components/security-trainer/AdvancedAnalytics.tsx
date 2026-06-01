@@ -118,6 +118,11 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
         setRetryData(retry);
         setLoading(false);
       }
+    }).catch((err) => {
+      if (!cancelled) {
+        console.error("AdvancedAnalytics: Failed to load data:", err);
+        setLoading(false);
+      }
     });
     return () => { cancelled = true; };
   }, [days, groupId]);

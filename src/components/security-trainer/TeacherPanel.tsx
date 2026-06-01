@@ -873,7 +873,7 @@ export default function TeacherPanel() {
                     <ResponsiveContainer width="100%" height={220}>
                       <PieChart>
                         <Pie data={data} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 10 }}>
-                          {data.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                          {data.map((entry) => <Cell key={entry.color + entry.name} fill={entry.color} />)}
                         </Pie>
                         <Tooltip formatter={(value: unknown) => `${value}`} />
                       </PieChart>
@@ -901,7 +901,7 @@ export default function TeacherPanel() {
                     <ResponsiveContainer width="100%" height={220}>
                       <PieChart>
                         <Pie data={data} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 10 }}>
-                          {data.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                          {data.map((entry) => <Cell key={entry.color + entry.name} fill={entry.color} />)}
                         </Pie>
                         <Tooltip formatter={(value: unknown) => `${value}`} />
                       </PieChart>
@@ -1138,8 +1138,8 @@ export default function TeacherPanel() {
                         </div>
                       </div>
                       <div className="mt-3 flex flex-wrap gap-1.5">
-                        {reasons.map((r, i) => (
-                          <Badge key={i} variant="destructive" className="text-[10px]">{r}</Badge>
+                        {reasons.map((r, _i) => (
+                          <Badge key={r} variant="destructive" className="text-[10px]">{r}</Badge>
                         ))}
                       </div>
                     </CardContent>
@@ -1270,7 +1270,7 @@ export default function TeacherPanel() {
                         label={(entry) => `${entry.name} (${((entry.percent ?? 0) * 100).toFixed(0)}%)`}
                       >
                         {distribution.map((entry, i) => (
-                          <Cell key={i} fill={entry.color} />
+                          <Cell key={entry.color + entry.name} fill={entry.color} />
                         ))}
                       </Pie>
                       <Tooltip />
@@ -1364,7 +1364,7 @@ export default function TeacherPanel() {
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {reasons.slice(0, 2).map((r, i) => (
-                          <Badge key={i} variant="destructive" className="text-[10px]">{r}</Badge>
+                          <Badge key={r} variant="destructive" className="text-[10px]">{r}</Badge>
                         ))}
                       </div>
                     </div>

@@ -93,7 +93,12 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
 
   // Fetch groups list for selector
   useEffect(() => {
-    getAllGroups().then((g) => setGroups(g)).catch(() => setGroups([]));
+    const controller = new AbortController();
+    getAllGroups().then((g) => setGroups(g)).catch((err) => {
+      console.error('CohortAnalysis: Failed to load groups:', err);
+      setGroups([]);
+    });
+    return () => { controller.abort(); };
   }, []);
 
   // Fetch cohort data

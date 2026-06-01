@@ -140,7 +140,7 @@ export default function AdminPanel() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   useEffect(() => {
     getAllUsers()
-      .then(setAllUsers)
+      .then(setAllUsers).catch((err) => console.error("AdminPanel: Failed to load users:", err))
       .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
   const filteredUsers = allUsers.filter((u) => {

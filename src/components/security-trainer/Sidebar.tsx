@@ -135,8 +135,8 @@ export default function Sidebar() {
           setDeadlineMap(map);
         }
       })
-      .catch(() => {
-        // Intentionally silent
+      .catch((err) => {
+        console.error('Sidebar: Failed to load deadlines:', err);
       });
     return () => controller.abort();
   }, []);

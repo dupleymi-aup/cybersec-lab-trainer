@@ -60,7 +60,9 @@ export default function AuditLogView() {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
     loadData();
+    return () => { controller.abort(); };
   }, []);
 
   // Get unique admin names for filter

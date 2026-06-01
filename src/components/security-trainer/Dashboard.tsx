@@ -157,8 +157,8 @@ export default function Dashboard() {
           }
         }
       })
-      .catch(() => {
-        // Silently ignore errors
+      .catch((err) => {
+        console.error('Dashboard: Failed to load notifications:', err);
       });
   }, []);
 

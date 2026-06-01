@@ -57,15 +57,23 @@ function getAuthHeaders(): Record<string, string> {
   return { 'Content-Type': 'application/json' };
 }
 
-async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  return fetch(url, {
-    ...options,
-    headers: {
-      ...getAuthHeaders(),
-      ...options.headers,
-      ...getCsrfHeaders(),
-    },
-  });
+async function apiFetch(url: string, options: RequestInit = {}, timeoutMs = 10000): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        ...getAuthHeaders(),
+        ...options.headers,
+        ...getCsrfHeaders(),
+      },
+    });
+    return res;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // ─── Exported helper functions (used by AdminPanel, TeacherPanel, etc.) ──

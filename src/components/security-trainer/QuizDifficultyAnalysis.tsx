@@ -54,7 +54,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
     fetch(`/api/analytics/quiz-difficulty?${params}`)
       .then((res) => res.json())
       .then(setData)
-      .catch(() => setData(null))
+      .catch((err) => { console.error("QuizDifficultyAnalysis: Failed to load data:", err); setData(null); })
       .finally(() => setLoading(false));
   }, [groupId, days]);
 
