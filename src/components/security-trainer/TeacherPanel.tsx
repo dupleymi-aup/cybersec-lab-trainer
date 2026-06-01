@@ -143,6 +143,19 @@ async function getStudentProgress(userId: string): Promise<StudentProgress> {
   };
 }
 
+const EMPTY_PROGRESS: StudentProgress = {
+  userId: "",
+  completedModules: [],
+  quizScores: {},
+  moduleTimestamps: {},
+  quizTimestamps: {},
+  studiedOwaspItems: [],
+  sqlCompletedLevels: [],
+  xssCompletedLevels: [],
+  csrfCompletedSteps: [],
+  secureCodingCorrectCount: 0,
+};
+
 export default function TeacherPanel() {
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const user = useAuthStore(s => s.user);
@@ -153,18 +166,6 @@ export default function TeacherPanel() {
   const [_selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; email: string; group: string; avatar: string }>>([]);
   const [studentProgress, setStudentProgress] = useState<Record<string, StudentProgress>>({});
-  const EMPTY_PROGRESS: StudentProgress = {
-    userId: '',
-    completedModules: [],
-    quizScores: {},
-    moduleTimestamps: {},
-    quizTimestamps: {},
-    studiedOwaspItems: [],
-    sqlCompletedLevels: [],
-    xssCompletedLevels: [],
-    csrfCompletedSteps: [],
-    secureCodingCorrectCount: 0,
-  };
   const getSp = useCallback((id: string) => studentProgress[id] ?? EMPTY_PROGRESS, [studentProgress]);
   const [loadingStudents, setLoadingStudents] = useState(true);
 
