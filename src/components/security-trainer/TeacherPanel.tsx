@@ -373,6 +373,19 @@ export default function TeacherPanel() {
     });
   }, [groups, students, getSp]);
 
+  const sortedStudents = useMemo(() => {
+    const sorted = [...filteredStudents];
+    if (gradebookSort === 'modules') sorted.sort((a, b) => getSp(b.id).completedModules.length - getSp(a.id).completedModules.length);
+    if (gradebookSort === 'score') sorted.sort((a, b) => {
+      const aScores = Object.values(getSp(a.id).quizScores);
+      const bScores = Object.values(getSp(b.id).quizScores);
+      const aAvg = aScores.length > 0 ? aScores.reduce((x, y) => x + y, 0) / aScores.length : 0;
+      const bAvg = bScores.length > 0 ? bScores.reduce((x, y) => x + y, 0) / bScores.length : 0;
+      return bAvg - aAvg;
+    });
+    return sorted;
+  }, [filteredStudents, gradebookSort, getSp]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -501,49 +514,37 @@ export default function TeacherPanel() {
                 </tr>
               </thead>
               <tbody>
-                {(() => {
-                  const sorted = useMemo(() => [...filteredStudents], [filteredStudents]);
-                  if (gradebookSort === 'modules') sorted.sort((a, b) => getSp(b.id).completedModules.length - getSp(a.id).completedModules.length);
-                  if (gradebookSort === 'score') sorted.sort((a, b) => {
-                    const aScores = Object.values(getSp(a.id).quizScores);
-                    const bScores = Object.values(getSp(b.id).quizScores);
-                    const aAvg = aScores.length > 0 ? aScores.reduce((x, y) => x + y, 0) / aScores.length : 0;
-                    const bAvg = bScores.length > 0 ? bScores.reduce((x, y) => x + y, 0) / bScores.length : 0;
-                    return bAvg - aAvg;
-                  });
+                {sortedStudents.map((student) => {
+                  const progress = getSp(student.id);
+                  const scores = Object.entries(progress.quizScores);
+                  const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, [, v]) => a + v, 0) / scores.length) : 0;
 
-                  return sorted.map((student) => {
-                    const progress = getSp(student.id);
-                    const scores = Object.entries(progress.quizScores);
-                    const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, [, v]) => a + v, 0) / scores.length) : 0;
-
-                    return (
-                      <tr key={student.id} className="border-b border-slate-100 hover:bg-secondary">
-                        <td className="p-2 font-medium sticky left-0 bg-card z-10">
-                          <div>
-                            <div className="truncate max-w-[120px]">{student.fullName}</div>
-                            {student.group && <div className="text-[10px] text-slate-400">{student.group}</div>}
-                          </div>
-                        </td>
-                        {modules.map((m) => {
-                          const done = progress.completedModules.includes(m.id);
-                          return (
-                            <td key={m.id} className="p-2 text-center">
-                              <span className={`inline-block w-5 h-5 rounded-full text-[10px] leading-5 ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-slate-300'}`}>
-                                {done ? '✓' : '·'}
-                              </span>
-                            </td>
-                          );
-                        })}
-                        <td className="p-2 text-center">
-                          <Badge variant={avgScore >= 70 ? 'default' : avgScore >= 50 ? 'secondary' : 'destructive'} className="text-[10px] min-w-[36px]">
-                            {scores.length > 0 ? `${avgScore}%` : '—'}
-                          </Badge>
-                        </td>
-                      </tr>
-                    );
-                  });
-                })()}
+                  return (
+                    <tr key={student.id} className="border-b border-slate-100 hover:bg-secondary">
+                      <td className="p-2 font-medium sticky left-0 bg-card z-10">
+                        <div>
+                          <div className="truncate max-w-[120px]">{student.fullName}</div>
+                          {student.group && <div className="text-[10px] text-slate-400">{student.group}</div>}
+                        </div>
+                      </td>
+                      {modules.map((m) => {
+                        const done = progress.completedModules.includes(m.id);
+                        return (
+                          <td key={m.id} className="p-2 text-center">
+                            <span className={`inline-block w-5 h-5 rounded-full text-[10px] leading-5 ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-slate-300'}`}>
+                              {done ? '✓' : '·'}
+                            </span>
+                          </td>
+                        );
+                      })}
+                      <td className="p-2 text-center">
+                        <Badge variant={avgScore >= 70 ? 'default' : avgScore >= 50 ? 'secondary' : 'destructive'} className="text-[10px] min-w-[36px]">
+                          {scores.length > 0 ? `${avgScore}%` : '—'}
+                        </Badge>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -1269,8 +1270,8 @@ export default function TeacherPanel() {
                         nameKey="range"
                         label={(entry) => `${entry.name} (${((entry.percent ?? 0) * 100).toFixed(0)}%)`}
                       >
-                        {distribution.map((entry, i) => (
-                          <Cell key={entry.color + entry.name} fill={entry.color} />
+                        {distribution.map((entry) => (
+                          <Cell key={entry.color + entry.range} fill={entry.color} />
                         ))}
                       </Pie>
                       <Tooltip />
@@ -1363,7 +1364,7 @@ export default function TeacherPanel() {
                         {student.group && <Badge variant="secondary" className="text-[10px]">{student.group}</Badge>}
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {reasons.slice(0, 2).map((r, i) => (
+                        {reasons.slice(0, 2).map((r) => (
                           <Badge key={r} variant="destructive" className="text-[10px]">{r}</Badge>
                         ))}
                       </div>

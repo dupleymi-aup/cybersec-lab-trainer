@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-interface UseAnalyticsFetchOptions<T> {
+interface UseAnalyticsFetchOptions<_T> {
   /** API endpoint URL (e.g., '/api/analytics/engagement') */
   endpoint: string;
   /** Query parameters (e.g., 'days=30&groupId=abc') */

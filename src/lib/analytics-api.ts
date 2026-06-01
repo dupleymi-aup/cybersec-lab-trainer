@@ -31,8 +31,9 @@ async function apiFetch(url: string, options: RequestInit = {}, timeoutMs = 1000
         .find((row) => row.startsWith('csrf-token='))
         ?.split('=')[1]
     : undefined;
+  let res: Response;
   try {
-    const res = await fetch(url, {
+    res = await fetch(url, {
       ...options,
       signal: controller.signal,
       headers: {

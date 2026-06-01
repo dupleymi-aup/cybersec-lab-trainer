@@ -124,7 +124,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={tierData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 10 }}>
-                    {tierData.map((entry) => <Cell key={entry.tier} fill={entry.color} />)}
+                    {tierData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
                   </Pie>
                   <Tooltip />
                 </PieChart>
@@ -229,7 +229,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                         <h4 className="font-semibold text-sm text-indigo-700 mb-1">Рекомендации</h4>
                         <ul className="space-y-1">
                           {s.recommendations.map((r, _i) => (
-                            <li key={s.certLevel + r} className="text-xs text-muted-foreground flex items-start gap-1">
+                            <li key={s.readinessTier + r} className="text-xs text-muted-foreground flex items-start gap-1">
                               <span className="text-indigo-500 mt-0.5">•</span> {r}
                             </li>
                           ))}

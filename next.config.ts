@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  turbo: { root: process.cwd() },
   typescript: {
     ignoreBuildErrors: false,
   },
