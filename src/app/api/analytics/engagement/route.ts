@@ -70,15 +70,15 @@ export async function GET(request: NextRequest) {
   for (const l of loginActivity) {
     if (!l.userId) continue;
     if (!loginByUser.has(l.userId)) loginByUser.set(l.userId, []);
-    loginByUser.get(l.userId).push(l);
+    loginByUser.get(l.userId)!.push(l);
   }
   for (const p of progressRecords) {
     if (!progressByUser.has(p.userId)) progressByUser.set(p.userId, []);
-    progressByUser.get(p.userId).push(p);
+    progressByUser.get(p.userId)!.push(p);
   }
   for (const q of quizAttempts) {
     if (!attemptsByUser.has(q.userId)) attemptsByUser.set(q.userId, []);
-    attemptsByUser.get(q.userId).push(q);
+    attemptsByUser.get(q.userId)!.push(q);
   }
   for (const p of allProgress) {
     if (p.completed) {
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
   }
   for (const q of allQuizResults) {
     if (!quizResultsByUser.has(q.userId)) quizResultsByUser.set(q.userId, []);
-    quizResultsByUser.get(q.userId).push(q);
+    quizResultsByUser.get(q.userId)!.push(q);
   }
 
   const engagementScores: number[] = [];

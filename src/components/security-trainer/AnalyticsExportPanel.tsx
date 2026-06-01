@@ -62,8 +62,9 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
   }, []);
 
   useEffect(() => {
+    const timers = timersRef.current;
     return () => {
-      timersRef.current.forEach(clearTimeout);
+      timers.forEach(clearTimeout);
     };
   }, []);
 
