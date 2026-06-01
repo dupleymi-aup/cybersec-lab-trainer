@@ -64,15 +64,15 @@ export async function GET(request: NextRequest) {
 
   for (const p of progressRecords) {
     if (!progressByUser.has(p.userId)) progressByUser.set(p.userId, []);
-    progressByUser.get(p.userId)!.push(p);
+    progressByUser.get(p.userId)?.push(p);
   }
   for (const q of quizResults) {
     if (!quizByUser.has(q.userId)) quizByUser.set(q.userId, []);
-    quizByUser.get(q.userId)!.push(q);
+    quizByUser.get(q.userId)?.push(q);
   }
   for (const q of quizAttempts) {
     if (!attemptsByUser.has(q.userId)) attemptsByUser.set(q.userId, []);
-    attemptsByUser.get(q.userId)!.push(q);
+    attemptsByUser.get(q.userId)?.push(q);
   }
 
   for (const student of students) {

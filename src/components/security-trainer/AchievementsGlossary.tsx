@@ -338,7 +338,7 @@ export default function AchievementsAndGlossary() {
           {activeCategory && (
             <p className="text-xs text-muted-foreground">
               Показано: <strong>{activeCategory}</strong> — {filteredTerms.length} терминов
-              <button className="text-emerald-600 ml-1 underline" onClick={() => setActiveCategory('')}>Сбросить</button>
+              <button type="button" className="text-emerald-600 ml-1 underline" onClick={() => setActiveCategory('')}>Сбросить</button>
             </p>
           )}
 

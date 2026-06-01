@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { getAllUsers, useAuthStore } from '@/lib/auth-store';
 import { useAppStore, getAuthHeaders } from '@/lib/store';
 import { quizCategories, modules } from '@/lib/data';
@@ -165,7 +165,7 @@ export default function TeacherPanel() {
     csrfCompletedSteps: [],
     secureCodingCorrectCount: 0,
   };
-  const getSp = (id: string) => studentProgress[id] ?? EMPTY_PROGRESS;
+  const getSp = useCallback((id: string) => studentProgress[id] ?? EMPTY_PROGRESS, [studentProgress]);
   const [loadingStudents, setLoadingStudents] = useState(true);
 
   useEffect(() => {
@@ -502,7 +502,7 @@ export default function TeacherPanel() {
               </thead>
               <tbody>
                 {(() => {
-                  const sorted = [...filteredStudents];
+                  const sorted = useMemo(() => [...filteredStudents], [filteredStudents]);
                   if (gradebookSort === 'modules') sorted.sort((a, b) => getSp(b.id).completedModules.length - getSp(a.id).completedModules.length);
                   if (gradebookSort === 'score') sorted.sort((a, b) => {
                     const aScores = Object.values(getSp(a.id).quizScores);

@@ -150,18 +150,18 @@ export async function GET(request: NextRequest) {
   const quizByUser = new Map<string, typeof quizResults>();
   for (const p of progressRecords) {
     if (!progressByUser.has(p.userId)) progressByUser.set(p.userId, []);
-    progressByUser.get(p.userId)!.push(p);
+    progressByUser.get(p.userId)?.push(p);
   }
   for (const q of quizResults) {
     if (!quizByUser.has(q.userId)) quizByUser.set(q.userId, []);
-    quizByUser.get(q.userId)!.push(q);
+    quizByUser.get(q.userId)?.push(q);
   }
 
   // Module distribution - index by moduleId first
   const progressByModule = new Map<string, typeof progressRecords>();
   for (const p of progressRecords) {
     if (!progressByModule.has(p.moduleId)) progressByModule.set(p.moduleId, []);
-    progressByModule.get(p.moduleId)!.push(p);
+    progressByModule.get(p.moduleId)?.push(p);
   }
 
   const moduleDistribution = Object.keys(MODULE_NAMES).map((moduleId) => {

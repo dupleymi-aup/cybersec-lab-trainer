@@ -491,7 +491,7 @@ export default function LtiPlatformManager() {
                   <div className="flex items-center gap-1">
                     <span className="text-muted-foreground">Client ID:</span>
                     <code className="bg-muted px-1 rounded text-[10px]">{p.clientId}</code>
-                    <button onClick={() => copyToClipboard(p.clientId, 'Client ID')}>
+                    <button type="button" onClick={() => copyToClipboard(p.clientId, 'Client ID')}>
                       <Copy size={10} className="text-muted-foreground" />
                     </button>
                   </div>

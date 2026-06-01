@@ -150,7 +150,7 @@ export default function GlobalSearch() {
                     placeholder="Поиск модулей, квизов, терминов..."
                     className="flex-1 text-sm outline-none bg-transparent placeholder:text-slate-400"
                   />
-                  <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-muted-foreground">
+                  <button type="button" onClick={() => setOpen(false)} className="text-slate-400 hover:text-muted-foreground">
                     <X size={16} />
                   </button>
                 </div>

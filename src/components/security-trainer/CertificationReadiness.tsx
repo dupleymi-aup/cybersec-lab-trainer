@@ -174,7 +174,7 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                     <td className="p-2 text-center">{s.modulesCompleted}/{s.totalModules}</td>
                     <td className="p-2 text-center">{s.achievements}</td>
                     <td className="p-2 text-center">
-                      <button onClick={() => setExpandedId(expandedId === s.userId ? null : s.userId)} className="text-slate-400 hover:text-muted-foreground">
+                      <button type="button" onClick={() => setExpandedId(expandedId === s.userId ? null : s.userId)} className="text-slate-400 hover:text-muted-foreground">
                         {expandedId === s.userId ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                       </button>
                     </td>

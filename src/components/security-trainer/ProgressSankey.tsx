@@ -92,7 +92,7 @@ export default function ProgressSankey({ groupId: controlledGroupId, days: contr
       {controlledDays === undefined && (
         <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
           {PERIOD_OPTIONS.map(({ key, label }) => (
-            <button key={key} onClick={() => setInternalDays(key)}
+            <button type="button" key={key} onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'}`}>
               {label}
             </button>

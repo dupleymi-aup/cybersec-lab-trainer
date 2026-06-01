@@ -295,7 +295,7 @@ export default function AuthPages() {
                   <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm">
                     <p className="text-slate-400">
                       Нет аккаунта?{' '}
-                      <button onClick={() => setPage('register')} className="text-violet-400 hover:text-violet-300 font-medium">
+                      <button type="button" onClick={() => setPage('register')} className="text-violet-400 hover:text-violet-300 font-medium">
                         Зарегистрироваться
                       </button>
                     </p>
@@ -505,7 +505,7 @@ export default function AuthPages() {
 
                   <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm text-slate-400">
                     Уже есть аккаунт?{' '}
-                    <button onClick={() => setPage('login')} className="text-violet-400 hover:text-violet-300 font-medium">
+                    <button type="button" onClick={() => setPage('login')} className="text-violet-400 hover:text-violet-300 font-medium">
                       Войти
                     </button>
                   </div>
@@ -732,7 +732,7 @@ export default function AuthPages() {
 
                   {recoveryStep !== 'enter-otp' && (
                     <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm text-slate-400">
-                      <button onClick={() => { setPage('login'); setRecoveryStep('enter-contact'); }} className="text-violet-400 hover:text-violet-300 font-medium">
+                      <button type="button" onClick={() => { setPage('login'); setRecoveryStep('enter-contact'); }} className="text-violet-400 hover:text-violet-300 font-medium">
                         Вернуться ко входу
                       </button>
                     </div>

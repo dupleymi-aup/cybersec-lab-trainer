@@ -44,7 +44,7 @@ async function apiFetch(url: string, options: RequestInit = {}, timeoutMs = 1000
   if (!res.ok) {
     const contentType = res.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
-      const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+      const error = await res.json().catch(() => ({ error: 'Failed to parse error response' }));
       throw new Error(error.error || `API error: ${res.status}`);
     }
     throw new Error(`API error: ${res.status} ${res.statusText}`);
