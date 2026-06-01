@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  student
+  teacher
+  admin
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -20,7 +26,7 @@ model User {
   university   String    @default("")
   avatar       String    @default("")
   bio          String    @default("")
-  role         String    @default("student")  // student, teacher, admin
+  role         Role      @default(student)
   tokenVersion Int       @default(1)          // incremented on role/password change to revoke old tokens
   passwordHash String    @map("password_hash")
   createdAt    DateTime  @default(now())       @map("created_at")

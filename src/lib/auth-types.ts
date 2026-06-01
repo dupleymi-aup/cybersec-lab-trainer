@@ -6,18 +6,48 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
   admin: 2,
 };
 
+export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
+  student: ['view_modules', 'take_quizzes', 'view_progress', 'view_leaderboard'],
+  teacher: [
+    'view_modules', 'take_quizzes', 'view_progress', 'view_leaderboard',
+    'create_assignments', 'grade_submissions', 'view_students_progress',
+    'manage_deadlines', 'view_analytics', 'export_grades',
+  ],
+  admin: [
+    'view_modules', 'take_quizzes', 'view_progress', 'view_leaderboard',
+    'create_assignments', 'grade_submissions', 'view_students_progress',
+    'manage_deadlines', 'view_analytics', 'export_grades',
+    'manage_users', 'change_roles', 'block_users', 'view_audit_logs',
+    'impersonate', 'manage_announcements', 'system_settings',
+  ],
+};
+
 export function hasRole(userRole: UserRole | null | undefined, requiredRole: UserRole): boolean {
   if (!userRole) return false;
   return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
 }
 
+export function hasPermission(userRole: UserRole | null | undefined, permission: string): boolean {
+  if (!userRole) return false;
+  return ROLE_PERMISSIONS[userRole].includes(permission);
+}
+
 export function getRoleLabel(role: UserRole): string {
-  switch (role) {
-    case 'student': return 'Студент';
-    case 'teacher': return 'Преподаватель';
-    case 'admin': return 'Администратор';
-    default: return role;
-  }
+  const labels: Record<UserRole, string> = {
+    student: 'Студент',
+    teacher: 'Преподаватель',
+    admin: 'Администратор',
+  };
+  return labels[role] || role;
+}
+
+export function getRoleDescription(role: UserRole): string {
+  const descriptions: Record<UserRole, string> = {
+    student: 'Доступ к учебным модулям, тестам и отслеживанию прогресса',
+    teacher: 'Создание заданий, проверка работ, аналитика студентов',
+    admin: 'Полный доступ: управление пользователями, настройки системы',
+  };
+  return descriptions[role] || '';
 }
 
 export interface User {

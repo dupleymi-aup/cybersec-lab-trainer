@@ -50,7 +50,7 @@ export const registerSchema = z.object({
   email: z.string().email('Invalid email').max(255),
   phone: z.string().min(10, 'Invalid phone number').max(20),
   fullName: z.string().min(2, 'Name must be at least 2 characters').max(200),
-  role: z.enum(['student', 'teacher', 'admin']),
+  role: z.enum(['student', 'teacher', 'admin'], { message: 'Допустимые роли: student, teacher, admin' }),
   inviteCode: z.string().max(100).optional(),
   password: z.string().min(8, 'Password must be at least 8 characters').max(128),
 });
@@ -72,7 +72,7 @@ export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 
 // Role change validation
 export const roleChangeSchema = z.object({
-  role: z.enum(['student', 'teacher', 'admin']),
+  role: z.enum(['student', 'teacher', 'admin'], { message: 'Допустимые роли: student, teacher, admin' }),
 });
 
 export type RoleChangeInput = z.infer<typeof roleChangeSchema>;
@@ -97,7 +97,7 @@ export const createUserSchema = z.object({
   email: z.string().email('Invalid email').max(255),
   phone: z.string().min(10, 'Invalid phone number').max(20),
   fullName: z.string().min(2, 'Name must be at least 2 characters').max(200),
-  role: z.enum(['student', 'teacher', 'admin']).optional(),
+  role: z.enum(['student', 'teacher', 'admin'], { message: 'Допустимые роли: student, teacher, admin' }).optional(),
   password: z.string().min(8, 'Password must be at least 8 characters').max(128),
   group: z.string().max(100).optional(),
   course: z.string().max(100).optional(),

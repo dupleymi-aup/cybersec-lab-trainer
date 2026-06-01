@@ -51,6 +51,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Normalize role to lowercase
+    const normalizedRole = role.toLowerCase() as 'student' | 'teacher' | 'admin';
+
     const passwordHash = await hashPassword(password);
 
     const user = await prisma.user.create({
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
         email,
         phone,
         fullName,
-        role,
+        role: normalizedRole,
         passwordHash,
         lastLoginAt: new Date(),
         loginCount: 1,

@@ -47,9 +47,9 @@ export type { UserRole, User, LoginActivityEntry, AuditAction, AuditLogEntry,
   QuizSessionData, GroupDynamicsData, LoginPatternsData, QuizDifficultyData, QuizRetryData, ErrorPatternsData, PredictiveRiskData, ScheduledReport,
 };
 
-import { hasRole, getRoleLabel } from './auth-types';
+import { hasRole, hasPermission, getRoleLabel, getRoleDescription } from './auth-types';
 
-export { hasRole, getRoleLabel };
+export { hasRole, hasPermission, getRoleLabel, getRoleDescription };
 
 // ─── API helpers ──────────────────────────────────────────────
 function getAuthHeaders(): Record<string, string> {
@@ -206,8 +206,8 @@ export async function bulkChangeRole(userIds: string[], newRole: UserRole): Prom
   return { success: count > 0, count };
 }
 
-export async function bulkToggleBlock(userIds: string[], currentUserId: string, blocked: boolean): Promise<{ success: boolean; error?: string; count: number }> {
-  const action = blocked ? 'заблокировать' : 'разблокировать';
+export async function bulkToggleBlock(userIds: string[], currentUserId: string, _blocked: boolean): Promise<{ success: boolean; error?: string; count: number }> {
+  const action = _blocked ? 'заблокировать' : 'разблокировать';
   if (userIds.includes(currentUserId)) return { success: false, error: `Нельзя ${action} себя`, count: 0 };
   const results = await Promise.allSettled(userIds.filter((id) => id !== currentUserId).map((id) => toggleUserBlock(id)));
   const count = results.filter((r) => r.status === 'fulfilled' && r.value.success).length;

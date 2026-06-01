@@ -53,6 +53,7 @@ function formatMonthLabel(ym: string): string {
 }
 
 export async function GET(request: NextRequest) {
+  try {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
@@ -196,5 +197,12 @@ export async function GET(request: NextRequest) {
     week12: totalStudentsAll > 0 ? Math.round((overallAggregate.week12 / totalStudentsAll) * 10000) / 100 : 0,
   };
 
-  return NextResponse.json({ cohorts, overallRetention });
+    return NextResponse.json({ cohorts, overallRetention });
+  } catch (error) {
+    console.error('[analytics/cohort] GET error:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
 }

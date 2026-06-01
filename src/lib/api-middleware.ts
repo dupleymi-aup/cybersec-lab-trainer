@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateToken, getTokenPayload, type TokenPayload } from '@/lib/auth-server';
-import { ROLE_HIERARCHY } from './auth-types';
+import { ROLE_HIERARCHY, hasPermission, type UserRole } from './auth-types';
 import { prisma } from '@/lib/db';
 
 export type { TokenPayload };
@@ -43,6 +43,10 @@ export function requireRole(userRole: string, ...requiredRoles: string[]): boole
     if (requiredLevel === undefined) return false;
     return userLevel >= requiredLevel;
   });
+}
+
+export function requirePermission(userRole: string, permission: string): boolean {
+  return hasPermission(userRole as UserRole, permission);
 }
 
 
