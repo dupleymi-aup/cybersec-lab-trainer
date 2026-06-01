@@ -560,7 +560,7 @@ app.use((err, req, res, next) => {
 
 // Безопасно:
 app.use((err, req, res, next) => {
-  console.error('Internal error:', err); // Логируем для разработчиков
+  if (process.env.NODE_ENV === "development") console.error('Internal error:', err);
   res.status(500).json({
     error: 'Internal Server Error',
     requestId: req.id, // Для поддержки
@@ -615,7 +615,7 @@ app.use((err, req, res, next) => {
     message = err.message;
   } else {
     // Log unexpected errors for investigation
-    console.error('Unexpected error:', err);
+    if (process.env.NODE_ENV === "development") console.error('Unexpected error:', err);
     if (process.env.NODE_ENV === 'production') {
       message = 'Internal Server Error';
     } else {

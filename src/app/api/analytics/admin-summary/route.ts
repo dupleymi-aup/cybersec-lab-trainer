@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { MS_PER_DAY, PERCENT_ROUNDING_FACTOR, PERCENT_SCALE } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -11,8 +12,8 @@ export async function GET(request: NextRequest) {
   const groupBy = searchParams.get('groupBy'); // 'group' | 'course' | 'university'
 
   const now = new Date();
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * MS_PER_DAY);
+  const sixtyDaysAgo = new Date(now.getTime() - 60 * MS_PER_DAY);
 
   // Current period (last 30 days)
   const students = await prisma.user.findMany({
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
   const studentIds = students.map((s) => s.id);
   const totalStudents = students.length;
   const activeStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo).length;
-  const activePercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 10000) / 100 : 0;
+  const activePercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
 
   // Progress data
   const progressRecords = await prisma.progress.findMany({
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
     totalCompletedModules += count;
   }
   const avgCompletionRate = totalStudents > 0
-    ? Math.round((totalCompletedModules / (totalStudents * totalModules)) * 10000) / 100
+    ? Math.round((totalCompletedModules / (totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
     : 0;
 
   // Avg quiz score
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
   // Previous period (30-60 days ago)
   const prevStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= sixtyDaysAgo && s.lastLoginAt < thirtyDaysAgo);
   const prevActiveStudents = prevStudents.length;
-  const prevActivePercentage = totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * 10000) / 100 : 0;
+  const prevActivePercentage = totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
 
   // Previous period progress
   const prevProgress = await prisma.progress.findMany({
@@ -111,7 +112,7 @@ export async function GET(request: NextRequest) {
     prevTotalCompleted += count;
   }
   const prevAvgCompletionRate = totalStudents > 0
-    ? Math.round((prevTotalCompleted / (totalStudents * totalModules)) * 10000) / 100
+    ? Math.round((prevTotalCompleted / (totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
     : 0;
 
   const prevAvgQuizScore = prevQuizResults.length > 0
@@ -194,7 +195,7 @@ export async function GET(request: NextRequest) {
     for (const [key, g] of groups.entries()) {
       const completedCount = g.progressRecords.filter((p) => p.completed).length;
       const groupAvgCompletion = g.totalStudents > 0
-        ? Math.round((completedCount / (g.totalStudents * totalModules)) * 10000) / 100
+        ? Math.round((completedCount / (g.totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
         : 0;
       const groupAvgQuiz = g.quizResults.length > 0
         ? Math.round((g.quizResults.reduce((sum, q) => sum + q.percentage, 0) / g.quizResults.length) * 100) / 100

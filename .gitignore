@@ -12,3 +12,4 @@ public/workbox-*.js
 public/fallback-*.js
 prisma/dev.db
 cyberlab-mtusi/
+.lint_output.txt

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { verifyLtiLaunch, type LtiClaims } from '@/lib/lti-utils';
 import { logger } from '@/lib/logger';
 
+import { DEFAULT_APP_URL } from '@/lib/constants';
 /**
  * POST /api/lti/launch
  * Handle LTI 1.3 launch from Moodle/other LMS
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
     const token = await signJwt({ id: user.id, role: user.role });
 
     // Build redirect URL without token in query string to prevent token leakage
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL;
     const redirectUrl = `${appUrl}/lti-callback?platform=${platform.id}`;
 
     const response = NextResponse.json({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit } from '@/lib/api-middleware';
+import { RATE_WINDOW_1_MIN } from '@/lib/constants';
 
 // GET /api/admin/stats - dashboard KPIs
 export async function GET(request: NextRequest) {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
   if (!requireRole(auth.role, 'admin')) return forbidden();
 
   // Rate limit: 30 requests per minute
-  const rateLimit = checkRateLimit(`admin-stats:${auth.id}`, 30, 60_000);
+  const rateLimit = checkRateLimit(`admin-stats:${auth.id}`, 30, RATE_WINDOW_1_MIN);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: 'Too many requests', retryAfter: rateLimit.retryAfter },
