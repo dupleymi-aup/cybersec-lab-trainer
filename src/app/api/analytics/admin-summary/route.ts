@@ -161,15 +161,14 @@ export async function GET(request: NextRequest) {
 
     for (const s of students) {
       const key = s[field] || '(не указано)';
-      if (!groups.has(key)) {
-        groups.set(key, { totalStudents: 0, activeStudents: 0, progressRecords: [], quizResults: [] });
+      let g = groups.get(key);
+      if (!g) {
+        g = { totalStudents: 0, activeStudents: 0, progressRecords: [], quizResults: [] };
+        groups.set(key, g);
       }
-      const g = groups.get(key);
-      if (g) {
-        g.totalStudents++;
-        if (s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo) {
-          g.activeStudents++;
-        }
+      g.totalStudents++;
+      if (s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo) {
+        g.activeStudents++;
       }
     }
 
