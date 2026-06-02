@@ -13,3 +13,10 @@ public/fallback-*.js
 prisma/dev.db
 cyberlab-mtusi/
 .lint_output.txt
+
+# Translation generation scripts
+_gen_translations.mjs
+_gt.mjs
+
+# Local prisma
+_local_prisma/
