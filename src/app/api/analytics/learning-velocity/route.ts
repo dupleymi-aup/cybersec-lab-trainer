@@ -3,7 +3,6 @@ import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import type { Prisma } from '@prisma/client';
 
-const _MODULE_IDS = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);

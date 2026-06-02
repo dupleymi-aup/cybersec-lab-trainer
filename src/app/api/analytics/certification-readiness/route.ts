@@ -3,9 +3,8 @@ import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { isAchievementUnlocked } from '@/lib/data/achievements-data';
 import type { Prisma } from '@prisma/client';
+import { TOTAL_MODULES } from '@/lib/module-constants';
 
-const MODULE_IDS = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf'];
-const TOTAL_MODULES = MODULE_IDS.length;
 const ALL_QUIZ_CATEGORIES = ['sql', 'xss', 'csrf', 'auth', 'general', 'owasp', 'coding', 'network', 'social'];
 const CATEGORY_NAMES: Record<string, string> = {
   sql: 'SQL-инъекции',

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { CORE_MODULE_IDS } from '@/lib/module-constants';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -57,8 +58,7 @@ export async function GET(request: NextRequest) {
     distinct: ['moduleId'],
   });
   const completedModuleIds = new Set(completedModules.map((p) => p.moduleId));
-  const allModuleIds = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers'];
-  const zeroCompletionModules = allModuleIds.filter((m) => !completedModuleIds.has(m));
+  const zeroCompletionModules = CORE_MODULE_IDS.filter((m) => !completedModuleIds.has(m));
 
   // 4. Progress entries not updated in 60+ days
   const staleProgress = await prisma.progress.findMany({
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
     summary: {
       totalStudents: students.length,
       activeStudents: students.length - inactiveStudents.length,
-      totalModules: allModuleIds.length,
+      totalModules: CORE_MODULE_IDS.length,
       completedModules: completedModuleIds.size,
       totalQuizzes: await prisma.quizResult.count({ where: { userId: { in: Array.from(studentIds) } } }),
     },
