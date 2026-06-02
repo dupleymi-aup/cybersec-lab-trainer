@@ -1,8 +1,11 @@
+import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const withNextIntl = createNextIntlPlugin("./src/i18n.ts");
+
+const baseConfig = {
   reactStrictMode: true,
-  turbo: { root: process.cwd() },
+  outputFileTracingRoot: process.cwd(),
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -90,4 +93,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const nextConfig = {...baseConfig};
+export default withNextIntl(nextConfig);

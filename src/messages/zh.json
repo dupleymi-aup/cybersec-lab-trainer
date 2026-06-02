@@ -1,0 +1,247 @@
+{
+  "landing": {
+    "header": {
+      "logo": "CyberSec Lab",
+      "login": "登录",
+      "register": "注册",
+      "dashboard": "控制台"
+    },
+    "hero": {
+      "badge": "专业 09.03.04 软件工程",
+      "title": "网络安全",
+      "titleHighlight": "培训平台",
+      "subtitle": "学习Web应用程序漏洞，完成交互式测验并获得证书。面向学生和开发者的实用网络安全教育。",
+      "startLearning": "开始学习",
+      "learnMore": "了解更多"
+    },
+    "stats": {
+      "modules": "模块",
+      "quizQuestions": "测验题目",
+      "achievements": "成就",
+      "careerPaths": "职业路径"
+    },
+    "howItWorks": {
+      "badge": "简单流程",
+      "title": "使用方式",
+      "subtitle": "从注册到获得证书仅需四个步骤",
+      "steps": {
+        "1": {
+          "title": "注册账号",
+          "description": "30秒内创建账号，只需邮箱和密码"
+        },
+        "2": {
+          "title": "选择模块",
+          "description": "OWASP Top 10、SQL注入、XSS、CSRF等"
+        },
+        "3": {
+          "title": "完成测验",
+          "description": "136+道练习题，即时反馈"
+        },
+        "4": {
+          "title": "获得证书",
+          "description": "完成模块并获得技能认证"
+        }
+      }
+    },
+    "features": {
+      "title": "网络安全学习的一切所需",
+      "subtitle": "理论、实践和分析整合为一个系统",
+      "items": {
+        "interactiveModules": {
+          "title": "12个交互模块",
+          "description": "OWASP Top 10、SQL注入、XSS、CSRF等，配有实践练习"
+        },
+        "quizQuestions": {
+          "title": "136+道测验题",
+          "description": "在9个类别中测试您的知识"
+        },
+        "achievements": {
+          "title": "成就系统",
+          "description": "因进步获得奖励，保持学习动力"
+        },
+        "analytics": {
+          "title": "进度分析",
+          "description": "通过图表和报告跟踪进度"
+        },
+        "ltiIntegration": {
+          "title": "LTI集成",
+          "description": "与Moodle、Canvas等LMS系统集成"
+        },
+        "teacherAdmin": {
+          "title": "教师和管理员角色",
+          "description": "管理学生、小组和课程"
+        }
+      }
+    },
+    "demoModules": {
+      "title": "免费试用",
+      "subtitle": "从这些模块开始",
+      "lessons": "课程",
+      "try": "试用",
+      "registerCTA": "注册并获取所有模块访问权限",
+      "difficulties": {
+        "Beginner": "初级",
+        "Medium": "中级",
+        "Advanced": "高级"
+      },
+      "modules": {
+        "owasp": {
+          "title": "OWASP Top 10",
+          "description": "学习10个关键Web安全风险"
+        },
+        "auth": {
+          "title": "身份认证",
+          "description": "构建可靠的认证系统"
+        },
+        "tools": {
+          "title": "安全工具",
+          "description": "掌握安全分析工具"
+        },
+        "phishing": {
+          "title": "钓鱼分析器",
+          "description": "识别钓鱼和社会工程学攻击"
+        }
+      }
+    },
+    "reviews": {
+      "badge": "学生评价",
+      "title": "用户评价",
+      "subtitle": "超过1000名学生完成培训",
+      "items": [
+        {
+          "name": "Alexey Petrov",
+          "role": "学生，莫斯科国立大学",
+          "text": "平台帮助我理解了OWASP Top 10。交互式测验比阅读理论好得多。",
+          "achievement": "完成 OWASP Top 10"
+        },
+        {
+          "name": "Maria Ivanova",
+          "role": "开发者，Yandex",
+          "text": "完成模块后开始编写更安全的代码。",
+          "achievement": "XSS模块 100%"
+        },
+        {
+          "name": "Dmitry Kozlov",
+          "role": "教师，ITMO大学",
+          "text": "LTI集成与Moodle运行良好。",
+          "achievement": "50+名学生"
+        },
+        {
+          "name": "Elena Smirnova",
+          "role": "实习生，卡巴斯基",
+          "text": "为实际工作做好了充分准备。",
+          "achievement": "进度前10"
+        },
+        {
+          "name": "Artem Volkov",
+          "role": "开发者，Sber",
+          "text": "一个月内完成所有12个模块。",
+          "achievement": "完成全部模块"
+        },
+        {
+          "name": "Olga Novikova",
+          "role": "学生，圣彼得堡国立大学",
+          "text": "帮助我准备网络安全竞赛。",
+          "achievement": "竞赛获奖者"
+        }
+      ]
+    },
+    "cta": {
+      "title": "准备好开始学习了吗？",
+      "subtitle": "加入成千上万学习网络安全的学生",
+      "students": "学生",
+      "certificates": "证书",
+      "registration": "注册",
+      "startFree": "免费开始",
+      "disclaimer": "无需信用卡，免费模块，即时访问"
+    },
+    "faq": {
+      "badge": "常见问题",
+      "title": "常见问题",
+      "subtitle": "关于平台的答案",
+      "items": [
+        {
+          "question": "平台免费吗？",
+          "answer": "是的，基础模块免费。高级功能需要订阅。"
+        },
+        {
+          "question": "需要编程知识吗？",
+          "answer": "基础模块不需要深入编程知识。"
+        },
+        {
+          "question": "LTI集成如何工作？",
+          "answer": "通过LTI 1.3连接到Moodle或Canvas。"
+        },
+        {
+          "question": "可以跟踪学生进度吗？",
+          "answer": "是的，教师可以获得详细分析报告。"
+        },
+        {
+          "question": "有证书吗？",
+          "answer": "是的，完成每个模块后获得数字证书。"
+        },
+        {
+          "question": "涵盖哪些主题？",
+          "answer": "12个模块：OWASP、SQL注入、XSS、CSRF、密码学等。"
+        },
+        {
+          "question": "如何注册教师账号？",
+          "answer": "正常注册后联系管理员获取教师角色。"
+        }
+      ]
+    },
+    "footer": {
+      "description": "网络安全教育交互平台。学习漏洞、完成测验并获得证书。",
+      "sections": {
+        "platform": {
+          "title": "平台",
+          "links": [
+            "模块",
+            "功能",
+            "定价",
+            "LTI集成"
+          ]
+        },
+        "resources": {
+          "title": "资源",
+          "links": [
+            "文档",
+            "指南",
+            "博客",
+            "OWASP Top 10"
+          ]
+        },
+        "company": {
+          "title": "公司",
+          "links": [
+            "关于",
+            "联系",
+            "招聘",
+            "合作伙伴"
+          ]
+        },
+        "legal": {
+          "title": "法律",
+          "links": [
+            "隐私",
+            "条款",
+            "Cookie"
+          ]
+        }
+      },
+      "copyright": "(c) {year} CyberSec Lab. 保留所有权利。",
+      "statsModules": "12个模块",
+      "statsStudents": "1000+名学生",
+      "statsQuizzes": "136+道测验"
+    },
+    "codeTerminal": {
+      "comment": "// 有漏洞的代码 - 找出错误！",
+      "alert": "检测到SQL注入漏洞！",
+      "alertDescription": "在CyberSec Lab中学习如何修复漏洞"
+    },
+    "skipToContent": "跳转到主要内容"
+  },
+  "common": {
+    "language": "语言"
+  }
+}

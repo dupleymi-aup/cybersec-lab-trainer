@@ -1,0 +1,247 @@
+{
+  "landing": {
+    "header": {
+      "logo": "CyberSec Lab",
+      "login": "Log In",
+      "register": "Register",
+      "dashboard": "Dashboard"
+    },
+    "hero": {
+      "badge": "Program 09.03.04 Software Engineering",
+      "title": "Cybersecurity",
+      "titleHighlight": "Training Platform",
+      "subtitle": "Learn web application vulnerabilities, complete interactive quizzes, and earn certificates. Practical cybersecurity education for students and developers.",
+      "startLearning": "Start Learning",
+      "learnMore": "Learn More"
+    },
+    "stats": {
+      "modules": "Modules",
+      "quizQuestions": "Quiz Questions",
+      "achievements": "Achievements",
+      "careerPaths": "Career Paths"
+    },
+    "howItWorks": {
+      "badge": "Simple Process",
+      "title": "How It Works",
+      "subtitle": "Four simple steps from registration to certification",
+      "steps": {
+        "1": {
+          "title": "Sign Up",
+          "description": "Create an account in 30 seconds"
+        },
+        "2": {
+          "title": "Choose a Module",
+          "description": "OWASP Top 10, SQL Injection, XSS, CSRF, and more"
+        },
+        "3": {
+          "title": "Solve Quizzes",
+          "description": "136+ hands-on exercises with instant feedback"
+        },
+        "4": {
+          "title": "Get Certified",
+          "description": "Complete a module and earn a certificate"
+        }
+      }
+    },
+    "features": {
+      "title": "Everything for Cybersecurity Learning",
+      "subtitle": "Theory, practice, and analytics in one system",
+      "items": {
+        "interactiveModules": {
+          "title": "12 Interactive Modules",
+          "description": "OWASP Top 10, SQL Injection, XSS, CSRF, and more with hands-on exercises"
+        },
+        "quizQuestions": {
+          "title": "136+ Quiz Questions",
+          "description": "Test knowledge across 9 categories"
+        },
+        "achievements": {
+          "title": "Achievement System",
+          "description": "Earn rewards and stay motivated"
+        },
+        "analytics": {
+          "title": "Progress Analytics",
+          "description": "Track progress with charts and reports"
+        },
+        "ltiIntegration": {
+          "title": "LTI Integration",
+          "description": "Integration with Moodle, Canvas via LTI 1.3"
+        },
+        "teacherAdmin": {
+          "title": "Teacher and Admin Roles",
+          "description": "Manage students, groups, and courses"
+        }
+      }
+    },
+    "demoModules": {
+      "title": "Try for Free",
+      "subtitle": "Start with these modules",
+      "lessons": "lessons",
+      "try": "Try Now",
+      "registerCTA": "Register and access all modules",
+      "difficulties": {
+        "Beginner": "Beginner",
+        "Medium": "Medium",
+        "Advanced": "Advanced"
+      },
+      "modules": {
+        "owasp": {
+          "title": "OWASP Top 10",
+          "description": "Learn the 10 most critical web security risks"
+        },
+        "auth": {
+          "title": "Authentication",
+          "description": "Build reliable authentication systems"
+        },
+        "tools": {
+          "title": "Security Tools",
+          "description": "Master security analysis tools"
+        },
+        "phishing": {
+          "title": "Phishing Analyzer",
+          "description": "Identify phishing and social engineering"
+        }
+      }
+    },
+    "reviews": {
+      "badge": "Student Reviews",
+      "title": "What Our Users Say",
+      "subtitle": "Over 1000 students trained",
+      "items": [
+        {
+          "name": "Alexey Petrov",
+          "role": "Student, MSU",
+          "text": "Great platform for learning OWASP Top 10. Interactive quizzes are better than reading theory.",
+          "achievement": "Completed OWASP Top 10"
+        },
+        {
+          "name": "Maria Ivanova",
+          "role": "Developer, Yandex",
+          "text": "Started writing more secure code after completing modules.",
+          "achievement": "100% in XSS Module"
+        },
+        {
+          "name": "Dmitry Kozlov",
+          "role": "Teacher, ITMO",
+          "text": "LTI integration with Moodle works great.",
+          "achievement": "50+ students"
+        },
+        {
+          "name": "Elena Smirnova",
+          "role": "Intern, Kaspersky",
+          "text": "Excellent practical preparation for real work.",
+          "achievement": "Top 10 progress"
+        },
+        {
+          "name": "Artem Volkov",
+          "role": "Developer, Sber",
+          "text": "Completed all 12 modules in a month.",
+          "achievement": "All modules done"
+        },
+        {
+          "name": "Olga Novikova",
+          "role": "Student, SPbU",
+          "text": "Helped me prepare for security olympiad.",
+          "achievement": "Olympiad winner"
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready to Start Learning?",
+      "subtitle": "Join thousands of students learning cybersecurity",
+      "students": "Students",
+      "certificates": "Certificates",
+      "registration": "Registration",
+      "startFree": "Start for Free",
+      "disclaimer": "No credit card - Free modules - Instant access"
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Frequently Asked Questions",
+      "subtitle": "Popular questions about the platform",
+      "items": [
+        {
+          "question": "Is the platform free?",
+          "answer": "Yes, basic modules are free. Advanced features require subscription."
+        },
+        {
+          "question": "Do I need programming knowledge?",
+          "answer": "Basic modules do not require deep programming knowledge."
+        },
+        {
+          "question": "How does LTI integration work?",
+          "answer": "Connect CyberSec Lab to Moodle or Canvas via LTI 1.3."
+        },
+        {
+          "question": "Can I track student progress?",
+          "answer": "Yes, teachers get detailed analytics and reports."
+        },
+        {
+          "question": "Are there certificates?",
+          "answer": "Yes, digital certificates after each module."
+        },
+        {
+          "question": "What topics are covered?",
+          "answer": "12 modules: OWASP, SQL Injection, XSS, CSRF, crypto, and more."
+        },
+        {
+          "question": "How to register a teacher account?",
+          "answer": "Register normally, then ask admin for teacher role."
+        }
+      ]
+    },
+    "footer": {
+      "description": "Interactive cybersecurity education platform.",
+      "sections": {
+        "platform": {
+          "title": "Platform",
+          "links": [
+            "Modules",
+            "Features",
+            "Pricing",
+            "LTI Integration"
+          ]
+        },
+        "resources": {
+          "title": "Resources",
+          "links": [
+            "Documentation",
+            "Guide",
+            "Blog",
+            "OWASP Top 10"
+          ]
+        },
+        "company": {
+          "title": "Company",
+          "links": [
+            "About",
+            "Contact",
+            "Careers",
+            "Partners"
+          ]
+        },
+        "legal": {
+          "title": "Legal",
+          "links": [
+            "Privacy",
+            "Terms",
+            "Cookies"
+          ]
+        }
+      },
+      "copyright": "(c) {year} CyberSec Lab. All rights reserved.",
+      "statsModules": "12 modules",
+      "statsStudents": "1000+ students",
+      "statsQuizzes": "136+ quizzes"
+    },
+    "codeTerminal": {
+      "comment": "// Vulnerable code - find the bug!",
+      "alert": "SQL Injection vulnerability detected!",
+      "alertDescription": "Learn to fix vulnerabilities in CyberSec Lab"
+    },
+    "skipToContent": "Skip to main content"
+  },
+  "common": {
+    "language": "Language"
+  }
+}

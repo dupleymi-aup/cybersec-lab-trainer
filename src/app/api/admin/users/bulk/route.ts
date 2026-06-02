@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { Role } from '@prisma/client';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { validateUuid } from '@/lib/validate-uuid';
 import { logger } from '@/lib/logger';
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'role_change': {
-        const targetRole = role as string;
+        const targetRole = role as Role;
         await prisma.user.updateMany({
           where: { id: { in: userIds } },
           data: { role: targetRole, tokenVersion: { increment: 1 } },
