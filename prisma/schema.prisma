@@ -37,6 +37,7 @@ model User {
   level        Int       @default(1)           // 1-50: Junior(1-10) → Mid(11-20) → Senior(21-35) → Lead(36-50)
   streak       Int       @default(0)           // consecutive days active
   lastActivityAt DateTime?                     @map("last_activity_at")  // for streak calculation
+  hasCompletedOnboarding Boolean @default(false) @map("has_completed_onboarding")
 
   progress          Progress[]
   quizResults       QuizResult[]
