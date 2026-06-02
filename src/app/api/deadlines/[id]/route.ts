@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { updateDeadlineSchema } from '@/lib/validations/api';
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const auth = await authenticate(request);
@@ -13,7 +14,11 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
   if (existing.createdBy !== auth.id && auth.role !== 'admin') return forbidden();
 
   const body = await request.json();
-  const { dueAt, title, description, group } = body;
+  const parsed = updateDeadlineSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+  }
+  const { dueAt, title, description, group } = parsed.data;
 
   const deadline = await prisma.deadline.update({
     where: { id },

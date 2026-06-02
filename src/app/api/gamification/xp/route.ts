@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, checkRateLimit } from '@/lib/api-middleware';
 import { getLevel, XP_REWARDS } from '@/lib/xp-utils';
+import { xpActionSchema } from '@/lib/validations/api';
 
 const XP_RATE_LIMIT_MAX = 20; // max XP awards per window
 const XP_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -38,7 +39,11 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { action } = body as { action: string };
+  const parsed = xpActionSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+  }
+  const { action } = parsed.data;
 
   const xpAmount = action === 'daily_login'
     ? await calculateDailyLoginXp(auth.id)

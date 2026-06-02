@@ -184,3 +184,116 @@ export const gradeSubmissionSchema = z.object({
 });
 
 export type GradeSubmissionInput = z.infer<typeof gradeSubmissionSchema>;
+
+// XP action validation
+export const xpActionSchema = z.object({
+  action: z.string().min(1).max(100),
+  moduleId: z.string().max(100).optional(),
+});
+
+export type XPActionInput = z.infer<typeof xpActionSchema>;
+
+// Deadline creation validation
+export const createDeadlineSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200),
+  dueAt: z.string().datetime('Invalid date format'),
+  description: z.string().max(1000).optional().default(''),
+  scope: z.enum(['course', 'module', 'quiz']).default('course'),
+  scopeId: z.string().min(1, 'Scope ID is required').max(100),
+});
+
+export type CreateDeadlineInput = z.infer<typeof createDeadlineSchema>;
+
+// Deadline update validation
+export const updateDeadlineSchema = createDeadlineSchema.partial().extend({ group: z.string().max(100).optional() });
+
+export type UpdateDeadlineInput = z.infer<typeof updateDeadlineSchema>;
+
+// Quiz submission validation
+export const quizSubmissionSchema = z.object({
+  quizId: z.string().min(1, 'Quiz ID is required').max(100),
+  score: z.number().int().min(0, 'Score cannot be negative'),
+  total: z.number().int().min(1, 'Total must be at least 1'),
+  attempts: z.number().int().min(0).max(10).optional().default(1),
+  answers: z.array(z.object({
+    questionId: z.string().max(100),
+    selectedAnswer: z.union([z.string(), z.number(), z.array(z.string())]).optional(),
+  })).optional(),
+});
+
+export type QuizSubmissionInput = z.infer<typeof quizSubmissionSchema>;
+
+// Recovery request validation (email only)
+export const recoveryRequestSchema = z.object({
+  email: z.string().email('Invalid email').max(255),
+});
+
+export type RecoveryRequestInput = z.infer<typeof recoveryRequestSchema>;
+
+// Recovery request validation (email or phone)
+export const recoveryRequestEmailPhoneSchema = z.object({
+  emailOrPhone: z.string().min(1, 'Email or phone is required').max(255),
+});
+
+export type RecoveryRequestEmailPhoneInput = z.infer<typeof recoveryRequestEmailPhoneSchema>;
+
+// Recovery verification validation (email or phone)
+export const recoveryVerifyEmailPhoneSchema = z.object({
+  emailOrPhone: z.union([z.string().email('Invalid email').max(255), z.string().min(10).max(255)]),
+  otp: z.string().length(6, 'OTP must be 6 digits'),
+});
+
+export type RecoveryVerifyEmailPhoneInput = z.infer<typeof recoveryVerifyEmailPhoneSchema>;
+
+// Recovery password reset validation (email or phone)
+export const recoveryResetEmailPhoneSchema = z.object({
+  emailOrPhone: z.union([z.string().email('Invalid email').max(255), z.string().min(10).max(255)]),
+  otp: z.string().length(6, 'OTP must be 6 digits'),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters').max(128),
+});
+
+export type RecoveryResetEmailPhoneInput = z.infer<typeof recoveryResetEmailPhoneSchema>;
+
+
+// Admin announcement validation
+export const createAnnouncementSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200),
+  content: z.string().min(1, 'Content is required').max(5000),
+  priority: z.enum(['low', 'medium', 'high', 'urgent']).optional().default('medium'),
+  expiresAt: z.string().datetime().optional(),
+});
+
+export type CreateAnnouncementInput = z.infer<typeof createAnnouncementSchema>;
+
+// CSP report validation
+export const cspReportSchema = z.object({
+  'csp-report': z.object({
+    'document-uri': z.string().optional(),
+    'violated-directive': z.string().optional(),
+    'original-policy': z.string().optional(),
+    'disposition': z.string().optional(),
+  }).optional(),
+});
+
+// Import users validation
+export const importUsersSchema = z.object({
+  users: z.array(z.object({
+    email: z.string().email().max(255),
+    phone: z.string().min(10).max(20),
+    fullName: z.string().min(2).max(200),
+    role: z.enum(['student', 'teacher', 'admin']).optional(),
+    password: z.string().min(8).max(128).optional(),
+    group: z.string().max(100).optional(),
+    course: z.string().max(100).optional(),
+    university: z.string().max(200).optional(),
+  })),
+});
+
+export type ImportUsersInput = z.infer<typeof importUsersSchema>;
+
+// Password reset for admin
+export const adminResetPasswordSchema = z.object({
+  newPassword: z.string().min(8, 'Password must be at least 8 characters').max(128),
+});
+
+export type AdminResetPasswordInput = z.infer<typeof adminResetPasswordSchema>;

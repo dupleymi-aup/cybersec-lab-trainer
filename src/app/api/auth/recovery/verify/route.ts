@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
+import { recoveryVerifyEmailPhoneSchema } from '@/lib/validations/api';
 import { timingSafeEqual } from 'crypto';
 
 export async function POST(request: NextRequest) {

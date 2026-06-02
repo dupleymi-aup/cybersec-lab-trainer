@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, checkRateLimit } from '@/lib/api-middleware';
 import { quizCategories } from '@/lib/data';
+import { quizSubmissionSchema } from '@/lib/validations/api';
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
@@ -18,11 +19,15 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { quizId, score, total, attempts } = body;
+  const parsed = quizSubmissionSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+  }
+  const { quizId, score, total, attempts } = parsed.data;
 
   // Validate quizId against known quiz categories to prevent fabricated results
   const validQuizIds = quizCategories.map(c => c.id);
-  if (quizId && !validQuizIds.includes(quizId)) {
+  if (!validQuizIds.includes(quizId)) {
     return NextResponse.json({ error: 'Invalid quiz ID' }, { status: 400 });
   }
 

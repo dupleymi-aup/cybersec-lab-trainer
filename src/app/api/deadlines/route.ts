@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { createDeadlineSchema } from '@/lib/validations/api';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -40,15 +41,13 @@ export async function POST(request: NextRequest) {
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const body = await request.json();
-  const { scope, scopeId, dueAt, title, description, group } = body;
-
-  if (!scope || !scopeId || !dueAt || !title) {
-    return NextResponse.json({ error: 'scope, scopeId, dueAt, and title are required' }, { status: 400 });
+  const parsed = createDeadlineSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
-
-  if (!['course', 'module', 'quiz'].includes(scope)) {
-    return NextResponse.json({ error: 'scope must be "course", "module", or "quiz"' }, { status: 400 });
-  }
+  const { scope, scopeId: scopeIdRaw, dueAt, title, description } = parsed.data;
+  const scopeId = scopeIdRaw || '';
+  const group = body.group || '';
 
   const deadline = await prisma.deadline.create({
     data: {
@@ -57,8 +56,8 @@ export async function POST(request: NextRequest) {
       scopeId,
       dueAt: new Date(dueAt),
       title,
-      description: description || '',
-      group: group || '',
+      description,
+      group,
       createdBy: auth.id,
     },
     include: {

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
+import { recoveryResetEmailPhoneSchema } from '@/lib/validations/api';
 import { timingSafeEqual } from 'crypto';
 
 export async function POST(request: NextRequest) {

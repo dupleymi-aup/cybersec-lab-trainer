@@ -4,14 +4,15 @@ import { generateOTP } from '@/lib/auth-utils';
 import { otpStore, ensureOtpCapacity } from '@/lib/otp-store';
 import { sendOTPRecoveryEmail } from '@/lib/email';
 import { checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { recoveryRequestEmailPhoneSchema } from '@/lib/validations/api';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { emailOrPhone } = body;
-
-  if (!emailOrPhone) {
-    return NextResponse.json({ error: 'Email or phone required' }, { status: 400 });
+  const parsed = recoveryRequestEmailPhoneSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
+  const { emailOrPhone } = parsed.data;
 
   // Rate limit: 3 OTP requests per 10 minutes per email/phone to prevent email flooding
   const rateKey = `otp-request-${emailOrPhone.toLowerCase()}`;
