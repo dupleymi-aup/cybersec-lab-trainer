@@ -1,178 +1,78 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Menu, X, LogIn, UserPlus } from 'lucide-react';
-import Link from 'next/link';
-import { useAuthStore } from '@/lib/auth-store';
+import {useTranslations} from "next-intl";
+import {Shield, Menu, X} from "lucide-react";
+import Link from "next/link";
+import {Button} from "@/components/ui/button";
+import {useState} from "react";
+import ThemeToggle from "@/components/security-trainer/ThemeToggle";
 
 export default function LandingHeader() {
-  const isAuthenticated = useAuthStore(s => s.isAuthenticated);
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
-
-  const navLinks = [
-    { href: '#features', label: 'Возможности' },
-    { href: '#how-it-works', label: 'Как это работает' },
-    { href: '#modules', label: 'Модули' },
-    { href: '#reviews', label: 'Отзывы' },
-    { href: '#faq', label: 'FAQ' },
-  ];
+  const t = useTranslations("landing.header");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50 shadow-lg shadow-slate-950/50'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-700 rounded-xl shadow-lg shadow-violet-600/20 group-hover:shadow-violet-600/40 transition-shadow">
-              <Shield className="w-5 h-5 text-white" aria-hidden="true" />
-            </div>
-            <span className="text-xl font-bold text-white">
-              CyberSec{' '}
-              <span className="bg-gradient-to-r from-violet-400 to-emerald-400 bg-clip-text text-transparent">
-                Lab
-              </span>
-            </span>
-          </Link>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            {isAuthenticated ? (
-              <Link
-                href="/dashboard-app"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-xl transition-all hover:scale-105 shadow-lg shadow-violet-600/25"
-              >
-                <Shield className="w-4 h-4" aria-hidden="true" />
-                Перейти в кабинет
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-slate-300 hover:text-white text-sm font-semibold transition-colors"
-                >
-                  <LogIn className="w-4 h-4" aria-hidden="true" />
-                  Войти
-                </Link>
-                <Link
-                  href="/register"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-xl transition-all hover:scale-105 shadow-lg shadow-violet-600/25"
-                >
-                  <UserPlus className="w-4 h-4" aria-hidden="true" />
-                  Регистрация
-                </Link>
-              </>
-            )}
+    <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-700 rounded-xl">
+            <Shield className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
+          <span className="text-xl font-bold text-foreground">
+            CyberSec{" "}
+            <span className="bg-gradient-to-r from-violet-500 to-emerald-500 bg-clip-text text-transparent">
+              Lab
+            </span>
+          </span>
+        </Link>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-menu"
-          >
-            {mobileOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
+        <nav className="hidden md:flex items-center gap-6">
+          <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            {t("dashboard")}
+          </a>
+          <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            {t("register")}
+          </a>
+          <a href="#faq" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            {t("login")}
+          </a>
+        </nav>
+
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link href="/register">
+            <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white hidden sm:inline-flex">
+              {t("register")}
+            </Button>
+          </Link>
+          <Link href="/login">
+            <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
+              {t("login")}
+            </Button>
+          </Link>
+          <button className="md:hidden p-2" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            id="mobile-menu"
-            role="navigation"
-            aria-label="Mobile navigation"
-            className="md:hidden bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/50"
-          >
-            <div className="container mx-auto px-4 py-6 space-y-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="block text-slate-400 hover:text-white transition-colors py-2"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="pt-4 border-t border-slate-800 space-y-3">
-                {isAuthenticated ? (
-                  <Link
-                    href="/dashboard-app"
-                    onClick={() => setMobileOpen(false)}
-                    className="block w-full text-center px-5 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl"
-                  >
-                    Перейти в кабинет
-                  </Link>
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileOpen(false)}
-                      className="block w-full text-center px-5 py-3 text-slate-300 hover:text-white font-semibold"
-                    >
-                      Войти
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setMobileOpen(false)}
-                      className="block w-full text-center px-5 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl"
-                    >
-                      Регистрация
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.header>
+      {menuOpen && (
+        <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 py-4 space-y-3">
+          <a href="#how-it-works" className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2">
+            {t("dashboard")}
+          </a>
+          <Link href="/register">
+            <Button size="sm" className="w-full bg-violet-600 hover:bg-violet-700 text-white">
+              {t("register")}
+            </Button>
+          </Link>
+          <Link href="/login">
+            <Button variant="outline" size="sm" className="w-full">
+              {t("login")}
+            </Button>
+          </Link>
+        </div>
+      )}
+    </header>
   );
 }
