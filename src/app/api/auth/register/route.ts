@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const token = generateToken(user.id, user.role, { group: user.group, fullName: user.fullName });
+    const token = await generateToken(user.id, user.role, { group: user.group, fullName: user.fullName });
 
     const response = NextResponse.json({
       success: true,

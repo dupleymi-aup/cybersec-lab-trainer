@@ -25,7 +25,7 @@ export function getTokenFromRequest(request: NextRequest): string | null {
 
 export async function authenticate(request: NextRequest): Promise<AuthUser | null> {
   const token = getTokenFromRequest(request);
-  const payload = getTokenPayload(token);
+  const payload = await getTokenPayload(token);
   if (!payload) return null;
   if (payload.exp < Date.now() / 1000) return null;
 

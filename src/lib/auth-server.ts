@@ -1,44 +1,43 @@
-import jwt from 'jsonwebtoken';
+import { SignJWT, jwtVerify } from 'jose';
 import { env } from '@/lib/env';
 
 export interface TokenPayload {
   id: string;
   role: string;
-  tokenVersion?: number;  // incremented on role/password change to revoke old tokens
+  tokenVersion?: number;
   group?: string;
   fullName?: string;
   exp: number;
 }
 
-const JWT_SECRET = env.tokenSecret;
+const JWT_SECRET = new TextEncoder().encode(env.tokenSecret);
 const JWT_ALGORITHM = 'HS256';
 
-export function generateToken(userId: string, role: string, options?: { rememberMe?: boolean; group?: string; fullName?: string; tokenVersion?: number }): string {
+export async function generateToken(userId: string, role: string, options?: { rememberMe?: boolean; group?: string; fullName?: string; tokenVersion?: number }): Promise<string> {
   const { rememberMe, group, fullName, tokenVersion } = options || {};
-  const expiry = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
-  return jwt.sign(
-    { id: userId, role, group, fullName, tokenVersion },
-    JWT_SECRET,
-    { algorithm: JWT_ALGORITHM, expiresIn: expiry }
-  );
+  const expiry = rememberMe ? '30d' : '7d';
+  return new SignJWT({ id: userId, role, group, fullName, tokenVersion })
+    .setProtectedHeader({ alg: JWT_ALGORITHM })
+    .setExpirationTime(expiry)
+    .setIssuedAt()
+    .sign(JWT_SECRET);
 }
 
-// Alias for LTI integration compatibility
 export async function signJwt(payload: { id: string; role: string; group?: string; fullName?: string }): Promise<string> {
   return generateToken(payload.id, payload.role, { group: payload.group, fullName: payload.fullName });
 }
 
-export function verifyToken(token: string): TokenPayload | null {
+export async function verifyToken(token: string): Promise<TokenPayload | null> {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] }) as jwt.JwtPayload;
-    if (!decoded.id || !decoded.role || !decoded.exp) return null;
+    const { payload } = await jwtVerify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] });
+    if (!payload.id || !payload.role || !payload.exp) return null;
     return {
-      id: decoded.id as string,
-      role: decoded.role as string,
-      tokenVersion: decoded.tokenVersion as number | undefined,
-      group: decoded.group as string | undefined,
-      fullName: decoded.fullName as string | undefined,
-      exp: decoded.exp,
+      id: payload.id as string,
+      role: payload.role as string,
+      tokenVersion: payload.tokenVersion as number | undefined,
+      group: payload.group as string | undefined,
+      fullName: payload.fullName as string | undefined,
+      exp: payload.exp as number,
     };
   } catch (e) {
     if (process.env.NODE_ENV === "development") console.warn("[auth-server.ts] verifyToken failed:", e);
@@ -46,13 +45,13 @@ export function verifyToken(token: string): TokenPayload | null {
   }
 }
 
-export function getTokenPayload(token: string | null): TokenPayload | null {
+export async function getTokenPayload(token: string | null): Promise<TokenPayload | null> {
   if (!token) return null;
   return verifyToken(token);
 }
 
 export async function authenticate(token: string | null): Promise<{ id: string; role: string } | null> {
-  const payload = getTokenPayload(token);
+  const payload = await getTokenPayload(token);
   if (!payload) return null;
   return { id: payload.id, role: payload.role };
 }
