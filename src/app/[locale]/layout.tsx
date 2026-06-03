@@ -28,7 +28,7 @@ export async function generateMetadata({params}: {params: Promise<{locale: strin
 
 export default async function LocaleLayout({children, params}: {children: React.ReactNode; params: Promise<{locale: string}>}) {
   const {locale} = await params;
-  if (!routing.locales.includes(locale as any)) notFound();
+  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) notFound();
   const messages = await getMessages();
   return (
     <html lang={locale} suppressHydrationWarning>

@@ -237,24 +237,6 @@ export const recoveryRequestEmailPhoneSchema = z.object({
 
 export type RecoveryRequestEmailPhoneInput = z.infer<typeof recoveryRequestEmailPhoneSchema>;
 
-// Recovery verification validation (email or phone)
-export const recoveryVerifyEmailPhoneSchema = z.object({
-  emailOrPhone: z.union([z.string().email('Invalid email').max(255), z.string().min(10).max(255)]),
-  otp: z.string().length(6, 'OTP must be 6 digits'),
-});
-
-export type RecoveryVerifyEmailPhoneInput = z.infer<typeof recoveryVerifyEmailPhoneSchema>;
-
-// Recovery password reset validation (email or phone)
-export const recoveryResetEmailPhoneSchema = z.object({
-  emailOrPhone: z.union([z.string().email('Invalid email').max(255), z.string().min(10).max(255)]),
-  otp: z.string().length(6, 'OTP must be 6 digits'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters').max(128),
-});
-
-export type RecoveryResetEmailPhoneInput = z.infer<typeof recoveryResetEmailPhoneSchema>;
-
-
 // Admin announcement validation
 export const createAnnouncementSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
