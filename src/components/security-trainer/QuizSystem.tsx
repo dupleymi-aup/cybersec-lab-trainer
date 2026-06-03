@@ -83,12 +83,6 @@ export default function QuizSystem() {
   const currentQuestionRef = useRef(currentQuestion);
   const timedOutRef = useRef(false);
   const selectedAnswerRef = useRef(selectedAnswer);
-
-  useEffect(() => {
-    currentQuestionRef.current = currentQuestion;
-  }, [currentQuestion]);
-
-  // Refs to avoid stale closures in callbacks
   const quizQuestionsRef = useRef(quizQuestions);
   const difficultyFilterRef = useRef(difficultyFilter);
   const answersRef = useRef(answers);
@@ -98,13 +92,16 @@ export default function QuizSystem() {
   const startTimeRef = useRef(startTime);
   const maxStreakRef = useRef(maxStreak);
 
-  useEffect(() => { difficultyFilterRef.current = difficultyFilter; }, [difficultyFilter]);
-  useEffect(() => { answersRef.current = answers; }, [answers]);
-  useEffect(() => { correctCountRef.current = correctCount; }, [correctCount]);
-  useEffect(() => { activeCategoryRef.current = activeCategory; }, [activeCategory]);
-  useEffect(() => { startTimeRef.current = startTime; }, [startTime]);
-  useEffect(() => { maxStreakRef.current = maxStreak; }, [maxStreak]);
-  useEffect(() => { selectedAnswerRef.current = selectedAnswer; }, [selectedAnswer]);
+  useEffect(() => {
+    currentQuestionRef.current = currentQuestion;
+    difficultyFilterRef.current = difficultyFilter;
+    answersRef.current = answers;
+    correctCountRef.current = correctCount;
+    activeCategoryRef.current = activeCategory;
+    startTimeRef.current = startTime;
+    maxStreakRef.current = maxStreak;
+    selectedAnswerRef.current = selectedAnswer;
+  }, [currentQuestion, difficultyFilter, answers, correctCount, activeCategory, startTime, maxStreak, selectedAnswer]);
 
   const filterQuestions = useCallback((categoryName: string) => {
     const q = quizQuestionsRef.current;
@@ -165,8 +162,8 @@ export default function QuizSystem() {
       }));
       saveQuizAttempts(catId, attempts);
 
-      apiClient.saveQuizResults(catId, score, q.length).catch(() => {
-        // Silently fail — data is in localStorage and will sync on next login
+      apiClient.saveQuizResults(catId, score, q.length).catch((err) => {
+        if (process.env.NODE_ENV === 'development') console.warn('QuizSystem: Failed to save quiz results:', err);
       });
 
       setQuizState('result');

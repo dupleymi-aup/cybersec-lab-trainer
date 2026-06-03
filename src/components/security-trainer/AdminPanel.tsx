@@ -140,7 +140,7 @@ export default function AdminPanel() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   useEffect(() => {
     getAllUsers()
-      .then(setAllUsers).catch((err) => console.error("AdminPanel: Failed to load users:", err))
+      .then(setAllUsers).catch((err) => { if (process.env.NODE_ENV === 'development') console.error("AdminPanel: Failed to load users:", err); })
       .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
   const filteredUsers = allUsers.filter((u) => {
@@ -264,7 +264,10 @@ export default function AdminPanel() {
           const existing = allUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
           if (existing) { skipped++; continue; }
 
-          const defaultPassword = 'Temp@1234';
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+          const array = new Uint8Array(14);
+          crypto.getRandomValues(array);
+          const defaultPassword = Array.from(array, (b) => chars[b % chars.length]).join('');
           const result = await createUser(
             { email, phone, fullName, role, group, course: '', university: '' },
             defaultPassword
@@ -276,7 +279,7 @@ export default function AdminPanel() {
         toast.success(`Импортировано: ${created}, пропущено: ${skipped}`);
         refresh();
       } catch (e) {
-        if (process.env.NODE_ENV === "development") console.warn("[AdminPanel.tsx] handleToggleBlock failed:", e);
+        if (process.env.NODE_ENV === "development") console.warn("[AdminPanel] handleCSVImport failed:", e);
         toast.error('Ошибка parsing CSV');
       }
     };

@@ -69,7 +69,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
@@ -84,21 +84,21 @@ export default function RegisterPage() {
           <Link href="/" className="inline-flex items-center justify-center w-16 h-16 bg-violet-600 rounded-2xl mb-3 shadow-lg shadow-violet-600/20 hover:bg-violet-700 transition">
             <Shield className="w-8 h-8 text-white" />
           </Link>
-          <h1 className="text-2xl font-bold text-white">CyberSec Lab</h1>
-          <p className="text-slate-400 text-sm mt-1">Тренажёр по информационной безопасности</p>
+          <h1 className="text-2xl font-bold text-foreground">CyberSec Lab</h1>
+          <p className="text-muted-foreground text-sm mt-1">Тренажёр по информационной безопасности</p>
         </div>
 
-        <Card className="border-slate-700/50 bg-slate-800/80 dark:bg-slate-700/50 backdrop-blur-xl shadow-xl">
+        <Card className="backdrop-blur-xl shadow-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-white text-xl">Регистрация</CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardTitle className="text-xl">Регистрация</CardTitle>
+            <CardDescription>
               Создайте аккаунт для начала обучения
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="reg-name" className="text-slate-300">
+                <Label htmlFor="reg-name">
                   ФИО
                 </Label>
                 <Input
@@ -106,12 +106,11 @@ export default function RegisterPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Иванов Иван Иванович"
-                  className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="reg-email" className="text-slate-300">
+                  <Label htmlFor="reg-email">
                     Email
                   </Label>
                   <Input
@@ -120,11 +119,10 @@ export default function RegisterPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="example@mail.com"
-                    className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="reg-phone" className="text-slate-300">
+                  <Label htmlFor="reg-phone">
                     Телефон
                   </Label>
                   <Input
@@ -133,41 +131,40 @@ export default function RegisterPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+7 (999)..."
-                    className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                   />
                 </div>
               </div>
               <div className="space-y-3">
-                <Label className="text-slate-300">Роль</Label>
+                <Label className="text-foreground">Роль</Label>
                 <RadioGroup value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)} className="space-y-2">
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/30 hover:bg-accent transition cursor-pointer">
                     <RadioGroupItem value="student" id="role-student" className="mt-1" />
                     <label htmlFor="role-student" className="flex-1 cursor-pointer">
                       <div className="flex items-center gap-2">
                         <GraduationCap size={16} className="text-violet-400" />
-                        <span className="text-sm font-medium text-white">Студент</span>
+                        <span className="text-sm font-medium">Студент</span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">Изучайте модули, проходите квизы и выполняйте лабораторные работы</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Изучайте модули, проходите квизы и выполняйте лабораторные работы</p>
                     </label>
                   </div>
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/30 hover:bg-accent transition cursor-pointer">
                     <RadioGroupItem value="teacher" id="role-teacher" className="mt-1" />
                     <label htmlFor="role-teacher" className="flex-1 cursor-pointer">
                       <div className="flex items-center gap-2">
                         <Users size={16} className="text-amber-400" />
-                        <span className="text-sm font-medium text-white">Преподаватель</span>
+                        <span className="text-sm font-medium">Преподаватель</span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">Отслеживайте прогресс студентов, управляйте группами и смотрите аналитику</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Отслеживайте прогресс студентов, управляйте группами и смотрите аналитику</p>
                     </label>
                   </div>
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/30 hover:bg-accent transition cursor-pointer">
                     <RadioGroupItem value="admin" id="role-admin" className="mt-1" />
                     <label htmlFor="role-admin" className="flex-1 cursor-pointer">
                       <div className="flex items-center gap-2">
                         <ShieldCheck size={16} className="text-red-400" />
-                        <span className="text-sm font-medium text-white">Администратор</span>
+                        <span className="text-sm font-medium">Администратор</span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">Полный доступ: управление пользователями, база данных, системные настройки</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Полный доступ: управление пользователями, база данных, системные настройки</p>
                     </label>
                   </div>
                 </RadioGroup>
@@ -180,7 +177,7 @@ export default function RegisterPage() {
                     exit={{ opacity: 0, height: 0 }}
                     className="space-y-2"
                   >
-                    <Label htmlFor="admin-invite-code" className="text-slate-300">
+                    <Label htmlFor="admin-invite-code">
                       Код приглашения администратора
                     </Label>
                     <Input
@@ -188,16 +185,15 @@ export default function RegisterPage() {
                       value={adminInviteCode}
                       onChange={(e) => setAdminInviteCode(e.target.value)}
                       placeholder="Введите код приглашения"
-                      className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                     />
-                    <p className="text-xs text-amber-400">
+                    <p className="text-xs text-amber-500 dark:text-amber-400">
                       Для получения роли администратора необходим код приглашения
                     </p>
                   </motion.div>
                 )}
               </AnimatePresence>
               <div className="space-y-2">
-                <Label htmlFor="reg-password" className="text-slate-300">
+                <Label htmlFor="reg-password">
                   Пароль
                 </Label>
                 <div className="relative">
@@ -207,12 +203,12 @@ export default function RegisterPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Минимум 8 символов"
-                    className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
+                    className="pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -224,7 +220,7 @@ export default function RegisterPage() {
                     className="mt-3 space-y-2"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-400">Надёжность пароля</span>
+                      <span className="text-xs text-muted-foreground">Надёжность пароля</span>
                       <span className={`text-xs font-medium ${
                         pwStrength.score >= 70 ? 'text-emerald-400' :
                         pwStrength.score >= 50 ? 'text-yellow-400' : 'text-red-400'
@@ -239,7 +235,7 @@ export default function RegisterPage() {
                           ) : (
                             <AlertTriangle size={12} className="text-muted-foreground" />
                           )}
-                          <span className={check.passed ? 'text-slate-300' : 'text-muted-foreground'}>
+                          <span className={check.passed ? 'text-foreground' : 'text-muted-foreground'}>
                             {check.label}
                           </span>
                         </div>
@@ -249,7 +245,7 @@ export default function RegisterPage() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="reg-confirm" className="text-slate-300">
+                <Label htmlFor="reg-confirm">
                   Подтверждение пароля
                 </Label>
                 <div className="relative">
@@ -259,18 +255,18 @@ export default function RegisterPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Повторите пароль"
-                    className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
+                    className="pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 {confirmPassword && password !== confirmPassword && (
-                  <p className="text-xs text-red-400 mt-1">Пароли не совпадают</p>
+                  <p className="text-xs text-destructive mt-1">Пароли не совпадают</p>
                 )}
               </div>
               <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
@@ -278,15 +274,15 @@ export default function RegisterPage() {
               </Button>
             </form>
 
-            <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm space-y-2">
-              <p className="text-slate-400">
+            <div className="mt-6 pt-4 border-t border-border text-center text-sm space-y-2">
+              <p className="text-muted-foreground">
                 Уже есть аккаунт?{' '}
-                <Link href="/login" className="text-violet-400 hover:text-violet-300 font-medium">
+                <Link href="/login" className="text-primary hover:text-primary/80 font-medium">
                   Войти
                 </Link>
               </p>
-              <p className="text-slate-500">
-                <Link href="/" className="text-slate-400 hover:text-slate-300">
+              <p className="text-muted-foreground">
+                <Link href="/" className="text-muted-foreground hover:text-foreground">
                   ← На главную
                 </Link>
               </p>

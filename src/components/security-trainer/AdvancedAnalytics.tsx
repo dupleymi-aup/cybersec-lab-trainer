@@ -120,7 +120,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
       }
     }).catch((err) => {
       if (!cancelled) {
-        console.error("AdvancedAnalytics: Failed to load data:", err);
+        if (process.env.NODE_ENV === 'development') console.error("AdvancedAnalytics: Failed to load data:", err);
         setLoading(false);
       }
     });

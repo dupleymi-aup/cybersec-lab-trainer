@@ -175,7 +175,7 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
     } catch (error) {
       toast.error('Ошибка генерации отчёта');
       if (process.env.NODE_ENV === 'development') {
-        console.error('[ExecutiveSummaryExport] PDF generation failed:', error);
+        if (process.env.NODE_ENV === 'development') console.error('[ExecutiveSummaryExport] PDF generation failed:', error);
       }
     } finally {
       setGenerating(false);

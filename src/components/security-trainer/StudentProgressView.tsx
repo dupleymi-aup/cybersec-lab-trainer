@@ -75,7 +75,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
         setTrends(trendData);
       })
       .catch((err) => {
-        console.error('StudentProgressView: Failed to load student data:', err);
+        if (process.env.NODE_ENV === 'development') console.error('StudentProgressView: Failed to load student data:', err);
       })
       .finally(() => setLoading(false));
   }, [selectedId, groupId]);

@@ -165,7 +165,7 @@ export default function Dashboard() {
         }
       })
       .catch((err) => {
-        console.error('Dashboard: Failed to load notifications:', err);
+        if (process.env.NODE_ENV === 'development') console.error('Dashboard: Failed to load notifications:', err);
       });
   }, []);
 
@@ -184,7 +184,9 @@ export default function Dashboard() {
           });
         }
       })
-      .catch(() => { /* network error — silently ignore */ });
+      .catch((err) => {
+        if (process.env.NODE_ENV === 'development') console.warn('Dashboard: Failed to load teacher stats:', err);
+      });
   }, [user?.role]);
 
   const dismissAnnouncement = (id: string) => {

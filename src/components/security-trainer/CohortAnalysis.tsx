@@ -95,7 +95,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
   useEffect(() => {
     const controller = new AbortController();
     getAllGroups().then((g) => setGroups(g)).catch((err) => {
-      console.error('CohortAnalysis: Failed to load groups:', err);
+      if (process.env.NODE_ENV === 'development') console.error('CohortAnalysis: Failed to load groups:', err);
       setGroups([]);
     });
     return () => { controller.abort(); };

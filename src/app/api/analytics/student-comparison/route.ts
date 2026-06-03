@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   // Get progress for all users
   const progressRecords = await prisma.progress.findMany({
     where: { userId: { in: userIds } },
-    select: { userId: true, moduleId: true, completed: true, score: true },
+    select: { userId: true, moduleId: true, completed: true, score: true, updatedAt: true },
   });
 
   // Get quiz results

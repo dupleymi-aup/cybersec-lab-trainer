@@ -256,7 +256,7 @@ export default function TeacherPanel() {
         }
       }
     } catch (err) {
-      console.error('Failed to create deadline:', err);
+      if (process.env.NODE_ENV === 'development') console.error('Failed to create deadline:', err);
     }
   };
 
@@ -272,7 +272,7 @@ export default function TeacherPanel() {
         setDeadlineReminders(prev => prev.filter(r => r.deadline.id !== id));
       }
     } catch (err) {
-      console.error('Failed to delete deadline:', err);
+      if (process.env.NODE_ENV === 'development') console.error('Failed to delete deadline:', err);
     }
   };
 

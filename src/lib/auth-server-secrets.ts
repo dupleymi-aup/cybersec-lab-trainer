@@ -1,3 +1,5 @@
+import { randomBytes } from 'crypto';
+
 /**
  * Server-only module for sensitive secrets.
  * NEVER import this file from client components.
@@ -12,9 +14,11 @@ export function getAdminInviteCode(): string | undefined {
   const envCode = process.env.ADMIN_INVITE_CODE;
   if (envCode) return envCode;
 
-  // Only allow default in development
   if (process.env.NODE_ENV === 'development') {
-    return 'CYBERSEC-ADMIN-2024';
+    const code = randomBytes(10).toString('hex');
+    // eslint-disable-next-line no-console -- intentional dev-only logging
+    console.log(`[DEV] Admin invite code: ${code}`);
+    return code;
   }
 
   return undefined;

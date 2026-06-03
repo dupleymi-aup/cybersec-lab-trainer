@@ -70,7 +70,7 @@ export function useAnalyticsFetch<T = unknown>({
       .catch((err) => {
         if (!cancelled) {
           if (err.name === 'AbortError') return;
-          console.error(`useAnalyticsFetch: Failed to fetch ${endpoint}:`, err);
+          if (process.env.NODE_ENV === 'development') console.error(`useAnalyticsFetch: Failed to fetch ${endpoint}:`, err);
           setError(err.message || 'Ошибка загрузки данных');
           setLoading(false);
         }

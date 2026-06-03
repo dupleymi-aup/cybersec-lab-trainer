@@ -191,7 +191,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
 
       setStatus('gradebook', 'success', `Экспортировано ${studentData.length} студентов`);
     } catch (error) {
-      console.error('Gradebook export failed:', error);
+      if (process.env.NODE_ENV === 'development') console.error('Gradebook export failed:', error);
       setStatus('gradebook', 'error', 'Ошибка экспорта');
     } finally {
       endExport('gradebook');
@@ -257,7 +257,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
 
       setStatus('studentReport', 'success', 'Отчёт студента экспортирован');
     } catch (error) {
-      console.error('Student report export failed:', error);
+      if (process.env.NODE_ENV === 'development') console.error('Student report export failed:', error);
       setStatus('studentReport', 'error', 'Ошибка экспорта');
     }
 

@@ -13,8 +13,8 @@ export default function RecoveryPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900">
-      <p className="text-slate-400">Redirecting...</p>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <p className="text-muted-foreground">Redirecting...</p>
     </div>
   );
 }

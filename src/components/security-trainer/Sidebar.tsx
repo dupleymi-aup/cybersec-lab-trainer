@@ -136,7 +136,7 @@ export default function Sidebar() {
         }
       })
       .catch((err) => {
-        console.error('Sidebar: Failed to load deadlines:', err);
+        if (process.env.NODE_ENV === 'development') console.error('Sidebar: Failed to load deadlines:', err);
       });
     return () => controller.abort();
   }, []);

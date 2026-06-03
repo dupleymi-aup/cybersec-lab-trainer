@@ -25,7 +25,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
     getAllGroups().then((g) => {
       setGroups(g);
     }).catch((err) => {
-      console.error('BulkActionsBar: Failed to load groups:', err);
+      if (process.env.NODE_ENV === 'development') console.error('BulkActionsBar: Failed to load groups:', err);
     });
     return () => { controller.abort(); };
   }, []);

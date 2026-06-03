@@ -4,8 +4,8 @@
   "description": "Интерактивная платформа для изучения уязвимостей веб-приложений",
   "start_url": "/dashboard-app",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
   "orientation": "portrait-primary",
   "icons": [
     {

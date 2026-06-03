@@ -14,7 +14,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="text-center max-w-md">
         <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-3xl mb-8 shadow-2xl shadow-red-600/30">
           <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
@@ -23,8 +23,8 @@ export default function Error({
             <line x1="12" x2="12.01" y1="16" y2="16" />
           </svg>
         </div>
-        <h1 className="text-4xl font-bold text-white mb-3">Ошибка</h1>
-        <p className="text-slate-300 mb-6">
+        <h1 className="text-4xl font-bold text-foreground mb-3">Ошибка</h1>
+        <p className="text-foreground mb-6">
           Произошла ошибка при загрузке страницы
         </p>
         <button
