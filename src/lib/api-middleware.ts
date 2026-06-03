@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateToken, getTokenPayload, type TokenPayload } from '@/lib/auth-server';
 import { ROLE_HIERARCHY, hasPermission, type UserRole } from './auth-types';
+import { hasCapability, hasAnyCapability, hasCapabilities, type Capability } from './capabilities';
 import { prisma } from '@/lib/db';
 
 export type { TokenPayload };
+
+export interface AuthUser {
+  id: string;
+  role: string;
+  group?: string;
+  fullName?: string;
+  tokenVersion?: number;
+}
 
 export function getTokenFromRequest(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization');
@@ -14,20 +23,17 @@ export function getTokenFromRequest(request: NextRequest): string | null {
 }
 
 
-export async function authenticate(request: NextRequest): Promise<{ id: string; role: string; group?: string; fullName?: string; tokenVersion?: number } | null> {
+export async function authenticate(request: NextRequest): Promise<AuthUser | null> {
   const token = getTokenFromRequest(request);
   const payload = getTokenPayload(token);
   if (!payload) return null;
-  // Explicitly check expiration even though jwt.verify does this — defense in depth
   if (payload.exp < Date.now() / 1000) return null;
 
-  // Fetch user from database to validate tokenVersion and blocked status
   const user = await prisma.user.findUnique({
     where: { id: payload.id },
     select: { tokenVersion: true, isBlocked: true, role: true },
   });
 
-  // Reject if user doesn't exist, is blocked, or tokenVersion mismatch
   if (!user || user.isBlocked) return null;
   if (payload.tokenVersion !== undefined && user.tokenVersion !== payload.tokenVersion) return null;
 
@@ -47,6 +53,76 @@ export function requireRole(userRole: string, ...requiredRoles: string[]): boole
 
 export function requirePermission(userRole: string, permission: string): boolean {
   return hasPermission(userRole as UserRole, permission);
+}
+
+/**
+ * Check if the authenticated user possesses a specific capability.
+ * Returns true if the user has the capability (or is an admin).
+ */
+export function requireCapability(auth: AuthUser | null, capability: Capability): boolean {
+  if (!auth) return false;
+  return hasCapability(auth.role as UserRole, capability);
+}
+
+/**
+ * Check if the authenticated user possesses ALL specified capabilities.
+ */
+export function requireCapabilities(auth: AuthUser | null, ...capabilities: Capability[]): boolean {
+  if (!auth) return false;
+  return hasCapabilities(auth.role as UserRole, ...capabilities);
+}
+
+/**
+ * Check if the authenticated user possesses ANY of the specified capabilities.
+ */
+export function requireAnyCapability(auth: AuthUser | null, ...capabilities: Capability[]): boolean {
+  if (!auth) return false;
+  return hasAnyCapability(auth.role as UserRole, ...capabilities);
+}
+
+/**
+ * Guard middleware — authenticate + check capability in one call.
+ * Returns null on success (no error), or a NextResponse on failure.
+ * 
+ * Usage:
+ *   const guard = await withCapability(request, 'assignments:grade');
+ *   if (guard) return guard; // 401 or 403
+ *   const { auth } = guard;  // type-narrowed AuthUser
+ */
+export async function withCapability(
+  request: NextRequest,
+  capability: Capability
+): Promise<{ auth: AuthUser } | NextResponse> {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!hasCapability(auth.role as UserRole, capability)) return forbidden();
+  return { auth };
+}
+
+/**
+ * Guard middleware — authenticate + check ANY of the given capabilities.
+ */
+export async function withAnyCapability(
+  request: NextRequest,
+  ...capabilities: Capability[]
+): Promise<{ auth: AuthUser } | NextResponse> {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!hasAnyCapability(auth.role as UserRole, ...capabilities)) return forbidden();
+  return { auth };
+}
+
+/**
+ * Guard middleware — authenticate + check ALL of the given capabilities.
+ */
+export async function withAllCapabilities(
+  request: NextRequest,
+  ...capabilities: Capability[]
+): Promise<{ auth: AuthUser } | NextResponse> {
+  const auth = await authenticate(request);
+  if (!auth) return unauthorized();
+  if (!hasCapabilities(auth.role as UserRole, ...capabilities)) return forbidden();
+  return { auth };
 }
 
 

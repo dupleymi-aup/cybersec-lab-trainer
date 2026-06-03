@@ -1,4 +1,4 @@
-import { generateKeyPair, importSPKI, SignJWT, jwtVerify, type JWK } from 'jose';
+import { generateKeyPair, importPKCS8, SignJWT, jwtVerify, type JWK } from 'jose';
 import { prisma } from '@/lib/db';
 
 export interface LtiClaims {
@@ -140,7 +140,7 @@ export async function signAgsToken(
   tokenUrl: string,
   clientId: string,
 ): Promise<string> {
-  const privateKey = await importSPKI(privateKeyPem, 'RS256');
+  const privateKey = await importPKCS8(privateKeyPem, 'RS256');
 
   const now = Math.floor(Date.now() / 1000);
 

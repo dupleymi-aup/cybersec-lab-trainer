@@ -72,11 +72,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const totalQuizAttempts = quizAttempts.length;
 
   // Last active days
+  const progressTimestamps = progressRecords.map((p) => p.updatedAt.getTime());
+  const quizTimestamps = quizResults.map((q) => q.updatedAt.getTime());
   const lastActivityDate = user.lastLoginAt
     ? new Date(Math.max(
         user.lastLoginAt.getTime(),
-        ...progressRecords.map((p) => p.updatedAt.getTime()),
-        ...quizResults.map((q) => q.updatedAt.getTime()),
+        ...(progressTimestamps.length > 0 ? progressTimestamps : [0]),
+        ...(quizTimestamps.length > 0 ? quizTimestamps : [0]),
       ))
     : null;
   const lastActiveDays = lastActivityDate ? Math.floor((now.getTime() - lastActivityDate.getTime()) / (24 * 60 * 60 * 1000)) : 999;
@@ -217,10 +219,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     .sort((a, b) => a.date.localeCompare(b.date));
 
   // ─── Skills Gap Analysis ───
-  // Get cohort averages for comparison
-  const allUserProgress = await prisma.progress.findMany({
-    select: { moduleId: true, score: true, completed: true },
-  });
+  // Get cohort averages for comparison (same group for meaningful comparison)
+  const cohortUserIds = user.group
+    ? (await prisma.user.findMany({ where: { group: user.group }, select: { id: true } })).map(u => u.id)
+    : [];
+  const allUserProgress = cohortUserIds.length > 0
+    ? await prisma.progress.findMany({
+        where: { userId: { in: cohortUserIds } },
+        select: { moduleId: true, score: true, completed: true },
+      })
+    : [];
 
   const cohortModuleAverages = new Map<string, { totalScore: number; count: number; completedCount: number; totalCount: number }>();
   for (const p of allUserProgress) {
@@ -253,10 +261,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return { moduleId, studentScore, cohortAvg, gap, severity };
   });
 
-  // Category-level gap analysis
-  const allQuizAttemptsForCohort = await prisma.quizAttempt.findMany({
-    select: { category: true, correct: true },
-  });
+  // Category-level gap analysis (same cohort scope)
+  const allQuizAttemptsForCohort = cohortUserIds.length > 0
+    ? await prisma.quizAttempt.findMany({
+        where: { userId: { in: cohortUserIds } },
+        select: { category: true, correct: true },
+      })
+    : [];
 
   const cohortCategoryAverages = new Map<string, { correct: number; total: number }>();
   for (const a of allQuizAttemptsForCohort) {

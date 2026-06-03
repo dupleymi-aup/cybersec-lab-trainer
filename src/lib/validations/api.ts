@@ -24,19 +24,6 @@ export const quizResultsSchema = z.object({
 
 export type QuizResultsInput = z.infer<typeof quizResultsSchema>;
 
-// Combined API request schema
-export const apiRequestSchema = z.discriminatedUnion('type', [
-  progressSchema,
-  quizResultsSchema,
-]);
-
-export type ApiRequest = z.infer<typeof apiRequestSchema>;
-
-// Validation helper
-export function validateApiInput(data: unknown): ApiRequest {
-  return apiRequestSchema.parse(data);
-}
-
 // Auth validation schemas
 export const loginSchema = z.object({
   emailOrPhone: z.string().min(1, 'Email or phone is required').max(255),
@@ -111,16 +98,6 @@ export const createUserSchema = z.object({
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
-// Audit log creation validation
-export const auditLogSchema = z.object({
-  action: z.string().min(1).max(100),
-  targetId: z.string().min(1).max(100),
-  targetName: z.string().max(200).optional(),
-  details: z.string().max(2000).optional(),
-});
-
-export type AuditLogInput = z.infer<typeof auditLogSchema>;
-
 // Batch progress save validation
 export const batchProgressSchema = z.object({
   progress: z.array(z.object({
@@ -143,6 +120,8 @@ export const batchProgressSchema = z.object({
 });
 
 export type BatchProgressInput = z.infer<typeof batchProgressSchema>;
+
+
 
 // Assignment creation validation
 export const createAssignmentSchema = z.object({

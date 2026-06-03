@@ -60,10 +60,11 @@ export async function GET(request: NextRequest) {
     const totalQuizAttempts = userQuizAttempts.length;
 
     // Last active days
+    const progressTimestamps = userProgress.map((p) => p.updatedAt.getTime());
     const lastActivityDate = user.lastLoginAt
       ? new Date(Math.max(
           user.lastLoginAt.getTime(),
-          ...userProgress.map(() => new Date().getTime()),
+          ...(progressTimestamps.length > 0 ? progressTimestamps : [0]),
         ))
       : null;
     const lastActiveDays = lastActivityDate ? Math.floor((now.getTime() - lastActivityDate.getTime()) / (24 * 60 * 60 * 1000)) : 999;

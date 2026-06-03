@@ -18,6 +18,7 @@ vi.mock('jose', () => ({
   }),
   exportJWK: vi.fn().mockResolvedValue({ kty: 'RSA', n: 'test', e: 'AQAB' }),
   importSPKI: vi.fn().mockResolvedValue({ type: 'key' }),
+  importPKCS8: vi.fn().mockResolvedValue({ type: 'key' }),
   SignJWT: class MockSignJWT {
     private payload: Record<string, unknown>;
     constructor(payload: Record<string, unknown>) {

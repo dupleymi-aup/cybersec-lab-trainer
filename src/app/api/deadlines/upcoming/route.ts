@@ -43,8 +43,9 @@ export async function GET(request: NextRequest) {
       if (due < sevenDaysFromNow) {
         // Check if completed
         if (d.scope === 'course') {
-          // Course deadline: check if all modules are done (simplified: check if any progress exists)
-          return progress.length > 0 && !completedModules.size;
+          // Course deadline: check if all modules are done
+          const allModulesCompleted = progress.length > 0 && progress.every(p => p.completed);
+          return !allModulesCompleted;
         }
         if (d.scope === 'module') return !completedModules.has(d.scopeId);
         if (d.scope === 'quiz') return !completedQuizzes.has(d.scopeId);

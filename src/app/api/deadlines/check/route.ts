@@ -41,16 +41,16 @@ export async function POST(request: NextRequest) {
   let sentCount = 0;
 
   for (const window of windows) {
-    const startDate = new Date(now.getTime() + window.start * 24 * 60 * 60 * 1000);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(now.getTime() + window.end * 24 * 60 * 60 * 1000);
-    endDate.setHours(23, 59, 59, 999);
+    const rangeStart = new Date(now.getTime() + window.start * 24 * 60 * 60 * 1000);
+    rangeStart.setHours(0, 0, 0, 0);
+    const rangeEnd = new Date(now.getTime() + window.end * 24 * 60 * 60 * 1000);
+    rangeEnd.setHours(23, 59, 59, 999);
 
     const deadlines = await prisma.deadline.findMany({
       where: {
         dueAt: {
-          gte: endDate,
-          lte: startDate,
+          gte: rangeEnd,
+          lte: rangeStart,
         },
       },
     });

@@ -69,9 +69,9 @@ export async function GET(request: NextRequest) {
 
   const totalQuizAttempts = quizResults.length;
 
-  // Previous period (30-60 days ago)
-  const prevStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= sixtyDaysAgo && s.lastLoginAt < thirtyDaysAgo);
-  const prevActiveStudents = prevStudents.length;
+  // Previous period student count (total students active in 30-60 days ago period)
+  const prevPeriodStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= sixtyDaysAgo && s.lastLoginAt < thirtyDaysAgo);
+  const prevActiveStudents = prevPeriodStudents.length;
   const prevActivePercentage = totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
 
   // Previous period progress
@@ -147,10 +147,10 @@ export async function GET(request: NextRequest) {
   };
 
   const trends = {
-    activeStudents: trendIndicator(activePercentage, prevActivePercentage),
-    avgCompletionRate: trendIndicator(avgCompletionRate, prevAvgCompletionRate),
-    avgQuizScore: trendIndicator(avgQuizScore, prevAvgQuizScore),
-    totalLoginAttempts: trendIndicator(loginActivity, prevLoginActivity),
+    students: 'stable' as const,
+    activity: trendIndicator(activePercentage, prevActivePercentage),
+    completion: trendIndicator(avgCompletionRate, prevAvgCompletionRate),
+    quizScore: trendIndicator(avgQuizScore, prevAvgQuizScore),
   };
 
   // Optional groupBy aggregation

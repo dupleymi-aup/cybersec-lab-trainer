@@ -313,6 +313,9 @@ export async function startImpersonation(
   try {
     if (targetUserId === adminId) return { success: false, error: 'Нельзя войти как себя' };
 
+    // Save admin user data before impersonating (so we can restore later)
+    const currentUser = useAuthStore.getState().user;
+
     const res = await apiFetch('/api/auth/impersonate', {
       method: 'POST',
       body: JSON.stringify({ targetUserId }),
@@ -321,12 +324,15 @@ export async function startImpersonation(
     if (!res.ok) return { success: false, error: data.error };
 
     // The server sets the impersonation token in httpOnly cookie
-    localStorage.setItem(IMPERSONATION_KEY, JSON.stringify({
-      isImpersonating: true,
-      originalUserId: adminId,
-      impersonatingUserId: targetUserId,
-      startedAt: new Date().toISOString(),
-    }));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(IMPERSONATION_KEY, JSON.stringify({
+        isImpersonating: true,
+        originalUserId: adminId,
+        impersonatingUserId: targetUserId,
+        startedAt: new Date().toISOString(),
+        originalUserData: currentUser,
+      }));
+    }
 
     useAuthStore.setState({ user: data.user, isAuthenticated: true });
     return { success: true };
@@ -346,15 +352,17 @@ export async function stopImpersonation(): Promise<{ success: boolean; error?: s
 
     localStorage.removeItem(IMPERSONATION_KEY);
 
-    // Fetch original user data — cookie auth will handle authentication
-    const res = await fetch(`/api/users/${data.originalUserId}`, {
-      headers: getCsrfHeaders(),
-    });
-    if (!res.ok) return { success: false, error: 'Не удалось восстановить аккаунт' };
+    // Restore admin user from stored data
+    const originalUserData = data.originalUserData;
+    if (!originalUserData) {
+      return { success: false, error: 'Нет данных об оригинальном пользователе' };
+    }
 
-    const userData = await res.json();
+    // Clear impersonated session cookie (best-effort, ignore network errors)
+    void fetch('/api/auth/logout', { method: 'POST', headers: getCsrfHeaders() });
+
     useAuthStore.setState({
-      user: userData,
+      user: originalUserData,
       isAuthenticated: true,
     });
 
