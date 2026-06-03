@@ -50,7 +50,7 @@ export async function POST(
   const passwordHash = await hashPassword(newPassword);
   await prisma.user.update({
     where: { id },
-    data: { passwordHash },
+    data: { passwordHash, tokenVersion: { increment: 1 } },
   });
 
   // Audit log the password reset

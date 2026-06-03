@@ -28,12 +28,9 @@ export async function POST(request: NextRequest) {
     select: { id: true },
   });
 
-  if (!user) {
-    return NextResponse.json({ error: 'Неверный OTP' }, { status: 400 });
-  }
-
   // Rate limiting: 5 attempts per 10 minutes per user
-  const rateKey = `otp-reset-${user.id}`;
+  // Use emailOrPhone as rate key even before finding user, to avoid timing-based enumeration
+  const rateKey = `otp-reset-${emailOrPhone}`;
   const rateResult = checkRateLimit(rateKey, 5, 10 * 60 * 1000);
   if (!rateResult.allowed) {
     return NextResponse.json(
@@ -42,14 +39,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const entry = otpStore.get(user.id);
-  if (!entry) {
-    return NextResponse.json({ error: 'OTP not found or expired' }, { status: 400 });
+  const genericError = NextResponse.json({ error: 'Неверный или просроченный OTP' }, { status: 400 });
+
+  if (!user) {
+    return genericError;
   }
 
-  if (Date.now() > entry.expiresAt) {
-    otpStore.delete(user.id);
-    return NextResponse.json({ error: 'OTP expired' }, { status: 400 });
+  const entry = otpStore.get(user.id);
+  if (!entry || Date.now() > entry.expiresAt) {
+    if (entry) otpStore.delete(user.id);
+    return genericError;
   }
 
   // Use timing-safe comparison to prevent timing attacks
@@ -60,7 +59,7 @@ export async function POST(request: NextRequest) {
     );
 
   if (!isValid) {
-    return NextResponse.json({ error: 'Неверный OTP' }, { status: 400 });
+    return genericError;
   }
 
   otpStore.delete(user.id);

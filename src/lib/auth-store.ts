@@ -350,21 +350,28 @@ export async function stopImpersonation(): Promise<{ success: boolean; error?: s
     const data = JSON.parse(raw);
     if (!data.originalUserId) return { success: false, error: 'Нет активной имперсонации' };
 
-    localStorage.removeItem(IMPERSONATION_KEY);
-
-    // Restore admin user from stored data
     const originalUserData = data.originalUserData;
-    if (!originalUserData) {
-      return { success: false, error: 'Нет данных об оригинальном пользователе' };
+
+    // Call server to re-issue admin JWT and set the auth cookie
+    const res = await fetch('/api/auth/impersonate/stop', {
+      method: 'POST',
+      headers: getCsrfHeaders(),
+    });
+
+    if (!res.ok) {
+      // Fallback: restore from localStorage but warn that session may be invalid
+      if (process.env.NODE_ENV === "development") console.warn("[auth-store] impersonate/stop failed, falling back to local restore");
     }
 
-    // Clear impersonated session cookie (best-effort, ignore network errors)
-    void fetch('/api/auth/logout', { method: 'POST', headers: getCsrfHeaders() });
+    localStorage.removeItem(IMPERSONATION_KEY);
 
-    useAuthStore.setState({
-      user: originalUserData,
-      isAuthenticated: true,
-    });
+    const userData = originalUserData || data.originalUserData;
+    if (userData) {
+      useAuthStore.setState({
+        user: userData,
+        isAuthenticated: true,
+      });
+    }
 
     return { success: true };
   } catch (e) {

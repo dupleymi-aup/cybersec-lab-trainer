@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -25,6 +25,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { getAdminSummary, type AdminSummary } from '@/lib/auth-store';
+import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
 import { Card, CardContent } from '@/components/ui/card';
 
 type GroupBy = 'group' | 'course' | 'university';
@@ -143,34 +144,12 @@ function tableData(summary: AdminSummary, groupBy: GroupBy) {
 }
 
 export default function AdminSummaryReport() {
-  const [summary, setSummary] = useState<AdminSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [groupBy, setGroupBy] = useState<GroupBy>('group');
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    getAdminSummary(groupBy)
-      .then((data) => {
-        if (!cancelled) {
-          setSummary(data);
-          setLoading(false);
-        }
-      })
-      .catch((e) => {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : 'Ошибка загрузки данных');
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [groupBy]);
+  const { data: summary, loading, error } = useAnalyticsFetcher<AdminSummary>(
+    () => getAdminSummary(groupBy),
+    [groupBy],
+  );
 
   if (loading) {
     return (

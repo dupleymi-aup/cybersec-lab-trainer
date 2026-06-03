@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line,
@@ -9,6 +9,7 @@ import {
   Loader2, AlertTriangle, LogIn, Users, AlertCircle, Clock,
 } from 'lucide-react';
 import { getLoginPatterns, type LoginPatternsData } from '@/lib/auth-store';
+import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -18,23 +19,15 @@ export interface LoginPatternsProps {
 }
 
 export default function LoginPatterns({ groupId: propGroupId, days: propDays }: LoginPatternsProps = {}) {
-  const [data, setData] = useState<LoginPatternsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
   const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    getLoginPatterns(days, propGroupId || internalGroupId || undefined)
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((e) => { if (!cancelled) { setError(e.message || 'Ошибка загрузки'); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [days, propGroupId, internalGroupId]);
+  const { data, loading, error } = useAnalyticsFetcher<LoginPatternsData>(
+    () => getLoginPatterns(days, propGroupId || internalGroupId || undefined),
+    [days, propGroupId, internalGroupId],
+  );
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
@@ -10,6 +10,7 @@ import {
   Download, FileText,
 } from 'lucide-react';
 import { getAtRiskStudents, type AtRiskStudent } from '@/lib/auth-store';
+import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -30,29 +31,17 @@ const RISK_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981'];
 export default function AtRiskReport({ groupId: controlledGroupId, days: controlledDays }: { groupId?: string; days?: number } = {}) {
   const [internalDays, setInternalDays] = useState(30);
   const days = controlledDays !== undefined ? controlledDays : internalDays;
-  const [atRiskStudents, setAtRiskStudents] = useState<AtRiskStudent[]>([]);
-  const [summary, setSummary] = useState({ totalStudents: 0, atRiskCount: 0, atRiskPercentage: 0, criticalCount: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [sortField, setSortField] = useState<'riskScore' | 'fullName' | 'lastActiveDays' | 'avgQuizScore'>('riskScore');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    getAtRiskStudents(days, controlledGroupId)
-      .then((d) => {
-        if (!cancelled) {
-          setAtRiskStudents(d.atRiskStudents);
-          setSummary(d.summary);
-          setLoading(false);
-        }
-      })
-      .catch((e) => { if (!cancelled) { setError(e.message || 'Ошибка загрузки'); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [days, controlledGroupId]);
+  const { data: atRiskData, loading, error } = useAnalyticsFetcher<{ atRiskStudents: AtRiskStudent[]; summary: { totalStudents: number; atRiskCount: number; atRiskPercentage: number; criticalCount: number } }>(
+    () => getAtRiskStudents(days, controlledGroupId),
+    [days, controlledGroupId],
+  );
+
+  const atRiskStudents = atRiskData?.atRiskStudents ?? [];
+  const summary = atRiskData?.summary ?? { totalStudents: 0, atRiskCount: 0, atRiskPercentage: 0, criticalCount: 0 };
 
   const handleSort = (field: typeof sortField) => {
     if (sortField === field) {

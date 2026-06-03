@@ -35,7 +35,7 @@ export async function authenticate(request: NextRequest): Promise<AuthUser | nul
   });
 
   if (!user || user.isBlocked) return null;
-  if (payload.tokenVersion !== undefined && user.tokenVersion !== payload.tokenVersion) return null;
+  if (user.tokenVersion !== (payload.tokenVersion ?? 0)) return null;
 
   return { id: payload.id, role: payload.role, group: payload.group, fullName: payload.fullName, tokenVersion: user.tokenVersion };
 }
@@ -136,24 +136,19 @@ export function forbidden(message = 'Forbidden') {
 }
 
 
-/** Extract client IP from request, validating proxy headers to prevent spoofing */
+/** Extract client IP from request, checking standard proxy headers */
 export function getClientIp(request: NextRequest): string {
-  // Only trust x-forwarded-for if we know we're behind a trusted proxy
-  // In production, this should be configured via TRUSTED_PROXIES env var
-  const trustedProxies = process.env.TRUSTED_PROXIES?.split(',') || [];
-  const remoteAddr = request.headers.get('x-real-ip');
-
-  // If behind a trusted proxy, use x-real-ip (set by the proxy)
-  if (remoteAddr && (trustedProxies.length > 0 || process.env.NODE_ENV === 'production')) {
-    return remoteAddr;
-  }
-
-  // Fall back to connection-level IP (harder to spoof)
-  // In Next.js, this would come from socket address if available
+  // x-forwarded-for: set by most reverse proxies (nginx, Cloudflare, Vercel)
+  // Contains comma-separated IPs, leftmost is the original client
   const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded && trustedProxies.length > 0) {
-    return forwarded.split(',')[0].trim();
+  if (forwarded) {
+    const clientIp = forwarded.split(',')[0].trim();
+    if (clientIp) return clientIp;
   }
+
+  // x-real-ip: set by nginx as an alternative
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp;
 
   return 'unknown';
 }
