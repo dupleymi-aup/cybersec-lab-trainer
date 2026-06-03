@@ -224,6 +224,15 @@ export const createAnnouncementSchema = z.object({
   expiresAt: z.string().datetime().optional(),
 });
 
+export const updateAnnouncementSchema = z.object({
+  id: z.string().min(1, 'ID is required'),
+  title: z.string().min(1).max(200).optional(),
+  content: z.string().min(1).max(5000).optional(),
+  priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  active: z.boolean().optional(),
+  expiresAt: z.string().datetime().nullable().optional(),
+});
+
 export type CreateAnnouncementInput = z.infer<typeof createAnnouncementSchema>;
 
 // CSP report validation

@@ -48,25 +48,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const nextAttempt = currentAttempt + 1;
 
-    // Upsert: allow resubmission within attempt limit
-    const submission = await prisma.assignmentSubmission.upsert({
-      where: {
-        assignmentId_userId_attempt: {
-          assignmentId: id,
-          userId: auth.id,
-          attempt: nextAttempt,
-        },
-      },
-      create: {
+    const submission = await prisma.assignmentSubmission.create({
+      data: {
         assignmentId: id,
         userId: auth.id,
         content: parsed.data.content,
         maxScore: assignment.maxScore,
         attempt: nextAttempt,
-      },
-      update: {
-        content: parsed.data.content,
-        submittedAt: new Date(),
       },
     });
 

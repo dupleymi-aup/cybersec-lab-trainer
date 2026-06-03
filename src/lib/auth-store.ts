@@ -487,6 +487,21 @@ export async function getStudentProgress(userId: string): Promise<{ progress: St
   }
 }
 
+// Batch fetch student progress — replaces N individual API calls with one
+export async function getBatchStudentProgress(
+  userIds: string[],
+): Promise<Record<string, { progress: StudentProgress[]; quizResults: StudentQuizResult[] }>> {
+  if (userIds.length === 0) return {};
+  try {
+    const res = await apiFetch(`/api/progress/batch?userIds=${userIds.join(',')}`);
+    if (!res.ok) return {};
+    return await res.json();
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") console.warn("[auth-store] getBatchStudentProgress failed:", e);
+    return {};
+  }
+}
+
 // Get login activity for a user
 export async function getLoginActivity(userId: string): Promise<LoginActivityEntry[]> {
   try {

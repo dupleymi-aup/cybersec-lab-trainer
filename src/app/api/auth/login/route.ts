@@ -61,10 +61,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Update login stats atomically to prevent race condition
+    const now = new Date();
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        lastLoginAt: new Date(),
+        lastLoginAt: now,
         loginCount: { increment: 1 },
       },
     });
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
         bio: user.bio,
         role: user.role,
         createdAt: user.createdAt.toISOString(),
-        lastLoginAt: user.lastLoginAt?.toISOString(),
+        lastLoginAt: now.toISOString(),
         loginCount: user.loginCount + 1,
         isBlocked: user.isBlocked,
       },

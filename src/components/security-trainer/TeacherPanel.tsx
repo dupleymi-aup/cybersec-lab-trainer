@@ -69,80 +69,6 @@ interface StudentProgress {
   lastActive?: string;
 }
 
-async function getStudentProgress(userId: string): Promise<StudentProgress> {
-  try {
-    const headers = await getAuthHeaders();
-    const res = await fetch(`/api/progress/${userId}`, { headers });
-    if (res.ok) {
-      const data = await res.json();
-
-      // Compute completed modules, quiz scores, and last active from API response
-      const completedModules: string[] = [];
-      const moduleTimestamps: Record<string, string> = {};
-      let studiedOwaspItems: string[] = [];
-      let sqlCompletedLevels: string[] = [];
-      let xssCompletedLevels: string[] = [];
-      let csrfCompletedSteps: number[] = [];
-      let secureCodingCorrectCount = 0;
-      const timestamps: string[] = [];
-
-      for (const p of data.progress || []) {
-        completedModules.push(p.moduleId);
-        if (p.updatedAt) {
-          moduleTimestamps[p.moduleId] = p.updatedAt;
-          timestamps.push(p.updatedAt);
-        }
-        if (p.studiedOwaspItems) studiedOwaspItems = [...new Set([...studiedOwaspItems, ...p.studiedOwaspItems])];
-        if (p.sqlLevels) sqlCompletedLevels = [...sqlCompletedLevels, ...(Array.isArray(p.sqlLevels) ? p.sqlLevels : [])];
-        if (p.xssLevels) xssCompletedLevels = [...xssCompletedLevels, ...(Array.isArray(p.xssLevels) ? p.xssLevels : [])];
-        if (p.csrfSteps) csrfCompletedSteps = [...csrfCompletedSteps, ...(Array.isArray(p.csrfSteps) ? p.csrfSteps : [])];
-        if (p.secureCodingCorrectCount) secureCodingCorrectCount += p.secureCodingCorrectCount;
-      }
-
-      const quizScores: Record<string, number> = {};
-      const quizTimestamps: Record<string, string> = {};
-      for (const q of data.quizResults || []) {
-        quizScores[q.quizId] = q.percentage;
-        if (q.updatedAt) {
-          quizTimestamps[q.quizId] = q.updatedAt;
-          timestamps.push(q.updatedAt);
-        }
-      }
-
-      const lastActive = timestamps.length > 0 ? timestamps.sort().reverse()[0] : undefined;
-
-      return {
-        userId,
-        completedModules,
-        quizScores,
-        moduleTimestamps,
-        quizTimestamps,
-        studiedOwaspItems,
-        sqlCompletedLevels,
-        xssCompletedLevels,
-        csrfCompletedSteps,
-        secureCodingCorrectCount,
-        lastActive,
-      };
-    }
-  } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[TeacherPanel.tsx] getStudentProgress failed:", e);
-    // ignore
-  }
-  return {
-    userId,
-    completedModules: [],
-    quizScores: {},
-    moduleTimestamps: {},
-    quizTimestamps: {},
-    studiedOwaspItems: [],
-    sqlCompletedLevels: [],
-    xssCompletedLevels: [],
-    csrfCompletedSteps: [],
-    secureCodingCorrectCount: 0,
-  };
-}
-
 const EMPTY_PROGRESS: StudentProgress = {
   userId: "",
   completedModules: [],
@@ -175,14 +101,77 @@ export default function TeacherPanel() {
       .finally(() => setLoadingStudents(false));
   }, []);
 
-  // Load all student progress from API
+  // Load all student progress from batch API (avoids N concurrent requests)
   useEffect(() => {
     if (students.length === 0) return;
     const loadProgress = async () => {
-      const results = await Promise.all(students.map(async (s) => {
-        return [s.id, await getStudentProgress(s.id)] as const;
-      }));
-      setStudentProgress(Object.fromEntries(results));
+      const headers = await getAuthHeaders();
+      const batchResult: Record<string, StudentProgress> = {};
+      const userIds = students.map(s => s.id);
+      const batchSize = 100;
+
+      for (let i = 0; i < userIds.length; i += batchSize) {
+        const chunk = userIds.slice(i, i + batchSize);
+        try {
+          const res = await fetch(`/api/progress/batch?userIds=${chunk.join(',')}`, { headers });
+          if (!res.ok) continue;
+          const data = await res.json();
+
+          for (const [userId, userData] of Object.entries(data) as Array<[string, { progress: Array<{ moduleId: string; completed: boolean; score: number | null; updatedAt: string; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingCorrectCount: number; studiedOwaspItems: string | null }>; quizResults: Array<{ quizId: string; percentage: number; updatedAt: string }> }]>) {
+            const completedModules: string[] = [];
+            const moduleTimestamps: Record<string, string> = {};
+            let studiedOwaspItems: string[] = [];
+            let sqlCompletedLevels: string[] = [];
+            let xssCompletedLevels: string[] = [];
+            let csrfCompletedSteps: number[] = [];
+            let secureCodingCorrectCount = 0;
+            const timestamps: string[] = [];
+
+            for (const p of userData.progress || []) {
+              completedModules.push(p.moduleId);
+              if (p.updatedAt) {
+                moduleTimestamps[p.moduleId] = p.updatedAt;
+                timestamps.push(p.updatedAt);
+              }
+              if (p.studiedOwaspItems) studiedOwaspItems = [...new Set([...studiedOwaspItems, ...p.studiedOwaspItems])];
+              if (p.sqlLevels) sqlCompletedLevels = [...sqlCompletedLevels, ...(Array.isArray(p.sqlLevels) ? p.sqlLevels : [])];
+              if (p.xssLevels) xssCompletedLevels = [...xssCompletedLevels, ...(Array.isArray(p.xssLevels) ? p.xssLevels : [])];
+              if (p.csrfSteps) csrfCompletedSteps = [...csrfCompletedSteps, ...(Array.isArray(p.csrfSteps) ? p.csrfSteps : [])];
+              if (p.secureCodingCorrectCount) secureCodingCorrectCount += p.secureCodingCorrectCount;
+            }
+
+            const quizScores: Record<string, number> = {};
+            const quizTimestamps: Record<string, string> = {};
+            for (const q of userData.quizResults || []) {
+              quizScores[q.quizId] = q.percentage;
+              if (q.updatedAt) {
+                quizTimestamps[q.quizId] = q.updatedAt;
+                timestamps.push(q.updatedAt);
+              }
+            }
+
+            const lastActive = timestamps.length > 0 ? timestamps.sort().reverse()[0] : undefined;
+
+            batchResult[userId] = {
+              userId,
+              completedModules,
+              quizScores,
+              moduleTimestamps,
+              quizTimestamps,
+              studiedOwaspItems,
+              sqlCompletedLevels,
+              xssCompletedLevels,
+              csrfCompletedSteps,
+              secureCodingCorrectCount,
+              lastActive,
+            };
+          }
+        } catch {
+          // Skip failed batch silently
+        }
+      }
+
+      setStudentProgress(batchResult);
     };
     loadProgress();
   }, [students]);

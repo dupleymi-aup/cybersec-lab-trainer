@@ -21,23 +21,26 @@ export async function GET(request: NextRequest) {
   }
 
   // For timeframe filtering, we would use lastActivityAt but for simplicity show all-time
-  const users = await prisma.user.findMany({
-    where,
-    orderBy: [
-      { xp: 'desc' },
-      { level: 'desc' },
-    ],
-    take: Math.min(limit, 100),
-    select: {
-      id: true,
-      fullName: true,
-      group: true,
-      xp: true,
-      level: true,
-      streak: true,
-      lastActivityAt: true,
-    },
-  });
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      orderBy: [
+        { xp: 'desc' },
+        { level: 'desc' },
+      ],
+      take: Math.min(limit, 100),
+      select: {
+        id: true,
+        fullName: true,
+        group: true,
+        xp: true,
+        level: true,
+        streak: true,
+        lastActivityAt: true,
+      },
+    }),
+    prisma.user.count({ where }),
+  ]);
 
   const leaderboard = users.map((u, index) => ({
     position: index + 1,
@@ -79,6 +82,6 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     leaderboard,
     currentUser: userRank,
-    total: users.length,
+    total,
   });
 }

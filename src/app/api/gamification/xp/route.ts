@@ -22,22 +22,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Check daily XP cap using XpLog table
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const xpToday = await prisma.xpLog.aggregate({
-    where: { userId: auth.id, createdAt: { gte: todayStart } },
-    _sum: { amount: true },
-  });
-  const dailyXpEarned = xpToday._sum.amount ?? 0;
-
-  if (dailyXpEarned >= MAX_DAILY_XP) {
-    return NextResponse.json(
-      { error: 'Daily XP limit reached. Come back tomorrow!', maxDailyXp: MAX_DAILY_XP },
-      { status: 429 },
-    );
-  }
-
   const body = await request.json();
   const parsed = xpActionSchema.safeParse(body);
   if (!parsed.success) {
@@ -45,34 +29,38 @@ export async function POST(request: NextRequest) {
   }
   const { action } = parsed.data;
 
-  const xpAmount = action === 'daily_login'
-    ? await calculateDailyLoginXp(auth.id)
-    : (() => {
-        switch (action) {
-          case 'module_complete': return XP_REWARDS.moduleComplete;
-          case 'quiz_pass': return XP_REWARDS.quizPass;
-          case 'quiz_perfect': return XP_REWARDS.quizPerfect;
-          case 'assignment_submit': return XP_REWARDS.assignmentSubmit;
-          case 'assignment_passed': return XP_REWARDS.assignmentPassed;
-          default: return -1;
-        }
-      })();
-
-  if (xpAmount <= 0) {
-    return NextResponse.json({ error: 'No XP awarded' }, { status: 400 });
-  }
-
-  // Check if awarding this XP would exceed daily cap
-  if (dailyXpEarned + xpAmount > MAX_DAILY_XP) {
-    return NextResponse.json(
-      { error: 'Daily XP limit would be exceeded. Come back tomorrow!', maxDailyXp: MAX_DAILY_XP },
-      { status: 429 },
-    );
-  }
-
-  // Use transaction to prevent race condition: XP increment, level update, and XP log
-  // must succeed together, preventing stale reads from concurrent requests
+  // Use transaction to prevent race condition on XP + streak updates
   const result = await prisma.$transaction(async (tx) => {
+    const xpAmount = action === 'daily_login'
+      ? await calculateDailyLoginXp(tx, auth.id)
+      : (() => {
+          switch (action) {
+            case 'module_complete': return XP_REWARDS.moduleComplete;
+            case 'quiz_pass': return XP_REWARDS.quizPass;
+            case 'quiz_perfect': return XP_REWARDS.quizPerfect;
+            case 'assignment_submit': return XP_REWARDS.assignmentSubmit;
+            case 'assignment_passed': return XP_REWARDS.assignmentPassed;
+            default: return -1;
+          }
+        })();
+
+    if (xpAmount <= 0) {
+      throw new Error('NO_XP');
+    }
+
+    // Re-check daily cap inside transaction
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const xpToday = await tx.xpLog.aggregate({
+      where: { userId: auth.id, createdAt: { gte: todayStart } },
+      _sum: { amount: true },
+    });
+    const dailyXpEarned = xpToday._sum.amount ?? 0;
+
+    if (dailyXpEarned >= MAX_DAILY_XP || dailyXpEarned + xpAmount > MAX_DAILY_XP) {
+      throw new Error('DAILY_CAP');
+    }
+
     const user = await tx.user.update({
       where: { id: auth.id },
       data: {
@@ -82,7 +70,6 @@ export async function POST(request: NextRequest) {
       select: { id: true, xp: true, level: true, streak: true },
     });
 
-    // Log the XP award for accurate daily cap tracking
     await tx.xpLog.create({
       data: {
         userId: auth.id,
@@ -96,9 +83,7 @@ export async function POST(request: NextRequest) {
 
     const updated = await tx.user.update({
       where: { id: auth.id },
-      data: {
-        level: newLevel.level,
-      },
+      data: { level: newLevel.level },
     });
 
     return {
@@ -110,7 +95,29 @@ export async function POST(request: NextRequest) {
       newLevel: leveledUp ? newLevel.level : null,
       streak: user.streak,
     };
+  }).catch((err) => {
+    if (err instanceof Error && err.message === 'NO_XP') return null;
+    if (err instanceof Error && err.message === 'DAILY_CAP') return null;
+    throw err;
   });
+
+  if (result === null && action === 'daily_login') {
+    const recheck = await prisma.xpLog.aggregate({
+      where: { userId: auth.id, createdAt: { gte: (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })() } },
+      _sum: { amount: true },
+    });
+    if ((recheck._sum.amount ?? 0) >= MAX_DAILY_XP) {
+      return NextResponse.json(
+        { error: 'Daily XP limit reached. Come back tomorrow!', maxDailyXp: MAX_DAILY_XP },
+        { status: 429 },
+      );
+    }
+    return NextResponse.json({ error: 'No XP awarded' }, { status: 400 });
+  }
+
+  if (!result) {
+    return NextResponse.json({ error: 'No XP awarded' }, { status: 400 });
+  }
 
   return NextResponse.json({
     success: true,
@@ -118,8 +125,8 @@ export async function POST(request: NextRequest) {
   });
 }
 
-async function calculateDailyLoginXp(userId: string): Promise<number> {
-  const user = await prisma.user.findUnique({
+async function calculateDailyLoginXp(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0], userId: string): Promise<number> {
+  const user = await tx.user.findUnique({
     where: { id: userId },
     select: { lastActivityAt: true, streak: true },
   });
@@ -130,8 +137,7 @@ async function calculateDailyLoginXp(userId: string): Promise<number> {
   const last = user.lastActivityAt;
 
   if (!last) {
-    // First activity
-    await prisma.user.update({
+    await tx.user.update({
       where: { id: userId },
       data: { streak: 1 },
     });
@@ -141,23 +147,20 @@ async function calculateDailyLoginXp(userId: string): Promise<number> {
   const diffDays = Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    // Already logged in today — no XP
     return 0;
   }
 
   if (diffDays === 1) {
-    // Consecutive day — increment streak
     const newStreak = (user.streak || 0) + 1;
     const bonusXP = XP_REWARDS.dailyLogin + newStreak * XP_REWARDS.streakBonus;
-    await prisma.user.update({
+    await tx.user.update({
       where: { id: userId },
       data: { streak: newStreak },
     });
     return bonusXP;
   }
 
-  // Streak broken — reset
-  await prisma.user.update({
+  await tx.user.update({
     where: { id: userId },
     data: { streak: 1 },
   });

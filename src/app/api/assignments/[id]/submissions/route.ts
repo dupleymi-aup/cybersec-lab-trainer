@@ -7,7 +7,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const auth = await authenticate(request);
     if (!auth) return unauthorized();
-    if (auth.role !== 'teacher' && auth.role !== 'admin') return forbidden();
 
     const { id } = await params;
 
@@ -20,7 +19,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
     }
 
-    if (assignment.createdBy !== auth.id && auth.role !== 'admin') {
+    // Students can view only their own submissions
+    if (auth.role === 'student') {
+      const submissions = await prisma.assignmentSubmission.findMany({
+        where: { assignmentId: id, userId: auth.id },
+        orderBy: { submittedAt: 'desc' },
+      });
+      return NextResponse.json(submissions);
+    }
+
+    // Teachers can only view submissions for their own assignments
+    if (auth.role === 'teacher' && assignment.createdBy !== auth.id) {
       return forbidden();
     }
 

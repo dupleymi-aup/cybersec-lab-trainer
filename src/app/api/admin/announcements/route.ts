@@ -8,6 +8,7 @@ import {
   checkRateLimit,
   getClientIp,
 } from '@/lib/api-middleware';
+import { createAnnouncementSchema, updateAnnouncementSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
 
 // GET /api/admin/announcements - List all announcements
@@ -77,36 +78,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { title, content, priority, expiresAt } = body;
-
-  // Validation
-  if (!title || typeof title !== 'string' || title.length > 100) {
-    return NextResponse.json(
-      { error: 'Title is required and must be 100 characters or fewer' },
-      { status: 400 }
-    );
-  }
-  if (!content || typeof content !== 'string' || content.length > 500) {
-    return NextResponse.json(
-      { error: 'Content is required and must be 500 characters or fewer' },
-      { status: 400 }
-    );
+  const parsed = createAnnouncementSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
 
-  const validPriorities = ['low', 'normal', 'high'];
-  const announcementPriority =
-    typeof priority === 'string' && validPriorities.includes(priority)
-      ? priority
-      : 'normal';
+  const { title, content, priority = 'medium', expiresAt } = parsed.data;
 
-  const parsedExpiresAt =
-    typeof expiresAt === 'string' ? new Date(expiresAt) : null;
-  if (expiresAt && parsedExpiresAt && isNaN(parsedExpiresAt.getTime())) {
-    return NextResponse.json(
-      { error: 'Invalid expiresAt date format' },
-      { status: 400 }
-    );
-  }
+  const parsedExpiresAt = expiresAt ? new Date(expiresAt) : null;
 
   const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
   const ip = getClientIp(request);
@@ -118,7 +97,7 @@ export async function POST(request: NextRequest) {
       title,
       content,
       author: adminUser?.fullName || adminUser?.email || 'Unknown',
-      priority: announcementPriority,
+      priority: priority,
       expiresAt: parsedExpiresAt,
     },
   });
@@ -185,14 +164,12 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { id, title, content, priority, active, expiresAt } = body;
-
-  if (!id || typeof id !== 'string') {
-    return NextResponse.json(
-      { error: 'Announcement ID is required' },
-      { status: 400 }
-    );
+  const parsed = updateAnnouncementSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
+
+  const { id, title, content, priority, active, expiresAt } = parsed.data;
 
   const existing = await prisma.announcement.findUnique({ where: { id } });
   if (!existing) {
@@ -202,49 +179,10 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  if (title !== undefined && (typeof title !== 'string' || title.length > 100)) {
-    return NextResponse.json(
-      { error: 'Title must be 100 characters or fewer' },
-      { status: 400 }
-    );
-  }
-  if (
-    content !== undefined &&
-    (typeof content !== 'string' || content.length > 500)
-  ) {
-    return NextResponse.json(
-      { error: 'Content must be 500 characters or fewer' },
-      { status: 400 }
-    );
-  }
-
-  const validPriorities = ['low', 'normal', 'high'];
-  if (priority !== undefined && !validPriorities.includes(priority as string)) {
-    return NextResponse.json(
-      { error: 'Priority must be low, normal, or high' },
-      { status: 400 }
-    );
-  }
-
-  let parsedExpiresAt: Date | null | undefined = undefined;
-  if (expiresAt !== undefined) {
-    if (expiresAt === null) {
-      parsedExpiresAt = null;
-    } else if (typeof expiresAt === 'string') {
-      parsedExpiresAt = new Date(expiresAt);
-      if (isNaN(parsedExpiresAt.getTime())) {
-        return NextResponse.json(
-          { error: 'Invalid expiresAt date format' },
-          { status: 400 }
-        );
-      }
-    } else {
-      return NextResponse.json(
-        { error: 'Invalid expiresAt value' },
-        { status: 400 }
-      );
-    }
-  }
+  const parsedExpiresAt =
+    expiresAt === null ? null
+    : expiresAt !== undefined ? new Date(expiresAt)
+    : undefined;
 
   const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
   const ip = getClientIp(request);
