@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { createDeadlineSchema } from '@/lib/validations/api';
 
 export async function GET(request: NextRequest) {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  if (!requireCapability(auth, 'deadlines:create')) return forbidden();
 
   const body = await request.json();
   const parsed = createDeadlineSchema.safeParse(body);

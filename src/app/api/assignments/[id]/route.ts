@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { updateAssignmentSchema } from '@/lib/validations/api';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (auth.role !== 'teacher' && auth.role !== 'admin') return forbidden();
+  if (!requireCapability(auth, 'assignments:edit')) return forbidden();
 
   const { id } = await params;
 
@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (auth.role !== 'teacher' && auth.role !== 'admin') return forbidden();
+  if (!requireCapability(auth, 'assignments:delete')) return forbidden();
 
   const { id } = await params;
 

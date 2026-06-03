@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { generateGradebookCSV } from '@/lib/export-utils';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  if (!requireCapability(auth, 'grades:export')) return forbidden();
 
   const { searchParams } = new URL(request.url);
   const groupId = searchParams.get('groupId') || undefined;

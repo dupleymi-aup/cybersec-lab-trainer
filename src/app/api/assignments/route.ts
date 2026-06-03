@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { createAssignmentSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await authenticate(request);
     if (!auth) return unauthorized();
-    if (auth.role !== 'teacher' && auth.role !== 'admin') return forbidden();
+    if (!requireCapability(auth, 'assignments:create')) return forbidden();
 
     const body = await request.json();
     const parsed = createAssignmentSchema.safeParse(body);

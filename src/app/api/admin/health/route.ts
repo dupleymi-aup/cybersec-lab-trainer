@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireCapability, checkRateLimit } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 
 // GET /api/admin/health — system health check
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireCapability(auth, 'system:health')) return forbidden();
 
   // Rate limit: 30 per minute
   const rateLimit = checkRateLimit(`health:${auth.id}`, 30, 60_000);
@@ -105,10 +105,36 @@ export async function GET(request: NextRequest) {
     checks.security = { status: 'warn', details: 'Could not check login activity' };
   }
 
+  // 7. System info
+  const uptimeSeconds = process.uptime();
+  const days = Math.floor(uptimeSeconds / 86400);
+  const hours = Math.floor((uptimeSeconds % 86400) / 3600);
+  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+  const uptimeFormatted = days > 0
+    ? `${days}d ${hours}h ${minutes}m`
+    : hours > 0
+      ? `${hours}h ${minutes}m`
+      : `${minutes}m`;
+
+  checks.system = {
+    status: 'ok',
+    details: {
+      uptimeSeconds: Math.round(uptimeSeconds),
+      uptimeFormatted,
+      nodeVersion: process.version,
+      platform: process.platform,
+      arch: process.arch,
+      pid: process.pid,
+      cwd: process.cwd(),
+      nodeEnv: process.env.NODE_ENV || 'development',
+    },
+  };
+
   return NextResponse.json({
     status: overallStatus,
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
+    uptime: uptimeSeconds,
+    uptimeFormatted,
     checks,
   });
 }

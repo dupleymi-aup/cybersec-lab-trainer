@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireCapability, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { validateUuid } from '@/lib/validate-uuid';
 
 export async function PUT(
@@ -9,7 +9,7 @@ export async function PUT(
 ) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireCapability(auth, 'users:change_role')) return forbidden();
 
   // Rate limit: 20 role changes per minute per admin
   const rateLimit = checkRateLimit(`role:${auth.id}`, 20, 60_000);

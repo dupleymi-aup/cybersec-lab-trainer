@@ -160,7 +160,7 @@ export default function TeacherPanel() {
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const user = useAuthStore(s => s.user);
   const [searchTerm, setSearchTerm] = useState('');
-  const [groupFilter, _setGroupFilter] = useState('');
+  const [groupFilter, setGroupFilter] = useState('');
   const [gradebookSort, setGradebookSort] = useState<'name' | 'modules' | 'score'>('name');
   const [analyticsSubTab, setAnalyticsSubTab] = useState<'overview' | 'trends' | 'questions' | 'achievements' | 'competency' | 'weaknesses' | 'predictive' | 'export' | 'module-deep-dive' | 'certification' | 'quiz-session'>('overview');
   const [_selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
@@ -405,6 +405,31 @@ export default function TeacherPanel() {
         </div>
         <AnalyticsExportPanel students={students} />
       </div>
+
+      {/* Group filter */}
+      {groups.length > 0 && (
+        <div className="flex items-center gap-2">
+          <Filter size={14} className="text-muted-foreground" />
+          <select
+            value={groupFilter}
+            onChange={(e) => setGroupFilter(e.target.value)}
+            className="text-sm border rounded-md px-3 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500"
+          >
+            <option value="">Все группы</option>
+            {groups.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+          {groupFilter && (
+            <button
+              onClick={() => setGroupFilter('')}
+              className="text-xs text-muted-foreground hover:text-foreground px-2 py-1"
+            >
+              Сбросить
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">

@@ -41,6 +41,7 @@ import {
   Info,
   Activity,
   UserCheck,
+  Users,
 } from 'lucide-react';
 import type { PageType } from '@/lib/store';
 import type { Announcement } from '@/lib/auth-types';
@@ -129,6 +130,12 @@ export default function Dashboard() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [dismissedAnnouncements, setDismissedAnnouncements] = useState<Set<string>>(new Set());
   const [upcomingDeadlines, setUpcomingDeadlines] = useState<UpcomingDeadline[]>([]);
+  const [teacherStats, setTeacherStats] = useState<{
+    totalStudents: number;
+    activeStudents: number;
+    avgModules: number;
+    atRiskCount: number;
+  } | null>(null);
   useEffect(() => {
     fetchActiveAnnouncements().then(setAnnouncements).catch((e) => {
       if (process.env.NODE_ENV === 'development') console.warn('[Dashboard] fetchActiveAnnouncements failed:', e);
@@ -161,6 +168,24 @@ export default function Dashboard() {
         console.error('Dashboard: Failed to load notifications:', err);
       });
   }, []);
+
+  useEffect(() => {
+    if (user?.role !== 'teacher' && user?.role !== 'admin') return;
+    getAuthHeaders()
+      .then(h => fetch('/api/analytics/admin-summary?days=30', { headers: h }))
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.current) {
+          setTeacherStats({
+            totalStudents: data.current.totalStudents || 0,
+            activeStudents: data.current.activeStudents || 0,
+            avgModules: Math.round(data.current.avgCompletionRate || 0),
+            atRiskCount: data.atRiskCount || 0,
+          });
+        }
+      })
+      .catch(() => { /* network error — silently ignore */ });
+  }, [user?.role]);
 
   const dismissAnnouncement = (id: string) => {
     setDismissedAnnouncements((prev) => new Set([...prev, id]));
@@ -546,6 +571,39 @@ export default function Dashboard() {
             </Button>
           ))}
         </div>
+      )}
+
+      {/* Teacher/Admin: Class Overview */}
+      {teacherStats && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="p-4 rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Users size={18} className="text-amber-600" />
+            <span className="text-sm font-semibold text-amber-800">Обзор класса</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+              <p className="text-xl font-bold text-amber-700">{teacherStats.totalStudents}</p>
+              <p className="text-xs text-amber-600/80">Всего студентов</p>
+            </div>
+            <div>
+              <p className="text-xl font-bold text-emerald-700">{teacherStats.activeStudents}</p>
+              <p className="text-xs text-emerald-600/80">Активных за 30 дн.</p>
+            </div>
+            <div>
+              <p className="text-xl font-bold text-violet-700">{teacherStats.avgModules}%</p>
+              <p className="text-xs text-violet-600/80">Среднее завершение</p>
+            </div>
+            <div>
+              <p className="text-xl font-bold text-red-600">{teacherStats.atRiskCount}</p>
+              <p className="text-xs text-red-500/80">В зоне риска</p>
+            </div>
+          </div>
+        </motion.div>
       )}
 
       {/* Recommendation + Next Achievement side by side */}

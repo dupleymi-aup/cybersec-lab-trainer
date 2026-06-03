@@ -4,7 +4,7 @@ import {
   authenticate,
   unauthorized,
   forbidden,
-  requireRole,
+  requireCapability,
   checkRateLimit,
   getClientIp,
 } from '@/lib/api-middleware';
@@ -14,7 +14,7 @@ import { logger } from '@/lib/logger';
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireCapability(auth, 'announcements:read')) return forbidden();
 
   // Rate limit: 60 requests per minute
   const rateLimit = checkRateLimit(`announcements-get:${auth.id}`, 60, 60_000);
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireCapability(auth, 'announcements:create')) return forbidden();
 
   // Rate limit: 20 requests per minute
   const rateLimit = checkRateLimit(`announcements-post:${auth.id}`, 20, 60_000);
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireCapability(auth, 'announcements:edit')) return forbidden();
 
   // Rate limit: 20 requests per minute
   const rateLimit = checkRateLimit(`announcements-put:${auth.id}`, 20, 60_000);
@@ -300,7 +300,7 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireCapability(auth, 'announcements:delete')) return forbidden();
 
   // Rate limit: 20 requests per minute
   const rateLimit = checkRateLimit(

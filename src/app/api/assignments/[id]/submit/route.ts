@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
+import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { submitAssignmentSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (auth.role !== 'student') return forbidden();
+  if (!requireCapability(auth, 'assignments:submit')) return forbidden();
 
   try {
     const { id } = await params;
