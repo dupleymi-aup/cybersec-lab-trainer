@@ -821,5 +821,143 @@
       "lowScore": "Low score ({score}%)",
       "fewModules": "Few modules"
     }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "subtitle": "Manage users and system",
+    "tabs": {
+      "users": "Users",
+      "groups": "Groups",
+      "database": "Statistics",
+      "settings": "Settings",
+      "modules": "Modules",
+      "lms": "LMS",
+      "announcements": "Announcements",
+      "analytics": "Analytics",
+      "audit": "Audit Log",
+      "report": "Report"
+    },
+    "kpi": {
+      "totalUsers": "Total Users",
+      "students": "Students",
+      "teachers": "Teachers",
+      "blocked": "Blocked",
+      "total": "Total",
+      "keys": "Keys",
+      "used": "Used",
+      "localStorageKeys": "localStorage Keys",
+      "storage": "Storage"
+    },
+    "search": {
+      "placeholder": "Search by name or email...",
+      "allRoles": "All Roles",
+      "student": "Student",
+      "teacher": "Teacher",
+      "admin": "Administrator"
+    },
+    "users": {
+      "create": "Create",
+      "selectAll": "Select All",
+      "selected": "Selected: {count}",
+      "loading": "Loading users...",
+      "you": "You",
+      "blocked": "Blocked",
+      "logins": "Logins: {count}",
+      "neverLoggedIn": "Never logged in",
+      "activity": "User Activity",
+      "resetPassword": "Reset Password",
+      "loginAs": "Log In As"
+    },
+    "database": {
+      "usersByRole": "Users by Role",
+      "students": "Students",
+      "teachers": "Teachers",
+      "admins": "Administrators",
+      "localStorage": "Storage (localStorage)"
+    },
+    "settings": {
+      "systemActions": "System Actions",
+      "clearProgress": "Clear All Progress",
+      "exportJson": "Export Data (JSON)",
+      "importCsv": "Import CSV",
+      "warning": "Warning:",
+      "warningText": "These actions are irreversible. Clearing progress will delete all module and quiz completion data for all users.",
+      "csvInfo": "CSV Import:",
+      "csvFormat": "Format: fullName,email,phone,role,group. Default password: Temp@1234",
+      "overallStats": "Overall Statistics"
+    },
+    "groups": {
+      "title": "Group Management",
+      "subtitle": "Create, rename, and delete groups"
+    },
+    "audit": {
+      "title": "Activity Log",
+      "subtitle": "History of all admin actions"
+    },
+    "report": {
+      "summary": "Summary",
+      "activity": "Activity",
+      "quizzes": "Quizzes",
+      "questions": "Questions",
+      "students": "Students",
+      "export": "Export"
+    },
+    "analytics": {
+      "dashboard": "Dashboard",
+      "modules": "Modules",
+      "dynamics": "Dynamics",
+      "trends": "Trends",
+      "atRisk": "At Risk",
+      "comparison": "Comparison",
+      "engagement": "Engagement",
+      "achievements": "Achievements",
+      "gradebook": "Gradebook",
+      "learningPath": "Funnel",
+      "quizTrajectory": "Trajectory",
+      "cohort": "Cohorts",
+      "competency": "Competencies",
+      "weaknesses": "Weaknesses",
+      "predictive": "Predictions",
+      "student": "Student",
+      "moduleDeepDive": "Modules+",
+      "certification": "Certification",
+      "velocity": "Velocity",
+      "quizSession": "Quiz Sessions",
+      "groupDynamics": "Group Dynamics",
+      "loginPatterns": "Logins",
+      "advanced": "Advanced",
+      "difficulty": "Difficulty",
+      "heatmap": "Heatmap",
+      "questionsTab": "Questions",
+      "summaryTab": "Summary",
+      "retry": "Retries",
+      "errors": "Errors",
+      "sankey": "Funnel+",
+      "calendar": "Calendar",
+      "predictiveRisk": "Predictive Risk",
+      "scheduler": "Scheduler",
+      "dataQuality": "Data Quality",
+      "periodComparison": "Period Comparison",
+      "selectStudent": "Select a student...",
+      "totalStudents": "Total Students",
+      "activePercent": "Active",
+      "avgCompletion": "Avg Completion",
+      "avgQuizScore": "Avg Quiz Score"
+    },
+    "actions": {
+      "roleChanged": "Role changed to {role}",
+      "confirmDelete": "Delete user \"{name}\"?",
+      "userDeleted": "User deleted",
+      "userBlocked": "User blocked",
+      "userUnblocked": "User unblocked",
+      "csvEmpty": "CSV file is empty",
+      "csvMissingColumns": "CSV must contain fullName and email columns",
+      "csvImported": "Imported: {created}, skipped: {skipped}",
+      "csvParseError": "CSV parsing error",
+      "confirmClearProgress": "Clear all progress for all users?",
+      "progressCleared": "Progress cleared",
+      "dataExported": "Data exported",
+      "loggedInAs": "You are now logged in as {name}"
+    }
   }
 }

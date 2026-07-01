@@ -820,5 +820,143 @@
       "lowScore": "低分 ({score}%)",
       "fewModules": "模块数少"
     }
+  },
+  "admin": {
+    "title": "管理员面板",
+    "subtitle": "管理用户和系统",
+    "tabs": {
+      "users": "用户",
+      "groups": "小组",
+      "database": "统计",
+      "settings": "设置",
+      "modules": "模块",
+      "lms": "LMS",
+      "announcements": "公告",
+      "analytics": "分析",
+      "audit": "审计日志",
+      "report": "报告"
+    },
+    "kpi": {
+      "totalUsers": "总用户数",
+      "students": "学生",
+      "teachers": "教师",
+      "blocked": "已封禁",
+      "total": "总计",
+      "keys": "键数",
+      "used": "已使用",
+      "localStorageKeys": "localStorage 键数",
+      "storage": "存储"
+    },
+    "search": {
+      "placeholder": "按姓名或邮箱搜索...",
+      "allRoles": "所有角色",
+      "student": "学生",
+      "teacher": "教师",
+      "admin": "管理员"
+    },
+    "users": {
+      "create": "创建",
+      "selectAll": "全选",
+      "selected": "已选: {count}",
+      "loading": "加载用户中...",
+      "you": "你",
+      "blocked": "已封禁",
+      "logins": "登录次数: {count}",
+      "neverLoggedIn": "从未登录",
+      "activity": "用户活动",
+      "resetPassword": "重置密码",
+      "loginAs": "以身份登录"
+    },
+    "database": {
+      "usersByRole": "按角色统计用户",
+      "students": "学生",
+      "teachers": "教师",
+      "admins": "管理员",
+      "localStorage": "存储 (localStorage)"
+    },
+    "settings": {
+      "systemActions": "系统操作",
+      "clearProgress": "清除所有进度",
+      "exportJson": "导出数据 (JSON)",
+      "importCsv": "导入 CSV",
+      "warning": "注意:",
+      "warningText": "这些操作不可逆。清除进度将删除所有用户的模块和测验完成数据。",
+      "csvInfo": "CSV 导入:",
+      "csvFormat": "格式: fullName,email,phone,role,group。默认密码: Temp@1234",
+      "overallStats": "总体统计"
+    },
+    "groups": {
+      "title": "小组管理",
+      "subtitle": "创建、重命名和删除小组"
+    },
+    "audit": {
+      "title": "操作日志",
+      "subtitle": "所有管理员操作的历史记录"
+    },
+    "report": {
+      "summary": "摘要",
+      "activity": "活动",
+      "quizzes": "测验",
+      "questions": "问题",
+      "students": "学生",
+      "export": "导出"
+    },
+    "analytics": {
+      "dashboard": "仪表盘",
+      "modules": "模块",
+      "dynamics": "动态",
+      "trends": "趋势",
+      "atRisk": "风险",
+      "comparison": "对比",
+      "engagement": "参与度",
+      "achievements": "成就",
+      "gradebook": "成绩册",
+      "learningPath": "漏斗",
+      "quizTrajectory": "轨迹",
+      "cohort": "队列",
+      "competency": "能力",
+      "weaknesses": "薄弱点",
+      "predictive": "预测",
+      "student": "学生",
+      "moduleDeepDive": "模块+",
+      "certification": "认证",
+      "velocity": "速度",
+      "quizSession": "测验会话",
+      "groupDynamics": "小组动态",
+      "loginPatterns": "登录模式",
+      "advanced": "高级",
+      "difficulty": "难度",
+      "heatmap": "热力图",
+      "questionsTab": "问题",
+      "summaryTab": "摘要",
+      "retry": "重试",
+      "errors": "错误",
+      "sankey": "漏斗+",
+      "calendar": "日历",
+      "predictiveRisk": "风险预测",
+      "scheduler": "调度器",
+      "dataQuality": "数据质量",
+      "periodComparison": "周期对比",
+      "selectStudent": "选择学生...",
+      "totalStudents": "学生总数",
+      "activePercent": "活跃",
+      "avgCompletion": "平均完成率",
+      "avgQuizScore": "平均测验分数"
+    },
+    "actions": {
+      "roleChanged": "角色已更改为 {role}",
+      "confirmDelete": "删除用户 \"{name}\"？",
+      "userDeleted": "用户已删除",
+      "userBlocked": "用户已封禁",
+      "userUnblocked": "用户已解封",
+      "csvEmpty": "CSV 文件为空",
+      "csvMissingColumns": "CSV 必须包含 fullName 和 email 列",
+      "csvImported": "已导入: {created}, 已跳过: {skipped}",
+      "csvParseError": "CSV 解析错误",
+      "confirmClearProgress": "清除所有用户的所有进度？",
+      "progressCleared": "进度已清除",
+      "dataExported": "数据已导出",
+      "loggedInAs": "你现在以 {name} 身份登录"
+    }
   }
 }

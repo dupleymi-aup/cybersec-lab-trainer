@@ -66,6 +66,7 @@ import {
   Loader2,
   ArrowLeftRight,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import UserModal from './UserModal';
 import BulkActionsBar from './BulkActionsBar';
@@ -118,6 +119,7 @@ const roleColors: Record<UserRole, string> = {
 };
 
 export default function AdminPanel() {
+  const t = useTranslations('admin');
   const formatDate = useDateFormatter();
   const user = useAuthStore(s => s.user);
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
@@ -179,7 +181,7 @@ export default function AdminPanel() {
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
     const result = await changeUserRole(userId, newRole);
     if (result.success) {
-      toast.success(`Роль изменена на ${getRoleLabel(newRole)}`);
+      toast.success(t('actions.roleChanged', { role: getRoleLabel(newRole) }));
       refresh();
     } else {
       toast.error(result.error);
@@ -187,10 +189,10 @@ export default function AdminPanel() {
   };
 
   const handleDeleteUser = async (userId: string, fullName: string) => {
-    if (!confirm(`Удалить пользователя "${fullName}"?`)) return;
+    if (!confirm(t('actions.confirmDelete', { name: fullName }))) return;
     const result = await deleteUser(userId);
     if (result.success) {
-      toast.success('Пользователь удалён');
+      toast.success(t('actions.userDeleted'));
       refresh();
     } else {
       toast.error(result.error);
@@ -201,7 +203,7 @@ export default function AdminPanel() {
     const result = await toggleUserBlock(userId);
     if (result.success) {
       const isNowBlocked = allUsers.find((u) => u.id === userId)?.isBlocked;
-      toast.success(isNowBlocked ? 'Пользователь заблокирован' : 'Пользователь разблокирован');
+      toast.success(isNowBlocked ? t('actions.userBlocked') : t('actions.userUnblocked'));
       refresh();
     } else {
       toast.error(result.error);
@@ -236,7 +238,7 @@ export default function AdminPanel() {
       try {
         const text = event.target?.result as string;
         const lines = text.split('\n').filter((l) => l.trim());
-        if (lines.length < 2) { toast.error('CSV файл пуст'); return; }
+        if (lines.length < 2) { toast.error(t('actions.csvEmpty')); return; }
 
         // Parse header
         const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
@@ -247,7 +249,7 @@ export default function AdminPanel() {
         const groupIdx = headers.findIndex((h) => h.includes('group') || h.includes('группа'));
 
         if (nameIdx === -1 || emailIdx === -1) {
-          toast.error('CSV должен содержать колонки fullName и email');
+          toast.error(t('actions.csvMissingColumns'));
           return;
         }
 
@@ -278,11 +280,11 @@ export default function AdminPanel() {
           else skipped++;
         }
 
-        toast.success(`Импортировано: ${created}, пропущено: ${skipped}`);
+        toast.success(t('actions.csvImported', { created, skipped }));
         refresh();
       } catch (e) {
         if (process.env.NODE_ENV === "development") console.warn("[AdminPanel] handleCSVImport failed:", e);
-        toast.error('Ошибка parsing CSV');
+        toast.error(t('actions.csvParseError'));
       }
     };
     reader.readAsText(file);
@@ -290,7 +292,7 @@ export default function AdminPanel() {
   };
 
   const handleClearProgress = () => {
-    if (!confirm('Очистить весь прогресс всех пользователей?')) return;
+    if (!confirm(t('actions.confirmClearProgress'))) return;
     if (typeof window === 'undefined') return;
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -300,7 +302,7 @@ export default function AdminPanel() {
       }
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
-    toast.success('Прогресс очищен');
+    toast.success(t('actions.progressCleared'));
   };
 
   const handleExportData = () => {
@@ -315,7 +317,7 @@ export default function AdminPanel() {
     a.download = `cybersec-lab-export-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Данные экспортированы');
+    toast.success(t('actions.dataExported'));
   };
 
   return (
@@ -330,8 +332,8 @@ export default function AdminPanel() {
             <Settings size={20} className="text-red-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">Панель администратора</h1>
-            <p className="text-xs text-muted-foreground">Управление пользователями и системой</p>
+            <h1 className="text-xl font-bold">{t('title')}</h1>
+            <p className="text-xs text-muted-foreground">{t('subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -343,28 +345,28 @@ export default function AdminPanel() {
       {/* KPI Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <KPICard
-          label="Всего пользователей"
+          label={t('kpi.totalUsers')}
           value={totalUsers}
           icon={<Users size={18} />}
           iconColor="text-sky-600"
           iconBg="bg-sky-50"
         />
         <KPICard
-          label="Студенты"
+          label={t('kpi.students')}
           value={studentCount}
           icon={<Users size={18} />}
           iconColor="text-violet-600"
           iconBg="bg-violet-50"
         />
         <KPICard
-          label="Преподаватели"
+          label={t('kpi.teachers')}
           value={teacherCount}
           icon={<Users size={18} />}
           iconColor="text-amber-600"
           iconBg="bg-amber-50"
         />
         <KPICard
-          label="Заблокировано"
+          label={t('kpi.blocked')}
           value={blockedCount}
           icon={<Shield size={18} />}
           iconColor="text-red-600"
@@ -377,34 +379,34 @@ export default function AdminPanel() {
         <div className="overflow-x-auto pb-2 scrollbar-thin">
           <TabsList className="grid w-full grid-cols-5 md:grid-cols-10 min-w-[700px] md:min-w-0">
             <TabsTrigger value="users" className="text-xs">
-              <Users size={14} className="mr-1" /> Пользователи
+              <Users size={14} className="mr-1" /> {t('tabs.users')}
             </TabsTrigger>
             <TabsTrigger value="groups" className="text-xs">
-              <Database size={14} className="mr-1" /> Группы
+              <Database size={14} className="mr-1" /> {t('tabs.groups')}
             </TabsTrigger>
             <TabsTrigger value="database" className="text-xs hidden md:block">
-              <Database size={14} className="mr-1" /> Статистика
+              <Database size={14} className="mr-1" /> {t('tabs.database')}
             </TabsTrigger>
             <TabsTrigger value="settings" className="text-xs hidden md:block">
-              <Settings size={14} className="mr-1" /> Настройки
+              <Settings size={14} className="mr-1" /> {t('tabs.settings')}
             </TabsTrigger>
             <TabsTrigger value="modules" className="text-xs hidden lg:block">
-              <BookOpen size={14} className="mr-1" /> Модули
+              <BookOpen size={14} className="mr-1" /> {t('tabs.modules')}
             </TabsTrigger>
             <TabsTrigger value="lms" className="text-xs hidden lg:block">
-              <Link size={14} className="mr-1" /> LMS
+              <Link size={14} className="mr-1" /> {t('tabs.lms')}
             </TabsTrigger>
             <TabsTrigger value="announcements" className="text-xs hidden xl:block">
-              <Megaphone size={14} className="mr-1" /> Объявления
+              <Megaphone size={14} className="mr-1" /> {t('tabs.announcements')}
             </TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs hidden xl:block">
-              <LineChart size={14} className="mr-1" /> Аналитика
+              <LineChart size={14} className="mr-1" /> {t('tabs.analytics')}
             </TabsTrigger>
             <TabsTrigger value="audit" className="text-xs hidden xl:block">
-              <Activity size={14} className="mr-1" /> Журнал
+              <Activity size={14} className="mr-1" /> {t('tabs.audit')}
             </TabsTrigger>
             <TabsTrigger value="report" className="text-xs hidden xl:block">
-              <FileBarChart size={14} className="mr-1" /> Отчёт
+              <FileBarChart size={14} className="mr-1" /> {t('tabs.report')}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -417,7 +419,7 @@ export default function AdminPanel() {
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Поиск по имени или email..."
+                placeholder={t('search.placeholder')}
                 className="pl-10"
               />
             </div>
@@ -426,13 +428,13 @@ export default function AdminPanel() {
               onChange={(e) => setRoleFilter(e.target.value)}
               className="px-3 py-2 border border-border rounded-md text-sm bg-card"
             >
-              <option value="">Все роли</option>
-              <option value="student">Студент</option>
-              <option value="teacher">Преподаватель</option>
-              <option value="admin">Администратор</option>
+              <option value="">{t('search.allRoles')}</option>
+              <option value="student">{t('search.student')}</option>
+              <option value="teacher">{t('search.teacher')}</option>
+              <option value="admin">{t('search.admin')}</option>
             </select>
             <Button onClick={() => setCreateModalOpen(true)}>
-              <UserPlus size={16} className="mr-1" /> Создать
+              <UserPlus size={16} className="mr-1" /> {t('users.create')}
             </Button>
           </div>
 
@@ -442,9 +444,9 @@ export default function AdminPanel() {
               checked={filteredUsers.filter((u) => u.id !== user?.id).length > 0 && selectedUserIds.size === filteredUsers.filter((u) => u.id !== user?.id).length}
               onCheckedChange={handleSelectAll}
             />
-            <span className="text-xs text-muted-foreground">Выбрать всех</span>
+            <span className="text-xs text-muted-foreground">{t('users.selectAll')}</span>
             {selectedUserIds.size > 0 && (
-              <Badge variant="secondary" className="text-[10px]">Выбрано: {selectedUserIds.size}</Badge>
+              <Badge variant="secondary" className="text-[10px]">{t('users.selected', { count: selectedUserIds.size })}</Badge>
             )}
           </div>
 
@@ -452,7 +454,7 @@ export default function AdminPanel() {
             {loadingUsers ? (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <Loader2 size={32} className="mb-3 animate-spin opacity-50" />
-                <p className="text-sm">Загрузка пользователей...</p>
+                <p className="text-sm">{t('users.loading')}</p>
               </div>
             ) : (
             filteredUsers.map((u, i) => (
@@ -478,10 +480,10 @@ export default function AdminPanel() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-semibold text-sm">{u.fullName}</p>
                             {u.id === user?.id && (
-                              <Badge variant="outline" className="text-[10px]">Вы</Badge>
+                              <Badge variant="outline" className="text-[10px]">{t('users.you')}</Badge>
                             )}
                             {u.isBlocked && (
-                              <Badge variant="destructive" className="text-[10px]">Заблокирован</Badge>
+                              <Badge variant="destructive" className="text-[10px]">{t('users.blocked')}</Badge>
                             )}
                           </div>
                           <p className="text-xs text-muted-foreground">{u.email} • {u.phone}</p>
@@ -497,9 +499,9 @@ export default function AdminPanel() {
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="text-right mr-2">
-                          <p className="text-xs text-muted-foreground">Входов: {u.loginCount || 0}</p>
+                          <p className="text-xs text-muted-foreground">{t('users.logins', { count: u.loginCount || 0 })}</p>
                           <p className="text-[10px] text-slate-400">
-                            {u.lastLoginAt ? formatDate(u.lastLoginAt) : 'Не входил'}
+                            {u.lastLoginAt ? formatDate(u.lastLoginAt) : t('users.neverLoggedIn')}
                           </p>
                         </div>
                         {u.id !== user?.id && (
@@ -509,16 +511,16 @@ export default function AdminPanel() {
                               onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
                               className="px-2 py-1 border border-border rounded-md text-xs bg-card"
                             >
-                              <option value="student">Студент</option>
-                              <option value="teacher">Преподаватель</option>
-                              <option value="admin">Администратор</option>
+                              <option value="student">{t('search.student')}</option>
+                              <option value="teacher">{t('search.teacher')}</option>
+                              <option value="admin">{t('search.admin')}</option>
                             </select>
                             <Button
                               variant="ghost"
                               size="icon"
                               className="text-muted-foreground hover:text-sky-700 hover:bg-sky-50"
                               onClick={() => setActivityUser(u)}
-                              title="Активность пользователя"
+                              title={t('users.activity')}
                             >
                               <Activity size={16} />
                             </Button>
@@ -535,7 +537,7 @@ export default function AdminPanel() {
                               size="icon"
                               className="text-muted-foreground hover:text-amber-700 hover:bg-amber-50"
                               onClick={() => setPasswordResetUser(u)}
-                              title="Сброс пароля"
+                              title={t('users.resetPassword')}
                             >
                               <KeyRound size={16} />
                             </Button>
@@ -546,13 +548,13 @@ export default function AdminPanel() {
                               onClick={async () => {
                                 const result = await startImpersonation(u.id, user?.id || '');
                                 if (result.success) {
-                                  toast.success(`Вы вошли как ${u.fullName}`);
+                                  toast.success(t('actions.loggedInAs', { name: u.fullName }));
                                   setCurrentPage('dashboard');
                                 } else {
                                   toast.error(result.error);
                                 }
                               }}
-                              title="Войти как"
+                              title={t('users.loginAs')}
                             >
                               <LogIn size={16} />
                             </Button>
@@ -585,19 +587,19 @@ export default function AdminPanel() {
         <TabsContent value="database" className="mt-4 space-y-4">
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">Пользователи по ролям</h3>
+              <h3 className="font-semibold text-sm mb-4">{t('database.usersByRole')}</h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-violet-50 rounded-lg">
                   <p className="text-3xl font-bold text-violet-600">{studentCount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Студенты</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('database.students')}</p>
                 </div>
                 <div className="text-center p-4 bg-amber-50 rounded-lg">
                   <p className="text-3xl font-bold text-amber-600">{teacherCount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Преподаватели</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('database.teachers')}</p>
                 </div>
                 <div className="text-center p-4 bg-red-50 rounded-lg">
                   <p className="text-3xl font-bold text-red-600">{adminCount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Администраторы</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('database.admins')}</p>
                 </div>
               </div>
             </CardContent>
@@ -605,15 +607,15 @@ export default function AdminPanel() {
 
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">Хранилище (localStorage)</h3>
+              <h3 className="font-semibold text-sm mb-4">{t('database.localStorage')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-sky-50 rounded-lg">
                   <p className="text-3xl font-bold text-sky-600">{keysCount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Ключей</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('kpi.keys')}</p>
                 </div>
                 <div className="text-center p-4 bg-emerald-50 rounded-lg">
                   <p className="text-3xl font-bold text-emerald-600">{storageKB} KB</p>
-                  <p className="text-xs text-muted-foreground mt-1">Использовано</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('kpi.used')}</p>
                 </div>
               </div>
             </CardContent>
@@ -624,7 +626,7 @@ export default function AdminPanel() {
         <TabsContent value="settings" className="mt-4 space-y-4">
           <Card className="border-border">
             <CardContent className="p-5 space-y-4">
-              <h3 className="font-semibold text-sm">Системные действия</h3>
+              <h3 className="font-semibold text-sm">{t('settings.systemActions')}</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <Button
@@ -633,7 +635,7 @@ export default function AdminPanel() {
                   onClick={handleClearProgress}
                 >
                   <RotateCcw size={16} className="mr-2" />
-                  Очистить весь прогресс
+                  {t('settings.clearProgress')}
                 </Button>
 
                 <Button
@@ -642,7 +644,7 @@ export default function AdminPanel() {
                   onClick={handleExportData}
                 >
                   <Download size={16} className="mr-2" />
-                  Экспорт данных (JSON)
+                  {t('settings.exportJson')}
                 </Button>
 
                 <div>
@@ -659,17 +661,17 @@ export default function AdminPanel() {
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload size={16} className="mr-2" />
-                    Импорт CSV
+                    {t('settings.importCsv')}
                   </Button>
                 </div>
               </div>
 
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-xs text-amber-700">
-                  <strong>Внимание:</strong> Эти действия необратимы. Очистка прогресса удалит все данные о прохождении модулей и квизов для всех пользователей.
+                  <strong>{t('settings.warning')}</strong> {t('settings.warningText')}
                 </p>
                 <p className="text-xs text-amber-700 mt-1">
-                  <strong>CSV импорт:</strong> Формат — <code className="bg-amber-100 px-1 rounded">fullName,email,phone,role,group</code>. Пароль по умолчанию: <code className="bg-amber-100 px-1 rounded">Temp@1234</code>
+                  <strong>{t('settings.csvInfo')}</strong> {t('settings.csvFormat')}
                 </p>
               </div>
             </CardContent>
@@ -678,23 +680,23 @@ export default function AdminPanel() {
           {/* Stats */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">Общая статистика</h3>
+              <h3 className="font-semibold text-sm mb-4">{t('settings.overallStats')}</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-3 bg-violet-50 rounded-lg">
                   <p className="text-2xl font-bold text-violet-600">{totalUsers}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Всего</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('kpi.total')}</p>
                 </div>
                 <div className="text-center p-3 bg-red-50 rounded-lg">
                   <p className="text-2xl font-bold text-red-600">{blockedCount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Заблокировано</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('kpi.blocked')}</p>
                 </div>
                 <div className="text-center p-3 bg-sky-50 rounded-lg">
                   <p className="text-2xl font-bold text-sky-600">{keysCount}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Ключей localStorage</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('kpi.localStorageKeys')}</p>
                 </div>
                 <div className="text-center p-3 bg-emerald-50 rounded-lg">
                   <p className="text-2xl font-bold text-emerald-600">{storageKB} KB</p>
-                  <p className="text-xs text-muted-foreground mt-1">Хранилище</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('kpi.storage')}</p>
                 </div>
               </div>
             </CardContent>
@@ -708,8 +710,8 @@ export default function AdminPanel() {
               <Users size={16} className="text-sky-600" />
             </div>
             <div>
-              <h2 className="text-sm font-bold">Управление группами</h2>
-              <p className="text-xs text-muted-foreground">Создание, переименование и удаление групп</p>
+              <h2 className="text-sm font-bold">{t('groups.title')}</h2>
+              <p className="text-xs text-muted-foreground">{t('groups.subtitle')}</p>
             </div>
           </div>
           <GroupManager onRefresh={refresh} />
@@ -727,7 +729,7 @@ export default function AdminPanel() {
 
         {/* Announcements Tab */}
         <TabsContent value="announcements" className="mt-4 space-y-4">
-          <SystemAnnouncements currentUser={user?.fullName || 'Администратор'} />
+          <SystemAnnouncements currentUser={user?.fullName || t('search.admin')} />
         </TabsContent>
 
         {/* Analytics Tab */}
@@ -747,8 +749,8 @@ export default function AdminPanel() {
               <Activity size={16} className="text-purple-600" />
             </div>
             <div>
-              <h2 className="text-sm font-bold">Журнал действий</h2>
-              <p className="text-xs text-muted-foreground">История всех действий администраторов</p>
+              <h2 className="text-sm font-bold">{t('audit.title')}</h2>
+              <p className="text-xs text-muted-foreground">{t('audit.subtitle')}</p>
             </div>
           </div>
           <AuditLogView />
@@ -759,12 +761,12 @@ export default function AdminPanel() {
           {/* Sub-tab selector */}
           <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
             {[
-              { key: 'summary' as const, label: 'Сводка', icon: FileBarChart },
-              { key: 'heatmap' as const, label: 'Активность', icon: Calendar },
-              { key: 'quiz-categories' as const, label: 'Квизы', icon: HelpCircle },
-              { key: 'quiz-questions' as const, label: 'Вопросы', icon: HelpCircle },
-              { key: 'student-comparison' as const, label: 'Студенты', icon: GitCompare },
-              { key: 'export' as const, label: 'Экспорт', icon: Download },
+              { key: 'summary' as const, label: t('report.summary'), icon: FileBarChart },
+              { key: 'heatmap' as const, label: t('report.activity'), icon: Calendar },
+              { key: 'quiz-categories' as const, label: t('report.quizzes'), icon: HelpCircle },
+              { key: 'quiz-questions' as const, label: t('report.questions'), icon: HelpCircle },
+              { key: 'student-comparison' as const, label: t('report.students'), icon: GitCompare },
+              { key: 'export' as const, label: t('report.export'), icon: Download },
             ].map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
@@ -886,6 +888,7 @@ function AnalyticsSubTabs({
   selectedStudentId: string;
   setSelectedStudentId: (id: string) => void;
 }) {
+  const t = useTranslations('admin');
   const [analyticsSubTab, setAnalyticsSubTab] = useState<'dashboard' | 'modules' | 'dynamics' | 'trends' | 'at-risk' | 'comparison' | 'engagement' | 'student' | 'achievements' | 'gradebook' | 'learning-path' | 'quiz-trajectory' | 'cohort' | 'competency' | 'weaknesses' | 'predictive' | 'module-deep-dive' | 'certification' | 'velocity' | 'quiz-session' | 'group-dynamics' | 'login-patterns' | 'advanced' | 'difficulty' | 'heatmap' | 'questions' | 'summary' | 'retry' | 'errors' | 'sankey' | 'calendar' | 'predictive-risk' | 'scheduler' | 'data-quality' | 'period-comparison'>('dashboard');
   const { groupId, days } = useAnalyticsFilters();
   const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
@@ -902,25 +905,25 @@ function AnalyticsSubTabs({
           <KPICard
             icon={<Users size={18} />}
             value={summary.kpis.totalStudents ?? 0}
-            label="Всего студентов"
+            label={t('analytics.totalStudents')}
             trend={summary.trends.students ?? 'stable'}
           />
           <KPICard
             icon={<Activity size={18} />}
             value={`${summary.kpis.activePercentage ?? 0}%`}
-            label="Активных"
+            label={t('analytics.activePercent')}
             trend={summary.trends.activity ?? 'stable'}
           />
           <KPICard
             icon={<BookOpen size={18} />}
             value={`${summary.kpis.avgCompletionRate ?? 0}%`}
-            label="Среднее завершение"
+            label={t('analytics.avgCompletion')}
             trend={summary.trends.completion ?? 'stable'}
           />
           <KPICard
             icon={<HelpCircle size={18} />}
             value={`${summary.kpis.avgQuizScore ?? 0}%`}
-            label="Средний балл quiz"
+            label={t('analytics.avgQuizScore')}
             trend={summary.trends.quizScore ?? 'stable'}
           />
         </div>
@@ -929,41 +932,41 @@ function AnalyticsSubTabs({
       {/* Sub-tab selector */}
       <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
         {[
-          { key: 'dashboard' as const, label: 'Дашборд', icon: BarChart3 },
-          { key: 'modules' as const, label: 'Модули', icon: BookOpen },
-          { key: 'dynamics' as const, label: 'Динамика', icon: TrendingUp },
-          { key: 'trends' as const, label: 'Тренды', icon: LineChart },
-          { key: 'at-risk' as const, label: 'Внимание', icon: AlertTriangle },
-          { key: 'comparison' as const, label: 'Сравнение', icon: GitCompare },
-          { key: 'engagement' as const, label: 'Вовлечённость', icon: Flame },
-          { key: 'achievements' as const, label: 'Достижения', icon: Award },
-          { key: 'gradebook' as const, label: 'Ведомость', icon: Table },
-          { key: 'learning-path' as const, label: 'Воронка', icon: GitBranch },
-          { key: 'quiz-trajectory' as const, label: 'Траектория', icon: Target },
-          { key: 'cohort' as const, label: 'Когорты', icon: Layers },
-          { key: 'competency' as const, label: 'Компетенции', icon: Radar },
-          { key: 'weaknesses' as const, label: 'Слабые места', icon: AlertTriangle },
-          { key: 'predictive' as const, label: 'Прогноз', icon: TrendingUp },
-          { key: 'student' as const, label: 'Студент', icon: Users },
-          { key: 'module-deep-dive' as const, label: 'Модули+', icon: ListChecks },
-          { key: 'certification' as const, label: 'Сертификация', icon: Award },
-          { key: 'velocity' as const, label: 'Скорость', icon: Zap },
-          { key: 'quiz-session' as const, label: 'Сессии квизов', icon: Clock },
-          { key: 'group-dynamics' as const, label: 'Динамика групп', icon: Heart },
-          { key: 'login-patterns' as const, label: 'Входы', icon: LogIn },
-          { key: 'advanced' as const, label: 'Продвинутая', icon: Layers },
-          { key: 'difficulty' as const, label: 'Сложность', icon: Target },
-          { key: 'heatmap' as const, label: 'Тепловая карта', icon: Grid },
-          { key: 'questions' as const, label: 'Вопросы', icon: HelpCircle },
-          { key: 'summary' as const, label: 'Сводка', icon: FileBarChart },
-          { key: 'retry' as const, label: 'Повторы', icon: Repeat },
-          { key: 'errors' as const, label: 'Ошибки', icon: AlertOctagon },
-          { key: 'sankey' as const, label: 'Воронка+', icon: GitBranch },
-          { key: 'calendar' as const, label: 'Календарь', icon: Calendar },
-          { key: 'predictive-risk' as const, label: 'Прогноз риска', icon: TrendingUp },
-          { key: 'scheduler' as const, label: 'Расписание', icon: Calendar },
-          { key: 'data-quality' as const, label: 'Качество данных', icon: ShieldCheck },
-          { key: 'period-comparison' as const, label: 'Сравнение периодов', icon: ArrowLeftRight },
+          { key: 'dashboard' as const, label: t('analytics.dashboard'), icon: BarChart3 },
+          { key: 'modules' as const, label: t('analytics.modules'), icon: BookOpen },
+          { key: 'dynamics' as const, label: t('analytics.dynamics'), icon: TrendingUp },
+          { key: 'trends' as const, label: t('analytics.trends'), icon: LineChart },
+          { key: 'at-risk' as const, label: t('analytics.atRisk'), icon: AlertTriangle },
+          { key: 'comparison' as const, label: t('analytics.comparison'), icon: GitCompare },
+          { key: 'engagement' as const, label: t('analytics.engagement'), icon: Flame },
+          { key: 'achievements' as const, label: t('analytics.achievements'), icon: Award },
+          { key: 'gradebook' as const, label: t('analytics.gradebook'), icon: Table },
+          { key: 'learning-path' as const, label: t('analytics.learningPath'), icon: GitBranch },
+          { key: 'quiz-trajectory' as const, label: t('analytics.quizTrajectory'), icon: Target },
+          { key: 'cohort' as const, label: t('analytics.cohort'), icon: Layers },
+          { key: 'competency' as const, label: t('analytics.competency'), icon: Radar },
+          { key: 'weaknesses' as const, label: t('analytics.weaknesses'), icon: AlertTriangle },
+          { key: 'predictive' as const, label: t('analytics.predictive'), icon: TrendingUp },
+          { key: 'student' as const, label: t('analytics.student'), icon: Users },
+          { key: 'module-deep-dive' as const, label: t('analytics.moduleDeepDive'), icon: ListChecks },
+          { key: 'certification' as const, label: t('analytics.certification'), icon: Award },
+          { key: 'velocity' as const, label: t('analytics.velocity'), icon: Zap },
+          { key: 'quiz-session' as const, label: t('analytics.quizSession'), icon: Clock },
+          { key: 'group-dynamics' as const, label: t('analytics.groupDynamics'), icon: Heart },
+          { key: 'login-patterns' as const, label: t('analytics.loginPatterns'), icon: LogIn },
+          { key: 'advanced' as const, label: t('analytics.advanced'), icon: Layers },
+          { key: 'difficulty' as const, label: t('analytics.difficulty'), icon: Target },
+          { key: 'heatmap' as const, label: t('analytics.heatmap'), icon: Grid },
+          { key: 'questions' as const, label: t('analytics.questionsTab'), icon: HelpCircle },
+          { key: 'summary' as const, label: t('analytics.summaryTab'), icon: FileBarChart },
+          { key: 'retry' as const, label: t('analytics.retry'), icon: Repeat },
+          { key: 'errors' as const, label: t('analytics.errors'), icon: AlertOctagon },
+          { key: 'sankey' as const, label: t('analytics.sankey'), icon: GitBranch },
+          { key: 'calendar' as const, label: t('analytics.calendar'), icon: Calendar },
+          { key: 'predictive-risk' as const, label: t('analytics.predictiveRisk'), icon: TrendingUp },
+          { key: 'scheduler' as const, label: t('analytics.scheduler'), icon: Calendar },
+          { key: 'data-quality' as const, label: t('analytics.dataQuality'), icon: ShieldCheck },
+          { key: 'period-comparison' as const, label: t('analytics.periodComparison'), icon: ArrowLeftRight },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -1067,7 +1070,7 @@ function AnalyticsSubTabs({
                 onChange={(e) => setSelectedStudentId(e.target.value)}
                 className="px-3 py-2 border border-border rounded-md text-sm bg-card"
               >
-                <option value="">Выберите студента...</option>
+                <option value="">{t('analytics.selectStudent')}</option>
                 {allUsers.filter((u) => u.role === 'student').map((u) => (
                   <option key={u.id} value={u.id}>{u.fullName} ({u.email})</option>
                 ))}

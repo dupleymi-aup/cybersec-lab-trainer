@@ -820,5 +820,143 @@
       "lowScore": "Низкий балл ({score}%)",
       "fewModules": "Мало модулей"
     }
+  },
+  "admin": {
+    "title": "Панель администратора",
+    "subtitle": "Управление пользователями и системой",
+    "tabs": {
+      "users": "Пользователи",
+      "groups": "Группы",
+      "database": "Статистика",
+      "settings": "Настройки",
+      "modules": "Модули",
+      "lms": "LMS",
+      "announcements": "Объявления",
+      "analytics": "Аналитика",
+      "audit": "Журнал",
+      "report": "Отчёт"
+    },
+    "kpi": {
+      "totalUsers": "Всего пользователей",
+      "students": "Студенты",
+      "teachers": "Преподаватели",
+      "blocked": "Заблокировано",
+      "total": "Всего",
+      "keys": "Ключей",
+      "used": "Использовано",
+      "localStorageKeys": "Ключей localStorage",
+      "storage": "Хранилище"
+    },
+    "search": {
+      "placeholder": "Поиск по имени или email...",
+      "allRoles": "Все роли",
+      "student": "Студент",
+      "teacher": "Преподаватель",
+      "admin": "Администратор"
+    },
+    "users": {
+      "create": "Создать",
+      "selectAll": "Выбрать всех",
+      "selected": "Выбрано: {count}",
+      "loading": "Загрузка пользователей...",
+      "you": "Вы",
+      "blocked": "Заблокирован",
+      "logins": "Входов: {count}",
+      "neverLoggedIn": "Не входил",
+      "activity": "Активность пользователя",
+      "resetPassword": "Сброс пароля",
+      "loginAs": "Войти как"
+    },
+    "database": {
+      "usersByRole": "Пользователи по ролям",
+      "students": "Студенты",
+      "teachers": "Преподаватели",
+      "admins": "Администраторы",
+      "localStorage": "Хранилище (localStorage)"
+    },
+    "settings": {
+      "systemActions": "Системные действия",
+      "clearProgress": "Очистить весь прогресс",
+      "exportJson": "Экспорт данных (JSON)",
+      "importCsv": "Импорт CSV",
+      "warning": "Внимание:",
+      "warningText": "Эти действия необратимы. Очистка прогресса удалит все данные о прохождении модулей и квизов для всех пользователей.",
+      "csvInfo": "CSV импорт:",
+      "csvFormat": "Формат — fullName,email,phone,role,group. Пароль по умолчанию: Temp@1234",
+      "overallStats": "Общая статистика"
+    },
+    "groups": {
+      "title": "Управление группами",
+      "subtitle": "Создание, переименование и удаление групп"
+    },
+    "audit": {
+      "title": "Журнал действий",
+      "subtitle": "История всех действий администраторов"
+    },
+    "report": {
+      "summary": "Сводка",
+      "activity": "Активность",
+      "quizzes": "Квизы",
+      "questions": "Вопросы",
+      "students": "Студенты",
+      "export": "Экспорт"
+    },
+    "analytics": {
+      "dashboard": "Дашборд",
+      "modules": "Модули",
+      "dynamics": "Динамика",
+      "trends": "Тренды",
+      "atRisk": "Внимание",
+      "comparison": "Сравнение",
+      "engagement": "Вовлечённость",
+      "achievements": "Достижения",
+      "gradebook": "Ведомость",
+      "learningPath": "Воронка",
+      "quizTrajectory": "Траектория",
+      "cohort": "Когорты",
+      "competency": "Компетенции",
+      "weaknesses": "Слабые места",
+      "predictive": "Прогноз",
+      "student": "Студент",
+      "moduleDeepDive": "Модули+",
+      "certification": "Сертификация",
+      "velocity": "Скорость",
+      "quizSession": "Сессии квизов",
+      "groupDynamics": "Динамика групп",
+      "loginPatterns": "Входы",
+      "advanced": "Продвинутая",
+      "difficulty": "Сложность",
+      "heatmap": "Тепловая карта",
+      "questionsTab": "Вопросы",
+      "summaryTab": "Сводка",
+      "retry": "Повторы",
+      "errors": "Ошибки",
+      "sankey": "Воронка+",
+      "calendar": "Календарь",
+      "predictiveRisk": "Прогноз риска",
+      "scheduler": "Расписание",
+      "dataQuality": "Качество данных",
+      "periodComparison": "Сравнение периодов",
+      "selectStudent": "Выберите студента...",
+      "totalStudents": "Всего студентов",
+      "activePercent": "Активных",
+      "avgCompletion": "Среднее завершение",
+      "avgQuizScore": "Средний балл quiz"
+    },
+    "actions": {
+      "roleChanged": "Роль изменена на {role}",
+      "confirmDelete": "Удалить пользователя \"{name}\"?",
+      "userDeleted": "Пользователь удалён",
+      "userBlocked": "Пользователь заблокирован",
+      "userUnblocked": "Пользователь разблокирован",
+      "csvEmpty": "CSV файл пуст",
+      "csvMissingColumns": "CSV должен содержать колонки fullName и email",
+      "csvImported": "Импортировано: {created}, пропущено: {skipped}",
+      "csvParseError": "Ошибка parsing CSV",
+      "confirmClearProgress": "Очистить весь прогресс всех пользователей?",
+      "progressCleared": "Прогресс очищен",
+      "dataExported": "Данные экспортированы",
+      "loggedInAs": "Вы вошли как {name}"
+    }
   }
 }
