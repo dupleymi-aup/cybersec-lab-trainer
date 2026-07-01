@@ -4,21 +4,28 @@ import dynamic from 'next/dynamic';
 import { useAppStore, type PageType } from '@/lib/store';
 import { useAuthStore, hasRole, getRoleLabel, getImpersonationState, stopImpersonation, saveProgressSnapshot, type UserRole } from '@/lib/auth-store';
 import { initAuthBridge } from '@/lib/auth-bridge';
-import Sidebar from '@/components/security-trainer/Sidebar';
-import Dashboard from '@/components/security-trainer/Dashboard';
-import PWAHandler from '@/components/security-trainer/PWAHandler';
-import OnboardingTour from '@/components/security-trainer/OnboardingTour';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'sonner';
 import { useMemo, useEffect } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import ModuleNavigation from '@/components/security-trainer/ModuleNavigation';
-import KeyboardShortcuts from '@/components/security-trainer/KeyboardShortcuts';
-import CompletionCelebration from '@/components/security-trainer/CompletionCelebration';
-import OfflineBanner from '@/components/security-trainer/OfflineBanner';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
+
+const ModuleLoader = () => (
+  <div className="flex items-center justify-center min-h-[200px] py-12">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
+
+const Sidebar = dynamic(() => import('@/components/security-trainer/Sidebar'), { ssr: false, loading: ModuleLoader });
+const Dashboard = dynamic(() => import('@/components/security-trainer/Dashboard'), { ssr: false, loading: ModuleLoader });
+const PWAHandler = dynamic(() => import('@/components/security-trainer/PWAHandler'), { ssr: false });
+const OnboardingTour = dynamic(() => import('@/components/security-trainer/OnboardingTour'), { ssr: false });
+const ModuleNavigation = dynamic(() => import('@/components/security-trainer/ModuleNavigation'), { ssr: false });
+const KeyboardShortcuts = dynamic(() => import('@/components/security-trainer/KeyboardShortcuts'), { ssr: false });
+const CompletionCelebration = dynamic(() => import('@/components/security-trainer/CompletionCelebration'), { ssr: false });
+const OfflineBanner = dynamic(() => import('@/components/security-trainer/OfflineBanner'), { ssr: false });
 
 const modulePageIds = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf', 'api-security', 'phishing-analyzer', 'career-paths'];
 
@@ -27,12 +34,6 @@ const ModuleWrapper = ({ name, children, pageId }: { name: string; children: Rea
     {children}
     {pageId && modulePageIds.includes(pageId) && <ModuleNavigation currentId={pageId} />}
   </ErrorBoundary>
-);
-
-const ModuleLoader = () => (
-  <div className="flex items-center justify-center min-h-[200px] py-12">
-    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-  </div>
 );
 
 const LazyOWASPTop10 = dynamic(() => import('@/components/security-trainer/OWASPTop10'), { ssr: false, loading: ModuleLoader });
