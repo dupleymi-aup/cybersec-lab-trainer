@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { getAllUsers, useAuthStore } from '@/lib/auth-store';
+import { useDateFormatter } from '@/lib/format';
 import { useAppStore, getAuthHeaders } from '@/lib/store';
 import { quizCategories, modules } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -84,6 +85,7 @@ const EMPTY_PROGRESS: StudentProgress = {
 };
 
 export default function TeacherPanel() {
+  const formatDate = useDateFormatter();
   const t = useTranslations('teacher');
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const user = useAuthStore(s => s.user);
@@ -943,7 +945,7 @@ export default function TeacherPanel() {
                     const mods = p.completedModules.length;
                     const scores = Object.values(p.quizScores);
                     const avgQ = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-                    const lastActive = p.lastActive ? new Date(p.lastActive).toLocaleDateString('ru-RU') : '—';
+                    const lastActive = p.lastActive ? formatDate(p.lastActive) : '—';
                     return { userId: s.id, fullName: s.fullName, group: s.group, mods, avgQ, total: mods * 10 + avgQ, lastActive };
                   })
                   .sort((a, b) => b.total - a.total);

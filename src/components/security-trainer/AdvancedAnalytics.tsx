@@ -7,6 +7,7 @@ import {
   LineChart, Line, PieChart, Pie, Cell,
 } from 'recharts';
 import { Loader2, AlertTriangle, Clock, RefreshCw, Target, TrendingUp } from 'lucide-react';
+import { useDateFormatter } from '@/lib/format';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import KPICard from './KPICard';
@@ -93,6 +94,7 @@ interface Props {
 }
 
 export default function AdvancedAnalytics({ groupId, days: controlledDays }: Props) {
+  const formatDate = useDateFormatter();
   const [internalDays, setInternalDays] = useState(30);
   const [subTab, setSubTab] = useState<'time' | 'errors' | 'retry'>('time');
   const [timeData, setTimeData] = useState<TimeAnalyticsData | null>(null);
@@ -326,9 +328,9 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={errorData.errorTrends}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="week" tick={{ fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })} />
+                    <XAxis dataKey="week" tick={{ fontSize: 10 }} tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })} />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip labelFormatter={(v) => new Date(v).toLocaleDateString('ru-RU')} />
+                    <Tooltip labelFormatter={(v) => formatDate(v)} />
                     <Legend />
                     <Line type="monotone" dataKey="errorRate" stroke="#ef4444" name="Ошибка %" dot={false} />
                   </LineChart>

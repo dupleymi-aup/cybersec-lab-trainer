@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/auth-store';
 import { getAuthHeaders } from '@/lib/store';
+import { useDateFormatter } from '@/lib/format';
 import { modules } from '@/lib/data';
 
 interface Assignment {
@@ -61,6 +62,7 @@ const typeLabels: Record<Assignment['type'], string> = {
 };
 
 export default function StudentAssignments() {
+  const formatDate = useDateFormatter();
   const user = useAuthStore(s => s.user);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submissions, setSubmissions] = useState<Record<string, Submission[]>>({});
@@ -300,7 +302,7 @@ export default function StudentAssignments() {
                     <div className="flex items-center gap-3 text-sm">
                       <span className="text-muted-foreground">Попытка #{sub.attempt}</span>
                       <span className="text-muted-foreground">
-                        {new Date(sub.startedAt).toLocaleDateString('ru-RU')}
+                        {formatDate(sub.startedAt)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

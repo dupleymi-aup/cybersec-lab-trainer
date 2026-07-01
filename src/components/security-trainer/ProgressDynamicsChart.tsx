@@ -6,6 +6,7 @@ import {
 } from 'recharts';
 import { Loader2, AlertTriangle, TrendingUp, BookOpen, Users, Target } from 'lucide-react';
 import { getProgressDynamics, type ProgressDynamicsDay } from '@/lib/auth-store';
+import { useDateFormatter } from '@/lib/format';
 import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
 import { CHART_COLORS } from '@/lib/constants';
@@ -25,6 +26,7 @@ export interface ProgressDynamicsChartProps {
 const DEFAULT_DAYS = 30;
 
 export default function ProgressDynamicsChart({ groupId, days: controlledDays }: ProgressDynamicsChartProps = {}) {
+  const formatDate = useDateFormatter();
   const [daily, setDaily] = useState<ProgressDynamicsDay[]>([]);
   const [summary, setSummary] = useState<{ totalModulesCompleted: number; totalQuizAttempts: number; avgDailyActive: number; trend: 'up' | 'down' | 'stable' }>({ totalModulesCompleted: 0, totalQuizAttempts: 0, avgDailyActive: 0, trend: 'stable' });
   const [loading, setLoading] = useState(true);
@@ -70,7 +72,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
 
   const chartData = daily.map((d) => ({
     ...d,
-    dateShort: new Date(d.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }),
+    dateShort: formatDate(d.date, { day: 'numeric', month: 'short' }),
   }));
 
   return (

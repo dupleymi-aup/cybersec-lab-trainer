@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAuthStore, getAllUsers, changeUserRole, deleteUser, toggleUserBlock, createUser, startImpersonation, getComprehensiveSummary, getRoleLabel, type UserRole, type User, type ComprehensiveSummary } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
+import { useDateFormatter } from '@/lib/format';
 import { AnalyticsProvider, useAnalyticsFilters } from '@/lib/analytics-context';
 import KPICard from './KPICard';
 import AnalyticsFilterBar from './AnalyticsFilterBar';
@@ -117,6 +118,7 @@ const roleColors: Record<UserRole, string> = {
 };
 
 export default function AdminPanel() {
+  const formatDate = useDateFormatter();
   const user = useAuthStore(s => s.user);
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const { groupId: analyticsGroupId, days: analyticsDays } = useAnalyticsFilters();
@@ -497,7 +499,7 @@ export default function AdminPanel() {
                         <div className="text-right mr-2">
                           <p className="text-xs text-muted-foreground">Входов: {u.loginCount || 0}</p>
                           <p className="text-[10px] text-slate-400">
-                            {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString('ru-RU') : 'Не входил'}
+                            {u.lastLoginAt ? formatDate(u.lastLoginAt) : 'Не входил'}
                           </p>
                         </div>
                         {u.id !== user?.id && (

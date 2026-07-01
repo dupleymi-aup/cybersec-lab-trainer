@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useDateFormatter } from '@/lib/format';
 import type { Announcement } from '@/lib/auth-types';
 
 const PRIORITY_CONFIG = {
@@ -67,6 +68,7 @@ async function deleteAnnouncement(id: string): Promise<{ success: boolean; error
 }
 
 export default function SystemAnnouncements({ currentUser: _currentUser }: { currentUser: string }) {
+  const formatDate = useDateFormatter();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -269,10 +271,10 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
                       </div>
                       <p className="text-xs text-muted-foreground mt-1 whitespace-pre-wrap">{ann.content}</p>
                       <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400">
-                        <span>{new Date(ann.createdAt).toLocaleDateString('ru-RU')}</span>
+                        <span>{formatDate(ann.createdAt)}</span>
                         <span>Автор: {ann.author}</span>
                         {ann.expiresAt && (
-                          <span>Действ. до: {new Date(ann.expiresAt).toLocaleDateString('ru-RU')}</span>
+                          <span>Действ. до: {formatDate(ann.expiresAt)}</span>
                         )}
                       </div>
                     </div>

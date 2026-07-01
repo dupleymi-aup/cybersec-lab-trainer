@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getStudentPerformance, getComprehensiveSummary, getProgressTrends } from '@/lib/auth-store';
+import { useDateFormatter, useDateTimeFormatter } from '@/lib/format';
 import { modules, quizCategories } from '@/lib/data';
 import type { StudentPerformanceData, ComprehensiveSummary, TrendPoint } from '@/lib/auth-store';
 
@@ -46,6 +47,8 @@ export default function StudentProgressView({ students: studentList, groupId, on
   groupId?: string;
   onBack: () => void;
 }) {
+  const formatDate = useDateFormatter();
+  const formatDateTime = useDateTimeFormatter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [data, setData] = useState<StudentPerformanceData | null>(null);
   const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
@@ -334,7 +337,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
                             event.type === 'quiz' ? 'bg-emerald-400' : 'bg-slate-300'
                           }`} />
                           <span className="text-muted-foreground min-w-[80px]">
-                            {new Date(event.date).toLocaleDateString('ru-RU')}
+                            {formatDate(event.date)}
                           </span>
                           <span className="text-foreground/70">{event.details}</span>
                         </div>
@@ -371,7 +374,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
                           <div className="text-right">
                             {mod.updatedAt && (
                               <p className="text-[10px] text-slate-400">
-                                {new Date(mod.updatedAt).toLocaleDateString('ru-RU')}
+                                {formatDate(mod.updatedAt)}
                               </p>
                             )}
                           </div>
@@ -431,7 +434,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
                           <div className="flex-1 min-w-0">
                             <p className="text-xs text-foreground/70">{event.details}</p>
                             <p className="text-[10px] text-slate-400 mt-0.5">
-                              {new Date(event.date).toLocaleString('ru-RU')}
+                              {formatDateTime(event.date)}
                             </p>
                           </div>
                           <Badge variant="secondary" className="text-[10px] capitalize">

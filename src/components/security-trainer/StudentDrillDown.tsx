@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Loader2, AlertTriangle, Users, BookOpen, HelpCircle, Award, Activity } from 'lucide-react';
 import { getStudentPerformance, type StudentPerformanceData } from '@/lib/auth-store';
+import { useDateFormatter, useDateTimeFormatter } from '@/lib/format';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,8 @@ export default function StudentDrillDown({
   days?: number;
   onClose: () => void;
 }) {
+  const formatDate = useDateFormatter();
+  const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -193,7 +196,7 @@ export default function StudentDrillDown({
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-medium">{item.details}</p>
                               <p className="text-[10px] text-slate-400">
-                                {item.date ? new Date(item.date).toLocaleString('ru-RU') : ''}
+                                {item.date ? formatDateTime(item.date) : ''}
                               </p>
                             </div>
                           </div>
@@ -217,7 +220,7 @@ export default function StudentDrillDown({
                             <div className="min-w-0">
                               <p className="text-xs font-medium truncate">{ach.title}</p>
                               <p className="text-[10px] text-slate-400">
-                                {ach.unlockedAt ? new Date(ach.unlockedAt).toLocaleDateString('ru-RU') : 'Не разблокировано'}
+                                {ach.unlockedAt ? formatDate(ach.unlockedAt) : 'Не разблокировано'}
                               </p>
                             </div>
                           </div>

@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useDateFormatter } from '@/lib/format';
 import type { Announcement } from '@/lib/auth-types';
 
 const STORAGE_KEY = 'cybersec-announcements';
@@ -28,6 +29,7 @@ function saveAll(items: Announcement[]) {
 }
 
 export default function TeacherMessaging({ currentUser, groups = [] }: { currentUser: string; groups: string[] }) {
+  const formatDate = useDateFormatter();
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -190,7 +192,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                     </div>
                     <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{msg.content.split('\n')[0]}</p>
                     <p className="text-[10px] text-slate-400 mt-1">
-                      {new Date(msg.createdAt).toLocaleDateString('ru-RU')}
+                      {formatDate(msg.createdAt)}
                     </p>
                   </div>
                 </div>

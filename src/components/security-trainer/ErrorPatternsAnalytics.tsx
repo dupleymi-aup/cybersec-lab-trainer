@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
 import { AlertOctagon, Loader2, AlertTriangle } from 'lucide-react';
 import { getErrorPatternsAnalytics, type ErrorPatternsData } from '@/lib/auth-store';
+import { useDateFormatter } from '@/lib/format';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import KPICard from './KPICard';
@@ -20,6 +21,7 @@ const DIFFICULTY_LABELS: Record<string, string> = { easy: 'Лёгкий', medium
 const DIFFICULTY_COLORS: Record<string, string> = { easy: '#10b981', medium: '#f59e0b', hard: '#ef4444' };
 
 export default function ErrorPatternsAnalytics({ groupId: controlledGroupId, days: controlledDays }: { groupId?: string; days?: number } = {}) {
+  const formatDate = useDateFormatter();
   const [internalDays, setInternalDays] = useState(30);
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [data, setData] = useState<ErrorPatternsData | null>(null);
@@ -131,9 +133,9 @@ export default function ErrorPatternsAnalytics({ groupId: controlledGroupId, day
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={errorTrends}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" tick={{ fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })} />
+                <XAxis dataKey="week" tick={{ fontSize: 10 }} tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })} />
                 <YAxis />
-                <Tooltip labelFormatter={(v) => new Date(v).toLocaleDateString('ru-RU')} />
+                <Tooltip labelFormatter={(v) => formatDate(v)} />
                 <Legend />
                 <Line type="monotone" dataKey="errorRate" stroke="#ef4444" name="% ошибок" dot={false} />
                 <Line type="monotone" dataKey="incorrectCount" stroke="#f59e0b" name="Кол-во ошибок" dot={false} />

@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { motion } from 'framer-motion';
+import { useDateTimeFormatter } from '@/lib/format';
 import {
   ChevronLeft,
   KeyRound,
@@ -208,6 +209,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export default function ToolsLab() {
+  const formatDateTime = useDateTimeFormatter();
   const completeModule = useAppStore(s => s.completeModule);
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const completedModules = useAppStore(s => s.completedModules);
@@ -934,8 +936,8 @@ function vigenereEncrypt(text, key) {
                       <p className="text-[11px] text-muted-foreground">
                         <strong>Срок действия:</strong>{' '}
                         {jwtDecoded.error
-                          ? <span className="text-red-600">Истёк {new Date((jwtDecoded.payload as Record<string, number>).exp * 1000).toLocaleString('ru-RU')}</span>
-                          : <span className="text-emerald-600">Действителен до {new Date((jwtDecoded.payload as Record<string, number>).exp * 1000).toLocaleString('ru-RU')}</span>
+                          ? <span className="text-red-600">Истёк {formatDateTime((jwtDecoded.payload as Record<string, number>).exp * 1000)}</span>
+                          : <span className="text-emerald-600">Действителен до {formatDateTime((jwtDecoded.payload as Record<string, number>).exp * 1000)}</span>
                         }
                       </p>
                     </div>

@@ -11,6 +11,7 @@ import {
   Loader2, AlertTriangle,
 } from 'lucide-react';
 import { getComprehensiveSummary, type ComprehensiveSummary } from '@/lib/auth-store';
+import { useDateFormatter } from '@/lib/format';
 import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
 import StudentDrillDown from './StudentDrillDown';
@@ -30,6 +31,7 @@ interface ComprehensiveDashboardProps {
 }
 
 export default function ComprehensiveDashboard({ groupId, days: daysProp }: ComprehensiveDashboardProps) {
+  const formatDate = useDateFormatter();
   const [data, setData] = useState<ComprehensiveSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -278,7 +280,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
                       <p className="text-xs text-slate-400">{activity.details}</p>
                     </div>
                     <span className="text-xs text-slate-400 whitespace-nowrap">
-                      {new Date(activity.timestamp).toLocaleDateString('ru-RU')}
+                      {formatDate(activity.timestamp)}
                     </span>
                   </motion.div>
                 ))}

@@ -9,6 +9,7 @@ import {
   Loader2, AlertTriangle, LogIn, Users, AlertCircle, Clock,
 } from 'lucide-react';
 import { getLoginPatterns, type LoginPatternsData } from '@/lib/auth-store';
+import { useDateFormatter } from '@/lib/format';
 import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +20,7 @@ export interface LoginPatternsProps {
 }
 
 export default function LoginPatterns({ groupId: propGroupId, days: propDays }: LoginPatternsProps = {}) {
+  const formatDate = useDateFormatter();
   const [internalDays, setInternalDays] = useState(30);
   const [internalGroupId] = useState('');
 
@@ -166,7 +168,7 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
                       </td>
                       <td className="p-2 text-center text-muted-foreground">
                         {f.recentAttempts.map((a, i) => (
-                          <span key={i} className="mr-2">{new Date(a.timestamp).toLocaleDateString('ru-RU')} ({a.ip})</span>
+                          <span key={i} className="mr-2">{formatDate(a.timestamp)} ({a.ip})</span>
                         ))}
                       </td>
                     </tr>
@@ -200,7 +202,7 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
                     <tr key={d.userId} className="border-b border-slate-100 hover:bg-secondary">
                       <td className="p-2 font-medium">{d.fullName}</td>
                       <td className="p-2 text-muted-foreground">{d.group || '—'}</td>
-                      <td className="p-2 text-center text-muted-foreground">{new Date(d.lastLogin).toLocaleDateString('ru-RU')}</td>
+                      <td className="p-2 text-center text-muted-foreground">{formatDate(d.lastLogin)}</td>
                       <td className="p-2 text-center">
                         <Badge variant="destructive" className="text-[10px]">{d.daysInactive} дн.</Badge>
                       </td>

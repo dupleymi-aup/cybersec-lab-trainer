@@ -5,6 +5,7 @@ import { FileDown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { getComprehensiveSummary } from '@/lib/auth-store';
+import { useDateFormatter } from '@/lib/format';
 import { modules } from '@/lib/data';
 
 async function downloadPDF(pdfBlob: Blob, filename: string): Promise<void> {
@@ -17,6 +18,7 @@ async function downloadPDF(pdfBlob: Blob, filename: string): Promise<void> {
 }
 
 export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: string; days?: number }) {
+  const formatDate = useDateFormatter();
   const [generating, setGenerating] = useState(false);
 
   const handleGenerate = async () => {
@@ -145,7 +147,7 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
         const activityTable = recentActivity.slice(0, 15).map((a) => [
           a.fullName,
           a.details,
-          new Date(a.timestamp).toLocaleDateString('ru-RU'),
+          formatDate(a.timestamp),
         ]);
 
         autoTable(doc, {

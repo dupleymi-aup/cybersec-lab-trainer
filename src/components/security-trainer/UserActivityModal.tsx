@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import { X, BookOpen, Trophy, Activity, BarChart3, Database, Clock, ShieldCheck, Code } from 'lucide-react';
+import { useDateTimeFormatter } from '@/lib/format';
 
 interface UserActivityModalProps {
   user: User;
@@ -94,6 +95,7 @@ function getScoreColor(score: number): string {
 }
 
 export default function UserActivityModal({ user, onClose }: UserActivityModalProps) {
+  const formatDateTime = useDateTimeFormatter();
   const [progress, setProgress] = useState<UserProgressData>({
     completedModules: [],
     quizScores: {},
@@ -336,7 +338,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                     </div>
                   </div>
                   <p className="text-[10px] text-muted-foreground">
-                    {new Date(entry.timestamp).toLocaleString('ru-RU')}
+                    {formatDateTime(entry.timestamp)}
                   </p>
                 </div>
               ))

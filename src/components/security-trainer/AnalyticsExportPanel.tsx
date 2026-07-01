@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { getAllUsers, getStudentProgress, getModulePerformance, getAtRiskStudents, getGroupComparison, getComprehensiveSummary, getQuizRetryAnalytics, type User } from '@/lib/auth-store';
 import { downloadCSV, generateGradebookCSV, generateStudentReportCSV, generateStudentReportPDF, generateModulePerformanceCSV, generateAtRiskCSV, generateGroupComparisonCSV, generateAnalyticsCSV, generateGradebookPDF, generateAtRiskPDF, generateAnalyticsPDF, generateModulePerformancePDF, generateGroupComparisonPDF, generateQuizRetryPDF } from '@/lib/export-utils';
 import { modules } from '@/lib/data';
+import { useDateFormatter } from '@/lib/format';
 
 interface AnalyticsExportPanelProps {
   students?: Array<{ id: string; fullName: string; email: string; group: string }>;
@@ -47,6 +48,7 @@ const isControlled = (props: AnalyticsExportPanelProps): props is AnalyticsExpor
 
 
 export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = {}) {
+  const formatDate = useDateFormatter();
   const { students: propStudents, groupId } = props;
   const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const exportingKeys = useRef(new Set<string>());
@@ -163,7 +165,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
               ].filter(Boolean) as string[];
               if (allTimestamps.length > 0) {
                 allTimestamps.sort();
-                lastActive = new Date(allTimestamps[allTimestamps.length - 1]).toLocaleDateString('ru-RU');
+                lastActive = formatDate(allTimestamps[allTimestamps.length - 1]);
               }
             } catch (e) {
               if (process.env.NODE_ENV === "development") console.warn("[AnalyticsExportPanel.tsx] handleGradebookExport failed:", e);

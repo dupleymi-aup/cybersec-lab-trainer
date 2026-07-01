@@ -12,6 +12,7 @@ import {
   Download, FileText,
 } from 'lucide-react';
 import { getStudentPerformance, type StudentPerformanceData } from '@/lib/auth-store';
+import { useDateFormatter, useDateTimeFormatter } from '@/lib/format';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,8 @@ interface Props {
 }
 
 export default function StudentPerformanceReport({ userId, initialDays = 30, groupId: _groupId }: Props) {
+  const formatDate = useDateFormatter();
+  const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -254,7 +257,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                       <div className="flex-1">
                         <p className="text-xs font-medium">{activity.details}</p>
                         <p className="text-[10px] text-slate-400">
-                          {new Date(activity.date).toLocaleString('ru-RU')}
+                          {formatDateTime(activity.date)}
                         </p>
                       </div>
                     </motion.div>
@@ -308,7 +311,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                       <div>
                         <p className="text-sm font-medium">{module.moduleName}</p>
                         <p className="text-[10px] text-slate-400">
-                          {new Date(module.updatedAt).toLocaleDateString('ru-RU')}
+                          {formatDate(module.updatedAt)}
                         </p>
                       </div>
                     </div>
@@ -382,7 +385,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                     <div className="flex-1">
                       <p className="text-xs font-medium">{activity.details}</p>
                       <p className="text-[10px] text-slate-400">
-                        {new Date(activity.date).toLocaleString('ru-RU')}
+                        {formatDateTime(activity.date)}
                       </p>
                     </div>
                     <Badge variant="outline" className="text-[10px]">
@@ -408,9 +411,9 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                 <ResponsiveContainer width="100%" height={250}>
                   <AreaChart data={moduleCompletionTimeline}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })} />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })} />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip labelFormatter={(v) => new Date(v).toLocaleDateString('ru-RU')} />
+                    <Tooltip labelFormatter={(v) => formatDate(v)} />
                     <Legend />
                     <Area type="monotone" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.1} name="Балл" />
                   </AreaChart>
@@ -430,9 +433,9 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={loginActivityTimeline}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })} />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })} />
                     <YAxis />
-                    <Tooltip labelFormatter={(v) => new Date(v).toLocaleDateString('ru-RU')} />
+                    <Tooltip labelFormatter={(v) => formatDate(v)} />
                     <Legend />
                     <Bar dataKey="count" fill="#6366f1" name="Входы" />
                     <Bar dataKey="successCount" fill="#10b981" name="Успешные" />
@@ -453,9 +456,9 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={quizCategoryTrajectory}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="week" tick={{ fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' })} />
+                    <XAxis dataKey="week" tick={{ fontSize: 10 }} tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })} />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip labelFormatter={(v) => new Date(v).toLocaleDateString('ru-RU')} />
+                    <Tooltip labelFormatter={(v) => formatDate(v)} />
                     <Legend />
                     {Array.from(new Set(quizCategoryTrajectory.map((p) => p.category))).map((category, i) => {
                       const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
