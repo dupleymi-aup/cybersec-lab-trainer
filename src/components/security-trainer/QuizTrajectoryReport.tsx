@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useDateFormatter } from '@/lib/format';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { Loader2, AlertTriangle, TrendingUp, Target, BarChart3 } from 'lucide-react';
 import { getQuizTrajectory, type QuizTrajectoryPoint } from '@/lib/auth-store';
+import { CHART_COLORS } from '@/lib/constants';
 import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
 
@@ -16,18 +18,15 @@ const PERIOD_OPTIONS = [
   { key: 180, label: '180d' },
 ];
 
-// Consistent color palette for categories
+// Consistent color palette for categories — derived from central chart palette
 const CATEGORY_COLORS = [
-  '#6366f1', // indigo
-  '#10b981', // emerald
-  '#f59e0b', // amber
-  '#ef4444', // red
-  '#3b82f6', // blue
-  '#8b5cf6', // violet
-  '#ec4899', // pink
-  '#14b8a6', // teal
-  '#f97316', // orange
-  '#06b6d4', // cyan
+  CHART_COLORS.primary,
+  CHART_COLORS.success,
+  CHART_COLORS.warning,
+  CHART_COLORS.danger,
+  CHART_COLORS.info,
+  CHART_COLORS.accent,
+  CHART_COLORS.muted,
 ];
 
 export interface QuizTrajectoryReportProps {
@@ -38,6 +37,7 @@ export interface QuizTrajectoryReportProps {
 const DEFAULT_DAYS = 30;
 
 export default function QuizTrajectoryReport({ groupId, days: controlledDays }: QuizTrajectoryReportProps = {}) {
+  const formatDateLocale = useDateFormatter();
   const [trajectories, setTrajectories] = useState<QuizTrajectoryPoint[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,7 +135,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
 
   const formatDate = (weekStr: string) => {
     const d = new Date(weekStr);
-    return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    return formatDateLocale(d, { day: 'numeric', month: 'short' });
   };
 
   if (loading) {
@@ -214,23 +214,23 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={350}>
               <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
                 <XAxis
                   dataKey="week"
                   tick={{ fontSize: 10 }}
                   tickLine={false}
-                  axisLine={{ stroke: '#e2e8f0' }}
+                  axisLine={{ stroke: CHART_COLORS.grid }}
                   tickFormatter={formatDate}
                 />
                 <YAxis
                   tick={{ fontSize: 11 }}
                   tickLine={false}
-                  axisLine={{ stroke: '#e2e8f0' }}
+                  axisLine={{ stroke: CHART_COLORS.grid }}
                   domain={[0, 100]}
                   tickFormatter={(v: number) => `${v}%`}
                 />
                 <Tooltip
-                  contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                  contentStyle={{ fontSize: 12, borderRadius: 8, border: `1px solid ${CHART_COLORS.grid}` }}
                   formatter={(value, name) => {
                     const nameStr = String(name || '');
                     if (nameStr.endsWith('_attempts')) return [value, 'Попытки'];
