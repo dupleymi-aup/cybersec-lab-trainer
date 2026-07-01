@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,6 +29,7 @@ import {
 } from 'lucide-react';
 
 export default function AuthSecurityLab() {
+  const t = useTranslations('labs.auth');
   const completeModule = useAppStore(s => s.completeModule);
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const completedModules = useAppStore(s => s.completedModules);
@@ -85,38 +87,44 @@ export default function AuthSecurityLab() {
     if (!password) return { score: 0, label: '', color: '', checks: [] };
 
     const checks = [
-      { label: 'Минимум 8 символов', passed: password.length >= 8 },
-      { label: 'Строчные буквы (a-z)', passed: /[a-z]/.test(password) },
-      { label: 'Заглавные буквы (A-Z)', passed: /[A-Z]/.test(password) },
-      { label: 'Цифры (0-9)', passed: /[0-9]/.test(password) },
-      { label: 'Спецсимволы (!@#$...)', passed: /[^a-zA-Z0-9]/.test(password) },
-      { label: 'Минимум 12 символов', passed: password.length >= 12 },
-      { label: 'Нет повторяющихся символов', passed: !/(.)\1{2,}/.test(password) },
-      { label: 'Нет последовательностей (abc, 123)', passed: !/(?:abc|bcd|cde|def|efg|012|123|234|345|456|567|678|789)/i.test(password) },
+      { label: t('password.minLength'), passed: password.length >= 8 },
+      { label: t('password.lowercase'), passed: /[a-z]/.test(password) },
+      { label: t('password.uppercase'), passed: /[A-Z]/.test(password) },
+      { label: t('password.numbers'), passed: /[0-9]/.test(password) },
+      { label: t('password.symbols'), passed: /[^a-zA-Z0-9]/.test(password) },
+      { label: t('password.minLength12'), passed: password.length >= 12 },
+      { label: t('password.noRepeats'), passed: !/(.)\1{2,}/.test(password) },
+      { label: t('password.noSequences'), passed: !/(?:abc|bcd|cde|def|efg|012|123|234|345|456|567|678|789)/i.test(password) },
     ];
 
     const passedCount = checks.filter((c) => c.passed).length;
     const score = passedCount <= 2 ? 20 : passedCount <= 3 ? 40 : passedCount <= 5 ? 60 : passedCount <= 6 ? 80 : 100;
-    const label = passedCount <= 2 ? 'Очень слабый' : passedCount <= 3 ? 'Слабый' : passedCount <= 5 ? 'Средний' : passedCount <= 6 ? 'Надёжный' : 'Отличный';
+    const label = passedCount <= 2 ? t('password.veryWeak') : passedCount <= 3 ? t('password.weak') : passedCount <= 5 ? t('password.medium') : passedCount <= 6 ? t('password.strong') : t('password.excellent');
     const color = passedCount <= 2 ? 'bg-red-500' : passedCount <= 3 ? 'bg-red-400' : passedCount <= 5 ? 'bg-yellow-500' : passedCount <= 6 ? 'bg-emerald-500' : 'bg-emerald-600';
 
     return { score, label, color, checks };
-  }, [password]);
+  }, [password, t]);
 
-  const formatTime = (seconds: number) => {
-    if (seconds < 1) return 'Мгновенно';
-    if (seconds < 60) return `${Math.round(seconds)} сек`;
-    if (seconds < 3600) return `${Math.round(seconds / 60)} мин`;
-    if (seconds < 86400) return `${Math.round(seconds / 3600)} ч`;
-    if (seconds < 31536000) return `${Math.round(seconds / 86400)} дн`;
-    if (seconds < 31536000 * 100) return `${Math.round(seconds / 31536000)} лет`;
-    if (seconds < 31536000 * 1e6) return `${Math.round(seconds / 31536000 / 1000)} тыс. лет`;
-    if (seconds < 31536000 * 1e9) return `${Math.round(seconds / 31536000 / 1e6)} млн лет`;
-    return 'Бесконечно';
+  const formatTime = useCallback((seconds: number) => {
+    if (seconds < 1) return t('bruteforce.instant');
+    if (seconds < 60) return `${Math.round(seconds)} ${t('bruteforce.seconds')}`;
+    if (seconds < 3600) return `${Math.round(seconds / 60)} ${t('bruteforce.minutes')}`;
+    if (seconds < 86400) return `${Math.round(seconds / 3600)} ${t('bruteforce.hours')}`;
+    if (seconds < 31536000) return `${Math.round(seconds / 86400)} ${t('bruteforce.days')}`;
+    if (seconds < 31536000 * 100) return `${Math.round(seconds / 31536000)} ${t('bruteforce.years')}`;
+    if (seconds < 31536000 * 1e6) return `${Math.round(seconds / 31536000 / 1000)} ${t('bruteforce.thousandYears')}`;
+    if (seconds < 31536000 * 1e9) return `${Math.round(seconds / 31536000 / 1e6)} ${t('bruteforce.millionYears')}`;
+    return t('bruteforce.infinite');
+  }, [t]);
+
+  const crackTimeColor = (seconds: number) => {
+    if (seconds < 3600) return 'text-red-400';
+    if (seconds < 31536000) return 'text-amber-400';
+    return 'text-emerald-400';
   };
 
   // Brute force time estimation
-  const crackTime = useMemo(() => {
+  const crackData = useMemo(() => {
     let charsetSize = 26;
     if (crackComplexity >= 2) charsetSize += 26;
     if (crackComplexity >= 3) charsetSize += 10;
@@ -124,8 +132,8 @@ export default function AuthSecurityLab() {
     const combinations = Math.pow(charsetSize, crackLength);
     const attemptsPerSecond = 1e10;
     const seconds = combinations / attemptsPerSecond / 2;
-    return formatTime(seconds);
-  }, [crackLength, crackComplexity]);
+    return { text: formatTime(seconds), seconds, color: crackTimeColor(seconds) };
+  }, [crackLength, crackComplexity, formatTime]);
 
   // Simulated hash
   const simulatedHash = useMemo(() => {
@@ -155,27 +163,27 @@ export default function AuthSecurityLab() {
           <Lock size={20} className="text-emerald-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Безопасность аутентификации</h1>
-          <p className="text-xs text-muted-foreground">Пароли, хеширование и управление сессиями</p>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <p className="text-xs text-muted-foreground">{t('subtitle')}</p>
         </div>
       </div>
 
       <Tabs defaultValue="password" className="space-y-4">
         <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
           <TabsTrigger value="password" className="text-xs">
-            <KeyRound size={14} className="mr-1" /> Пароли
+            <KeyRound size={14} className="mr-1" /> {t('tabs.password')}
           </TabsTrigger>
           <TabsTrigger value="bruteforce" className="text-xs">
-            <Zap size={14} className="mr-1" /> Брутфорс
+            <Zap size={14} className="mr-1" /> {t('tabs.bruteforce')}
           </TabsTrigger>
           <TabsTrigger value="hashing" className="text-xs">
-            <Hash size={14} className="mr-1" /> Хеширование
+            <Hash size={14} className="mr-1" /> {t('tabs.hashing')}
           </TabsTrigger>
           <TabsTrigger value="otp" className="text-xs">
-            <ShieldCheck size={14} className="mr-1" /> 2FA/OTP
+            <ShieldCheck size={14} className="mr-1" /> {t('tabs.otp')}
           </TabsTrigger>
           <TabsTrigger value="sessions" className="text-xs">
-            <Clock size={14} className="mr-1" /> Сессии
+            <Clock size={14} className="mr-1" /> {t('tabs.sessions')}
           </TabsTrigger>
         </TabsList>
 
@@ -185,14 +193,14 @@ export default function AuthSecurityLab() {
             <CardContent className="p-5">
               <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <KeyRound size={16} className="text-emerald-600" />
-                Проверка надёжности пароля
+                {t('password.checkerTitle')}
               </h3>
               <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Введите пароль для проверки..."
+                  placeholder={t('password.placeholder')}
                   className="pr-10 font-mono"
                 />
                 <button
@@ -228,7 +236,7 @@ export default function AuthSecurityLab() {
                   <Separator />
 
                   <div className="space-y-2">
-                    <h4 className="text-xs font-semibold text-muted-foreground">Критерии проверки:</h4>
+                    <h4 className="text-xs font-semibold text-muted-foreground">{t('password.criteriaTitle')}</h4>
                     {passwordAnalysis.checks.map((check, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
                         {check.passed ? (
@@ -254,17 +262,17 @@ export default function AuthSecurityLab() {
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <Zap size={16} className="text-red-500" />
-                Визуализация полного перебора (Brute Force)
+                {t('bruteforce.title')}
               </h3>
               <p className="text-xs text-muted-foreground">
-                Узнайте, сколько времени нужно для подбора пароля с учётом длины и сложности.
+                {t('bruteforce.description')}
               </p>
 
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-xs mb-2">
-                    <span>Длина пароля</span>
-                    <span className="font-mono font-bold">{crackLength} символов</span>
+                    <span>{t('bruteforce.passwordLength')}</span>
+                    <span className="font-mono font-bold">{crackLength} {t('bruteforce.characters')}</span>
                   </div>
                   <input
                     type="range"
@@ -282,7 +290,7 @@ export default function AuthSecurityLab() {
 
                 <div>
                   <div className="flex justify-between text-xs mb-2">
-                    <span>Сложность (набор символов)</span>
+                    <span>{t('bruteforce.complexity')}</span>
                     <span className="font-mono font-bold">
                       {crackComplexity === 1
                         ? '26 (a-z)'
@@ -290,7 +298,7 @@ export default function AuthSecurityLab() {
                           ? '52 (a-z, A-Z)'
                           : crackComplexity === 3
                             ? '62 (+0-9)'
-                            : '94 (+спецсимволы)'}
+                            : '94 (+!@#$...)'}
                     </span>
                   </div>
                   <input
@@ -303,26 +311,20 @@ export default function AuthSecurityLab() {
                     className="w-full accent-emerald-600"
                   />
                   <div className="flex justify-between text-[10px] text-slate-400">
-                    <span>Строчные</span>
-                    <span>Полная</span>
+                    <span>{t('bruteforce.lowercaseOnly')}</span>
+                    <span>{t('bruteforce.fullComplexity')}</span>
                   </div>
                 </div>
 
                 <Separator />
 
                 <div className="bg-slate-900 rounded-xl p-5 text-center">
-                  <p className="text-xs text-slate-400 mb-2">Время полного перебора (10 млрд попыток/сек)</p>
-                  <p className={`text-3xl font-bold font-mono ${
-                    crackTime === 'Мгновенно' || crackTime.includes('сек') || crackTime.includes('мин')
-                      ? 'text-red-400'
-                      : crackTime.includes('ч') || crackTime.includes('дн')
-                        ? 'text-amber-400'
-                        : 'text-emerald-400'
-                  }`}>
-                    {crackTime}
+                  <p className="text-xs text-slate-400 mb-2">{t('bruteforce.bruteForceTime')}</p>
+                  <p className={`text-3xl font-bold font-mono ${crackData.color}`}>
+                    {crackData.text}
                   </p>
                   <p className="text-[11px] text-muted-foreground mt-2">
-                    Комбинаций: {Math.pow(
+                    {t('bruteforce.combinations')} {Math.pow(
                       crackComplexity === 1 ? 26 : crackComplexity === 2 ? 52 : crackComplexity === 3 ? 62 : 94,
                       crackLength
                     ).toExponential(2)}
@@ -332,9 +334,7 @@ export default function AuthSecurityLab() {
                 <div className="bg-emerald-50 rounded-lg p-3">
                   <p className="text-xs text-emerald-700 flex items-start gap-2">
                     <Lightbulb size={14} className="mt-0.5 shrink-0" />
-                    <span><strong>Рекомендация:</strong> Используйте пароли длиной 12+ символов с
-                    заглавными и строчными буквами, цифрами и спецсимволами. Такой пароль потребует
-                    сотни лет для подбора даже на мощных GPU-кластерах.</span>
+                    <span>{t('bruteforce.recommendation')}</span>
                   </p>
                 </div>
               </div>
@@ -348,16 +348,16 @@ export default function AuthSecurityLab() {
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <Hash size={16} className="text-violet-600" />
-                Демонстрация хеширования паролей
+                {t('hashing.demoTitle')}
               </h3>
               <p className="text-xs text-muted-foreground">
-                Введите пароль, чтобы увидеть, как работает bcrypt-хеширование с солью.
+                {t('hashing.demoDescription')}
               </p>
 
               <Input
                 value={hashInput}
                 onChange={(e) => setHashInput(e.target.value)}
-                placeholder="Введите пароль для хеширования..."
+                placeholder={t('hashing.placeholder')}
                 type="text"
                 className="font-mono"
               />
@@ -369,42 +369,42 @@ export default function AuthSecurityLab() {
                   className="space-y-3"
                 >
                   <div className="bg-secondary rounded-lg p-3">
-                    <p className="text-[10px] text-muted-foreground mb-1">Оригинальный пароль:</p>
+                    <p className="text-[10px] text-muted-foreground mb-1">{t('hashing.originalPassword')}</p>
                     <code className="text-xs font-mono">{hashInput}</code>
                   </div>
 
                   <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
-                    <p className="text-[10px] text-violet-500 mb-1">Сгенерированный хеш (bcrypt-подобный):</p>
+                    <p className="text-[10px] text-violet-500 mb-1">{t('hashing.generatedHash')}</p>
                     <code className="text-xs font-mono text-violet-700 break-all">{simulatedHash}</code>
                   </div>
 
                   <div className="bg-secondary rounded-lg p-3">
-                    <p className="text-[10px] text-muted-foreground mb-1">Структура хеша:</p>
+                    <p className="text-[10px] text-muted-foreground mb-1">{t('hashing.hashStructure')}</p>
                     <div className="space-y-1">
                       <p className="text-[11px]">
                         <code className="bg-red-100 text-red-700 px-1 rounded">$2b$12$</code>
-                        <span className="text-muted-foreground ml-1">— алгоритм (bcrypt) и стоимость (12 раундов)</span>
+                        <span className="text-muted-foreground ml-1">{t('hashing.algorithmLabel')}</span>
                       </p>
                       <p className="text-[11px]">
                         <code className="bg-amber-100 text-amber-700 px-1 rounded">a1b2c3d4e5f6</code>
-                        <span className="text-muted-foreground ml-1">— соль (уникальная для каждого пользователя)</span>
+                        <span className="text-muted-foreground ml-1">{t('hashing.saltLabel')}</span>
                       </p>
                       <p className="text-[11px]">
                         <code className="bg-emerald-100 text-emerald-700 px-1 rounded">7f3a...</code>
-                        <span className="text-muted-foreground ml-1">— собственно хеш пароля</span>
+                        <span className="text-muted-foreground ml-1">{t('hashing.hashLabel')}</span>
                       </p>
                     </div>
                   </div>
 
                   <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
                     <h4 className="text-xs font-semibold text-emerald-700 mb-1 flex items-center gap-1.5">
-                      <ShieldCheck size={14} /> Почему bcrypt?
+                      <ShieldCheck size={14} /> {t('hashing.whyBcrypt')}
                     </h4>
                     <ul className="text-[11px] text-emerald-600 space-y-1">
-                      <li>• Автоматически добавляет соль — защита от rainbow tables</li>
-                      <li>• Настраиваемая стоимость (cost factor) — замедляет перебор</li>
-                      <li>• Устойчив к GPU-атакам (памятекоёмкий алгоритм)</li>
-                      <li>• Однонаправленный — невозможно восстановить пароль из хеша</li>
+                      <li>• {t('hashing.autoSalt')}</li>
+                      <li>• {t('hashing.adjustableCost')}</li>
+                      <li>• {t('hashing.gpuResistant')}</li>
+                      <li>• {t('hashing.oneWay')}</li>
                     </ul>
                   </div>
                 </motion.div>
@@ -441,20 +441,18 @@ async function verify(password, hash) {
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <ShieldCheck size={16} className="text-emerald-600" />
-                Интерактивная демонстрация TOTP (Time-based One-Time Password)
+                {t('otp.title')}
               </h3>
               <p className="text-xs text-muted-foreground">
-                TOTP генерирует одноразовый 6-значный код, который меняется каждые 30 секунд.
-                Это второй фактор аутентификации — даже если злоумышленник узнает пароль,
-                без этого кода он не войдёт.
+                {t('otp.description')}
               </p>
 
               {/* Simulated TOTP display */}
               <div className="bg-slate-900 rounded-xl p-6 text-center space-y-3">
-                <p className="text-xs text-slate-400">Ваш секретный ключ:</p>
+                <p className="text-xs text-slate-400">{t('otp.secretKey')}</p>
                 <code className="text-sm font-mono text-amber-400 bg-amber-400/10 px-3 py-1 rounded">{otpSecret}</code>
                 <Separator />
-                <p className="text-xs text-slate-400">Текущий TOTP-код (обновляется каждые 30 сек):</p>
+                <p className="text-xs text-slate-400">{t('otp.currentCode')}</p>
                 <p className="text-4xl font-bold font-mono text-emerald-400 tracking-wider">{currentTOTP}</p>
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-32 h-1.5 bg-slate-700 rounded-full overflow-hidden">
@@ -465,38 +463,38 @@ async function verify(password, hash) {
                       style={{ width: `${(otpTimeLeft / 30) * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs font-mono text-slate-400">{otpTimeLeft}с</span>
+                  <span className="text-xs font-mono text-slate-400">{otpTimeLeft}s</span>
                 </div>
               </div>
 
               {/* Verification simulation */}
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold">Проверка кода:</h4>
+                <h4 className="text-xs font-semibold">{t('otp.verifyTitle')}</h4>
                 <div className="flex gap-2">
                   <Input
                     value={otpInput}
                     onChange={(e) => { setOtpInput(e.target.value.replace(/\D/g, '').substring(0, 6)); setOtpVerified(null); }}
-                    placeholder="Введите 6-значный код"
+                    placeholder={t('otp.verifyPlaceholder')}
                     className="font-mono text-center text-lg tracking-widest"
                     maxLength={6}
                     onKeyDown={(e) => e.key === 'Enter' && verifyOTP()}
                   />
                   <Button onClick={verifyOTP} className="bg-emerald-600 hover:bg-emerald-700 shrink-0">
-                    Проверить
+                    {t('otp.verifyButton')}
                   </Button>
                 </div>
                 {otpVerified === true && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-emerald-600 font-medium flex items-center gap-2">
-                    <CheckCircle2 size={16} /> Код верный! Вход разрешён.
+                    <CheckCircle2 size={16} /> {t('otp.codeCorrect')}
                   </motion.div>
                 )}
                 {otpVerified === false && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600 font-medium flex items-center gap-2">
-                    <AlertTriangle size={16} /> Код неверный. Попробуйте ещё раз.
+                    <AlertTriangle size={16} /> {t('otp.codeWrong')}
                   </motion.div>
                 )}
                 <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                  <Lightbulb size={12} /> Подсказка: скопируйте код сверху ({currentTOTP}) и вставьте его для проверки
+                  <Lightbulb size={12} /> {t('otp.hint')} ({currentTOTP})
                 </p>
               </div>
 
@@ -504,13 +502,13 @@ async function verify(password, hash) {
 
               {/* How 2FA works */}
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold">Как работает TOTP:</h4>
+                <h4 className="text-xs font-semibold">{t('otp.howItWorks')}</h4>
                 <div className="space-y-2">
                   {[
-                    { step: '1', title: 'Секретный ключ', desc: 'Сервер генерирует случайный секрет (обычно 16-32 символа Base32) и передаёт его пользователю (QR-код).' },
-                    { step: '2', title: 'Вычисление HMAC', desc: 'Клиент и сервер вычисляют HMAC-SHA1 от секрета и текущего временного шага (timestamp / 30).' },
-                    { step: '3', title: 'Динамическое усечение', desc: 'Из HMAC извлекаются 4 байта, преобразуются в 31-битное число, затем берётся по модулю 10^6 = 6-значный код.' },
-                    { step: '4', title: 'Сверка', desc: 'Сервер сравнивает код клиента с собственным вычислением. Допускается ±1 шаг (30 сек) для компенсации задержки.' },
+                    { step: '1', title: t('otp.step1Title'), desc: t('otp.step1Desc') },
+                    { step: '2', title: t('otp.step2Title'), desc: t('otp.step2Desc') },
+                    { step: '3', title: t('otp.step3Title'), desc: t('otp.step3Desc') },
+                    { step: '4', title: t('otp.step4Title'), desc: t('otp.step4Desc') },
                   ].map((item) => (
                     <div key={item.step} className="flex gap-3">
                       <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">
@@ -551,24 +549,22 @@ const isValid = authenticator.check(token, user.secret);
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="bg-red-50 rounded-lg p-3 border border-red-200">
                   <h4 className="text-xs font-semibold text-red-700 mb-2 flex items-center gap-1.5">
-                    <X size={14} /> Без 2FA
+                    <X size={14} /> {t('otp.without2fa')}
                   </h4>
                   <ul className="text-[11px] text-red-600 space-y-1">
-                    <li>• Только пароль — одна точка отказа</li>
-                    <li>• Утечка из БД = мгновенный доступ</li>
-                    <li>• Фишинг = полный компромисс</li>
-                    <li>• Брутфорс = eventual access</li>
+                    {t.raw('otp.without2faItems').map((item: string, i: number) => (
+                      <li key={i}>• {item}</li>
+                    ))}
                   </ul>
                 </div>
                 <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
                   <h4 className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
-                    <CheckCircle2 size={14} /> С 2FA (TOTP)
+                    <CheckCircle2 size={14} /> {t('otp.with2fa')}
                   </h4>
                   <ul className="text-[11px] text-emerald-600 space-y-1">
-                    <li>• Нужен пароль + устройство с TOTP</li>
-                    <li>• Код действует только 30 секунд</li>
-                    <li>• Секрет не передаётся по сети</li>
-                    <li>• Защита от фишинга и брутфорса</li>
+                    {t.raw('otp.with2faItems').map((item: string, i: number) => (
+                      <li key={i}>• {item}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -582,18 +578,14 @@ const isValid = authenticator.check(token, user.secret);
             <CardContent className="p-5 space-y-4">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <Clock size={16} className="text-sky-600" />
-                Безопасность сессий
+                {t('sessions.title')}
               </h3>
 
               <div className="space-y-4">
                 <div className="bg-sky-50 rounded-lg p-4 border border-sky-200">
-                  <h4 className="text-xs font-semibold text-sky-800 mb-2">JWT (JSON Web Token)</h4>
+                  <h4 className="text-xs font-semibold text-sky-800 mb-2">{t('sessions.jwtTitle')}</h4>
                   <p className="text-xs text-sky-700 leading-relaxed">
-                    JWT — это компактный токен для передачи информации между клиентом и сервером.
-                    Состоит из трёх частей: Header (заголовок с алгоритмом подписи), Payload
-                    (данные: id пользователя, роль, срок действия) и Signature (подпись для
-                    проверки целостности). Токены могут храниться в localStorage или в HttpOnly
-                    куках.
+                    {t('sessions.jwtDescription')}
                   </p>
                 </div>
 
@@ -631,24 +623,22 @@ function authenticate(req, res, next) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="bg-red-50 rounded-lg p-3 border border-red-200">
                     <h4 className="text-xs font-semibold text-red-700 mb-2 flex items-center gap-1.5">
-                      <X size={14} /> Небезопасно
+                      <X size={14} /> {t('sessions.unsafe')}
                     </h4>
                     <ul className="text-[11px] text-red-600 space-y-1">
-                      <li>• Хранение JWT в localStorage (доступен через XSS)</li>
-                      <li>• Срок действия больше 24 часов</li>
-                      <li>• Отсутствие refresh-токенов</li>
-                      <li>• Секрет в клиентском коде</li>
+                      {t.raw('sessions.unsafeItems').map((item: string, i: number) => (
+                        <li key={i}>• {item}</li>
+                      ))}
                     </ul>
                   </div>
                   <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
                     <h4 className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1.5">
-                      <CheckCircle2 size={14} /> Безопасно
+                      <CheckCircle2 size={14} /> {t('sessions.safe')}
                     </h4>
                     <ul className="text-[11px] text-emerald-600 space-y-1">
-                      <li>• Хранение в HttpOnly + Secure куках</li>
-                      <li>• Короткий срок (15-30 мин) + refresh-токен</li>
-                      <li>• Проверка подписи на каждом запросе</li>
-                      <li>• Чёрный список compromised токенов</li>
+                      {t.raw('sessions.safeItems').map((item: string, i: number) => (
+                        <li key={i}>• {item}</li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -664,11 +654,11 @@ function authenticate(req, res, next) {
           className="w-full bg-emerald-600 hover:bg-emerald-700"
           onClick={handleComplete}
         >
-          Отметить модуль как изученный
+          {t('completeModule')}
         </Button>
       ) : (
         <div className="text-center text-sm text-emerald-600 font-medium flex items-center justify-center gap-2">
-          <CheckCircle2 size={16} /> Модуль завершён!
+          <CheckCircle2 size={16} /> {t('moduleCompleted')}
         </div>
       )}
     </div>
