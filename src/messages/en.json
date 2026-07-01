@@ -959,5 +959,141 @@
       "dataExported": "Data exported",
       "loggedInAs": "You are now logged in as {name}"
     }
+  },
+  "labs": {
+    "tools": {
+      "title": "Security Tools",
+      "subtitle": "Ciphers, encoding, hashing, and password generator",
+      "tabs": {
+        "ciphers": "Ciphers",
+        "encoding": "Encoding",
+        "hashing": "Hashes",
+        "passwords": "Passwords",
+        "advanced": "Advanced"
+      },
+      "caesar": {
+        "title": "Caesar Cipher",
+        "badge": "Classic",
+        "description": "Shifts each letter of the alphabet by a fixed number of positions.",
+        "encrypt": "Encrypt",
+        "decrypt": "Decrypt",
+        "shift": "Shift: {value}",
+        "text": "Text:",
+        "placeholder": "Enter text...",
+        "example": "Example: \"HELLO\" with shift 3 → KHOOR. Used by Roman general Caesar for secret correspondence. Vulnerable to frequency analysis — easily cracked with text longer than 20 characters."
+      },
+      "vigenere": {
+        "title": "Vigenere Cipher",
+        "badge": "Polyalphabetic",
+        "description": "Uses a keyword for variable shifting of each letter. Long considered unbreakable.",
+        "keyword": "Keyword:"
+      },
+      "xor": {
+        "title": "XOR Encryption",
+        "badge": "Symmetric",
+        "description": "Bitwise exclusive OR. Encryption and decryption are the same operation.",
+        "key": "Key:",
+        "textLabel": "Text",
+        "hexLabel": "HEX string",
+        "textPlaceholder": "Enter text...",
+        "hexPlaceholder": "Enter HEX...",
+        "property": "Property: A XOR B XOR B = A. So the same XOR operation both encrypts and decrypts. XOR is used in OTP (One-Time Pad) — the only theoretically unbreakable cipher, if the key is truly random and used only once."
+      },
+      "base64": {
+        "title": "Base64",
+        "badge": "Encoding",
+        "description": "Encodes binary data as text. Used for data transmission in JSON, email (MIME), Data URLs in HTML/CSS. Base64 is NOT encryption! Anyone can decode the data.",
+        "text": "Text:"
+      },
+      "urlEncoding": {
+        "title": "URL Encoding / Decoding",
+        "description": "Encodes special characters in URLs. Essential skill for XSS and CSRF work — understanding how browsers interpret encoded characters.",
+        "securityNote": "Security connection: URL encoding can bypass WAFs. For example, <script> can be encoded as %3Cscript%3E. Some filters check the decoded version, others don't."
+      },
+      "hashing": {
+        "title": "Hash Functions — Visualization",
+        "description": "A hash function converts input data of arbitrary length into a fixed-length string. Changing even one input character completely changes the hash. A hash is one-way: the original data cannot be recovered.",
+        "enterText": "Enter text:",
+        "placeholder": "Enter any text...",
+        "md5Like": "MD5-like (demo):",
+        "shaLike": "SHA-256-like (demo):",
+        "djb2": "DJB2 (compact):",
+        "avalanche": "Avalanche Effect:",
+        "original": "Original",
+        "modified": "Modified",
+        "avalancheNote": "Even a single character change completely alters the hashing result — this is called the \"avalanche effect\".",
+        "comparisonTitle": "Hash Algorithm Comparison",
+        "algo": "Algorithm",
+        "hashLength": "Hash Length",
+        "security": "Security",
+        "usage": "Usage",
+        "safe": "Secure",
+        "unsafe": "Insecure",
+        "md5Usage": "File integrity checking",
+        "sha1Usage": "Git commits (deprecated)",
+        "sha256Usage": "TLS, blockchain, signatures",
+        "sha512Usage": "High security",
+        "bcryptUsage": "Password hashing",
+        "argon2Usage": "PHC competition, passwords"
+      },
+      "passwords": {
+        "title": "Password Generator",
+        "description": "Generates cryptographically strong passwords using Web Crypto API.",
+        "generate": "Generate",
+        "placeholder": "Click \"Generate\"",
+        "length": "Password Length",
+        "uppercase": "A-Z Uppercase",
+        "lowercase": "a-z Lowercase",
+        "numbers": "0-9 Numbers",
+        "symbols": "!@# Symbols",
+        "charCount": "Length: {count} characters",
+        "entropy": "Entropy: ~{bits} bits",
+        "managersTitle": "Password Managers",
+        "managersDescription": "Generating passwords isn't enough — you need to store them securely. Use trusted password managers that encrypt the vault with a master password:",
+        "bitwarden": "Open source, free, cross-platform",
+        "keepassxc": "Local storage, open source, browser plugins",
+        "1password": "Commercial, great UX, family plans"
+      },
+      "aes": {
+        "title": "AES-like Encryption (Demo)",
+        "badge": "Symmetric",
+        "description": "Demonstration of symmetric encryption. Real AES-256-GCM uses Web Crypto API with a 256-bit key, IV, and authentication tag. This demo shows the working principle.",
+        "key": "Key:",
+        "keyPlaceholder": "secret key",
+        "plaintext": "Plaintext",
+        "ciphertext": "Ciphertext (Base64):",
+        "encryptButton": "Encrypt",
+        "decryptButton": "Decrypt",
+        "note": "Note: This is a simplified demonstration. Real AES-256-GCM uses SubBytes, ShiftRows, MixColumns, and AddRoundKey rounds. Use Web Crypto API."
+      },
+      "jwt": {
+        "title": "JWT Decoder",
+        "badge": "Tokens",
+        "description": "JSON Web Token consists of 3 parts: Header (algorithm), Payload (data), and Signature. Data is encoded in Base64URL — paste a token to decode.",
+        "token": "JWT token:",
+        "header": "Header:",
+        "payload": "Payload:",
+        "expiry": "Expiry:",
+        "expired": "Expired {date}",
+        "validUntil": "Valid until {date}",
+        "tryDemo": "Try:",
+        "insertDemo": "Insert demo token"
+      },
+      "rot13": {
+        "title": "ROT13",
+        "badge": "Classic",
+        "description": "A special case of the Caesar cipher with a shift of 13. Since the English alphabet has 26 letters, ROT13 restores the original text twice: ROT13(ROT13(x)) = x.",
+        "placeholder": "Enter English text...",
+        "example": "Example: \"Hello World\" → Uryyb Jbeyq. Used on forums to hide spoilers. Not encryption — doesn't protect data since there's no key."
+      },
+      "completeModule": "Mark Module as Completed",
+      "moduleCompleted": "Module Completed!",
+      "encodingError": "Encoding error",
+      "decodingError": "Decoding error",
+      "aesError": "Error: invalid key or corrupted data",
+      "jwtPartsError": "JWT must contain 3 parts separated by dots",
+      "jwtExpired": "Token expired",
+      "jwtInvalid": "Invalid JWT: {error}"
+    }
   }
 }

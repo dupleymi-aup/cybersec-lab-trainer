@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import CodeBlock from './CodeBlock';
 import { Card, CardContent } from '@/components/ui/card';
@@ -209,6 +210,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export default function ToolsLab() {
+  const t = useTranslations('labs.tools');
   const formatDateTime = useDateTimeFormatter();
   const completeModule = useAppStore(s => s.completeModule);
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
@@ -356,27 +358,27 @@ export default function ToolsLab() {
           <KeyRound size={20} className="text-violet-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Инструменты безопасности</h1>
-          <p className="text-xs text-muted-foreground">Шифры, кодирование, хеширование и генератор паролей</p>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <p className="text-xs text-muted-foreground">{t('subtitle')}</p>
         </div>
       </div>
 
       <Tabs defaultValue="ciphers" className="space-y-4">
         <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full">
           <TabsTrigger value="ciphers" className="text-xs">
-            <Lock size={14} className="mr-1" /> Шифры
+            <Lock size={14} className="mr-1" /> {t('tabs.ciphers')}
           </TabsTrigger>
           <TabsTrigger value="encoding" className="text-xs">
-            <Shuffle size={14} className="mr-1" /> Кодирование
+            <Shuffle size={14} className="mr-1" /> {t('tabs.encoding')}
           </TabsTrigger>
           <TabsTrigger value="hashing" className="text-xs">
-            <KeyRound size={14} className="mr-1" /> Хеши
+            <KeyRound size={14} className="mr-1" /> {t('tabs.hashing')}
           </TabsTrigger>
           <TabsTrigger value="passwords" className="text-xs">
-            <Unlock size={14} className="mr-1" /> Пароли
+            <Unlock size={14} className="mr-1" /> {t('tabs.passwords')}
           </TabsTrigger>
           <TabsTrigger value="advanced" className="text-xs">
-            <KeyRound size={14} className="mr-1" /> Продвинутые
+            <KeyRound size={14} className="mr-1" /> {t('tabs.advanced')}
           </TabsTrigger>
         </TabsList>
 
@@ -387,32 +389,32 @@ export default function ToolsLab() {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Lock size={16} className="text-amber-600" />
-                <h3 className="text-sm font-semibold">Шифр Цезаря</h3>
-                <Badge variant="secondary" className="text-[10px]">Классический</Badge>
+                <h3 className="text-sm font-semibold">{t('caesar.title')}</h3>
+                <Badge variant="secondary" className="text-[10px]">{t('caesar.badge')}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">Сдвиг каждой буквы алфавита на фиксированное число позиций.</p>
+              <p className="text-xs text-muted-foreground">{t('caesar.description')}</p>
 
               <RadioGroup value={caesarMode} onValueChange={(v) => setCaesarMode(v as 'encrypt' | 'decrypt')} className="flex gap-4">
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem value="encrypt" id="caesar-e" />
-                  <Label htmlFor="caesar-e" className="text-xs">Шифрование</Label>
+                  <Label htmlFor="caesar-e" className="text-xs">{t('caesar.encrypt')}</Label>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem value="decrypt" id="caesar-d" />
-                  <Label htmlFor="caesar-d" className="text-xs">Дешифрование</Label>
+                  <Label htmlFor="caesar-d" className="text-xs">{t('caesar.decrypt')}</Label>
                 </div>
               </RadioGroup>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs">Сдвиг: {caesarShift}</Label>
+                  <Label className="text-xs">{t('caesar.shift', { value: caesarShift })}</Label>
                 </div>
                 <Slider value={[caesarShift]} min={1} max={25} step={1} onValueChange={(v) => setCaesarShift(v[0])} />
               </div>
 
               <div>
-                <Label className="text-xs mb-1 block">Текст:</Label>
-                <Input value={caesarText} onChange={(e) => setCaesarText(e.target.value)} placeholder="Введите текст..." className="font-mono text-sm" />
+                <Label className="text-xs mb-1 block">{t('caesar.text')}</Label>
+                <Input value={caesarText} onChange={(e) => setCaesarText(e.target.value)} placeholder={t('caesar.placeholder')} className="font-mono text-sm" />
               </div>
 
               <div className="bg-secondary rounded-lg p-3 flex items-center justify-between gap-2">
@@ -421,10 +423,9 @@ export default function ToolsLab() {
               </div>
 
               <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                <p className="text-[11px] text-amber-700">
-                  <strong>Пример:</strong> &quot;HELLO&quot; со сдвигом 3 → <code>KHOOR</code>. Используется римским полководцем Цезарем для секретной переписки.
-                  Уязвим к частотному анализу — легко взламывается при длине текста более 20 символов.
-                </p>
+                  <p className="text-[11px] text-amber-700">
+                    <strong>{t('caesar.example')}</strong>
+                  </p>
               </div>
             </CardContent>
           </Card>
@@ -434,29 +435,29 @@ export default function ToolsLab() {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Lock size={16} className="text-violet-600" />
-                <h3 className="text-sm font-semibold">Шифр Виженера</h3>
-                <Badge variant="secondary" className="text-[10px]">Полиалфавитный</Badge>
+                <h3 className="text-sm font-semibold">{t('vigenere.title')}</h3>
+                <Badge variant="secondary" className="text-[10px]">{t('vigenere.badge')}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">Использует ключевое слово для переменного сдвига каждой буквы. Долгое время считался невзламываемым.</p>
+              <p className="text-xs text-muted-foreground">{t('vigenere.description')}</p>
 
               <RadioGroup value={vigenereMode} onValueChange={(v) => setVigenereMode(v as 'encrypt' | 'decrypt')} className="flex gap-4">
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem value="encrypt" id="vig-e" />
-                  <Label htmlFor="vig-e" className="text-xs">Шифрование</Label>
+                  <Label htmlFor="vig-e" className="text-xs">{t('caesar.encrypt')}</Label>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem value="decrypt" id="vig-d" />
-                  <Label htmlFor="vig-d" className="text-xs">Дешифрование</Label>
+                  <Label htmlFor="vig-d" className="text-xs">{t('caesar.decrypt')}</Label>
                 </div>
               </RadioGroup>
 
               <div>
-                <Label className="text-xs mb-1 block">Ключевое слово:</Label>
+                <Label className="text-xs mb-1 block">{t('vigenere.keyword')}</Label>
                 <Input value={vigenereKey} onChange={(e) => setVigenereKey(e.target.value)} placeholder="secret" className="font-mono text-sm" />
               </div>
               <div>
-                <Label className="text-xs mb-1 block">Текст:</Label>
-                <Input value={vigenereText} onChange={(e) => setVigenereText(e.target.value)} placeholder="Введите текст..." className="font-mono text-sm" />
+                <Label className="text-xs mb-1 block">{t('caesar.text')}</Label>
+                <Input value={vigenereText} onChange={(e) => setVigenereText(e.target.value)} placeholder={t('caesar.placeholder')} className="font-mono text-sm" />
               </div>
 
               <div className="bg-secondary rounded-lg p-3 flex items-center justify-between gap-2">
@@ -489,29 +490,29 @@ function vigenereEncrypt(text, key) {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Unlock size={16} className="text-sky-600" />
-                <h3 className="text-sm font-semibold">XOR-шифрование</h3>
-                <Badge variant="secondary" className="text-[10px]">Симметричный</Badge>
+                <h3 className="text-sm font-semibold">{t('xor.title')}</h3>
+                <Badge variant="secondary" className="text-[10px]">{t('xor.badge')}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">Побитовое исключающее ИЛИ. Шифрование и дешифрование — одна и та же операция.</p>
+              <p className="text-xs text-muted-foreground">{t('xor.description')}</p>
 
               <RadioGroup value={xorMode} onValueChange={(v) => setXorMode(v as 'encrypt' | 'decrypt')} className="flex gap-4">
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem value="encrypt" id="xor-e" />
-                  <Label htmlFor="xor-e" className="text-xs">Шифрование</Label>
+                  <Label htmlFor="xor-e" className="text-xs">{t('caesar.encrypt')}</Label>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem value="decrypt" id="xor-d" />
-                  <Label htmlFor="xor-d" className="text-xs">Дешифрование</Label>
+                  <Label htmlFor="xor-d" className="text-xs">{t('caesar.decrypt')}</Label>
                 </div>
               </RadioGroup>
 
               <div>
-                <Label className="text-xs mb-1 block">Ключ:</Label>
+                <Label className="text-xs mb-1 block">{t('xor.key')}</Label>
                 <Input value={xorKey} onChange={(e) => setXorKey(e.target.value)} placeholder="key" className="font-mono text-sm" />
               </div>
               <div>
-                <Label className="text-xs mb-1 block">{xorMode === 'encrypt' ? 'Текст' : 'HEX-строка'}:</Label>
-                <Input value={xorText} onChange={(e) => setXorText(e.target.value)} placeholder={xorMode === 'encrypt' ? 'Введите текст...' : 'Введите HEX...'} className="font-mono text-sm" />
+                <Label className="text-xs mb-1 block">{xorMode === 'encrypt' ? t('xor.textLabel') : t('xor.hexLabel')}:</Label>
+                <Input value={xorText} onChange={(e) => setXorText(e.target.value)} placeholder={xorMode === 'encrypt' ? t('xor.textPlaceholder') : t('xor.hexPlaceholder')} className="font-mono text-sm" />
               </div>
 
               <div className="bg-secondary rounded-lg p-3 flex items-center justify-between gap-2">
@@ -520,10 +521,9 @@ function vigenereEncrypt(text, key) {
               </div>
 
               <div className="bg-sky-50 rounded-lg p-3 border border-sky-200">
-                <p className="text-[11px] text-sky-700">
-                  <strong>Свойство:</strong> A XOR B XOR B = A. Поэтому одна и та же операция XOR и шифрует, и дешифрует.
-                  XOR используется в OTP (One-Time Pad) — единственном теоретически неразрушимом шифре, если ключ истинно случаен и используется только один раз.
-                </p>
+                  <p className="text-[11px] text-sky-700">
+                    <strong>{t('xor.property')}</strong>
+                  </p>
               </div>
             </CardContent>
           </Card>
@@ -536,12 +536,11 @@ function vigenereEncrypt(text, key) {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Shuffle size={16} className="text-emerald-600" />
-                <h3 className="text-sm font-semibold">Base64</h3>
-                <Badge variant="secondary" className="text-[10px]">Кодировка</Badge>
+                <h3 className="text-sm font-semibold">{t('base64.title')}</h3>
+                <Badge variant="secondary" className="text-[10px]">{t('base64.badge')}</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                Кодирование бинарных данных в текст. Используется для передачи данных в JSON, email (MIME), Data URL в HTML/CSS.
-                <strong>Base64 — НЕ шифрование!</strong> Любой может декодировать данные.
+                {t('base64.description')}
               </p>
 
               <RadioGroup value={b64Mode} onValueChange={(v) => setB64Mode(v as 'encode' | 'decode')} className="flex gap-4">
@@ -556,8 +555,8 @@ function vigenereEncrypt(text, key) {
               </RadioGroup>
 
               <div>
-                <Label className="text-xs mb-1 block">Текст:</Label>
-                <Input value={b64Text} onChange={(e) => setB64Text(e.target.value)} placeholder={b64Mode === 'encode' ? 'Введите текст...' : 'SGVsbG8gV29ybGQ='} className="font-mono text-sm" />
+                <Label className="text-xs mb-1 block">{t('base64.text')}</Label>
+                <Input value={b64Text} onChange={(e) => setB64Text(e.target.value)} placeholder={b64Mode === 'encode' ? t('caesar.placeholder') : 'SGVsbG8gV29ybGQ='} className="font-mono text-sm" />
               </div>
 
               <div className="bg-secondary rounded-lg p-3 flex items-center justify-between gap-2">
@@ -576,8 +575,7 @@ function vigenereEncrypt(text, key) {
                 <Badge variant="secondary" className="text-[10px]">RFC 3986</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                Кодирование спецсимволов в URL. Необходимый навык для работы с XSS и CSRF — понимание того,
-                как браузер интерпретирует закодированные символы.
+                {t('urlEncoding.description')}
               </p>
 
               <RadioGroup value={urlMode} onValueChange={(v) => setUrlMode(v as 'encode' | 'decode')} className="flex gap-4">
@@ -592,7 +590,7 @@ function vigenereEncrypt(text, key) {
               </RadioGroup>
 
               <div>
-                <Label className="text-xs mb-1 block">Текст:</Label>
+                <Label className="text-xs mb-1 block">{t('caesar.text')}</Label>
                 <Input value={urlText} onChange={(e) => setUrlText(e.target.value)} placeholder='<script>alert("XSS")</script>' className="font-mono text-sm" />
               </div>
 
@@ -603,9 +601,7 @@ function vigenereEncrypt(text, key) {
 
               <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                 <p className="text-[11px] text-amber-700">
-                  <strong>Связь с безопасностью:</strong> URL-кодирование может обходить WAF. Например,
-                  <code>&lt;script&gt;</code> может быть закодирован как <code>%3Cscript%3E</code>.
-                  Некоторые фильтры проверяют декодированный вариант, другие — нет.
+                  <strong>{t('urlEncoding.securityNote')}</strong>
                 </p>
               </div>
             </CardContent>
@@ -618,36 +614,35 @@ function vigenereEncrypt(text, key) {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <KeyRound size={16} className="text-red-600" />
-                <h3 className="text-sm font-semibold">Хеш-функции — визуализация</h3>
+                <h3 className="text-sm font-semibold">{t('hashing.title')}</h3>
               </div>
               <p className="text-xs text-muted-foreground">
-                Хеш-функция преобразует входные данные произвольной длины в строку фиксированной длины.
-                Изменение даже одного символа входа полностью меняет хеш. Хеш — <strong>однонаправленный</strong>: нельзя восстановить исходные данные.
+                {t('hashing.description')}
               </p>
 
               <div>
-                <Label className="text-xs mb-1 block">Введите текст:</Label>
-                <Input value={hashText} onChange={(e) => setHashText(e.target.value)} placeholder="Введите любой текст..." className="font-mono text-sm" />
+                <Label className="text-xs mb-1 block">{t('hashing.enterText')}</Label>
+                <Input value={hashText} onChange={(e) => setHashText(e.target.value)} placeholder={t('hashing.placeholder')} className="font-mono text-sm" />
               </div>
 
               {hashText && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
                   <div className="bg-secondary rounded-lg p-3">
-                    <p className="text-[10px] text-muted-foreground mb-1">MD5-подобный (демо):</p>
+                    <p className="text-[10px] text-muted-foreground mb-1">{t('hashing.md5Like')}</p>
                     <div className="flex items-center gap-2">
                       <code className="text-xs font-mono text-red-700 break-all flex-1">{hashResult.md5Like}</code>
                       <CopyButton text={hashResult.md5Like} />
                     </div>
                   </div>
                   <div className="bg-secondary rounded-lg p-3">
-                    <p className="text-[10px] text-muted-foreground mb-1">SHA-256-подобный (демо):</p>
+                    <p className="text-[10px] text-muted-foreground mb-1">{t('hashing.shaLike')}</p>
                     <div className="flex items-center gap-2">
                       <code className="text-xs font-mono text-orange-700 break-all flex-1">{hashResult.shaLike}</code>
                       <CopyButton text={hashResult.shaLike} />
                     </div>
                   </div>
                   <div className="bg-secondary rounded-lg p-3">
-                    <p className="text-[10px] text-muted-foreground mb-1">DJB2 (компактный):</p>
+                    <p className="text-[10px] text-muted-foreground mb-1">{t('hashing.djb2')}</p>
                     <div className="flex items-center gap-2">
                       <code className="text-xs font-mono text-sky-700 break-all flex-1">{hashResult.djb2}</code>
                       <CopyButton text={hashResult.djb2} />
@@ -658,15 +653,15 @@ function vigenereEncrypt(text, key) {
 
                   {/* Avalanche effect demo */}
                   <div>
-                    <p className="text-xs font-semibold mb-2">Эффект лавины (Avalanche Effect):</p>
+                    <p className="text-xs font-semibold mb-2">{t('hashing.avalanche')}</p>
                     {hashText.length > 0 && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
-                          <p className="text-[10px] text-emerald-600 mb-1">Оригинал: &quot;{hashText}&quot;</p>
+                          <p className="text-[10px] text-emerald-600 mb-1">{t('hashing.original')}: &quot;{hashText}&quot;</p>
                           <code className="text-[11px] font-mono text-emerald-800 break-all">{hashResult.djb2}</code>
                         </div>
                         <div className="bg-red-50 rounded-lg p-3 border border-red-200">
-                          <p className="text-[10px] text-red-600 mb-1">Изменено: &quot;{hashText.slice(0, -1) + (hashText[hashText.length - 1] === 'a' ? 'b' : 'a')}&quot;</p>
+                          <p className="text-[10px] text-red-600 mb-1">{t('hashing.modified')}: &quot;{hashText.slice(0, -1) + (hashText[hashText.length - 1] === 'a' ? 'b' : 'a')}&quot;</p>
                           <code className="text-[11px] font-mono text-red-800 break-all">
                             {simpleHash(hashText.slice(0, -1) + (hashText[hashText.length - 1] === 'a' ? 'b' : 'a')).djb2}
                           </code>
@@ -674,7 +669,7 @@ function vigenereEncrypt(text, key) {
                       </div>
                     )}
                     <p className="text-[11px] text-muted-foreground mt-2">
-                      Даже одно изменение последнего символа полностью меняет результат хеширования — это называется «эффект лавины».
+                      {t('hashing.avalancheNote')}
                     </p>
                   </div>
                 </motion.div>
@@ -684,32 +679,32 @@ function vigenereEncrypt(text, key) {
 
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="text-sm font-semibold mb-3">Сравнение алгоритмов хеширования</h3>
+              <h3 className="text-sm font-semibold mb-3">{t('hashing.comparisonTitle')}</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-2 pr-4 text-muted-foreground">Алгоритм</th>
-                      <th className="text-left py-2 pr-4 text-muted-foreground">Длина хеша</th>
-                      <th className="text-left py-2 pr-4 text-muted-foreground">Безопасность</th>
-                      <th className="text-left py-2 text-muted-foreground">Применение</th>
+                      <th className="text-left py-2 pr-4 text-muted-foreground">{t('hashing.algo')}</th>
+                      <th className="text-left py-2 pr-4 text-muted-foreground">{t('hashing.hashLength')}</th>
+                      <th className="text-left py-2 pr-4 text-muted-foreground">{t('hashing.security')}</th>
+                      <th className="text-left py-2 text-muted-foreground">{t('hashing.usage')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      ['MD5', '128 бит', 'Небезопасен', 'Контроль целостности файлов'],
-                      ['SHA-1', '160 бит', 'Небезопасен', 'Git коммиты (устаревает)'],
-                      ['SHA-256', '256 бит', 'Безопасен', 'TLS, блокчейн, подписи'],
-                      ['SHA-512', '512 бит', 'Безопасен', 'Высокая безопасность'],
-                      ['bcrypt', '192 бит', 'Безопасен', 'Хеширование паролей'],
-                      ['Argon2', 'Переменный', 'Безопасен', 'Конкурс PHC, пароли'],
+                      ['MD5', '128 bits', t('hashing.unsafe'), t('hashing.md5Usage')],
+                      ['SHA-1', '160 bits', t('hashing.unsafe'), t('hashing.sha1Usage')],
+                      ['SHA-256', '256 bits', t('hashing.safe'), t('hashing.sha256Usage')],
+                      ['SHA-512', '512 bits', t('hashing.safe'), t('hashing.sha512Usage')],
+                      ['bcrypt', '192 bits', t('hashing.safe'), t('hashing.bcryptUsage')],
+                      ['Argon2', t('hashing.hashLength'), t('hashing.safe'), t('hashing.argon2Usage')],
                     ].map(([name, len, sec, use]) => (
                       <tr key={name} className="border-b border-slate-100">
                         <td className="py-2 pr-4 font-mono font-medium">{name}</td>
                         <td className="py-2 pr-4">{len}</td>
                         <td className="py-2 pr-4">
                           <Badge variant="secondary" className={`text-[10px] ${
-                            sec === 'Безопасен' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                            sec === t('hashing.safe') ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
                           }`}>
                             {sec}
                           </Badge>
@@ -730,14 +725,14 @@ function vigenereEncrypt(text, key) {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Unlock size={16} className="text-emerald-600" />
-                <h3 className="text-sm font-semibold">Генератор паролей</h3>
+                <h3 className="text-sm font-semibold">{t('passwords.title')}</h3>
               </div>
-              <p className="text-xs text-muted-foreground">Генерирует криптографически стойкие пароли с использованием Web Crypto API.</p>
+              <p className="text-xs text-muted-foreground">{t('passwords.description')}</p>
 
               {/* Generated password display */}
               <div className="bg-slate-900 rounded-xl p-5 flex items-center gap-3">
                 <code className={`flex-1 font-mono text-lg break-all ${showPw ? 'text-emerald-400' : 'text-slate-400'}`}>
-                  {generatedPassword || 'Нажмите "Сгенерировать"'}
+                  {generatedPassword || t('passwords.placeholder')}
                 </code>
                 <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white" onClick={() => setShowPw(!showPw)}>
                   {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -748,7 +743,7 @@ function vigenereEncrypt(text, key) {
               {/* Length slider */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs">Длина пароля</Label>
+                  <Label className="text-xs">{t('passwords.length')}</Label>
                   <span className="text-sm font-mono font-bold">{pwLength}</span>
                 </div>
                 <Slider value={[pwLength]} min={4} max={64} step={1} onValueChange={(v) => setPwLength(v[0])} />
@@ -757,10 +752,10 @@ function vigenereEncrypt(text, key) {
               {/* Options */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'A-Z Заглавные', value: pwUppercase, setter: setPwUppercase },
-                  { label: 'a-z Строчные', value: pwLowercase, setter: setPwLowercase },
-                  { label: '0-9 Цифры', value: pwNumbers, setter: setPwNumbers },
-                  { label: '!@# Символы', value: pwSymbols, setter: setPwSymbols },
+                  { label: t('passwords.uppercase'), value: pwUppercase, setter: setPwUppercase },
+                  { label: t('passwords.lowercase'), value: pwLowercase, setter: setPwLowercase },
+                  { label: t('passwords.numbers'), value: pwNumbers, setter: setPwNumbers },
+                  { label: t('passwords.symbols'), value: pwSymbols, setter: setPwSymbols },
                 ].map((opt) => (
                   <button
                     key={opt.label}
@@ -780,19 +775,19 @@ function vigenereEncrypt(text, key) {
               </div>
 
               <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={generatePassword}>
-                <RefreshCw size={14} className="mr-2" /> Сгенерировать
+                <RefreshCw size={14} className="mr-2" /> {t('passwords.generate')}
               </Button>
 
               {/* Entropy info */}
               {generatedPassword && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                   <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
-                    <h4 className="text-xs font-semibold text-emerald-700 mb-1">Характеристики пароля</h4>
+                    <h4 className="text-xs font-semibold text-emerald-700 mb-1">{t('passwords.managersTitle')}</h4>
                     <div className="grid grid-cols-2 gap-2 text-[11px] text-emerald-600">
-                      <span>Длина: {generatedPassword.length} символов</span>
-                      <span>Энтропия: ~{Math.round(generatedPassword.length * Math.log2(
+                      <span>{t('passwords.charCount', { count: generatedPassword.length })}</span>
+                      <span>{t('passwords.entropy', { bits: Math.round(generatedPassword.length * Math.log2(
                         (pwUppercase ? 26 : 0) + (pwLowercase ? 26 : 0) + (pwNumbers ? 10 : 0) + (pwSymbols ? 32 : 0) || 26
-                      ))} бит</span>
+                      ))})}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -802,16 +797,15 @@ function vigenereEncrypt(text, key) {
 
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="text-sm font-semibold mb-3">Менеджеры паролей</h3>
+              <h3 className="text-sm font-semibold mb-3">{t('passwords.managersTitle')}</h3>
               <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                Генерировать пароли недостаточно — их нужно безопасно хранить. Используйте проверенные менеджеры паролей,
-                которые шифруют хранилище мастер-паролем:
+                {t('passwords.managersDescription')}
               </p>
               <div className="space-y-2">
                 {[
-                  { name: 'Bitwarden', desc: 'Открытый исходный код, бесплатный, кроссплатформенный' },
-                  { name: 'KeePassXC', desc: 'Локальное хранение, открытое ПО, плагины для браузеров' },
-                  { name: '1Password', desc: 'Коммерческий, отличный UX, семейные планы' },
+                  { name: 'Bitwarden', desc: t('passwords.bitwarden') },
+                  { name: 'KeePassXC', desc: t('passwords.keepassxc') },
+                  { name: '1Password', desc: t('passwords.1password') },
                 ].map((pm) => (
                   <div key={pm.name} className="flex items-start gap-2 bg-secondary rounded-lg p-3">
                     <CheckCircle2 size={14} className="text-emerald-500 mt-0.5 shrink-0" />
@@ -833,32 +827,31 @@ function vigenereEncrypt(text, key) {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Lock size={16} className="text-blue-600" />
-                <h3 className="text-sm font-semibold">AES-подобное шифрование (демо)</h3>
-                <Badge variant="secondary" className="text-[10px]">Симметричное</Badge>
+                <h3 className="text-sm font-semibold">{t('aes.title')}</h3>
+                <Badge variant="secondary" className="text-[10px]">{t('aes.badge')}</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                Демонстрация симметричного шифрования. В реальном AES-256-GCM используется Web Crypto API
-                с 256-битным ключом, IV и аутентификационным тегом. Эта демо-версия показывает принцип работы.
+                {t('aes.description')}
               </p>
 
               <RadioGroup value={aesMode} onValueChange={(v) => setAesMode(v as 'encrypt' | 'decrypt')} className="flex gap-4">
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem value="encrypt" id="aes-e" />
-                  <Label htmlFor="aes-e" className="text-xs">Шифрование</Label>
+                  <Label htmlFor="aes-e" className="text-xs">{t('caesar.encrypt')}</Label>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <RadioGroupItem value="decrypt" id="aes-d" />
-                  <Label htmlFor="aes-d" className="text-xs">Дешифрование</Label>
+                  <Label htmlFor="aes-d" className="text-xs">{t('caesar.decrypt')}</Label>
                 </div>
               </RadioGroup>
 
               <div>
-                <Label className="text-xs mb-1 block">Ключ:</Label>
-                <Input value={aesKey} onChange={(e) => setAesKey(e.target.value)} placeholder="секретный ключ" className="font-mono text-sm" />
+                <Label className="text-xs mb-1 block">{t('aes.key')}</Label>
+                <Input value={aesKey} onChange={(e) => setAesKey(e.target.value)} placeholder={t('aes.keyPlaceholder')} className="font-mono text-sm" />
               </div>
               <div>
-                <Label className="text-xs mb-1 block">{aesMode === 'encrypt' ? 'Открытый текст' : 'Зашифрованный текст (Base64):'}</Label>
-                <Input value={aesText} onChange={(e) => setAesText(e.target.value)} placeholder="Введите текст..." className="font-mono text-sm" />
+                <Label className="text-xs mb-1 block">{aesMode === 'encrypt' ? t('aes.plaintext') : t('aes.ciphertext')}</Label>
+                <Input value={aesText} onChange={(e) => setAesText(e.target.value)} placeholder={t('caesar.placeholder')} className="font-mono text-sm" />
               </div>
 
               <Button
@@ -868,7 +861,7 @@ function vigenereEncrypt(text, key) {
                 }}
               >
                 {aesMode === 'encrypt' ? <Lock size={14} className="mr-1" /> : <Unlock size={14} className="mr-1" />}
-                {aesMode === 'encrypt' ? 'Зашифровать' : 'Дешифровать'}
+                {aesMode === 'encrypt' ? t('aes.encryptButton') : t('aes.decryptButton')}
               </Button>
 
               {aesResult && (
@@ -882,8 +875,7 @@ function vigenereEncrypt(text, key) {
 
               <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
                 <p className="text-[11px] text-blue-700">
-                  <strong>Примечание:</strong> Это упрощённая демонстрация. Реальный AES-256-GCM использует
-                  раунды SubBytes, ShiftRows, MixColumns и AddRoundKey. Используйте Web Crypto API:
+                  <strong>{t('aes.note')}</strong>
                   <code className="block mt-1 bg-blue-100 px-2 py-1 rounded text-[10px]">
                     {'crypto.subtle.encrypt({ name: "AES-GCM", iv, tagLength: 128 }, key, data)'}
                   </code>
@@ -897,16 +889,15 @@ function vigenereEncrypt(text, key) {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <KeyRound size={16} className="text-violet-600" />
-                <h3 className="text-sm font-semibold">JWT Decoder</h3>
-                <Badge variant="secondary" className="text-[10px]">Токены</Badge>
+                <h3 className="text-sm font-semibold">{t('jwt.title')}</h3>
+                <Badge variant="secondary" className="text-[10px]">{t('jwt.badge')}</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                JSON Web Token состоит из 3 частей: Header (алгоритм), Payload (данные) и Signature (подпись).
-                Данные закодированы в Base64URL — вставьте токен для декодирования.
+                {t('jwt.description')}
               </p>
 
               <div>
-                <Label className="text-xs mb-1 block">JWT токен:</Label>
+                <Label className="text-xs mb-1 block">{t('jwt.token')}</Label>
                 <Input
                   value={jwtToken}
                   onChange={(e) => { setJwtToken(e.target.value); decodeJWT(e.target.value); }}
@@ -924,20 +915,20 @@ function vigenereEncrypt(text, key) {
               {jwtDecoded.valid && jwtDecoded.header && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
                   <div className="bg-red-50 rounded-lg p-3 border border-red-200">
-                    <p className="text-[10px] font-semibold text-red-700 mb-1">Header (Заголовок):</p>
+                    <p className="text-[10px] font-semibold text-red-700 mb-1">{t('jwt.header')}</p>
                     <CodeBlock code={JSON.stringify(jwtDecoded.header, null, 2)} language="json" title="header.json" />
                   </div>
                   <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
-                    <p className="text-[10px] font-semibold text-violet-700 mb-1">Payload (Данные):</p>
+                    <p className="text-[10px] font-semibold text-violet-700 mb-1">{t('jwt.payload')}</p>
                     <CodeBlock code={JSON.stringify(jwtDecoded.payload, null, 2)} language="json" title="payload.json" />
                   </div>
                   {typeof (jwtDecoded.payload as Record<string, unknown>)?.exp === 'number' && (
                     <div className="bg-secondary rounded-lg p-3">
                       <p className="text-[11px] text-muted-foreground">
-                        <strong>Срок действия:</strong>{' '}
+                        <strong>{t('jwt.expiry')}</strong>{' '}
                         {jwtDecoded.error
-                          ? <span className="text-red-600">Истёк {formatDateTime((jwtDecoded.payload as Record<string, number>).exp * 1000)}</span>
-                          : <span className="text-emerald-600">Действителен до {formatDateTime((jwtDecoded.payload as Record<string, number>).exp * 1000)}</span>
+                          ? <span className="text-red-600">{t('jwt.expired', { date: formatDateTime((jwtDecoded.payload as Record<string, number>).exp * 1000) })}</span>
+                          : <span className="text-emerald-600">{t('jwt.validUntil', { date: formatDateTime((jwtDecoded.payload as Record<string, number>).exp * 1000) })}</span>
                         }
                       </p>
                     </div>
@@ -947,14 +938,14 @@ function vigenereEncrypt(text, key) {
 
               <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
                 <p className="text-[11px] text-violet-700">
-                  <strong>Попробуйте:</strong>{' '}
+                  <strong>{t('jwt.tryDemo')}</strong>{' '}
                   <button
                     className="underline text-violet-600 font-medium"
                     onClick={() => {
                       const demo = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE5OTk5OTk5OTl9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
                       setJwtToken(demo); decodeJWT(demo);
                     }}
-                  >Вставить демо-токен</button>
+                  >{t('jwt.insertDemo')}</button>
                 </p>
               </div>
             </CardContent>
@@ -965,17 +956,16 @@ function vigenereEncrypt(text, key) {
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Lock size={16} className="text-amber-600" />
-                <h3 className="text-sm font-semibold">ROT13</h3>
-                <Badge variant="secondary" className="text-[10px]">Классический</Badge>
+                <h3 className="text-sm font-semibold">{t('rot13.title')}</h3>
+                <Badge variant="secondary" className="text-[10px]">{t('rot13.badge')}</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                Частный случай шифра Цезаря со сдвигом 13. Поскольку в английском алфавите 26 букв,
-                ROT13 дважды восстанавливает исходный текст: ROT13(ROT13(x)) = x.
+                {t('rot13.description')}
               </p>
 
               <div>
-                <Label className="text-xs mb-1 block">Текст:</Label>
-                <Input value={rot13Text} onChange={(e) => setRot13Text(e.target.value)} placeholder="Введите текст на английском..." className="font-mono text-sm" />
+                <Label className="text-xs mb-1 block">{t('caesar.text')}</Label>
+                <Input value={rot13Text} onChange={(e) => setRot13Text(e.target.value)} placeholder={t('rot13.placeholder')} className="font-mono text-sm" />
               </div>
 
               {rot13Text && (
@@ -989,9 +979,7 @@ function vigenereEncrypt(text, key) {
 
               <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                 <p className="text-[11px] text-amber-700">
-                  <strong>Пример:</strong> &quot;Hello World&quot; → <code>Uryyb Jbeyq</code>.
-                  Применяется в форумах для скрытия спойлеров. Не является шифрованием —
-                  не защищает данные, так как нет ключа.
+                  <strong>{t('rot13.example')}</strong>
                 </p>
               </div>
             </CardContent>
@@ -1001,12 +989,12 @@ function vigenereEncrypt(text, key) {
 
       {/* Complete */}
       {!isCompleted ? (
-        <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={() => completeModule('tools')}>
-          Отметить модуль как изученный
+          <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={() => completeModule('tools')}>
+          {t('completeModule')}
         </Button>
       ) : (
         <div className="text-center text-sm text-emerald-600 font-medium flex items-center justify-center gap-2">
-          <CheckCircle2 size={16} /> Модуль завершён!
+          <CheckCircle2 size={16} /> {t('moduleCompleted')}
         </div>
       )}
     </div>

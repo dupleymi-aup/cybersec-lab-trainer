@@ -958,5 +958,141 @@
       "dataExported": "数据已导出",
       "loggedInAs": "你现在以 {name} 身份登录"
     }
+  },
+  "labs": {
+    "tools": {
+      "title": "安全工具",
+      "subtitle": "加密、编码、哈希和密码生成器",
+      "tabs": {
+        "ciphers": "加密",
+        "encoding": "编码",
+        "hashing": "哈希",
+        "passwords": "密码",
+        "advanced": "高级"
+      },
+      "caesar": {
+        "title": "凯撒密码",
+        "badge": "经典",
+        "description": "将字母表中的每个字母移动固定数量的位置。",
+        "encrypt": "加密",
+        "decrypt": "解密",
+        "shift": "位移: {value}",
+        "text": "文本:",
+        "placeholder": "输入文本...",
+        "example": "示例: \"HELLO\" 位移 3 → KHOOR。曾被罗马将军凯撒用于秘密通信。容易被频率分析破解——超过20个字符的文本很容易被破解。"
+      },
+      "vigenere": {
+        "title": "维吉尼亚密码",
+        "badge": "多字母",
+        "description": "使用关键字对每个字母进行可变位移。长期被认为是不可破解的。",
+        "keyword": "关键字:"
+      },
+      "xor": {
+        "title": "XOR 加密",
+        "badge": "对称",
+        "description": "按位异或。加密和解密是相同的操作。",
+        "key": "密钥:",
+        "textLabel": "文本",
+        "hexLabel": "HEX 字符串",
+        "textPlaceholder": "输入文本...",
+        "hexPlaceholder": "输入 HEX...",
+        "property": "属性: A XOR B XOR B = A。因此同一个 XOR 操作既能加密也能解密。XOR 用于 OTP（一次性密码本）——唯一理论上不可破解的密码，前提是密钥真正随机且只使用一次。"
+      },
+      "base64": {
+        "title": "Base64",
+        "badge": "编码",
+        "description": "将二进制数据编码为文本。用于 JSON、邮件（MIME）、HTML/CSS 中的 Data URL 传输数据。Base64 不是加密！任何人都可以解码数据。",
+        "text": "文本:"
+      },
+      "urlEncoding": {
+        "title": "URL 编码 / 解码",
+        "description": "编码 URL 中的特殊字符。XSS 和 CSRF 工作的必备技能——理解浏览器如何解释编码字符。",
+        "securityNote": "安全关联: URL 编码可以绕过 WAF。例如 <script> 可以编码为 %3Cscript%3E。有些过滤器检查解码版本，有些不检查。"
+      },
+      "hashing": {
+        "title": "哈希函数 — 可视化",
+        "description": "哈希函数将任意长度的输入数据转换为固定长度的字符串。即使改变输入的一个字符也会完全改变哈希值。哈希是单向的：无法恢复原始数据。",
+        "enterText": "输入文本:",
+        "placeholder": "输入任意文本...",
+        "md5Like": "MD5 类似（演示）:",
+        "shaLike": "SHA-256 类似（演示）:",
+        "djb2": "DJB2（紧凑）:",
+        "avalanche": "雪崩效应:",
+        "original": "原始",
+        "modified": "修改后",
+        "avalancheNote": "即使只改变最后一个字符也会完全改变哈希结果——这被称为「雪崩效应」。",
+        "comparisonTitle": "哈希算法对比",
+        "algo": "算法",
+        "hashLength": "哈希长度",
+        "security": "安全性",
+        "usage": "用途",
+        "safe": "安全",
+        "unsafe": "不安全",
+        "md5Usage": "文件完整性检查",
+        "sha1Usage": "Git 提交（已过时）",
+        "sha256Usage": "TLS、区块链、签名",
+        "sha512Usage": "高安全性",
+        "bcryptUsage": "密码哈希",
+        "argon2Usage": "PHC 竞赛、密码"
+      },
+      "passwords": {
+        "title": "密码生成器",
+        "description": "使用 Web Crypto API 生成密码学强度高的密码。",
+        "generate": "生成",
+        "placeholder": "点击「生成」",
+        "length": "密码长度",
+        "uppercase": "A-Z 大写",
+        "lowercase": "a-z 小写",
+        "numbers": "0-9 数字",
+        "symbols": "!@# 符号",
+        "charCount": "长度: {count} 个字符",
+        "entropy": "熵: ~{bits} 位",
+        "managersTitle": "密码管理器",
+        "managersDescription": "生成密码还不够——需要安全地存储它们。使用经过验证的密码管理器，它们用主密码加密存储库:",
+        "bitwarden": "开源、免费、跨平台",
+        "keepassxc": "本地存储、开源、浏览器插件",
+        "1password": "商业软件、出色的用户体验、家庭计划"
+      },
+      "aes": {
+        "title": "AES 类似加密（演示）",
+        "badge": "对称",
+        "description": "对称加密的演示。真实的 AES-256-GCM 使用 Web Crypto API，包含 256 位密钥、IV 和认证标签。此演示展示工作原理。",
+        "key": "密钥:",
+        "keyPlaceholder": "秘密密钥",
+        "plaintext": "明文",
+        "ciphertext": "密文（Base64）:",
+        "encryptButton": "加密",
+        "decryptButton": "解密",
+        "note": "注意：这是简化演示。真实的 AES-256-GCM 使用 SubBytes、ShiftRows、MixColumns 和 AddRoundKey 轮次。请使用 Web Crypto API。"
+      },
+      "jwt": {
+        "title": "JWT 解码器",
+        "badge": "令牌",
+        "description": "JSON Web Token 由 3 部分组成: Header（算法）、Payload（数据）和 Signature（签名）。数据以 Base64URL 编码——粘贴令牌进行解码。",
+        "token": "JWT 令牌:",
+        "header": "Header（头部）:",
+        "payload": "Payload（负载）:",
+        "expiry": "有效期:",
+        "expired": "已过期 {date}",
+        "validUntil": "有效期至 {date}",
+        "tryDemo": "试试:",
+        "insertDemo": "插入演示令牌"
+      },
+      "rot13": {
+        "title": "ROT13",
+        "badge": "经典",
+        "description": "凯撒密码的特例，位移为 13。由于英文字母表有 26 个字母，ROT13 执行两次恢复原文: ROT13(ROT13(x)) = x。",
+        "placeholder": "输入英文文本...",
+        "example": "示例: \"Hello World\" → Uryyb Jbeyq。用于论坛隐藏剧透。不是加密——因为没有密钥，无法保护数据。"
+      },
+      "completeModule": "标记模块为已完成",
+      "moduleCompleted": "模块已完成！",
+      "encodingError": "编码错误",
+      "decodingError": "解码错误",
+      "aesError": "错误: 无效密钥或数据损坏",
+      "jwtPartsError": "JWT 必须包含 3 个用点分隔的部分",
+      "jwtExpired": "令牌已过期",
+      "jwtInvalid": "无效的 JWT: {error}"
+    }
   }
 }
