@@ -37,6 +37,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from 'next-intl';
 import ThemeToggle from './ThemeToggle';
 import GlobalSearch from './GlobalSearch';
 import SyncIndicator from './SyncIndicator';
@@ -65,31 +66,56 @@ const iconMap: Record<string, React.ReactNode> = {
   ClipboardList: <ClipboardList size={18} />,
 };
 
-// Navigation structure with grouping
-const mainNavItems: { id: PageType; label: string; iconKey: string }[] = [
-  { id: 'dashboard', label: 'Главная', iconKey: 'LayoutDashboard' },
+const navKeyMap: Record<string, string> = {
+  dashboard: 'dashboard',
+  quiz: 'quiz',
+  assignments: 'assignments',
+  achievements: 'achievements',
+  'cheat-sheets': 'cheatSheets',
+  'password-checker': 'passwordChecker',
+  leaderboard: 'leaderboard',
+  'career-paths': 'careerPaths',
+  'teacher-panel': 'teacherPanel',
+  'admin-panel': 'adminPanel',
+  owasp: 'owasp',
+  'sql-injection': 'sqlInjection',
+  xss: 'xss',
+  csrf: 'csrf',
+  auth: 'authSecurity',
+  'secure-coding': 'secureCoding',
+  tools: 'tools',
+  'security-headers': 'securityHeaders',
+  idor: 'idor',
+  ssrf: 'ssrf',
+  'api-security': 'apiSecurity',
+  'phishing-analyzer': 'phishingAnalyzer',
+};
+
+const mainNavItems: { id: PageType; iconKey: string }[] = [
+  { id: 'dashboard', iconKey: 'LayoutDashboard' },
 ];
 
 const moduleNavItems: { id: PageType; label: string; iconKey: string }[] = [
   ...modules.map((m) => ({ id: m.id as PageType, label: m.title, iconKey: m.icon })),
 ];
 
-const toolNavItems: { id: PageType; label: string; iconKey: string }[] = [
-  { id: 'quiz', label: 'Квизы', iconKey: 'HelpCircle' },
-  { id: 'assignments' as PageType, label: 'Задания', iconKey: 'ClipboardList' },
-  { id: 'achievements', label: 'Достижения', iconKey: 'Trophy' },
-  { id: 'cheat-sheets' as PageType, label: 'Шпаргалки', iconKey: 'BookOpen' },
-  { id: 'password-checker' as PageType, label: 'Проверка пароля', iconKey: 'Key' },
-  { id: 'leaderboard' as PageType, label: 'Рейтинг', iconKey: 'TrendingUp' },
-  { id: 'career-paths' as PageType, label: 'Карьерные пути', iconKey: 'Target' },
+const toolNavItems: { id: PageType; iconKey: string }[] = [
+  { id: 'quiz', iconKey: 'HelpCircle' },
+  { id: 'assignments' as PageType, iconKey: 'ClipboardList' },
+  { id: 'achievements', iconKey: 'Trophy' },
+  { id: 'cheat-sheets' as PageType, iconKey: 'BookOpen' },
+  { id: 'password-checker' as PageType, iconKey: 'Key' },
+  { id: 'leaderboard' as PageType, iconKey: 'TrendingUp' },
+  { id: 'career-paths' as PageType, iconKey: 'Target' },
 ];
 
-const roleNavItems: { id: PageType; label: string; iconKey: string; requiredRole: UserRole }[] = [
-  { id: 'teacher-panel', label: 'Панель преподавателя', iconKey: 'Users', requiredRole: 'teacher' },
-  { id: 'admin-panel', label: 'Панель администратора', iconKey: 'Settings', requiredRole: 'admin' },
+const roleNavItems: { id: PageType; iconKey: string; requiredRole: UserRole }[] = [
+  { id: 'teacher-panel', iconKey: 'Users', requiredRole: 'teacher' },
+  { id: 'admin-panel', iconKey: 'Settings', requiredRole: 'admin' },
 ];
 
 export default function Sidebar() {
+  const t = useTranslations('nav');
   const currentPage = useAppStore(s => s.currentPage);
   const sidebarOpen = useAppStore(s => s.sidebarOpen);
   const setSidebarOpen = useAppStore(s => s.setSidebarOpen);
@@ -151,13 +177,15 @@ export default function Sidebar() {
     setCurrentPage('dashboard');
   };
 
-  const NavItem = ({ item, isRolePanel }: { item: { id: PageType; label: string; iconKey: string }; isRolePanel?: boolean }) => {
+  const NavItem = ({ item, isRolePanel }: { item: { id: PageType; label?: string; iconKey: string }; isRolePanel?: boolean }) => {
     const isActive = currentPage === item.id;
     const isCompleted = item.id !== 'dashboard' && completedModules.includes(item.id);
+    const itemLabel = navKeyMap[item.id] ? t(navKeyMap[item.id]) : (item.label || item.id);
 
     return (
       <button
         onClick={() => { setCurrentPage(item.id); setSidebarOpen(false); }}
+        aria-current={isActive ? 'page' : undefined}
         className={`
           w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium
           transition-all duration-200 text-left group
@@ -181,7 +209,7 @@ export default function Sidebar() {
         }`}>
           {iconMap[item.iconKey]}
         </span>
-        <span className="flex-1 truncate">{item.label}</span>
+        <span className="flex-1 truncate">{itemLabel}</span>
         {deadlineMap[item.id] !== undefined && (
           <span className={`flex items-center gap-0.5 text-[10px] font-medium shrink-0 ${
             deadlineMap[item.id] <= 0 ? 'text-red-400' : deadlineMap[item.id] <= 2 ? 'text-orange-400' : 'text-amber-400'
@@ -200,6 +228,7 @@ export default function Sidebar() {
   const SectionHeader = ({ title, isExpanded, onToggle, count }: { title: string; isExpanded: boolean; onToggle: () => void; count?: number }) => (
     <button
       onClick={onToggle}
+      aria-expanded={isExpanded}
       className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider hover:text-sidebar-foreground/70 transition-colors"
     >
       <span className="flex items-center gap-2">
@@ -233,7 +262,7 @@ export default function Sidebar() {
             size="icon"
             className="text-sidebar-foreground/50 hover:text-sidebar-foreground md:hidden"
             onClick={() => setSidebarOpen(false)}
-            aria-label="Закрыть боковую панель"
+            aria-label={t('closeSidebar')}
           >
             <X size={18} />
           </Button>
@@ -246,7 +275,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-1" aria-label={t('dashboard')}>
         {/* Main nav */}
         {mainNavItems.map((item) => (
           <NavItem key={item.id} item={item} />
@@ -256,7 +285,7 @@ export default function Sidebar() {
 
         {/* Modules section */}
         <SectionHeader
-          title="Модули"
+          title={t('modules')}
           isExpanded={expandedSections.modules}
           onToggle={() => toggleSection('modules')}
           count={completedModules.filter(id => modules.some(m => m.id === id)).length}
@@ -281,7 +310,7 @@ export default function Sidebar() {
 
         {/* Tools section */}
         <SectionHeader
-          title="Инструменты"
+          title={t('toolsSection')}
           isExpanded={expandedSections.tools}
           onToggle={() => toggleSection('tools')}
         />
@@ -319,7 +348,7 @@ export default function Sidebar() {
         {/* Progress */}
         <div className="p-3 pb-2">
           <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="text-sidebar-foreground/50">Прогресс</span>
+            <span className="text-sidebar-foreground/50">{t('progress')}</span>
             <span className="text-emerald-400 font-semibold">{progressPct}%</span>
           </div>
           <Progress value={progressPct} className="h-1.5 bg-sidebar-border [&>div]:bg-emerald-500" />
@@ -335,7 +364,7 @@ export default function Sidebar() {
               <div className="w-7 h-7 rounded-full bg-violet-600/30 dark:bg-violet-600/20 flex items-center justify-center overflow-hidden shrink-0">
                 {user.avatar ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={user.avatar} alt={`Аватар: ${user.fullName}`} className="w-full h-full object-cover" />
+                  <img src={user.avatar} alt={t('avatarAlt')} className="w-full h-full object-cover" />
                 ) : (
                   <User size={14} className="text-violet-600 dark:text-violet-400" />
                 )}
@@ -361,7 +390,7 @@ export default function Sidebar() {
                 className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs text-red-400 hover:bg-red-600/10 hover:text-red-300 transition"
               >
                 <LogOut size={14} />
-                Выйти
+                {t('logout')}
               </button>
               <div className="px-1">
                 <SyncIndicator />
@@ -392,6 +421,7 @@ export default function Sidebar() {
               exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="fixed left-0 top-0 bottom-0 w-[280px] z-50 md:hidden"
+              aria-label={t('closeSidebar')}
             >
               {sidebarContent}
             </motion.aside>

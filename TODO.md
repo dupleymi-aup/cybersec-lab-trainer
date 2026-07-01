@@ -1,248 +1,561 @@
-# CyberSec Lab — Топ-10 улучшений проекта
+# CyberSec Lab — План работ
 
-Приоритизированный список самых impactful улучшений, которые дадут максимальную отдачу проекту.
-
----
-
-## -2. ~~🐛 TeacherPanel data loss, deadline auth, timer fix, XP grinding~~ ✅ ВЫПОЛНЕНО
-
-**Статус:** Реализовано 2026-05-24
-
-**Что сделано:**
-- **TeacherPanel type mismatch — lab progress silently dropped**: `getStudentProgress()` читал `p.sqlLevels.completed`, `p.xssLevels.completed`, `p.csrfSteps.completed` — но API возвращает эти поля как массивы, а не объекты с `.completed`. Все lab-данные терялись. Заменено на `Array.isArray(p.sqlLevels) ? p.sqlLevels : []` (и аналогично для xssLevels, csrfSteps)
-- **TeacherPanel deadline fetch без auth headers**: `fetch('/api/deadlines')` и `fetch('/api/deadlines/teacher/reminders')` не отправляли Bearer токен — преподаватель получал 401, UI дедлайнов молча пустой. Обёрнуто в async IIFE с `getAuthHeaders()`
-- **StudentAssignments timer interval recreation**: `useEffect` таймера имел `timer` в dependency array `[timerRunning, timer]` — interval пересоздавался каждую секунду, приводя к toast-спаму и некорректному отсчёту. Убран `timer` из зависимостей: `}, [timerRunning])`
-- **XP endpoint rate limiting**: `POST /api/gamification/xp` без лимита — бот мог бесконечно фармить XP. Добавлено: 20 запросов за час на пользователя через `checkRateLimit()`
-- Тесты: bugfixes-round5.test.ts (6 тестов)
-- Всего тестов: 201 (было 195)
+Полный пошаговый план дальнейшего развития проекта. Сгруппирован по фазам, каждая задача — конкретный атомарный шаг с указанием файлов.
 
 ---
 
-## -1. ~~🔐 Account deletion security, LTI token fix, quiz rate limiting~~ ✅ ВЫПОЛНЕНО
+## Выполнено ранее (сводка)
 
-**Статус:** Реализовано 2026-05-24
+| # | Улучшение | Статус |
+|---|-----------|--------|
+| -2 | TeacherPanel data loss, deadline auth, timer fix, XP grinding | ✅ |
+| -1 | Account deletion security, LTI token fix, quiz rate limiting | ✅ |
+| 0 | Critical bug fixes (assignment submit, teacher panel, password) | ✅ |
+| 1 | Security fixes (rate limiting, password validation, CSV injection) | ✅ |
+| 2 | OTP email / восстановление пароля | ✅ |
+| 3 | CSRF защита + security headers | ✅ |
+| 4 | Конструктор заданий для преподавателей | ✅ |
+| 7 | Миграция на PostgreSQL | ✅ |
+| 8 | PWA и mobile experience | ✅ |
+| 9 | API документация (Swagger/OpenAPI 3.0) | ✅ |
+| 10 | Система уровней и RPG-геймификация | ✅ |
 
-**Что сделано:**
-- **Account deletion без password confirmation**: `DELETE /api/auth/delete` удалял аккаунт только по токену — stolen token = удаление аккаунта. Добавлена обязательная проверка `currentPassword` через `verifyPassword()`
-- **Rate limiting на удаление аккаунта**: 3 попытки за час на пользователя + 5 на IP — предотвращает массовое удаление
-- **LTI token leakage**: JWT токен был в URL query (`?lti_token=...`) — попадал в логи, историю браузера, referer. Токен теперь в теле ответа, redirect на `/lti-callback` без токена
-- **LTI error message leakage**: внутренние ошибки (stack traces, crypto errors) возвращались клиенту. Заменено на generic сообщение
-- **Quiz submission rate limiting**: `POST /api/quiz` без лимита — возможен спам/DoS. Добавлено: 10 попыток за 5 минут
-- Тесты: security-deletion.test.ts (9 тестов)
-- Всего тестов: 195 (было 186)
-
----
-
-## 0. ~~🐛 Critical bug fixes: assignment submit, teacher panel, password change~~ ✅ ВЫПОЛНЕНО
-
-**Статус:** Реализовано 2026-05-24
-
-**Что сделано:**
-- **Assignment submit без auth headers**: `StudentAssignments.tsx` не отправлял Bearer токен — студенты получали 401 при отправке заданий. Добавлен `getAuthHeaders()` для всех fetch запросов
-- **TeacherPanel читал прогресс из localStorage**: преподаватель видел только данные из своего браузера, а не студентов. Заменено на API вызов `/api/progress/[userId]` с загрузкой всех данных в state
-- **Password validation на смену пароля**: `PUT /api/auth/password` принимал слабые пароли (только min 8 символов). Добавлена `validatePassword()` с требованиями к верхним/строчным, цифрам, спецсимволам
-- Тесты: security-fixes.test.ts (13 тестов)
-- Всего тестов: 186 (было 173)
+Текущее состояние:
+- **248 тестов** (240 unit + 8 E2E), покрытие ~30% lines / 25% functions
+- **i18n**: next-intl настроен, 3 локали (en/ru/zh), но переведена **только** landing page (~14 компонентов). Остальные ~100 компонентов и все auth-страницы — хардкод на русском. **ru.json содержит английский текст почти во всех ключах** — требуется обратный перевод.
+- **Маршрутизация**: landing в `[locale]/`, все остальные страницы (login, register, dashboard-app, offline) — **вне** `[locale]`, без доступа к `NextIntlClientProvider`.
 
 ---
 
-## 1. ~~🔒 Security fixes: rate limiting, password validation, CSV injection~~ ✅ ВЫПОЛНЕНО
+# Фаза 1: i18n — локализация всей платформы (RU ↔ EN)
 
-**Статус:** Реализовано 2026-05-24
+## 1.1 Исправить RU-переводы landing page
 
-**Что сделано:**
-- Rate limiting на `POST /api/auth/recovery`: 3 запроса за 10 минут на email/phone + 10 на IP
-- Password validation на `POST /api/auth/recovery/reset`: новый пароль проверяется через `validatePassword()` (минимум 8 символов, верхние/строчные, цифры, спецсимволы)
-- CSV injection prevention в `POST /api/admin/users/export`: поля с `=`, `+`, `-`, `@`, `\t`, `\r` оборачиваются в кавычки
-- Тесты: recovery-validation.test.ts (8 тестов), csv-export.test.ts (10 тестов)
-- Всего тестов: 173 (было 155)
+> **Проблема**: `src/messages/ru.json` (247 строк) содержит **английские строки** во всех секциях кроме `landing.header` и `common.language`. При locale=ru landing показывает английский текст.
 
----
+### 1.1.1 Актуализировать ru.json
+**Файл:** `src/messages/ru.json`
+- Перевести ВСЕ значения на русский: `hero.*`, `howItWorks.*`, `features.*`, `demoModules.*`, `reviews.*`, `cta.*`, `faq.*`, `footer.*`, `codeTerminal.*`
+- Сохранить структуру ключей идентичной `en.json`
+- Проверить интерполяцию `{year}` в `footer.copyright`
 
-## 2. ~~📧 Реализовать отправку OTP email и безопасное восстановление пароля~~ ✅ ВЫПОЛНЕНО
+### 1.1.2 Проверить zh.json
+**Файл:** `src/messages/zh.json`
+- Верифицировать, что все 247 строк переведены на китайский
+- Исправить если есть пропуски
 
-**Статус:** Реализовано (OTP email отправка через nodemailer, HTML письма с кодом, rate limiting, expiry)
-
-**Что сделано:**
-- `sendOTPRecoveryEmail()` в `src/lib/email.ts` — красивые HTML письма с OTP кодом
-- OTP сохраняется в in-memory store с expiry (10 минут)
-- Rate limiting на verification (5 попыток за 10 минут)
-- Анти-enumeration: одинаковый ответ даже если пользователь не найден
-- Dev mode: OTP выводится в консоль если SMTP не настроен
+### 1.1.3 Визуальная проверка
+- `npm run dev` → открыть `/ru`, `/en`, `/zh` — все три версии landing должны показывать корректный перевод
 
 ---
 
-## 3. ~~🛡️ Добавить CSRF защиту и security headers~~ ✅ ВЫПОЛНЕНО
+## 1.2 Перенести auth-страницы в [locale]
 
-**Статус:** Реализовано 2026-05-23
+> **Проблема**: `login`, `register`, `recovery` находятся вне `[locale]/`, не обёрнуты в `NextIntlClientProvider`, весь текст захардкожен.
 
-**Что сделано:**
-- Security headers в `next.config.ts`: CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, HSTS, Permissions-Policy
-- CSRF middleware в `src/middleware.ts`: double-submit cookie pattern
-- Публичные endpoints (login, register, recovery, health, docs, lti) исключены из CSRF проверки
-- Клиентская утилита `src/lib/csrf-client.ts`: getCsrfToken(), getCsrfHeaders(), csrfFetch()
-- SameSite=strict для CSRF cookie, secure flag в production
-- Тесты: csrf-middleware.test.ts (8 тестов), auth-server.test.ts (4 теста)
+### 1.2.1 Создать `src/app/[locale]/login/page.tsx`
+- Переместить логику из `src/app/login/page.tsx`
+- Обернуть в `NextIntlClientProvider` (уже есть в `[locale]/layout.tsx`)
+- Заменить все хардкод-строки на `useTranslations('auth')`
 
-**Бонусные исправления:**
-- Исправлен баг в `verifyToken()`: теперь корректно возвращает group и fullName из JWT payload
-- Добавлены 155 passing unit тестов (было 146)
+### 1.2.2 Создать `src/app/[locale]/register/page.tsx`
+- Аналогично из `src/app/register/page.tsx`
 
----
+### 1.2.3 Создать `src/app/[locale]/recovery/page.tsx`
+- Аналогично из `src/app/recovery/page.tsx`
 
-## 4. ~~📊 Конструктор заданий для преподавателей~~ ✅ ВЫПОЛНЕНО
+### 1.2.4 Удалить старые страницы
+- Удалить `src/app/login/`, `src/app/register/`, `src/app/recovery/`
+- Или оставить редирект: `redirect('/ru/login')`
 
-**Статус:** Полностью реализовано 2026-05-22 (API + UI)
+### 1.2.5 Обновить все ссылки в коде
+- Найти все `href="/login"`, `href="/register"`, `router.push('/login')` и т.д.
+- Заменить на локально-зависимые: `href="/ru/login"` или использовать `<Link href="/login">` с `next-intl/link`
+- **Ключевые файлы для поиска:**
+  - `src/components/landing/LandingHeader.tsx` (кнопки Войти/Регистрация)
+  - `src/components/landing/CTASection.tsx`
+  - `src/components/landing/HeroSection.tsx`
+  - `src/components/security-trainer/AuthPages.tsx` (форма логина/регистрации)
+  - `src/components/security-trainer/Sidebar.tsx` (кнопка выхода → логин)
+  - `src/lib/auth-store.ts` (logout redirect)
+  - `src/middleware.ts` (защита маршрутов)
 
-**Что сделано (API слой):**
-- Prisma модели: Assignment + AssignmentSubmission с relations к User
-- CRUD API: GET/POST /api/assignments, GET/PUT/DELETE /api/assignments/[id]
-- Submission API: POST /api/assignments/[id]/submit с лимитами попыток
-- Grading API: POST /api/assignments/[id]/submissions/[submissionId]/grade
-- Список submissions: GET /api/assignments/[id]/submissions с фильтрами
-- Zod валидация: createAssignmentSchema, submitAssignmentSchema, gradeSubmissionSchema
-- Role-based access: teacher создаёт/оценивает, student отправляет
-- Функции: auto-grade flag, time limits, max attempts, group targeting, deadlines
-
-**Что сделано (UI слой):**
-- AssignmentBuilder компонент: форма создания/редактирования с полями title, type, module, description, content, maxScore, passScore, timeLimit, attempts, dueAt, group, autoGrade, published
-- Список заданий с фильтрами (Все/Опубликованные/Черновики)
-- Детальный просмотр задания с метриками (баллы, попытки, submission'ы, дедлайн)
-- One-click publish/unpublish toggle
-- Delete с подтверждением
-- Интеграция в TeacherPanel как отдельная вкладка "Задания"
-- StudentAssignments страница: список доступных заданий, форма submission с таймером, отслеживание попыток, история результатов, прогресс-бар
-- Sidebar: добавлен пункт "Задания" (ClipboardList icon)
-- PageType: добавлен 'assignments' в store
-
-**Бонусные исправления:**
-- TokenPayload расширен: добавлены group, fullName
-- authenticate() возвращает group/fullName из JWT
-- generateToken() принимает options { rememberMe, group, fullName }
-- Исправлены TS2339 ошибки в assignments и gamification API routes
+### 1.2.6 Обновить middleware для защиты новых путей
+**Файл:** `src/middleware.ts`
+- Добавить проверку auth-токена для `/[locale]/login`, `/[locale]/register` (редирект авторизованных на dashboard)
+- Обновить matcher если нужно
 
 ---
 
-## 5. 🌐 i18n — поддержка русского и английского языков
+## 1.3 Расширить JSON-словари новыми секциями
 
-**Проблема:** Весь UI и контент на русском. Английская документация есть, но платформа недоступна для международной аудитории.
+> Добавить ключи в `en.json`, `ru.json`, `zh.json` для всех разделов платформы.
 
-**Что сделать:**
-- Интегрировать `next-intl` или `react-i18next`
-- Вынести все строки UI в locale-файлы (RU + EN)
-- Добавить переключатель языка в sidebar
-- Перевести контент модулей и квизов
-- Настроить маршрутизацию `/ru/` и `/en/`
+### 1.3.1 Добавить секцию `auth`
+**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
+```
+auth.login.title, auth.login.email, auth.login.password, auth.login.submit,
+auth.login.forgot, auth.login.noAccount, auth.login.registerLink,
+auth.register.title, auth.register.fullName, auth.register.email,
+auth.register.phone, auth.register.password, auth.register.confirmPassword,
+auth.register.group, auth.register.submit, auth.register.hasAccount,
+auth.register.loginLink,
+auth.recovery.title, auth.recovery.email, auth.recovery.phone,
+auth.recovery.submit, auth.recovery.backToLogin,
+auth.validation.required, auth.validation.emailInvalid,
+auth.validation.phoneInvalid, auth.validation.passwordMismatch,
+auth.validation.passwordWeak, auth.validation.otpSent,
+auth.logout, auth.welcome, auth.role.student, auth.role.teacher, auth.role.admin
+```
 
-**Влияние:** Удвоение потенциальной аудитории. Возможность публикации на GitHub с international reach.
+### 1.3.2 Добавить секцию `common`
+**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
+```
+common.save, common.cancel, common.delete, common.edit, common.close,
+common.loading, common.error, common.retry, common.search, common.filter,
+common.export, common.import, common.refresh, common.more, common.less,
+common.back, common.next, common.previous, common.submit, common.confirm,
+common.yes, common.no, common.all, common.none, common.selected,
+common.noData, common.notFound, common.unauthorized, common.forbidden,
+common.serverError, common.networkError
+```
 
-**Сложность:** 🔴 Высокая | **Время:** 4-6 недель
+### 1.3.3 Добавить секцию `nav` (sidebar + навигация)
+**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
+```
+nav.dashboard, nav.owasp, nav.sqlInjection, nav.xss, nav.csrf,
+nav.authSecurity, nav.secureCoding, nav.tools, nav.securityHeaders,
+nav.idor, nav.ssrf, nav.apiSecurity, nav.phishingAnalyzer,
+nav.careerPaths, nav.quiz, nav.achievements, nav.cheatSheets,
+nav.passwordChecker, nav.leaderboard, nav.assignments,
+nav.profile, nav.teacherPanel, nav.adminPanel, nav.logout,
+nav.theme, nav.language
+```
 
----
+### 1.3.4 Добавить секцию `dashboard`
+**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
+```
+dashboard.welcome, dashboard.subtitle,
+dashboard.stats.totalStudents, dashboard.stats.active,
+dashboard.stats.avgModules, dashboard.stats.avgScore,
+dashboard.quickActions, dashboard.recentActivity,
+dashboard.progress, dashboard.achievements,
+dashboard.level, dashboard.xp, dashboard.rank
+```
 
-## 6. ~~🧪 Увеличить покрытие тестами до 80%+~~ ✅ ЧАСТИЧНО ВЫПОЛНЕНО
+### 1.3.5 Добавить секции для каждого lab-модуля
+**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
+```
+labs.owasp.*, labs.sqlInjection.*, labs.xss.*, labs.csrf.*,
+labs.auth.*, labs.secureCoding.*, labs.tools.*,
+labs.securityHeaders.*, labs.idor.*, labs.ssrf.*,
+labs.apiSecurity.*, labs.phishingAnalyzer.*
+```
+> **Note**: Полный список ключей будет определён в процессе работы, по мере замены хардкод-строк в компонентах. Каждый компонент добавляет свои ключи.
 
-**Статус:** 146 тестов (было 6). Реализовано 2026-05-22.
+### 1.3.6 Добавить секцию `quiz`
+```
+quiz.title, quiz.start, quiz.submit, quiz.next, quiz.previous,
+quiz.results, quiz.score, quiz.passed, quiz.failed, quiz.retry,
+quiz.perfect, quiz.progress, quiz.category.*, quiz.difficulty.*
+```
 
-**Что сделано:**
-- 11 test files: 146 passing tests (было 6 unit + 2 E2E)
-- xp-utils.test.ts: 19 тестов для системы уровней и XP
-- api-validation.test.ts: 17 тестов для Zod схем assignments
-- auth-schemas.test.ts: 22 теста для login/register/password схем
-- progress-schemas.test.ts: 9 тестов для progress schemas
-- achievement-utils.test.ts: 13 тестов для системы достижений
-- Настроен vitest coverage с v8 provider
-- Скрипт `npm run test:coverage` для отчёта
-- Thresholds: 30% lines, 25% functions, 20% branches
-
-**Осталось:**
-- Integration тесты для API endpoints (mock Prisma)
-- E2E тесты для всех модулей обучения
-- Увеличить покрытие до 80%+
-
----
-
-## 7. ~~🚀 Миграция на PostgreSQL~~ ✅ ВЫПОЛНЕНО
-
-**Статус:** Реализовано 2026-05-22
-
-**Что сделано:**
-- Prisma datasource переключён с SQLite на PostgreSQL
-- Все String @id поля получили @default(cuid()) для PostgreSQL совместимости
-- DATABASE_URL replaces SQLITE_URL в .env.example
-- docker-compose.yml уже содержит PostgreSQL сервис с healthcheck
-- README обновлён с инструкциями по настройке БД (Docker + cloud варианты)
-- Скрипты db:migrate и db:reset уже настроены для миграций
-
----
-
-## 8. ~~📱 Улучшить PWA и mobile experience~~ ✅ ВЫПОЛНЕНО
-
-**Статус:** Реализовано 2026-05-22
-
-**Что сделано:**
-- Обновлён manifest.json: добавлены screenshots, share_target, protocol_handlers, edge_side_panel, 3 shortcut'а
-- Создана offline страница (`/offline`) с UI для проверки подключения и кнопкой retry
-- Улучшены PWA meta теи в layout.tsx: apple-touch-icon, mobile-web-app-capable, theme color по схеме
-- Расширены runtimeCaching в next.config.ts: кэширование JS/CSS бандлов и API ответов (NetworkFirst)
-- Добавлены mobile-responsive CSS: safe-area-inset для notch устройств, min tap target 44px, iOS font-size fix
-- Viewport: viewportFit=cover, maximumScale=5, userScalable=true
-- overscroll-behavior-y: contain для предотвращения pull-to-refresh в PWA
-
----
-
-## 9. ~~📖 API документация (Swagger/OpenAPI)~~ ✅ ВЫПОЛНЕНО
-
-**Статус:** Реализовано 2026-05-22
-
-**Что сделано:**
-- Создана полная OpenAPI 3.0 спецификация (`/public/openapi.yaml`) для 70+ endpoints
-- Swagger UI доступен по адресу `/api/docs`
-- Документация покрывает все категории: Auth, Progress, Quiz, Analytics, Admin, Users, Deadlines, LTI, Export, Reports
-- Поддержка авторизации через JWT Bearer token прямо в UI
-- Try-it-out функциональность для тестирования endpoints
-- Добавлен скрипт `npm run docs` для быстрого доступа
+### 1.3.7 Добавить секции `achievements`, `profile`, `errors`, `teacher`, `admin`
+- Структура определяется по мере замены хардкод-строк в соответствующих компонентах
 
 ---
 
-## 10. ~~🎮 Система уровней и прогрессии (RPG-геймификация)~~ ✅ ВЫПОЛНЕНО
+## 1.4 Локализовать компоненты security-trainer
 
-**Статус:** Реализовано 2026-05-22
+> Заменить хардкод-русские строки на `useTranslations()` в ~100 компонентах. Порядок — по приоритету (от наиболее видимых к наименее).
 
-**Что сделано:**
-- Prisma: поля xp, level, streak, lastActivityAt в User model
-- XP Calculator (xp-utils.ts): 50 уровней, 4 ранга (Junior → Mid → Senior → Lead), таблица 0-125000 XP
-- XP Rewards: module complete (100), quiz pass (50), perfect (100), assignment submit (25), assignment passed (50)
-- Daily login: 10 XP + streak bonus (5 XP за каждый день серии)
-- API: GET /api/gamification/level, POST /api/gamification/xp, GET /api/gamification/leaderboard
-- Leaderboard с фильтрацией по группе, ranking position, rankTitle
-- Streak system: автоматический подсчёт дней + reset при пропуске
+### 1.4.1 Sidebar (`src/components/security-trainer/Sidebar.tsx`)
+- ~50 строк навигации: пункты меню, заголовки секций, подсказки
+- Ключи: `nav.*`
+
+### 1.4.2 Dashboard (`src/components/security-trainer/Dashboard.tsx`)
+- ~100 строк: приветствие, статистика, карточки, toast-сообщения
+- Ключи: `dashboard.*`
+
+### 1.4.3 AuthPages (`src/components/security-trainer/AuthPages.tsx`)
+- ~80 строк: форма логина/регистрации, валидация, сообщения об ошибках
+- Ключи: `auth.*`
+
+### 1.4.4 QuizSystem (`src/components/security-trainer/QuizSystem.tsx`)
+- ~60 строк: интерфейс квиза, результаты, категории
+- Ключи: `quiz.*`
+
+### 1.4.5 ProfilePage (`src/components/security-trainer/ProfilePage.tsx`)
+- ~50 строк: профиль, настройки, смена пароля
+- Ключи: `profile.*`
+
+### 1.4.6 TeacherPanel (`src/components/security-trainer/TeacherPanel.tsx`)
+- ~80 строк: вкладки, таблицы, фильтры, метрики
+- Ключи: `teacher.*`
+
+### 1.4.7 AdminPanel (`src/components/security-trainer/AdminPanel.tsx`)
+- ~80 строк: управление пользователями, экспорт, модерация
+- Ключи: `admin.*`
+
+### 1.4.8 Labs (SQLInjectionLab, XSSLab, CSRFLab, IDORLab, SSRFLab, etc.) — 10 компонентов
+- Каждый по ~40-100 строк
+- Ключи: `labs.{moduleName}.*`
+
+### 1.4.9 Остальные компоненты (~80 файлов)
+- AchievementAnalytics, AchievementsGlossary, ActivityCalendar, etc.
+- AssignmentBuilder, StudentAssignments
+- Leaderboard
+- SecurityCheatSheets
+- PasswordStrengthChecker
+- CareerPaths
+- Все аналитические компоненты (~30 файлов)
+- ErrorBoundary
+- NotificationBell, OTPModal, OnboardingTour, etc.
+
+### 1.4.10 Типовой паттерн замены (для каждого компонента):
+```tsx
+// Было:
+<h1>Панель преподавателя</h1>
+<p>Загрузка данных студентов...</p>
+
+// Стало:
+import { useTranslations } from 'next-intl';
+const t = useTranslations('teacher');
+<h1>{t('title')}</h1>
+<p>{t('loading')}</p>
+```
 
 ---
 
-## 📋 Рекомендуемый порядок выполнения
+## 1.5 Перенести dashboard-app в [locale]
 
-| # | Улучшение | Приоритет | Время | Impact |
-|---|-----------|-----------|-------|--------|
-| 0 | Critical bug fixes (auth, teacher panel, password) | ✅ Реализовано | | Bug fixes |
-| 1 | Security fixes (rate limit, password, CSV) | ✅ Реализовано | | Security fix |
-| 2 | OTP email / восстановление пароля | ✅ Реализовано | | Security fix |
-| 3 | CSRF защита + security headers | ✅ Реализовано | | Security fix |
-| 4 | Завершить LTI интеграцию | 🔴 Критический | 2-3 недели | Distribution |
-| 5 | Конструктор заданий | 🟡 Высокий | 3-4 недели | Feature |
-| 6 | PostgreSQL + Redis | 🟡 Высокий | 1-2 недели | Infrastructure |
-| 7 | Тесты 80%+ | 🟡 Высокий | 2-3 недели | Quality |
-| 8 | PWA + mobile | 🟡 Высокий | 2-3 недели | UX |
-| 9 | API документация | 🟢 Средний | 1 неделя | Developer exp |
-| 10 | i18n (RU/EN) | 🟢 Средний | 4-6 недель | Growth |
+> **Проблема**: `/dashboard-app` — SPA-оболочка всего приложения, не под `[locale]`, нет доступа к `NextIntlClientProvider`.
 
-**Первые 2 — mandatory для production.** Без них platform небезопасна.
+### 1.5.1 Создать `src/app/[locale]/app/page.tsx`
+- Импортировать логику из `src/app/dashboard-app/page.tsx`
+- Убедиться что `NextIntlClientProvider` работает (layout уже оборачивает)
+- Обновить точку входа для всех lazy-loaded компонентов
 
-**Следующие 4 — ключевые для adoption.** LTI + конструктор = преподаватели приходят. PostgreSQL + тесты = platform stable.
+### 1.5.2 Создать `src/app/[locale]/app/layout.tsx` (при необходимости)
+- Если нужна отдельная разметка для dashboard
 
-**Последние 4 — growth и polish.** Делают продукт конкурентоспособным на рынке EdTech.
+### 1.5.3 Обновить redirect после логина
+**Файлы:** `src/components/security-trainer/AuthPages.tsx`, `src/lib/auth-store.ts`
+- `router.push('/dashboard-app')` → `router.push('/ru/app')` (locale-aware)
+
+### 1.5.4 Обновить Sidebar навигацию
+**Файл:** `src/components/security-trainer/Sidebar.tsx`
+- `setCurrentPage('dashboard')` — не требует изменений (zustand state, не URL)
+
+### 1.5.5 Удалить старый `src/app/dashboard-app/`
 
 ---
 
-*Сгенерировано: 2026-05-22*
+## 1.6 Локализовать error / not-found / offline страницы
+
+### 1.6.1 `src/app/[locale]/not-found.tsx`
+- Создать locale-aware версию
+- Заменить хардкод на `useTranslations('errors')`
+
+### 1.6.2 `src/app/[locale]/error.tsx`
+- Аналогично
+
+### 1.6.3 `src/app/[locale]/offline/page.tsx`
+- Переместить из `src/app/offline/page.tsx`
+- Заменить хардкод на `useTranslations('errors')`
+
+### 1.6.4 Удалить старые `src/app/error.tsx`, `src/app/not-found.tsx`, `src/app/offline/`
+
+---
+
+## 1.7 Динамический `lang` атрибут в `<html>`
+
+**Файл:** `src/app/[locale]/layout.tsx` или через middleware
+- Текущий `src/app/layout.tsx` имеет хардкод `<html lang="ru">`
+- Нужно установить `lang` динамически в зависимости от locale
+- Вариант: middleware устанавливает `lang`, или [locale]/layout передаёт в HTML
+
+---
+
+# Фаза 2: Тестовое покрытие — цель 80%+
+
+## 2.0 Базовая подготовка
+
+### 2.0.1 Запустить покрытие и сохранить baseline
+```bash
+npm run test:coverage
+```
+- Сохранить `coverage/lcov-report/index.html` как baseline
+- Зафиксировать текущие проценты (≈30% lines / 25% functions / 20% branches)
+
+### 2.0.2 Настроить `@prisma/client` mock для интеграционных тестов
+- Создать `tests/__mocks__/prisma.ts` — singleton с `vi.mock('@prisma/client')`
+- Helper-функции для создания mock-пользователей, прогресса, квизов
+- **Файлы:** `tests/__mocks__/prisma.ts`, `tests/setup.ts` (дополнить)
+
+---
+
+## 2.1 Интеграционные тесты API endpoints (mock Prisma)
+
+> Каждый тестовый файл покрывает одну группу endpoints. Паттерн: arrange (mock Prisma returns), act (call handler), assert (response + Prisma calls).
+
+### 2.1.1 `tests/api-auth.test.ts` — Auth endpoints
+- `POST /api/auth/register` — успех, дубликат email, слабый пароль, невалидные данные
+- `POST /api/auth/login` — успех, неверный пароль, несуществующий пользователь, заблокированный
+- `GET /api/auth/profile` — с токеном, без токена, истёкший токен
+- `PUT /api/auth/password` — успех, старый пароль неверный, слабый новый пароль
+- `DELETE /api/auth/delete` — успех (с password), без password (ошибка), 3-попытки rate limit
+- `POST /api/auth/recovery` — успех, email не найден, rate limit
+- `POST /api/auth/recovery/reset` — успех, неверный OTP, истёкший OTP
+- Цель: ~25 тестов
+
+### 2.1.2 `tests/api-quiz.test.ts` — Quiz endpoints
+- `GET /api/quiz` — получить вопросы (с категорией/без)
+- `POST /api/quiz` — отправить ответы (успех, fail), rate limit (10 за 5 мин)
+- `GET /api/quiz/results` — история результатов
+- Цель: ~15 тестов
+
+### 2.1.3 `tests/api-progress.test.ts` — Progress endpoints
+- `GET /api/progress` — свой прогресс
+- `GET /api/progress/[userId]` — чужой прогресс (teacher) + forbidden (student)
+- `POST /api/progress` — сохранить прогресс модуля
+- Цель: ~12 тестов
+
+### 2.1.4 `tests/api-assignments.test.ts` — Assignment endpoints
+- `POST /api/assignments` — создать задание (teacher) + forbidden (student)
+- `GET /api/assignments` — список заданий
+- `GET /api/assignments/[id]` — одно задание
+- `PUT /api/assignments/[id]` — обновить
+- `DELETE /api/assignments/[id]` — удалить
+- `POST /api/assignments/[id]/submit` — отправить решение (student), лимит попыток
+- `POST /api/assignments/[id]/submissions/[subId]/grade` — оценить (teacher)
+- Цель: ~18 тестов
+
+### 2.1.5 `tests/api-gamification.test.ts` — Gamification endpoints
+- `GET /api/gamification/level` — уровень пользователя
+- `POST /api/gamification/xp` — начислить XP (rate limit 20/час)
+- `GET /api/gamification/leaderboard` — таблица лидеров (с фильтром по группе, без)
+- Цель: ~10 тестов
+
+### 2.1.6 `tests/api-admin.test.ts` — Admin endpoints
+- `GET /api/admin/users` — список пользователей (admin) + forbidden (student)
+- `PUT /api/admin/users/[id]/role` — сменить роль
+- `PUT /api/admin/users/[id]/block` — заблокировать/разблокировать
+- `POST /api/admin/users/export` — экспорт CSV
+- Цель: ~12 тестов
+
+### 2.1.7 `tests/api-deadlines.test.ts` — Deadline endpoints
+- `GET /api/deadlines` — свои дедлайны (student)
+- `POST /api/deadlines` — создать дедлайн (teacher)
+- `GET /api/deadlines/teacher/reminders` — напоминания (teacher)
+- Цель: ~8 тестов
+
+---
+
+## 2.2 Компонентные тесты (React Testing Library)
+
+### 2.2.1 `tests/components/QuizSystem.test.tsx`
+- Рендер вопросов разных категорий
+- Выбор ответа, переход к следующему
+- Сабмит, отображение результата (passed/failed/perfect)
+- Retry
+- Цель: ~12 тестов
+
+### 2.2.2 `tests/components/AuthPages.test.tsx`
+- Форма логина: заполнение полей, валидация email, вызов submit
+- Форма регистрации: проверка совпадения паролей, валидация телефона
+- Сообщения об ошибках от сервера
+- Цель: ~10 тестов
+
+### 2.2.3 `tests/components/Sidebar.test.tsx`
+- Рендер всех пунктов меню для student
+- Скрытые пункты для teacher/admin
+- Активный пункт выделен
+- Переключение страницы при клике
+- Цель: ~8 тестов
+
+### 2.2.4 `tests/components/Dashboard.test.tsx`
+- Загрузка данных (loading state)
+- Отображение статистики, карточек
+- Обработка ошибки API
+- Цель: ~6 тестов
+
+### 2.2.5 `tests/components/ProfilePage.test.tsx`
+- Отображение данных профиля
+- Форма редактирования
+- Смена пароля (валидация)
+- Цель: ~8 тестов
+
+### 2.2.6 `tests/components/TeacherPanel.test.tsx`
+- Вкладки (Прогресс, Журнал, Аналитика, Дедлайны, Группы)
+- Загрузка списка студентов
+- Фильтрация по группе
+- Цель: ~10 тестов
+
+### 2.2.7 `tests/components/AdminPanel.test.tsx`
+- Список пользователей
+- Блокировка/разблокировка пользователя
+- Смена роли
+- Экспорт
+- Цель: ~8 тестов
+
+### 2.2.8 `tests/components/NotificationBell.test.tsx`
+- Отображение количества непрочитанных
+- Открытие/закрытие списка
+- Mark as read
+- Цель: ~5 тестов
+
+---
+
+## 2.3 Расширение E2E тестов (Playwright)
+
+### 2.3.1 `e2e/registration.spec.ts` — Registration flow
+- Успешная регистрация нового пользователя
+- Валидация полей (email, пароль, телефон)
+- Регистрация с уже существующим email
+- Цель: ~4 теста
+
+### 2.3.2 `e2e/quiz-flow.spec.ts` — Quiz flow
+- Выбор модуля → открытие квиза
+- Прохождение всех вопросов
+- Результат passed / failed / perfect
+- Retry quiz
+- Цель: ~5 тестов
+
+### 2.3.3 `e2e/assignments.spec.ts` — Assignment workflow
+- Студент видит список заданий
+- Отправка решения
+- Преподаватель оценивает
+- Студент видит оценку
+- Цель: ~5 тестов
+
+### 2.3.4 `e2e/admin-actions.spec.ts` — Admin actions
+- Просмотр списка пользователей
+- Блокировка пользователя
+- Смена роли student → teacher
+- Экспорт пользователей
+- Цель: ~5 тестов
+
+### 2.3.5 `e2e/i18n-switch.spec.ts` — Language switching
+- Переключение RU → EN → ZH на landing
+- Переключение на dashboard (после реализации i18n)
+- Сохранение выбранного языка между страницами
+- Цель: ~4 теста
+
+### 2.3.6 `e2e/password-recovery.spec.ts` — Password recovery
+- Запрос OTP
+- Ввод неверного OTP
+- Успешный сброс пароля
+- Rate limit превышение
+- Цель: ~4 теста
+
+---
+
+## 2.4 Повышение порогов покрытия
+
+### 2.4.1 Поднять thresholds в `vitest.config.ts`
+```ts
+// Было:   lines: 30, functions: 25, branches: 20, statements: 30
+// Стало:  lines: 50, functions: 45, branches: 40, statements: 50
+```
+- После интеграционных тестов → 50%
+- После компонентных тестов → 65%
+- После E2E расширения → 80%
+
+### 2.4.2 Добавить `npm run test:all` скрипт
+- Последовательно: `vitest run --coverage && playwright test`
+
+---
+
+# Фаза 3: Качество и производительность
+
+## 3.1 ESLint и TypeScript strictness
+
+### 3.1.1 Проверить текущий линтинг
+```bash
+npm run lint
+```
+- Исправить все ошибки и предупреждения
+
+### 3.1.2 Рассмотреть включение `strict: true` в tsconfig
+- Оценить количество ошибок
+- Исправить по файлам если разумно
+
+---
+
+## 3.2 Доступность (a11y)
+
+### 3.2.1 Аудит ARIA-атрибутов
+- `Sidebar.tsx`: роли, `aria-label`, `aria-current`
+- `QuizSystem.tsx`: `aria-live` для результатов
+- Модальные окна: focus trap, `aria-modal`
+- Toast-уведомления: `aria-live="polite"`
+
+### 3.2.2 Проверить контраст и keyboard navigation
+- Tab-индексы на интерактивных элементах
+- Skip-to-content ссылка (уже есть в `layout.tsx`)
+
+---
+
+## 3.3 Производительность
+
+### 3.3.1 Динамические импорты
+- Проверить что все lab-компоненты lazy-loaded (уже сделано в `dashboard-app/page.tsx`)
+- Применить `next/dynamic` для тяжёлых analytics-компонентов
+
+### 3.3.2 Оптимизация изображений
+- `public/logo.svg`, `public/icons/*` — использовать `next/image`
+- Lazy loading для изображений вне viewport
+
+### 3.3.3 Bundle size анализ
+```bash
+npx next build --debug && npx @next/bundle-analyzer
+```
+- Найти и уменьшить крупные чанки
+
+---
+
+## 3.4 Документация и onboarding
+
+### 3.4.1 Актуализировать `AUTO-START.md`
+- Проверить все команды на актуальность
+
+### 3.4.2 Обновить README
+- Добавить секцию про i18n (когда будет готово)
+- Актуализировать скриншоты
+
+---
+
+# Сводная таблица
+
+| Фаза | Секция | Задач | Приоритет | Оценка времени |
+|------|--------|-------|-----------|----------------|
+| **1.1** | Исправить RU-переводы landing | 3 | 🔴 Критический | 1 день |
+| **1.2** | Перенести auth-страницы в [locale] | 6 | 🔴 Критический | 2–3 дня |
+| **1.3** | Расширить JSON-словари | 7 | 🔴 Критический | 3–5 дней |
+| **1.4** | Локализовать компоненты (~100 файлов) | 9 групп | 🔴 Критический | 10–20 дней |
+| **1.5** | Перенести dashboard-app в [locale] | 5 | 🔴 Критический | 1–2 дня |
+| **1.6** | Локализовать error/offline страницы | 4 | 🟡 Высокий | 1 день |
+| **1.7** | Динамический lang атрибут | 1 | 🟢 Средний | 0.5 дня |
+| **2.1** | Интеграционные тесты API | 7 файлов | 🟡 Высокий | 5–7 дней |
+| **2.2** | Компонентные тесты | 8 файлов | 🟡 Высокий | 5–7 дней |
+| **2.3** | Расширение E2E тестов | 6 файлов | 🟡 Высокий | 4–6 дней |
+| **2.4** | Поднять пороги покрытия | 2 | 🟢 Средний | 0.5 дня |
+| **3.1** | ESLint / TypeScript | 2 | 🟢 Средний | 1–2 дня |
+| **3.2** | Доступность (a11y) | 2 | 🟢 Средний | 2–3 дня |
+| **3.3** | Производительность | 3 | 🟢 Средний | 2–3 дня |
+| **3.4** | Документация | 2 | 🟢 Низкий | 1 день |
+
+**Общая оценка:** ~40–70 рабочих дней (8–14 недель) на всю Фазу 1–3.
+
+**Рекомендуемый порядок:**
+1. Фаза 1.1 → 1.2 → 1.3 (i18n инфраструктура, 1 неделя)
+2. Фаза 1.4 параллельно с Фазой 2.1 (основная работа, 3–4 недели)
+3. Фаза 1.5 → 1.6 → 1.7 (финализация i18n, 3 дня)
+4. Фаза 2.2 → 2.3 → 2.4 (тесты, 2–3 недели)
+5. Фаза 3 (качество, 1–2 недели)
+
+---
+
+*Обновлено: 2026-06-03*
 *Версия проекта: 0.2.0*

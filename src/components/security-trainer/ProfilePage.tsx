@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useMemo, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/auth-store';
 import { useAppStore } from '@/lib/store';
 import { validatePassword } from '@/lib/auth-utils';
@@ -23,6 +24,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 export default function ProfilePage() {
+  const t = useTranslations('profile');
   const user = useAuthStore(s => s.user);
   const updateProfile = useAuthStore(s => s.updateProfile);
   const updatePassword = useAuthStore(s => s.updatePassword);
@@ -124,10 +126,10 @@ export default function ProfilePage() {
     }
     for (const [quizId, ts] of Object.entries(timestamps.quizzes)) {
       const cat = modules.find((m) => m.id === quizId);
-      events.push({ date: new Date(ts), type: 'quiz', label: cat?.title || `Квиз: ${quizId}` });
+      events.push({ date: new Date(ts), type: 'quiz', label: cat?.title || t('activityQuizPrefix', { id: quizId }) });
     }
     return events.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 10);
-  }, [timestamps]);
+  }, [timestamps, t]);
 
   const achievementIcons: Record<string, React.ReactNode> = {
     'first-steps': <BookOpen size={20} />,
@@ -154,11 +156,22 @@ export default function ProfilePage() {
 
   const formatDate = (iso: string) => {
     try {
-      return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+      return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
     } catch (e) {
       if (process.env.NODE_ENV === "development") console.warn("[ProfilePage.tsx] ProfilePage failed:", e);
       return iso;
     }
+  };
+
+  const formatTimeAgo = (iso: string) => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return t('timeJustNow');
+    if (mins < 60) return t('timeMinAgo', { n: mins });
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return t('timeHourAgo', { n: hours });
+    const days = Math.floor(hours / 24);
+    return t('timeDayAgo', { n: days });
   };
 
   if (!user) return null;
@@ -167,34 +180,34 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      toast.error('Выберите изображение');
+      toast.error(t('avatarUploadError'));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Файл слишком большой (макс. 5 МБ)');
+      toast.error(t('avatarUploadSizeError'));
       return;
     }
     const reader = new FileReader();
     reader.onload = async (ev) => {
       const base64 = ev.target?.result as string;
       await updateProfile({ avatar: base64 });
-      toast.success('Аватар обновлён');
+      toast.success(t('avatarUpdated'));
     };
     reader.readAsDataURL(file);
   };
 
   const handleSaveProfile = async () => {
     if (!fullName.trim()) {
-      toast.error('ФИО обязательно');
+      toast.error(t('fullNameRequired'));
       return;
     }
     await updateProfile({ fullName, group, course, university, bio });
-    toast.success('Профиль сохранён');
+    toast.success(t('profileSaved'));
   };
 
   const handlePasswordChange = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
-      toast.error('Заполните все поля');
+      toast.error(t('fillAllPasswordFields'));
       return;
     }
     const validation = validatePassword(newPassword);
@@ -203,12 +216,12 @@ export default function ProfilePage() {
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('Пароли не совпадают');
+      toast.error(t('passwordsMismatch'));
       return;
     }
     const result = await updatePassword(oldPassword, newPassword);
     if (result.success) {
-      toast.success('Пароль изменён');
+      toast.success(t('passwordChanged'));
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -241,7 +254,7 @@ export default function ProfilePage() {
     a.download = `cybersec-progress-${user.id}-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Прогресс экспортирован');
+    toast.success(t('progressExported'));
   };
 
   // Import progress from JSON file
@@ -253,7 +266,7 @@ export default function ProfilePage() {
       try {
         const data = JSON.parse(ev.target?.result as string);
         if (!data.progress) {
-          toast.error('Неверный формат файла');
+          toast.error(t('invalidFileFormat'));
           return;
         }
         const p = data.progress;
@@ -274,10 +287,10 @@ export default function ProfilePage() {
           secureCodingAnsweredChallenges: p.secureCodingAnsweredChallenges || [],
           secureCodingCorrectCount: p.secureCodingCorrectCount || 0,
         });
-        toast.success('Прогресс импортирован');
+        toast.success(t('progressImported'));
       } catch (e) {
         if (process.env.NODE_ENV === "development") console.warn("[ProfilePage.tsx] handlePasswordChange failed:", e);
-        toast.error('Ошибка при чтении файла');
+        toast.error(t('fileReadError'));
       }
     };
     reader.readAsText(file);
@@ -286,36 +299,25 @@ export default function ProfilePage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (deleteConfirmText !== 'УДАЛИТЬ') {
-      toast.error('Введите "УДАЛИТЬ" для подтверждения');
+    if (deleteConfirmText !== t('deleteAccountConfirmText')) {
+      toast.error(t('wrongDeleteConfirmation'));
       return;
     }
     const result = await deleteAccount(deletePassword);
     if (result.success) {
-      toast.success('Аккаунт удалён');
+      toast.success(t('accountDeleted'));
       window.location.reload();
     } else {
       toast.error(result.error);
     }
   };
 
-  const formatTimeAgo = (iso: string) => {
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'только что';
-    if (mins < 60) return `${mins} мин назад`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours} ч назад`;
-    const days = Math.floor(hours / 24);
-    return `${days} дн назад`;
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Личный профиль</h1>
-        <p className="text-muted-foreground">Управление данными аккаунта</p>
+        <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       {/* Profile Card */}
@@ -325,7 +327,7 @@ export default function ProfilePage() {
             <div className="w-20 h-20 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden border-2 border-violet-200">
               {user.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.avatar} alt={`Аватар: ${user.fullName || "Пользователь"}`} className="w-full h-full object-cover" />
+                <img src={user.avatar} alt={t('avatarAlt', { name: user.fullName || t('avatarAltDefault') })} className="w-full h-full object-cover" />
               ) : (
                 <User className="w-10 h-10 text-violet-500" />
               )}
@@ -348,11 +350,11 @@ export default function ProfilePage() {
             <CardTitle className="text-lg">{user.fullName}</CardTitle>
             <CardDescription>
               {user.role === 'admin' ? (
-                <Badge variant="destructive" className="mt-1">Администратор</Badge>
+                <Badge variant="destructive" className="mt-1">{t('roleAdmin')}</Badge>
               ) : user.role === 'teacher' ? (
-                <Badge className="mt-1 bg-amber-100 text-amber-700 border-0">Преподаватель</Badge>
+                <Badge className="mt-1 bg-amber-100 text-amber-700 border-0">{t('roleTeacher')}</Badge>
               ) : (
-                <Badge variant="secondary" className="mt-1 bg-violet-100 text-violet-700">Студент</Badge>
+                <Badge variant="secondary" className="mt-1 bg-violet-100 text-violet-700">{t('roleStudent')}</Badge>
               )}
             </CardDescription>
           </div>
@@ -360,7 +362,7 @@ export default function ProfilePage() {
         <CardContent>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Заполненность профиля</span>
+              <span className="text-muted-foreground">{t('profileCompletion')}</span>
               <span className={`font-semibold ${
                 profileCompletion >= 80 ? 'text-emerald-600' :
                 profileCompletion >= 40 ? 'text-amber-600' : 'text-muted-foreground'
@@ -369,11 +371,11 @@ export default function ProfilePage() {
             <Progress value={profileCompletion} className="h-2" />
             {profileCompletion < 100 && (
               <p className="text-xs text-slate-400">
-                {!fullName && 'Укажите ФИО. '}
-                {!group && 'Укажите группу. '}
-                {!course && 'Укажите курс. '}
-                {!university && 'Укажите университет. '}
-                {!bio && 'Добавьте биографию.'}
+                {!fullName && t('profileCompletionHintFullName')}
+                {!group && t('profileCompletionHintGroup')}
+                {!course && t('profileCompletionHintCourse')}
+                {!university && t('profileCompletionHintUniversity')}
+                {!bio && t('profileCompletionHintBio')}
               </p>
             )}
           </div>
@@ -385,7 +387,7 @@ export default function ProfilePage() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Activity className="w-5 h-5 text-emerald-500" />
-            Статистика обучения
+            {t('stats')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -393,7 +395,7 @@ export default function ProfilePage() {
             <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200">
               <div className="flex items-center gap-2 mb-1">
                 <BookOpen size={14} className="text-emerald-600" />
-                <span className="text-[11px] text-emerald-700 font-medium">Модули</span>
+                <span className="text-[11px] text-emerald-700 font-medium">{t('statsModules')}</span>
               </div>
               <p className="text-lg font-bold">{completedCount}/{totalModules}</p>
               <div className="w-full bg-emerald-200 rounded-full h-1.5 mt-1">
@@ -403,15 +405,15 @@ export default function ProfilePage() {
             <div className="p-3 rounded-lg bg-violet-50 border border-violet-200">
               <div className="flex items-center gap-2 mb-1">
                 <Brain size={14} className="text-violet-600" />
-                <span className="text-[11px] text-violet-700 font-medium">Ср. балл</span>
+                <span className="text-[11px] text-violet-700 font-medium">{t('statsAvgScore')}</span>
               </div>
               <p className="text-lg font-bold">{avgQuizScore}%</p>
-              <p className="text-[11px] text-violet-600 mt-0.5">{Object.keys(quizScores).length} квизов</p>
+              <p className="text-[11px] text-violet-600 mt-0.5">{Object.keys(quizScores).length} {t('statsQuizzesCount')}</p>
             </div>
             <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
               <div className="flex items-center gap-2 mb-1">
                 <Trophy size={14} className="text-amber-600" />
-                <span className="text-[11px] text-amber-700 font-medium">Достижения</span>
+                <span className="text-[11px] text-amber-700 font-medium">{t('statsAchievements')}</span>
               </div>
               <p className="text-lg font-bold">{unlockedCount}/{totalAchievements}</p>
               <div className="w-full bg-amber-200 rounded-full h-1.5 mt-1">
@@ -421,10 +423,10 @@ export default function ProfilePage() {
             <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
               <div className="flex items-center gap-2 mb-1">
                 <Calendar size={14} className="text-blue-600" />
-                <span className="text-[11px] text-blue-700 font-medium">На платформе</span>
+                <span className="text-[11px] text-blue-700 font-medium">{t('statsOnPlatform')}</span>
               </div>
               <p className="text-lg font-bold">{formatDate(user.createdAt).split(' ').slice(1, 3).join(' ')}</p>
-              <p className="text-[11px] text-blue-600 mt-0.5">Входов: {user.loginCount}</p>
+              <p className="text-[11px] text-blue-600 mt-0.5">{t('statsLogins', { count: user.loginCount })}</p>
             </div>
           </div>
         </CardContent>
@@ -436,7 +438,7 @@ export default function ProfilePage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Clock className="w-5 h-5 text-muted-foreground" />
-              Последняя активность
+              {t('recentActivity')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -447,11 +449,11 @@ export default function ProfilePage() {
                     event.type === 'module' ? 'bg-emerald-400' : 'bg-violet-400'
                   }`} />
                   <span className="text-[11px] text-slate-400 min-w-[80px]">
-                    {event.date.toLocaleDateString('ru-RU')}
+                    {event.date.toLocaleDateString()}
                   </span>
                   <span className="text-xs text-foreground/70">{event.label}</span>
                   <Badge variant="secondary" className="text-[10px] ml-auto">
-                    {event.type === 'module' ? 'Модуль' : 'Квиз'}
+                    {event.type === 'module' ? t('activityBadgeModule') : t('activityBadgeQuiz')}
                   </Badge>
                 </div>
               ))}
@@ -466,7 +468,7 @@ export default function ProfilePage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Trophy className="w-5 h-5 text-amber-500" />
-              Разблокированные достижения
+              {t('unlockedAchievements')}
               <Badge className="ml-auto text-[11px]">{unlockedCount}/{totalAchievements}</Badge>
             </CardTitle>
           </CardHeader>
@@ -493,76 +495,76 @@ export default function ProfilePage() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <User className="w-5 h-5 text-violet-500" />
-            Личные данные
+            {t('personalInfo')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="profile-fullname">ФИО *</Label>
+              <Label htmlFor="profile-fullname">{t('fullName')}</Label>
               <Input
                 id="profile-fullname"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Иванов Иван Иванович"
+                placeholder={t('fullNamePlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="profile-email">Email</Label>
+              <Label htmlFor="profile-email">{t('email')}</Label>
               <Input id="profile-email" value={user.email} disabled className="bg-secondary" />
-              <p className="text-xs text-slate-400">Email нельзя изменить</p>
+              <p className="text-xs text-slate-400">{t('emailNotEditable')}</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="profile-phone">Телефон</Label>
+              <Label htmlFor="profile-phone">{t('phone')}</Label>
               <Input id="profile-phone" value={user.phone} disabled className="bg-secondary" />
-              <p className="text-xs text-slate-400">Телефон нельзя изменить</p>
+              <p className="text-xs text-slate-400">{t('phoneNotEditable')}</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="profile-university">Университет</Label>
+              <Label htmlFor="profile-university">{t('university')}</Label>
               <Input
                 id="profile-university"
                 value={university}
                 onChange={(e) => setUniversity(e.target.value)}
-                placeholder="Название университета"
+                placeholder={t('universityPlaceholder')}
               />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="profile-course">Курс</Label>
+              <Label htmlFor="profile-course">{t('course')}</Label>
               <Input
                 id="profile-course"
                 value={course}
                 onChange={(e) => setCourse(e.target.value)}
-                placeholder="Например: 3"
+                placeholder={t('coursePlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="profile-group">Группа</Label>
+              <Label htmlFor="profile-group">{t('group')}</Label>
               <Input
                 id="profile-group"
                 value={group}
                 onChange={(e) => setGroup(e.target.value)}
-                placeholder="Например: ПИ-21"
+                placeholder={t('groupPlaceholder')}
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="profile-bio">Биография</Label>
+            <Label htmlFor="profile-bio">{t('bio')}</Label>
             <textarea
               id="profile-bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Расскажите о себе..."
+              placeholder={t('bioPlaceholder')}
               rows={3}
               className="w-full rounded-lg border border-border px-3 py-2 text-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 resize-none"
             />
           </div>
           <Button onClick={handleSaveProfile} className="bg-violet-600 hover:bg-violet-700">
             <Save className="w-4 h-4 mr-2" />
-            Сохранить
+            {t('saveChanges')}
           </Button>
         </CardContent>
       </Card>
@@ -572,19 +574,19 @@ export default function ProfilePage() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Shield className="w-5 h-5 text-violet-500" />
-            Смена пароля
+            {t('changePassword')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="old-password">Текущий пароль</Label>
+            <Label htmlFor="old-password">{t('currentPassword')}</Label>
             <div className="relative">
               <Input
                 id="old-password"
                 type={showOld ? 'text' : 'password'}
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                placeholder="Введите текущий пароль"
+                placeholder={t('currentPasswordPlaceholder')}
                 className="pr-10"
               />
               <button
@@ -597,14 +599,14 @@ export default function ProfilePage() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new-password">Новый пароль</Label>
+            <Label htmlFor="new-password">{t('newPassword')}</Label>
             <div className="relative">
               <Input
                 id="new-password"
                 type={showNew ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Минимум 8 символов"
+                placeholder={t('newPasswordPlaceholder')}
                 className="pr-10"
               />
               <button
@@ -622,7 +624,7 @@ export default function ProfilePage() {
                 className="mt-3 space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Надёжность пароля</span>
+                  <span className="text-xs text-muted-foreground">{t('passwordStrength')}</span>
                   <span className={`text-xs font-medium ${
                     pwStrength.score >= 70 ? 'text-emerald-600' :
                     pwStrength.score >= 50 ? 'text-amber-600' : 'text-red-600'
@@ -653,14 +655,14 @@ export default function ProfilePage() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Подтверждение пароля</Label>
+            <Label htmlFor="confirm-password">{t('confirmPassword')}</Label>
             <div className="relative">
               <Input
                 id="confirm-password"
                 type={showConfirm ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Повторите новый пароль"
+                placeholder={t('confirmPasswordPlaceholder')}
                 className="pr-10"
               />
               <button
@@ -676,15 +678,15 @@ export default function ProfilePage() {
                 newPassword === confirmPassword ? 'text-emerald-600' : 'text-red-500'
               }`}>
                 {newPassword === confirmPassword ? (
-                  <><CheckCircle2 size={12} /> Пароли совпадают</>
+                  <><CheckCircle2 size={12} /> {t('passwordsMatch')}</>
                 ) : (
-                  <><AlertCircle size={12} /> Пароли не совпадают</>
+                  <><AlertCircle size={12} /> {t('passwordsMismatch')}</>
                 )}
               </p>
             )}
           </div>
           <Button onClick={handlePasswordChange} className="bg-violet-600 hover:bg-violet-700">
-            Изменить пароль
+            {t('changePasswordButton')}
           </Button>
         </CardContent>
       </Card>
@@ -694,13 +696,13 @@ export default function ProfilePage() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Clock className="w-5 h-5 text-violet-500" />
-            Активность входа
+            {t('loginActivity')}
           </CardTitle>
-          <CardDescription>Последние попытки входа в аккаунт</CardDescription>
+          <CardDescription>{t('loginActivityDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           {user?.loginCount !== undefined ? (
-            <p className="text-xs text-muted-foreground mb-3">Всего входов: <span className="font-semibold text-foreground/70">{user.loginCount}</span>{user.lastLoginAt && ` · Последний: ${formatTimeAgo(user.lastLoginAt)}`}</p>
+            <p className="text-xs text-muted-foreground mb-3">{t('totalLogins')} <span className="font-semibold text-foreground/70">{user.loginCount}</span>{user.lastLoginAt && ` · ${t('lastLogin', { time: formatTimeAgo(user.lastLoginAt) })}`}</p>
           ) : null}
           {loginActivity && loginActivity.length > 0 ? (
             <div className="space-y-2">
@@ -715,7 +717,7 @@ export default function ProfilePage() {
                       <AlertCircle size={16} className="text-red-500" />
                     )}
                     <div>
-                      <p className="text-xs font-medium">{entry.success ? 'Успешный вход' : 'Неверный пароль'}</p>
+                      <p className="text-xs font-medium">{entry.success ? t('loginSuccess') : t('loginFailed')}</p>
                       <p className="text-[11px] text-slate-400">{entry.ip} · {formatTimeAgo(entry.timestamp)}</p>
                     </div>
                   </div>
@@ -723,7 +725,7 @@ export default function ProfilePage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-400 text-center py-4">Нет записей активности</p>
+            <p className="text-sm text-slate-400 text-center py-4">{t('noLoginActivity')}</p>
           )}
         </CardContent>
       </Card>
@@ -733,17 +735,17 @@ export default function ProfilePage() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Shield className="w-5 h-5 text-violet-500" />
-            Экспорт и импорт прогресса
+            {t('exportImport')}
           </CardTitle>
-          <CardDescription>Сохраните или восстановите свой прогресс</CardDescription>
+          <CardDescription>{t('exportImportDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-3">
             <Button onClick={handleExportProgress} className="flex-1 bg-violet-600 hover:bg-violet-700">
-              Экспортировать прогресс
+              {t('exportProgress')}
             </Button>
             <Button variant="outline" className="flex-1" onClick={() => importInputRef.current?.click()}>
-              Импортировать прогресс
+              {t('importProgress')}
             </Button>
             <input
               ref={importInputRef}
@@ -761,16 +763,16 @@ export default function ProfilePage() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2 text-red-600">
             <Trash2 className="w-5 h-5" />
-            Опасная зона
+            {t('dangerZone')}
           </CardTitle>
-          <CardDescription>Необратимые действия с аккаунтом</CardDescription>
+          <CardDescription>{t('dangerZoneDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {!showDeleteConfirm ? (
             <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
               <div>
-                <p className="text-sm font-semibold text-red-700">Удалить аккаунт</p>
-                <p className="text-xs text-red-600">Все данные будут удалены навсегда</p>
+                <p className="text-sm font-semibold text-red-700">{t('deleteAccount')}</p>
+                <p className="text-xs text-red-600">{t('deleteAccountWarning')}</p>
               </div>
               <Button
                 variant="outline"
@@ -778,18 +780,22 @@ export default function ProfilePage() {
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 <Trash2 size={14} className="mr-1" />
-                Удалить
+                {t('delete')}
               </Button>
             </div>
           ) : (
             <div className="p-4 bg-red-50 rounded-lg space-y-3">
-              <p className="text-sm font-semibold text-red-700">Вы уверены? Это действие нельзя отменить.</p>
-              <p className="text-xs text-red-600">Введите <code className="bg-red-100 px-1 rounded font-bold">УДАЛИТЬ</code> для подтверждения:</p>
+              <p className="text-sm font-semibold text-red-700">{t('deleteAccountConfirm')}</p>
+              <p className="text-xs text-red-600">
+                {t.rich('deleteAccountHint', {
+                  code: (chunks) => <code className="bg-red-100 px-1 rounded font-bold">{chunks}</code>,
+                })}
+              </p>
               <div className="flex gap-2">
                 <Input
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
-                  placeholder="УДАЛИТЬ"
+                  placeholder={t('deleteAccountConfirmText')}
                   className="border-red-300"
                 />
                 <Button
@@ -797,22 +803,22 @@ export default function ProfilePage() {
                   onClick={handleDeleteAccount}
                 >
                   <Trash2 size={14} className="mr-1" />
-                  Подтвердить
+                  {t('confirmDelete')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); setDeletePassword(''); }}
                 >
-                  Отмена
+                  {t('cancel')}
                 </Button>
               </div>
               <div className="space-y-2">
-                <p className="text-xs text-red-600">Введите пароль для подтверждения удаления:</p>
+                <p className="text-xs text-red-600">{t('enterPasswordToDelete')}</p>
                 <Input
                   type="password"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
-                  placeholder="Текущий пароль"
+                  placeholder={t('deletePasswordPlaceholder')}
                   className="border-red-300"
                 />
               </div>

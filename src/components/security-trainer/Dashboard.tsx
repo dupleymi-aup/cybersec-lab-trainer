@@ -15,6 +15,7 @@ import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import {
   Shield,
   ShieldCheck,
@@ -91,14 +92,14 @@ const achievementIcons: Record<string, React.ReactNode> = {
   'all-headers-correct': <ShieldCheck size={18} />,
 };
 
-function getProficiencyLevel(completedCount: number, totalModules: number, avgScore: number): { label: string; color: string; bg: string; icon: React.ReactNode } {
+function getProficiencyLevel(completedCount: number, totalModules: number, avgScore: number, t: ReturnType<typeof useTranslations>): { label: string; color: string; bg: string; icon: React.ReactNode } {
   const pct = totalModules > 0 ? completedCount / totalModules : 0;
-  if (pct === 0) return { label: 'Новичок', color: 'text-muted-foreground', bg: 'bg-muted', icon: <Star size={14} /> };
-  if (pct < 0.3) return { label: 'Начинающий', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/40', icon: <Star size={14} /> };
-  if (pct < 0.6) return { label: 'Практикующий', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-100 dark:bg-sky-900/40', icon: <Star size={14} /> };
-  if (pct < 0.9) return { label: 'Продвинутый', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-100 dark:bg-violet-900/40', icon: <Star size={14} /> };
-  if (avgScore >= 80) return { label: 'Эксперт', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/40', icon: <Trophy size={14} /> };
-  return { label: 'Продвинутый', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-100 dark:bg-violet-900/40', icon: <Star size={14} /> };
+  if (pct === 0) return { label: t('proficiency.novice'), color: 'text-muted-foreground', bg: 'bg-muted', icon: <Star size={14} /> };
+  if (pct < 0.3) return { label: t('proficiency.beginner'), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/40', icon: <Star size={14} /> };
+  if (pct < 0.6) return { label: t('proficiency.practitioner'), color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-100 dark:bg-sky-900/40', icon: <Star size={14} /> };
+  if (pct < 0.9) return { label: t('proficiency.advanced'), color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-100 dark:bg-violet-900/40', icon: <Star size={14} /> };
+  if (avgScore >= 80) return { label: t('proficiency.expert'), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/40', icon: <Trophy size={14} /> };
+  return { label: t('proficiency.advanced'), color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-100 dark:bg-violet-900/40', icon: <Star size={14} /> };
 }
 
 async function fetchActiveAnnouncements(): Promise<Announcement[]> {
@@ -114,6 +115,7 @@ async function fetchActiveAnnouncements(): Promise<Announcement[]> {
 }
 
 export default function Dashboard() {
+  const t = useTranslations('dashboard');
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const completedModules = useAppStore(s => s.completedModules);
   const quizScores = useAppStore(s => s.quizScores);
@@ -267,7 +269,7 @@ export default function Dashboard() {
     prevUnlockedRef.current = current;
   }, [unlockedAchievements]);
 
-  const proficiency = getProficiencyLevel(completedCount, totalModules, avgQuizScore);
+  const proficiency = getProficiencyLevel(completedCount, totalModules, avgQuizScore, t);
 
   const activityTimeline = useMemo(() => {
     const events: Array<{ date: Date; type: 'module' | 'quiz'; label: string }> = [];
@@ -278,11 +280,11 @@ export default function Dashboard() {
       }
     }
     for (const [quizId, ts] of Object.entries(quizTimestamps)) {
-      events.push({ date: new Date(ts), type: 'quiz' as const, label: `Квиз: ${quizId}` });
+      events.push({ date: new Date(ts), type: 'quiz' as const, label: t('activityTimeline.quizPrefix', { id: quizId }) });
     }
     events.sort((a, b) => b.date.getTime() - a.date.getTime());
     return events;
-  }, [moduleTimestamps, quizTimestamps]);
+  }, [moduleTimestamps, quizTimestamps, t]);
 
   const streakData = useMemo(() => {
     const allDates = new Set<string>();
@@ -345,58 +347,58 @@ export default function Dashboard() {
   const recommendation = useMemo(() => {
     const buildRecommendation = () => {
       if (user?.role === 'admin' && completedModules.length === 0) {
-        return { text: 'Управляйте пользователями и настройками системы.', page: 'admin-panel' as PageType };
+        return { text: t('recommendations.adminNew'), page: 'admin-panel' as PageType };
       }
       if (user?.role === 'teacher' && completedModules.length === 0) {
-        return { text: 'Посмотрите аналитику и прогресс студентов.', page: 'teacher-panel' as PageType };
+        return { text: t('recommendations.teacherNew'), page: 'teacher-panel' as PageType };
       }
 
       if (streakData.current >= 7) {
-        return { text: `Отличная серия — ${streakData.current} дней подряд! Продолжайте и открывайте новые достижения.`, page: 'achievements' as PageType };
+        return { text: t('recommendations.greatStreak', { streak: streakData.current }), page: 'achievements' as PageType };
       }
       if (streakData.current === 0 && streakData.daysSinceLast >= 3) {
         const nextModule = modules.find((m) => !completedModules.includes(m.id));
-        return { text: `Вы не занимались ${streakData.daysSinceLast} дн. Вернитесь к обучению — серия ждёт!`, page: (nextModule?.id || 'quiz') as PageType };
+        return { text: t('recommendations.inactive', { days: streakData.daysSinceLast }), page: (nextModule?.id || 'quiz') as PageType };
       }
 
       if (completedModules.length === 0) {
-        return { text: 'Начните с OWASP Top 10 — это фундамент веб-безопасности.', page: 'owasp' as PageType };
+        return { text: t('recommendations.startOwasp'), page: 'owasp' as PageType };
       }
       if (!completedModules.includes('sql-injection')) {
-        return { text: 'Попробуйте SQL-инъекции — самая распространённая уязвимость.', page: 'sql-injection' as PageType };
+        return { text: t('recommendations.trySql'), page: 'sql-injection' as PageType };
       }
       if (!completedModules.includes('xss')) {
-        return { text: 'Изучите XSS-атаки — они встречаются на каждом третьем сайте.', page: 'xss' as PageType };
+        return { text: t('recommendations.learnXss'), page: 'xss' as PageType };
       }
       if (!completedModules.includes('csrf')) {
-        return { text: 'Изучите CSRF-атаки — подделка запросов от имени пользователя.', page: 'csrf' as PageType };
+        return { text: t('recommendations.learnCsrf'), page: 'csrf' as PageType };
       }
       if (!completedModules.includes('security-headers')) {
-        return { text: 'Освойте Security Headers — CSP, HSTS и другие заголовки безопасности.', page: 'security-headers' as PageType };
+        return { text: t('recommendations.masterHeaders'), page: 'security-headers' as PageType };
       }
       if (!completedModules.includes('auth')) {
-        return { text: 'Попробуйте модуль аутентификации — пароли, хеширование и 2FA.', page: 'auth' as PageType };
+        return { text: t('recommendations.tryAuth'), page: 'auth' as PageType };
       }
       if (!completedModules.includes('secure-coding')) {
-        return { text: 'Практикуйтесь в безопасном кодировании — 15 задач по ревью кода.', page: 'secure-coding' as PageType };
+        return { text: t('recommendations.practiceCoding'), page: 'secure-coding' as PageType };
       }
       if (!completedModules.includes('tools')) {
-        return { text: 'Попробуйте инструменты: шифры, кодирование и генератор паролей.', page: 'tools' as PageType };
+        return { text: t('recommendations.tryTools'), page: 'tools' as PageType };
       }
       if (!completedModules.includes('api-security')) {
-        return { text: 'Изучите OWASP API Security Top 10 — уязвимости современных API.', page: 'api-security' as PageType };
+        return { text: t('recommendations.learnApi'), page: 'api-security' as PageType };
       }
       if (Object.keys(quizScores).length < 11) {
-        return { text: 'Проверьте свои знания в квизах — 11 категорий с фильтрацией по сложности!', page: 'quiz' as PageType };
+        return { text: t('recommendations.tryQuizzes'), page: 'quiz' as PageType };
       }
       if (totalProgress < 100) {
         const nextModule = modules.find((m) => !completedModules.includes(m.id));
-        return { text: 'Завершите оставшиеся модули для полного прохождения!', page: (nextModule?.id || 'dashboard') as PageType };
+        return { text: t('recommendations.finishModules'), page: (nextModule?.id || 'dashboard') as PageType };
       }
-      return { text: 'Великолепно! Вы прошли все модули. Посмотрите достижения!', page: 'achievements' as PageType };
+      return { text: t('recommendations.allDone'), page: 'achievements' as PageType };
     };
     return buildRecommendation();
-  }, [user?.role, completedModules, quizScores, totalProgress, streakData]);
+  }, [user?.role, completedModules, quizScores, totalProgress, streakData, t]);
 
   const [showAllActivity, setShowAllActivity] = useState(false);
 
@@ -406,10 +408,10 @@ export default function Dashboard() {
 
   const quickActions = [
     ...(user?.role === 'admin' || user?.role === 'teacher'
-      ? [{ label: 'Панель администратора' as const, page: 'admin-panel' as PageType, icon: Shield, color: 'bg-red-100 text-red-600' }]
+      ? [{ label: t('quickActions.adminPanel'), page: 'admin-panel' as PageType, icon: Shield, color: 'bg-red-100 text-red-600' }]
       : []),
     ...(user?.role === 'teacher' || user?.role === 'admin'
-      ? [{ label: 'Панель преподавателя' as const, page: 'teacher-panel' as PageType, icon: UserCheck, color: 'bg-amber-100 text-amber-600' }]
+      ? [{ label: t('quickActions.teacherPanel'), page: 'teacher-panel' as PageType, icon: UserCheck, color: 'bg-amber-100 text-amber-600' }]
       : []),
   ];
 
@@ -417,7 +419,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Mobile top bar */}
       <div className="flex items-center gap-3 md:hidden">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label="Открыть меню">
+        <Button variant="ghost" size="icon" onClick={toggleSidebar} aria-label={t('openMenu')}>
           <Menu size={22} />
         </Button>
         <Shield size={22} className="text-emerald-600" />
@@ -452,7 +454,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-semibold text-foreground/80">{ann.title}</p>
                         {ann.priority === 'high' && (
-                          <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">Важно</Badge>
+                          <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">{t('announcement.important')}</Badge>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">{ann.content}</p>
@@ -461,7 +463,7 @@ export default function Dashboard() {
                   <button
                     onClick={() => dismissAnnouncement(ann.id)}
                     className="text-slate-400 hover:text-muted-foreground shrink-0"
-                    aria-label={`Скрыть объявление: ${ann.title}`}
+                    aria-label={t('announcement.dismiss', { title: ann.title })}
                   >
                     <X size={16} />
                   </button>
@@ -483,37 +485,36 @@ export default function Dashboard() {
         <div className="relative z-10">
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-600/30">
-              09.03.04 Программная инженерия
+               {t('heroBadge')}
             </Badge>
             <Badge className={`${proficiency.bg} ${proficiency.color} border-0`}>
               {proficiency.icon} {proficiency.label}
             </Badge>
           </div>
           <h1 className="text-xl md:text-3xl font-bold mb-3">
-            Добро пожаловать{user?.fullName ? `, ${user.fullName.split(' ')[0]}` : ''}!
+            {t('welcome')}{user?.fullName ? `, ${user.fullName.split(' ')[0]}` : ''}!  
           </h1>
           <p className="text-sm md:text-base text-slate-300 max-w-2xl leading-relaxed">
-            Интерактивная платформа для изучения уязвимостей веб-приложений, методов атак и защитных
-            механизмов. Практикуйтесь в безопасной среде.
+            {t('subtitle')}
           </p>
           <div className="flex flex-wrap gap-3 md:gap-4 mt-6">
             <div className="flex items-center gap-2 text-sm">
               <BookOpen size={16} className="text-emerald-400" />
-              <span className="text-slate-300">{totalModules} модулей</span>
+              <span className="text-slate-300">{totalModules} {t('stats.modules')}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Flame size={16} className="text-emerald-400" />
-              <span className="text-slate-300">{totalProgress}% прогресса</span>
+              <span className="text-slate-300">{totalProgress}% {t('stats.progressLabel')}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Trophy size={16} className="text-emerald-400" />
               <span className="text-slate-300">
-                {avgQuizScore > 0 ? `Средний балл: ${avgQuizScore}%` : 'Пройдите квиз'}
+                {avgQuizScore > 0 ? `${t('stats.avgScoreLabel')} ${avgQuizScore}%` : t('takeQuiz')}
               </span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Star size={16} className="text-amber-400" />
-              <span className="text-slate-300">{unlockedCount} достижений</span>
+              <span className="text-slate-300">{unlockedCount} {t('stats.achievementsLabel')}</span>
             </div>
           </div>
         </div>
@@ -522,12 +523,12 @@ export default function Dashboard() {
       {/* Stats grid - key metrics first */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
         {[
-          { label: 'Модули', value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
-          { label: 'Квизы', value: `${Object.keys(quizScores).length}/${quizCategories.length}`, color: 'text-amber-600' },
-          { label: 'Средний балл', value: `${avgQuizScore}%`, color: 'text-sky-600' },
-          { label: 'Достижения', value: `${unlockedCount}/${achievements.length}`, color: 'text-violet-600' },
-          { label: streakData.current > 0 ? 'Серия' : 'Нет серии', value: streakData.current > 0 ? `${streakData.current} дн.` : '—', color: 'text-orange-600', tooltip: streakData.longest > 0 ? `Лучшая: ${streakData.longest} дн.` : undefined },
-          { label: 'Уровень', value: proficiency.label, color: proficiency.color },
+          { label: t('stats.modulesLabel'), value: `${completedCount}/${totalModules}`, color: 'text-emerald-600' },
+          { label: t('stats.quizzes'), value: `${Object.keys(quizScores).length}/${quizCategories.length}`, color: 'text-amber-600' },
+          { label: t('stats.avgScore'), value: `${avgQuizScore}%`, color: 'text-sky-600' },
+          { label: t('achievements'), value: `${unlockedCount}/${achievements.length}`, color: 'text-violet-600' },
+          { label: streakData.current > 0 ? t('streak') : t('stats.noStreak'), value: streakData.current > 0 ? `${streakData.current} ${t('days')}` : '—', color: 'text-orange-600', tooltip: streakData.longest > 0 ? t('stats.bestStreak', { streak: streakData.longest }) : undefined, streakKey: true },
+          { label: t('level'), value: proficiency.label, color: proficiency.color },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -537,7 +538,7 @@ export default function Dashboard() {
           >
             <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow">
               <CardContent className="p-4 text-center">
-                {stat.label.includes('Серия') || stat.label.includes('Нет') ? (
+                {'streakKey' in stat ? (
                   <>
                     <Flame size={20} className={`mx-auto mb-1 ${streakData.current > 0 ? 'text-orange-500' : 'text-slate-300'}`} />
                     <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -585,24 +586,24 @@ export default function Dashboard() {
         >
           <div className="flex items-center gap-2 mb-3">
             <Users size={18} className="text-amber-600" />
-            <span className="text-sm font-semibold text-amber-800">Обзор класса</span>
+            <span className="text-sm font-semibold text-amber-800">{t('classOverview')}</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <p className="text-xl font-bold text-amber-700">{teacherStats.totalStudents}</p>
-              <p className="text-xs text-amber-600/80">Всего студентов</p>
+              <p className="text-xs text-amber-600/80">{t('stats.totalStudents')}</p>
             </div>
             <div>
               <p className="text-xl font-bold text-emerald-700">{teacherStats.activeStudents}</p>
-              <p className="text-xs text-emerald-600/80">Активных за 30 дн.</p>
+              <p className="text-xs text-emerald-600/80">{t('stats.active30d')}</p>
             </div>
             <div>
               <p className="text-xl font-bold text-violet-700">{teacherStats.avgModules}%</p>
-              <p className="text-xs text-violet-600/80">Среднее завершение</p>
+              <p className="text-xs text-violet-600/80">{t('stats.avgCompletion')}</p>
             </div>
             <div>
               <p className="text-xl font-bold text-red-600">{teacherStats.atRiskCount}</p>
-              <p className="text-xs text-red-500/80">В зоне риска</p>
+              <p className="text-xs text-red-500/80">{t('stats.atRisk')}</p>
             </div>
           </div>
         </motion.div>
@@ -623,7 +624,7 @@ export default function Dashboard() {
                   <ArrowRight size={20} />
                 </div>
                 <div>
-                  <p className="text-xs text-emerald-600 font-medium">Рекомендация</p>
+                  <p className="text-xs text-emerald-600 font-medium">{t('recommendation')}</p>
                   <p className="text-sm font-semibold text-foreground/80">{recommendation.text}</p>
                 </div>
               </div>
@@ -644,7 +645,7 @@ export default function Dashboard() {
                   {achievementIcons[nextAchievement.id]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-amber-600">Следующее достижение</p>
+                  <p className="text-xs text-amber-600">{t('nextAchievement')}</p>
                   <p className="text-sm font-semibold text-amber-900">{nextAchievement.title}</p>
                   <p className="text-[11px] text-amber-700">{nextAchievement.condition}</p>
                 </div>
@@ -665,7 +666,7 @@ export default function Dashboard() {
             <CardContent className="p-5">
               <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
                 <Clock size={16} className="text-orange-500" />
-                Предстоящие дедлайны
+                {t('upcomingDeadlines')}
               </h3>
               <div className="space-y-3">
                 {upcomingDeadlines.map((deadline) => {
@@ -678,16 +679,16 @@ export default function Dashboard() {
                         : 'border-l-emerald-500 bg-emerald-50';
 
                   const urgencyBadge = deadline.isOverdue
-                    ? <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">Просрочен</Badge>
+                    ? <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">{t('deadline.overdue')}</Badge>
                     : deadline.daysLeft <= 1
-                      ? <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">{deadline.daysLeft === 0 ? 'Сегодня' : 'Завтра'}</Badge>
-                      : <Badge className="bg-orange-100 text-orange-700 border-0 text-[10px]">{deadline.daysLeft} дн.</Badge>;
+                      ? <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">{deadline.daysLeft === 0 ? t('deadline.today') : t('deadline.tomorrow')}</Badge>
+                      : <Badge className="bg-orange-100 text-orange-700 border-0 text-[10px]">{deadline.daysLeft} {t('days')}</Badge>;
 
                   const scopeLabel = deadline.scope === 'course'
-                    ? 'Курс'
+                    ? t('deadline.scopeCourse')
                     : deadline.scope === 'module'
                       ? modules.find(m => m.id === deadline.scopeId)?.title || deadline.scopeId
-                      : `Квиз: ${deadline.scopeId}`;
+                      : t('deadline.scopeQuiz', { id: deadline.scopeId });
 
                   const dueDate = new Date(deadline.dueAt).toLocaleDateString('ru-RU', {
                     day: 'numeric',
@@ -735,7 +736,7 @@ export default function Dashboard() {
 
       {/* Module Cards */}
       <div>
-        <h2 className="text-lg md:text-xl font-bold mb-4">Модули обучения</h2>
+        <h2 className="text-lg md:text-xl font-bold mb-4">{t('learningModules')}</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {modules.map((mod, i) => {
             const isCompleted = completedModules.includes(mod.id);
@@ -780,9 +781,9 @@ export default function Dashboard() {
                           <Badge variant="secondary" className={`text-[10px] ${mod.difficultyColor}`}>
                             {mod.difficulty}
                           </Badge>
-                          <span className="text-[11px] text-slate-400">{mod.lessons} уроков</span>
+                          <span className="text-[11px] text-slate-400">{mod.lessons} {t('module.lessons')}</span>
                           {isCompleted && (
-                            <Badge className="bg-emerald-100 text-emerald-700 border-0 text-[10px]">Пройден</Badge>
+                            <Badge className="bg-emerald-100 text-emerald-700 border-0 text-[10px]">{t('module.completed')}</Badge>
                           )}
                         </div>
                       </div>
@@ -827,14 +828,14 @@ export default function Dashboard() {
                   <div className="flex-1 p-4">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h3 className="font-semibold text-sm group-hover:text-amber-700 transition-colors">Проверка знаний</h3>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">Проверьте свои знания по 9 категориям безопасности с фильтрацией по сложности.</p>
+                        <h3 className="font-semibold text-sm group-hover:text-amber-700 transition-colors">{t('quizCard.title')}</h3>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{t('quizCard.description')}</p>
                       </div>
                       <ChevronRight size={16} className="text-slate-300 group-hover:text-amber-500 transition-colors mt-1 shrink-0" />
                     </div>
                     <div className="flex items-center gap-2 mt-3 flex-wrap">
-                      <Badge className="bg-amber-100 text-amber-700 border-0 text-[10px]">9 категорий</Badge>
-                      <span className="text-[11px] text-slate-400">136+ вопросов</span>
+                      <Badge className="bg-amber-100 text-amber-700 border-0 text-[10px]">{t('quizCard.categoriesBadge')}</Badge>
+                      <span className="text-[11px] text-slate-400">{t('quizCard.questionsBadge')}</span>
                     </div>
                   </div>
                 </div>
@@ -859,16 +860,16 @@ export default function Dashboard() {
                   <div className="flex-1 p-4">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h3 className="font-semibold text-sm group-hover:text-violet-700 transition-colors">Достижения и глоссарий</h3>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">Отслеживайте прогресс и изучайте термины ИБ.</p>
+                        <h3 className="font-semibold text-sm group-hover:text-violet-700 transition-colors">{t('achievementsCard.title')}</h3>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{t('achievementsCard.description')}</p>
                       </div>
                       <ChevronRight size={16} className="text-slate-300 group-hover:text-violet-500 transition-colors mt-1 shrink-0" />
                     </div>
                     <div className="flex items-center gap-2 mt-3 flex-wrap">
                       <Badge className="bg-violet-100 text-violet-700 border-0 text-[10px]">
-                        {unlockedCount}/{achievements.length} разблокировано
+                        {t('achievementsCard.unlocked', { unlocked: unlockedCount, total: achievements.length })}
                       </Badge>
-                      <span className="text-[11px] text-slate-400">80+ терминов</span>
+                      <span className="text-[11px] text-slate-400">{t('achievementsCard.terms')}</span>
                     </div>
                   </div>
                 </div>
@@ -893,14 +894,14 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-sm flex items-center gap-2">
                     <Activity size={16} className="text-indigo-500" />
-                    Хронология активности
+                    {t('activityTimeline.title')}
                   </h3>
                   {activityTimeline.length > 5 && (
                     <button
                       onClick={() => setShowAllActivity(!showAllActivity)}
                       className="text-xs text-indigo-600 hover:text-indigo-800"
                     >
-                      {showAllActivity ? 'Свернуть' : 'Показать все'}
+                      {showAllActivity ? t('activityTimeline.collapse') : t('activityTimeline.showAll')}
                     </button>
                   )}
                 </div>
@@ -929,7 +930,7 @@ export default function Dashboard() {
                         </p>
                       </div>
                       <Badge variant="outline" className="text-[10px]">
-                        {event.type === 'module' ? 'Модуль' : 'Квиз'}
+                        {event.type === 'module' ? t('activityTimeline.moduleBadge') : t('activityTimeline.quizBadge')}
                       </Badge>
                     </motion.div>
                   ))}
@@ -943,14 +944,14 @@ export default function Dashboard() {
       {/* Overall progress */}
       <Card className="border-none shadow-sm bg-card">
         <CardContent className="p-6">
-          <h3 className="font-semibold text-sm mb-3">Общий прогресс обучения</h3>
+          <h3 className="font-semibold text-sm mb-3">{t('overallProgress')}</h3>
           <Progress value={totalProgress} className="h-3 mb-2" />
           <p className="text-xs text-muted-foreground">
             {totalProgress === 100
-              ? 'Отлично! Вы прошли все модули. Попробуйте квизы для закрепления и откройте все достижения.'
+              ? t('progressCompleteMessage')
               : totalProgress === 0
-                ? 'Начните с любого модуля, который вас интересует.'
-                : `Продолжайте обучение! Ещё ${totalModules - completedCount} модулей осталось.`}
+                ? t('progressStartMessage')
+                : t('progressContinueMessage', { remaining: totalModules - completedCount })}
           </p>
         </CardContent>
       </Card>

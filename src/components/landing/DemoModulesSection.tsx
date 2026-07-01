@@ -1,6 +1,6 @@
 "use client";
 
-import {useTranslations} from "next-intl";
+import {useTranslations, useLocale} from "next-intl";
 import {motion} from "framer-motion";
 import {Shield, Lock, KeyRound, Mail, ArrowRight} from "lucide-react";
 import Link from "next/link";
@@ -18,6 +18,7 @@ const lessonCounts = [10, 5, 4, 6];
 
 export default function DemoModulesSection() {
   const t = useTranslations("landing.demoModules");
+  const locale = useLocale();
   return (
     <section id="modules" className="py-20 bg-accent/30" aria-label="Demo modules">
       <div className="container mx-auto px-4">
@@ -48,7 +49,7 @@ export default function DemoModulesSection() {
                   <CardContent>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">{lessonCounts[index]} {t("lessons")}</span>
-                      <Link href="/register">
+                      <Link href={`/${locale}/register`}>
                         <Button variant="ghost" className="text-violet-500 hover:text-violet-600 hover:bg-violet-500/10 gap-2">
                           {t("try")}
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
@@ -62,7 +63,7 @@ export default function DemoModulesSection() {
           })}
         </div>
         <motion.div initial={{opacity: 0, y: 20}} whileInView={{opacity: 1, y: 0}} viewport={{once: true}} className="text-center mt-12">
-          <Link href="/register">
+          <Link href={`/${locale}/register`}>
             <Button className="bg-violet-600 hover:bg-violet-700 text-white px-8">{t("registerCTA")}</Button>
           </Link>
         </motion.div>

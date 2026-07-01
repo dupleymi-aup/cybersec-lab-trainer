@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useAppStore, apiClient } from '@/lib/store';
+import { useTranslations } from 'next-intl';
 import { quizQuestions, quizCategories } from '@/lib/data';
 import { saveQuizAttempts, type QuizAttemptData } from '@/lib/auth-store';
 import { NotificationHelper } from '@/lib/notification-store';
@@ -54,7 +55,6 @@ function getDifficultyBreakdown(questions: typeof quizQuestions): Record<string,
   return counts;
 }
 
-const DIFF_LABELS: Record<string, string> = { easy: 'Лёгкий', medium: 'Средний', hard: 'Сложный' };
 const DIFF_COLORS: Record<string, string> = {
   easy: 'bg-emerald-100 text-emerald-700',
   medium: 'bg-amber-100 text-amber-700',
@@ -65,6 +65,7 @@ export default function QuizSystem() {
   const quizScores = useAppStore(s => s.quizScores);
   const setQuizScore = useAppStore(s => s.setQuizScore);
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const t = useTranslations('quiz');
   const [quizState, setQuizState] = useState<QuizState>('select');
   const [activeCategory, setActiveCategory] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
@@ -360,8 +361,8 @@ export default function QuizSystem() {
           <HelpCircle size={20} className="text-amber-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Проверка знаний</h1>
-          <p className="text-xs text-muted-foreground">Тестирование по информационной безопасности</p>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <p className="text-xs text-muted-foreground">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -370,8 +371,8 @@ export default function QuizSystem() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
           <Card className="border-none shadow-sm">
             <CardContent className="p-5">
-              <h2 className="font-semibold mb-1">Выберите категорию квиза</h2>
-              <p className="text-xs text-muted-foreground">Каждый квиз содержит вопросы с таймером 30 секунд на каждый.</p>
+              <h2 className="font-semibold mb-1">{t('selectCategory')}</h2>
+              <p className="text-xs text-muted-foreground">{t('selectDescription')}</p>
             </CardContent>
           </Card>
 
@@ -380,13 +381,13 @@ export default function QuizSystem() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <Target size={16} className="text-muted-foreground" />
-                <span className="text-xs font-semibold text-muted-foreground">Сложность:</span>
+                <span className="text-xs font-semibold text-muted-foreground">{t('difficultyLabel')}</span>
                 <div className="flex gap-1.5">
                   {([
-                    ['all', 'Все'],
-                    ['easy', 'Лёгкий'],
-                    ['medium', 'Средний'],
-                    ['hard', 'Сложный'],
+                    ['all', t('filterAll')],
+                    ['easy', t('difficulty.easy')],
+                    ['medium', t('difficulty.medium')],
+                    ['hard', t('difficulty.hard')],
                   ] as const).map(([key, label]) => (
                     <button
                       key={key}
@@ -432,12 +433,12 @@ export default function QuizSystem() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm">{cat.name}</h3>
-                        <p className="text-xs text-muted-foreground">{available.length} вопросов</p>
+                        <p className="text-xs text-muted-foreground">{t('questionsCount', { count: available.length })}</p>
                         <div className="flex gap-1 mt-1">
                           {(['easy', 'medium', 'hard'] as const).map((d) =>
                             breakdown[d] ? (
                               <span key={d} className={`text-[10px] px-1.5 py-0.5 rounded ${DIFF_COLORS[d]}`}>
-                                {DIFF_LABELS[d]}: {breakdown[d]}
+                                {t(`difficulty.${d}`)}: {breakdown[d]}
                               </span>
                             ) : null
                           )}
@@ -449,9 +450,9 @@ export default function QuizSystem() {
                             {score}%
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-[10px]">
-                            Новый
-                          </Badge>
+                            <Badge variant="outline" className="text-[10px]">
+                              {t('newBadge')}
+                            </Badge>
                         )}
                       </div>
                     </div>
@@ -538,9 +539,9 @@ export default function QuizSystem() {
                           : 'bg-red-100 text-red-700'
                       }`}
                     >
-                      {DIFF_LABELS[question.difficulty]}
+                      {t(`difficulty.${question.difficulty}`)}
                     </Badge>
-                    <span className="text-[10px] text-slate-400">Вопрос {currentQuestion + 1}/{categoryQuestions.length}</span>
+                    <span className="text-[10px] text-slate-400">{t('question', { current: currentQuestion + 1, total: categoryQuestions.length })}</span>
                   </div>
                   <h3 className="font-semibold text-sm leading-relaxed mb-4">{question.question}</h3>
 
@@ -601,15 +602,15 @@ export default function QuizSystem() {
                       onClick={handleAnswer}
                       disabled={!selectedAnswer}
                     >
-                      Ответить <kbd className="ml-2 hidden md:inline-flex items-center justify-center px-2 h-5 rounded text-[10px] font-mono bg-card/20 border border-white/30">Enter</kbd>
+                      {t('answer')} <kbd className="ml-2 hidden md:inline-flex items-center justify-center px-2 h-5 rounded text-[10px] font-mono bg-card/20 border border-white/30">Enter</kbd>
                     </Button>
                   )}
 
                   {/* Keyboard hints */}
                   <div className="hidden md:flex items-center gap-3 mt-3 text-[11px] text-slate-400">
-                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">1-4</kbd> выбрать</span>
-                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">↑↓</kbd> навигация</span>
-                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">Esc</kbd> выход</span>
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">1-4</kbd> {t('select')}</span>
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">↑↓</kbd> {t('navigation')}</span>
+                    <span><kbd className="inline-flex items-center justify-center px-1.5 h-4 rounded text-[10px] font-mono bg-muted border border-border mr-1">Esc</kbd> {t('exit')}</span>
                   </div>
 
                   {showAnswer && (
@@ -623,10 +624,10 @@ export default function QuizSystem() {
                       }`}>
                         <p className={`text-xs font-semibold flex items-center gap-1.5 ${answers[currentQuestion] ? 'text-emerald-700' : 'text-red-700'}`}>
                           {answers[currentQuestion]
-                            ? (<><CheckCircle2 size={14} /> Правильно!</>)
+                            ? (<><CheckCircle2 size={14} /> {t('correct')}</>)
                             : timeLeft <= 0
-                              ? (<><Clock size={14} /> Время вышло!</>)
-                              : (<><XCircle size={14} /> Неправильно!</>)}
+                              ? (<><Clock size={14} /> {t('timeUp')}</>)
+                              : (<><XCircle size={14} /> {t('incorrect')}</>)}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{question.explanation}</p>
                       </div>
@@ -636,8 +637,8 @@ export default function QuizSystem() {
                         onClick={() => nextQuestion()}
                       >
                         {currentQuestion < categoryQuestions.length - 1 ? (
-                          <>Следующий вопрос <ChevronRight size={14} className="ml-1" /></>
-                        ) : 'Результаты'}
+                          <>{t('next')} <ChevronRight size={14} className="ml-1" /></>
+                        ) : t('results')}
                       </Button>
                     </motion.div>
                   )}
@@ -663,25 +664,25 @@ export default function QuizSystem() {
                 )}
               </div>
               <h2 className="text-2xl font-bold mb-1">
-                {finalScore >= 80 ? 'Отлично!' : finalScore >= 60 ? 'Хороший результат!' : 'Нужно подтянуть!'}
+                {finalScore >= 80 ? t('perfect') : finalScore >= 60 ? t('passed') : t('failed')}
               </h2>
               <p className="text-slate-300 text-sm mb-4">{activeCategory}</p>
 
               <div className="text-5xl font-bold font-mono mb-2">{finalScore}%</div>
               <p className="text-slate-400 text-sm mb-1">
-                {correctCount} из {categoryQuestions.length} правильных ответов
+                {t('correctAnswers', { correct: correctCount, total: categoryQuestions.length })}
               </p>
 
               {/* Streak info */}
               {maxStreak >= 3 && (
                 <p className="text-amber-400 text-xs mb-2 flex items-center justify-center gap-1">
-                  <Flame size={14} /> Максимальная серия: {maxStreak} подряд
+                  <Flame size={14} /> {t('maxStreak', { streak: maxStreak })}
                 </p>
               )}
 
               {totalTimeTaken > 0 && (
                 <p className="text-slate-400 text-xs mb-4 flex items-center justify-center gap-1">
-                  <Clock size={12} /> Затраченное время: {totalTimeTaken}с
+                  <Clock size={12} /> {t('timeTaken', { seconds: totalTimeTaken })}
                 </p>
               )}
 
@@ -697,7 +698,7 @@ export default function QuizSystem() {
                   <div className="flex justify-center gap-4 mb-4">
                     {Object.entries(breakdown).map(([diff, stats]) => (
                       <span key={diff} className="text-xs font-mono">
-                        <span className={DIFF_COLORS[diff].split(' ')[1]}>{DIFF_LABELS[diff]}</span>
+                        <span className={DIFF_COLORS[diff].split(' ')[1]}>{t(`difficulty.${diff}`)}</span>
                         : {stats.correct}/{stats.total}
                       </span>
                     ))}
@@ -707,10 +708,10 @@ export default function QuizSystem() {
 
               <div className="flex gap-2 justify-center mt-4">
                 <Button variant="outline" className="text-white border-white/20 hover:bg-card/10" onClick={resetQuiz}>
-                  <RotateCcw size={14} className="mr-2" /> К категориям
+                  <RotateCcw size={14} className="mr-2" /> {t('backToModules')}
                 </Button>
                 <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => startQuiz(activeCategory)}>
-                  <RotateCcw size={14} className="mr-2" /> Пройти заново
+                  <RotateCcw size={14} className="mr-2" /> {t('retry')}
                 </Button>
               </div>
             </CardContent>
@@ -719,7 +720,7 @@ export default function QuizSystem() {
           {/* Answer breakdown */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="text-sm font-semibold mb-3">Разбор ответов</h3>
+              <h3 className="text-sm font-semibold mb-3">{t('answerBreakdown')}</h3>
               <div className="space-y-3">
                 {categoryQuestions.map((q, i) => (
                   <div key={q.id} className="flex items-start gap-3 p-3 rounded-lg bg-secondary">
@@ -732,7 +733,7 @@ export default function QuizSystem() {
                       <p className="text-xs font-medium leading-relaxed">{q.question}</p>
                       {!answers[i] && (
                         <p className="text-[11px] text-emerald-600 mt-1">
-                          Правильный ответ: {q.options[q.correctIndex]}
+                          {t('correctAnswer', { answer: q.options[q.correctIndex] })}
                         </p>
                       )}
                     </div>

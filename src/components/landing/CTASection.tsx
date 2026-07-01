@@ -1,12 +1,13 @@
 "use client";
 
-import {useTranslations} from "next-intl";
+import {useTranslations, useLocale} from "next-intl";
 import {motion} from "framer-motion";
 import {Zap, ArrowRight, Users, Trophy, Clock} from "lucide-react";
 import Link from "next/link";
 
 export default function CTASection() {
   const t = useTranslations("landing.cta");
+  const locale = useLocale();
   return (
     <section className="py-20 bg-background relative overflow-hidden" aria-label="Call to action">
       <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-accent/20 to-emerald-500/10" />
@@ -37,7 +38,7 @@ export default function CTASection() {
             </div>
           </div>
           <div className="text-center">
-            <Link href="/register" className="inline-flex items-center gap-3 px-10 py-5 bg-violet-600 hover:bg-violet-700 text-white text-xl font-bold rounded-2xl shadow-2xl shadow-violet-600/30 transition-all hover:scale-105 group">
+            <Link href={`/${locale}/register`} className="inline-flex items-center gap-3 px-10 py-5 bg-violet-600 hover:bg-violet-700 text-white text-xl font-bold rounded-2xl shadow-2xl shadow-violet-600/30 transition-all hover:scale-105 group">
               <Zap className="w-6 h-6" aria-hidden="true" />
               {t("startFree")}
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" aria-hidden="true" />

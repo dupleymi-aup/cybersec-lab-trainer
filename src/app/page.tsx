@@ -1,5 +1,5 @@
-import {redirect} from "next/navigation";
+import {redirect} from '@/routing';
 
 export default function RootPage() {
-  redirect("/ru");
+  redirect({href: '/', locale: 'ru'});
 }

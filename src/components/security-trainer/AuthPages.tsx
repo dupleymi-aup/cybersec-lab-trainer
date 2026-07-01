@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuthStore, type UserRole } from '@/lib/auth-store';
+import { useTranslations } from 'next-intl';
 import { validateEmail, validatePhone, validatePassword } from '@/lib/auth-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,10 +68,12 @@ export default function AuthPages() {
   const resetPassword = useAuthStore(s => s.resetPassword);
   const recoveryState = useAuthStore(s => s.recoveryState);
 
+  const t = useTranslations('auth');
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginContact || !loginPassword) {
-      toast.error('Заполните все поля');
+      toast.error(t('validation.allFieldsRequired'));
       return;
     }
     setLoading(true);
@@ -84,15 +87,15 @@ export default function AuthPages() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!regEmail || !regPhone || !regName || !regPassword || !regConfirmPassword) {
-      toast.error('Заполните все поля');
+      toast.error(t('validation.allFieldsRequired'));
       return;
     }
     if (!validateEmail(regEmail)) {
-      toast.error('Некорректный email');
+      toast.error(t('validation.invalidEmail'));
       return;
     }
     if (!validatePhone(regPhone)) {
-      toast.error('Некорректный номер телефона');
+      toast.error(t('validation.invalidPhone'));
       return;
     }
     const pwValidation = validatePassword(regPassword);
@@ -101,7 +104,7 @@ export default function AuthPages() {
       return;
     }
     if (regPassword !== regConfirmPassword) {
-      toast.error('Пароли не совпадают');
+      toast.error(t('validation.passwordMismatch'));
       return;
     }
     setLoading(true);
@@ -119,22 +122,22 @@ export default function AuthPages() {
 
   const handleSendRecovery = async () => {
     if (!recoveryContact) {
-      toast.error('Введите email или телефон');
+      toast.error(t('validation.allFieldsRequired'));
       return;
     }
     if (recoveryMethod === 'email' && !validateEmail(recoveryContact)) {
-      toast.error('Некорректный email');
+      toast.error(t('validation.invalidEmail'));
       return;
     }
     if (recoveryMethod === 'phone' && !validatePhone(recoveryContact)) {
-      toast.error('Некорректный номер телефона');
+      toast.error(t('validation.invalidPhone'));
       return;
     }
     setLoading(true);
     const result = await sendRecoveryOTP(recoveryContact);
     setLoading(false);
     if (result.success) {
-      toast.success('Код отправлен');
+      toast.success(t('recovery.otpSent'));
       setShowRecoveryOtp(false);
       setRecoveryStep('enter-otp');
       setCountdown(60);
@@ -148,7 +151,7 @@ export default function AuthPages() {
     if (valid) {
       setRecoveryStep('new-password');
     } else {
-      toast.error('Неверный или просроченный код');
+      toast.error(t('recovery.invalidOtp'));
     }
   };
 
@@ -157,7 +160,7 @@ export default function AuthPages() {
     const result = await sendRecoveryOTP(recoveryContact);
     setLoading(false);
     if (result.success) {
-      toast.success('Новый код отправлен');
+      toast.success(t('recovery.otpResent'));
       setCountdown(60);
     } else {
       toast.error(result.error);
@@ -166,7 +169,7 @@ export default function AuthPages() {
 
   const handleResetPassword = async () => {
     if (!recoveryNewPassword || !recoveryConfirmPassword) {
-      toast.error('Заполните все поля');
+      toast.error(t('validation.allFieldsRequired'));
       return;
     }
     const pwValidation = validatePassword(recoveryNewPassword);
@@ -175,12 +178,12 @@ export default function AuthPages() {
       return;
     }
     if (recoveryNewPassword !== recoveryConfirmPassword) {
-      toast.error('Пароли не совпадают');
+      toast.error(t('validation.passwordMismatch'));
       return;
     }
     const result = await resetPassword(recoveryOtp, recoveryNewPassword);
     if (result.success) {
-      toast.success('Пароль успешно изменён');
+      toast.success(t('recovery.passwordResetSuccess'));
       setPage('login');
       setRecoveryStep('enter-contact');
       setRecoveryContact('');
@@ -213,8 +216,8 @@ export default function AuthPages() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-violet-600 rounded-2xl mb-3 shadow-lg shadow-violet-600/20">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">CyberSec Lab</h1>
-          <p className="text-slate-400 text-sm mt-1">Тренажёр по информационной безопасности</p>
+          <h1 className="text-2xl font-bold text-white">{t('brand.name')}</h1>
+          <p className="text-slate-400 text-sm mt-1">{t('brand.tagline')}</p>
         </div>
 
         <AnimatePresence mode="wait">
@@ -227,28 +230,28 @@ export default function AuthPages() {
             >
               <Card className="border-slate-700/50 bg-slate-800/80 dark:bg-slate-700/50 backdrop-blur-xl shadow-xl">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-white text-xl">Вход в аккаунт</CardTitle>
+                  <CardTitle className="text-white text-xl">{t('login.title')}</CardTitle>
                   <CardDescription className="text-slate-400">
-                    Введите email или телефон и пароль
+                    {t('login.subtitle')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleLogin} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="login-contact" className="text-slate-300">
-                        Email или телефон
+                        {t('login.contact')}
                       </Label>
                       <Input
                         id="login-contact"
                         value={loginContact}
                         onChange={(e) => setLoginContact(e.target.value)}
-                        placeholder="example@mail.com или +7..."
+                        placeholder={t('login.contactPlaceholder')}
                         className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="login-password" className="text-slate-300">
-                        Пароль
+                        {t('login.password')}
                       </Label>
                       <div className="relative">
                         <Input
@@ -256,7 +259,7 @@ export default function AuthPages() {
                           type={showLoginPassword ? 'text' : 'password'}
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
-                          placeholder="Введите пароль"
+                          placeholder={t('login.passwordPlaceholder')}
                           className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                         />
                         <button
@@ -276,7 +279,7 @@ export default function AuthPages() {
                           onCheckedChange={(checked) => setRememberMe(!!checked)}
                         />
                         <Label htmlFor="remember-me" className="text-sm text-slate-300 cursor-pointer">
-                          Запомнить меня
+                          {t('login.rememberMe')}
                         </Label>
                       </div>
                       <button
@@ -284,19 +287,19 @@ export default function AuthPages() {
                         onClick={() => setPage('recovery')}
                         className="text-sm text-violet-400 hover:text-violet-300"
                       >
-                        Забыли пароль?
+                        {t('login.forgotPassword')}
                       </button>
                     </div>
                     <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
-                      {loading ? 'Вход...' : 'Войти'}
+                      {loading ? t('login.submitting') : t('login.submit')}
                     </Button>
                   </form>
 
                   <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm">
                     <p className="text-slate-400">
-                      Нет аккаунта?{' '}
+                      {t('login.noAccount')}{' '}
                       <button type="button" onClick={() => setPage('register')} className="text-violet-400 hover:text-violet-300 font-medium">
-                        Зарегистрироваться
+                        {t('login.registerLink')}
                       </button>
                     </p>
                   </div>
@@ -315,64 +318,64 @@ export default function AuthPages() {
             >
               <Card className="border-slate-700/50 bg-slate-800/80 dark:bg-slate-700/50 backdrop-blur-xl shadow-xl">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-white text-xl">Регистрация</CardTitle>
+                  <CardTitle className="text-white text-xl">{t('register.title')}</CardTitle>
                   <CardDescription className="text-slate-400">
-                    Создайте аккаунт для начала обучения
+                    {t('register.description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleRegister} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="reg-name" className="text-slate-300">
-                        ФИО
+                        {t('register.fullName')}
                       </Label>
                       <Input
                         id="reg-name"
                         value={regName}
                         onChange={(e) => setRegName(e.target.value)}
-                        placeholder="Иванов Иван Иванович"
+                        placeholder={t('register.fullNamePlaceholder')}
                         className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
                         <Label htmlFor="reg-email" className="text-slate-300">
-                          Email
+                          {t('register.email')}
                         </Label>
                         <Input
                           id="reg-email"
                           type="email"
                           value={regEmail}
                           onChange={(e) => setRegEmail(e.target.value)}
-                          placeholder="example@mail.com"
+                          placeholder={t('register.emailPlaceholder')}
                           className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="reg-phone" className="text-slate-300">
-                          Телефон
+                          {t('register.phone')}
                         </Label>
                         <Input
                           id="reg-phone"
                           type="tel"
                           value={regPhone}
                           onChange={(e) => setRegPhone(e.target.value)}
-                          placeholder="+7 (999)..."
+                          placeholder={t('register.phonePlaceholder')}
                           className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                         />
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <Label className="text-slate-300">Роль</Label>
+                      <Label className="text-slate-300">{t('register.role')}</Label>
                       <RadioGroup value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)} className="space-y-2">
                         <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
                           <RadioGroupItem value="student" id="role-student" className="mt-1" />
                           <label htmlFor="role-student" className="flex-1 cursor-pointer">
                             <div className="flex items-center gap-2">
                               <GraduationCap size={16} className="text-violet-400" />
-                              <span className="text-sm font-medium text-white">Студент</span>
+                              <span className="text-sm font-medium text-white">{t('register.roleStudent')}</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-0.5">Изучайте модули, проходите квизы и выполняйте лабораторные работы</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{t('register.roleStudentDesc')}</p>
                           </label>
                         </div>
                         <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
@@ -380,9 +383,9 @@ export default function AuthPages() {
                           <label htmlFor="role-teacher" className="flex-1 cursor-pointer">
                             <div className="flex items-center gap-2">
                               <Users size={16} className="text-amber-400" />
-                              <span className="text-sm font-medium text-white">Преподаватель</span>
+                              <span className="text-sm font-medium text-white">{t('register.roleTeacher')}</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-0.5">Отслеживайте прогресс студентов, управляйте группами и смотрите аналитику</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{t('register.roleTeacherDesc')}</p>
                           </label>
                         </div>
                         <div className="flex items-start gap-3 p-3 rounded-lg border border-slate-600 bg-slate-900/30 hover:bg-slate-800 dark:bg-slate-700/50 transition cursor-pointer">
@@ -390,9 +393,9 @@ export default function AuthPages() {
                           <label htmlFor="role-admin" className="flex-1 cursor-pointer">
                             <div className="flex items-center gap-2">
                               <ShieldCheck size={16} className="text-red-400" />
-                              <span className="text-sm font-medium text-white">Администратор</span>
+                              <span className="text-sm font-medium text-white">{t('register.roleAdmin')}</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-0.5">Полный доступ: управление пользователями, база данных, системные настройки</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{t('register.roleAdminDesc')}</p>
                           </label>
                         </div>
                       </RadioGroup>
@@ -406,24 +409,24 @@ export default function AuthPages() {
                           className="space-y-2"
                         >
                           <Label htmlFor="admin-invite-code" className="text-slate-300">
-                            Код приглашения администратора
+                            {t('register.inviteCode')}
                           </Label>
                           <Input
                             id="admin-invite-code"
                             value={adminInviteCode}
                             onChange={(e) => setAdminInviteCode(e.target.value)}
-                            placeholder="Введите код приглашения"
+                            placeholder={t('register.inviteCodePlaceholder')}
                             className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground"
                           />
                           <p className="text-xs text-amber-400">
-                            Для получения роли администратора необходим код приглашения
+                            {t('register.inviteCodeHint')}
                           </p>
                         </motion.div>
                       )}
                     </AnimatePresence>
                     <div className="space-y-2">
                       <Label htmlFor="reg-password" className="text-slate-300">
-                        Пароль
+                        {t('register.password')}
                       </Label>
                       <div className="relative">
                         <Input
@@ -431,7 +434,7 @@ export default function AuthPages() {
                           type={showRegisterPassword ? 'text' : 'password'}
                           value={regPassword}
                           onChange={(e) => setRegPassword(e.target.value)}
-                          placeholder="Минимум 8 символов"
+                            placeholder={t('recovery.newPasswordPlaceholder')}
                           className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                         />
                         <button
@@ -449,7 +452,7 @@ export default function AuthPages() {
                           className="mt-3 space-y-2"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-slate-400">Надёжность пароля</span>
+                              <span className="text-xs text-slate-400">{t('register.passwordStrength')}</span>
                             <span className={`text-xs font-medium ${
                               regPwStrength.score >= 70 ? 'text-emerald-400' :
                               regPwStrength.score >= 50 ? 'text-yellow-400' : 'text-red-400'
@@ -475,7 +478,7 @@ export default function AuthPages() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="reg-confirm" className="text-slate-300">
-                        Подтверждение пароля
+                        {t('register.confirmPassword')}
                       </Label>
                       <div className="relative">
                         <Input
@@ -483,7 +486,7 @@ export default function AuthPages() {
                           type={showConfirmPassword ? 'text' : 'password'}
                           value={regConfirmPassword}
                           onChange={(e) => setRegConfirmPassword(e.target.value)}
-                          placeholder="Повторите пароль"
+                            placeholder={t('recovery.confirmNewPasswordPlaceholder')}
                           className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                         />
                         <button
@@ -495,18 +498,18 @@ export default function AuthPages() {
                         </button>
                       </div>
                       {regConfirmPassword && regPassword !== regConfirmPassword && (
-                        <p className="text-xs text-red-400 mt-1">Пароли не совпадают</p>
+                        <p className="text-xs text-red-400 mt-1">{t('register.confirmPasswordMismatch')}</p>
                       )}
                     </div>
                     <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
-                      {loading ? 'Регистрация...' : 'Зарегистрироваться'}
+                      {loading ? t('register.submitting') : t('register.submit')}
                     </Button>
                   </form>
 
                   <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm text-slate-400">
-                    Уже есть аккаунт?{' '}
+                    {t('register.hasAccount')}{' '}
                     <button type="button" onClick={() => setPage('login')} className="text-violet-400 hover:text-violet-300 font-medium">
-                      Войти
+                      {t('register.loginLink')}
                     </button>
                   </div>
                 </CardContent>
@@ -523,11 +526,11 @@ export default function AuthPages() {
             >
               <Card className="border-slate-700/50 bg-slate-800/80 dark:bg-slate-700/50 backdrop-blur-xl shadow-xl">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-white text-xl">Восстановление пароля</CardTitle>
+                  <CardTitle className="text-white text-xl">{t('recovery.title')}</CardTitle>
                   <CardDescription className="text-slate-400">
-                    {recoveryStep === 'enter-contact' && 'Укажите email или телефон для восстановления'}
-                    {recoveryStep === 'enter-otp' && 'Введите код подтверждения'}
-                    {recoveryStep === 'new-password' && 'Придумайте новый пароль'}
+                    {recoveryStep === 'enter-contact' && t('recovery.description')}
+                    {recoveryStep === 'enter-otp' && t('recovery.otpDescription')}
+                    {recoveryStep === 'new-password' && t('recovery.newPasswordDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -556,12 +559,12 @@ export default function AuthPages() {
                           }`}
                         >
                           <Phone className="w-4 h-4" />
-                          Телефон
+                          {t('register.phone')}
                         </button>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="recovery-contact" className="text-slate-300">
-                          {recoveryMethod === 'email' ? 'Email' : 'Телефон'}
+                          {recoveryMethod === 'email' ? 'Email' : t('register.phone')}
                         </Label>
                         <Input
                           id="recovery-contact"
@@ -573,7 +576,7 @@ export default function AuthPages() {
                         />
                       </div>
                       <Button onClick={handleSendRecovery} className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
-                        {loading ? 'Отправка...' : 'Отправить код'}
+                        {loading ? t('recovery.sending') : t('recovery.enterContact')}
                       </Button>
                     </div>
                   )}
@@ -590,33 +593,33 @@ export default function AuthPages() {
                             <>
                               <EyeOff className="w-3 h-3" />
                               <span className="text-violet-400 font-mono">{recoveryState?.otp || '—'}</span>
-                              <span className="text-muted-foreground">скрыть</span>
+                              <span className="text-muted-foreground">{t('recovery.hideOtp')}</span>
                             </>
                           ) : (
                             <>
                               <Eye className="w-3 h-3" />
-                              Показать код
+                              {t('recovery.showOtp')}
                             </>
                           )}
                         </button>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-slate-300">Код подтверждения</Label>
+                        <Label className="text-slate-300">{t('recovery.otpLabel')}</Label>
                         <Input
                           value={recoveryOtp}
                           onChange={(e) => setRecoveryOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                          placeholder="Введите 6-значный код"
+                          placeholder={t('recovery.otpPlaceholder')}
                           maxLength={6}
                           className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground text-center text-xl tracking-widest"
                         />
                       </div>
                       <Button onClick={handleVerifyOTP} className="w-full bg-violet-600 hover:bg-violet-700">
-                        Подтвердить
+                        {t('recovery.enterOtp')}
                       </Button>
                       <div className="text-center space-y-2">
                         {countdown > 0 ? (
                           <p className="text-xs text-slate-400">
-                            Отправить код повторно через <span className="text-violet-400 font-semibold">{countdown} сек</span>
+                            {t('recovery.resendCountdown', { seconds: countdown })}
                           </p>
                         ) : (
                           <button
@@ -624,7 +627,7 @@ export default function AuthPages() {
                             disabled={loading}
                             className="text-sm text-violet-400 hover:text-violet-300 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            Отправить код повторно
+                            {t('recovery.resendOtp')}
                           </button>
                         )}
                       </div>
@@ -632,7 +635,7 @@ export default function AuthPages() {
                         onClick={() => setRecoveryStep('enter-contact')}
                         className="w-full text-sm text-muted-foreground hover:text-slate-400"
                       >
-                        Изменить способ восстановления
+                        {t('recovery.changeMethod')}
                       </button>
                     </div>
                   )}
@@ -641,7 +644,7 @@ export default function AuthPages() {
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="new-password" className="text-slate-300">
-                          Новый пароль
+                          {t('recovery.newPasswordLabel')}
                         </Label>
                         <div className="relative">
                           <Input
@@ -649,7 +652,7 @@ export default function AuthPages() {
                             type={showNewPassword ? 'text' : 'password'}
                             value={recoveryNewPassword}
                             onChange={(e) => setRecoveryNewPassword(e.target.value)}
-                            placeholder="Минимум 8 символов"
+                          placeholder={t('register.passwordPlaceholder')}
                             className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                           />
                           <button
@@ -667,7 +670,7 @@ export default function AuthPages() {
                             className="mt-3 space-y-2"
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-xs text-slate-400">Надёжность пароля</span>
+                            <span className="text-xs text-slate-400">{t('register.passwordStrength')}</span>
                               <span className={`text-xs font-medium ${
                                 recoveryPwStrength.score >= 70 ? 'text-emerald-400' :
                                 recoveryPwStrength.score >= 50 ? 'text-yellow-400' : 'text-red-400'
@@ -693,7 +696,7 @@ export default function AuthPages() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="confirm-new-password" className="text-slate-300">
-                          Подтверждение пароля
+                          {t('recovery.confirmNewPassword')}
                         </Label>
                         <div className="relative">
                           <Input
@@ -701,7 +704,7 @@ export default function AuthPages() {
                             type={showConfirmNewPassword ? 'text' : 'password'}
                             value={recoveryConfirmPassword}
                             onChange={(e) => setRecoveryConfirmPassword(e.target.value)}
-                            placeholder="Повторите пароль"
+                          placeholder={t('register.confirmPasswordPlaceholder')}
                             className="bg-slate-900/50 border-slate-600 text-white placeholder:text-muted-foreground pr-10"
                           />
                           <button
@@ -717,15 +720,15 @@ export default function AuthPages() {
                             recoveryNewPassword === recoveryConfirmPassword ? 'text-emerald-400' : 'text-red-400'
                           }`}>
                             {recoveryNewPassword === recoveryConfirmPassword ? (
-                              <><CheckCircle2 size={12} /> Пароли совпадают</>
+                              <><CheckCircle2 size={12} /> {t('recovery.passwordsMatch')}</>
                             ) : (
-                              <><AlertTriangle size={12} /> Пароли не совпадают</>
+                              <><AlertTriangle size={12} /> {t('register.confirmPasswordMismatch')}</>
                             )}
                           </p>
                         )}
                       </div>
                       <Button onClick={handleResetPassword} className="w-full bg-violet-600 hover:bg-violet-700">
-                        Сохранить новый пароль
+                        {t('recovery.submit')}
                       </Button>
                     </div>
                   )}
@@ -733,7 +736,7 @@ export default function AuthPages() {
                   {recoveryStep !== 'enter-otp' && (
                     <div className="mt-6 pt-4 border-t border-slate-700/50 text-center text-sm text-slate-400">
                       <button type="button" onClick={() => { setPage('login'); setRecoveryStep('enter-contact'); }} className="text-violet-400 hover:text-violet-300 font-medium">
-                        Вернуться ко входу
+                        {t('recovery.backToLogin')}
                       </button>
                     </div>
                   )}

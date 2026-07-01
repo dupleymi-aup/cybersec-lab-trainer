@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { getAllUsers, useAuthStore } from '@/lib/auth-store';
 import { useAppStore, getAuthHeaders } from '@/lib/store';
 import { quizCategories, modules } from '@/lib/data';
@@ -83,6 +84,7 @@ const EMPTY_PROGRESS: StudentProgress = {
 };
 
 export default function TeacherPanel() {
+  const t = useTranslations('teacher');
   const setCurrentPage = useAppStore(s => s.setCurrentPage);
   const user = useAuthStore(s => s.user);
   const [searchTerm, setSearchTerm] = useState('');
@@ -388,8 +390,8 @@ export default function TeacherPanel() {
             <Users size={20} className="text-amber-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">Панель преподавателя</h1>
-            <p className="text-xs text-muted-foreground">Отслеживайте прогресс и управляйте группами</p>
+            <h1 className="text-xl font-bold">{t('title')}</h1>
+            <p className="text-xs text-muted-foreground">{t('subtitle')}</p>
           </div>
         </div>
         <AnalyticsExportPanel students={students} />
@@ -404,7 +406,7 @@ export default function TeacherPanel() {
             onChange={(e) => setGroupFilter(e.target.value)}
             className="text-sm border rounded-md px-3 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500"
           >
-            <option value="">Все группы</option>
+            <option value="">{t('allGroups')}</option>
             {groups.map((g) => (
               <option key={g} value={g}>{g}</option>
             ))}
@@ -414,7 +416,7 @@ export default function TeacherPanel() {
               onClick={() => setGroupFilter('')}
               className="text-xs text-muted-foreground hover:text-foreground px-2 py-1"
             >
-              Сбросить
+              {t('reset')}
             </button>
           )}
         </div>
@@ -423,10 +425,10 @@ export default function TeacherPanel() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {[
-          { label: 'Всего студентов', value: totalStudents, icon: Users, color: 'text-sky-600', bg: 'bg-sky-50' },
-          { label: 'Активных', value: activeStudents, icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'Ср. модулей', value: avgCompletion, icon: BookOpen, color: 'text-violet-600', bg: 'bg-violet-50' },
-          { label: 'Ср. балл', value: `${avgQuizScore}%`, icon: Trophy, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: t('totalStudents'), value: totalStudents, icon: Users, color: 'text-sky-600', bg: 'bg-sky-50' },
+          { label: t('active'), value: activeStudents, icon: GraduationCap, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: t('avgModules'), value: avgCompletion, icon: BookOpen, color: 'text-violet-600', bg: 'bg-violet-50' },
+          { label: t('avgScore'), value: `${avgQuizScore}%`, icon: Trophy, color: 'text-amber-600', bg: 'bg-amber-50' },
         ].map((stat) => (
           <Card key={stat.label} className="border-none shadow-sm bg-card hover:shadow-md transition-shadow">
             <CardContent className="p-4">
@@ -444,34 +446,34 @@ export default function TeacherPanel() {
         <div className="overflow-x-auto pb-2 scrollbar-thin">
           <TabsList className="grid w-full grid-cols-5 md:grid-cols-9 min-w-[640px] md:min-w-0">
             <TabsTrigger value="progress" className="text-xs">
-              <BarChart3 size={14} className="mr-1" /> Прогресс
+              <BarChart3 size={14} className="mr-1" /> {t('tabs.progress')}
             </TabsTrigger>
             <TabsTrigger value="gradebook" className="text-xs">
-              <Table2 size={14} className="mr-1" /> Журнал
+              <Table2 size={14} className="mr-1" /> {t('tabs.gradebook')}
             </TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs">
-              <Filter size={14} className="mr-1" /> Аналитика
+              <Filter size={14} className="mr-1" /> {t('tabs.analytics')}
             </TabsTrigger>
             <TabsTrigger value="deadlines" className="text-xs">
-              <Calendar size={14} className="mr-1" /> Дедлайны
+              <Calendar size={14} className="mr-1" /> {t('tabs.deadlines')}
             </TabsTrigger>
             <TabsTrigger value="groups" className="text-xs">
-              <Users size={14} className="mr-1" /> Группы
+              <Users size={14} className="mr-1" /> {t('tabs.groups')}
             </TabsTrigger>
             <TabsTrigger value="compare" className="text-xs hidden md:block">
-              <GitCompare size={14} className="mr-1" /> Сравнение
+              <GitCompare size={14} className="mr-1" /> {t('tabs.comparison')}
             </TabsTrigger>
             <TabsTrigger value="at-risk" className="text-xs hidden md:block">
-              <AlertTriangle size={14} className="mr-1" /> Внимание
+              <AlertTriangle size={14} className="mr-1" /> {t('tabs.atRisk')}
             </TabsTrigger>
             <TabsTrigger value="messages" className="text-xs hidden lg:block">
-              <MessageSquare size={14} className="mr-1" /> Сообщения
+              <MessageSquare size={14} className="mr-1" /> {t('tabs.messages')}
             </TabsTrigger>
             <TabsTrigger value="reports" className="text-xs hidden lg:block">
-              <FileBarChart size={14} className="mr-1" /> Отчёты
+              <FileBarChart size={14} className="mr-1" /> {t('tabs.reports')}
             </TabsTrigger>
             <TabsTrigger value="assignments" className="text-xs hidden md:block">
-              <ClipboardList size={14} className="mr-1" /> Задания
+              <ClipboardList size={14} className="mr-1" /> {t('tabs.assignments')}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -490,7 +492,7 @@ export default function TeacherPanel() {
           {loadingStudents ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Loader2 size={32} className="mb-3 animate-spin opacity-50" />
-              <p className="text-sm">Загрузка данных студентов...</p>
+              <p className="text-sm">{t('loading')}</p>
             </div>
           ) : (
             <>
@@ -500,7 +502,7 @@ export default function TeacherPanel() {
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Поиск студента..."
+                placeholder={t('searchStudent')}
                 className="pl-10"
               />
             </div>
@@ -509,9 +511,9 @@ export default function TeacherPanel() {
               onChange={(e) => setGradebookSort(e.target.value as 'name' | 'modules' | 'score')}
               className="px-3 py-2 border border-border rounded-md text-sm bg-card"
             >
-              <option value="name">По имени</option>
-              <option value="modules">По модулям</option>
-              <option value="score">По баллу</option>
+              <option value="name">{t('sortByName')}</option>
+              <option value="modules">{t('sortByModules')}</option>
+              <option value="score">{t('sortByScore')}</option>
             </select>
           </div>
 
@@ -519,13 +521,13 @@ export default function TeacherPanel() {
             <table className="w-full text-xs">
               <thead className="bg-secondary border-b border-border">
                 <tr>
-                  <th className="text-left p-2 font-medium text-muted-foreground sticky left-0 bg-secondary z-10">Студент</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground sticky left-0 bg-secondary z-10">{t('student')}</th>
                   {modules.map((m) => (
                     <th key={m.id} className="p-2 font-medium text-muted-foreground text-center min-w-[60px]" title={m.title}>
                       {m.title.split(' ').slice(0, 2).join(' ')}
                     </th>
                   ))}
-                  <th className="p-2 font-medium text-muted-foreground text-center">Ср. балл</th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">{t('avgScore')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -569,7 +571,7 @@ export default function TeacherPanel() {
 
         {/* Messages Tab */}
         <TabsContent value="messages" className="mt-4 space-y-4">
-          <TeacherMessaging currentUser={user?.fullName || 'Преподаватель'} groups={groups} />
+          <TeacherMessaging currentUser={user?.fullName || t('defaultTeacherName')} groups={groups} />
         </TabsContent>
 
         {/* Deadlines Tab */}
@@ -580,7 +582,7 @@ export default function TeacherPanel() {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-sm flex items-center gap-2">
                   <Calendar size={16} className="text-orange-500" />
-                  Управление дедлайнами
+                  {t('manageDeadlines')}
                 </h3>
                 <Button
                   size="sm"
@@ -589,7 +591,7 @@ export default function TeacherPanel() {
                   className="text-xs"
                 >
                   <Plus size={14} className="mr-1" />
-                  {showCreateForm ? 'Отмена' : 'Новый дедлайн'}
+                  {showCreateForm ? t('cancel') : t('newDeadline')}
                 </Button>
               </div>
 
@@ -597,26 +599,26 @@ export default function TeacherPanel() {
                 <div className="space-y-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Тип</label>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('deadlineType')}</label>
                       <select
                         value={newDeadline.scope}
                         onChange={(e) => setNewDeadline({ ...newDeadline, scope: e.target.value, scopeId: '' })}
                         className="w-full px-3 py-2 border border-border rounded-md text-sm"
                       >
-                        <option value="module">Модуль</option>
-                        <option value="quiz">Квиз</option>
-                        <option value="course">Курс</option>
+                        <option value="module">{t('module')}</option>
+                        <option value="quiz">{t('quiz')}</option>
+                        <option value="course">{t('course')}</option>
                       </select>
                     </div>
                     <div>
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                        {newDeadline.scope === 'module' ? 'Модуль' : newDeadline.scope === 'quiz' ? 'Квиз' : 'Название'}
+                        {newDeadline.scope === 'module' ? t('module') : newDeadline.scope === 'quiz' ? t('quiz') : t('deadlineTitle')}
                       </label>
                       {newDeadline.scope === 'course' ? (
                         <Input
                           value={newDeadline.title}
                           onChange={(e) => setNewDeadline({ ...newDeadline, title: e.target.value, scopeId: 'course' })}
-                          placeholder="Название дедлайна"
+                          placeholder={t('deadlineTitle')}
                         />
                       ) : newDeadline.scope === 'module' ? (
                         <select
@@ -624,7 +626,7 @@ export default function TeacherPanel() {
                           onChange={(e) => setNewDeadline({ ...newDeadline, scopeId: e.target.value })}
                           className="w-full px-3 py-2 border border-border rounded-md text-sm"
                         >
-                          <option value="">Выберите модуль</option>
+                          <option value="">{t('selectModule')}</option>
                           {modules.map(m => (
                             <option key={m.id} value={m.id}>{m.title}</option>
                           ))}
@@ -635,7 +637,7 @@ export default function TeacherPanel() {
                           onChange={(e) => setNewDeadline({ ...newDeadline, scopeId: e.target.value })}
                           className="w-full px-3 py-2 border border-border rounded-md text-sm"
                         >
-                          <option value="">Выберите квиз</option>
+                          <option value="">{t('selectQuiz')}</option>
                           {quizCategories.map(q => (
                             <option key={q.id} value={q.id}>{q.name}</option>
                           ))}
@@ -643,7 +645,7 @@ export default function TeacherPanel() {
                       )}
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Срок</label>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('deadlineDate')}</label>
                       <Input
                         type="datetime-local"
                         value={newDeadline.dueAt}
@@ -651,13 +653,13 @@ export default function TeacherPanel() {
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Группа (пусто = все)</label>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('deadlineGroup')}</label>
                       <select
                         value={newDeadline.group}
                         onChange={(e) => setNewDeadline({ ...newDeadline, group: e.target.value })}
                         className="w-full px-3 py-2 border border-border rounded-md text-sm"
                       >
-                        <option value="">Все студенты</option>
+                        <option value="">{t('allStudents')}</option>
                         {groups.map(g => (
                           <option key={g} value={g}>{g}</option>
                         ))}
@@ -665,16 +667,16 @@ export default function TeacherPanel() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Описание</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('description')}</label>
                     <Input
                       value={newDeadline.description}
                       onChange={(e) => setNewDeadline({ ...newDeadline, description: e.target.value })}
-                      placeholder="Необязательно"
+                      placeholder={t('optional')}
                     />
                   </div>
                   <div className="flex justify-end gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setShowCreateForm(false)}>Отмена</Button>
-                    <Button size="sm" onClick={createDeadline}>Создать</Button>
+                    <Button size="sm" variant="outline" onClick={() => setShowCreateForm(false)}>{t('cancel')}</Button>
+                    <Button size="sm" onClick={createDeadline}>{t('saveDeadline')}</Button>
                   </div>
                 </div>
               )}
@@ -690,7 +692,7 @@ export default function TeacherPanel() {
                     const isOverdue = diffDays < 0;
 
                     const scopeLabel = d.scope === 'course'
-                      ? 'Курс'
+                      ? t('course')
                       : d.scope === 'module'
                         ? modules.find(m => m.id === d.scopeId)?.title || d.scopeId
                         : quizCategories.find(q => q.id === d.scopeId)?.name || d.scopeId;
@@ -705,15 +707,15 @@ export default function TeacherPanel() {
                             <div className="flex items-center gap-2 mb-1">
                               <p className="text-sm font-semibold text-foreground/80">{d.title}</p>
                               <Badge variant={isOverdue ? 'destructive' : diffDays <= 3 ? 'secondary' : 'default'} className="text-[10px]">
-                                {isOverdue ? `Просрочен (${Math.abs(diffDays)} дн.)` : diffDays === 0 ? 'Сегодня' : diffDays === 1 ? 'Завтра' : `${diffDays} дн.`}
+                                {isOverdue ? t('overdueDays', { days: Math.abs(diffDays) }) : diffDays === 0 ? t('today') : diffDays === 1 ? t('tomorrow') : t('daysLeft', { days: diffDays })}
                               </Badge>
                               {d.group && <Badge variant="outline" className="text-[10px]">{d.group}</Badge>}
                             </div>
-                            <p className="text-xs text-muted-foreground">{scopeLabel} — {dueDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
+                            <p className="text-xs text-muted-foreground">{scopeLabel} —                             {dueDate.toLocaleDateString(undefined, { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
                             {d.description && <p className="text-xs text-slate-400 mt-1">{d.description}</p>}
                             {reminder && (
                               <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1"><CheckCircle size={12} className="text-emerald-500" /> {reminder.completedCount}/{reminder.totalStudents} выполнено</span>
+                                <span className="flex items-center gap-1"><CheckCircle size={12} className="text-emerald-500" /> {reminder.completedCount}/{reminder.totalStudents} {t('completed')}</span>
                                 <span>{reminder.completionRate}%</span>
                               </div>
                             )}
@@ -721,7 +723,7 @@ export default function TeacherPanel() {
                           <button
                             onClick={() => deleteDeadline(d.id)}
                             className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors shrink-0"
-                            title="Удалить"
+                            title={t('deleteDeadline')}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -731,7 +733,7 @@ export default function TeacherPanel() {
                         {reminder && reminder.studentStatus.length > 0 && (
                           <details className="mt-3">
                             <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground/70">
-                              Статус студентов ({reminder.studentStatus.length})
+                              {t('studentStatus', { count: reminder.studentStatus.length })}
                             </summary>
                             <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
                               {reminder.studentStatus.map(s => (
@@ -739,11 +741,11 @@ export default function TeacherPanel() {
                                   <span className="text-foreground/70">{s.fullName}</span>
                                   <span className="flex items-center gap-1">
                                     {s.completed ? (
-                                      <span className="text-emerald-600 flex items-center gap-0.5"><CheckCircle size={10} /> Выполнен</span>
+                                      <span className="text-emerald-600 flex items-center gap-0.5"><CheckCircle size={10} /> {t('completed')}</span>
                                     ) : s.isOverdue ? (
-                                      <span className="text-red-600 flex items-center gap-0.5"><XCircle size={10} /> Просрочен</span>
+                                      <span className="text-red-600 flex items-center gap-0.5"><XCircle size={10} /> {t('overdue')}</span>
                                     ) : (
-                                      <span className="text-orange-500">В процессе</span>
+                                      <span className="text-orange-500">{t('inProgress')}</span>
                                     )}
                                   </span>
                                 </div>
@@ -758,7 +760,7 @@ export default function TeacherPanel() {
               ) : (
                 <div className="text-center py-8 text-slate-400">
                   <Calendar size={32} className="mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Нет активных дедлайнов. Создайте первый!</p>
+                  <p className="text-sm">{t('noDeadlines')}</p>
                 </div>
               )}
             </CardContent>
@@ -775,7 +777,7 @@ export default function TeacherPanel() {
                   <Card key={group} className="border-border">
                     <CardContent className="p-4">
                       <h3 className="font-semibold text-sm mb-2">{group}</h3>
-                      <p className="text-xs text-muted-foreground mb-3">{groupStudents.length} студентов</p>
+                      <p className="text-xs text-muted-foreground mb-3">{t('studentsCount', { count: groupStudents.length })}</p>
                       <div className="space-y-1">
                         {groupStudents.slice(0, 5).map((s) => (
                           <div key={s.id} className="flex items-center gap-2 text-xs">
@@ -786,7 +788,7 @@ export default function TeacherPanel() {
                           </div>
                         ))}
                         {groupStudents.length > 5 && (
-                          <p className="text-xs text-slate-400 italic">+{groupStudents.length - 5} ещё</p>
+                          <p className="text-xs text-slate-400 italic">{t('more', { count: groupStudents.length - 5 })}</p>
                         )}
                       </div>
                     </CardContent>
@@ -797,7 +799,7 @@ export default function TeacherPanel() {
           ) : (
             <div className="text-center py-12 text-slate-400">
               <Users size={40} className="mx-auto mb-3 opacity-50" />
-              <p className="text-sm">Группы ещё не созданы. Студенты могут указать группу в профиле.</p>
+              <p className="text-sm">{t('noGroups')}</p>
             </div>
           )}
         </TabsContent>
@@ -807,17 +809,17 @@ export default function TeacherPanel() {
           {/* Sub-tab selector */}
           <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
             {[
-              { key: 'overview' as const, label: 'Обзор', icon: BarChart3 },
-              { key: 'trends' as const, label: 'Тренды', icon: TrendingUp },
-              { key: 'questions' as const, label: 'Вопросы', icon: HelpCircle },
-              { key: 'achievements' as const, label: 'Достижения', icon: Award },
-              { key: 'competency' as const, label: 'Компетенции', icon: BarChart3 },
-              { key: 'weaknesses' as const, label: 'Слабые места', icon: AlertTriangle },
-              { key: 'predictive' as const, label: 'Прогноз', icon: TrendingUp },
-              { key: 'module-deep-dive' as const, label: 'Модули+', icon: BookOpen },
-              { key: 'certification' as const, label: 'Сертификация', icon: Trophy },
-              { key: 'quiz-session' as const, label: 'Сессии квизов', icon: Clock },
-              { key: 'export' as const, label: 'Экспорт', icon: Download },
+              { key: 'overview' as const, label: t('analytics.overview'), icon: BarChart3 },
+              { key: 'trends' as const, label: t('analytics.trends'), icon: TrendingUp },
+              { key: 'questions' as const, label: t('analytics.questions'), icon: HelpCircle },
+              { key: 'achievements' as const, label: t('analytics.achievements'), icon: Award },
+              { key: 'competency' as const, label: t('analytics.competency'), icon: BarChart3 },
+              { key: 'weaknesses' as const, label: t('analytics.weaknesses'), icon: AlertTriangle },
+              { key: 'predictive' as const, label: t('analytics.predictive'), icon: TrendingUp },
+              { key: 'module-deep-dive' as const, label: t('analytics.moduleDeepDive'), icon: BookOpen },
+              { key: 'certification' as const, label: t('analytics.certification'), icon: Trophy },
+              { key: 'quiz-session' as const, label: t('analytics.quizSession'), icon: Clock },
+              { key: 'export' as const, label: t('analytics.export'), icon: Download },
             ].map(({ key, label, icon: Icon }) => (
               <button
                 key={key}

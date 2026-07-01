@@ -1,6 +1,6 @@
 "use client";
 
-import {useTranslations} from "next-intl";
+import {useTranslations, useLocale} from "next-intl";
 import {Shield, Menu, X} from "lucide-react";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
@@ -9,12 +9,13 @@ import ThemeToggle from "@/components/security-trainer/ThemeToggle";
 
 export default function LandingHeader() {
   const t = useTranslations("landing.header");
+  const locale = useLocale();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href={`/${locale}`} className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-700 rounded-xl">
             <Shield className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
@@ -26,7 +27,7 @@ export default function LandingHeader() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
           <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             {t("dashboard")}
           </a>
@@ -40,12 +41,12 @@ export default function LandingHeader() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link href="/register">
+          <Link href={`/${locale}/register`}>
             <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white hidden sm:inline-flex">
               {t("register")}
             </Button>
           </Link>
-          <Link href="/login">
+          <Link href={`/${locale}/login`}>
             <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
               {t("login")}
             </Button>
@@ -57,16 +58,16 @@ export default function LandingHeader() {
       </div>
 
       {menuOpen && (
-        <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 py-4 space-y-3">
+        <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 py-4 space-y-3" role="navigation" aria-label="Mobile navigation">
           <a href="#how-it-works" className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2">
             {t("dashboard")}
           </a>
-          <Link href="/register">
+          <Link href={`/${locale}/register`}>
             <Button size="sm" className="w-full bg-violet-600 hover:bg-violet-700 text-white">
               {t("register")}
             </Button>
           </Link>
-          <Link href="/login">
+          <Link href={`/${locale}/login`}>
             <Button variant="outline" size="sm" className="w-full">
               {t("login")}
             </Button>

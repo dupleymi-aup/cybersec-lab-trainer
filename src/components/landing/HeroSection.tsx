@@ -1,6 +1,6 @@
 "use client";
 
-import {useTranslations} from "next-intl";
+import {useTranslations, useLocale} from "next-intl";
 import {motion} from "framer-motion";
 import {ArrowRight, Sparkles} from "lucide-react";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import CodeTerminal from "./CodeTerminal";
 
 export default function HeroSection() {
   const t = useTranslations("landing.hero");
+  const locale = useLocale();
 
   return (
     <section className="relative py-20 md:py-32 overflow-hidden bg-gradient-to-b from-background via-background to-accent/20">
@@ -39,7 +40,7 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link href="/register">
+              <Link href={`/${locale}/register`}>
                 <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-white px-8 text-lg group">
                   {t("startLearning")}
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />

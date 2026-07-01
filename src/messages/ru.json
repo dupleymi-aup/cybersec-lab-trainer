@@ -7,241 +7,811 @@
       "dashboard": "Панель"
     },
     "hero": {
-      "badge": "Program 09.03.04 Software Engineering",
-      "title": "Cybersecurity",
-      "titleHighlight": "Training Platform",
-      "subtitle": "Learn web application vulnerabilities, complete interactive quizzes, and earn certificates. Practical cybersecurity education for students and developers.",
-      "startLearning": "Start Learning",
-      "learnMore": "Learn More"
+      "badge": "Направление 09.03.04 Программная инженерия",
+      "title": "Тренажёр по",
+      "titleHighlight": "Информационной Безопасности",
+      "subtitle": "Изучайте уязвимости веб-приложений, проходите интерактивные тесты и получайте сертификаты. Практическое обучение кибербезопасности для студентов и разработчиков.",
+      "startLearning": "Начать обучение",
+      "learnMore": "Узнать больше"
     },
     "stats": {
-      "modules": "Modules",
-      "quizQuestions": "Quiz Questions",
-      "achievements": "Achievements",
-      "careerPaths": "Career Paths"
+      "modules": "Модулей",
+      "quizQuestions": "Вопросов",
+      "achievements": "Достижений",
+      "careerPaths": "Карьерных путей"
     },
     "howItWorks": {
-      "badge": "Simple Process",
-      "title": "How It Works",
-      "subtitle": "Four simple steps from registration to certification",
+      "badge": "Простой процесс",
+      "title": "Как это работает",
+      "subtitle": "Четыре простых шага от регистрации до сертификации",
       "steps": {
         "1": {
-          "title": "Sign Up",
-          "description": "Create an account in 30 seconds"
+          "title": "Регистрация",
+          "description": "Создайте аккаунт за 30 секунд"
         },
         "2": {
-          "title": "Choose a Module",
-          "description": "OWASP Top 10, SQL Injection, XSS, CSRF, and more"
+          "title": "Выберите модуль",
+          "description": "OWASP Top 10, SQL-инъекции, XSS, CSRF и другое"
         },
         "3": {
-          "title": "Solve Quizzes",
-          "description": "136+ hands-on exercises with instant feedback"
+          "title": "Решайте задания",
+          "description": "136+ практических упражнений с мгновенной обратной связью"
         },
         "4": {
-          "title": "Get Certified",
-          "description": "Complete a module and earn a certificate"
+          "title": "Получите сертификат",
+          "description": "Завершите модуль и получите сертификат"
         }
       }
     },
     "features": {
-      "title": "Everything for Cybersecurity Learning",
-      "subtitle": "Theory, practice, and analytics in one system",
+      "title": "Всё для изучения кибербезопасности",
+      "subtitle": "Теория, практика и аналитика в одной системе",
       "items": {
         "interactiveModules": {
-          "title": "12 Interactive Modules",
-          "description": "OWASP Top 10, SQL Injection, XSS, CSRF, and more with hands-on exercises"
+          "title": "12 интерактивных модулей",
+          "description": "OWASP Top 10, SQL-инъекции, XSS, CSRF и другие с практическими упражнениями"
         },
         "quizQuestions": {
-          "title": "136+ Quiz Questions",
-          "description": "Test knowledge across 9 categories"
+          "title": "136+ вопросов",
+          "description": "Проверка знаний по 9 категориям"
         },
         "achievements": {
-          "title": "Achievement System",
-          "description": "Earn rewards and stay motivated"
+          "title": "Система достижений",
+          "description": "Зарабатывайте награды и сохраняйте мотивацию"
         },
         "analytics": {
-          "title": "Progress Analytics",
-          "description": "Track progress with charts and reports"
+          "title": "Аналитика прогресса",
+          "description": "Отслеживайте успехи с графиками и отчётами"
         },
         "ltiIntegration": {
-          "title": "LTI Integration",
-          "description": "Integration with Moodle, Canvas via LTI 1.3"
+          "title": "Интеграция LTI",
+          "description": "Подключение к Moodle, Canvas через LTI 1.3"
         },
         "teacherAdmin": {
-          "title": "Teacher and Admin Roles",
-          "description": "Manage students, groups, and courses"
+          "title": "Роли преподавателя и администратора",
+          "description": "Управление студентами, группами и курсами"
         }
       }
     },
     "demoModules": {
-      "title": "Try for Free",
-      "subtitle": "Start with these modules",
-      "lessons": "lessons",
-      "try": "Try Now",
-      "registerCTA": "Register and access all modules",
+      "title": "Попробуйте бесплатно",
+      "subtitle": "Начните с этих модулей",
+      "lessons": "уроков",
+      "try": "Попробовать",
+      "registerCTA": "Зарегистрируйтесь для доступа ко всем модулям",
       "difficulties": {
-        "Beginner": "Beginner",
-        "Medium": "Medium",
-        "Advanced": "Advanced"
+        "Beginner": "Начальный",
+        "Medium": "Средний",
+        "Advanced": "Продвинутый"
       },
       "modules": {
         "owasp": {
           "title": "OWASP Top 10",
-          "description": "Learn the 10 most critical web security risks"
+          "description": "Изучите 10 самых критичных угроз веб-безопасности"
         },
         "auth": {
-          "title": "Authentication",
-          "description": "Build reliable authentication systems"
+          "title": "Аутентификация",
+          "description": "Постройте надёжные системы аутентификации"
         },
         "tools": {
-          "title": "Security Tools",
-          "description": "Master security analysis tools"
+          "title": "Инструменты безопасности",
+          "description": "Освойте инструменты анализа безопасности"
         },
         "phishing": {
-          "title": "Phishing Analyzer",
-          "description": "Identify phishing and social engineering"
+          "title": "Анализатор фишинга",
+          "description": "Выявляйте фишинг и социальную инженерию"
         }
       }
     },
     "reviews": {
-      "badge": "Student Reviews",
-      "title": "What Our Users Say",
-      "subtitle": "Over 1000 students trained",
+      "badge": "Отзывы студентов",
+      "title": "Что говорят наши пользователи",
+      "subtitle": "Более 1000 обученных студентов",
       "items": [
         {
-          "name": "Alexey Petrov",
-          "role": "Student, MSU",
-          "text": "Great platform for learning OWASP Top 10. Interactive quizzes are better than reading theory.",
-          "achievement": "Completed OWASP Top 10"
+          "name": "Алексей Петров",
+          "role": "Студент, МГУ",
+          "text": "Отличная платформа для изучения OWASP Top 10. Интерактивные тесты намного лучше сухой теории.",
+          "achievement": "Завершил OWASP Top 10"
         },
         {
-          "name": "Maria Ivanova",
-          "role": "Developer, Yandex",
-          "text": "Started writing more secure code after completing modules.",
-          "achievement": "100% in XSS Module"
+          "name": "Мария Иванова",
+          "role": "Разработчик, Яндекс",
+          "text": "После прохождения модулей стал писать более безопасный код.",
+          "achievement": "100% в модуле XSS"
         },
         {
-          "name": "Dmitry Kozlov",
-          "role": "Teacher, ITMO",
-          "text": "LTI integration with Moodle works great.",
-          "achievement": "50+ students"
+          "name": "Дмитрий Козлов",
+          "role": "Преподаватель, ИТМО",
+          "text": "Интеграция LTI с Moodle работает отлично.",
+          "achievement": "50+ студентов"
         },
         {
-          "name": "Elena Smirnova",
-          "role": "Intern, Kaspersky",
-          "text": "Excellent practical preparation for real work.",
-          "achievement": "Top 10 progress"
+          "name": "Елена Смирнова",
+          "role": "Стажёр, Kaspersky",
+          "text": "Превосходная практическая подготовка к реальной работе.",
+          "achievement": "Топ-10 прогресса"
         },
         {
-          "name": "Artem Volkov",
-          "role": "Developer, Sber",
-          "text": "Completed all 12 modules in a month.",
-          "achievement": "All modules done"
+          "name": "Артём Волков",
+          "role": "Разработчик, Сбер",
+          "text": "Прошёл все 12 модулей за месяц.",
+          "achievement": "Все модули пройдены"
         },
         {
-          "name": "Olga Novikova",
-          "role": "Student, SPbU",
-          "text": "Helped me prepare for security olympiad.",
-          "achievement": "Olympiad winner"
+          "name": "Ольга Новикова",
+          "role": "Студентка, СПбГУ",
+          "text": "Помогла подготовиться к олимпиаде по безопасности.",
+          "achievement": "Победитель олимпиады"
         }
       ]
     },
     "cta": {
-      "title": "Ready to Start Learning?",
-      "subtitle": "Join thousands of students learning cybersecurity",
-      "students": "Students",
-      "certificates": "Certificates",
-      "registration": "Registration",
-      "startFree": "Start for Free",
-      "disclaimer": "No credit card - Free modules - Instant access"
+      "title": "Готовы начать обучение?",
+      "subtitle": "Присоединяйтесь к тысячам студентов, изучающих кибербезопасность",
+      "students": "Студентов",
+      "certificates": "Сертификатов",
+      "registration": "Бесплатно",
+      "startFree": "Начать бесплатно",
+      "disclaimer": "Без карты — Бесплатные модули — Мгновенный доступ"
     },
     "faq": {
-      "badge": "FAQ",
-      "title": "Frequently Asked Questions",
-      "subtitle": "Popular questions about the platform",
+      "badge": "Часто задаваемые вопросы",
+      "title": "Часто задаваемые вопросы",
+      "subtitle": "Популярные вопросы о платформе",
       "items": [
         {
-          "question": "Is the platform free?",
-          "answer": "Yes, basic modules are free. Advanced features require subscription."
+          "question": "Платформа бесплатная?",
+          "answer": "Да, базовые модули бесплатны. Расширенные функции требуют подписки."
         },
         {
-          "question": "Do I need programming knowledge?",
-          "answer": "Basic modules do not require deep programming knowledge."
+          "question": "Нужны ли знания программирования?",
+          "answer": "Базовые модули не требуют глубоких знаний программирования."
         },
         {
-          "question": "How does LTI integration work?",
-          "answer": "Connect CyberSec Lab to Moodle or Canvas via LTI 1.3."
+          "question": "Как работает интеграция LTI?",
+          "answer": "Подключите CyberSec Lab к Moodle или Canvas через LTI 1.3."
         },
         {
-          "question": "Can I track student progress?",
-          "answer": "Yes, teachers get detailed analytics and reports."
+          "question": "Можно ли отслеживать прогресс студентов?",
+          "answer": "Да, преподаватели получают детальную аналитику и отчёты."
         },
         {
-          "question": "Are there certificates?",
-          "answer": "Yes, digital certificates after each module."
+          "question": "Выдаются ли сертификаты?",
+          "answer": "Да, цифровые сертификаты после каждого модуля."
         },
         {
-          "question": "What topics are covered?",
-          "answer": "12 modules: OWASP, SQL Injection, XSS, CSRF, crypto, and more."
+          "question": "Какие темы охватываются?",
+          "answer": "12 модулей: OWASP, SQL-инъекции, XSS, CSRF, криптография и другое."
         },
         {
-          "question": "How to register a teacher account?",
-          "answer": "Register normally, then ask admin for teacher role."
+          "question": "Как зарегистрировать аккаунт преподавателя?",
+          "answer": "Зарегистрируйтесь как обычно и запросите роль преподавателя у администратора."
         }
       ]
     },
     "footer": {
-      "description": "Interactive cybersecurity education platform.",
+      "description": "Интерактивная платформа обучения кибербезопасности.",
       "sections": {
         "platform": {
-          "title": "Platform",
+          "title": "Платформа",
           "links": [
-            "Modules",
-            "Features",
-            "Pricing",
-            "LTI Integration"
+            "Модули",
+            "Возможности",
+            "Цены",
+            "LTI интеграция"
           ]
         },
         "resources": {
-          "title": "Resources",
+          "title": "Ресурсы",
           "links": [
-            "Documentation",
-            "Guide",
-            "Blog",
+            "Документация",
+            "Руководство",
+            "Блог",
             "OWASP Top 10"
           ]
         },
         "company": {
-          "title": "Company",
+          "title": "Компания",
           "links": [
-            "About",
-            "Contact",
-            "Careers",
-            "Partners"
+            "О нас",
+            "Контакты",
+            "Карьера",
+            "Партнёры"
           ]
         },
         "legal": {
-          "title": "Legal",
+          "title": "Правовая информация",
           "links": [
-            "Privacy",
-            "Terms",
+            "Конфиденциальность",
+            "Условия",
             "Cookies"
           ]
         }
       },
-      "copyright": "(c) {year} CyberSec Lab. All rights reserved.",
-      "statsModules": "12 modules",
-      "statsStudents": "1000+ students",
-      "statsQuizzes": "136+ quizzes"
+      "copyright": "(c) {year} CyberSec Lab. Все права защищены.",
+      "statsModules": "12 модулей",
+      "statsStudents": "1000+ студентов",
+      "statsQuizzes": "136+ тестов"
     },
     "codeTerminal": {
-      "comment": "// Vulnerable code - find the bug!",
-      "alert": "SQL Injection vulnerability detected!",
-      "alertDescription": "Learn to fix vulnerabilities in CyberSec Lab"
+      "comment": "// Уязвимый код — найди ошибку!",
+      "alert": "Обнаружена SQL-инъекция!",
+      "alertDescription": "Научись исправлять уязвимости в CyberSec Lab"
     },
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Перейти к основному содержимому"
+  },
+  "auth": {
+    "login": {
+      "title": "Вход в аккаунт",
+      "subtitle": "Введите email или телефон и пароль",
+      "contact": "Email или телефон",
+      "contactPlaceholder": "example@mail.com или +7...",
+      "password": "Пароль",
+      "passwordPlaceholder": "Введите пароль",
+      "rememberMe": "Запомнить меня",
+      "forgotPassword": "Забыли пароль?",
+      "submit": "Войти",
+      "submitting": "Вход...",
+      "noAccount": "Нет аккаунта?",
+      "registerLink": "Зарегистрироваться",
+      "backToHome": "← На главную",
+      "showPassword": "Показать пароль",
+      "hidePassword": "Скрыть пароль"
+    },
+    "register": {
+      "title": "Регистрация",
+      "description": "Создайте аккаунт для начала обучения",
+      "fullName": "ФИО",
+      "fullNamePlaceholder": "Иванов Иван Иванович",
+      "email": "Email",
+      "emailPlaceholder": "example@mail.com",
+      "phone": "Телефон",
+      "phonePlaceholder": "+7 (999)...",
+      "role": "Роль",
+      "roleStudent": "Студент",
+      "roleStudentDesc": "Изучайте модули, проходите квизы и выполняйте лабораторные работы",
+      "roleTeacher": "Преподаватель",
+      "roleTeacherDesc": "Отслеживайте прогресс студентов, управляйте группами и смотрите аналитику",
+      "roleAdmin": "Администратор",
+      "roleAdminDesc": "Полный доступ: управление пользователями, база данных, системные настройки",
+      "inviteCode": "Код приглашения администратора",
+      "inviteCodePlaceholder": "Введите код приглашения",
+      "inviteCodeHint": "Для получения роли администратора необходим код приглашения",
+      "password": "Пароль",
+      "passwordPlaceholder": "Минимум 8 символов",
+      "passwordStrength": "Надёжность пароля",
+      "confirmPassword": "Подтверждение пароля",
+      "confirmPasswordPlaceholder": "Повторите пароль",
+      "confirmPasswordMismatch": "Пароли не совпадают",
+      "submit": "Зарегистрироваться",
+      "submitting": "Регистрация...",
+      "hasAccount": "Уже есть аккаунт?",
+      "loginLink": "Войти",
+      "showPassword": "Показать пароль",
+      "hidePassword": "Скрыть пароль",
+      "showConfirm": "Показать подтверждение пароля",
+      "hideConfirm": "Скрыть подтверждение пароля"
+    },
+    "recovery": {
+      "redirecting": "Перенаправление...",
+      "title": "Восстановление пароля",
+      "description": "Введите email или телефон для получения кода восстановления",
+      "otpDescription": "Введите код подтверждения",
+      "newPasswordDescription": "Придумайте новый пароль",
+      "enterContact": "Отправить код",
+      "enterOtp": "Подтвердить код",
+      "otpSent": "Код подтверждения отправлен",
+      "otpResent": "Новый код отправлен",
+      "invalidOtp": "Неверный или просроченный код",
+      "passwordResetSuccess": "Пароль успешно изменён",
+      "sending": "Отправка...",
+      "otpLabel": "Код подтверждения",
+      "otpPlaceholder": "Введите код из email/SMS",
+      "newPasswordLabel": "Новый пароль",
+      "newPasswordPlaceholder": "Введите новый пароль",
+      "confirmNewPassword": "Подтвердите новый пароль",
+      "confirmNewPasswordPlaceholder": "Повторите новый пароль",
+      "submit": "Сбросить пароль",
+      "backToLogin": "← Назад ко входу",
+      "showPassword": "Показать пароль",
+      "hidePassword": "Скрыть пароль",
+      "showOtp": "Показать код",
+      "hideOtp": "Скрыть",
+      "resendCountdown": "Отправить код повторно через {seconds} сек",
+      "resendOtp": "Отправить код повторно",
+      "changeMethod": "Изменить способ восстановления",
+      "passwordsMatch": "Пароли совпадают"
+    },
+    "loading": "Загрузка...",
+    "brand": {
+      "name": "CyberSec Lab",
+      "tagline": "Тренажёр по информационной безопасности"
+    },
+    "validation": {
+      "allFieldsRequired": "Заполните все поля",
+      "invalidEmail": "Некорректный email",
+      "invalidPhone": "Некорректный номер телефона",
+      "passwordMismatch": "Пароли не совпадают",
+      "otpRequired": "Введите код подтверждения"
+    }
   },
   "common": {
-    "language": "Язык"
+    "language": "Язык",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "close": "Закрыть",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "retry": "Повторить",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "refresh": "Обновить",
+    "back": "Назад",
+    "next": "Далее",
+    "previous": "Назад",
+    "submit": "Отправить",
+    "confirm": "Подтвердить",
+    "yes": "Да",
+    "no": "Нет",
+    "all": "Все",
+    "none": "Нет",
+    "selected": "Выбрано",
+    "noData": "Нет данных",
+    "notFound": "Не найдено",
+    "unauthorized": "Не авторизован",
+    "forbidden": "Доступ запрещён",
+    "serverError": "Ошибка сервера",
+    "networkError": "Ошибка сети",
+    "export": "Экспорт",
+    "import": "Импорт",
+    "download": "Скачать",
+    "upload": "Загрузить",
+    "copy": "Копировать",
+    "copied": "Скопировано!",
+    "success": "Успешно",
+    "warning": "Предупреждение",
+    "info": "Информация",
+    "required": "Обязательное поле",
+    "optional": "Необязательно"
+  },
+  "nav": {
+    "dashboard": "Главная",
+    "owasp": "OWASP Top 10",
+    "sqlInjection": "SQL-инъекции",
+    "xss": "XSS",
+    "csrf": "CSRF",
+    "authSecurity": "Аутентификация",
+    "secureCoding": "Безопасный код",
+    "tools": "Инструменты безопасности",
+    "securityHeaders": "Заголовки безопасности",
+    "idor": "IDOR",
+    "ssrf": "SSRF",
+    "apiSecurity": "API Безопасность",
+    "phishingAnalyzer": "Анализатор фишинга",
+    "careerPaths": "Карьерные пути",
+    "quiz": "Квизы",
+    "achievements": "Достижения",
+    "cheatSheets": "Шпаргалки",
+    "passwordChecker": "Проверка пароля",
+    "leaderboard": "Рейтинг",
+    "assignments": "Задания",
+    "profile": "Профиль",
+    "teacherPanel": "Панель преподавателя",
+    "adminPanel": "Панель администратора",
+    "logout": "Выйти",
+    "theme": "Тема",
+    "language": "Язык",
+    "modules": "Модули",
+    "toolsSection": "Инструменты",
+    "role": "Роль",
+    "impersonating": "Вы вошли как",
+    "returnToAdmin": "Вернуться к администратору",
+    "closeSidebar": "Закрыть боковую панель",
+    "avatarAlt": "Аватар",
+    "progress": "Прогресс"
+  },
+  "dashboard": {
+    "welcome": "Добро пожаловать",
+    "subtitle": "Интерактивная платформа для изучения уязвимостей веб-приложений, методов атак и защитных механизмов. Практикуйтесь в безопасной среде.",
+    "proficiency": {
+      "novice": "Новичок",
+      "beginner": "Начинающий",
+      "practitioner": "Практикующий",
+      "advanced": "Продвинутый",
+      "expert": "Эксперт"
+    },
+    "stats": {
+      "totalStudents": "Всего студентов",
+      "active": "Активных",
+      "active30d": "Активных за 30 дн.",
+      "avgModules": "Ср. модулей",
+      "avgScoreLabel": "Средний балл:",
+      "avgScore": "Средний балл",
+      "avgCompletion": "Среднее завершение",
+      "atRisk": "В зоне риска",
+      "modules": "модулей",
+      "modulesLabel": "Модули",
+      "quizzes": "Квизы",
+      "progressLabel": "прогресса",
+      "achievementsLabel": "достижений",
+      "noStreak": "Нет серии",
+      "bestStreak": "Лучшая: {streak} дн."
+    },
+    "quickActionsTitle": "Быстрые действия",
+    "recentActivity": "Последняя активность",
+    "progress": "Прогресс",
+    "achievements": "Достижения",
+    "level": "Уровень",
+    "xp": "XP",
+    "rank": "Ранг",
+    "streak": "Серия",
+    "days": "дн.",
+    "loadingStudents": "Загрузка данных студентов...",
+    "searchingStudent": "Поиск студента...",
+    "noData": "Нет данных",
+    "takeQuiz": "Пройдите квиз",
+    "classOverview": "Обзор класса",
+    "recommendation": "Рекомендация",
+    "nextAchievement": "Следующее достижение",
+    "upcomingDeadlines": "Предстоящие дедлайны",
+    "learningModules": "Модули обучения",
+    "overallProgress": "Общий прогресс обучения",
+    "openMenu": "Открыть меню",
+    "announcement": {
+      "important": "Важно",
+      "dismiss": "Скрыть объявление: {title}"
+    },
+    "deadline": {
+      "overdue": "Просрочен",
+      "today": "Сегодня",
+      "tomorrow": "Завтра",
+      "scopeCourse": "Курс",
+      "scopeQuiz": "Квиз: {id}"
+    },
+    "module": {
+      "lessons": "уроков",
+      "completed": "Пройден"
+    },
+    "quizCard": {
+      "title": "Проверка знаний",
+      "description": "Проверьте свои знания по 9 категориям безопасности с фильтрацией по сложности.",
+      "categoriesBadge": "9 категорий",
+      "questionsBadge": "136+ вопросов"
+    },
+    "achievementsCard": {
+      "title": "Достижения и глоссарий",
+      "description": "Отслеживайте прогресс и изучайте термины ИБ.",
+      "unlocked": "{unlocked}/{total} разблокировано",
+      "terms": "80+ терминов"
+    },
+    "activityTimeline": {
+      "title": "Хронология активности",
+      "collapse": "Свернуть",
+      "showAll": "Показать все",
+      "quizPrefix": "Квиз: {id}",
+      "moduleBadge": "Модуль",
+      "quizBadge": "Квиз"
+    },
+    "recommendations": {
+      "adminNew": "Управляйте пользователями и настройками системы.",
+      "teacherNew": "Посмотрите аналитику и прогресс студентов.",
+      "greatStreak": "Отличная серия — {streak} дней подряд! Продолжайте и открывайте новые достижения.",
+      "inactive": "Вы не занимались {days} дн. Вернитесь к обучению — серия ждёт!",
+      "startOwasp": "Начните с OWASP Top 10 — это фундамент веб-безопасности.",
+      "trySql": "Попробуйте SQL-инъекции — самая распространённая уязвимость.",
+      "learnXss": "Изучите XSS-атаки — они встречаются на каждом третьем сайте.",
+      "learnCsrf": "Изучите CSRF-атаки — подделка запросов от имени пользователя.",
+      "masterHeaders": "Освойте Security Headers — CSP, HSTS и другие заголовки безопасности.",
+      "tryAuth": "Попробуйте модуль аутентификации — пароли, хеширование и 2FA.",
+      "practiceCoding": "Практикуйтесь в безопасном кодировании — 15 задач по ревью кода.",
+      "tryTools": "Попробуйте инструменты: шифры, кодирование и генератор паролей.",
+      "learnApi": "Изучите OWASP API Security Top 10 — уязвимости современных API.",
+      "tryQuizzes": "Проверьте свои знания в квизах — 11 категорий с фильтрацией по сложности!",
+      "finishModules": "Завершите оставшиеся модули для полного прохождения!",
+      "allDone": "Великолепно! Вы прошли все модули. Посмотрите достижения!"
+    },
+    "progressCompleteMessage": "Отлично! Вы прошли все модули. Попробуйте квизы для закрепления и откройте все достижения.",
+    "progressStartMessage": "Начните с любого модуля, который вас интересует.",
+    "progressContinueMessage": "Продолжайте обучение! Ещё {remaining} модулей осталось.",
+    "heroBadge": "09.03.04 Программная инженерия",
+    "quickActions": {
+      "adminPanel": "Панель администратора",
+      "teacherPanel": "Панель преподавателя"
+    }
+  },
+  "quiz": {
+    "title": "Проверка знаний",
+    "subtitle": "Тестирование по информационной безопасности",
+    "start": "Начать",
+    "selectCategory": "Выберите категорию квиза",
+    "selectDescription": "Каждый квиз содержит вопросы с таймером 30 секунд на каждый.",
+    "submit": "Ответить",
+    "answer": "Ответить",
+    "next": "Следующий вопрос",
+    "previous": "Предыдущий вопрос",
+    "finish": "Завершить",
+    "score": "Результат",
+    "yourScore": "Ваш результат",
+    "maxScore": "Максимальный балл",
+    "passed": "Хороший результат!",
+    "failed": "Нужно подтянуть!",
+    "perfect": "Отлично!",
+    "retry": "Пройти заново",
+    "tryAgain": "Попробовать снова",
+    "progress": "Прогресс",
+    "question": "Вопрос {current}/{total}",
+    "of": "из",
+    "timeLeft": "Осталось времени",
+    "timeUp": "Время вышло!",
+    "category": "Категория",
+    "difficultyLabel": "Сложность:",
+    "difficulty": {
+      "easy": "Лёгкий",
+      "medium": "Средний",
+      "hard": "Сложный"
+    },
+    "correct": "Правильно!",
+    "incorrect": "Неправильно!",
+    "results": "Результаты",
+    "correctAnswers": "{correct} из {total} правильных ответов",
+    "backToModules": "К категориям",
+    "noQuestions": "Нет доступных вопросов",
+    "loading": "Загрузка...",
+    "submitting": "Отправка...",
+    "filterAll": "Все",
+    "questionsCount": "{count} вопросов",
+    "newBadge": "Новый",
+    "select": "выбрать",
+    "navigation": "навигация",
+    "exit": "выход",
+    "maxStreak": "Максимальная серия: {streak} подряд",
+    "timeTaken": "Затраченное время: {seconds}с",
+    "answerBreakdown": "Разбор ответов",
+    "correctAnswer": "Правильный ответ: {answer}"
+  },
+  "errors": {
+    "notFound": "Страница не найдена",
+    "notFoundDescription": "Запрашиваемая страница не существует или была перемещена.",
+    "goHome": "На главную",
+    "goBack": "Назад",
+    "serverError": "Ошибка",
+    "serverErrorDescription": "Произошла ошибка при загрузке страницы.",
+    "tryAgain": "Попробовать снова",
+    "reconnecting": "Переподключение...",
+    "offline": "Нет подключения",
+    "offlineDescription": "Похоже, вы потеряли соединение с интернетом. CyberSec Lab доступен только онлайн.",
+    "offlineCheckTitle": "Что можно проверить",
+    "offlineCheck1": "Проверьте подключение к Wi-Fi или мобильной сети",
+    "offlineCheck2": "Убедитесь, что не включён режим полёта",
+    "offlineCheck3": "Попробуйте открыть другой сайт для проверки",
+    "offlineBrand": "CyberSec Lab — Тренажёр по информационной безопасности"
+  },
+  "profile": {
+    "title": "Личный профиль",
+    "subtitle": "Управление данными аккаунта",
+    "avatarAlt": "Аватар: {name}",
+    "avatarAltDefault": "Пользователь",
+    "avatarUpdated": "Аватар обновлён",
+    "avatarUploadError": "Выберите изображение",
+    "avatarUploadSizeError": "Файл слишком большой (макс. 5 МБ)",
+    "profileCompletion": "Заполненность профиля",
+    "profileCompletionHintFullName": "Укажите ФИО. ",
+    "profileCompletionHintGroup": "Укажите группу. ",
+    "profileCompletionHintCourse": "Укажите курс. ",
+    "profileCompletionHintUniversity": "Укажите университет. ",
+    "profileCompletionHintBio": "Добавьте биографию.",
+    "stats": "Статистика обучения",
+    "statsModules": "Модули",
+    "statsAvgScore": "Ср. балл",
+    "statsQuizzesCount": "квизов",
+    "statsAchievements": "Достижения",
+    "statsOnPlatform": "На платформе",
+    "statsLogins": "Входов: {count}",
+    "recentActivity": "Последняя активность",
+    "activityBadgeModule": "Модуль",
+    "activityBadgeQuiz": "Квиз",
+    "activityQuizPrefix": "Квиз: {id}",
+    "unlockedAchievements": "Разблокированные достижения",
+    "personalInfo": "Личные данные",
+    "fullName": "ФИО *",
+    "fullNamePlaceholder": "Иванов Иван Иванович",
+    "fullNameRequired": "ФИО обязательно",
+    "email": "Email",
+    "emailNotEditable": "Email нельзя изменить",
+    "phone": "Телефон",
+    "phoneNotEditable": "Телефон нельзя изменить",
+    "university": "Университет",
+    "universityPlaceholder": "Название университета",
+    "course": "Курс",
+    "coursePlaceholder": "Например: 3",
+    "group": "Группа",
+    "groupPlaceholder": "Например: ПИ-21",
+    "bio": "Биография",
+    "bioPlaceholder": "Расскажите о себе...",
+    "profileSaved": "Профиль сохранён",
+    "changePassword": "Смена пароля",
+    "currentPassword": "Текущий пароль",
+    "currentPasswordPlaceholder": "Введите текущий пароль",
+    "newPassword": "Новый пароль",
+    "newPasswordPlaceholder": "Минимум 8 символов",
+    "confirmPassword": "Подтверждение пароля",
+    "confirmPasswordPlaceholder": "Повторите новый пароль",
+    "passwordStrength": "Надёжность пароля",
+    "passwordsMatch": "Пароли совпадают",
+    "passwordsMismatch": "Пароли не совпадают",
+    "passwordChanged": "Пароль изменён",
+    "fillAllPasswordFields": "Заполните все поля",
+    "changePasswordButton": "Изменить пароль",
+    "loginActivity": "Активность входа",
+    "loginActivityDescription": "Последние попытки входа в аккаунт",
+    "totalLogins": "Всего входов:",
+    "lastLogin": "Последний: {time}",
+    "loginSuccess": "Успешный вход",
+    "loginFailed": "Неверный пароль",
+    "noLoginActivity": "Нет записей активности",
+    "exportImport": "Экспорт и импорт прогресса",
+    "exportImportDescription": "Сохраните или восстановите свой прогресс",
+    "exportProgress": "Экспортировать прогресс",
+    "importProgress": "Импортировать прогресс",
+    "progressExported": "Прогресс экспортирован",
+    "progressImported": "Прогресс импортирован",
+    "invalidFileFormat": "Неверный формат файла",
+    "fileReadError": "Ошибка при чтении файла",
+    "dangerZone": "Опасная зона",
+    "dangerZoneDescription": "Необратимые действия с аккаунтом",
+    "deleteAccount": "Удалить аккаунт",
+    "deleteAccountWarning": "Все данные будут удалены навсегда",
+    "deleteAccountConfirm": "Вы уверены? Это действие нельзя отменить.",
+    "deleteAccountHint": "Введите <code>УДАЛИТЬ</code> для подтверждения:",
+    "deleteAccountConfirmText": "УДАЛИТЬ",
+    "enterPasswordToDelete": "Введите пароль для подтверждения удаления:",
+    "deletePasswordPlaceholder": "Текущий пароль",
+    "confirmDelete": "Подтвердить",
+    "accountDeleted": "Аккаунт удалён",
+    "wrongDeleteConfirmation": "Введите \"УДАЛИТЬ\" для подтверждения",
+    "roleAdmin": "Администратор",
+    "roleTeacher": "Преподаватель",
+    "roleStudent": "Студент",
+    "timeJustNow": "только что",
+    "timeMinAgo": "{n} мин назад",
+    "timeHourAgo": "{n} ч назад",
+    "timeDayAgo": "{n} дн назад",
+    "saveChanges": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль"
+  },
+  "teacher": {
+    "title": "Панель преподавателя",
+    "subtitle": "Отслеживайте прогресс и управляйте группами",
+    "tabs": {
+      "progress": "Прогресс",
+      "gradebook": "Журнал",
+      "analytics": "Аналитика",
+      "deadlines": "Дедлайны",
+      "groups": "Группы",
+      "comparison": "Сравнение",
+      "atRisk": "Внимание",
+      "messages": "Сообщения",
+      "reports": "Отчёты",
+      "assignments": "Задания"
+    },
+    "allGroups": "Все группы",
+    "reset": "Сбросить",
+    "totalStudents": "Всего студентов",
+    "active": "Активных",
+    "avgModules": "Ср. модулей",
+    "avgScore": "Ср. балл",
+    "excellent": "Отлично (80%+)",
+    "good": "Хорошо (60-79%)",
+    "average": "Средне (40-59%)",
+    "poor": "Плохо (<40%)",
+    "notSubmitted": "Не сдано",
+    "searchStudent": "Поиск студента...",
+    "searchGroup": "Поиск группы...",
+    "loading": "Загрузка данных студентов...",
+    "noData": "Нет данных",
+    "student": "Студент",
+    "module": "Модуль",
+    "modules": "Модули",
+    "quiz": "Квиз",
+    "course": "Курс",
+    "score": "Балл",
+    "status": "Статус",
+    "completed": "Выполнен",
+    "inProgress": "В процессе",
+    "notStarted": "Не начат",
+    "newDeadline": "Новый дедлайн",
+    "manageDeadlines": "Управление дедлайнами",
+    "deleteDeadline": "Удалить",
+    "deadlineTitle": "Название дедлайна",
+    "deadlineType": "Тип",
+    "deadlineDate": "Срок",
+    "deadlineGroup": "Группа (пусто = все)",
+    "saveDeadline": "Создать",
+    "cancel": "Отмена",
+    "allStudents": "Все студенты",
+    "description": "Описание",
+    "optional": "Необязательно",
+    "selectModule": "Выберите модуль",
+    "selectQuiz": "Выберите квиз",
+    "overdue": "Просрочен",
+    "today": "Сегодня",
+    "tomorrow": "Завтра",
+    "overdueDays": "Просрочен ({days} дн.)",
+    "daysLeft": "{days} дн.",
+    "days": "дн.",
+    "studentStatus": "Статус студентов ({count})",
+    "noDeadlines": "Нет активных дедлайнов. Создайте первый!",
+    "studentsCount": "{count} студентов",
+    "more": "+{count} ещё",
+    "noGroups": "Группы ещё не созданы. Студенты могут указать группу в профиле.",
+    "analytics": {
+      "overview": "Обзор",
+      "trends": "Тренды",
+      "questions": "Вопросы",
+      "achievements": "Достижения",
+      "competency": "Компетенции",
+      "weaknesses": "Слабые места",
+      "predictive": "Прогноз",
+      "moduleDeepDive": "Модули+",
+      "certification": "Сертификация",
+      "quizSession": "Сессии квизов",
+      "export": "Экспорт"
+    },
+    "analyticsTitle": "Средний балл по категориям квизов",
+    "analyticsSubtitle": "Распределение оценок",
+    "activityTitle": "Активность студентов",
+    "activeStudents": "Активные",
+    "inactiveStudents": "Неактивные",
+    "ranking": "Рейтинг студентов",
+    "quizScore": "{score}%",
+    "quizScoreShort": "квизы: {score}%",
+    "quizAvgScore": "Ср. балл квизов",
+    "lastActive": "Последняя активность",
+    "never": "Никогда",
+    "daysAgo": "{days} дн. назад",
+    "comparisonTitle": "Сравнение групп",
+    "comparisonSubtitle": "Нет данных для сравнения. Студенты должны быть распределены по группам.",
+    "activityRate": "Активность (%)",
+    "bestGroup": "Лучшая",
+    "needsAttention": "Требует внимания",
+    "noAtRisk": "Все студенты в порядке! Нет студентов с признаками риска.",
+    "moduleCompletionByGroup": "Завершение модулей по группам",
+    "quizScoreDistribution": "Распределение баллов квизов",
+    "engagementLeaders": "Лидеры по вовлечённости",
+    "atRiskStudents": "Студенты с признаками риска ({count})",
+    "defaultTeacherName": "Преподаватель",
+    "sortByName": "По имени",
+    "sortByModules": "По модулям",
+    "sortByScore": "По баллу",
+    "editDeadline": "Изменить",
+    "createGroup": "Создать группу",
+    "groupName": "Название группы",
+    "groupStudents": "Студенты группы",
+    "addStudent": "Добавить студента",
+    "removeStudent": "Удалить студента",
+    "actions": "Действия",
+    "viewDetails": "Подробнее",
+    "sendMessage": "Написать",
+    "grade": "Оценка",
+    "grading": "Оценивание",
+    "comment": "Комментарий",
+    "gradePlaceholder": "Введите оценку",
+    "submitGrade": "Выставить оценку",
+    "back": "Назад",
+    "filters": "Фильтры",
+    "apply": "Применить",
+    "clear": "Очистить",
+    "assignment": "Задание",
+    "atRisk": {
+      "inactiveDays": "Не активен {days} дн.",
+      "lowScore": "Низкий балл ({score}%)",
+      "fewModules": "Мало модулей"
+    }
   }
 }
