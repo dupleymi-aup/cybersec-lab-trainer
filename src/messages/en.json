@@ -587,7 +587,14 @@
     "offlineCheck1": "Check your Wi-Fi or mobile network connection",
     "offlineCheck2": "Make sure airplane mode is off",
     "offlineCheck3": "Try opening another website to test",
-    "offlineBrand": "CyberSec Lab — Cybersecurity Training Platform"
+    "offlineBrand": "CyberSec Lab — Cybersecurity Training Platform",
+    "componentError": "Error in {name}",
+    "unexpectedError": "An unexpected error occurred",
+    "reloadPage": "Reload page",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
+    "copy": "Copy",
+    "errorHandling": "Error handling"
   },
   "profile": {
     "title": "Personal Profile",

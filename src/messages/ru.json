@@ -587,7 +587,14 @@
     "offlineCheck1": "Проверьте подключение к Wi-Fi или мобильной сети",
     "offlineCheck2": "Убедитесь, что не включён режим полёта",
     "offlineCheck3": "Попробуйте открыть другой сайт для проверки",
-    "offlineBrand": "CyberSec Lab — Тренажёр по информационной безопасности"
+    "offlineBrand": "CyberSec Lab — Тренажёр по информационной безопасности",
+    "componentError": "Ошибка в {name}",
+    "unexpectedError": "Произошла непредвиденная ошибка",
+    "reloadPage": "Перезагрузить страницу",
+    "showDetails": "Показать детали",
+    "hideDetails": "Скрыть детали",
+    "copy": "Копировать",
+    "errorHandling": "Обработка ошибок"
   },
   "profile": {
     "title": "Личный профиль",

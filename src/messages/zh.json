@@ -587,7 +587,14 @@
     "offlineCheck1": "检查您的 Wi-Fi 或移动网络连接",
     "offlineCheck2": "确保飞行模式已关闭",
     "offlineCheck3": "尝试打开其他网站进行测试",
-    "offlineBrand": "CyberSec Lab — 网络安全培训平台"
+    "offlineBrand": "CyberSec Lab — 网络安全培训平台",
+    "componentError": "{name} 中发生错误",
+    "unexpectedError": "发生意外错误",
+    "reloadPage": "重新加载页面",
+    "showDetails": "显示详情",
+    "hideDetails": "隐藏详情",
+    "copy": "复制",
+    "errorHandling": "错误处理"
   },
   "profile": {
     "title": "个人资料",
