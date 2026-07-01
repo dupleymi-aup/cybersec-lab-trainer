@@ -18,17 +18,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CyberSec Lab — Тренажёр по информационной безопасности",
+  title: "CyberSec Lab — Cybersecurity Training Platform",
   description:
-    "Интерактивная платформа для изучения уязвимостей веб-приложений: OWASP Top 10, SQL-инъекции, XSS, CSRF и безопасное кодирование. Направление 09.03.04 Программная инженерия.",
+    "Interactive platform for learning web application vulnerabilities: OWASP Top 10, SQL Injection, XSS, CSRF and secure coding. Software Engineering program 09.03.04.",
   keywords: [
-    "информационная безопасность",
+    "cybersecurity",
     "OWASP",
-    "SQL-инъекция",
+    "SQL injection",
     "XSS",
     "CSRF",
-    "тренажёр",
-    "программная инженерия",
+    "training",
+    "software engineering",
   ],
   icons: {
     icon: "/logo.svg",
@@ -73,7 +73,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
@@ -82,7 +82,7 @@ export default function RootLayout({
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-violet-600 focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2 focus:ring-offset-background"
         >
-          Перейти к основному содержимому
+          Skip to main content
         </a>
         <NextThemesProvider
           attribute="class"
