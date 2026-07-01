@@ -37,6 +37,10 @@ const baseConfig = {
             value: "DENY",
           },
           {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+          {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
           },
@@ -49,11 +53,19 @@ const baseConfig = {
             value: "max-age=63072000; includeSubDomains; preload",
           },
           {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
+          },
+          {
+            key: "Cross-Origin-Resource-Policy",
+            value: "same-origin",
+          },
+          {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://unpkg.com",
-              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' https://unpkg.com/swagger-ui-dist@5",
+              "style-src 'self' 'unsafe-inline' https://unpkg.com/swagger-ui-dist@5",
               "img-src 'self' data: blob:",
               "font-src 'self' data: https://fonts.gstatic.com",
               "connect-src 'self'",
@@ -71,8 +83,8 @@ const baseConfig = {
             key: "Content-Security-Policy-Report-Only",
             value: [
               "default-src 'self'",
-              "script-src 'self' https://unpkg.com",
-              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' https://unpkg.com/swagger-ui-dist@5",
+              "style-src 'self' 'unsafe-inline' https://unpkg.com/swagger-ui-dist@5",
               "img-src 'self' data: blob:",
               "font-src 'self' data: https://fonts.gstatic.com",
               "connect-src 'self'",
