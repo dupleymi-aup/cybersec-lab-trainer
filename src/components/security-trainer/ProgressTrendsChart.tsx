@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
+import { CHART_COLORS } from '@/lib/constants';
 
 interface ProgressTrendsChartProps {
   students?: Array<{ id: string; fullName: string }>;
@@ -90,7 +91,7 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={trends}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
                   <XAxis
                     dataKey="date"
                     tick={{ fontSize: 11 }}
@@ -115,7 +116,7 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
                     type="monotone"
                     dataKey="modulesCompleted"
                     name="Модули пройдены"
-                    stroke="#10b981"
+                    stroke={CHART_COLORS.success}
                     strokeWidth={2}
                     dot={{ r: 3 }}
                     activeDot={{ r: 5 }}
@@ -125,7 +126,7 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
                     type="monotone"
                     dataKey="avgQuizScore"
                     name="Средний балл квизов"
-                    stroke="#3b82f6"
+                    stroke={CHART_COLORS.info}
                     strokeWidth={2}
                     dot={{ r: 3 }}
                     activeDot={{ r: 5 }}

@@ -8,6 +8,7 @@ import { Loader2, AlertTriangle, TrendingUp, BookOpen, Users, Target } from 'luc
 import { getProgressDynamics, type ProgressDynamicsDay } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
+import { CHART_COLORS } from '@/lib/constants';
 
 const PERIOD_OPTIONS = [
   { key: 7, label: '7д' },
@@ -131,12 +132,12 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="dateShort" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
-                <YAxis yAxisId="left" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                <XAxis dataKey="dateShort" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} />
+                <YAxis yAxisId="left" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                 <Tooltip
-                  contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                  contentStyle={{ fontSize: 12, borderRadius: 8, border: `1px solid ${CHART_COLORS.grid}` }}
                   formatter={(value, name) => {
                     if (name === 'modulesCompleted') return [value, 'Модулей завершено'];
                     if (name === 'avgQuizScore') return [`${value}%`, 'Ср. балл квизов'];
@@ -145,9 +146,9 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Area yAxisId="left" type="monotone" dataKey="activeStudents" name="activeStudents" fill="#3b82f6" fillOpacity={0.15} stroke="#3b82f6" strokeWidth={2} />
-                <Line yAxisId="right" type="monotone" dataKey="avgQuizScore" name="avgQuizScore" stroke="#6366f1" strokeWidth={2} dot={false} />
-                <Line yAxisId="left" type="monotone" dataKey="modulesCompleted" name="modulesCompleted" stroke="#10b981" strokeWidth={2} dot={false} />
+                <Area yAxisId="left" type="monotone" dataKey="activeStudents" name="activeStudents" fill={CHART_COLORS.info} fillOpacity={0.15} stroke={CHART_COLORS.info} strokeWidth={2} />
+                <Line yAxisId="right" type="monotone" dataKey="avgQuizScore" name="avgQuizScore" stroke={CHART_COLORS.primary} strokeWidth={2} dot={false} />
+                <Line yAxisId="left" type="monotone" dataKey="modulesCompleted" name="modulesCompleted" stroke={CHART_COLORS.success} strokeWidth={2} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           ) : (
@@ -163,13 +164,13 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="dateShort" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
-                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                <XAxis dataKey="dateShort" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} />
+                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} />
                 <Tooltip formatter={(value, name) => [value, name === 'newCompletions' ? 'Новые завершения' : 'Попытки квизов']} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Area type="monotone" dataKey="newCompletions" name="newCompletions" fill="#10b981" fillOpacity={0.2} stroke="#10b981" strokeWidth={2} />
-                <Area type="monotone" dataKey="quizAttempts" name="quizAttempts" fill="#6366f1" fillOpacity={0.2} stroke="#6366f1" strokeWidth={2} />
+                <Area type="monotone" dataKey="newCompletions" name="newCompletions" fill={CHART_COLORS.success} fillOpacity={0.2} stroke={CHART_COLORS.success} strokeWidth={2} />
+                <Area type="monotone" dataKey="quizAttempts" name="quizAttempts" fill={CHART_COLORS.primary} fillOpacity={0.2} stroke={CHART_COLORS.primary} strokeWidth={2} />
               </ComposedChart>
             </ResponsiveContainer>
           ) : (
