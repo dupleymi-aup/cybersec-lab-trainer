@@ -1,10 +1,10 @@
 "use client";
 
-import {useTranslations, useLocale} from "next-intl";
-import {Shield, Menu, X} from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { Shield, Menu, X } from "lucide-react";
 import Link from "next/link";
-import {Button} from "@/components/ui/button";
-import {useState} from "react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import ThemeToggle from "@/components/security-trainer/ThemeToggle";
 
 export default function LandingHeader() {
@@ -27,14 +27,26 @@ export default function LandingHeader() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
-          <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+        <nav
+          className="hidden md:flex items-center gap-6"
+          aria-label="Main navigation"
+        >
+          <a
+            href="#how-it-works"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
             {t("dashboard")}
           </a>
-          <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#features"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
             {t("register")}
           </a>
-          <a href="#faq" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#faq"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
             {t("login")}
           </a>
         </nav>
@@ -42,7 +54,10 @@ export default function LandingHeader() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <Link href={`/${locale}/register`}>
-            <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white hidden sm:inline-flex">
+            <Button
+              size="sm"
+              className="bg-violet-600 hover:bg-violet-700 text-white hidden sm:inline-flex"
+            >
               {t("register")}
             </Button>
           </Link>
@@ -51,19 +66,37 @@ export default function LandingHeader() {
               {t("login")}
             </Button>
           </Link>
-          <button className="md:hidden p-2" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
-            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <button
+            className="md:hidden p-2"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>
 
       {menuOpen && (
-        <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 py-4 space-y-3" role="navigation" aria-label="Mobile navigation">
-          <a href="#how-it-works" className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2">
+        <div
+          className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 py-4 space-y-3"
+          role="navigation"
+          aria-label="Mobile navigation"
+        >
+          <a
+            href="#how-it-works"
+            className="block text-sm font-medium text-muted-foreground hover:text-foreground py-2"
+          >
             {t("dashboard")}
           </a>
           <Link href={`/${locale}/register`}>
-            <Button size="sm" className="w-full bg-violet-600 hover:bg-violet-700 text-white">
+            <Button
+              size="sm"
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white"
+            >
               {t("register")}
             </Button>
           </Link>

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useLocale } from 'next-intl';
+import { useLocale } from "next-intl";
 
 const LOCALE_MAP: Record<string, string> = {
-  en: 'en-US',
-  ru: 'ru-RU',
-  zh: 'zh-CN',
+  en: "en-US",
+  ru: "ru-RU",
+  zh: "zh-CN",
 };
 
 function resolveLocale(locale: string): string {

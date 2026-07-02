@@ -1,20 +1,36 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { useNotificationStore, type Notification as NotifType } from '@/lib/notification-store';
+import { useState, useMemo } from "react";
 import {
-  Bell, BellOff, Check, Trash2, X, AlertTriangle, Trophy, BookOpen, Brain, Megaphone, Clock,
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+  useNotificationStore,
+  type Notification as NotifType,
+} from "@/lib/notification-store";
+import {
+  Bell,
+  BellOff,
+  Check,
+  Trash2,
+  X,
+  AlertTriangle,
+  Trophy,
+  BookOpen,
+  Brain,
+  Megaphone,
+  Clock,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const ICON_MAP: Record<NotifType['type'], { icon: typeof Trophy; className: string }> = {
-  achievement: { icon: Trophy, className: 'text-amber-500' },
-  progress: { icon: BookOpen, className: 'text-green-500' },
-  quiz: { icon: Brain, className: 'text-blue-500' },
-  warning: { icon: AlertTriangle, className: 'text-red-500' },
-  system: { icon: Bell, className: 'text-muted-foreground' },
-  announcement: { icon: Megaphone, className: 'text-purple-500' },
-  deadline: { icon: Clock, className: 'text-orange-500' },
+const ICON_MAP: Record<
+  NotifType["type"],
+  { icon: typeof Trophy; className: string }
+> = {
+  achievement: { icon: Trophy, className: "text-amber-500" },
+  progress: { icon: BookOpen, className: "text-green-500" },
+  quiz: { icon: Brain, className: "text-blue-500" },
+  warning: { icon: AlertTriangle, className: "text-red-500" },
+  system: { icon: Bell, className: "text-muted-foreground" },
+  announcement: { icon: Megaphone, className: "text-purple-500" },
+  deadline: { icon: Clock, className: "text-orange-500" },
 };
 
 function formatTime(ts: number): string {
@@ -22,29 +38,36 @@ function formatTime(ts: number): string {
   const m = Math.floor(diff / 60000);
   const h = Math.floor(diff / 3600000);
   const d = Math.floor(diff / 86400000);
-  if (m < 1) return 'Только что';
+  if (m < 1) return "Только что";
   if (m < 60) return `${m} мин. назад`;
   if (h < 24) return `${h} ч. назад`;
   return `${d} дн. назад`;
 }
 
 const FILTERS = [
-  { key: 'all', label: 'Все' },
-  { key: 'unread', label: 'Новые' },
-  { key: 'announcement', label: 'Объявления' },
+  { key: "all", label: "Все" },
+  { key: "unread", label: "Новые" },
+  { key: "announcement", label: "Объявления" },
 ] as const;
 
-type FilterKey = (typeof FILTERS)[number]['key'];
+type FilterKey = (typeof FILTERS)[number]["key"];
 
 export default function NotificationBell() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications, removeNotification } =
-    useNotificationStore();
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    clearNotifications,
+    removeNotification,
+  } = useNotificationStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState<FilterKey>('all');
+  const [filter, setFilter] = useState<FilterKey>("all");
 
   const filtered = useMemo(() => {
-    if (filter === 'unread') return notifications.filter((n) => !n.read);
-    if (filter === 'announcement') return notifications.filter((n) => n.type === 'announcement');
+    if (filter === "unread") return notifications.filter((n) => !n.read);
+    if (filter === "announcement")
+      return notifications.filter((n) => n.type === "announcement");
     return notifications;
   }, [notifications, filter]);
 
@@ -58,7 +81,7 @@ export default function NotificationBell() {
         <Bell className="h-5 w-5 text-foreground" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
@@ -66,7 +89,10 @@ export default function NotificationBell() {
       <AnimatePresence>
         {isOpen && (
           <>
-            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+            />
             <motion.div
               initial={{ opacity: 0, y: -8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -113,13 +139,15 @@ export default function NotificationBell() {
                     onClick={() => setFilter(f.key)}
                     className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                       filter === f.key
-                        ? 'bg-foreground text-background'
-                        : 'text-muted-foreground hover:bg-muted'
+                        ? "bg-foreground text-background"
+                        : "text-muted-foreground hover:bg-muted"
                     }`}
                   >
                     {f.label}
-                    {f.key === 'unread' && unreadCount > 0 && (
-                      <span className="ml-1.5 text-[10px] opacity-70">({unreadCount})</span>
+                    {f.key === "unread" && unreadCount > 0 && (
+                      <span className="ml-1.5 text-[10px] opacity-70">
+                        ({unreadCount})
+                      </span>
                     )}
                   </button>
                 ))}
@@ -131,19 +159,25 @@ export default function NotificationBell() {
                   <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                     <BellOff className="h-12 w-12 mb-2 opacity-50" />
                     <p className="text-sm">
-                      {filter === 'unread' ? 'Нет непрочитанных' : filter === 'announcement' ? 'Нет объявлений' : 'Нет уведомлений'}
+                      {filter === "unread"
+                        ? "Нет непрочитанных"
+                        : filter === "announcement"
+                          ? "Нет объявлений"
+                          : "Нет уведомлений"}
                     </p>
                   </div>
                 ) : (
                   <div className="divide-y">
                     {filtered.map((notif) => {
                       const Icon = ICON_MAP[notif.type]?.icon || Bell;
-                      const colorClass = ICON_MAP[notif.type]?.className || 'text-muted-foreground';
+                      const colorClass =
+                        ICON_MAP[notif.type]?.className ||
+                        "text-muted-foreground";
                       return (
                         <div
                           key={notif.id}
                           className={`p-3 hover:bg-muted/50 transition-colors cursor-pointer ${
-                            !notif.read ? 'bg-muted/30' : ''
+                            !notif.read ? "bg-muted/30" : ""
                           }`}
                           onClick={() => markAsRead(notif.id)}
                         >
@@ -153,7 +187,9 @@ export default function NotificationBell() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2">
-                                <p className="text-sm font-medium truncate">{notif.title}</p>
+                                <p className="text-sm font-medium truncate">
+                                  {notif.title}
+                                </p>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -164,7 +200,9 @@ export default function NotificationBell() {
                                   <X className="h-3 w-3 text-muted-foreground" />
                                 </button>
                               </div>
-                              <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {notif.message}
+                              </p>
                               <p className="text-xs text-muted-foreground/60 mt-1">
                                 {formatTime(notif.timestamp)}
                               </p>

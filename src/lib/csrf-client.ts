@@ -4,8 +4,8 @@
  * and headers to include in fetch requests.
  */
 
-const CSRF_COOKIE_NAME = 'csrf-token';
-const CSRF_HEADER_NAME = 'x-csrf-token';
+const CSRF_COOKIE_NAME = "csrf-token";
+const CSRF_HEADER_NAME = "x-csrf-token";
 
 /**
  * Get the current CSRF token from the cookie.
@@ -13,7 +13,7 @@ const CSRF_HEADER_NAME = 'x-csrf-token';
  */
 export function getCsrfToken(): string | null {
   const match = document.cookie.match(
-    new RegExp(`(?:^|; )${CSRF_COOKIE_NAME}=([^;]*)`)
+    new RegExp(`(?:^|; )${CSRF_COOKIE_NAME}=([^;]*)`),
   );
   return match ? decodeURIComponent(match[1]) : null;
 }
@@ -25,10 +25,12 @@ export function getCsrfToken(): string | null {
  * @param extraHeaders - Additional headers to include
  * @returns Headers object with Content-Type and X-CSRF-Token
  */
-export function getCsrfHeaders(extraHeaders?: Record<string, string>): Record<string, string> {
+export function getCsrfHeaders(
+  extraHeaders?: Record<string, string>,
+): Record<string, string> {
   const token = getCsrfToken();
   return {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...(token ? { [CSRF_HEADER_NAME]: token } : {}),
     ...extraHeaders,
   };
@@ -42,12 +44,17 @@ export function getCsrfHeaders(extraHeaders?: Record<string, string>): Record<st
  * @param options - Fetch options (method, body, etc.)
  * @returns The fetch response
  */
-export async function csrfFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  const { method = 'GET', body, headers, ...rest } = options;
+export async function csrfFetch(
+  url: string,
+  options: RequestInit = {},
+): Promise<Response> {
+  const { method = "GET", body, headers, ...rest } = options;
 
-  const isStateChanging = !['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase());
+  const isStateChanging = !["GET", "HEAD", "OPTIONS"].includes(
+    method.toUpperCase(),
+  );
   const requestHeaders: Record<string, string> = {
-    ...(headers as Record<string, string> || {}),
+    ...((headers as Record<string, string>) || {}),
   };
 
   if (isStateChanging) {

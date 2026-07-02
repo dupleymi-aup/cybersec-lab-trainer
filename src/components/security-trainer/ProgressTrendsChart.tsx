@@ -1,30 +1,42 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { getProgressTrends, type TrendPoint } from '@/lib/auth-store';
-import { motion } from 'framer-motion';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Card, CardContent } from '@/components/ui/card';
-import { Clock } from 'lucide-react';
-import { CHART_COLORS } from '@/lib/constants';
+import { useState, useEffect } from "react";
+import { getProgressTrends, type TrendPoint } from "@/lib/auth-store";
+import { motion } from "framer-motion";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { Card, CardContent } from "@/components/ui/card";
+import { Clock } from "lucide-react";
+import { CHART_COLORS } from "@/lib/constants";
 
 interface ProgressTrendsChartProps {
   students?: Array<{ id: string; fullName: string }>;
   groupId?: string;
 }
 
-type DateRange = '7d' | '30d' | '90d' | 'all';
+type DateRange = "7d" | "30d" | "90d" | "all";
 
 const dateRangeOptions: { value: DateRange; label: string }[] = [
-  { value: '7d', label: '7 дней' },
-  { value: '30d', label: '30 дней' },
-  { value: '90d', label: '90 дней' },
-  { value: 'all', label: 'Всё время' },
+  { value: "7d", label: "7 дней" },
+  { value: "30d", label: "30 дней" },
+  { value: "90d", label: "90 дней" },
+  { value: "all", label: "Всё время" },
 ];
 
-export default function ProgressTrendsChart({ students, groupId: _groupId }: ProgressTrendsChartProps) {
-  const [dateRange, setDateRange] = useState<DateRange>('30d');
-  const [selectedUserId, setSelectedUserId] = useState<string>('');
+export default function ProgressTrendsChart({
+  students,
+  groupId: _groupId,
+}: ProgressTrendsChartProps) {
+  const [dateRange, setDateRange] = useState<DateRange>("30d");
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [trends, setTrends] = useState<TrendPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +49,11 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
   }, [dateRange, selectedUserId]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <Card className="border-border bg-card rounded-xl">
         <CardContent className="p-5">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
@@ -66,8 +82,8 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
                     onClick={() => setDateRange(opt.value)}
                     className={`px-2.5 py-1 text-xs rounded transition-colors ${
                       dateRange === opt.value
-                        ? 'bg-background text-foreground shadow-sm font-medium'
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? "bg-background text-foreground shadow-sm font-medium"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {opt.label}
@@ -91,7 +107,10 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={trends}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke={CHART_COLORS.grid}
+                  />
                   <XAxis
                     dataKey="date"
                     tick={{ fontSize: 11 }}
@@ -100,14 +119,24 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
                   <YAxis
                     yAxisId="left"
                     tick={{ fontSize: 11 }}
-                    label={{ value: 'Модули', angle: -90, position: 'insideLeft', fontSize: 11 }}
+                    label={{
+                      value: "Модули",
+                      angle: -90,
+                      position: "insideLeft",
+                      fontSize: 11,
+                    }}
                   />
                   <YAxis
                     yAxisId="right"
                     orientation="right"
                     domain={[0, 100]}
                     tick={{ fontSize: 11 }}
-                    label={{ value: 'Балл (%)', angle: 90, position: 'insideRight', fontSize: 11 }}
+                    label={{
+                      value: "Балл (%)",
+                      angle: 90,
+                      position: "insideRight",
+                      fontSize: 11,
+                    }}
                   />
                   <Tooltip />
                   <Legend />

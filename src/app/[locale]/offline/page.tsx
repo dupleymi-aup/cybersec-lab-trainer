@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 export default function OfflinePage() {
-  const t = useTranslations('errors');
+  const t = useTranslations("errors");
   const [isRetrying, setIsRetrying] = useState(false);
 
   const handleRetry = () => {
@@ -24,29 +24,29 @@ export default function OfflinePage() {
         </div>
 
         <div className="space-y-3">
-          <h1 className="text-3xl font-bold text-foreground">{t('offline')}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t("offline")}</h1>
           <p className="text-muted-foreground text-lg">
-            {t('offlineDescription')}
+            {t("offlineDescription")}
           </p>
         </div>
 
         <div className="bg-card/50 backdrop-blur rounded-xl p-6 border border-border space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center justify-center gap-2">
             <Shield className="w-5 h-5 text-emerald-400" />
-            {t('offlineCheckTitle')}
+            {t("offlineCheckTitle")}
           </h2>
           <ul className="text-left space-y-2 text-foreground text-sm">
             <li className="flex items-start gap-2">
               <span className="text-blue-400 mt-0.5">•</span>
-              {t('offlineCheck1')}
+              {t("offlineCheck1")}
             </li>
             <li className="flex items-start gap-2">
               <span className="text-blue-400 mt-0.5">•</span>
-              {t('offlineCheck2')}
+              {t("offlineCheck2")}
             </li>
             <li className="flex items-start gap-2">
               <span className="text-blue-400 mt-0.5">•</span>
-              {t('offlineCheck3')}
+              {t("offlineCheck3")}
             </li>
           </ul>
         </div>
@@ -56,13 +56,13 @@ export default function OfflinePage() {
           disabled={isRetrying}
           className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white font-semibold rounded-lg transition-colors duration-200"
         >
-          <RefreshCw className={`w-4 h-4 ${isRetrying ? "animate-spin" : ""}`} />
-          {isRetrying ? t('reconnecting') : t('tryAgain')}
+          <RefreshCw
+            className={`w-4 h-4 ${isRetrying ? "animate-spin" : ""}`}
+          />
+          {isRetrying ? t("reconnecting") : t("tryAgain")}
         </button>
 
-        <p className="text-muted-foreground text-xs">
-          {t('offlineBrand')}
-        </p>
+        <p className="text-muted-foreground text-xs">{t("offlineBrand")}</p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
-import { randomBytes } from 'crypto';
+import { randomBytes } from "crypto";
+import { logger } from "./logger";
 
 /**
  * Server-only module for sensitive secrets.
@@ -14,10 +15,9 @@ export function getAdminInviteCode(): string | undefined {
   const envCode = process.env.ADMIN_INVITE_CODE;
   if (envCode) return envCode;
 
-  if (process.env.NODE_ENV === 'development') {
-    const code = randomBytes(10).toString('hex');
-    // eslint-disable-next-line no-console -- intentional dev-only logging
-    console.log(`[DEV] Admin invite code: ${code}`);
+  if (process.env.NODE_ENV === "development") {
+    const code = randomBytes(10).toString("hex");
+    logger.info("Admin invite code generated for dev", { code });
     return code;
   }
 

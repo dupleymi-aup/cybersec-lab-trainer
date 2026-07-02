@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { getAllGroups } from '@/lib/auth-store';
-import { useAnalyticsFilters } from '@/lib/analytics-context';
-import { Calendar, Users } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { getAllGroups } from "@/lib/auth-store";
+import { useAnalyticsFilters } from "@/lib/analytics-context";
+import { Calendar, Users } from "lucide-react";
 
 const DAY_PRESETS = [7, 30, 90, 180];
 
@@ -20,7 +20,9 @@ export default function AnalyticsFilterBar() {
       {/* Group filter */}
       <div className="flex items-center gap-2">
         <Users size={15} className="text-muted-foreground" />
-        <span className="text-xs font-medium text-muted-foreground">Группа:</span>
+        <span className="text-xs font-medium text-muted-foreground">
+          Группа:
+        </span>
         <select
           value={groupId}
           onChange={(e) => setGroupId(e.target.value)}
@@ -28,7 +30,9 @@ export default function AnalyticsFilterBar() {
         >
           <option value="">Все группы</option>
           {groups.map((g) => (
-            <option key={g} value={g}>{g}</option>
+            <option key={g} value={g}>
+              {g}
+            </option>
           ))}
         </select>
       </div>
@@ -39,7 +43,9 @@ export default function AnalyticsFilterBar() {
       {/* Period presets */}
       <div className="flex items-center gap-2">
         <Calendar size={15} className="text-muted-foreground" />
-        <span className="text-xs font-medium text-muted-foreground">Период:</span>
+        <span className="text-xs font-medium text-muted-foreground">
+          Период:
+        </span>
         <div className="flex gap-1 p-0.5 bg-muted rounded-md">
           {DAY_PRESETS.map((d) => (
             <button
@@ -47,8 +53,8 @@ export default function AnalyticsFilterBar() {
               onClick={() => setDays(d)}
               className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                 days === d
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {d}д

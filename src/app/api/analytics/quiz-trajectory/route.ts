@@ -1,15 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireRole,
+} from "@/lib/api-middleware";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  if (!requireRole(auth.role, "teacher")) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const days = parseInt(searchParams.get('days') || '30', 10);
-  const groupId = searchParams.get('groupId') || undefined;
+  const days = parseInt(searchParams.get("days") || "30", 10);
+  const groupId = searchParams.get("groupId") || undefined;
 
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
@@ -17,7 +22,7 @@ export async function GET(request: NextRequest) {
   // Fetch students, optionally filtered by group
   const students = await prisma.user.findMany({
     where: {
-      role: 'student',
+      role: "student",
       ...(groupId ? { group: groupId } : {}),
     },
     select: { id: true },
@@ -40,7 +45,7 @@ export async function GET(request: NextRequest) {
       correct: true,
       attemptedAt: true,
     },
-    orderBy: { attemptedAt: 'asc' },
+    orderBy: { attemptedAt: "asc" },
   });
 
   // Helper: get the Monday of a given date (week bucket)
@@ -76,10 +81,19 @@ export async function GET(request: NextRequest) {
   const aggMap = new Map<string, TrajectoryPoint>();
 
   for (const [key, bucket] of bucketMap) {
-    const [week, category] = key.split('|');
-    const scorePercent = bucket.total > 0 ? Math.round((bucket.correct / bucket.total) * 10000) / 100 : 0;
+    const [week, category] = key.split("|");
+    const scorePercent =
+      bucket.total > 0
+        ? Math.round((bucket.correct / bucket.total) * 10000) / 100
+        : 0;
     const aggKey = `${week}|${category}`;
-    const agg = aggMap.get(aggKey) || { week, category, totalScore: 0, studentCount: 0, attempts: 0 };
+    const agg = aggMap.get(aggKey) || {
+      week,
+      category,
+      totalScore: 0,
+      studentCount: 0,
+      attempts: 0,
+    };
     agg.totalScore += scorePercent;
     agg.studentCount += 1;
     agg.attempts += bucket.total;
@@ -91,10 +105,16 @@ export async function GET(request: NextRequest) {
     .map((a) => ({
       week: a.week,
       category: a.category,
-      avgScore: a.studentCount > 0 ? Math.round((a.totalScore / a.studentCount) * 100) / 100 : 0,
+      avgScore:
+        a.studentCount > 0
+          ? Math.round((a.totalScore / a.studentCount) * 100) / 100
+          : 0,
       attempts: a.attempts,
     }))
-    .sort((a, b) => a.week.localeCompare(b.week) || a.category.localeCompare(b.category));
+    .sort(
+      (a, b) =>
+        a.week.localeCompare(b.week) || a.category.localeCompare(b.category),
+    );
 
   // Collect unique categories
   const categories = [...new Set(attempts.map((a) => a.category))].sort();

@@ -1,26 +1,34 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { motion } from "framer-motion";
 import {
-  FileText, Clock, Award, Send, AlertCircle, CheckCircle,
-  Loader2, ChevronLeft, Calendar, Timer,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useAuthStore } from '@/lib/auth-store';
-import { getAuthHeaders } from '@/lib/store';
-import { useDateFormatter } from '@/lib/format';
-import { modules } from '@/lib/data';
+  FileText,
+  Clock,
+  Award,
+  Send,
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+  ChevronLeft,
+  Calendar,
+  Timer,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAuthStore } from "@/lib/auth-store";
+import { getAuthHeaders } from "@/lib/store";
+import { useDateFormatter } from "@/lib/format";
+import { modules } from "@/lib/data";
 
 interface Assignment {
   id: string;
   title: string;
   description: string;
-  type: 'quiz' | 'code-review' | 'attack' | 'writeup' | 'custom';
+  type: "quiz" | "code-review" | "attack" | "writeup" | "custom";
   moduleId: string;
   content: string;
   maxScore: number;
@@ -53,22 +61,24 @@ interface Submission {
   gradedBy: string | null;
 }
 
-const typeLabels: Record<Assignment['type'], string> = {
-  quiz: 'Квиз',
-  'code-review': 'Code Review',
-  attack: 'Атака',
-  writeup: 'Write-up',
-  custom: 'Своё',
+const typeLabels: Record<Assignment["type"], string> = {
+  quiz: "Квиз",
+  "code-review": "Code Review",
+  attack: "Атака",
+  writeup: "Write-up",
+  custom: "Своё",
 };
 
 export default function StudentAssignments() {
   const formatDate = useDateFormatter();
-  const user = useAuthStore(s => s.user);
+  const user = useAuthStore((s) => s.user);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [submissions, setSubmissions] = useState<Record<string, Submission[]>>({});
+  const [submissions, setSubmissions] = useState<Record<string, Submission[]>>(
+    {},
+  );
   const [loading, setLoading] = useState(true);
   const [viewingId, setViewingId] = useState<string | null>(null);
-  const [submissionText, setSubmissionText] = useState('');
+  const [submissionText, setSubmissionText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [timer, setTimer] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -77,7 +87,7 @@ export default function StudentAssignments() {
     try {
       const headers = await getAuthHeaders();
       const [assignmentsRes] = await Promise.all([
-        fetch('/api/assignments?published=true', { headers }),
+        fetch("/api/assignments?published=true", { headers }),
       ]);
 
       if (assignmentsRes.ok) {
@@ -87,32 +97,45 @@ export default function StudentAssignments() {
         // Fetch submissions for each assignment
         const submissionPromises = data.map(async (a: Assignment) => {
           try {
-            const res = await fetch(`/api/assignments/${a.id}/submissions`, { headers });
+            const res = await fetch(`/api/assignments/${a.id}/submissions`, {
+              headers,
+            });
             if (res.ok) {
               const subs = await res.json();
-              const mySubs = subs.filter((s: Submission) => s.userId === user?.id);
+              const mySubs = subs.filter(
+                (s: Submission) => s.userId === user?.id,
+              );
               return { id: a.id, subs: mySubs };
             }
           } catch (e) {
-            if (process.env.NODE_ENV === "development") console.warn("[StudentAssignments.tsx] StudentAssignments failed:", e);
+            if (process.env.NODE_ENV === "development")
+              console.warn(
+                "[StudentAssignments.tsx] StudentAssignments failed:",
+                e,
+              );
             return { id: a.id, subs: [] };
           }
         });
 
         const results = await Promise.all(submissionPromises);
         const subMap: Record<string, Submission[]> = {};
-        results.forEach((r) => { subMap[r.id] = r.subs; });
+        results.forEach((r) => {
+          subMap[r.id] = r.subs;
+        });
         setSubmissions(subMap);
       }
     } catch (e) {
-      if (process.env.NODE_ENV === "development") console.warn("[StudentAssignments.tsx] StudentAssignments failed:", e);
-      toast.error('Ошибка загрузки заданий');
+      if (process.env.NODE_ENV === "development")
+        console.warn("[StudentAssignments.tsx] StudentAssignments failed:", e);
+      toast.error("Ошибка загрузки заданий");
     } finally {
       setLoading(false);
     }
   }, [user?.id]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Timer for time-limited assignments
   useEffect(() => {
@@ -121,7 +144,7 @@ export default function StudentAssignments() {
       setTimer((t) => {
         if (t <= 1) {
           setTimerRunning(false);
-          toast.warning('Время вышло! Отправьте ваше решение.');
+          toast.warning("Время вышло! Отправьте ваше решение.");
           return 0;
         }
         return t - 1;
@@ -134,12 +157,12 @@ export default function StudentAssignments() {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
   const handleStartAssignment = (a: Assignment) => {
     setViewingId(a.id);
-    setSubmissionText('');
+    setSubmissionText("");
     if (a.timeLimit) {
       setTimer(a.timeLimit * 60);
       setTimerRunning(true);
@@ -148,7 +171,7 @@ export default function StudentAssignments() {
 
   const handleSubmit = async (a: Assignment) => {
     if (!submissionText.trim()) {
-      toast.error('Введите ваше решение');
+      toast.error("Введите ваше решение");
       return;
     }
 
@@ -156,24 +179,25 @@ export default function StudentAssignments() {
     try {
       const headers = await getAuthHeaders();
       const res = await fetch(`/api/assignments/${a.id}/submit`, {
-        method: 'POST',
+        method: "POST",
         headers,
         body: JSON.stringify({ content: submissionText }),
       });
 
       if (res.ok) {
-        toast.success('Решение отправлено!');
+        toast.success("Решение отправлено!");
         setViewingId(null);
-        setSubmissionText('');
+        setSubmissionText("");
         setTimerRunning(false);
         fetchData();
       } else {
-        const err = await res.json().catch(() => ({ error: 'Ошибка' }));
-        toast.error(err.error || 'Не удалось отправить');
+        const err = await res.json().catch(() => ({ error: "Ошибка" }));
+        toast.error(err.error || "Не удалось отправить");
       }
     } catch (e) {
-      if (process.env.NODE_ENV === "development") console.warn("[StudentAssignments.tsx] handleSubmit failed:", e);
-      toast.error('Ошибка сети');
+      if (process.env.NODE_ENV === "development")
+        console.warn("[StudentAssignments.tsx] handleSubmit failed:", e);
+      toast.error("Ошибка сети");
     } finally {
       setSubmitting(false);
     }
@@ -189,7 +213,8 @@ export default function StudentAssignments() {
     }, mySubs[0]);
   };
 
-  const _getMyAttemptCount = (a: Assignment) => (submissions[a.id] || []).length;
+  const _getMyAttemptCount = (a: Assignment) =>
+    (submissions[a.id] || []).length;
 
   // View single assignment
   if (viewingId) {
@@ -201,25 +226,41 @@ export default function StudentAssignments() {
     const canSubmit = attemptCount < maxAttempts;
 
     return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <Card className="border-border">
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Button size="sm" variant="ghost" onClick={() => { setViewingId(null); setTimerRunning(false); }}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setViewingId(null);
+                    setTimerRunning(false);
+                  }}
+                >
                   <ChevronLeft size={16} /> Назад
                 </Button>
                 <h2 className="text-lg font-bold">{a.title}</h2>
               </div>
               {a.timeLimit && (
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${timer <= 300 ? 'bg-red-100 text-red-700' : 'bg-muted'}`}>
+                <div
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${timer <= 300 ? "bg-red-100 text-red-700" : "bg-muted"}`}
+                >
                   <Timer size={16} />
-                  <span className="font-mono text-sm font-bold">{formatTime(timer)}</span>
+                  <span className="font-mono text-sm font-bold">
+                    {formatTime(timer)}
+                  </span>
                 </div>
               )}
             </div>
 
-            {a.description && <p className="text-sm text-muted-foreground">{a.description}</p>}
+            {a.description && (
+              <p className="text-sm text-muted-foreground">{a.description}</p>
+            )}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="p-3 rounded-lg bg-muted/50">
@@ -228,18 +269,26 @@ export default function StudentAssignments() {
               </div>
               <div className="p-3 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground">Баллы</p>
-                <p className="font-semibold text-sm">{a.passScore}% / {a.maxScore}</p>
+                <p className="font-semibold text-sm">
+                  {a.passScore}% / {a.maxScore}
+                </p>
               </div>
               <div className="p-3 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground">Попытки</p>
-                <p className="font-semibold text-sm">{attemptCount}/{a.attempts === 0 ? '∞' : a.attempts}</p>
+                <p className="font-semibold text-sm">
+                  {attemptCount}/{a.attempts === 0 ? "∞" : a.attempts}
+                </p>
               </div>
               <div className="p-3 rounded-lg bg-muted/50">
-                <p className="text-xs text-muted-foreground">Лучший результат</p>
+                <p className="text-xs text-muted-foreground">
+                  Лучший результат
+                </p>
                 <p className="font-semibold text-sm">
                   {(() => {
                     const best = getMyBestSubmission(a);
-                    return best && best.score !== null ? `${best.score}/${best.maxScore}` : '—';
+                    return best && best.score !== null
+                      ? `${best.score}/${best.maxScore}`
+                      : "—";
                   })()}
                 </p>
               </div>
@@ -247,14 +296,23 @@ export default function StudentAssignments() {
 
             {a.moduleId && (
               <Badge variant="outline" className="text-xs">
-                Модуль: {modules.find((m) => m.id === a.moduleId)?.title || a.moduleId}
+                Модуль:{" "}
+                {modules.find((m) => m.id === a.moduleId)?.title || a.moduleId}
               </Badge>
             )}
 
             {a.dueAt && (
               <div className="flex items-center gap-2 text-sm">
                 <Calendar size={14} className="text-orange-500" />
-                <span>Дедлайн: {new Date(a.dueAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</span>
+                <span>
+                  Дедлайн:{" "}
+                  {new Date(a.dueAt).toLocaleDateString("ru-RU", {
+                    day: "numeric",
+                    month: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
               </div>
             )}
 
@@ -274,12 +332,25 @@ export default function StudentAssignments() {
                 <textarea
                   value={submissionText}
                   onChange={(e) => setSubmissionText(e.target.value)}
-                  placeholder={a.type === 'code-review' ? '// Вставьте ваш код' : a.type === 'attack' ? 'Опишите ваш подход к атаке...' : 'Введите ваше решение...'}
+                  placeholder={
+                    a.type === "code-review"
+                      ? "// Вставьте ваш код"
+                      : a.type === "attack"
+                        ? "Опишите ваш подход к атаке..."
+                        : "Введите ваше решение..."
+                  }
                   className="w-full px-3 py-3 border border-border rounded-lg text-sm bg-card font-mono min-h-[150px]"
                 />
                 <div className="flex justify-end">
-                  <Button onClick={() => handleSubmit(a)} disabled={submitting || !submissionText.trim()}>
-                    {submitting ? <Loader2 size={16} className="mr-1 animate-spin" /> : <Send size={16} className="mr-1" />}
+                  <Button
+                    onClick={() => handleSubmit(a)}
+                    disabled={submitting || !submissionText.trim()}
+                  >
+                    {submitting ? (
+                      <Loader2 size={16} className="mr-1 animate-spin" />
+                    ) : (
+                      <Send size={16} className="mr-1" />
+                    )}
                     Отправить
                   </Button>
                 </div>
@@ -288,7 +359,8 @@ export default function StudentAssignments() {
               <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 flex items-center gap-3">
                 <AlertCircle size={20} className="text-amber-500 shrink-0" />
                 <p className="text-sm text-amber-700">
-                  Вы использовали все {a.attempts} попыток. Обратитесь к преподавателю для дополнительной попытки.
+                  Вы использовали все {a.attempts} попыток. Обратитесь к
+                  преподавателю для дополнительной попытки.
                 </p>
               </div>
             )}
@@ -298,16 +370,24 @@ export default function StudentAssignments() {
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold">Ваши попытки</h3>
                 {mySubs.map((sub) => (
-                  <div key={sub.id} className="p-3 rounded-lg border border-border flex items-center justify-between">
+                  <div
+                    key={sub.id}
+                    className="p-3 rounded-lg border border-border flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-3 text-sm">
-                      <span className="text-muted-foreground">Попытка #{sub.attempt}</span>
+                      <span className="text-muted-foreground">
+                        Попытка #{sub.attempt}
+                      </span>
                       <span className="text-muted-foreground">
                         {formatDate(sub.startedAt)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {sub.score !== null ? (
-                        <Badge variant={sub.passed ? 'default' : 'destructive'} className="text-xs">
+                        <Badge
+                          variant={sub.passed ? "default" : "destructive"}
+                          className="text-xs"
+                        >
                           {sub.score}/{sub.maxScore}
                         </Badge>
                       ) : sub.submittedAt ? (
@@ -315,9 +395,13 @@ export default function StudentAssignments() {
                           <Clock size={12} className="mr-1" /> Ожидает проверки
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-xs">Незавершённая</Badge>
+                        <Badge variant="outline" className="text-xs">
+                          Незавершённая
+                        </Badge>
                       )}
-                      {sub.passed === true && <CheckCircle size={14} className="text-emerald-500" />}
+                      {sub.passed === true && (
+                        <CheckCircle size={14} className="text-emerald-500" />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -337,7 +421,9 @@ export default function StudentAssignments() {
           <FileText size={22} className="text-violet-500" />
           Мои задания
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">Выполняйте задания преподавателя и отслеживайте прогресс</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Выполняйте задания преподавателя и отслеживайте прогресс
+        </p>
       </div>
 
       {loading ? (
@@ -359,21 +445,40 @@ export default function StudentAssignments() {
             const bestSub = getMyBestSubmission(a);
             const attemptCount = mySubs.length;
             const isCompleted = mySubs.some((s) => s.passed === true);
-            const isPending = mySubs.some((s) => s.submittedAt && s.score === null);
+            const isPending = mySubs.some(
+              (s) => s.submittedAt && s.score === null,
+            );
 
             const dueDate = a.dueAt ? new Date(a.dueAt) : null;
             const now = new Date();
             const isOverdue = dueDate && dueDate < now;
-            const daysLeft = dueDate ? Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null;
+            const daysLeft = dueDate
+              ? Math.ceil(
+                  (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+                )
+              : null;
 
             return (
-              <Card key={a.id} className={`border-border hover:shadow-sm transition-shadow ${isCompleted ? 'border-l-4 border-l-emerald-500' : ''}`}>
+              <Card
+                key={a.id}
+                className={`border-border hover:shadow-sm transition-shadow ${isCompleted ? "border-l-4 border-l-emerald-500" : ""}`}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                      isCompleted ? 'bg-emerald-100' : isOverdue ? 'bg-red-100' : 'bg-violet-100'
-                    }`}>
-                      {isCompleted ? <CheckCircle size={18} className="text-emerald-600" /> : <FileText size={18} className="text-violet-600" />}
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                        isCompleted
+                          ? "bg-emerald-100"
+                          : isOverdue
+                            ? "bg-red-100"
+                            : "bg-violet-100"
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <CheckCircle size={18} className="text-emerald-600" />
+                      ) : (
+                        <FileText size={18} className="text-violet-600" />
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -384,10 +489,13 @@ export default function StudentAssignments() {
                         >
                           {a.title}
                         </button>
-                        <Badge variant="outline" className="text-[10px]">{typeLabels[a.type]}</Badge>
+                        <Badge variant="outline" className="text-[10px]">
+                          {typeLabels[a.type]}
+                        </Badge>
                         {isCompleted && (
                           <Badge className="text-[10px] bg-emerald-100 text-emerald-700 border-0">
-                            <CheckCircle size={10} className="mr-0.5" /> Выполнено
+                            <CheckCircle size={10} className="mr-0.5" />{" "}
+                            Выполнено
                           </Badge>
                         )}
                         {isPending && (
@@ -397,16 +505,43 @@ export default function StudentAssignments() {
                         )}
                       </div>
 
-                      {a.description && <p className="text-xs text-muted-foreground mt-1">{a.description}</p>}
+                      {a.description && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {a.description}
+                        </p>
+                      )}
 
                       <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground flex-wrap">
-                        <span className="flex items-center gap-1"><Award size={12} /> {a.maxScore} баллов</span>
-                        {a.timeLimit && <span className="flex items-center gap-1"><Clock size={12} /> {a.timeLimit} мин</span>}
-                        <span>Попытки: {attemptCount}/{a.attempts === 0 ? '∞' : a.attempts}</span>
+                        <span className="flex items-center gap-1">
+                          <Award size={12} /> {a.maxScore} баллов
+                        </span>
+                        {a.timeLimit && (
+                          <span className="flex items-center gap-1">
+                            <Clock size={12} /> {a.timeLimit} мин
+                          </span>
+                        )}
+                        <span>
+                          Попытки: {attemptCount}/
+                          {a.attempts === 0 ? "∞" : a.attempts}
+                        </span>
                         {a.autoGrade && <span>Автопроверка</span>}
                         {dueDate && daysLeft !== null && (
-                          <span className={isOverdue ? 'text-red-500 font-medium' : daysLeft <= 3 ? 'text-orange-500' : ''}>
-                            {isOverdue ? `Просрочен (${Math.abs(daysLeft)} дн.)` : daysLeft === 0 ? 'Сегодня' : daysLeft === 1 ? 'Завтра' : `Дедлайн: ${daysLeft} дн.`}
+                          <span
+                            className={
+                              isOverdue
+                                ? "text-red-500 font-medium"
+                                : daysLeft <= 3
+                                  ? "text-orange-500"
+                                  : ""
+                            }
+                          >
+                            {isOverdue
+                              ? `Просрочен (${Math.abs(daysLeft)} дн.)`
+                              : daysLeft === 0
+                                ? "Сегодня"
+                                : daysLeft === 1
+                                  ? "Завтра"
+                                  : `Дедлайн: ${daysLeft} дн.`}
                           </span>
                         )}
                       </div>
@@ -414,8 +549,16 @@ export default function StudentAssignments() {
                       {/* Progress bar */}
                       {bestSub && bestSub.score !== null && (
                         <div className="mt-2 flex items-center gap-3">
-                          <Progress value={(bestSub.score / bestSub.maxScore) * 100} className="h-1.5 flex-1" />
-                          <span className="text-xs font-medium text-violet-600">{Math.round((bestSub.score / bestSub.maxScore) * 100)}%</span>
+                          <Progress
+                            value={(bestSub.score / bestSub.maxScore) * 100}
+                            className="h-1.5 flex-1"
+                          />
+                          <span className="text-xs font-medium text-violet-600">
+                            {Math.round(
+                              (bestSub.score / bestSub.maxScore) * 100,
+                            )}
+                            %
+                          </span>
                         </div>
                       )}
                     </div>

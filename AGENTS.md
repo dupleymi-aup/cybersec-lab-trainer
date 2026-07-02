@@ -13,5 +13,8 @@ This project belongs to the work account — always use the `github-work` host a
 
 ### Done last
 - **ESLint v10 + eslint-config-next v16 fix** — updated `package.json` version pins; fixed `terminal/eslint.config.mjs` (old `coreWebVitals` pattern); added `coverage/`, `other-repo/`, `terminal/` to root ignores
-- **0 ESLint warnings** — lint clean at `1f40fe5b`
-- **Remote sync** — `origin` (GitHub) and `gitverse` (GitVerse) now at `1f40fe5b` with i18n localization + CSP hardening + lazy loading + chart centralization
+- **Prettier config + format** — added `.prettierrc` with `prettier-plugin-tailwindcss`, formatted 290 files
+- **Package.json cleanup** — restored missing scripts (typecheck, format, analyze, db:schema), pinned `next ^16.2.9`, added missing `prettier` deps
+- **auth-server-secrets.ts fixed** — replaced `console.log` + eslint-disable with `logger.info`
+- **0 ESLint warnings** — lint clean
+- **Remote sync** — `origin` (GitHub) and `gitverse` (GitVerse) now at `f9bc4cdc`

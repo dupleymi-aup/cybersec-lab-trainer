@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAppStore } from '@/lib/store';
-import { secureCodingChallenges } from '@/lib/data';
-import CodeBlock from './CodeBlock';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from "react";
+import { useAppStore } from "@/lib/store";
+import { secureCodingChallenges } from "@/lib/data";
+import CodeBlock from "./CodeBlock";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
   Code,
@@ -16,17 +16,25 @@ import {
   ArrowRight,
   ArrowLeft,
   RotateCcw,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function SecureCodingLab() {
-  const completeModule = useAppStore(s => s.completeModule);
-  const setCurrentPage = useAppStore(s => s.setCurrentPage);
-  const completedModules = useAppStore(s => s.completedModules);
-  const secureCodingAnsweredChallenges = useAppStore(s => s.secureCodingAnsweredChallenges);
-  const addSecureCodingAnswer = useAppStore(s => s.addSecureCodingAnswer);
-  const removeSecureCodingAnswer = useAppStore(s => s.removeSecureCodingAnswer);
-  const secureCodingCorrectCount = useAppStore(s => s.secureCodingCorrectCount);
-  const setSecureCodingCorrectCount = useAppStore(s => s.setSecureCodingCorrectCount);
+  const completeModule = useAppStore((s) => s.completeModule);
+  const setCurrentPage = useAppStore((s) => s.setCurrentPage);
+  const completedModules = useAppStore((s) => s.completedModules);
+  const secureCodingAnsweredChallenges = useAppStore(
+    (s) => s.secureCodingAnsweredChallenges,
+  );
+  const addSecureCodingAnswer = useAppStore((s) => s.addSecureCodingAnswer);
+  const removeSecureCodingAnswer = useAppStore(
+    (s) => s.removeSecureCodingAnswer,
+  );
+  const secureCodingCorrectCount = useAppStore(
+    (s) => s.secureCodingCorrectCount,
+  );
+  const setSecureCodingCorrectCount = useAppStore(
+    (s) => s.setSecureCodingCorrectCount,
+  );
   const [activeChallenge, setActiveChallenge] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -34,7 +42,7 @@ export default function SecureCodingLab() {
   const answeredSet = new Set(secureCodingAnsweredChallenges);
   const challenge = secureCodingChallenges[activeChallenge];
   const isAnswered = answeredSet.has(activeChallenge);
-  const isCompleted = completedModules.includes('secure-coding');
+  const isCompleted = completedModules.includes("secure-coding");
 
   const handleSelectOption = (index: number) => {
     if (isAnswered) return;
@@ -53,7 +61,7 @@ export default function SecureCodingLab() {
     // Check completion: count current answered (not yet in store) + store length
     const totalAnswered = answeredSet.size + 1;
     if (totalAnswered === secureCodingChallenges.length) {
-      completeModule('secure-coding');
+      completeModule("secure-coding");
     }
   };
 
@@ -83,7 +91,11 @@ export default function SecureCodingLab() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCurrentPage("dashboard")}
+        >
           <ChevronLeft size={20} />
         </Button>
         <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
@@ -91,7 +103,9 @@ export default function SecureCodingLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Безопасное кодирование</h1>
-          <p className="text-xs text-muted-foreground">Найдите уязвимость и выберите правильное решение</p>
+          <p className="text-xs text-muted-foreground">
+            Найдите уязвимость и выберите правильное решение
+          </p>
         </div>
       </div>
 
@@ -103,10 +117,17 @@ export default function SecureCodingLab() {
               Задание {activeChallenge + 1} из {secureCodingChallenges.length}
             </span>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px] flex items-center gap-1">
+              <Badge
+                variant="outline"
+                className="text-[10px] flex items-center gap-1"
+              >
                 <CheckCircle2 size={12} /> {secureCodingCorrectCount} правильных
               </Badge>
-              {isCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
+              {isCompleted && (
+                <Badge className="bg-emerald-600 text-white">
+                  Модуль завершён!
+                </Badge>
+              )}
             </div>
           </div>
           <div className="flex gap-2">
@@ -120,10 +141,10 @@ export default function SecureCodingLab() {
                 }}
                 className={`flex-1 h-2 rounded-full transition-all ${
                   answeredSet.has(i)
-                    ? 'bg-emerald-500'
+                    ? "bg-emerald-500"
                     : i === activeChallenge
-                      ? 'bg-emerald-300'
-                      : 'bg-slate-200'
+                      ? "bg-emerald-300"
+                      : "bg-slate-200"
                 }`}
               />
             ))}
@@ -149,23 +170,30 @@ export default function SecureCodingLab() {
             <h2 className="font-semibold mb-3">{challenge.title}</h2>
 
             {/* Vulnerable code */}
-            <CodeBlock code={challenge.code} language="javascript" title="vulnerable.js" />
+            <CodeBlock
+              code={challenge.code}
+              language="javascript"
+              title="vulnerable.js"
+            />
 
             <div className="mt-4">
-              <h3 className="text-sm font-semibold mb-3">Что нужно исправить?</h3>
+              <h3 className="text-sm font-semibold mb-3">
+                Что нужно исправить?
+              </h3>
               <div className="space-y-2">
                 {challenge.options.map((option, i) => {
-                  let optionStyle = 'border-border hover:border-slate-400 hover:bg-secondary';
+                  let optionStyle =
+                    "border-border hover:border-slate-400 hover:bg-secondary";
                   if (isAnswered) {
                     if (option.correct) {
-                      optionStyle = 'border-emerald-400 bg-emerald-50';
+                      optionStyle = "border-emerald-400 bg-emerald-50";
                     } else if (selectedOption === i && !option.correct) {
-                      optionStyle = 'border-red-400 bg-red-50';
+                      optionStyle = "border-red-400 bg-red-50";
                     } else {
-                      optionStyle = 'border-slate-100 opacity-60';
+                      optionStyle = "border-slate-100 opacity-60";
                     }
                   } else if (selectedOption === i) {
-                    optionStyle = 'border-emerald-400 bg-emerald-50/50';
+                    optionStyle = "border-emerald-400 bg-emerald-50/50";
                   }
 
                   return (
@@ -179,18 +207,24 @@ export default function SecureCodingLab() {
                         <div
                           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
                             isAnswered && option.correct
-                              ? 'border-emerald-500 bg-emerald-500'
-                              : isAnswered && selectedOption === i && !option.correct
-                                ? 'border-red-500 bg-red-500'
+                              ? "border-emerald-500 bg-emerald-500"
+                              : isAnswered &&
+                                  selectedOption === i &&
+                                  !option.correct
+                                ? "border-red-500 bg-red-500"
                                 : selectedOption === i
-                                  ? 'border-emerald-500 bg-emerald-100'
-                                  : 'border-border'
+                                  ? "border-emerald-500 bg-emerald-100"
+                                  : "border-border"
                           }`}
                         >
-                          {(isAnswered && option.correct) && <CheckCircle2 size={14} className="text-white" />}
-                          {isAnswered && selectedOption === i && !option.correct && (
-                            <XCircle size={14} className="text-white" />
+                          {isAnswered && option.correct && (
+                            <CheckCircle2 size={14} className="text-white" />
                           )}
+                          {isAnswered &&
+                            selectedOption === i &&
+                            !option.correct && (
+                              <XCircle size={14} className="text-white" />
+                            )}
                         </div>
                         <span className="text-sm">{option.text}</span>
                       </div>
@@ -222,22 +256,32 @@ export default function SecureCodingLab() {
                   <div
                     className={`rounded-lg p-4 ${
                       challenge.options[selectedOption]?.correct
-                        ? 'bg-emerald-50 border border-emerald-200'
-                        : 'bg-red-50 border border-red-200'
+                        ? "bg-emerald-50 border border-emerald-200"
+                        : "bg-red-50 border border-red-200"
                     }`}
                   >
                     <h4
                       className={`text-xs font-semibold mb-1 ${
                         challenge.options[selectedOption]?.correct
-                          ? 'text-emerald-700'
-                          : 'text-red-700'
+                          ? "text-emerald-700"
+                          : "text-red-700"
                       }`}
                     >
-                      {challenge.options[selectedOption]?.correct
-                        ? (<><CheckCircle2 size={14} className="inline mr-1" /> Правильно!</>)
-                        : (<><XCircle size={14} className="inline mr-1" /> Неправильно</>)}
+                      {challenge.options[selectedOption]?.correct ? (
+                        <>
+                          <CheckCircle2 size={14} className="inline mr-1" />{" "}
+                          Правильно!
+                        </>
+                      ) : (
+                        <>
+                          <XCircle size={14} className="inline mr-1" />{" "}
+                          Неправильно
+                        </>
+                      )}
                     </h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{challenge.explanation}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {challenge.explanation}
+                    </p>
                   </div>
 
                   {/* Retry button */}

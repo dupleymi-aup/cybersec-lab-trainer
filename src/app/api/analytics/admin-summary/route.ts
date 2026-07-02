@@ -1,15 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
-import { MS_PER_DAY, PERCENT_ROUNDING_FACTOR, PERCENT_SCALE } from '@/lib/constants';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireRole,
+} from "@/lib/api-middleware";
+import {
+  MS_PER_DAY,
+  PERCENT_ROUNDING_FACTOR,
+  PERCENT_SCALE,
+} from "@/lib/constants";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireRole(auth.role, "admin")) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const groupBy = searchParams.get('groupBy'); // 'group' | 'course' | 'university'
+  const groupBy = searchParams.get("groupBy"); // 'group' | 'course' | 'university'
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * MS_PER_DAY);
@@ -17,14 +26,26 @@ export async function GET(request: NextRequest) {
 
   // Current period (last 30 days)
   const students = await prisma.user.findMany({
-    where: { role: 'student' },
-    select: { id: true, group: true, course: true, university: true, lastLoginAt: true },
+    where: { role: "student" },
+    select: {
+      id: true,
+      group: true,
+      course: true,
+      university: true,
+      lastLoginAt: true,
+    },
   });
 
   const studentIds = students.map((s) => s.id);
   const totalStudents = students.length;
-  const activeStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo).length;
-  const activePercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
+  const activeStudents = students.filter(
+    (s) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo,
+  ).length;
+  const activePercentage =
+    totalStudents > 0
+      ? Math.round((activeStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) /
+        PERCENT_SCALE
+      : 0;
 
   // Progress data
   const progressRecords = await prisma.progress.findMany({
@@ -51,28 +72,50 @@ export async function GET(request: NextRequest) {
   const perStudentModules = new Map<string, number>();
   for (const p of progressRecords) {
     if (p.completed) {
-      perStudentModules.set(p.userId, (perStudentModules.get(p.userId) || 0) + 1);
+      perStudentModules.set(
+        p.userId,
+        (perStudentModules.get(p.userId) || 0) + 1,
+      );
     }
   }
   let totalCompletedModules = 0;
   for (const count of perStudentModules.values()) {
     totalCompletedModules += count;
   }
-  const avgCompletionRate = totalStudents > 0
-    ? Math.round((totalCompletedModules / (totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
-    : 0;
+  const avgCompletionRate =
+    totalStudents > 0
+      ? Math.round(
+          (totalCompletedModules / (totalStudents * totalModules)) *
+            PERCENT_ROUNDING_FACTOR,
+        ) / PERCENT_SCALE
+      : 0;
 
   // Avg quiz score
-  const avgQuizScore = quizResults.length > 0
-    ? Math.round((quizResults.reduce((sum, q) => sum + q.percentage, 0) / quizResults.length) * 100) / 100
-    : 0;
+  const avgQuizScore =
+    quizResults.length > 0
+      ? Math.round(
+          (quizResults.reduce((sum, q) => sum + q.percentage, 0) /
+            quizResults.length) *
+            100,
+        ) / 100
+      : 0;
 
   const totalQuizAttempts = quizResults.length;
 
   // Previous period student count (total students active in 30-60 days ago period)
-  const prevPeriodStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= sixtyDaysAgo && s.lastLoginAt < thirtyDaysAgo);
+  const prevPeriodStudents = students.filter(
+    (s) =>
+      s.lastLoginAt &&
+      s.lastLoginAt >= sixtyDaysAgo &&
+      s.lastLoginAt < thirtyDaysAgo,
+  );
   const prevActiveStudents = prevPeriodStudents.length;
-  const prevActivePercentage = totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
+  const prevActivePercentage =
+    totalStudents > 0
+      ? Math.round(
+          (prevActiveStudents / totalStudents) * PERCENT_ROUNDING_FACTOR,
+        ) / PERCENT_SCALE
+      : 0;
 
   // Previous period progress
   const prevProgress = await prisma.progress.findMany({
@@ -104,26 +147,41 @@ export async function GET(request: NextRequest) {
   const prevPerStudentModules = new Map<string, number>();
   for (const p of prevProgress) {
     if (p.completed) {
-      prevPerStudentModules.set(p.userId, (prevPerStudentModules.get(p.userId) || 0) + 1);
+      prevPerStudentModules.set(
+        p.userId,
+        (prevPerStudentModules.get(p.userId) || 0) + 1,
+      );
     }
   }
   let prevTotalCompleted = 0;
   for (const count of prevPerStudentModules.values()) {
     prevTotalCompleted += count;
   }
-  const prevAvgCompletionRate = totalStudents > 0
-    ? Math.round((prevTotalCompleted / (totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
-    : 0;
+  const prevAvgCompletionRate =
+    totalStudents > 0
+      ? Math.round(
+          (prevTotalCompleted / (totalStudents * totalModules)) *
+            PERCENT_ROUNDING_FACTOR,
+        ) / PERCENT_SCALE
+      : 0;
 
-  const prevAvgQuizScore = prevQuizResults.length > 0
-    ? Math.round((prevQuizResults.reduce((sum, q) => sum + q.percentage, 0) / prevQuizResults.length) * 100) / 100
-    : 0;
+  const prevAvgQuizScore =
+    prevQuizResults.length > 0
+      ? Math.round(
+          (prevQuizResults.reduce((sum, q) => sum + q.percentage, 0) /
+            prevQuizResults.length) *
+            100,
+        ) / 100
+      : 0;
 
-  function trendIndicator(current: number, previous: number): 'up' | 'down' | 'stable' {
+  function trendIndicator(
+    current: number,
+    previous: number,
+  ): "up" | "down" | "stable" {
     const diff = current - previous;
-    if (diff > 2) return 'up';
-    if (diff < -2) return 'down';
-    return 'stable';
+    if (diff > 2) return "up";
+    if (diff < -2) return "down";
+    return "stable";
   }
 
   const current = {
@@ -147,7 +205,7 @@ export async function GET(request: NextRequest) {
   };
 
   const trends = {
-    students: 'stable' as const,
+    students: "stable" as const,
     activity: trendIndicator(activePercentage, prevActivePercentage),
     completion: trendIndicator(avgCompletionRate, prevAvgCompletionRate),
     quizScore: trendIndicator(avgQuizScore, prevAvgQuizScore),
@@ -156,15 +214,28 @@ export async function GET(request: NextRequest) {
   // Optional groupBy aggregation
   let groupedData: Record<string, unknown> = {};
 
-  if (groupBy === 'group' || groupBy === 'course' || groupBy === 'university') {
-    const field = groupBy as 'group' | 'course' | 'university';
-    const groups = new Map<string, { totalStudents: number; activeStudents: number; progressRecords: typeof progressRecords; quizResults: typeof quizResults }>();
+  if (groupBy === "group" || groupBy === "course" || groupBy === "university") {
+    const field = groupBy as "group" | "course" | "university";
+    const groups = new Map<
+      string,
+      {
+        totalStudents: number;
+        activeStudents: number;
+        progressRecords: typeof progressRecords;
+        quizResults: typeof quizResults;
+      }
+    >();
 
     for (const s of students) {
-      const key = s[field] || '(не указано)';
+      const key = s[field] || "(не указано)";
       let g = groups.get(key);
       if (!g) {
-        g = { totalStudents: 0, activeStudents: 0, progressRecords: [], quizResults: [] };
+        g = {
+          totalStudents: 0,
+          activeStudents: 0,
+          progressRecords: [],
+          quizResults: [],
+        };
         groups.set(key, g);
       }
       g.totalStudents++;
@@ -176,7 +247,7 @@ export async function GET(request: NextRequest) {
     for (const p of progressRecords) {
       const student = students.find((s) => s.id === p.userId);
       if (student) {
-        const key = student[field] || '(не указано)';
+        const key = student[field] || "(не указано)";
         const g = groups.get(key);
         if (g) g.progressRecords.push(p);
       }
@@ -185,7 +256,7 @@ export async function GET(request: NextRequest) {
     for (const q of quizResults) {
       const student = students.find((s) => s.id === q.userId);
       if (student) {
-        const key = student[field] || '(не указано)';
+        const key = student[field] || "(не указано)";
         const g = groups.get(key);
         if (g) g.quizResults.push(q);
       }
@@ -193,13 +264,24 @@ export async function GET(request: NextRequest) {
 
     const byField: Record<string, unknown>[] = [];
     for (const [key, g] of groups.entries()) {
-      const completedCount = g.progressRecords.filter((p) => p.completed).length;
-      const groupAvgCompletion = g.totalStudents > 0
-        ? Math.round((completedCount / (g.totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
-        : 0;
-      const groupAvgQuiz = g.quizResults.length > 0
-        ? Math.round((g.quizResults.reduce((sum, q) => sum + q.percentage, 0) / g.quizResults.length) * 100) / 100
-        : 0;
+      const completedCount = g.progressRecords.filter(
+        (p) => p.completed,
+      ).length;
+      const groupAvgCompletion =
+        g.totalStudents > 0
+          ? Math.round(
+              (completedCount / (g.totalStudents * totalModules)) *
+                PERCENT_ROUNDING_FACTOR,
+            ) / PERCENT_SCALE
+          : 0;
+      const groupAvgQuiz =
+        g.quizResults.length > 0
+          ? Math.round(
+              (g.quizResults.reduce((sum, q) => sum + q.percentage, 0) /
+                g.quizResults.length) *
+                100,
+            ) / 100
+          : 0;
       byField.push({
         name: key,
         totalStudents: g.totalStudents,
@@ -209,7 +291,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    groupedData = { [`by${field.charAt(0).toUpperCase() + field.slice(1)}`]: byField };
+    groupedData = {
+      [`by${field.charAt(0).toUpperCase() + field.slice(1)}`]: byField,
+    };
   }
 
   return NextResponse.json({

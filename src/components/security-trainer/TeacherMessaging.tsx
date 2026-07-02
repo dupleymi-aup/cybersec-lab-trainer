@@ -1,25 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Send, Users, MessageSquare, X, AlertCircle, Info,
-} from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { useDateFormatter } from '@/lib/format';
-import type { Announcement } from '@/lib/auth-types';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send, Users, MessageSquare, X, AlertCircle, Info } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useDateFormatter } from "@/lib/format";
+import type { Announcement } from "@/lib/auth-types";
 
-const STORAGE_KEY = 'cybersec-announcements';
+const STORAGE_KEY = "cybersec-announcements";
 
 function loadAll(): Announcement[] {
-  if (typeof window === 'undefined') return [];
+  if (typeof window === "undefined") return [];
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[TeacherMessaging.tsx] loadAll failed:", e);
+    if (process.env.NODE_ENV === "development")
+      console.warn("[TeacherMessaging.tsx] loadAll failed:", e);
   }
   return [];
 }
@@ -28,13 +27,19 @@ function saveAll(items: Announcement[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 }
 
-export default function TeacherMessaging({ currentUser, groups = [] }: { currentUser: string; groups: string[] }) {
+export default function TeacherMessaging({
+  currentUser,
+  groups = [],
+}: {
+  currentUser: string;
+  groups: string[];
+}) {
   const formatDate = useDateFormatter();
   const [showForm, setShowForm] = useState(false);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [priority, setPriority] = useState<'low' | 'normal' | 'high'>('normal');
-  const [targetGroup, setTargetGroup] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [priority, setPriority] = useState<"low" | "normal" | "high">("normal");
+  const [targetGroup, setTargetGroup] = useState("");
   const [recentMessages, setRecentMessages] = useState<Announcement[]>([]);
 
   useEffect(() => {
@@ -44,14 +49,15 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
 
   const handleSend = () => {
     if (!title.trim() || !content.trim()) {
-      toast.error('Заполните заголовок и сообщение');
+      toast.error("Заполните заголовок и сообщение");
       return;
     }
 
     const msg: Announcement = {
       id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
       title: title.trim(),
-      content: content.trim() + (targetGroup ? `\n\nГруппа: ${targetGroup}` : ''),
+      content:
+        content.trim() + (targetGroup ? `\n\nГруппа: ${targetGroup}` : ""),
       author: currentUser,
       createdAt: new Date().toISOString(),
       priority,
@@ -63,11 +69,11 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
     saveAll(all);
     setRecentMessages(all.slice(0, 5));
     setShowForm(false);
-    setTitle('');
-    setContent('');
-    setPriority('normal');
-    setTargetGroup('');
-    toast.success('Сообщение отправлено студентам');
+    setTitle("");
+    setContent("");
+    setPriority("normal");
+    setTargetGroup("");
+    toast.success("Сообщение отправлено студентам");
   };
 
   const handleDelete = (id: string) => {
@@ -85,11 +91,13 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
           </div>
           <div>
             <h2 className="text-sm font-bold">Сообщения студентам</h2>
-            <p className="text-xs text-muted-foreground">Отправка уведомлений и объявлений</p>
+            <p className="text-xs text-muted-foreground">
+              Отправка уведомлений и объявлений
+            </p>
           </div>
         </div>
         <Button size="sm" onClick={() => setShowForm(!showForm)}>
-          <Send size={14} className="mr-1" /> {showForm ? 'Отмена' : 'Новое'}
+          <Send size={14} className="mr-1" /> {showForm ? "Отмена" : "Новое"}
         </Button>
       </div>
 
@@ -97,7 +105,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
         {showForm && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
           >
             <Card className="border-amber-200 bg-amber-50/50">
@@ -119,10 +127,14 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                 />
                 <div className="flex items-center gap-4 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Приоритет:</span>
+                    <span className="text-xs text-muted-foreground">
+                      Приоритет:
+                    </span>
                     <select
                       value={priority}
-                      onChange={(e) => setPriority(e.target.value as 'low' | 'normal' | 'high')}
+                      onChange={(e) =>
+                        setPriority(e.target.value as "low" | "normal" | "high")
+                      }
                       className="px-2 py-1.5 border border-border rounded-md text-xs bg-card"
                     >
                       <option value="low">Низкий</option>
@@ -140,7 +152,9 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                       >
                         <option value="">Всем студентам</option>
                         {groups.map((g) => (
-                          <option key={g} value={g}>Группа: {g}</option>
+                          <option key={g} value={g}>
+                            Группа: {g}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -169,28 +183,41 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-2 min-w-0">
-                  {msg.priority === 'high' ? (
-                    <AlertCircle size={14} className="text-red-500 mt-0.5 shrink-0" />
+                  {msg.priority === "high" ? (
+                    <AlertCircle
+                      size={14}
+                      className="text-red-500 mt-0.5 shrink-0"
+                    />
                   ) : (
                     <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
                   )}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-xs font-semibold">{msg.title}</p>
-                      <Badge className={`text-[10px] ${
-                        msg.priority === 'high' ? 'bg-red-100 text-red-700' :
-                        msg.priority === 'normal' ? 'bg-blue-100 text-blue-700' :
-                        'bg-muted text-foreground/70'
-                      }`}>
-                        {msg.priority === 'high' ? 'Важно' : msg.priority === 'normal' ? 'Обычное' : 'Инфо'}
+                      <Badge
+                        className={`text-[10px] ${
+                          msg.priority === "high"
+                            ? "bg-red-100 text-red-700"
+                            : msg.priority === "normal"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-muted text-foreground/70"
+                        }`}
+                      >
+                        {msg.priority === "high"
+                          ? "Важно"
+                          : msg.priority === "normal"
+                            ? "Обычное"
+                            : "Инфо"}
                       </Badge>
-                      {msg.content.includes('Группа:') && (
+                      {msg.content.includes("Группа:") && (
                         <Badge variant="secondary" className="text-[10px]">
-                          {msg.content.split('Группа: ')[1]?.split('\n')[0]}
+                          {msg.content.split("Группа: ")[1]?.split("\n")[0]}
                         </Badge>
                       )}
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{msg.content.split('\n')[0]}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
+                      {msg.content.split("\n")[0]}
+                    </p>
                     <p className="text-[10px] text-slate-400 mt-1">
                       {formatDate(msg.createdAt)}
                     </p>

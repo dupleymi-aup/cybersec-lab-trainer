@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { motion } from "framer-motion";
 import {
   BarChart,
   Bar,
@@ -12,7 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
   Cell,
-} from 'recharts';
+} from "recharts";
 import {
   Users,
   GraduationCap,
@@ -23,26 +23,35 @@ import {
   Minus,
   Loader2,
   AlertTriangle,
-} from 'lucide-react';
-import { getAdminSummary, type AdminSummary } from '@/lib/auth-store';
-import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
-import { Card, CardContent } from '@/components/ui/card';
+} from "lucide-react";
+import { getAdminSummary, type AdminSummary } from "@/lib/auth-store";
+import { useAnalyticsFetcher } from "@/hooks/use-analytics-fetch";
+import { Card, CardContent } from "@/components/ui/card";
 
-type GroupBy = 'group' | 'course' | 'university';
+type GroupBy = "group" | "course" | "university";
 
 const groupByLabels: Record<GroupBy, string> = {
-  group: 'По группе',
-  course: 'По курсу',
-  university: 'По университету',
+  group: "По группе",
+  course: "По курсу",
+  university: "По университету",
 };
 
-const COLORS = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#818cf8', '#7c3aed', '#a855f7', '#d8b4fe'];
+const COLORS = [
+  "#6366f1",
+  "#8b5cf6",
+  "#a78bfa",
+  "#c4b5fd",
+  "#818cf8",
+  "#7c3aed",
+  "#a855f7",
+  "#d8b4fe",
+];
 
 interface MetricCardProps {
   icon: React.ReactNode;
   value: string | number;
   label: string;
-  trend?: 'up' | 'down' | 'stable';
+  trend?: "up" | "down" | "stable";
   delta?: number;
   deltaSuffix?: string;
   delay?: number;
@@ -50,18 +59,37 @@ interface MetricCardProps {
   iconColor: string;
 }
 
-function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, iconBg, iconColor }: MetricCardProps) {
-  const trendIcon = trend === 'up' ? (
-    <TrendingUp size={14} className="text-emerald-500" />
-  ) : trend === 'down' ? (
-    <TrendingDown size={14} className="text-red-500" />
-  ) : (
-    <Minus size={14} className="text-slate-400" />
-  );
+function MetricCard({
+  icon,
+  value,
+  label,
+  trend,
+  delta,
+  deltaSuffix,
+  delay = 0,
+  iconBg,
+  iconColor,
+}: MetricCardProps) {
+  const trendIcon =
+    trend === "up" ? (
+      <TrendingUp size={14} className="text-emerald-500" />
+    ) : trend === "down" ? (
+      <TrendingDown size={14} className="text-red-500" />
+    ) : (
+      <Minus size={14} className="text-slate-400" />
+    );
 
-  const trendColor = trend === 'up' ? 'text-emerald-600' : trend === 'down' ? 'text-red-600' : 'text-slate-400';
+  const trendColor =
+    trend === "up"
+      ? "text-emerald-600"
+      : trend === "down"
+        ? "text-red-600"
+        : "text-slate-400";
 
-  const deltaDisplay = delta !== undefined ? `${delta > 0 ? '+' : ''}${delta}${deltaSuffix || ''}` : '';
+  const deltaDisplay =
+    delta !== undefined
+      ? `${delta > 0 ? "+" : ""}${delta}${deltaSuffix || ""}`
+      : "";
 
   return (
     <motion.div
@@ -73,7 +101,9 @@ function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, 
         <CardContent className="p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center`}>
+              <div
+                className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center`}
+              >
                 <span className={iconColor}>{icon}</span>
               </div>
               <div>
@@ -85,7 +115,9 @@ function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, 
               <div className="flex items-center gap-1">
                 {trendIcon}
                 {delta !== undefined && delta !== 0 && (
-                  <span className={`text-xs font-medium ${trendColor}`}>{deltaDisplay}</span>
+                  <span className={`text-xs font-medium ${trendColor}`}>
+                    {deltaDisplay}
+                  </span>
                 )}
               </div>
             )}
@@ -98,9 +130,9 @@ function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, 
 
 function chartData(summary: AdminSummary, groupBy: GroupBy) {
   const source =
-    groupBy === 'group'
+    groupBy === "group"
       ? summary.byGroup
-      : groupBy === 'course'
+      : groupBy === "course"
         ? summary.byCourse
         : summary.byUniversity;
 
@@ -108,9 +140,9 @@ function chartData(summary: AdminSummary, groupBy: GroupBy) {
 
   return source.map((item, i) => ({
     name:
-      groupBy === 'group'
+      groupBy === "group"
         ? (item as { group: string }).group
-        : groupBy === 'course'
+        : groupBy === "course"
           ? (item as { course: string }).course
           : (item as { university: string }).university,
     students: item.students,
@@ -122,9 +154,9 @@ function chartData(summary: AdminSummary, groupBy: GroupBy) {
 
 function tableData(summary: AdminSummary, groupBy: GroupBy) {
   const source =
-    groupBy === 'group'
+    groupBy === "group"
       ? summary.byGroup
-      : groupBy === 'course'
+      : groupBy === "course"
         ? summary.byCourse
         : summary.byUniversity;
 
@@ -132,9 +164,9 @@ function tableData(summary: AdminSummary, groupBy: GroupBy) {
 
   return source.map((item) => ({
     name:
-      groupBy === 'group'
+      groupBy === "group"
         ? (item as { group: string }).group
-        : groupBy === 'course'
+        : groupBy === "course"
           ? (item as { course: string }).course
           : (item as { university: string }).university,
     students: item.students,
@@ -144,9 +176,13 @@ function tableData(summary: AdminSummary, groupBy: GroupBy) {
 }
 
 export default function AdminSummaryReport() {
-  const [groupBy, setGroupBy] = useState<GroupBy>('group');
+  const [groupBy, setGroupBy] = useState<GroupBy>("group");
 
-  const { data: summary, loading, error } = useAnalyticsFetcher<AdminSummary>(
+  const {
+    data: summary,
+    loading,
+    error,
+  } = useAnalyticsFetcher<AdminSummary>(
     () => getAdminSummary(groupBy),
     [groupBy],
   );
@@ -155,7 +191,10 @@ export default function AdminSummaryReport() {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
+          <Loader2
+            size={32}
+            className="animate-spin text-indigo-500 mx-auto mb-3"
+          />
           <p className="text-sm text-muted-foreground">Загрузка данных...</p>
         </div>
       </div>
@@ -167,8 +206,10 @@ export default function AdminSummaryReport() {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground font-medium">Ошибка загрузки</p>
-          <p className="text-xs text-slate-400 mt-1">{error || 'Нет данных'}</p>
+          <p className="text-sm text-muted-foreground font-medium">
+            Ошибка загрузки
+          </p>
+          <p className="text-xs text-slate-400 mt-1">{error || "Нет данных"}</p>
         </div>
       </div>
     );
@@ -210,7 +251,9 @@ export default function AdminSummaryReport() {
           value={`${completionModules}/8 модулей`}
           label="Ср. завершение"
           trend={trends.completion}
-          delta={Math.round(current.avgCompletionRate - previous.avgCompletionRate)}
+          delta={Math.round(
+            current.avgCompletionRate - previous.avgCompletionRate,
+          )}
           delay={2}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
@@ -220,7 +263,10 @@ export default function AdminSummaryReport() {
           value={`${(Math.round(current.avgQuizScore * 100) / 100).toFixed(1)}%`}
           label="Ср. балл квизов"
           trend={trends.quizScore}
-          delta={Math.round((current.avgQuizScore - previous.avgQuizScore) * 100) / 100}
+          delta={
+            Math.round((current.avgQuizScore - previous.avgQuizScore) * 100) /
+            100
+          }
           deltaSuffix="%"
           delay={3}
           iconBg="bg-violet-100"
@@ -234,14 +280,14 @@ export default function AdminSummaryReport() {
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h3 className="font-semibold text-sm">Агрегация по группам</h3>
             <div className="flex gap-1 bg-muted rounded-lg p-0.5">
-              {(['group', 'course', 'university'] as GroupBy[]).map((key) => (
+              {(["group", "course", "university"] as GroupBy[]).map((key) => (
                 <button
                   key={key}
                   onClick={() => setGroupBy(key)}
                   className={`px-3 py-1 text-xs rounded-md transition-colors ${
                     groupBy === key
-                      ? 'bg-background text-foreground shadow-sm font-medium'
-                      : 'text-muted-foreground hover:text-foreground'
+                      ? "bg-background text-foreground shadow-sm font-medium"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {groupByLabels[key]}
@@ -252,43 +298,80 @@ export default function AdminSummaryReport() {
 
           {cData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={cData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+              <BarChart
+                data={cData}
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
-                <YAxis yAxisId="left" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={{ stroke: "#e2e8f0" }}
+                />
+                <YAxis
+                  yAxisId="left"
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={{ stroke: "#e2e8f0" }}
+                />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
                   tick={{ fontSize: 11 }}
                   tickLine={false}
-                  axisLine={{ stroke: '#e2e8f0' }}
+                  axisLine={{ stroke: "#e2e8f0" }}
                   domain={[0, 100]}
                   tickFormatter={(v) => `${v}%`}
                 />
                 <Tooltip
-                  contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                  contentStyle={{
+                    fontSize: 12,
+                    borderRadius: 8,
+                    border: "1px solid #e2e8f0",
+                  }}
                   formatter={(value, name) => {
                     const v = value as number;
-                    if (name === 'students') return [v, 'Студенты'];
-                    if (name === 'avgCompletion') return [`${v}%`, 'Завершение'];
+                    if (name === "students") return [v, "Студенты"];
+                    if (name === "avgCompletion")
+                      return [`${v}%`, "Завершение"];
                     return value;
                   }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
-                  formatter={(value) => (value === 'students' ? 'Студенты' : value === 'avgCompletion' ? 'Завершение (%)' : value)}
+                  formatter={(value) =>
+                    value === "students"
+                      ? "Студенты"
+                      : value === "avgCompletion"
+                        ? "Завершение (%)"
+                        : value
+                  }
                 />
-                <Bar yAxisId="left" dataKey="students" name="students" radius={[4, 4, 0, 0]}>
+                <Bar
+                  yAxisId="left"
+                  dataKey="students"
+                  name="students"
+                  radius={[4, 4, 0, 0]}
+                >
                   {cData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
-                <Bar yAxisId="right" dataKey="avgCompletion" name="avgCompletion" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                <Bar
+                  yAxisId="right"
+                  dataKey="avgCompletion"
+                  name="avgCompletion"
+                  fill="#94a3b8"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center py-12">
-              <p className="text-sm text-slate-400">Нет данных для отображения</p>
+              <p className="text-sm text-slate-400">
+                Нет данных для отображения
+              </p>
             </div>
           )}
         </CardContent>
@@ -299,9 +382,15 @@ export default function AdminSummaryReport() {
         <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-4">
-              Сводка{' '}
+              Сводка{" "}
               <span className="text-slate-400 font-normal">
-                ({groupBy === 'group' ? 'по группам' : groupBy === 'course' ? 'по курсам' : 'по университетам'})
+                (
+                {groupBy === "group"
+                  ? "по группам"
+                  : groupBy === "course"
+                    ? "по курсам"
+                    : "по университетам"}
+                )
               </span>
             </h3>
             <div className="overflow-x-auto">
@@ -309,7 +398,11 @@ export default function AdminSummaryReport() {
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {groupBy === 'group' ? 'Группа' : groupBy === 'course' ? 'Курс' : 'Университет'}
+                      {groupBy === "group"
+                        ? "Группа"
+                        : groupBy === "course"
+                          ? "Курс"
+                          : "Университет"}
                     </th>
                     <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Студенты
@@ -337,16 +430,18 @@ export default function AdminSummaryReport() {
                         <span
                           className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
                             Number(row.avgCompletion) >= 70
-                              ? 'bg-emerald-100 text-emerald-700'
+                              ? "bg-emerald-100 text-emerald-700"
                               : Number(row.avgCompletion) >= 40
-                                ? 'bg-amber-100 text-amber-700'
-                                : 'bg-red-100 text-red-700'
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-red-100 text-red-700"
                           }`}
                         >
                           {row.avgCompletion}%
                         </span>
                       </td>
-                      <td className="py-2.5 px-3 text-right font-medium">{row.avgQuizScore}%</td>
+                      <td className="py-2.5 px-3 text-right font-medium">
+                        {row.avgQuizScore}%
+                      </td>
                     </motion.tr>
                   ))}
                 </tbody>

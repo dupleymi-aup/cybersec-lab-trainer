@@ -1,21 +1,39 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
-  ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from 'recharts';
-import { Loader2, AlertTriangle, TrendingUp, BookOpen, Users, Target } from 'lucide-react';
-import { getProgressDynamics, type ProgressDynamicsDay } from '@/lib/auth-store';
-import { useDateFormatter } from '@/lib/format';
-import { Card, CardContent } from '@/components/ui/card';
-import KPICard from './KPICard';
-import { CHART_COLORS } from '@/lib/constants';
+  ComposedChart,
+  Line,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+import {
+  Loader2,
+  AlertTriangle,
+  TrendingUp,
+  BookOpen,
+  Users,
+  Target,
+} from "lucide-react";
+import {
+  getProgressDynamics,
+  type ProgressDynamicsDay,
+} from "@/lib/auth-store";
+import { useDateFormatter } from "@/lib/format";
+import { Card, CardContent } from "@/components/ui/card";
+import KPICard from "./KPICard";
+import { CHART_COLORS } from "@/lib/constants";
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
+  { key: 7, label: "7д" },
+  { key: 30, label: "30д" },
+  { key: 90, label: "90д" },
+  { key: 180, label: "180д" },
 ];
 
 export interface ProgressDynamicsChartProps {
@@ -25,10 +43,23 @@ export interface ProgressDynamicsChartProps {
 
 const DEFAULT_DAYS = 30;
 
-export default function ProgressDynamicsChart({ groupId, days: controlledDays }: ProgressDynamicsChartProps = {}) {
+export default function ProgressDynamicsChart({
+  groupId,
+  days: controlledDays,
+}: ProgressDynamicsChartProps = {}) {
   const formatDate = useDateFormatter();
   const [daily, setDaily] = useState<ProgressDynamicsDay[]>([]);
-  const [summary, setSummary] = useState<{ totalModulesCompleted: number; totalQuizAttempts: number; avgDailyActive: number; trend: 'up' | 'down' | 'stable' }>({ totalModulesCompleted: 0, totalQuizAttempts: 0, avgDailyActive: 0, trend: 'stable' });
+  const [summary, setSummary] = useState<{
+    totalModulesCompleted: number;
+    totalQuizAttempts: number;
+    avgDailyActive: number;
+    trend: "up" | "down" | "stable";
+  }>({
+    totalModulesCompleted: 0,
+    totalQuizAttempts: 0,
+    avgDailyActive: 0,
+    trend: "stable",
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(DEFAULT_DAYS);
@@ -48,14 +79,24 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
           setLoading(false);
         }
       })
-      .catch((e) => { if (!cancelled) { setError(e.message || 'Ошибка загрузки'); setLoading(false); } });
-    return () => { cancelled = true; };
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e.message || "Ошибка загрузки");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [days, groupId]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 size={32} className="animate-spin text-indigo-500 mx-auto mb-3" />
+        <Loader2
+          size={32}
+          className="animate-spin text-indigo-500 mx-auto mb-3"
+        />
         <p className="text-sm text-muted-foreground">Загрузка данных...</p>
       </div>
     );
@@ -72,7 +113,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
 
   const chartData = daily.map((d) => ({
     ...d,
-    dateShort: formatDate(d.date, { day: 'numeric', month: 'short' }),
+    dateShort: formatDate(d.date, { day: "numeric", month: "short" }),
   }));
 
   return (
@@ -85,7 +126,9 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
               key={key}
               onClick={() => setInternalDays(key)}
               className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
+                days === key
+                  ? "bg-background text-foreground shadow-sm font-medium"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {label}
@@ -119,7 +162,13 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
         />
         <KPICard
           icon={<TrendingUp size={18} />}
-          value={summary.trend === 'up' ? 'Рост' : summary.trend === 'down' ? 'Спад' : 'Стабильно'}
+          value={
+            summary.trend === "up"
+              ? "Рост"
+              : summary.trend === "down"
+                ? "Спад"
+                : "Стабильно"
+          }
           label="Тренд активности"
           trend={summary.trend}
           iconBg="bg-amber-100"
@@ -133,28 +182,86 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
           <h3 className="font-semibold text-sm mb-4">Динамика прогресса</h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                <XAxis dataKey="dateShort" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} />
-                <YAxis yAxisId="left" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+              <ComposedChart
+                data={chartData}
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={CHART_COLORS.grid}
+                />
+                <XAxis
+                  dataKey="dateShort"
+                  tick={{ fontSize: 10 }}
+                  tickLine={false}
+                  axisLine={{ stroke: CHART_COLORS.grid }}
+                />
+                <YAxis
+                  yAxisId="left"
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={{ stroke: CHART_COLORS.grid }}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={{ stroke: CHART_COLORS.grid }}
+                  domain={[0, 100]}
+                  tickFormatter={(v) => `${v}%`}
+                />
                 <Tooltip
-                  contentStyle={{ fontSize: 12, borderRadius: 8, border: `1px solid ${CHART_COLORS.grid}` }}
+                  contentStyle={{
+                    fontSize: 12,
+                    borderRadius: 8,
+                    border: `1px solid ${CHART_COLORS.grid}`,
+                  }}
                   formatter={(value, name) => {
-                    if (name === 'modulesCompleted') return [value, 'Модулей завершено'];
-                    if (name === 'avgQuizScore') return [`${value}%`, 'Ср. балл квизов'];
-                    if (name === 'activeStudents') return [value, 'Активных студентов'];
+                    if (name === "modulesCompleted")
+                      return [value, "Модулей завершено"];
+                    if (name === "avgQuizScore")
+                      return [`${value}%`, "Ср. балл квизов"];
+                    if (name === "activeStudents")
+                      return [value, "Активных студентов"];
                     return [value, name];
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Area yAxisId="left" type="monotone" dataKey="activeStudents" name="activeStudents" fill={CHART_COLORS.info} fillOpacity={0.15} stroke={CHART_COLORS.info} strokeWidth={2} />
-                <Line yAxisId="right" type="monotone" dataKey="avgQuizScore" name="avgQuizScore" stroke={CHART_COLORS.primary} strokeWidth={2} dot={false} />
-                <Line yAxisId="left" type="monotone" dataKey="modulesCompleted" name="modulesCompleted" stroke={CHART_COLORS.success} strokeWidth={2} dot={false} />
+                <Area
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="activeStudents"
+                  name="activeStudents"
+                  fill={CHART_COLORS.info}
+                  fillOpacity={0.15}
+                  stroke={CHART_COLORS.info}
+                  strokeWidth={2}
+                />
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="avgQuizScore"
+                  name="avgQuizScore"
+                  stroke={CHART_COLORS.primary}
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  yAxisId="left"
+                  type="monotone"
+                  dataKey="modulesCompleted"
+                  name="modulesCompleted"
+                  stroke={CHART_COLORS.success}
+                  strokeWidth={2}
+                  dot={false}
+                />
               </ComposedChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-slate-400 text-center py-12">Нет данных</p>
+            <p className="text-sm text-slate-400 text-center py-12">
+              Нет данных
+            </p>
           )}
         </CardContent>
       </Card>
@@ -162,21 +269,63 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
       {/* Secondary chart: new completions */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Новые завершения по дням</h3>
+          <h3 className="font-semibold text-sm mb-4">
+            Новые завершения по дням
+          </h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
-              <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                <XAxis dataKey="dateShort" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} />
-                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: CHART_COLORS.grid }} />
-                <Tooltip formatter={(value, name) => [value, name === 'newCompletions' ? 'Новые завершения' : 'Попытки квизов']} />
+              <ComposedChart
+                data={chartData}
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={CHART_COLORS.grid}
+                />
+                <XAxis
+                  dataKey="dateShort"
+                  tick={{ fontSize: 10 }}
+                  tickLine={false}
+                  axisLine={{ stroke: CHART_COLORS.grid }}
+                />
+                <YAxis
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={{ stroke: CHART_COLORS.grid }}
+                />
+                <Tooltip
+                  formatter={(value, name) => [
+                    value,
+                    name === "newCompletions"
+                      ? "Новые завершения"
+                      : "Попытки квизов",
+                  ]}
+                />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Area type="monotone" dataKey="newCompletions" name="newCompletions" fill={CHART_COLORS.success} fillOpacity={0.2} stroke={CHART_COLORS.success} strokeWidth={2} />
-                <Area type="monotone" dataKey="quizAttempts" name="quizAttempts" fill={CHART_COLORS.primary} fillOpacity={0.2} stroke={CHART_COLORS.primary} strokeWidth={2} />
+                <Area
+                  type="monotone"
+                  dataKey="newCompletions"
+                  name="newCompletions"
+                  fill={CHART_COLORS.success}
+                  fillOpacity={0.2}
+                  stroke={CHART_COLORS.success}
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="quizAttempts"
+                  name="quizAttempts"
+                  fill={CHART_COLORS.primary}
+                  fillOpacity={0.2}
+                  stroke={CHART_COLORS.primary}
+                  strokeWidth={2}
+                />
               </ComposedChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-slate-400 text-center py-12">Нет данных</p>
+            <p className="text-sm text-slate-400 text-center py-12">
+              Нет данных
+            </p>
           )}
         </CardContent>
       </Card>

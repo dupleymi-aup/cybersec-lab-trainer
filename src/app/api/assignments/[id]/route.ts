@@ -1,9 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
-import { updateAssignmentSchema } from '@/lib/validations/api';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireCapability,
+} from "@/lib/api-middleware";
+import { updateAssignmentSchema } from "@/lib/validations/api";
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
@@ -22,38 +30,50 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   });
 
   if (!assignment) {
-    return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
+    return NextResponse.json(
+      { error: "Assignment not found" },
+      { status: 404 },
+    );
   }
 
   // Students can only see published assignments
-  if (auth.role === 'student' && !assignment.published) {
+  if (auth.role === "student" && !assignment.published) {
     return forbidden();
   }
 
   return NextResponse.json(assignment);
 }
 
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireCapability(auth, 'assignments:edit')) return forbidden();
+  if (!requireCapability(auth, "assignments:edit")) return forbidden();
 
   const { id } = await params;
 
   const existing = await prisma.assignment.findUnique({ where: { id } });
   if (!existing) {
-    return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
+    return NextResponse.json(
+      { error: "Assignment not found" },
+      { status: 404 },
+    );
   }
 
   // Only creator or admin can update
-  if (existing.createdBy !== auth.id && auth.role !== 'admin') {
+  if (existing.createdBy !== auth.id && auth.role !== "admin") {
     return forbidden();
   }
 
   const body = await request.json();
   const parsed = updateAssignmentSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.issues[0].message },
+      { status: 400 },
+    );
   }
 
   const { dueAt, ...data } = parsed.data;
@@ -74,19 +94,25 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   return NextResponse.json(assignment);
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireCapability(auth, 'assignments:delete')) return forbidden();
+  if (!requireCapability(auth, "assignments:delete")) return forbidden();
 
   const { id } = await params;
 
   const existing = await prisma.assignment.findUnique({ where: { id } });
   if (!existing) {
-    return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
+    return NextResponse.json(
+      { error: "Assignment not found" },
+      { status: 404 },
+    );
   }
 
-  if (existing.createdBy !== auth.id && auth.role !== 'admin') {
+  if (existing.createdBy !== auth.id && auth.role !== "admin") {
     return forbidden();
   }
 

@@ -1,35 +1,54 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit } from '@/lib/api-middleware';
-import { RATE_WINDOW_1_MIN } from '@/lib/constants';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireRole,
+  checkRateLimit,
+} from "@/lib/api-middleware";
+import { RATE_WINDOW_1_MIN } from "@/lib/constants";
 
 // GET /api/admin/stats - dashboard KPIs
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireRole(auth.role, "admin")) return forbidden();
 
   // Rate limit: 30 requests per minute
-  const rateLimit = checkRateLimit(`admin-stats:${auth.id}`, 30, RATE_WINDOW_1_MIN);
+  const rateLimit = checkRateLimit(
+    `admin-stats:${auth.id}`,
+    30,
+    RATE_WINDOW_1_MIN,
+  );
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: 'Too many requests', retryAfter: rateLimit.retryAfter },
-      { status: 429 }
+      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
+      { status: 429 },
     );
   }
 
   const { searchParams } = new URL(request.url);
-  const period = searchParams.get('period') || '30d';
+  const period = searchParams.get("period") || "30d";
 
   // Calculate date range
   const now = new Date();
   const dateFrom = new Date();
   switch (period) {
-    case '7d': dateFrom.setDate(now.getDate() - 7); break;
-    case '30d': dateFrom.setDate(now.getDate() - 30); break;
-    case '90d': dateFrom.setDate(now.getDate() - 90); break;
-    case '1y': dateFrom.setFullYear(now.getFullYear() - 1); break;
-    default: dateFrom.setDate(now.getDate() - 30);
+    case "7d":
+      dateFrom.setDate(now.getDate() - 7);
+      break;
+    case "30d":
+      dateFrom.setDate(now.getDate() - 30);
+      break;
+    case "90d":
+      dateFrom.setDate(now.getDate() - 90);
+      break;
+    case "1y":
+      dateFrom.setFullYear(now.getFullYear() - 1);
+      break;
+    default:
+      dateFrom.setDate(now.getDate() - 30);
   }
 
   // Parallel fetch all stats
@@ -60,7 +79,7 @@ export async function GET(request: NextRequest) {
     // User stats
     prisma.user.count(),
     prisma.user.groupBy({
-      by: ['role'],
+      by: ["role"],
       _count: true,
     }),
     prisma.user.count({ where: { isBlocked: true } }),
@@ -79,20 +98,22 @@ export async function GET(request: NextRequest) {
     // Login stats
     prisma.loginActivity.count(),
     prisma.loginActivity.count({ where: { timestamp: { gte: dateFrom } } }),
-    prisma.loginActivity.groupBy({
-      by: ['userId'],
-      where: { timestamp: { gte: dateFrom } },
-      _count: true,
-    }).then(results => results.length),
+    prisma.loginActivity
+      .groupBy({
+        by: ["userId"],
+        where: { timestamp: { gte: dateFrom } },
+        _count: true,
+      })
+      .then((results) => results.length),
 
     // Audit stats
     prisma.auditLog.count(),
     prisma.auditLog.count({ where: { timestamp: { gte: dateFrom } } }),
     prisma.auditLog.groupBy({
-      by: ['action'],
+      by: ["action"],
       where: { timestamp: { gte: dateFrom } },
       _count: true,
-      orderBy: { _count: { action: 'desc' } },
+      orderBy: { _count: { action: "desc" } },
       take: 10,
     }),
 
@@ -116,7 +137,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Build top actions
-  const topActionsList = topActions.map(a => ({
+  const topActionsList = topActions.map((a) => ({
     action: a.action,
     count: a._count,
   }));

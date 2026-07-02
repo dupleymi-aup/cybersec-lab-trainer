@@ -7,8 +7,8 @@
  * Or from a Next.js API route that runs on a schedule.
  */
 
-import { prisma } from './db';
-import { logger } from './logger';
+import { prisma } from "./db";
+import { logger } from "./logger";
 import {
   generateGradebookPDF,
   generateAtRiskPDF,
@@ -16,7 +16,7 @@ import {
   generateModulePerformancePDF,
   generateGroupComparisonPDF,
   generateQuizRetryPDF,
-} from './export-utils';
+} from "./export-utils";
 
 interface ScheduledReportRecord {
   id: string;
@@ -56,12 +56,15 @@ interface AtRiskStudent {
   modulesCompleted: number;
   avgQuizScore: number;
   quizAttempts: number;
-  trend: 'improving' | 'declining' | 'stable';
+  trend: "improving" | "declining" | "stable";
 }
 
-const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Promise<void>> = {
+const REPORT_GENERATORS: Record<
+  string,
+  (days: number, groupId?: string) => Promise<void>
+> = {
   gradebook: async (days, groupId): Promise<void> => {
-    const { getGradebook } = await import('./analytics-api');
+    const { getGradebook } = await import("./analytics-api");
     const data = await getGradebook({ groupId: groupId || undefined, days });
     if (!data.students?.length) return;
 
@@ -70,23 +73,29 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
       fullName: s.fullName,
       email: s.email,
       group: s.group,
-      modulesCompleted: Object.values(s.moduleScores || {}).filter(m => m.completed).length,
+      modulesCompleted: Object.values(s.moduleScores || {}).filter(
+        (m) => m.completed,
+      ).length,
       quizCount: 0, // API doesn't provide quiz count separately
       avgScore: s.avgQuizScore || 0,
     }));
 
-    await generateGradebookPDF(students, (data.modules || []).map((m: { moduleId: string }) => m.moduleId), groupId || 'all');
+    await generateGradebookPDF(
+      students,
+      (data.modules || []).map((m: { moduleId: string }) => m.moduleId),
+      groupId || "all",
+    );
   },
 
-  'at-risk': async (days, groupId): Promise<void> => {
-    const { getAtRiskStudents } = await import('./analytics-api');
+  "at-risk": async (days, groupId): Promise<void> => {
+    const { getAtRiskStudents } = await import("./analytics-api");
     const data = await getAtRiskStudents(days, groupId);
     if (!data.atRiskStudents?.length) return;
 
     await generateAtRiskPDF(
       data.atRiskStudents.map((s: AtRiskStudent) => ({
         fullName: s.fullName,
-        email: s.email || '',
+        email: s.email || "",
         group: s.group,
         riskScore: s.riskScore,
         reasons: s.reasons || [],
@@ -94,44 +103,44 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
         modulesCompleted: s.modulesCompleted || 0,
         avgQuizScore: s.avgQuizScore || 0,
       })),
-      days
+      days,
     );
   },
 
   analytics: async (days, groupId): Promise<void> => {
-    const { getComprehensiveSummary } = await import('./analytics-api');
+    const { getComprehensiveSummary } = await import("./analytics-api");
     const summary = await getComprehensiveSummary(days, groupId);
 
     await generateAnalyticsPDF(
       summary,
       summary.moduleDistribution || [],
       summary.trends,
-      groupId || 'all'
+      groupId || "all",
     );
   },
 
-  'module-performance': async (days, groupId): Promise<void> => {
-    const { getModulePerformance } = await import('./analytics-api');
+  "module-performance": async (days, groupId): Promise<void> => {
+    const { getModulePerformance } = await import("./analytics-api");
     const data = await getModulePerformance(days, groupId);
 
-    await generateModulePerformancePDF(data || [], groupId || 'all');
+    await generateModulePerformancePDF(data || [], groupId || "all");
   },
 
-  'group-comparison': async (days, groupId): Promise<void> => {
-    const { getGroupComparison } = await import('./analytics-api');
+  "group-comparison": async (days, groupId): Promise<void> => {
+    const { getGroupComparison } = await import("./analytics-api");
     const data = await getGroupComparison(days);
 
-    await generateGroupComparisonPDF(data.dimensions || [], groupId || 'all');
+    await generateGroupComparisonPDF(data.dimensions || [], groupId || "all");
   },
 
-  'quiz-retry': async (days, groupId): Promise<void> => {
-    const { getQuizRetryAnalytics } = await import('./analytics-api');
+  "quiz-retry": async (days, groupId): Promise<void> => {
+    const { getQuizRetryAnalytics } = await import("./analytics-api");
     const data = await getQuizRetryAnalytics(days, groupId);
 
     await generateQuizRetryPDF(
       data.categoryRetryStats || [],
       data.topRetryers || [],
-      groupId || 'all'
+      groupId || "all",
     );
   },
 };
@@ -144,9 +153,10 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
   const results = { success: 0, skipped: 0, failed: 0 };
 
   // Get all active scheduled reports
-  const reports: ScheduledReportRecord[] = await prisma.scheduledReport.findMany({
-    where: { isActive: true },
-  });
+  const reports: ScheduledReportRecord[] =
+    await prisma.scheduledReport.findMany({
+      where: { isActive: true },
+    });
 
   const dayOfWeek = now.getDay(); // 0-6
   const dayOfMonth = now.getDate(); // 1-31
@@ -196,7 +206,9 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
 
       results.success++;
     } catch (error) {
-      logger.error(`Failed to generate report ${report.id}`, { error: error instanceof Error ? error.message : String(error) });
+      logger.error(`Failed to generate report ${report.id}`, {
+        error: error instanceof Error ? error.message : String(error),
+      });
       results.failed++;
     }
   }
@@ -207,14 +219,14 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
 function shouldExecuteReport(
   report: ScheduledReportRecord,
   dayOfWeek: number,
-  dayOfMonth: number
+  dayOfMonth: number,
 ): boolean {
   switch (report.frequency) {
-    case 'daily':
+    case "daily":
       return true;
-    case 'weekly':
+    case "weekly":
       return report.dayOfWeek === dayOfWeek;
-    case 'monthly':
+    case "monthly":
       return report.dayOfMonth === dayOfMonth;
     default:
       return false;
@@ -224,17 +236,17 @@ function shouldExecuteReport(
 async function _saveReport(
   report: ScheduledReportRecord,
   pdfBlob: Blob,
-  now: Date
+  now: Date,
 ): Promise<void> {
-  const fs = await import('fs');
-  const path = await import('path');
-  const reportsDir = path.join(process.cwd(), 'reports');
+  const fs = await import("fs");
+  const path = await import("path");
+  const reportsDir = path.join(process.cwd(), "reports");
 
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir, { recursive: true });
   }
 
-  const filename = `${report.reportType}_${now.toISOString().split('T')[0]}.pdf`;
+  const filename = `${report.reportType}_${now.toISOString().split("T")[0]}.pdf`;
   const filePath = path.join(reportsDir, filename);
 
   const buffer = Buffer.from(await pdfBlob.arrayBuffer());
@@ -244,11 +256,13 @@ async function _saveReport(
 async function sendEmailNotification(
   report: ScheduledReportRecord,
   _pdfBlob: Blob,
-  _now: Date
+  _now: Date,
 ): Promise<void> {
   // Placeholder for email sending logic
   // In production, integrate with SendGrid, Resend, or nodemailer
-  logger.warn(`[Email] Notification would be sent to ${report.email} for report ${report.id}`);
+  logger.warn(
+    `[Email] Notification would be sent to ${report.email} for report ${report.id}`,
+  );
 
   // Example with nodemailer:
   // const nodemailer = await import('nodemailer');
@@ -263,14 +277,21 @@ async function sendEmailNotification(
 }
 
 // Run if executed directly
-if (typeof process !== 'undefined' && process.argv[1] && (process.argv[1].endsWith('report-runner.ts') || process.argv[1].endsWith('report-runner.js'))) {
+if (
+  typeof process !== "undefined" &&
+  process.argv[1] &&
+  (process.argv[1].endsWith("report-runner.ts") ||
+    process.argv[1].endsWith("report-runner.js"))
+) {
   runScheduledReports()
     .then((results) => {
-      logger.info('Report runner completed', { results });
+      logger.info("Report runner completed", { results });
       process.exit(0);
     })
     .catch((error) => {
-      logger.error('Report runner failed', { error: error instanceof Error ? error.message : String(error) });
+      logger.error("Report runner failed", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       process.exit(1);
     });
 }

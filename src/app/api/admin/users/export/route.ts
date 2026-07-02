@@ -1,7 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireRole,
+  checkRateLimit,
+  getClientIp,
+} from "@/lib/api-middleware";
+import { logger } from "@/lib/logger";
 
 interface ExportRequestBody {
   role?: string;
@@ -11,13 +18,23 @@ interface ExportRequestBody {
   ids?: string[];
 }
 
-function escapeCsvField(value: string | number | boolean | null | undefined): string {
-  if (value == null) return '';
+function escapeCsvField(
+  value: string | number | boolean | null | undefined,
+): string {
+  if (value == null) return "";
   const str = String(value);
   // Prevent CSV formula injection: fields starting with =, +, -, @, tab, or CR can execute formulas
-  const dangerousPrefixes = ['=', '+', '-', '@', '\t', '\r'];
-  const needsPrefixEscape = dangerousPrefixes.some(prefix => str.startsWith(prefix));
-  if (needsPrefixEscape || str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+  const dangerousPrefixes = ["=", "+", "-", "@", "\t", "\r"];
+  const needsPrefixEscape = dangerousPrefixes.some((prefix) =>
+    str.startsWith(prefix),
+  );
+  if (
+    needsPrefixEscape ||
+    str.includes(",") ||
+    str.includes('"') ||
+    str.includes("\n") ||
+    str.includes("\r")
+  ) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
@@ -27,14 +44,14 @@ function escapeCsvField(value: string | number | boolean | null | undefined): st
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireRole(auth.role, "admin")) return forbidden();
 
   // Rate limit: 10 exports per minute per admin
   const rateLimit = checkRateLimit(`export:${auth.id}`, 10, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: 'Too many requests', retryAfter: rateLimit.retryAfter },
-      { status: 429 }
+      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
+      { status: 429 },
     );
   }
 
@@ -42,8 +59,8 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch (e) {
-    logger.error('Users export failed', { error: String(e) });
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    logger.error("Users export failed", { error: String(e) });
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const { role, group, university, course, ids } = body;
@@ -55,9 +72,11 @@ export async function POST(request: NextRequest) {
     where.id = { in: ids };
   } else {
     if (role) where.role = role;
-    if (group) where.group = { contains: group, mode: 'insensitive' as const };
-    if (university) where.university = { contains: university, mode: 'insensitive' as const };
-    if (course) where.course = { contains: course, mode: 'insensitive' as const };
+    if (group) where.group = { contains: group, mode: "insensitive" as const };
+    if (university)
+      where.university = { contains: university, mode: "insensitive" as const };
+    if (course)
+      where.course = { contains: course, mode: "insensitive" as const };
   }
 
   // Fetch users
@@ -77,28 +96,28 @@ export async function POST(request: NextRequest) {
       loginCount: true,
       isBlocked: true,
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 
   // CSV headers
   const headers = [
-    'id',
-    'email',
-    'phone',
-    'fullName',
-    'group',
-    'course',
-    'university',
-    'role',
-    'createdAt',
-    'lastLoginAt',
-    'loginCount',
-    'isBlocked',
+    "id",
+    "email",
+    "phone",
+    "fullName",
+    "group",
+    "course",
+    "university",
+    "role",
+    "createdAt",
+    "lastLoginAt",
+    "loginCount",
+    "isBlocked",
   ];
 
   // Build CSV rows
   const rows = [
-    headers.join(','),
+    headers.join(","),
     ...users.map((u) =>
       [
         escapeCsvField(u.id),
@@ -110,14 +129,14 @@ export async function POST(request: NextRequest) {
         escapeCsvField(u.university),
         escapeCsvField(u.role),
         escapeCsvField(u.createdAt.toISOString()),
-        escapeCsvField(u.lastLoginAt?.toISOString() ?? ''),
+        escapeCsvField(u.lastLoginAt?.toISOString() ?? ""),
         escapeCsvField(u.loginCount),
         escapeCsvField(u.isBlocked),
-      ].join(',')
+      ].join(","),
     ),
   ];
 
-  const csvContent = rows.join('\n');
+  const csvContent = rows.join("\n");
 
   // Generate filename with current date
   const now = new Date();
@@ -132,8 +151,8 @@ export async function POST(request: NextRequest) {
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'users_export',
+        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
+        action: "users_export",
         targetId: auth.id,
         targetName: `${users.length} users`,
         details: `Admin ${auth.id} exported ${users.length} users as CSV [IP: ${ip}]`,
@@ -141,16 +160,16 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     // Audit logging is best-effort
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('Audit logging failed:', error);
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Audit logging failed:", error);
     }
   }
 
   return new NextResponse(csvContent, {
     status: 200,
     headers: {
-      'Content-Type': 'text/csv',
-      'Content-Disposition': `attachment; filename="${filename}"`,
+      "Content-Type": "text/csv",
+      "Content-Disposition": `attachment; filename="${filename}"`,
     },
   });
 }

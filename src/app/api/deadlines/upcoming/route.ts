@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { authenticate, unauthorized } from "@/lib/api-middleware";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -13,10 +13,10 @@ export async function GET(request: NextRequest) {
   if (!user) return unauthorized();
 
   // Find deadlines that apply to this user
-  const applicableGroups = ['', user.group || ''].filter(Boolean);
+  const applicableGroups = ["", user.group || ""].filter(Boolean);
   const deadlines = await prisma.deadline.findMany({
     where: { group: { in: applicableGroups } },
-    orderBy: { dueAt: 'asc' },
+    orderBy: { dueAt: "asc" },
   });
 
   const now = new Date();
@@ -27,32 +27,35 @@ export async function GET(request: NextRequest) {
     where: { userId: auth.id },
     select: { moduleId: true, completed: true },
   });
-  const completedModules = new Set(progress.filter(p => p.completed).map(p => p.moduleId));
+  const completedModules = new Set(
+    progress.filter((p) => p.completed).map((p) => p.moduleId),
+  );
 
   const quizResults = await prisma.quizResult.findMany({
     where: { userId: auth.id },
     select: { quizId: true },
   });
-  const completedQuizzes = new Set(quizResults.map(q => q.quizId));
+  const completedQuizzes = new Set(quizResults.map((q) => q.quizId));
 
   // Filter to upcoming (within 7 days) or overdue deadlines, exclude completed
   const upcoming = deadlines
-    .filter(d => {
+    .filter((d) => {
       const due = new Date(d.dueAt);
       // Include if overdue or due within 7 days
       if (due < sevenDaysFromNow) {
         // Check if completed
-        if (d.scope === 'course') {
+        if (d.scope === "course") {
           // Course deadline: check if all modules are done
-          const allModulesCompleted = progress.length > 0 && progress.every(p => p.completed);
+          const allModulesCompleted =
+            progress.length > 0 && progress.every((p) => p.completed);
           return !allModulesCompleted;
         }
-        if (d.scope === 'module') return !completedModules.has(d.scopeId);
-        if (d.scope === 'quiz') return !completedQuizzes.has(d.scopeId);
+        if (d.scope === "module") return !completedModules.has(d.scopeId);
+        if (d.scope === "quiz") return !completedQuizzes.has(d.scopeId);
       }
       return false;
     })
-    .map(d => {
+    .map((d) => {
       const due = new Date(d.dueAt);
       const diffMs = due.getTime() - now.getTime();
       const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));

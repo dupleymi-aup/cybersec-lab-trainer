@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { deleteAuthCookie } from '@/lib/cookie-auth';
-import { logger } from '@/lib/logger';
+import { NextResponse } from "next/server";
+import { deleteAuthCookie } from "@/lib/cookie-auth";
+import { logger } from "@/lib/logger";
 
 export async function POST() {
   try {
@@ -8,7 +8,12 @@ export async function POST() {
     deleteAuthCookie(response);
     return response;
   } catch (error) {
-    logger.error('Logout failed', { error: error instanceof Error ? error.message : 'Unknown' });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logger.error("Logout failed", {
+      error: error instanceof Error ? error.message : "Unknown",
+    });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

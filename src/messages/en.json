@@ -195,38 +195,19 @@
       "sections": {
         "platform": {
           "title": "Platform",
-          "links": [
-            "Modules",
-            "Features",
-            "Pricing",
-            "LTI Integration"
-          ]
+          "links": ["Modules", "Features", "Pricing", "LTI Integration"]
         },
         "resources": {
           "title": "Resources",
-          "links": [
-            "Documentation",
-            "Guide",
-            "Blog",
-            "OWASP Top 10"
-          ]
+          "links": ["Documentation", "Guide", "Blog", "OWASP Top 10"]
         },
         "company": {
           "title": "Company",
-          "links": [
-            "About",
-            "Contact",
-            "Careers",
-            "Partners"
-          ]
+          "links": ["About", "Contact", "Careers", "Partners"]
         },
         "legal": {
           "title": "Legal",
-          "links": [
-            "Privacy",
-            "Terms",
-            "Cookies"
-          ]
+          "links": ["Privacy", "Terms", "Cookies"]
         }
       },
       "copyright": "(c) {year} CyberSec Lab. All rights reserved.",
@@ -1181,18 +1162,38 @@
         "step4Title": "Verification",
         "step4Desc": "Server compares client's code with its own computation. ±1 step (30 sec) is allowed to compensate for network delay.",
         "without2fa": "Without 2FA",
-        "without2faItems": ["Password only — single point of failure", "DB leak = instant access", "Phishing = full compromise", "Brute force = eventual access"],
+        "without2faItems": [
+          "Password only — single point of failure",
+          "DB leak = instant access",
+          "Phishing = full compromise",
+          "Brute force = eventual access"
+        ],
         "with2fa": "With 2FA (TOTP)",
-        "with2faItems": ["Need password + TOTP device", "Code valid for only 30 seconds", "Secret never transmitted over network", "Protection from phishing and brute force"]
+        "with2faItems": [
+          "Need password + TOTP device",
+          "Code valid for only 30 seconds",
+          "Secret never transmitted over network",
+          "Protection from phishing and brute force"
+        ]
       },
       "sessions": {
         "title": "Session Security",
         "jwtTitle": "JWT (JSON Web Token)",
         "jwtDescription": "JWT is a compact token for transmitting information between client and server. Consists of three parts: Header (algorithm), Payload (data: user ID, role, expiry) and Signature (integrity check). Tokens can be stored in localStorage or HttpOnly cookies.",
         "unsafe": "Insecure",
-        "unsafeItems": ["JWT in localStorage (accessible via XSS)", "Expiry longer than 24 hours", "No refresh tokens", "Secret in client-side code"],
+        "unsafeItems": [
+          "JWT in localStorage (accessible via XSS)",
+          "Expiry longer than 24 hours",
+          "No refresh tokens",
+          "Secret in client-side code"
+        ],
         "safe": "Secure",
-        "safeItems": ["HttpOnly + Secure cookie storage", "Short expiry (15-30 min) + refresh token", "Signature verification on every request", "Compromised token blacklist"]
+        "safeItems": [
+          "HttpOnly + Secure cookie storage",
+          "Short expiry (15-30 min) + refresh token",
+          "Signature verification on every request",
+          "Compromised token blacklist"
+        ]
       },
       "completeModule": "Mark Module as Completed",
       "moduleCompleted": "Module Completed!"

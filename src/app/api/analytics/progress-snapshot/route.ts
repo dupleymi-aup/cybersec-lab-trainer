@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized } from '@/lib/api-middleware';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { authenticate, unauthorized } from "@/lib/api-middleware";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
 
   if (!moduleId || score === undefined || completed === undefined) {
     return NextResponse.json(
-      { error: 'moduleId, score, and completed are required' },
-      { status: 400 }
+      { error: "moduleId, score, and completed are required" },
+      { status: 400 },
     );
   }
 
@@ -26,8 +26,14 @@ export async function POST(request: NextRequest) {
       where: { id: auth.id },
       select: { role: true },
     });
-    if (!caller || (caller.role !== 'admin' && caller.role !== 'teacher')) {
-      return NextResponse.json({ error: 'Only admins and teachers can create snapshots for other users' }, { status: 403 });
+    if (!caller || (caller.role !== "admin" && caller.role !== "teacher")) {
+      return NextResponse.json(
+        {
+          error:
+            "Only admins and teachers can create snapshots for other users",
+        },
+        { status: 403 },
+      );
     }
   }
 
@@ -44,7 +50,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (e) {
-    logger.error('Progress snapshot failed', { error: String(e) });
-    return NextResponse.json({ error: 'Failed to create progress snapshot' }, { status: 500 });
+    logger.error("Progress snapshot failed", { error: String(e) });
+    return NextResponse.json(
+      { error: "Failed to create progress snapshot" },
+      { status: 500 },
+    );
   }
 }

@@ -1,8 +1,7 @@
 "use client";
 
-import {useTranslations} from "next-intl";
-import {useLocale} from "next-intl";
-
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 
 import LandingHeader from "@/components/landing/LandingHeader";
 import HeroSection from "@/components/landing/HeroSection";

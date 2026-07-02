@@ -1,16 +1,35 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
-  PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip,
-} from 'recharts';
+  PieChart,
+  Pie,
+  Cell,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import {
-  Loader2, AlertTriangle, Award, CheckCircle, XCircle, TrendingUp, ChevronDown, ChevronUp,
-} from 'lucide-react';
-import { getCertificationReadiness, type CertificationReadinessData } from '@/lib/auth-store';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  Loader2,
+  AlertTriangle,
+  Award,
+  CheckCircle,
+  XCircle,
+  TrendingUp,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import {
+  getCertificationReadiness,
+  type CertificationReadinessData,
+} from "@/lib/auth-store";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export interface CertificationReadinessProps {
   groupId?: string;
@@ -18,19 +37,37 @@ export interface CertificationReadinessProps {
 }
 
 const TIER_CONFIG = {
-  ready: { label: 'Готов', color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: CheckCircle },
-  almost: { label: 'Почти готов', color: 'bg-blue-100 text-blue-700 border-blue-200', icon: TrendingUp },
-  'needs-work': { label: 'Нужна работа', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: AlertTriangle },
-  'not-ready': { label: 'Не готов', color: 'bg-red-100 text-red-700 border-red-200', icon: XCircle },
+  ready: {
+    label: "Готов",
+    color: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    icon: CheckCircle,
+  },
+  almost: {
+    label: "Почти готов",
+    color: "bg-blue-100 text-blue-700 border-blue-200",
+    icon: TrendingUp,
+  },
+  "needs-work": {
+    label: "Нужна работа",
+    color: "bg-amber-100 text-amber-700 border-amber-200",
+    icon: AlertTriangle,
+  },
+  "not-ready": {
+    label: "Не готов",
+    color: "bg-red-100 text-red-700 border-red-200",
+    icon: XCircle,
+  },
 };
 
-
-export default function CertificationReadiness({ groupId: propGroupId, days: propDays }: CertificationReadinessProps = {}) {
+export default function CertificationReadiness({
+  groupId: propGroupId,
+  days: propDays,
+}: CertificationReadinessProps = {}) {
   const [data, setData] = useState<CertificationReadinessData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId] = useState('');
+  const [internalGroupId] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const days = propDays ?? internalDays;
@@ -40,9 +77,21 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
     setLoading(true);
     setError(null);
     getCertificationReadiness(days, propGroupId || internalGroupId || undefined)
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((e) => { if (!cancelled) { setError(e.message || 'Ошибка загрузки'); setLoading(false); } });
-    return () => { cancelled = true; };
+      .then((d) => {
+        if (!cancelled) {
+          setData(d);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e.message || "Ошибка загрузки");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [days, propGroupId, internalGroupId]);
 
   if (loading) {
@@ -58,7 +107,9 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">
+          {error || "Нет данных"}
+        </p>
       </div>
     );
   }
@@ -66,10 +117,18 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
   const { summary, students } = data;
 
   const tierData = [
-    { name: TIER_CONFIG.ready.label, value: summary.ready, color: '#10b981' },
-    { name: TIER_CONFIG.almost.label, value: summary.almost, color: '#3b82f6' },
-    { name: TIER_CONFIG['needs-work'].label, value: summary.needsWork, color: '#f59e0b' },
-    { name: TIER_CONFIG['not-ready'].label, value: summary.notReady, color: '#ef4444' },
+    { name: TIER_CONFIG.ready.label, value: summary.ready, color: "#10b981" },
+    { name: TIER_CONFIG.almost.label, value: summary.almost, color: "#3b82f6" },
+    {
+      name: TIER_CONFIG["needs-work"].label,
+      value: summary.needsWork,
+      color: "#f59e0b",
+    },
+    {
+      name: TIER_CONFIG["not-ready"].label,
+      value: summary.notReady,
+      color: "#ef4444",
+    },
   ].filter((d) => d.value > 0);
 
   return (
@@ -96,7 +155,9 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Card className="border-border">
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-indigo-600">{summary.avgReadinessScore}</p>
+            <p className="text-2xl font-bold text-indigo-600">
+              {summary.avgReadinessScore}
+            </p>
             <p className="text-xs text-muted-foreground">Ср. балл готовности</p>
           </CardContent>
         </Card>
@@ -106,8 +167,15 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
           return (
             <Card key={key} className="border-border">
               <CardContent className="p-4 text-center">
-                <Icon size={20} className={`mx-auto mb-1 ${key === 'ready' ? 'text-emerald-600' : key === 'almost' ? 'text-blue-600' : key === 'needs-work' ? 'text-amber-600' : 'text-red-600'}`} />
-                <p className={`text-2xl font-bold ${key === 'ready' ? 'text-emerald-600' : key === 'almost' ? 'text-blue-600' : key === 'needs-work' ? 'text-amber-600' : 'text-red-600'}`}>{count}</p>
+                <Icon
+                  size={20}
+                  className={`mx-auto mb-1 ${key === "ready" ? "text-emerald-600" : key === "almost" ? "text-blue-600" : key === "needs-work" ? "text-amber-600" : "text-red-600"}`}
+                />
+                <p
+                  className={`text-2xl font-bold ${key === "ready" ? "text-emerald-600" : key === "almost" ? "text-blue-600" : key === "needs-work" ? "text-amber-600" : "text-red-600"}`}
+                >
+                  {count}
+                </p>
                 <p className="text-xs text-muted-foreground">{config.label}</p>
               </CardContent>
             </Card>
@@ -119,12 +187,26 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
       {tierData.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">Распределение по уровням готовности</h3>
+            <h3 className="font-semibold text-sm mb-4">
+              Распределение по уровням готовности
+            </h3>
             <div className="h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={tierData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" label={({ name, value }) => `${name}: ${value}`} style={{ fontSize: 10 }}>
-                    {tierData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
+                  <Pie
+                    data={tierData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={2}
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}`}
+                    style={{ fontSize: 10 }}
+                  >
+                    {tierData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
                   </Pie>
                   <Tooltip />
                 </PieChart>
@@ -141,25 +223,44 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
             <table className="w-full text-xs">
               <thead className="bg-secondary border-b border-border">
                 <tr>
-                  <th className="text-left p-2 font-medium text-muted-foreground">Студент</th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">Группа</th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">Балл</th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">Уровень</th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">Модули</th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">Достижения</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground">
+                    Студент
+                  </th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">
+                    Группа
+                  </th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">
+                    Балл
+                  </th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">
+                    Уровень
+                  </th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">
+                    Модули
+                  </th>
+                  <th className="p-2 font-medium text-muted-foreground text-center">
+                    Достижения
+                  </th>
                   <th className="p-2 font-medium text-muted-foreground"></th>
                 </tr>
               </thead>
               <tbody>
                 {students.map((s) => (
-                  <motion.tr key={s.userId} className="border-b border-slate-100 hover:bg-secondary" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.tr
+                    key={s.userId}
+                    className="border-b border-slate-100 hover:bg-secondary"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
                     <td className="p-2 font-medium">{s.fullName}</td>
-                    <td className="p-2 text-center text-muted-foreground">{s.group || '—'}</td>
+                    <td className="p-2 text-center text-muted-foreground">
+                      {s.group || "—"}
+                    </td>
                     <td className="p-2 text-center">
                       <div className="flex items-center gap-2 justify-center">
                         <div className="w-16 bg-muted rounded-full h-2.5">
                           <div
-                            className={`h-full rounded-full ${s.readinessScore >= 75 ? 'bg-emerald-500' : s.readinessScore >= 55 ? 'bg-blue-500' : s.readinessScore >= 35 ? 'bg-amber-500' : 'bg-red-500'}`}
+                            className={`h-full rounded-full ${s.readinessScore >= 75 ? "bg-emerald-500" : s.readinessScore >= 55 ? "bg-blue-500" : s.readinessScore >= 35 ? "bg-amber-500" : "bg-red-500"}`}
                             style={{ width: `${s.readinessScore}%` }}
                           />
                         </div>
@@ -167,15 +268,31 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
                       </div>
                     </td>
                     <td className="p-2 text-center">
-                      <Badge className={`text-[10px] ${TIER_CONFIG[s.readinessTier].color}`}>
+                      <Badge
+                        className={`text-[10px] ${TIER_CONFIG[s.readinessTier].color}`}
+                      >
                         {TIER_CONFIG[s.readinessTier].label}
                       </Badge>
                     </td>
-                    <td className="p-2 text-center">{s.modulesCompleted}/{s.totalModules}</td>
+                    <td className="p-2 text-center">
+                      {s.modulesCompleted}/{s.totalModules}
+                    </td>
                     <td className="p-2 text-center">{s.achievements}</td>
                     <td className="p-2 text-center">
-                      <button type="button" onClick={() => setExpandedId(expandedId === s.userId ? null : s.userId)} className="text-slate-400 hover:text-muted-foreground">
-                        {expandedId === s.userId ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedId(
+                            expandedId === s.userId ? null : s.userId,
+                          )
+                        }
+                        className="text-slate-400 hover:text-muted-foreground"
+                      >
+                        {expandedId === s.userId ? (
+                          <ChevronUp size={14} />
+                        ) : (
+                          <ChevronDown size={14} />
+                        )}
                       </button>
                     </td>
                   </motion.tr>
@@ -185,62 +302,113 @@ export default function CertificationReadiness({ groupId: propGroupId, days: pro
           </div>
 
           {/* Expanded detail */}
-          {expandedId && (() => {
-            const s = students.find((st) => st.userId === expandedId);
-            if (!s) return null;
-            return (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="p-4 bg-secondary border-t border-border">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Radar chart */}
-                  <div>
-                    <h4 className="font-semibold text-sm mb-2">Готовность по категориям</h4>
-                    <div className="h-[250px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart data={s.categoryReadiness.map((c) => ({ name: c.category, score: c.score, fullMark: 100 }))}>
-                          <PolarGrid />
-                          <PolarAngleAxis dataKey="name" tick={{ fontSize: 9 }} />
-                          <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8 }} />
-                          <Radar name="Балл" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.4} />
-                        </RadarChart>
-                      </ResponsiveContainer>
+          {expandedId &&
+            (() => {
+              const s = students.find((st) => st.userId === expandedId);
+              if (!s) return null;
+              return (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="p-4 bg-secondary border-t border-border"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Radar chart */}
+                    <div>
+                      <h4 className="font-semibold text-sm mb-2">
+                        Готовность по категориям
+                      </h4>
+                      <div className="h-[250px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RadarChart
+                            data={s.categoryReadiness.map((c) => ({
+                              name: c.category,
+                              score: c.score,
+                              fullMark: 100,
+                            }))}
+                          >
+                            <PolarGrid />
+                            <PolarAngleAxis
+                              dataKey="name"
+                              tick={{ fontSize: 9 }}
+                            />
+                            <PolarRadiusAxis
+                              domain={[0, 100]}
+                              tick={{ fontSize: 8 }}
+                            />
+                            <Radar
+                              name="Балл"
+                              dataKey="score"
+                              stroke="#6366f1"
+                              fill="#6366f1"
+                              fillOpacity={0.4}
+                            />
+                          </RadarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    {/* Strengths/Weaknesses/Recommendations */}
+                    <div className="space-y-3">
+                      {s.strengths.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-sm text-emerald-700 mb-1">
+                            Сильные стороны
+                          </h4>
+                          <div className="flex flex-wrap gap-1">
+                            {s.strengths.map((w) => (
+                              <Badge
+                                key={w}
+                                className="bg-emerald-100 text-emerald-700 text-[10px]"
+                              >
+                                {w}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {s.weaknesses.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-sm text-amber-700 mb-1">
+                            Зоны роста
+                          </h4>
+                          <div className="flex flex-wrap gap-1">
+                            {s.weaknesses.map((w) => (
+                              <Badge
+                                key={w}
+                                className="bg-amber-100 text-amber-700 text-[10px]"
+                              >
+                                {w}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {s.recommendations.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-sm text-indigo-700 mb-1">
+                            Рекомендации
+                          </h4>
+                          <ul className="space-y-1">
+                            {s.recommendations.map((r, _i) => (
+                              <li
+                                key={s.readinessTier + r}
+                                className="text-xs text-muted-foreground flex items-start gap-1"
+                              >
+                                <span className="text-indigo-500 mt-0.5">
+                                  •
+                                </span>{" "}
+                                {r}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Strengths/Weaknesses/Recommendations */}
-                  <div className="space-y-3">
-                    {s.strengths.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-sm text-emerald-700 mb-1">Сильные стороны</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {s.strengths.map((w) => <Badge key={w} className="bg-emerald-100 text-emerald-700 text-[10px]">{w}</Badge>)}
-                        </div>
-                      </div>
-                    )}
-                    {s.weaknesses.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-sm text-amber-700 mb-1">Зоны роста</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {s.weaknesses.map((w) => <Badge key={w} className="bg-amber-100 text-amber-700 text-[10px]">{w}</Badge>)}
-                        </div>
-                      </div>
-                    )}
-                    {s.recommendations.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-sm text-indigo-700 mb-1">Рекомендации</h4>
-                        <ul className="space-y-1">
-                          {s.recommendations.map((r, _i) => (
-                            <li key={s.readinessTier + r} className="text-xs text-muted-foreground flex items-start gap-1">
-                              <span className="text-indigo-500 mt-0.5">•</span> {r}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })()}
+                </motion.div>
+              );
+            })()}
         </CardContent>
       </Card>
     </div>

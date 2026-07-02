@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 /**
  * Cookie configuration for JWT auth tokens.
@@ -6,17 +6,17 @@ import { NextResponse } from 'next/server';
  * secure: only sent over HTTPS in production
  * sameSite: strict CSRF protection
  */
-const COOKIE_NAME = 'auth-token';
+const COOKIE_NAME = "auth-token";
 
 interface CookieOptions {
   httpOnly: boolean;
   secure: boolean;
-  sameSite: 'lax' | 'strict' | 'none';
+  sameSite: "lax" | "strict" | "none";
   path: string;
   maxAge: number;
 }
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 
 export function getAuthCookieOptions(rememberMe?: boolean): CookieOptions {
   const maxAge = rememberMe
@@ -26,8 +26,8 @@ export function getAuthCookieOptions(rememberMe?: boolean): CookieOptions {
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
-    path: '/',
+    sameSite: "lax",
+    path: "/",
     maxAge,
   };
 }
@@ -35,7 +35,11 @@ export function getAuthCookieOptions(rememberMe?: boolean): CookieOptions {
 /**
  * Create a NextResponse cookie setter for the auth token.
  */
-export function setAuthCookie(response: NextResponse, token: string, rememberMe?: boolean): void {
+export function setAuthCookie(
+  response: NextResponse,
+  token: string,
+  rememberMe?: boolean,
+): void {
   response.cookies.set(COOKIE_NAME, token, getAuthCookieOptions(rememberMe));
 }
 
@@ -43,11 +47,11 @@ export function setAuthCookie(response: NextResponse, token: string, rememberMe?
  * Create a NextResponse cookie deleter for the auth token.
  */
 export function deleteAuthCookie(response: NextResponse): void {
-  response.cookies.set(COOKIE_NAME, '', {
+  response.cookies.set(COOKIE_NAME, "", {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
-    path: '/',
+    sameSite: "lax",
+    path: "/",
     maxAge: 0,
   });
 }

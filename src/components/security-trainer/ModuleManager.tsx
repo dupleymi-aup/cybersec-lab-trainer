@@ -1,17 +1,22 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Reorder } from 'framer-motion';
+import { useState } from "react";
+import { Reorder } from "framer-motion";
 import {
-  GripVertical, Eye, EyeOff, Star, BookOpen,
-  Save, RotateCcw,
-} from 'lucide-react';
-import { modules } from '@/lib/data';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
+  GripVertical,
+  Eye,
+  EyeOff,
+  Star,
+  BookOpen,
+  Save,
+  RotateCcw,
+} from "lucide-react";
+import { modules } from "@/lib/data";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 
 interface ModuleConfig {
   moduleId: string;
@@ -19,7 +24,7 @@ interface ModuleConfig {
   required: boolean;
 }
 
-const STORAGE_KEY = 'cybersec-module-config';
+const STORAGE_KEY = "cybersec-module-config";
 
 interface StoredConfig {
   modules: Record<string, ModuleConfig>;
@@ -27,12 +32,13 @@ interface StoredConfig {
 }
 
 function loadConfig(): StoredConfig {
-  if (typeof window === 'undefined') return { modules: {}, order: [] };
+  if (typeof window === "undefined") return { modules: {}, order: [] };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[ModuleManager.tsx] loadConfig failed:", e);
+    if (process.env.NODE_ENV === "development")
+      console.warn("[ModuleManager.tsx] loadConfig failed:", e);
     // Intentionally silent — fallback to defaults if localStorage fails
   }
   return { modules: {}, order: [] };
@@ -66,7 +72,7 @@ export default function ModuleManager() {
   const handleToggleEnabled = (moduleId: string) => {
     setModuleOrder((prev) => {
       const next = prev.map((m) =>
-        m.id === moduleId ? { ...m, enabled: !m.enabled } : m
+        m.id === moduleId ? { ...m, enabled: !m.enabled } : m,
       );
       setHasChanges(true);
       return next;
@@ -76,7 +82,7 @@ export default function ModuleManager() {
   const handleToggleRequired = (moduleId: string) => {
     setModuleOrder((prev) => {
       const next = prev.map((m) =>
-        m.id === moduleId ? { ...m, required: !m.required } : m
+        m.id === moduleId ? { ...m, required: !m.required } : m,
       );
       setHasChanges(true);
       return next;
@@ -86,7 +92,11 @@ export default function ModuleManager() {
   const handleSave = () => {
     const moduleConfigs: Record<string, ModuleConfig> = {};
     moduleOrder.forEach((m) => {
-      moduleConfigs[m.id] = { moduleId: m.id, enabled: m.enabled, required: m.required };
+      moduleConfigs[m.id] = {
+        moduleId: m.id,
+        enabled: m.enabled,
+        required: m.required,
+      };
     });
     const stored: StoredConfig = {
       modules: moduleConfigs,
@@ -94,14 +104,21 @@ export default function ModuleManager() {
     };
     saveConfig(stored);
     setHasChanges(false);
-    toast.success('Конфигурация модулей сохранена');
+    toast.success("Конфигурация модулей сохранена");
   };
 
   const handleReset = () => {
     localStorage.removeItem(STORAGE_KEY);
-    setModuleOrder(modules.map((m, i) => ({ ...m, enabled: true, required: true, order: i })));
+    setModuleOrder(
+      modules.map((m, i) => ({
+        ...m,
+        enabled: true,
+        required: true,
+        order: i,
+      })),
+    );
     setHasChanges(false);
-    toast.success('Конфигурация сброшена');
+    toast.success("Конфигурация сброшена");
   };
 
   const enabledCount = moduleOrder.filter((m) => m.enabled).length;
@@ -150,7 +167,12 @@ export default function ModuleManager() {
 
       <Card className="border-border">
         <CardContent className="p-0">
-          <Reorder.Group axis="y" values={moduleOrder} onReorder={handleReorder} className="divide-y divide-slate-100">
+          <Reorder.Group
+            axis="y"
+            values={moduleOrder}
+            onReorder={handleReorder}
+            className="divide-y divide-slate-100"
+          >
             {moduleOrder.map((mod) => (
               <Reorder.Item
                 key={mod.id}
@@ -164,22 +186,38 @@ export default function ModuleManager() {
                   </div>
 
                   <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                    <BookOpen size={18} className={mod.enabled ? 'text-indigo-600' : 'text-slate-300'} />
+                    <BookOpen
+                      size={18}
+                      className={
+                        mod.enabled ? "text-indigo-600" : "text-slate-300"
+                      }
+                    />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className={`text-sm font-semibold ${mod.enabled ? '' : 'text-slate-400 line-through'}`}>
+                      <p
+                        className={`text-sm font-semibold ${mod.enabled ? "" : "text-slate-400 line-through"}`}
+                      >
                         {mod.title}
                       </p>
                       {mod.required && mod.enabled && (
-                        <Star size={12} className="text-amber-500 fill-amber-500" />
+                        <Star
+                          size={12}
+                          className="text-amber-500 fill-amber-500"
+                        />
                       )}
                     </div>
-                    <p className="text-xs text-slate-400 truncate">{mod.description}</p>
+                    <p className="text-xs text-slate-400 truncate">
+                      {mod.description}
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <Badge className={`text-[10px] ${mod.difficultyColor}`}>{mod.difficulty}</Badge>
-                      <span className="text-[10px] text-slate-400">{mod.lessons} уроков</span>
+                      <Badge className={`text-[10px] ${mod.difficultyColor}`}>
+                        {mod.difficulty}
+                      </Badge>
+                      <span className="text-[10px] text-slate-400">
+                        {mod.lessons} уроков
+                      </span>
                     </div>
                   </div>
 
@@ -195,7 +233,11 @@ export default function ModuleManager() {
                     </label>
 
                     <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                      {mod.enabled ? <Eye size={14} className="text-emerald-500" /> : <EyeOff size={14} className="text-slate-300" />}
+                      {mod.enabled ? (
+                        <Eye size={14} className="text-emerald-500" />
+                      ) : (
+                        <EyeOff size={14} className="text-slate-300" />
+                      )}
                       <Switch
                         checked={mod.enabled}
                         onCheckedChange={() => handleToggleEnabled(mod.id)}
@@ -213,10 +255,11 @@ export default function ModuleManager() {
       {!hasChanges && (
         <div className="p-4 bg-sky-50 border border-sky-100 rounded-lg">
           <p className="text-xs text-sky-700">
-            <strong>Как это работает:</strong> Перетаскивайте модули для изменения порядка.
-            Отключенные модули скрываются из навигации студентов.
-            Обязательные модули отмечаются звездочкой и требуют прохождения.
-            Изменения сохраняются локально и применяются ко всем пользователям после перезагрузки.
+            <strong>Как это работает:</strong> Перетаскивайте модули для
+            изменения порядка. Отключенные модули скрываются из навигации
+            студентов. Обязательные модули отмечаются звездочкой и требуют
+            прохождения. Изменения сохраняются локально и применяются ко всем
+            пользователям после перезагрузки.
           </p>
         </div>
       )}

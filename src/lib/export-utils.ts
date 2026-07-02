@@ -3,7 +3,7 @@ export function buildCSV(headers: string[], rows: string[][]): string {
   // Sanitize value to prevent CSV injection attacks (formula injection)
   // Characters like =, +, -, @, \t, \r can start formulas in Excel/Google Sheets
   const sanitize = (v: string): string => {
-    const value = String(v ?? '');
+    const value = String(v ?? "");
     if (value.match(/^[=+\-@\t\r]/)) {
       return "'" + value; // Prefix with single quote to prevent formula execution
     }
@@ -13,7 +13,10 @@ export function buildCSV(headers: string[], rows: string[][]): string {
     const sanitized = sanitize(v);
     return `"${sanitized.replace(/"/g, '""')}"`;
   };
-  return [headers.map(escape).join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
+  return [
+    headers.map(escape).join(","),
+    ...rows.map((r) => r.map(escape).join(",")),
+  ].join("\n");
 }
 
 interface JsPdfWithAutoTable {
@@ -22,9 +25,9 @@ interface JsPdfWithAutoTable {
 
 // Trigger browser download of CSV
 export function downloadCSV(csv: string, filename: string): void {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.click();
@@ -34,7 +37,7 @@ export function downloadCSV(csv: string, filename: string): void {
 // Trigger browser download of PDF
 async function downloadPDF(pdfBlob: Blob, filename: string): Promise<void> {
   const url = URL.createObjectURL(pdfBlob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.click();
@@ -43,18 +46,43 @@ async function downloadPDF(pdfBlob: Blob, filename: string): Promise<void> {
 
 // Generate student performance PDF report
 export async function generateStudentReportPDF(
-  student: { fullName: string; email: string; group: string; course: string; university: string },
-  kpis: { modulesCompleted: number; totalModules: number; avgQuizScore: number; engagementScore: number; riskScore: number },
-  progress: Array<{ moduleId: string; completed: boolean; score: number | null }>,
-  quizResults: Array<{ quizId: string; score: number; total: number; percentage: number }>,
-  recommendations: Array<{ title: string; description: string; priority: string }>
+  student: {
+    fullName: string;
+    email: string;
+    group: string;
+    course: string;
+    university: string;
+  },
+  kpis: {
+    modulesCompleted: number;
+    totalModules: number;
+    avgQuizScore: number;
+    engagementScore: number;
+    riskScore: number;
+  },
+  progress: Array<{
+    moduleId: string;
+    completed: boolean;
+    score: number | null;
+  }>,
+  quizResults: Array<{
+    quizId: string;
+    score: number;
+    total: number;
+    percentage: number;
+  }>,
+  recommendations: Array<{
+    title: string;
+    description: string;
+    priority: string;
+  }>,
 ): Promise<void> {
-  const { jsPDF } = await import('jspdf');
+  const { jsPDF } = await import("jspdf");
   const doc = new jsPDF();
 
   // Title
   doc.setFontSize(18);
-  doc.text('Отчёт по студенту', 14, 20);
+  doc.text("Отчёт по студенту", 14, 20);
 
   // Student info
   doc.setFontSize(12);
@@ -66,7 +94,7 @@ export async function generateStudentReportPDF(
 
   // KPIs
   doc.setFontSize(14);
-  doc.text('Ключевые показатели', 14, 95);
+  doc.text("Ключевые показатели", 14, 95);
   doc.setFontSize(10);
   doc.text(`Модули: ${kpis.modulesCompleted}/${kpis.totalModules}`, 14, 105);
   doc.text(`Средний балл: ${kpis.avgQuizScore}%`, 70, 105);
@@ -75,13 +103,17 @@ export async function generateStudentReportPDF(
 
   // Module progress table
   doc.setFontSize(14);
-  doc.text('Прогресс по модулям', 14, 120);
-  const { autoTable } = await import('jspdf-autotable');
+  doc.text("Прогресс по модулям", 14, 120);
+  const { autoTable } = await import("jspdf-autotable");
   autoTable(doc, {
     startY: 125,
-    head: [['Модуль', 'Пройден', 'Балл (%)']],
-    body: progress.map(p => [p.moduleId, p.completed ? 'Да' : 'Нет', p.score?.toString() ?? 'N/A']),
-    theme: 'striped',
+    head: [["Модуль", "Пройден", "Балл (%)"]],
+    body: progress.map((p) => [
+      p.moduleId,
+      p.completed ? "Да" : "Нет",
+      p.score?.toString() ?? "N/A",
+    ]),
+    theme: "striped",
     headStyles: { fillColor: [99, 102, 241] },
     styles: { fontSize: 8 },
   });
@@ -89,12 +121,17 @@ export async function generateStudentReportPDF(
   // Quiz results
   const finalY = (doc as JsPdfWithAutoTable).lastAutoTable?.finalY || 150;
   doc.setFontSize(14);
-  doc.text('Результаты квизов', 14, finalY + 10);
+  doc.text("Результаты квизов", 14, finalY + 10);
   autoTable(doc, {
     startY: finalY + 15,
-    head: [['Квиз', 'Правильных', 'Всего', 'Процент (%)']],
-    body: quizResults.map(q => [q.quizId, String(q.score), String(q.total), String(q.percentage)]),
-    theme: 'striped',
+    head: [["Квиз", "Правильных", "Всего", "Процент (%)"]],
+    body: quizResults.map((q) => [
+      q.quizId,
+      String(q.score),
+      String(q.total),
+      String(q.percentage),
+    ]),
+    theme: "striped",
     headStyles: { fillColor: [99, 102, 241] },
     styles: { fontSize: 8 },
   });
@@ -103,13 +140,13 @@ export async function generateStudentReportPDF(
   if (recommendations && recommendations.length > 0) {
     const recY = (doc as JsPdfWithAutoTable).lastAutoTable?.finalY || 200;
     doc.setFontSize(14);
-    doc.text('Рекомендации', 14, recY + 10);
+    doc.text("Рекомендации", 14, recY + 10);
     doc.setFontSize(9);
     recommendations.slice(0, 5).forEach((rec, i) => {
       const y = recY + 20 + i * 15;
-      doc.setFont('helvetica', 'bold');
+      doc.setFont("helvetica", "bold");
       doc.text(`• ${rec.title}`, 14, y);
-      doc.setFont('helvetica', 'normal');
+      doc.setFont("helvetica", "normal");
       const splitDesc = doc.splitTextToSize(rec.description, 170);
       doc.text(splitDesc, 20, y + 5);
     });
@@ -121,40 +158,64 @@ export async function generateStudentReportPDF(
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text(`CyberSec Lab Trainer — ${new Date().toLocaleDateString('ru-RU')} — Стр. ${i}/${pageCount}`, 14, 290);
+    doc.text(
+      `CyberSec Lab Trainer — ${new Date().toLocaleDateString("ru-RU")} — Стр. ${i}/${pageCount}`,
+      14,
+      290,
+    );
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, `student-report-${student.fullName.replace(/\s+/g, '-')}.pdf`);
+  const pdfBlob = doc.output("blob");
+  await downloadPDF(
+    pdfBlob,
+    `student-report-${student.fullName.replace(/\s+/g, "-")}.pdf`,
+  );
 }
 
 // Generate gradebook PDF
 export async function generateGradebookPDF(
-  students: Array<{ id: string; fullName: string; email: string; group: string; modulesCompleted: number; quizCount: number; avgScore: number }>,
+  students: Array<{
+    id: string;
+    fullName: string;
+    email: string;
+    group: string;
+    modulesCompleted: number;
+    quizCount: number;
+    avgScore: number;
+  }>,
   _modules: string[] = [],
-  _groupId: string = 'all'
+  _groupId: string = "all",
 ): Promise<void> {
-  const { jsPDF } = await import('jspdf');
-  const { autoTable } = await import('jspdf-autotable');
-  const doc = new jsPDF('landscape');
+  const { jsPDF } = await import("jspdf");
+  const { autoTable } = await import("jspdf-autotable");
+  const doc = new jsPDF("landscape");
 
   doc.setFontSize(16);
-  doc.text('Журнал успеваемости', 14, 20);
+  doc.text("Журнал успеваемости", 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
-  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего студентов: ${students.length}`, 14, 30);
+  doc.text(
+    `Дата: ${new Date().toLocaleDateString("ru-RU")} | Всего студентов: ${students.length}`,
+    14,
+    30,
+  );
 
   autoTable(doc, {
     startY: 40,
-    head: [['#', 'ФИО', 'Email', 'Группа', 'Модули', 'Квизы', 'Ср. балл (%)']],
+    head: [["#", "ФИО", "Email", "Группа", "Модули", "Квизы", "Ср. балл (%)"]],
     body: students.map((s, i) => [
-      String(i + 1), s.fullName, s.email, s.group,
-      String(s.modulesCompleted), String(s.quizCount), s.avgScore.toFixed(1)
+      String(i + 1),
+      s.fullName,
+      s.email,
+      s.group,
+      String(s.modulesCompleted),
+      String(s.quizCount),
+      s.avgScore.toFixed(1),
     ]),
-    theme: 'striped',
+    theme: "striped",
     headStyles: { fillColor: [99, 102, 241] },
     styles: { fontSize: 9 },
-    columnStyles: { 0: { cellWidth: 10 }, 6: { halign: 'center' } },
+    columnStyles: { 0: { cellWidth: 10 }, 6: { halign: "center" } },
   });
 
   const pageCount = doc.getNumberOfPages();
@@ -165,42 +226,72 @@ export async function generateGradebookPDF(
     doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'gradebook.pdf');
+  const pdfBlob = doc.output("blob");
+  await downloadPDF(pdfBlob, "gradebook.pdf");
 }
 
 // Generate at-risk students PDF
 export async function generateAtRiskPDF(
-  atRiskStudents: Array<{ fullName: string; email: string; group: string; riskScore: number; reasons: string[]; lastActiveDays: number; modulesCompleted: number; avgQuizScore: number }>,
-  _days: number = 30
+  atRiskStudents: Array<{
+    fullName: string;
+    email: string;
+    group: string;
+    riskScore: number;
+    reasons: string[];
+    lastActiveDays: number;
+    modulesCompleted: number;
+    avgQuizScore: number;
+  }>,
+  _days: number = 30,
 ): Promise<void> {
-  const { jsPDF } = await import('jspdf');
-  const { autoTable } = await import('jspdf-autotable');
-  const doc = new jsPDF('landscape');
+  const { jsPDF } = await import("jspdf");
+  const { autoTable } = await import("jspdf-autotable");
+  const doc = new jsPDF("landscape");
 
   doc.setFontSize(16);
   doc.setTextColor(239, 68, 68);
-  doc.text('Студенты с признаками риска', 14, 20);
+  doc.text("Студенты с признаками риска", 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
-  doc.text(`Всего: ${atRiskStudents.length} | Дата: ${new Date().toLocaleDateString('ru-RU')}`, 14, 30);
+  doc.text(
+    `Всего: ${atRiskStudents.length} | Дата: ${new Date().toLocaleDateString("ru-RU")}`,
+    14,
+    30,
+  );
 
   autoTable(doc, {
     startY: 40,
-    head: [['#', 'ФИО', 'Email', 'Группа', 'Риск', 'Неактивен (дн.)', 'Модули', 'Ср. балл (%)', 'Причины']],
+    head: [
+      [
+        "#",
+        "ФИО",
+        "Email",
+        "Группа",
+        "Риск",
+        "Неактивен (дн.)",
+        "Модули",
+        "Ср. балл (%)",
+        "Причины",
+      ],
+    ],
     body: atRiskStudents.map((s, i) => [
-      String(i + 1), s.fullName, s.email, s.group,
-      String(s.riskScore), String(s.lastActiveDays),
-      String(s.modulesCompleted), String(s.avgQuizScore),
-      s.reasons.join('; ')
+      String(i + 1),
+      s.fullName,
+      s.email,
+      s.group,
+      String(s.riskScore),
+      String(s.lastActiveDays),
+      String(s.modulesCompleted),
+      String(s.avgQuizScore),
+      s.reasons.join("; "),
     ]),
-    theme: 'striped',
+    theme: "striped",
     headStyles: { fillColor: [239, 68, 68] },
     styles: { fontSize: 8 },
     didParseCell: (cellData) => {
       if (cellData.column.index === 4 && Number(cellData.cell.raw) >= 70) {
         cellData.cell.styles.textColor = [239, 68, 68];
-        cellData.cell.styles.fontStyle = 'bold';
+        cellData.cell.styles.fontStyle = "bold";
       }
     },
   });
@@ -213,62 +304,88 @@ export async function generateAtRiskPDF(
     doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'at-risk-students.pdf');
+  const pdfBlob = doc.output("blob");
+  await downloadPDF(pdfBlob, "at-risk-students.pdf");
 }
 
 // Generate comprehensive analytics PDF
 export async function generateAnalyticsPDF(
-  summary: { kpis: { totalStudents: number; activeStudents: number; activePercentage: number; avgCompletionRate: number; avgQuizScore: number; totalModulesCompleted: number; totalQuizAttempts: number; engagementScore: number }; moduleDistribution?: Array<{ moduleId: string; moduleName: string; completionRate: number; avgScore: number }> },
-  moduleDistribution?: Array<{ moduleId: string; moduleName: string; completionRate: number; avgScore: number }>,
+  summary: {
+    kpis: {
+      totalStudents: number;
+      activeStudents: number;
+      activePercentage: number;
+      avgCompletionRate: number;
+      avgQuizScore: number;
+      totalModulesCompleted: number;
+      totalQuizAttempts: number;
+      engagementScore: number;
+    };
+    moduleDistribution?: Array<{
+      moduleId: string;
+      moduleName: string;
+      completionRate: number;
+      avgScore: number;
+    }>;
+  },
+  moduleDistribution?: Array<{
+    moduleId: string;
+    moduleName: string;
+    completionRate: number;
+    avgScore: number;
+  }>,
   _trends?: unknown,
-  _groupId: string = 'all'
+  _groupId: string = "all",
 ): Promise<void> {
   const dist = moduleDistribution || summary.moduleDistribution || [];
-  const { jsPDF } = await import('jspdf');
-  const { autoTable } = await import('jspdf-autotable');
+  const { jsPDF } = await import("jspdf");
+  const { autoTable } = await import("jspdf-autotable");
   const doc = new jsPDF();
 
   // Title
   doc.setFontSize(18);
-  doc.text('Аналитический отчёт', 14, 20);
+  doc.text("Аналитический отчёт", 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
-  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')}`, 14, 30);
+  doc.text(`Дата: ${new Date().toLocaleDateString("ru-RU")}`, 14, 30);
 
   // KPIs
   doc.setTextColor(0);
   doc.setFontSize(14);
-  doc.text('Ключевые показатели', 14, 45);
+  doc.text("Ключевые показатели", 14, 45);
   doc.setFontSize(10);
   const kpis = summary.kpis;
   const kpiData = [
-    ['Всего студентов', String(kpis.totalStudents)],
-    ['Активных', `${kpis.activePercentage}%`],
-    ['Ср. завершение', `${kpis.avgCompletionRate}%`],
-    ['Ср. балл квизов', `${kpis.avgQuizScore}%`],
-    ['Модулей завершено', String(kpis.totalModulesCompleted)],
-    ['Попыток квизов', String(kpis.totalQuizAttempts)],
-    ['Вовлечённость', String(kpis.engagementScore)],
+    ["Всего студентов", String(kpis.totalStudents)],
+    ["Активных", `${kpis.activePercentage}%`],
+    ["Ср. завершение", `${kpis.avgCompletionRate}%`],
+    ["Ср. балл квизов", `${kpis.avgQuizScore}%`],
+    ["Модулей завершено", String(kpis.totalModulesCompleted)],
+    ["Попыток квизов", String(kpis.totalQuizAttempts)],
+    ["Вовлечённость", String(kpis.engagementScore)],
   ];
 
   let y = 55;
   kpiData.forEach(([label, value]) => {
-    doc.setFont('helvetica', 'bold');
+    doc.setFont("helvetica", "bold");
     doc.text(`${label}:`, 14, y);
-    doc.setFont('helvetica', 'normal');
+    doc.setFont("helvetica", "normal");
     doc.text(value, 80, y);
     y += 8;
   });
 
   // Module distribution table
   doc.setFontSize(14);
-  doc.text('Прогресс по модулям', 14, y + 10);
+  doc.text("Прогресс по модулям", 14, y + 10);
   autoTable(doc, {
     startY: y + 15,
-    head: [['Модуль', 'Завершение (%)', 'Ср. балл (%)']],
-    body: dist.map(m => [m.moduleName, String(m.completionRate), String(m.avgScore)]),
-    theme: 'striped',
+    head: [["Модуль", "Завершение (%)", "Ср. балл (%)"]],
+    body: dist.map((m) => [
+      m.moduleName,
+      String(m.completionRate),
+      String(m.avgScore),
+    ]),
+    theme: "striped",
     headStyles: { fillColor: [99, 102, 241] },
     styles: { fontSize: 9 },
   });
@@ -281,36 +398,67 @@ export async function generateAnalyticsPDF(
     doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 290);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'analytics-report.pdf');
+  const pdfBlob = doc.output("blob");
+  await downloadPDF(pdfBlob, "analytics-report.pdf");
 }
 
 // Generate module performance PDF
 export async function generateModulePerformancePDF(
-  modules: Array<{ moduleId: string; moduleName: string; totalStudents: number; completedCount: number; completionRate: number; avgScore: number; difficultyIndex: number }>,
-  _groupId: string = 'all'
+  modules: Array<{
+    moduleId: string;
+    moduleName: string;
+    totalStudents: number;
+    completedCount: number;
+    completionRate: number;
+    avgScore: number;
+    difficultyIndex: number;
+  }>,
+  _groupId: string = "all",
 ): Promise<void> {
-  const { jsPDF } = await import('jspdf');
-  const { autoTable } = await import('jspdf-autotable');
-  const doc = new jsPDF('landscape');
+  const { jsPDF } = await import("jspdf");
+  const { autoTable } = await import("jspdf-autotable");
+  const doc = new jsPDF("landscape");
 
   doc.setFontSize(16);
-  doc.text('Производительность модулей', 14, 20);
+  doc.text("Производительность модулей", 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
-  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего модулей: ${modules.length}`, 14, 30);
+  doc.text(
+    `Дата: ${new Date().toLocaleDateString("ru-RU")} | Всего модулей: ${modules.length}`,
+    14,
+    30,
+  );
 
   autoTable(doc, {
     startY: 40,
-    head: [['#', 'Модуль', 'Всего студентов', 'Завершили', 'Завершение (%)', 'Ср. балл (%)', 'Сложность']],
+    head: [
+      [
+        "#",
+        "Модуль",
+        "Всего студентов",
+        "Завершили",
+        "Завершение (%)",
+        "Ср. балл (%)",
+        "Сложность",
+      ],
+    ],
     body: modules.map((m, i) => [
-      String(i + 1), m.moduleName, String(m.totalStudents), String(m.completedCount),
-      String(m.completionRate), String(m.avgScore), String(m.difficultyIndex)
+      String(i + 1),
+      m.moduleName,
+      String(m.totalStudents),
+      String(m.completedCount),
+      String(m.completionRate),
+      String(m.avgScore),
+      String(m.difficultyIndex),
     ]),
-    theme: 'striped',
+    theme: "striped",
     headStyles: { fillColor: [99, 102, 241] },
     styles: { fontSize: 9 },
-    columnStyles: { 0: { cellWidth: 10 }, 4: { halign: 'center' }, 5: { halign: 'center' } },
+    columnStyles: {
+      0: { cellWidth: 10 },
+      4: { halign: "center" },
+      5: { halign: "center" },
+    },
   });
 
   const pageCount = doc.getNumberOfPages();
@@ -321,36 +469,69 @@ export async function generateModulePerformancePDF(
     doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'module-performance.pdf');
+  const pdfBlob = doc.output("blob");
+  await downloadPDF(pdfBlob, "module-performance.pdf");
 }
 
 // Generate group comparison PDF
 export async function generateGroupComparisonPDF(
-  dimensions: Array<{ name: string; studentCount: number; activeStudents: number; activeRate: number; avgModulesCompleted: number; avgCompletionRate: number; avgQuizScore: number; totalQuizAttempts: number; topModule: string; weakestModule: string }>,
-  _dimensionType: string = 'group',
-  _groupId: string = 'all'
+  dimensions: Array<{
+    name: string;
+    studentCount: number;
+    activeStudents: number;
+    activeRate: number;
+    avgModulesCompleted: number;
+    avgCompletionRate: number;
+    avgQuizScore: number;
+    totalQuizAttempts: number;
+    topModule: string;
+    weakestModule: string;
+  }>,
+  _dimensionType: string = "group",
+  _groupId: string = "all",
 ): Promise<void> {
-  const { jsPDF } = await import('jspdf');
-  const { autoTable } = await import('jspdf-autotable');
-  const doc = new jsPDF('landscape');
+  const { jsPDF } = await import("jspdf");
+  const { autoTable } = await import("jspdf-autotable");
+  const doc = new jsPDF("landscape");
 
-  const label = 'Групп';
+  const label = "Групп";
   doc.setFontSize(16);
-  doc.text('Сравнение групп', 14, 20);
+  doc.text("Сравнение групп", 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
-  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего ${label}: ${dimensions.length}`, 14, 30);
+  doc.text(
+    `Дата: ${new Date().toLocaleDateString("ru-RU")} | Всего ${label}: ${dimensions.length}`,
+    14,
+    30,
+  );
 
   autoTable(doc, {
     startY: 40,
-    head: [['#', 'Группа', 'Студенты', 'Активные', 'Активность (%)', 'Ср. модулей', 'Завершение (%)', 'Ср. балл (%)', 'Попытки квизов']],
+    head: [
+      [
+        "#",
+        "Группа",
+        "Студенты",
+        "Активные",
+        "Активность (%)",
+        "Ср. модулей",
+        "Завершение (%)",
+        "Ср. балл (%)",
+        "Попытки квизов",
+      ],
+    ],
     body: dimensions.map((d, i) => [
-      String(i + 1), d.name, String(d.studentCount), String(d.activeStudents),
-      String(d.activeRate), String(d.avgModulesCompleted), String(d.avgCompletionRate),
-      String(d.avgQuizScore), String(d.totalQuizAttempts)
+      String(i + 1),
+      d.name,
+      String(d.studentCount),
+      String(d.activeStudents),
+      String(d.activeRate),
+      String(d.avgModulesCompleted),
+      String(d.avgCompletionRate),
+      String(d.avgQuizScore),
+      String(d.totalQuizAttempts),
     ]),
-    theme: 'striped',
+    theme: "striped",
     headStyles: { fillColor: [99, 102, 241] },
     styles: { fontSize: 9 },
     columnStyles: { 0: { cellWidth: 10 } },
@@ -364,36 +545,54 @@ export async function generateGroupComparisonPDF(
     doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'group-comparison.pdf');
+  const pdfBlob = doc.output("blob");
+  await downloadPDF(pdfBlob, "group-comparison.pdf");
 }
 
 // Generate quiz retry PDF
 export async function generateQuizRetryPDF(
-  categoryRetryStats: Array<{ category: string; totalAttempts: number; uniqueStudents: number }>,
-  topRetryers: Array<{ fullName: string; group: string; retryCount: number }> = [],
-  _groupId: string = 'all'
+  categoryRetryStats: Array<{
+    category: string;
+    totalAttempts: number;
+    uniqueStudents: number;
+  }>,
+  topRetryers: Array<{
+    fullName: string;
+    group: string;
+    retryCount: number;
+  }> = [],
+  _groupId: string = "all",
 ): Promise<void> {
-  const { jsPDF } = await import('jspdf');
-  const { autoTable } = await import('jspdf-autotable');
-  const doc = new jsPDF('landscape');
+  const { jsPDF } = await import("jspdf");
+  const { autoTable } = await import("jspdf-autotable");
+  const doc = new jsPDF("landscape");
 
-  const totalRetries = categoryRetryStats.reduce((sum, c) => sum + c.totalAttempts, 0);
+  const totalRetries = categoryRetryStats.reduce(
+    (sum, c) => sum + c.totalAttempts,
+    0,
+  );
   const totalUniqueQuizzes = categoryRetryStats.length;
 
   doc.setFontSize(16);
-  doc.text('Анализ повторов квизов', 14, 20);
+  doc.text("Анализ повторов квизов", 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(150);
-  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Повторов: ${totalRetries} | Уникальных квизов: ${totalUniqueQuizzes}`, 14, 30);
+  doc.text(
+    `Дата: ${new Date().toLocaleDateString("ru-RU")} | Повторов: ${totalRetries} | Уникальных квизов: ${totalUniqueQuizzes}`,
+    14,
+    30,
+  );
 
   autoTable(doc, {
     startY: 40,
-    head: [['#', 'Категория', 'Попытки', 'Студенты']],
+    head: [["#", "Категория", "Попытки", "Студенты"]],
     body: categoryRetryStats.map((c, i) => [
-      String(i + 1), c.category, String(c.totalAttempts), String(c.uniqueStudents)
+      String(i + 1),
+      c.category,
+      String(c.totalAttempts),
+      String(c.uniqueStudents),
     ]),
-    theme: 'striped',
+    theme: "striped",
     headStyles: { fillColor: [99, 102, 241] },
     styles: { fontSize: 9 },
     columnStyles: { 0: { cellWidth: 10 } },
@@ -403,14 +602,19 @@ export async function generateQuizRetryPDF(
   if (topRetryers.length > 0) {
     doc.setTextColor(0);
     doc.setFontSize(14);
-    doc.text('Топ студентов по повторам', 14, retryTableY + 10);
+    doc.text("Топ студентов по повторам", 14, retryTableY + 10);
     autoTable(doc, {
       startY: retryTableY + 15,
-      head: [['#', 'ФИО', 'Группа', 'Повторы']],
-      body: topRetryers.slice(0, 20).map((r, i) => [
-        String(i + 1), r.fullName, r.group, String(r.retryCount)
-      ]),
-      theme: 'striped',
+      head: [["#", "ФИО", "Группа", "Повторы"]],
+      body: topRetryers
+        .slice(0, 20)
+        .map((r, i) => [
+          String(i + 1),
+          r.fullName,
+          r.group,
+          String(r.retryCount),
+        ]),
+      theme: "striped",
       headStyles: { fillColor: [239, 68, 68] },
       styles: { fontSize: 9 },
       columnStyles: { 0: { cellWidth: 10 } },
@@ -425,112 +629,274 @@ export async function generateQuizRetryPDF(
     doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'quiz-retry.pdf');
+  const pdfBlob = doc.output("blob");
+  await downloadPDF(pdfBlob, "quiz-retry.pdf");
 }
 
 // Generate gradebook CSV string
 export function generateGradebookCSV(
-  students: Array<{ id: string; fullName: string; email: string; group: string; modulesCompleted: number; quizCount: number; avgScore: number; lastActive: string }>,
-  _modules: string[]
+  students: Array<{
+    id: string;
+    fullName: string;
+    email: string;
+    group: string;
+    modulesCompleted: number;
+    quizCount: number;
+    avgScore: number;
+    lastActive: string;
+  }>,
+  _modules: string[],
 ): string {
-  const headers = ['ФИО', 'Email', 'Группа', 'Модули пройдено', 'Квизов пройдено', 'Средний балл (%)', 'Последняя активность'];
-  const rows = students.map(s => [
-    s.fullName, s.email, s.group, String(s.modulesCompleted), String(s.quizCount),
-    s.avgScore.toFixed(1), s.lastActive
+  const headers = [
+    "ФИО",
+    "Email",
+    "Группа",
+    "Модули пройдено",
+    "Квизов пройдено",
+    "Средний балл (%)",
+    "Последняя активность",
+  ];
+  const rows = students.map((s) => [
+    s.fullName,
+    s.email,
+    s.group,
+    String(s.modulesCompleted),
+    String(s.quizCount),
+    s.avgScore.toFixed(1),
+    s.lastActive,
   ]);
   return buildCSV(headers, rows);
 }
 
 // Generate student report CSV string
 export function generateStudentReportCSV(
-  student: { fullName: string; email: string; group: string; course: string; university: string },
-  progress: Array<{ moduleId: string; completed: boolean; score: number | null }>,
-  quizResults: Array<{ quizId: string; score: number; total: number; percentage: number }>
+  student: {
+    fullName: string;
+    email: string;
+    group: string;
+    course: string;
+    university: string;
+  },
+  progress: Array<{
+    moduleId: string;
+    completed: boolean;
+    score: number | null;
+  }>,
+  quizResults: Array<{
+    quizId: string;
+    score: number;
+    total: number;
+    percentage: number;
+  }>,
 ): string {
   const lines: string[] = [];
   lines.push(`Отчёт по студенту: ${student.fullName}`);
-  lines.push(`Email: ${student.email}, Группа: ${student.group}, Курс: ${student.course}, Университет: ${student.university}`);
-  lines.push('');
-  lines.push('Прогресс по модулям');
-  lines.push(buildCSV(['Модуль', 'Пройден', 'Балл (%)'],
-    progress.map(p => [p.moduleId, p.completed ? 'Да' : 'Нет', p.score?.toString() ?? 'N/A'])
-  ));
-  lines.push('');
-  lines.push('Результаты квизов');
-  lines.push(buildCSV(['Квиз', 'Правильных', 'Всего', 'Процент (%)'],
-    quizResults.map(q => [q.quizId, String(q.score), String(q.total), String(q.percentage)])
-  ));
-  return lines.join('\n');
+  lines.push(
+    `Email: ${student.email}, Группа: ${student.group}, Курс: ${student.course}, Университет: ${student.university}`,
+  );
+  lines.push("");
+  lines.push("Прогресс по модулям");
+  lines.push(
+    buildCSV(
+      ["Модуль", "Пройден", "Балл (%)"],
+      progress.map((p) => [
+        p.moduleId,
+        p.completed ? "Да" : "Нет",
+        p.score?.toString() ?? "N/A",
+      ]),
+    ),
+  );
+  lines.push("");
+  lines.push("Результаты квизов");
+  lines.push(
+    buildCSV(
+      ["Квиз", "Правильных", "Всего", "Процент (%)"],
+      quizResults.map((q) => [
+        q.quizId,
+        String(q.score),
+        String(q.total),
+        String(q.percentage),
+      ]),
+    ),
+  );
+  return lines.join("\n");
 }
 
 // Generate module performance CSV
 export function generateModulePerformanceCSV(
-  modules: Array<{ moduleId: string; moduleName: string; totalStudents: number; completedCount: number; completionRate: number; avgScore: number; difficultyIndex: number }>
+  modules: Array<{
+    moduleId: string;
+    moduleName: string;
+    totalStudents: number;
+    completedCount: number;
+    completionRate: number;
+    avgScore: number;
+    difficultyIndex: number;
+  }>,
 ): string {
-  const headers = ['Модуль', 'Всего студентов', 'Завершили', 'Завершение (%)', 'Ср. балл (%)', 'Индекс сложности'];
-  const rows = modules.map(m => [
-    m.moduleName, String(m.totalStudents), String(m.completedCount),
-    String(m.completionRate), String(m.avgScore), String(m.difficultyIndex)
+  const headers = [
+    "Модуль",
+    "Всего студентов",
+    "Завершили",
+    "Завершение (%)",
+    "Ср. балл (%)",
+    "Индекс сложности",
+  ];
+  const rows = modules.map((m) => [
+    m.moduleName,
+    String(m.totalStudents),
+    String(m.completedCount),
+    String(m.completionRate),
+    String(m.avgScore),
+    String(m.difficultyIndex),
   ]);
   return buildCSV(headers, rows);
 }
 
 // Generate at-risk students CSV
 export function generateAtRiskCSV(
-  atRiskStudents: Array<{ fullName: string; email: string; group: string; course: string; university: string; riskScore: number; reasons: string[]; lastActiveDays: number; modulesCompleted: number; avgQuizScore: number; trend: string }>
+  atRiskStudents: Array<{
+    fullName: string;
+    email: string;
+    group: string;
+    course: string;
+    university: string;
+    riskScore: number;
+    reasons: string[];
+    lastActiveDays: number;
+    modulesCompleted: number;
+    avgQuizScore: number;
+    trend: string;
+  }>,
 ): string {
-  const headers = ['ФИО', 'Email', 'Группа', 'Курс', 'Университет', 'Риск-скор', 'Причины', 'Неактивен (дн.)', 'Модули', 'Ср. балл (%)', 'Тренд'];
-  const rows = atRiskStudents.map(s => [
-    s.fullName, s.email, s.group, s.course, s.university,
-    String(s.riskScore), s.reasons.join('; '), String(s.lastActiveDays),
-    String(s.modulesCompleted), String(s.avgQuizScore), s.trend
+  const headers = [
+    "ФИО",
+    "Email",
+    "Группа",
+    "Курс",
+    "Университет",
+    "Риск-скор",
+    "Причины",
+    "Неактивен (дн.)",
+    "Модули",
+    "Ср. балл (%)",
+    "Тренд",
+  ];
+  const rows = atRiskStudents.map((s) => [
+    s.fullName,
+    s.email,
+    s.group,
+    s.course,
+    s.university,
+    String(s.riskScore),
+    s.reasons.join("; "),
+    String(s.lastActiveDays),
+    String(s.modulesCompleted),
+    String(s.avgQuizScore),
+    s.trend,
   ]);
   return buildCSV(headers, rows);
 }
 
 // Generate group comparison CSV
 export function generateGroupComparisonCSV(
-  dimensions: Array<{ name: string; studentCount: number; activeStudents: number; activeRate: number; avgModulesCompleted: number; avgCompletionRate: number; avgQuizScore: number; totalQuizAttempts: number; topModule: string; weakestModule: string }>,
-  dimension: string
+  dimensions: Array<{
+    name: string;
+    studentCount: number;
+    activeStudents: number;
+    activeRate: number;
+    avgModulesCompleted: number;
+    avgCompletionRate: number;
+    avgQuizScore: number;
+    totalQuizAttempts: number;
+    topModule: string;
+    weakestModule: string;
+  }>,
+  dimension: string,
 ): string {
-  const headers = [dimension === 'group' ? 'Группа' : dimension === 'course' ? 'Курс' : 'Университет', 'Студенты', 'Активные', 'Активность (%)', 'Ср. модулей', 'Завершение (%)', 'Ср. балл (%)', 'Попытки квизов', 'Лучший модуль', 'Слабый модуль'];
-  const rows = dimensions.map(d => [
-    d.name, String(d.studentCount), String(d.activeStudents), String(d.activeRate),
-    String(d.avgModulesCompleted), String(d.avgCompletionRate), String(d.avgQuizScore),
-    String(d.totalQuizAttempts), d.topModule, d.weakestModule
+  const headers = [
+    dimension === "group"
+      ? "Группа"
+      : dimension === "course"
+        ? "Курс"
+        : "Университет",
+    "Студенты",
+    "Активные",
+    "Активность (%)",
+    "Ср. модулей",
+    "Завершение (%)",
+    "Ср. балл (%)",
+    "Попытки квизов",
+    "Лучший модуль",
+    "Слабый модуль",
+  ];
+  const rows = dimensions.map((d) => [
+    d.name,
+    String(d.studentCount),
+    String(d.activeStudents),
+    String(d.activeRate),
+    String(d.avgModulesCompleted),
+    String(d.avgCompletionRate),
+    String(d.avgQuizScore),
+    String(d.totalQuizAttempts),
+    d.topModule,
+    d.weakestModule,
   ]);
   return buildCSV(headers, rows);
 }
 
 // Generate comprehensive analytics CSV
 export function generateAnalyticsCSV(
-  summary: { kpis: { totalStudents: number; activeStudents: number; activePercentage: number; avgCompletionRate: number; avgQuizScore: number; totalModulesCompleted: number; totalQuizAttempts: number; engagementScore: number } },
-  moduleDistribution: Array<{ moduleId: string; moduleName: string; completionRate: number; avgScore: number }>
+  summary: {
+    kpis: {
+      totalStudents: number;
+      activeStudents: number;
+      activePercentage: number;
+      avgCompletionRate: number;
+      avgQuizScore: number;
+      totalModulesCompleted: number;
+      totalQuizAttempts: number;
+      engagementScore: number;
+    };
+  },
+  moduleDistribution: Array<{
+    moduleId: string;
+    moduleName: string;
+    completionRate: number;
+    avgScore: number;
+  }>,
 ): string {
   const lines: string[] = [];
-  lines.push('Аналитический отчёт');
-  lines.push(`Дата: ${new Date().toLocaleDateString('ru-RU')}`);
-  lines.push('');
-  lines.push('Ключевые показатели');
-  lines.push(buildCSV(
-    ['Показатель', 'Значение'],
-    [
-      ['Всего студентов', String(summary.kpis.totalStudents)],
-      ['Активных студентов', String(summary.kpis.activeStudents)],
-      ['Активность (%)', `${summary.kpis.activePercentage}%`],
-      ['Ср. завершение (%)', `${summary.kpis.avgCompletionRate}%`],
-      ['Ср. балл квизов (%)', `${summary.kpis.avgQuizScore}%`],
-      ['Модулей завершено', String(summary.kpis.totalModulesCompleted)],
-      ['Попыток квизов', String(summary.kpis.totalQuizAttempts)],
-      ['Индекс вовлечённости', String(summary.kpis.engagementScore)],
-    ]
-  ));
-  lines.push('');
-  lines.push('Прогресс по модулям');
-  lines.push(buildCSV(
-    ['Модуль', 'Завершение (%)', 'Ср. балл (%)'],
-    moduleDistribution.map(m => [m.moduleName, String(m.completionRate), String(m.avgScore)])
-  ));
-  return lines.join('\n');
+  lines.push("Аналитический отчёт");
+  lines.push(`Дата: ${new Date().toLocaleDateString("ru-RU")}`);
+  lines.push("");
+  lines.push("Ключевые показатели");
+  lines.push(
+    buildCSV(
+      ["Показатель", "Значение"],
+      [
+        ["Всего студентов", String(summary.kpis.totalStudents)],
+        ["Активных студентов", String(summary.kpis.activeStudents)],
+        ["Активность (%)", `${summary.kpis.activePercentage}%`],
+        ["Ср. завершение (%)", `${summary.kpis.avgCompletionRate}%`],
+        ["Ср. балл квизов (%)", `${summary.kpis.avgQuizScore}%`],
+        ["Модулей завершено", String(summary.kpis.totalModulesCompleted)],
+        ["Попыток квизов", String(summary.kpis.totalQuizAttempts)],
+        ["Индекс вовлечённости", String(summary.kpis.engagementScore)],
+      ],
+    ),
+  );
+  lines.push("");
+  lines.push("Прогресс по модулям");
+  lines.push(
+    buildCSV(
+      ["Модуль", "Завершение (%)", "Ср. балл (%)"],
+      moduleDistribution.map((m) => [
+        m.moduleName,
+        String(m.completionRate),
+        String(m.avgScore),
+      ]),
+    ),
+  );
+  return lines.join("\n");
 }

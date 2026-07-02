@@ -1,23 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireRole,
+} from "@/lib/api-middleware";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  if (!requireRole(auth.role, "teacher")) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const groupId = searchParams.get('groupId') || '';
-  const days = parseInt(searchParams.get('days') || '30', 10);
+  const groupId = searchParams.get("groupId") || "";
+  const days = parseInt(searchParams.get("days") || "30", 10);
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
   // Get all quiz attempts grouped by user+quiz to find retries
   const attempts = await prisma.quizAttempt.findMany({
     where: { attemptedAt: { gte: since } },
-    select: { userId: true, quizId: true, correct: true, attemptedAt: true, category: true },
-    orderBy: { attemptedAt: 'asc' },
+    select: {
+      userId: true,
+      quizId: true,
+      correct: true,
+      attemptedAt: true,
+      category: true,
+    },
+    orderBy: { attemptedAt: "asc" },
   });
 
   // Get user info
@@ -26,11 +37,17 @@ export async function GET(request: NextRequest) {
   });
   const userMap = new Map(users.map((u) => [u.id, u]));
   const filteredUsers = new Set(
-    users.filter((u) => !groupId || u.group === groupId).map((u) => u.id)
+    users.filter((u) => !groupId || u.group === groupId).map((u) => u.id),
   );
 
   // Group attempts by user+quiz to find session boundaries
-  const userQuizMap = new Map<string, Map<string, Array<{ correct: boolean; attemptedAt: Date; category: string }>>>();
+  const userQuizMap = new Map<
+    string,
+    Map<
+      string,
+      Array<{ correct: boolean; attemptedAt: Date; category: string }>
+    >
+  >();
   for (const attempt of attempts) {
     if (!filteredUsers.has(attempt.userId)) continue;
 
@@ -85,7 +102,7 @@ export async function GET(request: NextRequest) {
         fullName: user.fullName,
         group: user.group,
         quizId,
-        category: attemptList[0]?.category || '',
+        category: attemptList[0]?.category || "",
         attempts: estimatedAttempts,
         firstScore: score,
         lastScore: score,
@@ -96,10 +113,25 @@ export async function GET(request: NextRequest) {
   }
 
   // Aggregate retry stats by quiz category
-  const categoryRetryMap = new Map<string, { totalAttempts: number; uniqueQuizzes: number; avgAttempts: number; avgScore: number; count: number }>();
+  const categoryRetryMap = new Map<
+    string,
+    {
+      totalAttempts: number;
+      uniqueQuizzes: number;
+      avgAttempts: number;
+      avgScore: number;
+      count: number;
+    }
+  >();
   for (const r of retryData) {
     if (!categoryRetryMap.has(r.category)) {
-      categoryRetryMap.set(r.category, { totalAttempts: 0, uniqueQuizzes: 0, avgAttempts: 0, avgScore: 0, count: 0 });
+      categoryRetryMap.set(r.category, {
+        totalAttempts: 0,
+        uniqueQuizzes: 0,
+        avgAttempts: 0,
+        avgScore: 0,
+        count: 0,
+      });
     }
     const cat = categoryRetryMap.get(r.category);
     if (cat) {
@@ -109,12 +141,15 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const categoryRetryStats = Array.from(categoryRetryMap.entries()).map(([category, data]) => ({
-    category,
-    totalAttempts: data.totalAttempts,
-    uniqueStudents: data.count,
-    avgAttemptsPerStudent: Math.round((data.totalAttempts / data.count) * 10) / 10,
-  })).sort((a, b) => b.totalAttempts - a.totalAttempts);
+  const categoryRetryStats = Array.from(categoryRetryMap.entries())
+    .map(([category, data]) => ({
+      category,
+      totalAttempts: data.totalAttempts,
+      uniqueStudents: data.count,
+      avgAttemptsPerStudent:
+        Math.round((data.totalAttempts / data.count) * 10) / 10,
+    }))
+    .sort((a, b) => b.totalAttempts - a.totalAttempts);
 
   // Retry distribution (how many students retry 1, 2, 3+ times)
   const userRetryCounts = new Map<string, number>();
@@ -127,10 +162,10 @@ export async function GET(request: NextRequest) {
   }
 
   const retryDistribution = [
-    { range: 'Без повторов', count: 0 },
-    { range: '1 повтор', count: 0 },
-    { range: '2 повтора', count: 0 },
-    { range: '3+ повторов', count: 0 },
+    { range: "Без повторов", count: 0 },
+    { range: "1 повтор", count: 0 },
+    { range: "2 повтора", count: 0 },
+    { range: "3+ повторов", count: 0 },
   ];
   for (const count of userRetryCounts.values()) {
     if (count === 0) retryDistribution[0].count++;
@@ -145,8 +180,8 @@ export async function GET(request: NextRequest) {
       const user = userMap.get(userId);
       return {
         userId,
-        fullName: user?.fullName || '',
-        group: user?.group || '',
+        fullName: user?.fullName || "",
+        group: user?.group || "",
         retryCount: count,
       };
     })
@@ -155,9 +190,9 @@ export async function GET(request: NextRequest) {
 
   // Score improvement by retry attempts
   const improvementByRetries = [
-    { attempts: '1 попытка', avgScore: 0, count: 0 },
-    { attempts: '2 попытки', avgScore: 0, count: 0 },
-    { attempts: '3+ попыток', avgScore: 0, count: 0 },
+    { attempts: "1 попытка", avgScore: 0, count: 0 },
+    { attempts: "2 попытки", avgScore: 0, count: 0 },
+    { attempts: "3+ попыток", avgScore: 0, count: 0 },
   ];
 
   for (const r of retryData) {

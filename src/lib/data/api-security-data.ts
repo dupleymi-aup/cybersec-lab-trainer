@@ -1,12 +1,13 @@
 export const apiSecurityTopics = [
   {
-    id: 'api-01-bola',
-    title: 'API1:2023 — Broken Object Level Authorization (BOLA)',
-    icon: 'Unlock',
-    description: 'Самая распространённая уязвимость API. Когда API не проверяет, что пользователь имеет права на доступ к запрошенному объекту.',
-    risk: 'КРИТИЧЕСКИЙ',
-    riskColor: 'text-red-600 dark:text-red-400',
-    riskBg: 'bg-red-100 dark:bg-red-900/30',
+    id: "api-01-bola",
+    title: "API1:2023 — Broken Object Level Authorization (BOLA)",
+    icon: "Unlock",
+    description:
+      "Самая распространённая уязвимость API. Когда API не проверяет, что пользователь имеет права на доступ к запрошенному объекту.",
+    risk: "КРИТИЧЕСКИЙ",
+    riskColor: "text-red-600 dark:text-red-400",
+    riskBg: "bg-red-100 dark:bg-red-900/30",
     content: `API1:2023 Broken Object Level Authorization (BOLA), ранее известный как IDOR для API, занимает первое место в OWASP API Security Top 10.
 
 Уязвимость возникает, когда API-эндпоинт принимает идентификатор объекта (ID), но не проверяет, имеет ли текущий пользователь права на доступ к этому конкретному объекту.
@@ -67,13 +68,14 @@ app.get('/api/orders/:id', authenticate, checkOwnership(Order), (req, res) => {
 });`,
   },
   {
-    id: 'api-02-bfla',
-    title: 'API2:2023 — Broken Function Level Authorization (BFLA)',
-    icon: 'ShieldOff',
-    description: 'Когда API позволяет пользователям выполнять функции, которые им не разрешены — например, обычные пользователи получают доступ к административным функциям.',
-    risk: 'ВЫСОКИЙ',
-    riskColor: 'text-orange-600 dark:text-orange-400',
-    riskBg: 'bg-orange-100 dark:bg-orange-900/30',
+    id: "api-02-bfla",
+    title: "API2:2023 — Broken Function Level Authorization (BFLA)",
+    icon: "ShieldOff",
+    description:
+      "Когда API позволяет пользователям выполнять функции, которые им не разрешены — например, обычные пользователи получают доступ к административным функциям.",
+    risk: "ВЫСОКИЙ",
+    riskColor: "text-orange-600 dark:text-orange-400",
+    riskBg: "bg-orange-100 dark:bg-orange-900/30",
     content: `API2:2023 Broken Function Level Authorization возникает, когда API не корректно проверяет права пользователя на выполнение конкретных операций.
 
 **Типичные сценарии:**
@@ -135,13 +137,14 @@ function requirePermission(permission) {
 app.delete('/api/posts/:id', authenticate, requirePermission('delete'), handler);`,
   },
   {
-    id: 'api-03-bola-params',
-    title: 'API3:2023 — Broken Object Property Level Authorization',
-    icon: 'EyeOff',
-    description: 'Уязвимость, при которой пользователь может прочитать или изменить свойства объекта, к которым не должен иметь доступа.',
-    risk: 'ВЫСОКИЙ',
-    riskColor: 'text-orange-600 dark:text-orange-400',
-    riskBg: 'bg-orange-100 dark:bg-orange-900/30',
+    id: "api-03-bola-params",
+    title: "API3:2023 — Broken Object Property Level Authorization",
+    icon: "EyeOff",
+    description:
+      "Уязвимость, при которой пользователь может прочитать или изменить свойства объекта, к которым не должен иметь доступа.",
+    risk: "ВЫСОКИЙ",
+    riskColor: "text-orange-600 dark:text-orange-400",
+    riskBg: "bg-orange-100 dark:bg-orange-900/30",
     content: `API3:2023 — новая категория в OWASP API Security Top 10 2023 года. Это более тонкая версия BOLA, когда пользователь имеет доступ к объекту, но может читать или изменять отдельные поля, которые ему не принадлежат.
 
 **Пример:** Пользователь может обновлять свой профиль, но через API также изменяет свою роль, баланс или email другого пользователя.
@@ -199,13 +202,14 @@ function getUserResponse(user, requester) {
 }`,
   },
   {
-    id: 'api-04-unrestricted',
-    title: 'API4:2023 — Unrestricted Resource Consumption',
-    icon: 'Gauge',
-    description: 'Отсутствие ограничений на количество, частоту или объём запросов к API, что приводит к DoS, брутфорсу и excessive data exposure.',
-    risk: 'ВЫСОКИЙ',
-    riskColor: 'text-orange-600 dark:text-orange-400',
-    riskBg: 'bg-orange-100 dark:bg-orange-900/30',
+    id: "api-04-unrestricted",
+    title: "API4:2023 — Unrestricted Resource Consumption",
+    icon: "Gauge",
+    description:
+      "Отсутствие ограничений на количество, частоту или объём запросов к API, что приводит к DoS, брутфорсу и excessive data exposure.",
+    risk: "ВЫСОКИЙ",
+    riskColor: "text-orange-600 dark:text-orange-400",
+    riskBg: "bg-orange-100 dark:bg-orange-900/30",
     content: `API4:2023 — уязвимость, при которой API не ограничивает потребление ресурсов: количество запросов, объём данных, сложность операций.
 
 **Типы ограничений, которые должны быть:**
@@ -283,13 +287,14 @@ app.post('/api/upload',
 );`,
   },
   {
-    id: 'api-05-bfla-auth',
-    title: 'API5:2023 — Broken Access Control',
-    icon: 'TriangleAlert',
-    description: 'Обобщённая категория, включающая проблемы CORS, отсутствие авторизации, неверная конфигурация JWT и небезопасные прямые ссылки.',
-    risk: 'КРИТИЧЕСКИЙ',
-    riskColor: 'text-red-600 dark:text-red-400',
-    riskBg: 'bg-red-100 dark:bg-red-900/30',
+    id: "api-05-bfla-auth",
+    title: "API5:2023 — Broken Access Control",
+    icon: "TriangleAlert",
+    description:
+      "Обобщённая категория, включающая проблемы CORS, отсутствие авторизации, неверная конфигурация JWT и небезопасные прямые ссылки.",
+    risk: "КРИТИЧЕСКИЙ",
+    riskColor: "text-red-600 dark:text-red-400",
+    riskBg: "bg-red-100 dark:bg-red-900/30",
     content: `API5:2023 — объединяет различные проблемы контроля доступа, которые не вошли в другие категории.
 
 **1. Небезопасная CORS конфигурация:**
@@ -353,13 +358,14 @@ app.use('/api', (req, res, next) => {
 });`,
   },
   {
-    id: 'api-06-mass-assignment',
-    title: 'API6:2023 — Unrestricted Access to Sensitive Business Flows',
-    icon: 'ShoppingCart',
-    description: 'API позволяет автоматизировать бизнес-процессы, которые должны выполняться вручную — например, массовая покупка, скрапинг цен, бот-регистрация.',
-    risk: 'СРЕДНИЙ',
-    riskColor: 'text-yellow-600 dark:text-yellow-400',
-    riskBg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    id: "api-06-mass-assignment",
+    title: "API6:2023 — Unrestricted Access to Sensitive Business Flows",
+    icon: "ShoppingCart",
+    description:
+      "API позволяет автоматизировать бизнес-процессы, которые должны выполняться вручную — например, массовая покупка, скрапинг цен, бот-регистрация.",
+    risk: "СРЕДНИЙ",
+    riskColor: "text-yellow-600 dark:text-yellow-400",
+    riskBg: "bg-yellow-100 dark:bg-yellow-900/30",
     content: `API6:2023 — уязвимость, при которой API позволяет автоматизировать и злоупотреблять бизнес-процессами, которые были предназначены для ручного использования.
 
 **Примеры злоупотреблений:**
@@ -426,13 +432,14 @@ async function antiBotCheck(req, res, next) {
 }`,
   },
   {
-    id: 'api-07-ssrf',
-    title: 'API7:2023 — Server Side Request Forgery (SSRF)',
-    icon: 'Globe',
-    description: 'Когда API принимает URL от пользователя и делает запрос к нему без должной валидации, что позволяет получить доступ к внутренним ресурсам.',
-    risk: 'КРИТИЧЕСКИЙ',
-    riskColor: 'text-red-600 dark:text-red-400',
-    riskBg: 'bg-red-100 dark:bg-red-900/30',
+    id: "api-07-ssrf",
+    title: "API7:2023 — Server Side Request Forgery (SSRF)",
+    icon: "Globe",
+    description:
+      "Когда API принимает URL от пользователя и делает запрос к нему без должной валидации, что позволяет получить доступ к внутренним ресурсам.",
+    risk: "КРИТИЧЕСКИЙ",
+    riskColor: "text-red-600 dark:text-red-400",
+    riskBg: "bg-red-100 dark:bg-red-900/30",
     content: `API7:2023 SSRF — одна из самых опасных уязвимостей API, особенно в облачных средах.
 
 **Типичный сценарий:**
@@ -535,13 +542,14 @@ async function safeFetch(url, maxRedirects = 0) {
 }`,
   },
   {
-    id: 'api-08-security-misconfig',
-    title: 'API8:2023 — Security Misconfiguration',
-    icon: 'Settings',
-    description: 'Небезопасные конфигурации API: отсутствие HTTPS, verbose error messages, включённый debug mode, открытые S3 buckets, отсутствие security headers.',
-    risk: 'ВЫСОКИЙ',
-    riskColor: 'text-orange-600 dark:text-orange-400',
-    riskBg: 'bg-orange-100 dark:bg-orange-900/30',
+    id: "api-08-security-misconfig",
+    title: "API8:2023 — Security Misconfiguration",
+    icon: "Settings",
+    description:
+      "Небезопасные конфигурации API: отсутствие HTTPS, verbose error messages, включённый debug mode, открытые S3 buckets, отсутствие security headers.",
+    risk: "ВЫСОКИЙ",
+    riskColor: "text-orange-600 dark:text-orange-400",
+    riskBg: "bg-orange-100 dark:bg-orange-900/30",
     content: `API8:2023 — небезопасные конфигурации, которые делают API уязвимым даже при корректном коде.
 
 **Частые проблемы:**
@@ -631,13 +639,14 @@ app.use((err, req, res, next) => {
 });`,
   },
   {
-    id: 'api-09-inventory',
-    title: 'API9:2023 — Improper Inventory Management',
-    icon: 'ClipboardList',
-    description: 'Неучтённые API-эндпоинты: старые версии API, забытые debug-эндпоинты, документированные но незащищённые эндпоинты, shadow API.',
-    risk: 'СРЕДНИЙ',
-    riskColor: 'text-yellow-600 dark:text-yellow-400',
-    riskBg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    id: "api-09-inventory",
+    title: "API9:2023 — Improper Inventory Management",
+    icon: "ClipboardList",
+    description:
+      "Неучтённые API-эндпоинты: старые версии API, забытые debug-эндпоинты, документированные но незащищённые эндпоинты, shadow API.",
+    risk: "СРЕДНИЙ",
+    riskColor: "text-yellow-600 dark:text-yellow-400",
+    riskBg: "bg-yellow-100 dark:bg-yellow-900/30",
     content: `API9:2023 — проблемы, связанные с отсутствием полного учёта всех API-эндпоинтов и их версий.
 
 **Типичные проблемы:**
@@ -721,13 +730,14 @@ async function auditAPI(spec, actualRoutes) {
 }`,
   },
   {
-    id: 'api-10-logging',
-    title: 'API10:2023 — Unsafe API Consumption',
-    icon: 'FileWarning',
-    description: 'Небезопасное использование API клиентами: хранение секретов на клиенте, отсутствие TLS pinning, excessive permissions в OAuth, логи с секретами.',
-    risk: 'СРЕДНИЙ',
-    riskColor: 'text-yellow-600 dark:text-yellow-400',
-    riskBg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    id: "api-10-logging",
+    title: "API10:2023 — Unsafe API Consumption",
+    icon: "FileWarning",
+    description:
+      "Небезопасное использование API клиентами: хранение секретов на клиенте, отсутствие TLS pinning, excessive permissions в OAuth, логи с секретами.",
+    risk: "СРЕДНИЙ",
+    riskColor: "text-yellow-600 dark:text-yellow-400",
+    riskBg: "bg-yellow-100 dark:bg-yellow-900/30",
     content: `API10:2023 — проблемы, возникающие когда клиенты (frontend, мобильные приложения, сторонние интеграции) небезопасно используют API.
 
 **Частые проблемы:**

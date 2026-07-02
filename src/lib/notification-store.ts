@@ -1,7 +1,14 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export type NotificationType = 'achievement' | 'progress' | 'quiz' | 'system' | 'warning' | 'announcement' | 'deadline';
+export type NotificationType =
+  | "achievement"
+  | "progress"
+  | "quiz"
+  | "system"
+  | "warning"
+  | "announcement"
+  | "deadline";
 
 export interface Notification {
   id: string;
@@ -20,7 +27,9 @@ export interface Notification {
 interface NotificationStore {
   notifications: Notification[];
   unreadCount: number;
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
+  addNotification: (
+    notification: Omit<Notification, "id" | "timestamp" | "read">,
+  ) => void;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
   clearNotifications: () => void;
@@ -43,7 +52,10 @@ export const useNotificationStore = create<NotificationStore>()(
           read: false,
         };
         set((state) => ({
-          notifications: [newNotification, ...state.notifications].slice(0, 100),
+          notifications: [newNotification, ...state.notifications].slice(
+            0,
+            100,
+          ),
           unreadCount: state.unreadCount + 1,
         }));
       },
@@ -53,7 +65,7 @@ export const useNotificationStore = create<NotificationStore>()(
           if (!notif || notif.read) return state;
           return {
             notifications: state.notifications.map((n) =>
-              n.id === id ? { ...n, read: true } : n
+              n.id === id ? { ...n, read: true } : n,
             ),
             unreadCount: Math.max(0, state.unreadCount - 1),
           };
@@ -73,74 +85,84 @@ export const useNotificationStore = create<NotificationStore>()(
           const notif = state.notifications.find((n) => n.id === id);
           return {
             notifications: state.notifications.filter((n) => n.id !== id),
-            unreadCount: notif && !notif.read ? Math.max(0, state.unreadCount - 1) : state.unreadCount,
+            unreadCount:
+              notif && !notif.read
+                ? Math.max(0, state.unreadCount - 1)
+                : state.unreadCount,
           };
         });
       },
     }),
     {
-      name: 'cybersec-notifications',
+      name: "cybersec-notifications",
       version: 1,
       partialize: (state) => ({
-        notifications: state.notifications.map(({ action: _, ...rest }) => rest),
+        notifications: state.notifications.map(
+          ({ action: _, ...rest }) => rest,
+        ),
         unreadCount: state.unreadCount,
       }),
-    }
-  )
+    },
+  ),
 );
 
 /** Helper to create common notification types */
 export const NotificationHelper = {
   achievementUnlocked: (name: string, description: string) => {
     useNotificationStore.getState().addNotification({
-      type: 'achievement',
-      title: '🏆 Достижение разблокировано!',
+      type: "achievement",
+      title: "🏆 Достижение разблокировано!",
       message: `${name}: ${description}`,
     });
   },
   moduleCompleted: (moduleName: string) => {
     useNotificationStore.getState().addNotification({
-      type: 'progress',
-      title: '✅ Модуль завершён',
+      type: "progress",
+      title: "✅ Модуль завершён",
       message: `Вы успешно завершили модуль "${moduleName}"`,
     });
   },
   quizCompleted: (category: string, score: number) => {
     useNotificationStore.getState().addNotification({
-      type: 'quiz',
-      title: score >= 80 ? '🎉 Отличный результат!' : '📝 Квиз завершён',
+      type: "quiz",
+      title: score >= 80 ? "🎉 Отличный результат!" : "📝 Квиз завершён",
       message: `Категория: ${category}, Результат: ${score}%`,
     });
   },
   streakAchieved: (count: number) => {
     useNotificationStore.getState().addNotification({
-      type: 'achievement',
-      title: '🔥 Серия!',
+      type: "achievement",
+      title: "🔥 Серия!",
       message: `Вы набрали серию из ${count} квизов с результатом 80%+`,
     });
   },
   systemWarning: (message: string) => {
     useNotificationStore.getState().addNotification({
-      type: 'warning',
-      title: '⚠️ Внимание',
+      type: "warning",
+      title: "⚠️ Внимание",
       message,
     });
   },
-  announcement: (title: string, message: string, priority?: 'low' | 'normal' | 'high') => {
+  announcement: (
+    title: string,
+    message: string,
+    priority?: "low" | "normal" | "high",
+  ) => {
     useNotificationStore.getState().addNotification({
-      type: 'announcement',
-      title: priority === 'high' ? '📢 Важное объявление' : '📢 Объявление',
+      type: "announcement",
+      title: priority === "high" ? "📢 Важное объявление" : "📢 Объявление",
       message,
     });
   },
   deadlineWarning: (title: string, daysLeft: number) => {
-    const urgency = daysLeft <= 0
-      ? 'Просрочен!'
-      : daysLeft === 1
-        ? 'Завтра последний день!'
-        : `Осталось ${daysLeft} дн.`;
+    const urgency =
+      daysLeft <= 0
+        ? "Просрочен!"
+        : daysLeft === 1
+          ? "Завтра последний день!"
+          : `Осталось ${daysLeft} дн.`;
     useNotificationStore.getState().addNotification({
-      type: 'deadline',
+      type: "deadline",
       title: `Дедлайн: ${title}`,
       message: urgency,
     });
@@ -150,25 +172,35 @@ export const NotificationHelper = {
 /** Load announcements from API into notifications */
 export async function loadAnnouncementsIntoNotifications() {
   try {
-    const res = await fetch('/api/announcements');
+    const res = await fetch("/api/announcements");
     if (!res.ok) return;
     const data = await res.json();
     const announcements = (data.announcements || []) as Array<{
-      id: string; title: string; content: string; priority: string;
+      id: string;
+      title: string;
+      content: string;
+      priority: string;
     }>;
     const store = useNotificationStore.getState();
-    const existing = new Set(store.notifications.map((n) => n.title + n.message));
+    const existing = new Set(
+      store.notifications.map((n) => n.title + n.message),
+    );
     for (const a of announcements.slice(0, 10)) {
-      const key = a.title + a.content.split('\n')[0];
+      const key = a.title + a.content.split("\n")[0];
       if (!existing.has(key)) {
         store.addNotification({
-          type: 'announcement',
-          title: a.priority === 'high' ? '📢 Важное объявление' : '📢 Объявление',
-          message: `${a.title}: ${a.content.split('\n')[0]}`,
+          type: "announcement",
+          title:
+            a.priority === "high" ? "📢 Важное объявление" : "📢 Объявление",
+          message: `${a.title}: ${a.content.split("\n")[0]}`,
         });
       }
     }
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[notification-store.ts] loadAnnouncementsIntoNotifications failed:", e);
+    if (process.env.NODE_ENV === "development")
+      console.warn(
+        "[notification-store.ts] loadAnnouncementsIntoNotifications failed:",
+        e,
+      );
   }
 }

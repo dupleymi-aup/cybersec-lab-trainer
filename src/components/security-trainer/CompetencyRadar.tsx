@@ -1,16 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  ResponsiveContainer, Tooltip, Legend,
-} from 'recharts';
-import { Shield, Loader2, AlertTriangle } from 'lucide-react';
-import { getComprehensiveSummary, getAllUsers, type User } from '@/lib/auth-store';
-import { Card, CardContent } from '@/components/ui/card';
-import { modules } from '@/lib/data';
-import CustomDateRangePicker from './CustomDateRangePicker';
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+} from "recharts";
+import { Shield, Loader2, AlertTriangle } from "lucide-react";
+import {
+  getComprehensiveSummary,
+  getAllUsers,
+  type User,
+} from "@/lib/auth-store";
+import { Card, CardContent } from "@/components/ui/card";
+import { modules } from "@/lib/data";
+import CustomDateRangePicker from "./CustomDateRangePicker";
 
 interface Props {
   groupId?: string;
@@ -20,14 +30,16 @@ export default function CompetencyRadar({ groupId }: Props) {
   const [days, setDays] = useState(90);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [chartData, setChartData] = useState<Array<{
-    category: string;
-    completion: number;
-    score: number;
-    maxScore: number;
-  }>>([]);
+  const [chartData, setChartData] = useState<
+    Array<{
+      category: string;
+      completion: number;
+      score: number;
+      maxScore: number;
+    }>
+  >([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
+  const [selectedStudentId, setSelectedStudentId] = useState<string>("");
 
   useEffect(() => {
     getAllUsers().then(setAllUsers);
@@ -38,38 +50,44 @@ export default function CompetencyRadar({ groupId }: Props) {
     setLoading(true);
     setError(null);
 
-    Promise.all([
-      getComprehensiveSummary(days, groupId),
-    ]).then(([summary]) => {
-      if (cancelled) return;
+    Promise.all([getComprehensiveSummary(days, groupId)])
+      .then(([summary]) => {
+        if (cancelled) return;
 
-      const radarData = modules.map((mod) => {
-        const moduleStat = summary.moduleDistribution.find((m) => m.moduleId === mod.id);
-        return {
-          category: mod.title,
-          completion: moduleStat ? Math.round(moduleStat.completionRate) : 0,
-          score: moduleStat ? Math.round(moduleStat.avgScore) : 0,
-          maxScore: 100,
-        };
+        const radarData = modules.map((mod) => {
+          const moduleStat = summary.moduleDistribution.find(
+            (m) => m.moduleId === mod.id,
+          );
+          return {
+            category: mod.title,
+            completion: moduleStat ? Math.round(moduleStat.completionRate) : 0,
+            score: moduleStat ? Math.round(moduleStat.avgScore) : 0,
+            maxScore: 100,
+          };
+        });
+
+        setChartData(radarData);
+        setLoading(false);
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e.message || "Ошибка загрузки");
+          setLoading(false);
+        }
       });
 
-      setChartData(radarData);
-      setLoading(false);
-    }).catch((e) => {
-      if (!cancelled) {
-        setError(e.message || 'Ошибка загрузки');
-        setLoading(false);
-      }
-    });
-
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [days, groupId]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных компетенций...</p>
+        <p className="text-sm text-muted-foreground ml-3">
+          Загрузка данных компетенций...
+        </p>
       </div>
     );
   }
@@ -78,12 +96,14 @@ export default function CompetencyRadar({ groupId }: Props) {
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">{error}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">
+          {error}
+        </p>
       </div>
     );
   }
 
-  const students = allUsers.filter((u) => u.role === 'student');
+  const students = allUsers.filter((u) => u.role === "student");
   const selectedStudent = students.find((s) => s.id === selectedStudentId);
 
   return (
@@ -111,7 +131,9 @@ export default function CompetencyRadar({ groupId }: Props) {
         >
           <option value="">Среднее по всем студентам</option>
           {students.map((s) => (
-            <option key={s.id} value={s.id}>{s.fullName}</option>
+            <option key={s.id} value={s.id}>
+              {s.fullName}
+            </option>
           ))}
         </select>
       </div>
@@ -122,15 +144,20 @@ export default function CompetencyRadar({ groupId }: Props) {
             <h3 className="font-semibold text-sm mb-4">
               {selectedStudent
                 ? `Компетенции: ${selectedStudent.fullName}`
-                : 'Средние компетенции группы'}
+                : "Средние компетенции группы"}
             </h3>
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
-                <RadarChart data={chartData} cx="50%" cy="50%" outerRadius="70%">
+                <RadarChart
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius="70%"
+                >
                   <PolarGrid stroke="#e2e8f0" />
                   <PolarAngleAxis
                     dataKey="category"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: "#64748b" }}
                   />
                   <PolarRadiusAxis
                     angle={30}
@@ -152,19 +179,21 @@ export default function CompetencyRadar({ groupId }: Props) {
                     fill="#10b981"
                     fillOpacity={0.15}
                   />
-                  <Tooltip
-                    formatter={(value, name) => [`${value}%`, name]}
-                  />
+                  <Tooltip formatter={(value, name) => [`${value}%`, name]} />
                   <Legend
                     wrapperStyle={{ fontSize: 12 }}
                     formatter={(value) =>
-                      value === 'completion' ? 'Завершение модулей' : 'Средний балл'
+                      value === "completion"
+                        ? "Завершение модулей"
+                        : "Средний балл"
                     }
                   />
                 </RadarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-sm text-slate-400 text-center py-12">Нет данных</p>
+              <p className="text-sm text-slate-400 text-center py-12">
+                Нет данных
+              </p>
             )}
           </CardContent>
         </Card>
@@ -180,10 +209,18 @@ export default function CompetencyRadar({ groupId }: Props) {
                   animate={{ opacity: 1, x: 0 }}
                   className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0"
                 >
-                  <span className="text-xs text-muted-foreground truncate mr-2">{item.category}</span>
-                  <span className={`text-xs font-semibold ${
-                    item.score >= 70 ? 'text-emerald-600' : item.score >= 40 ? 'text-amber-600' : 'text-red-600'
-                  }`}>
+                  <span className="text-xs text-muted-foreground truncate mr-2">
+                    {item.category}
+                  </span>
+                  <span
+                    className={`text-xs font-semibold ${
+                      item.score >= 70
+                        ? "text-emerald-600"
+                        : item.score >= 40
+                          ? "text-amber-600"
+                          : "text-red-600"
+                    }`}
+                  >
                     {item.score}%
                   </span>
                 </motion.div>
@@ -201,7 +238,10 @@ export default function CompetencyRadar({ groupId }: Props) {
                     .sort((a, b) => b.score - a.score)
                     .slice(0, 3)
                     .map((d) => (
-                      <li key={d.category} className="flex items-center gap-2 text-xs text-emerald-700">
+                      <li
+                        key={d.category}
+                        className="flex items-center gap-2 text-xs text-emerald-700"
+                      >
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         {d.category} — {d.score}%
                       </li>
@@ -223,14 +263,19 @@ export default function CompetencyRadar({ groupId }: Props) {
                     .sort((a, b) => a.score - b.score)
                     .slice(0, 3)
                     .map((d) => (
-                      <li key={d.category} className="flex items-center gap-2 text-xs text-amber-700">
+                      <li
+                        key={d.category}
+                        className="flex items-center gap-2 text-xs text-amber-700"
+                      >
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                         {d.category} — {d.score}%
                       </li>
                     ))}
                 </ul>
               ) : (
-                <p className="text-xs text-slate-400">Все модули на хорошем уровне</p>
+                <p className="text-xs text-slate-400">
+                  Все модули на хорошем уровне
+                </p>
               )}
             </CardContent>
           </Card>

@@ -1,14 +1,14 @@
 "use client";
 
-import {useLocale} from "next-intl";
-import {useRouter, usePathname} from "@/routing";
-import {Globe} from "lucide-react";
-import {useTranslations} from "next-intl";
+import { useLocale } from "next-intl";
+import { useRouter, usePathname } from "@/routing";
+import { Globe } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const locales = [
-  {code: "en", label: "EN", name: "English"},
-  {code: "ru", label: "РУ", name: "Русский"},
-  {code: "zh", label: "中", name: "中文"},
+  { code: "en", label: "EN", name: "English" },
+  { code: "ru", label: "РУ", name: "Русский" },
+  { code: "zh", label: "中", name: "中文" },
 ];
 
 export default function LanguageSwitcher() {
@@ -18,7 +18,7 @@ export default function LanguageSwitcher() {
   const _t = useTranslations("common");
 
   const switchLocale = (newLocale: string) => {
-    router.push(pathname, {locale: newLocale});
+    router.push(pathname, { locale: newLocale });
   };
 
   return (

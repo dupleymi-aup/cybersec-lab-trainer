@@ -1,15 +1,15 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { quizCategories, modules } from '@/lib/data';
-import { NotificationHelper } from './notification-store';
-import { getCurrentUserId, saveProgressSnapshotProxy } from './auth-bridge';
-import { logger } from './logger';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { quizCategories, modules } from "@/lib/data";
+import { NotificationHelper } from "./notification-store";
+import { getCurrentUserId, saveProgressSnapshotProxy } from "./auth-bridge";
+import { logger } from "./logger";
 
 // ─── API client ───────────────────────────────────────────────
 
 export async function getAuthHeaders(): Promise<Record<string, string>> {
   // Auth is now handled via httpOnly cookies sent automatically by the browser
-  return { 'Content-Type': 'application/json' };
+  return { "Content-Type": "application/json" };
 }
 
 /** No-op kept for backwards compatibility */
@@ -19,14 +19,16 @@ export function invalidateTokenCache() {
 
 const apiClient = {
   async saveProgress(moduleId: string, completed: boolean, score?: number) {
-    const response = await fetch('/api/progress', {
-      method: 'POST',
+    const response = await fetch("/api/progress", {
+      method: "POST",
       headers: await getAuthHeaders(),
       body: JSON.stringify({ moduleId, completed, score }),
     });
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || 'Failed to save progress');
+      const error = await response
+        .json()
+        .catch(() => ({ error: "Unknown error" }));
+      throw new Error(error.error || "Failed to save progress");
     }
     return response.json();
   },
@@ -44,52 +46,60 @@ const apiClient = {
     studiedOwaspItems?: string[];
     challengeScores?: unknown;
   }) {
-    const response = await fetch('/api/progress', {
-      method: 'POST',
+    const response = await fetch("/api/progress", {
+      method: "POST",
       headers: await getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || 'Failed to save progress');
+      const error = await response
+        .json()
+        .catch(() => ({ error: "Unknown error" }));
+      throw new Error(error.error || "Failed to save progress");
     }
     return response.json();
   },
 
   async saveQuizResults(quizId: string, score: number, total: number) {
-    const response = await fetch('/api/quiz', {
-      method: 'POST',
+    const response = await fetch("/api/quiz", {
+      method: "POST",
       headers: await getAuthHeaders(),
       body: JSON.stringify({ quizId, score, total }),
     });
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || 'Failed to save quiz results');
+      const error = await response
+        .json()
+        .catch(() => ({ error: "Unknown error" }));
+      throw new Error(error.error || "Failed to save quiz results");
     }
     return response.json();
   },
 
   async loadProgress() {
-    const response = await fetch('/api/progress', {
-      method: 'GET',
+    const response = await fetch("/api/progress", {
+      method: "GET",
       headers: await getAuthHeaders(),
     });
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || 'Failed to load progress');
+      const error = await response
+        .json()
+        .catch(() => ({ error: "Unknown error" }));
+      throw new Error(error.error || "Failed to load progress");
     }
     return response.json();
   },
 
   async batchSave(progress: unknown[], quizResults: unknown[]) {
-    const response = await fetch('/api/progress/batch', {
-      method: 'POST',
+    const response = await fetch("/api/progress/batch", {
+      method: "POST",
       headers: await getAuthHeaders(),
       body: JSON.stringify({ progress, quizResults }),
     });
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || 'Failed to batch save');
+      const error = await response
+        .json()
+        .catch(() => ({ error: "Unknown error" }));
+      throw new Error(error.error || "Failed to batch save");
     }
     return response.json();
   },
@@ -121,65 +131,70 @@ interface AppActions {
 
 type AppStore = AppState & AppActions;
 
-const syncWithDatabase = async (state: AppState, set: (partial: Partial<AppStore>) => void) => {
+const syncWithDatabase = async (
+  state: AppState,
+  set: (partial: Partial<AppStore>) => void,
+) => {
   if (!state.userId) {
-    set({ syncStatus: 'idle' });
+    set({ syncStatus: "idle" });
     return;
   }
 
-  set({ syncStatus: 'syncing' });
+  set({ syncStatus: "syncing" });
   try {
     // Build full progress array for all modules
-    const progress: Record<string, unknown>[] = state.completedModules.map(moduleId => ({
-      moduleId,
-      completed: true,
-      score: 100,
-    }));
+    const progress: Record<string, unknown>[] = state.completedModules.map(
+      (moduleId) => ({
+        moduleId,
+        completed: true,
+        score: 100,
+      }),
+    );
 
     // Add detailed progress for lab modules
     if (state.sqlCompletedLevels.length > 0) {
       progress.push({
-        moduleId: 'sql-injection',
+        moduleId: "sql-injection",
         sqlLevels: state.sqlCompletedLevels,
-        completed: state.completedModules.includes('sql-injection'),
+        completed: state.completedModules.includes("sql-injection"),
       });
     }
     if (state.xssCompletedLevels.length > 0) {
       progress.push({
-        moduleId: 'xss',
+        moduleId: "xss",
         xssLevels: state.xssCompletedLevels,
-        completed: state.completedModules.includes('xss'),
+        completed: state.completedModules.includes("xss"),
       });
     }
     if (state.csrfCompletedSteps.length > 0) {
       progress.push({
-        moduleId: 'csrf',
+        moduleId: "csrf",
         csrfSteps: state.csrfCompletedSteps,
         csrfChallengeScores: state.csrfChallengeScores,
-        completed: state.completedModules.includes('csrf'),
+        completed: state.completedModules.includes("csrf"),
       });
     }
     if (state.secureCodingAnsweredChallenges.length > 0) {
       progress.push({
-        moduleId: 'secure-coding',
+        moduleId: "secure-coding",
         secureCodingAnswers: state.secureCodingAnsweredChallenges,
         secureCodingCorrectCount: state.secureCodingCorrectCount,
-        completed: state.completedModules.includes('secure-coding'),
+        completed: state.completedModules.includes("secure-coding"),
       });
     }
     if (state.studiedOwaspItems.length > 0) {
       progress.push({
-        moduleId: 'owasp',
+        moduleId: "owasp",
         studiedOwaspItems: state.studiedOwaspItems,
-        completed: state.completedModules.includes('owasp'),
+        completed: state.completedModules.includes("owasp"),
       });
     }
 
     // Add challenge scores
     const challengeModules = [
-      { moduleId: 'owasp-challenge', data: state.owaspChallengeScores },
-      { moduleId: 'auth-challenge', data: state.authChallengeScores },
-      { moduleId: 'headers-challenge', data: state.headersChallengeScores },
+      { moduleId: "owasp-challenge", data: state.owaspChallengeScores },
+      { moduleId: "auth-challenge", data: state.authChallengeScores },
+      { moduleId: "headers-challenge", data: state.headersChallengeScores },
     ];
     for (const cm of challengeModules) {
       if (cm.data.answered.length > 0) {
@@ -191,33 +206,44 @@ const syncWithDatabase = async (state: AppState, set: (partial: Partial<AppStore
     }
 
     // Build quiz results array
-    const quizResults = Object.entries(state.quizScores).map(([quizId, percentage]) => {
-      const total = quizCategories.find((c) => c.id === quizId)?.count ?? 100;
-      const score = Math.round((percentage / 100) * total);
-      return { quizId, score, total };
-    });
+    const quizResults = Object.entries(state.quizScores).map(
+      ([quizId, percentage]) => {
+        const total = quizCategories.find((c) => c.id === quizId)?.count ?? 100;
+        const score = Math.round((percentage / 100) * total);
+        return { quizId, score, total };
+      },
+    );
 
     await apiClient.batchSave(progress, quizResults);
 
     // Save ProgressSnapshot records for each module (fire-and-forget)
     for (const p of progress) {
-      const score = typeof p.score === 'number' ? p.score : 0;
+      const score = typeof p.score === "number" ? p.score : 0;
       const completed = p.completed === true;
-      saveProgressSnapshotProxy(p.moduleId as string, score, completed).catch((err) => {
-        logger.warn('Failed to save progress snapshot', { moduleId: p.moduleId, error: err instanceof Error ? err.message : String(err) });
-      });
+      saveProgressSnapshotProxy(p.moduleId as string, score, completed).catch(
+        (err) => {
+          logger.warn("Failed to save progress snapshot", {
+            moduleId: p.moduleId,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        },
+      );
     }
 
-    set({ syncStatus: 'synced', lastSyncedAt: new Date() });
+    set({ syncStatus: "synced", lastSyncedAt: new Date() });
   } catch (e) {
-    logger.error('Sync error', { error: e instanceof Error ? e.message : String(e) });
-    set({ syncStatus: 'error' });
+    logger.error("Sync error", {
+      error: e instanceof Error ? e.message : String(e),
+    });
+    set({ syncStatus: "error" });
   }
 };
 
 const loadFromDatabase = async (
-  set: (partial: Partial<AppStore> | ((state: AppStore) => Partial<AppStore>)) => void,
-  userId: string
+  set: (
+    partial: Partial<AppStore> | ((state: AppStore) => Partial<AppStore>),
+  ) => void,
+  userId: string,
 ) => {
   try {
     const data = await apiClient.loadProgress();
@@ -225,58 +251,69 @@ const loadFromDatabase = async (
     set((s) => ({
       completedModules: data.completedModules || s.completedModules,
       quizScores: data.quizScores || s.quizScores,
-      ...(data.progress && data.progress.length > 0 && (() => {
-        const updates: Record<string, unknown> = {};
-        for (const p of data.progress) {
-          if (p.sqlLevels) updates.sqlCompletedLevels = p.sqlLevels;
-          if (p.xssLevels) updates.xssCompletedLevels = p.xssLevels;
-          if (p.csrfSteps) updates.csrfCompletedSteps = p.csrfSteps;
-          if (p.csrfChallengeScores) updates.csrfChallengeScores = p.csrfChallengeScores;
-          if (p.secureCodingAnswers) updates.secureCodingAnsweredChallenges = p.secureCodingAnswers;
-          if (p.secureCodingCorrectCount !== undefined) updates.secureCodingCorrectCount = p.secureCodingCorrectCount;
-          if (p.studiedOwaspItems) updates.studiedOwaspItems = p.studiedOwaspItems;
-          if (p.challengeScores) {
-            if (p.moduleId === 'owasp-challenge') updates.owaspChallengeScores = p.challengeScores;
-            if (p.moduleId === 'auth-challenge') updates.authChallengeScores = p.challengeScores;
-            if (p.moduleId === 'headers-challenge') updates.headersChallengeScores = p.challengeScores;
+      ...(data.progress &&
+        data.progress.length > 0 &&
+        (() => {
+          const updates: Record<string, unknown> = {};
+          for (const p of data.progress) {
+            if (p.sqlLevels) updates.sqlCompletedLevels = p.sqlLevels;
+            if (p.xssLevels) updates.xssCompletedLevels = p.xssLevels;
+            if (p.csrfSteps) updates.csrfCompletedSteps = p.csrfSteps;
+            if (p.csrfChallengeScores)
+              updates.csrfChallengeScores = p.csrfChallengeScores;
+            if (p.secureCodingAnswers)
+              updates.secureCodingAnsweredChallenges = p.secureCodingAnswers;
+            if (p.secureCodingCorrectCount !== undefined)
+              updates.secureCodingCorrectCount = p.secureCodingCorrectCount;
+            if (p.studiedOwaspItems)
+              updates.studiedOwaspItems = p.studiedOwaspItems;
+            if (p.challengeScores) {
+              if (p.moduleId === "owasp-challenge")
+                updates.owaspChallengeScores = p.challengeScores;
+              if (p.moduleId === "auth-challenge")
+                updates.authChallengeScores = p.challengeScores;
+              if (p.moduleId === "headers-challenge")
+                updates.headersChallengeScores = p.challengeScores;
+            }
           }
-        }
-        return updates;
-      })()),
+          return updates;
+        })()),
       userId,
-      syncStatus: 'synced' as const,
+      syncStatus: "synced" as const,
       lastSyncedAt: new Date(),
     }));
   } catch (e) {
-    logger.error('Load error', { error: e instanceof Error ? e.message : String(e) });
-    set({ syncStatus: 'error', userId });
+    logger.error("Load error", {
+      error: e instanceof Error ? e.message : String(e),
+    });
+    set({ syncStatus: "error", userId });
   }
 };
 
 export type PageType =
-  | 'dashboard'
-  | 'owasp'
-  | 'sql-injection'
-  | 'xss'
-  | 'csrf'
-  | 'auth'
-  | 'secure-coding'
-  | 'tools'
-  | 'security-headers'
-  | 'idor'
-  | 'ssrf'
-  | 'api-security'
-  | 'phishing-analyzer'
-  | 'career-paths'
-  | 'quiz'
-  | 'achievements'
-  | 'cheat-sheets'
-  | 'password-checker'
-  | 'profile'
-  | 'teacher-panel'
-  | 'admin-panel'
-  | 'leaderboard'
-  | 'assignments';
+  | "dashboard"
+  | "owasp"
+  | "sql-injection"
+  | "xss"
+  | "csrf"
+  | "auth"
+  | "secure-coding"
+  | "tools"
+  | "security-headers"
+  | "idor"
+  | "ssrf"
+  | "api-security"
+  | "phishing-analyzer"
+  | "career-paths"
+  | "quiz"
+  | "achievements"
+  | "cheat-sheets"
+  | "password-checker"
+  | "profile"
+  | "teacher-panel"
+  | "admin-panel"
+  | "leaderboard"
+  | "assignments";
 
 interface AppState {
   currentPage: PageType;
@@ -294,9 +331,13 @@ interface AppState {
   secureCodingCorrectCount: number;
   owaspChallengeScores: { correct: number; total: number; answered: number[] };
   authChallengeScores: { correct: number; total: number; answered: number[] };
-  headersChallengeScores: { correct: number; total: number; answered: number[] };
+  headersChallengeScores: {
+    correct: number;
+    total: number;
+    answered: number[];
+  };
   userId: string | null;
-  syncStatus: 'idle' | 'syncing' | 'synced' | 'error';
+  syncStatus: "idle" | "syncing" | "synced" | "error";
   lastSyncedAt: Date | null;
   setCurrentPage: (page: PageType) => void;
   toggleSidebar: () => void;
@@ -319,23 +360,24 @@ interface AppState {
 }
 
 // Type for what actually gets persisted (matches partialize output)
-type PersistedState = Pick<AppState,
-  | 'currentPage'
-  | 'sidebarOpen'
-  | 'completedModules'
-  | 'quizScores'
-  | 'moduleTimestamps'
-  | 'quizTimestamps'
-  | 'studiedOwaspItems'
-  | 'sqlCompletedLevels'
-  | 'xssCompletedLevels'
-  | 'csrfCompletedSteps'
-  | 'csrfChallengeScores'
-  | 'secureCodingAnsweredChallenges'
-  | 'secureCodingCorrectCount'
-  | 'owaspChallengeScores'
-  | 'authChallengeScores'
-  | 'headersChallengeScores'
+type PersistedState = Pick<
+  AppState,
+  | "currentPage"
+  | "sidebarOpen"
+  | "completedModules"
+  | "quizScores"
+  | "moduleTimestamps"
+  | "quizTimestamps"
+  | "studiedOwaspItems"
+  | "sqlCompletedLevels"
+  | "xssCompletedLevels"
+  | "csrfCompletedSteps"
+  | "csrfChallengeScores"
+  | "secureCodingAnsweredChallenges"
+  | "secureCodingCorrectCount"
+  | "owaspChallengeScores"
+  | "authChallengeScores"
+  | "headersChallengeScores"
 >;
 
 // Dynamic storage that uses the correct per-user localStorage key
@@ -358,14 +400,14 @@ function createDynamicStorage() {
 
 // Listen for auth changes and migrate progress to user-specific key
 function getStorageKey(userId: string | undefined) {
-  const id = userId || 'anonymous';
+  const id = userId || "anonymous";
   return `security-trainer-progress-${id}`;
 }
 
 export const useAppStore = create<AppStore>()(
   persist(
     (set, get) => ({
-      currentPage: 'dashboard',
+      currentPage: "dashboard",
       sidebarOpen: false,
       completedModules: [],
       quizScores: {},
@@ -382,7 +424,7 @@ export const useAppStore = create<AppStore>()(
       authChallengeScores: { correct: 0, total: 0, answered: [] },
       headersChallengeScores: { correct: 0, total: 0, answered: [] },
       userId: null,
-      syncStatus: 'idle',
+      syncStatus: "idle",
       lastSyncedAt: null,
       setCurrentPage: (page) => set({ currentPage: page, sidebarOpen: false }),
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
@@ -397,14 +439,20 @@ export const useAppStore = create<AppStore>()(
           }
           return {
             completedModules: [...s.completedModules, moduleId],
-            moduleTimestamps: { ...s.moduleTimestamps, [moduleId]: new Date().toISOString() },
+            moduleTimestamps: {
+              ...s.moduleTimestamps,
+              [moduleId]: new Date().toISOString(),
+            },
           };
         });
       },
       setQuizScore: (category, score) => {
         set((s) => ({
           quizScores: { ...s.quizScores, [category]: score },
-          quizTimestamps: { ...s.quizTimestamps, [category]: new Date().toISOString() },
+          quizTimestamps: {
+            ...s.quizTimestamps,
+            [category]: new Date().toISOString(),
+          },
         }));
       },
       resetProgress: () =>
@@ -424,7 +472,7 @@ export const useAppStore = create<AppStore>()(
           authChallengeScores: { correct: 0, total: 0, answered: [] },
           headersChallengeScores: { correct: 0, total: 0, answered: [] },
           userId: s.userId,
-          syncStatus: 'idle' as const,
+          syncStatus: "idle" as const,
           lastSyncedAt: null,
         })),
       addStudiedOwasp: (id) =>
@@ -465,24 +513,32 @@ export const useAppStore = create<AppStore>()(
         }),
       addSecureCodingAnswer: (idx) =>
         set((s) => ({
-          secureCodingAnsweredChallenges: s.secureCodingAnsweredChallenges.includes(idx)
-            ? s.secureCodingAnsweredChallenges
-            : [...s.secureCodingAnsweredChallenges, idx],
+          secureCodingAnsweredChallenges:
+            s.secureCodingAnsweredChallenges.includes(idx)
+              ? s.secureCodingAnsweredChallenges
+              : [...s.secureCodingAnsweredChallenges, idx],
         })),
       removeSecureCodingAnswer: (idx) =>
         set((s) => ({
-          secureCodingAnsweredChallenges: s.secureCodingAnsweredChallenges.filter((i) => i !== idx),
+          secureCodingAnsweredChallenges:
+            s.secureCodingAnsweredChallenges.filter((i) => i !== idx),
         })),
       setSecureCodingCorrectCount: (count) =>
         set({ secureCodingCorrectCount: count }),
       setOwaspChallengeScore: (correct, answered) => {
-        set({ owaspChallengeScores: { correct, total: answered.length, answered } });
+        set({
+          owaspChallengeScores: { correct, total: answered.length, answered },
+        });
       },
       setAuthChallengeScore: (correct, answered) => {
-        set({ authChallengeScores: { correct, total: answered.length, answered } });
+        set({
+          authChallengeScores: { correct, total: answered.length, answered },
+        });
       },
       setHeadersChallengeScore: (correct, answered) => {
-        set({ headersChallengeScores: { correct, total: answered.length, answered } });
+        set({
+          headersChallengeScores: { correct, total: answered.length, answered },
+        });
       },
       setUserId: (uid) => set({ userId: uid }),
       syncWithDatabase: async () => {
@@ -493,7 +549,7 @@ export const useAppStore = create<AppStore>()(
       },
     }),
     {
-      name: 'security-trainer-progress',
+      name: "security-trainer-progress",
       storage: createDynamicStorage(),
       partialize: (state) => ({
         currentPage: state.currentPage,
@@ -514,13 +570,13 @@ export const useAppStore = create<AppStore>()(
         headersChallengeScores: state.headersChallengeScores,
         // syncStatus and lastSyncedAt are runtime-only, not persisted
       }),
-    }
-  )
+    },
+  ),
 );
 
 // Migrate progress to user-specific storage on login
 export function migrateProgressToUser(userId: string) {
-  const anonKey = 'security-trainer-progress-anonymous';
+  const anonKey = "security-trainer-progress-anonymous";
   const userKey = getStorageKey(userId);
   const data = localStorage.getItem(anonKey);
   if (data) {

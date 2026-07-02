@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { Calendar, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect } from "react";
+import { Calendar, ChevronDown } from "lucide-react";
 
 interface Props {
   days: number;
@@ -10,22 +10,26 @@ interface Props {
 }
 
 const PRESETS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-  { key: 365, label: '1г' },
-  { key: -1, label: 'Всё время' },
+  { key: 7, label: "7д" },
+  { key: 30, label: "30д" },
+  { key: 90, label: "90д" },
+  { key: 180, label: "180д" },
+  { key: 365, label: "1г" },
+  { key: -1, label: "Всё время" },
 ];
 
 function daysToDateRange(days: number): string {
-  if (days === -1) return 'За всё время';
+  if (days === -1) return "За всё время";
   return `Последние ${days} дн.`;
 }
 
-export default function CustomDateRangePicker({ days, onChange, customLabel }: Props) {
+export default function CustomDateRangePicker({
+  days,
+  onChange,
+  customLabel,
+}: Props) {
   const [customOpen, setCustomOpen] = useState(false);
-  const [customDays, setCustomDays] = useState('');
+  const [customDays, setCustomDays] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -39,7 +43,7 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
     if (n > 0 && n <= 3650) {
       onChange(n);
       setCustomOpen(false);
-      setCustomDays('');
+      setCustomDays("");
     }
   };
 
@@ -54,8 +58,8 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
             onClick={() => onChange(p.key)}
             className={`px-3 py-1.5 text-xs rounded-md transition-all ${
               days === p.key
-                ? 'bg-background text-foreground shadow-sm font-medium'
-                : 'text-muted-foreground hover:text-foreground'
+                ? "bg-background text-foreground shadow-sm font-medium"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {p.label}
@@ -68,18 +72,22 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
           onClick={() => setCustomOpen(!customOpen)}
           className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md border transition-all ${
             !isPreset
-              ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-medium'
-              : 'border-border text-muted-foreground hover:border-border'
+              ? "bg-indigo-50 border-indigo-200 text-indigo-700 font-medium"
+              : "border-border text-muted-foreground hover:border-border"
           }`}
         >
           <Calendar size={13} />
-          <span>{customLabel || (isPreset ? daysToDateRange(days) : `${days} дн.`)}</span>
+          <span>
+            {customLabel || (isPreset ? daysToDateRange(days) : `${days} дн.`)}
+          </span>
           <ChevronDown size={12} />
         </button>
 
         {customOpen && (
           <div className="absolute right-0 top-full mt-1 z-20 bg-card border border-border rounded-lg shadow-lg p-3 min-w-[200px]">
-            <p className="text-xs font-medium text-foreground/70 mb-2">Свой период</p>
+            <p className="text-xs font-medium text-foreground/70 mb-2">
+              Свой период
+            </p>
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -88,7 +96,9 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
                 max="3650"
                 value={customDays}
                 onChange={(e) => setCustomDays(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleCustomSubmit(); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCustomSubmit();
+                }}
                 placeholder="Кол-во дней"
                 className="flex-1 px-3 py-1.5 border border-border rounded-md text-xs"
               />

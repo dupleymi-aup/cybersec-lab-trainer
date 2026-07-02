@@ -1,24 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { hashPassword, validatePassword } from '@/lib/auth-utils';
-import { otpStore } from '@/lib/otp-store';
-import { checkRateLimit } from '@/lib/api-middleware';
-import { timingSafeEqual } from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { hashPassword, validatePassword } from "@/lib/auth-utils";
+import { otpStore } from "@/lib/otp-store";
+import { checkRateLimit } from "@/lib/api-middleware";
+import { timingSafeEqual } from "crypto";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { emailOrPhone, newPassword, otp } = body;
 
   if (!emailOrPhone || !newPassword || !otp) {
-    return NextResponse.json({ error: 'Email/phone, OTP and new password required' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Email/phone, OTP and new password required" },
+      { status: 400 },
+    );
   }
 
   // Validate password strength
   const passwordValidation = validatePassword(newPassword);
   if (!passwordValidation.valid) {
     return NextResponse.json(
-      { error: 'Пароль не соответствует требованиям', details: passwordValidation.errors },
-      { status: 400 }
+      {
+        error: "Пароль не соответствует требованиям",
+        details: passwordValidation.errors,
+      },
+      { status: 400 },
     );
   }
 
@@ -34,12 +40,18 @@ export async function POST(request: NextRequest) {
   const rateResult = checkRateLimit(rateKey, 5, 10 * 60 * 1000);
   if (!rateResult.allowed) {
     return NextResponse.json(
-      { error: 'Слишком много попыток. Подождите', retryAfter: rateResult.retryAfter },
-      { status: 429 }
+      {
+        error: "Слишком много попыток. Подождите",
+        retryAfter: rateResult.retryAfter,
+      },
+      { status: 429 },
     );
   }
 
-  const genericError = NextResponse.json({ error: 'Неверный или просроченный OTP' }, { status: 400 });
+  const genericError = NextResponse.json(
+    { error: "Неверный или просроченный OTP" },
+    { status: 400 },
+  );
 
   if (!user) {
     return genericError;
@@ -52,11 +64,9 @@ export async function POST(request: NextRequest) {
   }
 
   // Use timing-safe comparison to prevent timing attacks
-  const isValid = entry.otp.length === otp.length &&
-    timingSafeEqual(
-      Buffer.from(entry.otp),
-      Buffer.from(otp)
-    );
+  const isValid =
+    entry.otp.length === otp.length &&
+    timingSafeEqual(Buffer.from(entry.otp), Buffer.from(otp));
 
   if (!isValid) {
     return genericError;
@@ -69,7 +79,7 @@ export async function POST(request: NextRequest) {
     where: { id: user.id },
     data: {
       passwordHash: hash,
-      tokenVersion: { increment: 1 },  // Revoke all existing tokens
+      tokenVersion: { increment: 1 }, // Revoke all existing tokens
     },
   });
 

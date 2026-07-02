@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface UseAnalyticsFetchOptions<_T> {
   /** API endpoint URL (e.g., '/api/analytics/engagement') */
@@ -28,7 +28,7 @@ interface UseAnalyticsFetchResult<T> {
  */
 export function useAnalyticsFetch<T = unknown>({
   endpoint,
-  params = '',
+  params = "",
   enabled = true,
 }: UseAnalyticsFetchOptions<T>): UseAnalyticsFetchResult<T> {
   const [data, setData] = useState<T | null>(null);
@@ -69,9 +69,13 @@ export function useAnalyticsFetch<T = unknown>({
       })
       .catch((err) => {
         if (!cancelled) {
-          if (err.name === 'AbortError') return;
-          if (process.env.NODE_ENV === 'development') console.error(`useAnalyticsFetch: Failed to fetch ${endpoint}:`, err);
-          setError(err.message || 'Ошибка загрузки данных');
+          if (err.name === "AbortError") return;
+          if (process.env.NODE_ENV === "development")
+            console.error(
+              `useAnalyticsFetch: Failed to fetch ${endpoint}:`,
+              err,
+            );
+          setError(err.message || "Ошибка загрузки данных");
           setLoading(false);
         }
       });
@@ -126,7 +130,9 @@ export function useAnalyticsFetcher<T = unknown>(
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Ошибка загрузки данных');
+          setError(
+            err instanceof Error ? err.message : "Ошибка загрузки данных",
+          );
           setLoading(false);
         }
       });
@@ -150,60 +156,70 @@ export function useAnalyticsMutation<TResult = unknown, TBody = unknown>() {
   const [error, setError] = useState<string | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
 
-  const mutate = useCallback(async (
-    endpoint: string,
-    method: 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'POST',
-    body?: TBody,
-  ): Promise<TResult | null> => {
-    // Cancel any in-flight request
-    if (controllerRef.current) {
-      controllerRef.current.abort();
-    }
-    const controller = new AbortController();
-    controllerRef.current = controller;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      const csrfToken = typeof document !== 'undefined'
-        ? document.cookie.split(';').find((c) => c.trim().startsWith('csrf-token='))?.split('=')[1]
-        : undefined;
-      if (csrfToken) {
-        headers['x-csrf-token'] = csrfToken;
+  const mutate = useCallback(
+    async (
+      endpoint: string,
+      method: "POST" | "PUT" | "DELETE" | "PATCH" = "POST",
+      body?: TBody,
+    ): Promise<TResult | null> => {
+      // Cancel any in-flight request
+      if (controllerRef.current) {
+        controllerRef.current.abort();
       }
+      const controller = new AbortController();
+      controllerRef.current = controller;
 
-      const res = await fetch(endpoint, {
-        method,
-        headers,
-        body: body !== undefined ? JSON.stringify(body) : undefined,
-        signal: controller.signal,
-      });
+      setLoading(true);
+      setError(null);
 
-      if (!res.ok) {
-        let errorMsg = `HTTP ${res.status}: ${res.statusText}`;
-        try {
-          const errBody = await res.json();
-          if (errBody.error) errorMsg = errBody.error;
-        } catch {
-          // response body not JSON
+      try {
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        const csrfToken =
+          typeof document !== "undefined"
+            ? document.cookie
+                .split(";")
+                .find((c) => c.trim().startsWith("csrf-token="))
+                ?.split("=")[1]
+            : undefined;
+        if (csrfToken) {
+          headers["x-csrf-token"] = csrfToken;
         }
-        throw new Error(errorMsg);
-      }
 
-      const result = await res.json();
-      setData(result);
-      setLoading(false);
-      return result;
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') return null;
-      const message = err instanceof Error ? err.message : 'Ошибка выполнения';
-      setError(message);
-      setLoading(false);
-      return null;
-    }
-  }, []);
+        const res = await fetch(endpoint, {
+          method,
+          headers,
+          body: body !== undefined ? JSON.stringify(body) : undefined,
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          let errorMsg = `HTTP ${res.status}: ${res.statusText}`;
+          try {
+            const errBody = await res.json();
+            if (errBody.error) errorMsg = errBody.error;
+          } catch {
+            // response body not JSON
+          }
+          throw new Error(errorMsg);
+        }
+
+        const result = await res.json();
+        setData(result);
+        setLoading(false);
+        return result;
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return null;
+        const message =
+          err instanceof Error ? err.message : "Ошибка выполнения";
+        setError(message);
+        setLoading(false);
+        return null;
+      }
+    },
+    [],
+  );
 
   return { data, loading, error, mutate };
 }

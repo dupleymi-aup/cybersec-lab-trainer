@@ -1,10 +1,10 @@
 "use client";
 
-import {useTranslations, useLocale} from "next-intl";
-import {motion} from "framer-motion";
-import {ArrowRight, Sparkles} from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import CodeTerminal from "./CodeTerminal";
 
 export default function HeroSection() {
@@ -16,13 +16,16 @@ export default function HeroSection() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
           <motion.div
-            initial={{opacity: 0, y: 30}}
-            animate={{opacity: 1, y: 0}}
-            transition={{duration: 0.6}}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
             className="text-center lg:text-left"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
-              <Sparkles className="w-4 h-4 text-violet-500" aria-hidden="true" />
+              <Sparkles
+                className="w-4 h-4 text-violet-500"
+                aria-hidden="true"
+              />
               <span className="text-sm font-medium text-violet-600 dark:text-violet-400">
                 {t("badge")}
               </span>
@@ -41,9 +44,15 @@ export default function HeroSection() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link href={`/${locale}/register`}>
-                <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-white px-8 text-lg group">
+                <Button
+                  size="lg"
+                  className="bg-violet-600 hover:bg-violet-700 text-white px-8 text-lg group"
+                >
                   {t("startLearning")}
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                  <ArrowRight
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                    aria-hidden="true"
+                  />
                 </Button>
               </Link>
               <Link href="#how-it-works">
@@ -55,9 +64,9 @@ export default function HeroSection() {
           </motion.div>
 
           <motion.div
-            initial={{opacity: 0, scale: 0.95}}
-            animate={{opacity: 1, scale: 1}}
-            transition={{duration: 0.6, delay: 0.2}}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
             <CodeTerminal />
           </motion.div>

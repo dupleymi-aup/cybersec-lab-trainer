@@ -1,103 +1,109 @@
-'use client';
+"use client";
 
-import { useMemo } from 'react';
-import { useAppStore } from '@/lib/store';
-import { motion } from 'framer-motion';
-import { Flame, CalendarDays } from 'lucide-react';
+import { useMemo } from "react";
+import { useAppStore } from "@/lib/store";
+import { motion } from "framer-motion";
+import { Flame, CalendarDays } from "lucide-react";
 
 export default function ActivityCalendar() {
-  const moduleTimestamps = useAppStore(s => s.moduleTimestamps);
-  const quizTimestamps = useAppStore(s => s.quizTimestamps);
+  const moduleTimestamps = useAppStore((s) => s.moduleTimestamps);
+  const quizTimestamps = useAppStore((s) => s.quizTimestamps);
 
-  const { dailyData, currentStreak, longestStreak, totalActiveDays } = useMemo(() => {
-    const dayMap = new Map<string, { count: number; types: Set<string> }>();
+  const { dailyData, currentStreak, longestStreak, totalActiveDays } =
+    useMemo(() => {
+      const dayMap = new Map<string, { count: number; types: Set<string> }>();
 
-    for (const ts of Object.values(moduleTimestamps)) {
-      const day = new Date(ts).toISOString().slice(0, 10);
-      const entry = dayMap.get(day) || { count: 0, types: new Set<string>() };
-      entry.count++;
-      entry.types.add('module');
-      dayMap.set(day, entry);
-    }
-    for (const ts of Object.values(quizTimestamps)) {
-      const day = new Date(ts).toISOString().slice(0, 10);
-      const entry = dayMap.get(day) || { count: 0, types: new Set<string>() };
-      entry.count++;
-      entry.types.add('quiz');
-      dayMap.set(day, entry);
-    }
+      for (const ts of Object.values(moduleTimestamps)) {
+        const day = new Date(ts).toISOString().slice(0, 10);
+        const entry = dayMap.get(day) || { count: 0, types: new Set<string>() };
+        entry.count++;
+        entry.types.add("module");
+        dayMap.set(day, entry);
+      }
+      for (const ts of Object.values(quizTimestamps)) {
+        const day = new Date(ts).toISOString().slice(0, 10);
+        const entry = dayMap.get(day) || { count: 0, types: new Set<string>() };
+        entry.count++;
+        entry.types.add("quiz");
+        dayMap.set(day, entry);
+      }
 
-    const _sortedDays = [...dayMap.keys()].sort().reverse();
+      const _sortedDays = [...dayMap.keys()].sort().reverse();
 
-    // Current streak
-    let streak = 0;
-    const today = new Date().toISOString().slice(0, 10);
-    const checkDate = new Date(today);
-    while (true) {
-      const ds = checkDate.toISOString().slice(0, 10);
-      if (dayMap.has(ds)) {
-        streak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-      } else {
-        // Allow yesterday gap
-        if (streak === 0) {
+      // Current streak
+      let streak = 0;
+      const today = new Date().toISOString().slice(0, 10);
+      const checkDate = new Date(today);
+      while (true) {
+        const ds = checkDate.toISOString().slice(0, 10);
+        if (dayMap.has(ds)) {
+          streak++;
           checkDate.setDate(checkDate.getDate() - 1);
-          if (dayMap.has(checkDate.toISOString().slice(0, 10))) {
-            streak++;
+        } else {
+          // Allow yesterday gap
+          if (streak === 0) {
             checkDate.setDate(checkDate.getDate() - 1);
+            if (dayMap.has(checkDate.toISOString().slice(0, 10))) {
+              streak++;
+              checkDate.setDate(checkDate.getDate() - 1);
+            } else break;
           } else break;
-        } else break;
+        }
       }
-    }
 
-    // Longest streak
-    let longest = 0;
-    let cur = 0;
-    const allSorted = [...dayMap.keys()].sort();
-    for (let i = 0; i < allSorted.length; i++) {
-      if (i === 0 || daysDiff(allSorted[i - 1], allSorted[i]) === 1) {
-        cur++;
-      } else {
-        cur = 1;
+      // Longest streak
+      let longest = 0;
+      let cur = 0;
+      const allSorted = [...dayMap.keys()].sort();
+      for (let i = 0; i < allSorted.length; i++) {
+        if (i === 0 || daysDiff(allSorted[i - 1], allSorted[i]) === 1) {
+          cur++;
+        } else {
+          cur = 1;
+        }
+        longest = Math.max(longest, cur);
       }
-      longest = Math.max(longest, cur);
-    }
 
-    // Build last 30 days
-    const days: Array<{ date: string; count: number; level: 0 | 1 | 2 | 3 | 4 }> = [];
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const ds = d.toISOString().slice(0, 10);
-      const entry = dayMap.get(ds);
-      const count = entry?.count || 0;
-      let level: 0 | 1 | 2 | 3 | 4 = 0;
-      if (count > 0) level = count <= 2 ? 1 : count <= 4 ? 2 : count <= 8 ? 3 : 4;
-      days.push({ date: ds, count, level });
-    }
+      // Build last 30 days
+      const days: Array<{
+        date: string;
+        count: number;
+        level: 0 | 1 | 2 | 3 | 4;
+      }> = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const ds = d.toISOString().slice(0, 10);
+        const entry = dayMap.get(ds);
+        const count = entry?.count || 0;
+        let level: 0 | 1 | 2 | 3 | 4 = 0;
+        if (count > 0)
+          level = count <= 2 ? 1 : count <= 4 ? 2 : count <= 8 ? 3 : 4;
+        days.push({ date: ds, count, level });
+      }
 
-    return {
-      dailyData: days,
-      currentStreak: streak,
-      longestStreak: longest,
-      totalActiveDays: dayMap.size,
-    };
-  }, [moduleTimestamps, quizTimestamps]);
+      return {
+        dailyData: days,
+        currentStreak: streak,
+        longestStreak: longest,
+        totalActiveDays: dayMap.size,
+      };
+    }, [moduleTimestamps, quizTimestamps]);
 
   if (totalActiveDays === 0) return null;
 
-  const weekDays = ['Пн', '', 'Ср', '', 'Пт', '', ''];
-  const weeks: typeof dailyData[] = [];
+  const weekDays = ["Пн", "", "Ср", "", "Пт", "", ""];
+  const weeks: (typeof dailyData)[] = [];
   for (let i = 0; i < dailyData.length; i += 7) {
     weeks.push(dailyData.slice(i, i + 7));
   }
 
   const levelColors = [
-    'bg-muted',
-    'bg-emerald-200',
-    'bg-emerald-400',
-    'bg-emerald-500',
-    'bg-emerald-600',
+    "bg-muted",
+    "bg-emerald-200",
+    "bg-emerald-400",
+    "bg-emerald-500",
+    "bg-emerald-600",
   ];
 
   return (
@@ -111,19 +117,25 @@ export default function ActivityCalendar() {
         {currentStreak > 0 && (
           <div className="flex items-center gap-1.5">
             <Flame size={16} className="text-orange-500" />
-            <span className="font-semibold text-foreground/70">{currentStreak} дн.</span>
+            <span className="font-semibold text-foreground/70">
+              {currentStreak} дн.
+            </span>
             <span className="text-slate-400">текущая серия</span>
           </div>
         )}
         {longestStreak > 0 && (
           <div className="flex items-center gap-1.5">
             <CalendarDays size={14} className="text-violet-500" />
-            <span className="font-semibold text-foreground/70">{longestStreak} дн.</span>
+            <span className="font-semibold text-foreground/70">
+              {longestStreak} дн.
+            </span>
             <span className="text-slate-400">макс. серия</span>
           </div>
         )}
         <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-foreground/70">{totalActiveDays}</span>
+          <span className="font-semibold text-foreground/70">
+            {totalActiveDays}
+          </span>
           <span className="text-slate-400">активных дней</span>
         </div>
       </div>
@@ -132,7 +144,12 @@ export default function ActivityCalendar() {
       <div className="flex gap-1">
         <div className="flex flex-col gap-1 pt-0.5">
           {weekDays.map((d, i) => (
-            <span key={i} className="text-[9px] text-slate-400 h-[14px] leading-[14px]">{d}</span>
+            <span
+              key={i}
+              className="text-[9px] text-slate-400 h-[14px] leading-[14px]"
+            >
+              {d}
+            </span>
           ))}
         </div>
         <div className="flex gap-1">

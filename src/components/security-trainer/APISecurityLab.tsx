@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAppStore } from '@/lib/store';
-import { apiSecurityTopics } from '@/lib/data/api-security-data';
-import CodeBlock from './CodeBlock';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { useAppStore } from "@/lib/store";
+import { apiSecurityTopics } from "@/lib/data/api-security-data";
+import CodeBlock from "./CodeBlock";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,26 +19,142 @@ import {
   Code2,
   BookOpen,
   Lightbulb,
-} from 'lucide-react';
+} from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
   Unlock: <Shield size={18} />,
   ShieldOff: <Shield size={18} />,
-  EyeOff: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>,
-  Gauge: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>,
+  EyeOff: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+      <line x1="2" x2="22" y1="2" y2="22" />
+    </svg>
+  ),
+  Gauge: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m12 14 4-4" />
+      <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+    </svg>
+  ),
   TriangleAlert: <AlertTriangle size={18} />,
-  ShoppingCart: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>,
-  Globe: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>,
-  Settings: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
-  ClipboardList: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>,
-  FileWarning: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>,
+  ShoppingCart: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="8" cy="21" r="1" />
+      <circle cx="19" cy="21" r="1" />
+      <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+    </svg>
+  ),
+  Globe: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+      <path d="M2 12h20" />
+    </svg>
+  ),
+  Settings: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  ClipboardList: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="M12 11h4" />
+      <path d="M12 16h4" />
+      <path d="M8 11h.01" />
+      <path d="M8 16h.01" />
+    </svg>
+  ),
+  FileWarning: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </svg>
+  ),
 };
 
 export default function APISecurityLab() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
-  const completeModule = useAppStore(s => s.completeModule);
-  const addStudiedOwasp = useAppStore(s => s.addStudiedOwasp);
+  const [completedTopics, setCompletedTopics] = useState<Set<string>>(
+    new Set(),
+  );
+  const completeModule = useAppStore((s) => s.completeModule);
+  const addStudiedOwasp = useAppStore((s) => s.addStudiedOwasp);
 
   const topic = apiSecurityTopics[currentIndex];
   const isCompleted = completedTopics.has(topic.id);
@@ -63,25 +179,32 @@ export default function APISecurityLab() {
     if (currentIndex < apiSecurityTopics.length - 1) {
       handleNext();
     } else {
-      completeModule('api-security');
+      completeModule("api-security");
     }
   };
 
   // Extract defense recommendations from content
-  const defenseItems = topic.content.match(/• (.+)/g)?.map((item) => item.replace('• ', '')) || [];
+  const defenseItems =
+    topic.content.match(/• (.+)/g)?.map((item) => item.replace("• ", "")) || [];
 
   // Render theory content, skipping code blocks
   const renderTheory = () => {
-    const lines = topic.content.split('\n');
+    const lines = topic.content.split("\n");
     const elements: React.ReactNode[] = [];
     let inCodeBlock = false;
-    let codeContent = '';
+    let codeContent = "";
 
     lines.forEach((line, i) => {
-      if (line.startsWith('```')) {
+      if (line.startsWith("```")) {
         if (inCodeBlock) {
-          elements.push(<CodeBlock key={`code-${i}`} code={codeContent.trim()} language="javascript" />);
-          codeContent = '';
+          elements.push(
+            <CodeBlock
+              key={`code-${i}`}
+              code={codeContent.trim()}
+              language="javascript"
+            />,
+          );
+          codeContent = "";
           inCodeBlock = false;
         } else {
           inCodeBlock = true;
@@ -90,30 +213,38 @@ export default function APISecurityLab() {
       }
 
       if (inCodeBlock) {
-        codeContent += line + '\n';
+        codeContent += line + "\n";
         return;
       }
 
-      if (line.startsWith('**') && line.endsWith('**')) {
+      if (line.startsWith("**") && line.endsWith("**")) {
         elements.push(
-          <h3 key={i} className="text-base font-semibold text-foreground mt-4 mb-2">
-            {line.replace(/\*\*/g, '')}
-          </h3>
+          <h3
+            key={i}
+            className="text-base font-semibold text-foreground mt-4 mb-2"
+          >
+            {line.replace(/\*\*/g, "")}
+          </h3>,
         );
-      } else if (line.startsWith('•')) {
+      } else if (line.startsWith("•")) {
         elements.push(
           <div key={i} className="flex items-start gap-2 my-1">
-            <ChevronRight size={14} className="text-violet-500 shrink-0 mt-0.5" />
-            <span className="text-sm text-muted-foreground">{line.replace('• ', '')}</span>
-          </div>
+            <ChevronRight
+              size={14}
+              className="text-violet-500 shrink-0 mt-0.5"
+            />
+            <span className="text-sm text-muted-foreground">
+              {line.replace("• ", "")}
+            </span>
+          </div>,
         );
-      } else if (line.trim() === '') {
+      } else if (line.trim() === "") {
         elements.push(<br key={i} />);
       } else {
         elements.push(
           <p key={i} className="text-sm text-muted-foreground leading-relaxed">
             {line}
-          </p>
+          </p>,
         );
       }
     });
@@ -134,16 +265,25 @@ export default function APISecurityLab() {
             <Shield className="text-white" size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Безопасность API</h1>
-            <p className="text-sm text-muted-foreground">OWASP API Security Top 10 (2023)</p>
+            <h1 className="text-xl font-bold text-foreground">
+              Безопасность API
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              OWASP API Security Top 10 (2023)
+            </p>
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
-          Интерактивный гид по 10 самым критическим угрозам безопасности API с примерами кода и мерами защиты.
+          Интерактивный гид по 10 самым критическим угрозам безопасности API с
+          примерами кода и мерами защиты.
         </p>
         <div className="flex items-center gap-2 mt-3">
-          <Badge variant="secondary" className="text-xs">10 тем</Badge>
-          <Badge variant="secondary" className="text-xs">Продвинутый</Badge>
+          <Badge variant="secondary" className="text-xs">
+            10 тем
+          </Badge>
+          <Badge variant="secondary" className="text-xs">
+            Продвинутый
+          </Badge>
           <div className="flex-1" />
           <span className="text-xs text-muted-foreground">
             {completedTopics.size} / {apiSecurityTopics.length} изучено
@@ -152,7 +292,9 @@ export default function APISecurityLab() {
         <div className="w-full bg-muted rounded-full h-1.5 mt-2">
           <div
             className="bg-gradient-to-r from-violet-500 to-purple-600 h-1.5 rounded-full transition-all duration-300"
-            style={{ width: `${(completedTopics.size / apiSecurityTopics.length) * 100}%` }}
+            style={{
+              width: `${(completedTopics.size / apiSecurityTopics.length) * 100}%`,
+            }}
           />
         </div>
       </div>
@@ -160,17 +302,20 @@ export default function APISecurityLab() {
       {/* Topic Navigation */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
         {apiSecurityTopics.map((t, idx) => {
-          const shortLabel = t.id.replace('api-0', '').replace('api-', '').split('-')[0];
+          const shortLabel = t.id
+            .replace("api-0", "")
+            .replace("api-", "")
+            .split("-")[0];
           return (
             <button
               key={t.id}
               onClick={() => setCurrentIndex(idx)}
               className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                 idx === currentIndex
-                  ? 'bg-violet-600 text-white'
+                  ? "bg-violet-600 text-white"
                   : completedTopics.has(t.id)
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
               }`}
             >
               {idx + 1}. {shortLabel}
@@ -187,10 +332,16 @@ export default function APISecurityLab() {
               {iconMap[topic.icon] || <Shield size={18} />}
             </div>
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-foreground">{topic.title}</h2>
-              <p className="text-sm text-muted-foreground mt-1">{topic.description}</p>
+              <h2 className="text-lg font-semibold text-foreground">
+                {topic.title}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                {topic.description}
+              </p>
             </div>
-            <Badge className={`${topic.riskBg} ${topic.riskColor} text-xs font-medium`}>
+            <Badge
+              className={`${topic.riskBg} ${topic.riskColor} text-xs font-medium`}
+            >
               {topic.risk}
             </Badge>
           </div>
@@ -235,7 +386,10 @@ export default function APISecurityLab() {
                   </h4>
                   <ul className="space-y-2">
                     {defenseItems.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-green-700 dark:text-green-300">
+                      <li
+                        key={i}
+                        className="flex items-start gap-2 text-sm text-green-700 dark:text-green-300"
+                      >
                         <CheckCircle2 size={14} className="shrink-0 mt-0.5" />
                         {item}
                       </li>
@@ -264,11 +418,15 @@ export default function APISecurityLab() {
               size="sm"
               onClick={handleComplete}
               className={`flex items-center gap-1 ${
-                isCompleted ? 'bg-green-600 hover:bg-green-700' : 'bg-violet-600 hover:bg-violet-700'
+                isCompleted
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-violet-600 hover:bg-violet-700"
               } text-white`}
             >
               {isCompleted ? (
-                <><CheckCircle2 size={16} /> Изучено</>
+                <>
+                  <CheckCircle2 size={16} /> Изучено
+                </>
               ) : (
                 <>Отметить как изученное</>
               )}

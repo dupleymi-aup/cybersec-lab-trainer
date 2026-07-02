@@ -1,12 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { type UserRole, getRoleLabel, bulkDeleteUsers, bulkChangeRole, bulkToggleBlock, assignUsersToGroup, getAllGroups } from '@/lib/auth-store';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Trash2, Shield, Ban, CheckCircle, X, Users } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import {
+  type UserRole,
+  getRoleLabel,
+  bulkDeleteUsers,
+  bulkChangeRole,
+  bulkToggleBlock,
+  assignUsersToGroup,
+  getAllGroups,
+} from "@/lib/auth-store";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { AnimatePresence, motion } from "framer-motion";
+import { Trash2, Shield, Ban, CheckCircle, X, Users } from "lucide-react";
+import { toast } from "sonner";
 
 interface BulkActionsBarProps {
   selectedIds: string[];
@@ -14,20 +22,29 @@ interface BulkActionsBarProps {
   onDone: () => void;
 }
 
-export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: BulkActionsBarProps) {
+export default function BulkActionsBar({
+  selectedIds,
+  currentUserId,
+  onDone,
+}: BulkActionsBarProps) {
   const [showRolePicker, setShowRolePicker] = useState(false);
   const [showGroupPicker, setShowGroupPicker] = useState(false);
-  const [newGroupInput, setNewGroupInput] = useState('');
+  const [newGroupInput, setNewGroupInput] = useState("");
   const [groups, setGroups] = useState<string[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
-    getAllGroups().then((g) => {
-      setGroups(g);
-    }).catch((err) => {
-      if (process.env.NODE_ENV === 'development') console.error('BulkActionsBar: Failed to load groups:', err);
-    });
-    return () => { controller.abort(); };
+    getAllGroups()
+      .then((g) => {
+        setGroups(g);
+      })
+      .catch((err) => {
+        if (process.env.NODE_ENV === "development")
+          console.error("BulkActionsBar: Failed to load groups:", err);
+      });
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const handleBulkDelete = async () => {
@@ -53,7 +70,11 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
   const handleBulkBlock = async (blocked: boolean) => {
     const result = await bulkToggleBlock(selectedIds, currentUserId, blocked);
     if (result.success) {
-      toast.success(blocked ? `Заблокировано: ${result.count}` : `Разблокировано: ${result.count}`);
+      toast.success(
+        blocked
+          ? `Заблокировано: ${result.count}`
+          : `Разблокировано: ${result.count}`,
+      );
       onDone();
     } else {
       toast.error(result.error);
@@ -61,12 +82,17 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
   };
 
   const handleGroupAssign = async (groupName: string) => {
-    if (!groupName.trim()) { toast.error('Введите название группы'); return; }
+    if (!groupName.trim()) {
+      toast.error("Введите название группы");
+      return;
+    }
     const result = await assignUsersToGroup(selectedIds, groupName);
     if (result.success) {
-      toast.success(`Группа "${groupName.trim()}" назначена ${result.count} пользователям`);
+      toast.success(
+        `Группа "${groupName.trim()}" назначена ${result.count} пользователям`,
+      );
       setShowGroupPicker(false);
-      setNewGroupInput('');
+      setNewGroupInput("");
       onDone();
     } else {
       toast.error(result.error);
@@ -104,7 +130,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
               </Button>
               {showRolePicker && (
                 <div className="absolute bottom-full mb-2 left-0 bg-card rounded-lg shadow-xl p-1 min-w-[160px]">
-                  {(['student', 'teacher', 'admin'] as UserRole[]).map((r) => (
+                  {(["student", "teacher", "admin"] as UserRole[]).map((r) => (
                     <button
                       key={r}
                       onClick={() => handleBulkRoleChange(r)}
@@ -166,10 +192,15 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
                         placeholder="Новая группа..."
                         className="text-xs h-7"
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleGroupAssign(newGroupInput);
+                          if (e.key === "Enter")
+                            handleGroupAssign(newGroupInput);
                         }}
                       />
-                      <Button size="sm" className="h-7 px-2" onClick={() => handleGroupAssign(newGroupInput)}>
+                      <Button
+                        size="sm"
+                        className="h-7 px-2"
+                        onClick={() => handleGroupAssign(newGroupInput)}
+                      >
                         OK
                       </Button>
                     </div>

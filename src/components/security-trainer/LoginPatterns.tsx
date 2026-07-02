@@ -1,28 +1,43 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line,
-} from 'recharts';
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
 import {
-  Loader2, AlertTriangle, LogIn, Users, AlertCircle, Clock,
-} from 'lucide-react';
-import { getLoginPatterns, type LoginPatternsData } from '@/lib/auth-store';
-import { useDateFormatter } from '@/lib/format';
-import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+  Loader2,
+  AlertTriangle,
+  LogIn,
+  Users,
+  AlertCircle,
+  Clock,
+} from "lucide-react";
+import { getLoginPatterns, type LoginPatternsData } from "@/lib/auth-store";
+import { useDateFormatter } from "@/lib/format";
+import { useAnalyticsFetcher } from "@/hooks/use-analytics-fetch";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export interface LoginPatternsProps {
   groupId?: string;
   days?: number;
 }
 
-export default function LoginPatterns({ groupId: propGroupId, days: propDays }: LoginPatternsProps = {}) {
+export default function LoginPatterns({
+  groupId: propGroupId,
+  days: propDays,
+}: LoginPatternsProps = {}) {
   const formatDate = useDateFormatter();
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId] = useState('');
+  const [internalGroupId] = useState("");
 
   const days = propDays ?? internalDays;
 
@@ -44,12 +59,20 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">
+          {error || "Нет данных"}
+        </p>
       </div>
     );
   }
 
-  const { loginFrequency, failedLogins, dormantAccounts, hourlyDistribution, dailyDistribution } = data;
+  const {
+    loginFrequency,
+    failedLogins,
+    dormantAccounts,
+    hourlyDistribution,
+    dailyDistribution,
+  } = data;
 
   const totalLogins = loginFrequency.reduce((sum, l) => sum + l.loginCount, 0);
 
@@ -85,21 +108,27 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Users size={18} className="mx-auto mb-1 text-indigo-600" />
-            <p className="text-2xl font-bold text-indigo-600">{loginFrequency.length}</p>
+            <p className="text-2xl font-bold text-indigo-600">
+              {loginFrequency.length}
+            </p>
             <p className="text-xs text-muted-foreground">Студентов</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <AlertCircle size={18} className="mx-auto mb-1 text-amber-600" />
-            <p className="text-2xl font-bold text-amber-600">{failedLogins.length}</p>
+            <p className="text-2xl font-bold text-amber-600">
+              {failedLogins.length}
+            </p>
             <p className="text-xs text-muted-foreground">С ошибками входа</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Clock size={18} className="mx-auto mb-1 text-red-600" />
-            <p className="text-2xl font-bold text-red-600">{dormantAccounts.length}</p>
+            <p className="text-2xl font-bold text-red-600">
+              {dormantAccounts.length}
+            </p>
             <p className="text-xs text-muted-foreground">Спящих аккаунтов</p>
           </CardContent>
         </Card>
@@ -108,7 +137,9 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
       {/* Hourly distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Распределение входов по часам</h3>
+          <h3 className="font-semibold text-sm mb-4">
+            Распределение входов по часам
+          </h3>
           <div className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hourlyDistribution}>
@@ -116,7 +147,12 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
                 <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Bar dataKey="loginCount" name="Входов" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="loginCount"
+                  name="Входов"
+                  fill="#6366f1"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -132,10 +168,21 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={dailyDistribution}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="day" tick={{ fontSize: 10 }} tickFormatter={(v: string) => v.slice(5)} />
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontSize: 10 }}
+                    tickFormatter={(v: string) => v.slice(5)}
+                  />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="loginCount" name="Входов" stroke="#10b981" strokeWidth={2} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="loginCount"
+                    name="Входов"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -148,27 +195,41 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
         <Card className="border-l-4 border-l-amber-400 border-border">
           <CardContent className="p-5">
             <h3 className="font-semibold text-sm mb-3 flex items-center gap-2 text-amber-600">
-              <AlertCircle size={16} /> Частые ошибки входа ({failedLogins.length} студентов)
+              <AlertCircle size={16} /> Частые ошибки входа (
+              {failedLogins.length} студентов)
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead className="bg-secondary border-b border-border">
                   <tr>
-                    <th className="text-left p-2 font-medium text-muted-foreground">Студент</th>
-                    <th className="p-2 font-medium text-muted-foreground text-center">Ошибок</th>
-                    <th className="p-2 font-medium text-muted-foreground text-center">Последние попытки</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">
+                      Студент
+                    </th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">
+                      Ошибок
+                    </th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">
+                      Последние попытки
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {failedLogins.slice(0, 15).map((f) => (
-                    <tr key={f.userId} className="border-b border-slate-100 hover:bg-secondary">
+                    <tr
+                      key={f.userId}
+                      className="border-b border-slate-100 hover:bg-secondary"
+                    >
                       <td className="p-2 font-medium">{f.fullName}</td>
                       <td className="p-2 text-center">
-                        <Badge variant="destructive" className="text-[10px]">{f.count}</Badge>
+                        <Badge variant="destructive" className="text-[10px]">
+                          {f.count}
+                        </Badge>
                       </td>
                       <td className="p-2 text-center text-muted-foreground">
                         {f.recentAttempts.map((a, i) => (
-                          <span key={i} className="mr-2">{formatDate(a.timestamp)} ({a.ip})</span>
+                          <span key={i} className="mr-2">
+                            {formatDate(a.timestamp)} ({a.ip})
+                          </span>
                         ))}
                       </td>
                     </tr>
@@ -191,20 +252,37 @@ export default function LoginPatterns({ groupId: propGroupId, days: propDays }: 
               <table className="w-full text-xs">
                 <thead className="bg-secondary border-b border-border">
                   <tr>
-                    <th className="text-left p-2 font-medium text-muted-foreground">Студент</th>
-                    <th className="p-2 font-medium text-muted-foreground">Группа</th>
-                    <th className="p-2 font-medium text-muted-foreground text-center">Последний вход</th>
-                    <th className="p-2 font-medium text-muted-foreground text-center">Дней неактивен</th>
+                    <th className="text-left p-2 font-medium text-muted-foreground">
+                      Студент
+                    </th>
+                    <th className="p-2 font-medium text-muted-foreground">
+                      Группа
+                    </th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">
+                      Последний вход
+                    </th>
+                    <th className="p-2 font-medium text-muted-foreground text-center">
+                      Дней неактивен
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {dormantAccounts.slice(0, 20).map((d) => (
-                    <tr key={d.userId} className="border-b border-slate-100 hover:bg-secondary">
+                    <tr
+                      key={d.userId}
+                      className="border-b border-slate-100 hover:bg-secondary"
+                    >
                       <td className="p-2 font-medium">{d.fullName}</td>
-                      <td className="p-2 text-muted-foreground">{d.group || '—'}</td>
-                      <td className="p-2 text-center text-muted-foreground">{formatDate(d.lastLogin)}</td>
+                      <td className="p-2 text-muted-foreground">
+                        {d.group || "—"}
+                      </td>
+                      <td className="p-2 text-center text-muted-foreground">
+                        {formatDate(d.lastLogin)}
+                      </td>
                       <td className="p-2 text-center">
-                        <Badge variant="destructive" className="text-[10px]">{d.daysInactive} дн.</Badge>
+                        <Badge variant="destructive" className="text-[10px]">
+                          {d.daysInactive} дн.
+                        </Badge>
                       </td>
                     </tr>
                   ))}

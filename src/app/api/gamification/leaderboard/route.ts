@@ -1,18 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized } from '@/lib/api-middleware';
-import { getRank } from '@/lib/xp-utils';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { authenticate, unauthorized } from "@/lib/api-middleware";
+import { getRank } from "@/lib/xp-utils";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
   const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get('limit') || '50', 10);
-  const group = searchParams.get('group');
+  const limit = parseInt(searchParams.get("limit") || "50", 10);
+  const group = searchParams.get("group");
 
   const where: Record<string, unknown> = {
-    role: 'student',
+    role: "student",
     isBlocked: false,
   };
 
@@ -24,10 +24,7 @@ export async function GET(request: NextRequest) {
   const [users, total] = await Promise.all([
     prisma.user.findMany({
       where,
-      orderBy: [
-        { xp: 'desc' },
-        { level: 'desc' },
-      ],
+      orderBy: [{ xp: "desc" }, { level: "desc" }],
       take: Math.min(limit, 100),
       select: {
         id: true,
@@ -59,7 +56,7 @@ export async function GET(request: NextRequest) {
   let userRank = leaderboard.find((u) => u.isCurrentUser);
   if (!userRank) {
     const [ownUser] = await prisma.user.findMany({
-      where: { id: auth.id, role: 'student', isBlocked: false },
+      where: { id: auth.id, role: "student", isBlocked: false },
       select: { xp: true, level: true, streak: true },
     });
     if (ownUser) {
@@ -67,8 +64,8 @@ export async function GET(request: NextRequest) {
       userRank = {
         position: -1,
         id: auth.id,
-        fullName: auth.fullName || 'You',
-        group: auth.group || '',
+        fullName: auth.fullName || "You",
+        group: auth.group || "",
         xp: ownUser.xp,
         level: ownUser.level,
         rankTitle: ownLevel,

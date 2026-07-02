@@ -1,5 +1,5 @@
-import { SignJWT, jwtVerify } from 'jose';
-import { env } from '@/lib/env';
+import { SignJWT, jwtVerify } from "jose";
+import { env } from "@/lib/env";
 
 export interface TokenPayload {
   id: string;
@@ -11,11 +11,20 @@ export interface TokenPayload {
 }
 
 const JWT_SECRET = new TextEncoder().encode(env.tokenSecret);
-const JWT_ALGORITHM = 'HS256';
+const JWT_ALGORITHM = "HS256";
 
-export async function generateToken(userId: string, role: string, options?: { rememberMe?: boolean; group?: string; fullName?: string; tokenVersion?: number }): Promise<string> {
+export async function generateToken(
+  userId: string,
+  role: string,
+  options?: {
+    rememberMe?: boolean;
+    group?: string;
+    fullName?: string;
+    tokenVersion?: number;
+  },
+): Promise<string> {
   const { rememberMe, group, fullName, tokenVersion } = options || {};
-  const expiry = rememberMe ? '30d' : '7d';
+  const expiry = rememberMe ? "30d" : "7d";
   return new SignJWT({ id: userId, role, group, fullName, tokenVersion })
     .setProtectedHeader({ alg: JWT_ALGORITHM })
     .setExpirationTime(expiry)
@@ -23,13 +32,23 @@ export async function generateToken(userId: string, role: string, options?: { re
     .sign(JWT_SECRET);
 }
 
-export async function signJwt(payload: { id: string; role: string; group?: string; fullName?: string }): Promise<string> {
-  return generateToken(payload.id, payload.role, { group: payload.group, fullName: payload.fullName });
+export async function signJwt(payload: {
+  id: string;
+  role: string;
+  group?: string;
+  fullName?: string;
+}): Promise<string> {
+  return generateToken(payload.id, payload.role, {
+    group: payload.group,
+    fullName: payload.fullName,
+  });
 }
 
 export async function verifyToken(token: string): Promise<TokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] });
+    const { payload } = await jwtVerify(token, JWT_SECRET, {
+      algorithms: [JWT_ALGORITHM],
+    });
     if (!payload.id || !payload.role || !payload.exp) return null;
     return {
       id: payload.id as string,
@@ -40,17 +59,22 @@ export async function verifyToken(token: string): Promise<TokenPayload | null> {
       exp: payload.exp as number,
     };
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[auth-server.ts] verifyToken failed:", e);
+    if (process.env.NODE_ENV === "development")
+      console.warn("[auth-server.ts] verifyToken failed:", e);
     return null;
   }
 }
 
-export async function getTokenPayload(token: string | null): Promise<TokenPayload | null> {
+export async function getTokenPayload(
+  token: string | null,
+): Promise<TokenPayload | null> {
   if (!token) return null;
   return verifyToken(token);
 }
 
-export async function authenticate(token: string | null): Promise<{ id: string; role: string } | null> {
+export async function authenticate(
+  token: string | null,
+): Promise<{ id: string; role: string } | null> {
   const payload = await getTokenPayload(token);
   if (!payload) return null;
   return { id: payload.id, role: payload.role };

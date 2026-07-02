@@ -1,44 +1,61 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireRole,
+} from "@/lib/api-middleware";
 
 // GET /api/progress/batch?userIds=id1,id2,id3
 // Fetch progress for multiple students at once (teacher/admin only)
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  if (!requireRole(auth.role, "teacher")) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const userIdsParam = searchParams.get('userIds');
+  const userIdsParam = searchParams.get("userIds");
   if (!userIdsParam) {
-    return NextResponse.json({ error: 'userIds query parameter required' }, { status: 400 });
+    return NextResponse.json(
+      { error: "userIds query parameter required" },
+      { status: 400 },
+    );
   }
 
-  const userIds = userIdsParam.split(',').map(id => id.trim()).filter(Boolean);
+  const userIds = userIdsParam
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
   if (userIds.length === 0) {
-    return NextResponse.json({ error: 'At least one userId required' }, { status: 400 });
+    return NextResponse.json(
+      { error: "At least one userId required" },
+      { status: 400 },
+    );
   }
   if (userIds.length > 200) {
-    return NextResponse.json({ error: 'Maximum 200 userIds per batch request' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Maximum 200 userIds per batch request" },
+      { status: 400 },
+    );
   }
 
   // Verify scope: teachers can only fetch students in their group
   let allowedIds = userIds;
-  if (auth.role !== 'admin' && auth.group) {
+  if (auth.role !== "admin" && auth.group) {
     const targetUsers = await prisma.user.findMany({
-      where: { id: { in: userIds }, role: 'student' },
+      where: { id: { in: userIds }, role: "student" },
       select: { id: true, group: true },
     });
     allowedIds = targetUsers
-      .filter(u => u.group === auth.group)
-      .map(u => u.id);
-  } else if (auth.role === 'admin') {
+      .filter((u) => u.group === auth.group)
+      .map((u) => u.id);
+  } else if (auth.role === "admin") {
     const targetUsers = await prisma.user.findMany({
-      where: { id: { in: userIds }, role: 'student' },
+      where: { id: { in: userIds }, role: "student" },
       select: { id: true },
     });
-    allowedIds = targetUsers.map(u => u.id);
+    allowedIds = targetUsers.map((u) => u.id);
   }
 
   if (allowedIds.length === 0) {
@@ -56,28 +73,31 @@ export async function GET(request: NextRequest) {
   ]);
 
   // Group results by userId
-  const result: Record<string, {
-    progress: Array<{
-      moduleId: string;
-      completed: boolean;
-      score: number | null;
-      sqlLevels: string | null;
-      xssLevels: string | null;
-      csrfSteps: string | null;
-      secureCodingAnswers: string | null;
-      secureCodingCorrectCount: number;
-      studiedOwaspItems: string | null;
-      challengeScores: string | null;
-      updatedAt: string;
-    }>;
-    quizResults: Array<{
-      quizId: string;
-      score: number;
-      total: number;
-      percentage: number;
-      updatedAt: string;
-    }>;
-  }> = {};
+  const result: Record<
+    string,
+    {
+      progress: Array<{
+        moduleId: string;
+        completed: boolean;
+        score: number | null;
+        sqlLevels: string | null;
+        xssLevels: string | null;
+        csrfSteps: string | null;
+        secureCodingAnswers: string | null;
+        secureCodingCorrectCount: number;
+        studiedOwaspItems: string | null;
+        challengeScores: string | null;
+        updatedAt: string;
+      }>;
+      quizResults: Array<{
+        quizId: string;
+        score: number;
+        total: number;
+        percentage: number;
+        updatedAt: string;
+      }>;
+    }
+  > = {};
 
   for (const id of allowedIds) {
     result[id] = { progress: [], quizResults: [] };
@@ -125,16 +145,20 @@ export async function POST(request: NextRequest) {
   const { progress, quizResults } = body;
 
   if (!progress && !quizResults) {
-    return NextResponse.json({ error: 'No data to save' }, { status: 400 });
+    return NextResponse.json({ error: "No data to save" }, { status: 400 });
   }
 
   // Limit batch size to prevent DoS
   const MAX_BATCH_SIZE = 100;
-  const progressArray = (progress && Array.isArray(progress) ? progress : []).slice(0, MAX_BATCH_SIZE);
-  const quizArray = (quizResults && Array.isArray(quizResults) ? quizResults : []).slice(0, MAX_BATCH_SIZE);
+  const progressArray = (
+    progress && Array.isArray(progress) ? progress : []
+  ).slice(0, MAX_BATCH_SIZE);
+  const quizArray = (
+    quizResults && Array.isArray(quizResults) ? quizResults : []
+  ).slice(0, MAX_BATCH_SIZE);
 
   if (progressArray.length + quizArray.length === 0) {
-    return NextResponse.json({ error: 'No data to save' }, { status: 400 });
+    return NextResponse.json({ error: "No data to save" }, { status: 400 });
   }
 
   // Wrap all operations in a transaction for atomicity
@@ -152,26 +176,71 @@ export async function POST(request: NextRequest) {
           moduleId: p.moduleId,
           completed: p.completed || false,
           score: p.score,
-          sqlLevels: Array.isArray(p.sqlLevels) ? JSON.stringify(p.sqlLevels) : (p.sqlLevels || ''),
-          xssLevels: Array.isArray(p.xssLevels) ? JSON.stringify(p.xssLevels) : (p.xssLevels || ''),
-          csrfSteps: Array.isArray(p.csrfSteps) ? JSON.stringify(p.csrfSteps) : (p.csrfSteps || ''),
-          csrfChallengeScores: Array.isArray(p.csrfChallengeScores) ? JSON.stringify(p.csrfChallengeScores) : (p.csrfChallengeScores || ''),
-          secureCodingAnswers: Array.isArray(p.secureCodingAnswers) ? JSON.stringify(p.secureCodingAnswers) : (p.secureCodingAnswers || ''),
+          sqlLevels: Array.isArray(p.sqlLevels)
+            ? JSON.stringify(p.sqlLevels)
+            : p.sqlLevels || "",
+          xssLevels: Array.isArray(p.xssLevels)
+            ? JSON.stringify(p.xssLevels)
+            : p.xssLevels || "",
+          csrfSteps: Array.isArray(p.csrfSteps)
+            ? JSON.stringify(p.csrfSteps)
+            : p.csrfSteps || "",
+          csrfChallengeScores: Array.isArray(p.csrfChallengeScores)
+            ? JSON.stringify(p.csrfChallengeScores)
+            : p.csrfChallengeScores || "",
+          secureCodingAnswers: Array.isArray(p.secureCodingAnswers)
+            ? JSON.stringify(p.secureCodingAnswers)
+            : p.secureCodingAnswers || "",
           secureCodingCorrectCount: p.secureCodingCorrectCount || 0,
-          studiedOwaspItems: Array.isArray(p.studiedOwaspItems) ? JSON.stringify(p.studiedOwaspItems) : (p.studiedOwaspItems || ''),
-          challengeScores: p.challengeScores ? JSON.stringify(p.challengeScores) : undefined,
+          studiedOwaspItems: Array.isArray(p.studiedOwaspItems)
+            ? JSON.stringify(p.studiedOwaspItems)
+            : p.studiedOwaspItems || "",
+          challengeScores: p.challengeScores
+            ? JSON.stringify(p.challengeScores)
+            : undefined,
         },
         update: {
           ...(p.completed !== undefined && { completed: p.completed }),
           ...(p.score !== undefined && { score: p.score }),
-          ...(p.sqlLevels && { sqlLevels: Array.isArray(p.sqlLevels) ? JSON.stringify(p.sqlLevels) : p.sqlLevels }),
-          ...(p.xssLevels && { xssLevels: Array.isArray(p.xssLevels) ? JSON.stringify(p.xssLevels) : p.xssLevels }),
-          ...(p.csrfSteps && { csrfSteps: Array.isArray(p.csrfSteps) ? JSON.stringify(p.csrfSteps) : p.csrfSteps }),
-          ...(p.csrfChallengeScores && { csrfChallengeScores: Array.isArray(p.csrfChallengeScores) ? JSON.stringify(p.csrfChallengeScores) : p.csrfChallengeScores }),
-          ...(p.secureCodingAnswers && { secureCodingAnswers: Array.isArray(p.secureCodingAnswers) ? JSON.stringify(p.secureCodingAnswers) : p.secureCodingAnswers }),
-          ...(p.secureCodingCorrectCount !== undefined && { secureCodingCorrectCount: p.secureCodingCorrectCount }),
-          ...(p.studiedOwaspItems && { studiedOwaspItems: Array.isArray(p.studiedOwaspItems) ? JSON.stringify(p.studiedOwaspItems) : p.studiedOwaspItems }),
-          ...(p.challengeScores !== undefined && { challengeScores: typeof p.challengeScores === 'object' ? JSON.stringify(p.challengeScores) : p.challengeScores }),
+          ...(p.sqlLevels && {
+            sqlLevels: Array.isArray(p.sqlLevels)
+              ? JSON.stringify(p.sqlLevels)
+              : p.sqlLevels,
+          }),
+          ...(p.xssLevels && {
+            xssLevels: Array.isArray(p.xssLevels)
+              ? JSON.stringify(p.xssLevels)
+              : p.xssLevels,
+          }),
+          ...(p.csrfSteps && {
+            csrfSteps: Array.isArray(p.csrfSteps)
+              ? JSON.stringify(p.csrfSteps)
+              : p.csrfSteps,
+          }),
+          ...(p.csrfChallengeScores && {
+            csrfChallengeScores: Array.isArray(p.csrfChallengeScores)
+              ? JSON.stringify(p.csrfChallengeScores)
+              : p.csrfChallengeScores,
+          }),
+          ...(p.secureCodingAnswers && {
+            secureCodingAnswers: Array.isArray(p.secureCodingAnswers)
+              ? JSON.stringify(p.secureCodingAnswers)
+              : p.secureCodingAnswers,
+          }),
+          ...(p.secureCodingCorrectCount !== undefined && {
+            secureCodingCorrectCount: p.secureCodingCorrectCount,
+          }),
+          ...(p.studiedOwaspItems && {
+            studiedOwaspItems: Array.isArray(p.studiedOwaspItems)
+              ? JSON.stringify(p.studiedOwaspItems)
+              : p.studiedOwaspItems,
+          }),
+          ...(p.challengeScores !== undefined && {
+            challengeScores:
+              typeof p.challengeScores === "object"
+                ? JSON.stringify(p.challengeScores)
+                : p.challengeScores,
+          }),
         },
       });
       progressSaved++;
@@ -179,7 +248,8 @@ export async function POST(request: NextRequest) {
 
     // Save quiz results
     for (const q of quizArray) {
-      const percentage = q.total > 0 ? Math.round((q.score / q.total) * 100) : 0;
+      const percentage =
+        q.total > 0 ? Math.round((q.score / q.total) * 100) : 0;
       await tx.quizResult.upsert({
         where: { userId_quizId: { userId: auth.id, quizId: q.quizId } },
         create: {

@@ -1,5 +1,5 @@
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface CodeBlockProps {
   code: string;
@@ -7,7 +7,11 @@ interface CodeBlockProps {
   title?: string;
 }
 
-export default function CodeBlock({ code, language = 'javascript', title }: CodeBlockProps) {
+export default function CodeBlock({
+  code,
+  language = "javascript",
+  title,
+}: CodeBlockProps) {
   return (
     <div className="rounded-lg overflow-hidden border border-slate-700 my-3">
       {title && (
@@ -18,7 +22,11 @@ export default function CodeBlock({ code, language = 'javascript', title }: Code
           <span className="ml-2">{title}</span>
         </div>
       )}
-      <SyntaxHighlighter language={language} style={oneDark} customStyle={{ margin: 0, fontSize: '0.85rem' }}>
+      <SyntaxHighlighter
+        language={language}
+        style={oneDark}
+        customStyle={{ margin: 0, fontSize: "0.85rem" }}
+      >
         {code}
       </SyntaxHighlighter>
     </div>

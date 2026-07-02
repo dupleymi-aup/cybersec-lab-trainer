@@ -1,6 +1,11 @@
-import { useAuthStore } from '@/lib/auth-store';
-import { hasCapability, hasAnyCapability, hasCapabilities, type Capability } from '@/lib/capabilities';
-import type { UserRole } from '@/lib/auth-types';
+import { useAuthStore } from "@/lib/auth-store";
+import {
+  hasCapability,
+  hasAnyCapability,
+  hasCapabilities,
+  type Capability,
+} from "@/lib/capabilities";
+import type { UserRole } from "@/lib/auth-types";
 
 /**
  * React hook for client-side capability checks.

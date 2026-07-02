@@ -1,22 +1,53 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
 import {
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-  LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-} from 'recharts';
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  LineChart,
+  Line,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+} from "recharts";
 import {
-  ArrowLeft, GraduationCap, BookOpen, Brain, Clock, AlertTriangle, TrendingUp,
-  Target, Zap, CheckCircle2, XCircle, Activity, Loader2, Users,
-} from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getStudentPerformance, getComprehensiveSummary, getProgressTrends } from '@/lib/auth-store';
-import { useDateFormatter, useDateTimeFormatter } from '@/lib/format';
-import { modules, quizCategories } from '@/lib/data';
-import type { StudentPerformanceData, ComprehensiveSummary, TrendPoint } from '@/lib/auth-store';
+  ArrowLeft,
+  GraduationCap,
+  BookOpen,
+  Brain,
+  Clock,
+  AlertTriangle,
+  TrendingUp,
+  Target,
+  Zap,
+  CheckCircle2,
+  XCircle,
+  Activity,
+  Loader2,
+  Users,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  getStudentPerformance,
+  getComprehensiveSummary,
+  getProgressTrends,
+} from "@/lib/auth-store";
+import { useDateFormatter, useDateTimeFormatter } from "@/lib/format";
+import { modules, quizCategories } from "@/lib/data";
+import type {
+  StudentPerformanceData,
+  ComprehensiveSummary,
+  TrendPoint,
+} from "@/lib/auth-store";
 
 function getStudentProgressLocal(userId: string): {
   completedModules: string[];
@@ -36,14 +67,33 @@ function getStudentProgressLocal(userId: string): {
       };
     }
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[StudentProgressView.tsx] getStudentProgressLocal failed:", e);
+    if (process.env.NODE_ENV === "development")
+      console.warn(
+        "[StudentProgressView.tsx] getStudentProgressLocal failed:",
+        e,
+      );
     // Intentionally silent — fallback to defaults if localStorage fails
   }
-  return { completedModules: [], quizScores: {}, moduleTimestamps: {}, quizTimestamps: {} };
+  return {
+    completedModules: [],
+    quizScores: {},
+    moduleTimestamps: {},
+    quizTimestamps: {},
+  };
 }
 
-export default function StudentProgressView({ students: studentList, groupId, onBack }: {
-  students: Array<{ id: string; fullName: string; email: string; group: string; avatar: string }>;
+export default function StudentProgressView({
+  students: studentList,
+  groupId,
+  onBack,
+}: {
+  students: Array<{
+    id: string;
+    fullName: string;
+    email: string;
+    group: string;
+    avatar: string;
+  }>;
   groupId?: string;
   onBack: () => void;
 }) {
@@ -54,11 +104,11 @@ export default function StudentProgressView({ students: studentList, groupId, on
   const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
   const [trends, setTrends] = useState<TrendPoint[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   const selectedStudent = useMemo(
     () => studentList.find((s) => s.id === selectedId) || null,
-    [selectedId, studentList]
+    [selectedId, studentList],
   );
 
   useEffect(() => {
@@ -70,7 +120,7 @@ export default function StudentProgressView({ students: studentList, groupId, on
     Promise.all([
       getStudentPerformance(selectedId, 30),
       getComprehensiveSummary(30, groupId),
-      getProgressTrends(selectedId, '30d', groupId),
+      getProgressTrends(selectedId, "30d", groupId),
     ])
       .then(([perf, summ, trendData]) => {
         setData(perf);
@@ -78,12 +128,16 @@ export default function StudentProgressView({ students: studentList, groupId, on
         setTrends(trendData);
       })
       .catch((err) => {
-        if (process.env.NODE_ENV === 'development') console.error('StudentProgressView: Failed to load student data:', err);
+        if (process.env.NODE_ENV === "development")
+          console.error(
+            "StudentProgressView: Failed to load student data:",
+            err,
+          );
       })
       .finally(() => setLoading(false));
   }, [selectedId, groupId]);
 
-  const localProgress = getStudentProgressLocal(selectedId || '');
+  const localProgress = getStudentProgressLocal(selectedId || "");
 
   const radarData = useMemo(() => {
     if (!selectedId) return [];
@@ -111,9 +165,15 @@ export default function StudentProgressView({ students: studentList, groupId, on
           const progress = getStudentProgressLocal(student.id);
           const moduleCount = progress.completedModules.length;
           const quizCount = Object.keys(progress.quizScores).length;
-          const avgScore = Object.values(progress.quizScores).length > 0
-            ? Math.round(Object.values(progress.quizScores).reduce((a, b) => a + b, 0) / Object.values(progress.quizScores).length)
-            : 0;
+          const avgScore =
+            Object.values(progress.quizScores).length > 0
+              ? Math.round(
+                  Object.values(progress.quizScores).reduce(
+                    (a, b) => a + b,
+                    0,
+                  ) / Object.values(progress.quizScores).length,
+                )
+              : 0;
 
           return (
             <motion.div
@@ -132,16 +192,32 @@ export default function StudentProgressView({ students: studentList, groupId, on
                       <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden shrink-0">
                         {student.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={student.avatar} alt={`Аватар: ${student.fullName}`} className="w-full h-full object-cover" />
+                          <img
+                            src={student.avatar}
+                            alt={`Аватар: ${student.fullName}`}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
-                          <GraduationCap size={16} className="text-violet-600" />
+                          <GraduationCap
+                            size={16}
+                            className="text-violet-600"
+                          />
                         )}
                       </div>
                       <div>
-                        <p className="font-semibold text-sm">{student.fullName}</p>
-                        <p className="text-xs text-slate-400">{student.email}</p>
+                        <p className="font-semibold text-sm">
+                          {student.fullName}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          {student.email}
+                        </p>
                         {student.group && (
-                          <Badge variant="secondary" className="text-[10px] mt-0.5">{student.group}</Badge>
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] mt-0.5"
+                          >
+                            {student.group}
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -181,7 +257,11 @@ export default function StudentProgressView({ students: studentList, groupId, on
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
-          onClick={() => { setSelectedId(null); setData(null); onBack(); }}
+          onClick={() => {
+            setSelectedId(null);
+            setData(null);
+            onBack();
+          }}
           className="p-1.5 rounded-lg hover:bg-muted transition-colors"
         >
           <ArrowLeft size={18} className="text-muted-foreground" />
@@ -190,7 +270,11 @@ export default function StudentProgressView({ students: studentList, groupId, on
           <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden">
             {selectedStudent.avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={selectedStudent.avatar} alt={`Аватар: ${selectedStudent.fullName}`} className="w-full h-full object-cover" />
+              <img
+                src={selectedStudent.avatar}
+                alt={`Аватар: ${selectedStudent.fullName}`}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <GraduationCap size={20} className="text-violet-600" />
             )}
@@ -201,11 +285,15 @@ export default function StudentProgressView({ students: studentList, groupId, on
           </div>
         </div>
         {data && (
-          <Badge className={
-            data.kpis.riskScore > 60 ? 'bg-red-100 text-red-700' :
-            data.kpis.riskScore > 30 ? 'bg-amber-100 text-amber-700' :
-            'bg-emerald-100 text-emerald-700'
-          }>
+          <Badge
+            className={
+              data.kpis.riskScore > 60
+                ? "bg-red-100 text-red-700"
+                : data.kpis.riskScore > 30
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-emerald-100 text-emerald-700"
+            }
+          >
             Риск: {data.kpis.riskScore}%
           </Badge>
         )}
@@ -225,11 +313,15 @@ export default function StudentProgressView({ students: studentList, groupId, on
                   <BookOpen size={14} className="text-blue-500" />
                   <span className="text-xs text-muted-foreground">Модули</span>
                 </div>
-                <p className="text-xl font-bold mt-1">{data.kpis.modulesCompleted}/{data.kpis.totalModules}</p>
+                <p className="text-xl font-bold mt-1">
+                  {data.kpis.modulesCompleted}/{data.kpis.totalModules}
+                </p>
                 <div className="w-full bg-muted rounded-full h-1.5 mt-1">
                   <div
                     className="bg-blue-500 h-1.5 rounded-full transition-all"
-                    style={{ width: `${data.kpis.totalModules > 0 ? (data.kpis.modulesCompleted / data.kpis.totalModules) * 100 : 0}%` }}
+                    style={{
+                      width: `${data.kpis.totalModules > 0 ? (data.kpis.modulesCompleted / data.kpis.totalModules) * 100 : 0}%`,
+                    }}
                   />
                 </div>
               </CardContent>
@@ -238,31 +330,56 @@ export default function StudentProgressView({ students: studentList, groupId, on
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <Brain size={14} className="text-emerald-500" />
-                  <span className="text-xs text-muted-foreground">Ср. балл</span>
+                  <span className="text-xs text-muted-foreground">
+                    Ср. балл
+                  </span>
                 </div>
-                <p className="text-xl font-bold mt-1">{data.kpis.avgQuizScore}%</p>
-                <p className="text-xs text-slate-400 mt-1">{data.kpis.totalQuizAttempts} попыток</p>
+                <p className="text-xl font-bold mt-1">
+                  {data.kpis.avgQuizScore}%
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {data.kpis.totalQuizAttempts} попыток
+                </p>
               </CardContent>
             </Card>
             <Card className="border-border">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <Activity size={14} className="text-violet-500" />
-                  <span className="text-xs text-muted-foreground">Вовлечённость</span>
+                  <span className="text-xs text-muted-foreground">
+                    Вовлечённость
+                  </span>
                 </div>
-                <p className="text-xl font-bold mt-1">{data.kpis.engagementScore}%</p>
-                <p className="text-xs text-slate-400 mt-1">Не активен {data.kpis.lastActiveDays} дн.</p>
+                <p className="text-xl font-bold mt-1">
+                  {data.kpis.engagementScore}%
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Не активен {data.kpis.lastActiveDays} дн.
+                </p>
               </CardContent>
             </Card>
             <Card className="border-border">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
-                  <Target size={14} className={data.kpis.riskScore > 60 ? 'text-red-500' : data.kpis.riskScore > 30 ? 'text-amber-500' : 'text-emerald-500'} />
+                  <Target
+                    size={14}
+                    className={
+                      data.kpis.riskScore > 60
+                        ? "text-red-500"
+                        : data.kpis.riskScore > 30
+                          ? "text-amber-500"
+                          : "text-emerald-500"
+                    }
+                  />
                   <span className="text-xs text-muted-foreground">Риск</span>
                 </div>
                 <p className="text-xl font-bold mt-1">{data.kpis.riskScore}%</p>
                 <p className="text-xs text-slate-400 mt-1">
-                  {data.kpis.riskScore > 60 ? 'Требует внимания' : data.kpis.riskScore > 30 ? 'Средний' : 'Низкий'}
+                  {data.kpis.riskScore > 60
+                    ? "Требует внимания"
+                    : data.kpis.riskScore > 30
+                      ? "Средний"
+                      : "Низкий"}
                 </p>
               </CardContent>
             </Card>
@@ -271,10 +388,18 @@ export default function StudentProgressView({ students: studentList, groupId, on
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview" className="text-xs">Обзор</TabsTrigger>
-              <TabsTrigger value="modules" className="text-xs">Модули</TabsTrigger>
-              <TabsTrigger value="trends" className="text-xs">Тренды</TabsTrigger>
-              <TabsTrigger value="activity" className="text-xs">Активность</TabsTrigger>
+              <TabsTrigger value="overview" className="text-xs">
+                Обзор
+              </TabsTrigger>
+              <TabsTrigger value="modules" className="text-xs">
+                Модули
+              </TabsTrigger>
+              <TabsTrigger value="trends" className="text-xs">
+                Тренды
+              </TabsTrigger>
+              <TabsTrigger value="activity" className="text-xs">
+                Активность
+              </TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
@@ -288,10 +413,29 @@ export default function StudentProgressView({ students: studentList, groupId, on
                       <ResponsiveContainer width="100%" height="100%">
                         <RadarChart data={radarData}>
                           <PolarGrid stroke="#e2e8f0" />
-                          <PolarAngleAxis dataKey="category" tick={{ fontSize: 10 }} />
-                          <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 9 }} />
-                          <Radar name={selectedStudent.fullName} dataKey="student" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.2} />
-                          <Radar name="Среднее по группе" dataKey="group" stroke="#94a3b8" fill="#94a3b8" fillOpacity={0.1} />
+                          <PolarAngleAxis
+                            dataKey="category"
+                            tick={{ fontSize: 10 }}
+                          />
+                          <PolarRadiusAxis
+                            angle={30}
+                            domain={[0, 100]}
+                            tick={{ fontSize: 9 }}
+                          />
+                          <Radar
+                            name={selectedStudent.fullName}
+                            dataKey="student"
+                            stroke="#8b5cf6"
+                            fill="#8b5cf6"
+                            fillOpacity={0.2}
+                          />
+                          <Radar
+                            name="Среднее по группе"
+                            dataKey="group"
+                            stroke="#94a3b8"
+                            fill="#94a3b8"
+                            fillOpacity={0.1}
+                          />
                           <Legend wrapperStyle={{ fontSize: 10 }} />
                         </RadarChart>
                       </ResponsiveContainer>
@@ -302,21 +446,36 @@ export default function StudentProgressView({ students: studentList, groupId, on
                 {/* Category Breakdown */}
                 <Card className="border-border">
                   <CardContent className="p-3">
-                    <h4 className="text-xs font-semibold mb-2">Результаты по категориям</h4>
+                    <h4 className="text-xs font-semibold mb-2">
+                      Результаты по категориям
+                    </h4>
                     <div className="space-y-2">
                       {radarData.map((cat) => (
-                        <div key={cat.category} className="flex items-center gap-2">
-                          <span className="text-[11px] text-muted-foreground w-24 truncate" title={cat.category}>{cat.category}</span>
+                        <div
+                          key={cat.category}
+                          className="flex items-center gap-2"
+                        >
+                          <span
+                            className="text-[11px] text-muted-foreground w-24 truncate"
+                            title={cat.category}
+                          >
+                            {cat.category}
+                          </span>
                           <div className="flex-1 bg-muted rounded-full h-2">
                             <div
                               className={`h-2 rounded-full transition-all ${
-                                cat.student >= 80 ? 'bg-emerald-500' :
-                                cat.student >= 50 ? 'bg-amber-500' : 'bg-red-400'
+                                cat.student >= 80
+                                  ? "bg-emerald-500"
+                                  : cat.student >= 50
+                                    ? "bg-amber-500"
+                                    : "bg-red-400"
                               }`}
                               style={{ width: `${cat.student}%` }}
                             />
                           </div>
-                          <span className="text-[11px] font-medium w-8 text-right">{cat.student}%</span>
+                          <span className="text-[11px] font-medium w-8 text-right">
+                            {cat.student}%
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -328,18 +487,30 @@ export default function StudentProgressView({ students: studentList, groupId, on
               {data.activityTimeline.length > 0 && (
                 <Card className="border-border">
                   <CardContent className="p-3">
-                    <h4 className="text-xs font-semibold mb-2">Последние действия</h4>
+                    <h4 className="text-xs font-semibold mb-2">
+                      Последние действия
+                    </h4>
                     <div className="space-y-1.5">
                       {data.activityTimeline.slice(0, 5).map((event, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs">
-                          <div className={`w-1.5 h-1.5 rounded-full ${
-                            event.type === 'module' ? 'bg-blue-400' :
-                            event.type === 'quiz' ? 'bg-emerald-400' : 'bg-slate-300'
-                          }`} />
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 text-xs"
+                        >
+                          <div
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              event.type === "module"
+                                ? "bg-blue-400"
+                                : event.type === "quiz"
+                                  ? "bg-emerald-400"
+                                  : "bg-slate-300"
+                            }`}
+                          />
                           <span className="text-muted-foreground min-w-[80px]">
                             {formatDate(event.date)}
                           </span>
-                          <span className="text-foreground/70">{event.details}</span>
+                          <span className="text-foreground/70">
+                            {event.details}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -352,23 +523,37 @@ export default function StudentProgressView({ students: studentList, groupId, on
             <TabsContent value="modules" className="mt-3">
               <Card className="border-border">
                 <CardContent className="p-3">
-                  <h4 className="text-xs font-semibold mb-3">Прогресс по модулям</h4>
+                  <h4 className="text-xs font-semibold mb-3">
+                    Прогресс по модулям
+                  </h4>
                   <div className="space-y-1.5">
                     {data.moduleProgress.map((mod) => {
-                      const modInfo = modules.find((m) => m.id === mod.moduleId);
+                      const modInfo = modules.find(
+                        (m) => m.id === mod.moduleId,
+                      );
                       return (
-                        <div key={mod.moduleId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary">
+                        <div
+                          key={mod.moduleId}
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary"
+                        >
                           <div className="w-6 h-6 rounded-full flex items-center justify-center">
                             {mod.completed ? (
-                              <CheckCircle2 size={16} className="text-emerald-500" />
+                              <CheckCircle2
+                                size={16}
+                                className="text-emerald-500"
+                              />
                             ) : (
                               <XCircle size={16} className="text-slate-300" />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium truncate">{modInfo?.title || mod.moduleId}</p>
+                            <p className="text-xs font-medium truncate">
+                              {modInfo?.title || mod.moduleId}
+                            </p>
                             <p className="text-[10px] text-slate-400">
-                              {mod.completed ? `Оценка: ${mod.score ?? '—'}%` : 'Не пройден'}
+                              {mod.completed
+                                ? `Оценка: ${mod.score ?? "—"}%`
+                                : "Не пройден"}
                             </p>
                           </div>
                           <div className="text-right">
@@ -390,26 +575,58 @@ export default function StudentProgressView({ students: studentList, groupId, on
             <TabsContent value="trends" className="mt-3">
               <Card className="border-border">
                 <CardContent className="p-3">
-                  <h4 className="text-xs font-semibold mb-3">Динамика успеваемости</h4>
+                  <h4 className="text-xs font-semibold mb-3">
+                    Динамика успеваемости
+                  </h4>
                   {trends.length > 0 ? (
                     <div className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={trends}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="#e2e8f0"
+                          />
                           <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                          <YAxis yAxisId="left" domain={[0, 100]} tick={{ fontSize: 10 }} />
-                          <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} tick={{ fontSize: 10 }} />
+                          <YAxis
+                            yAxisId="left"
+                            domain={[0, 100]}
+                            tick={{ fontSize: 10 }}
+                          />
+                          <YAxis
+                            yAxisId="right"
+                            orientation="right"
+                            domain={[0, "auto"]}
+                            tick={{ fontSize: 10 }}
+                          />
                           <Tooltip contentStyle={{ fontSize: 12 }} />
                           <Legend wrapperStyle={{ fontSize: 10 }} />
-                          <Line yAxisId="left" type="monotone" dataKey="avgQuizScore" name="Ср. балл" stroke="#8b5cf6" strokeWidth={2} dot={false} />
-                          <Line yAxisId="right" type="monotone" dataKey="modulesCompleted" name="Модули" stroke="#10b981" strokeWidth={2} dot={false} />
+                          <Line
+                            yAxisId="left"
+                            type="monotone"
+                            dataKey="avgQuizScore"
+                            name="Ср. балл"
+                            stroke="#8b5cf6"
+                            strokeWidth={2}
+                            dot={false}
+                          />
+                          <Line
+                            yAxisId="right"
+                            type="monotone"
+                            dataKey="modulesCompleted"
+                            name="Модули"
+                            stroke="#10b981"
+                            strokeWidth={2}
+                            dot={false}
+                          />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center h-48 text-slate-400">
                       <TrendingUp size={24} className="mr-2 opacity-50" />
-                      <span className="text-sm">Недостаточно данных для тренда</span>
+                      <span className="text-sm">
+                        Недостаточно данных для тренда
+                      </span>
                     </div>
                   )}
                 </CardContent>
@@ -420,24 +637,39 @@ export default function StudentProgressView({ students: studentList, groupId, on
             <TabsContent value="activity" className="mt-3">
               <Card className="border-border">
                 <CardContent className="p-3">
-                  <h4 className="text-xs font-semibold mb-3">Хронология активности</h4>
+                  <h4 className="text-xs font-semibold mb-3">
+                    Хронология активности
+                  </h4>
                   {data.activityTimeline.length > 0 ? (
                     <div className="space-y-1.5 max-h-96 overflow-y-auto">
                       {data.activityTimeline.map((event, i) => (
-                        <div key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-secondary">
+                        <div
+                          key={i}
+                          className="flex items-start gap-3 p-2 rounded-lg hover:bg-secondary"
+                        >
                           <div className="mt-0.5">
-                            <div className={`w-2 h-2 rounded-full ${
-                              event.type === 'module' ? 'bg-blue-400' :
-                              event.type === 'quiz' ? 'bg-emerald-400' : 'bg-slate-300'
-                            }`} />
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                event.type === "module"
+                                  ? "bg-blue-400"
+                                  : event.type === "quiz"
+                                    ? "bg-emerald-400"
+                                    : "bg-slate-300"
+                              }`}
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs text-foreground/70">{event.details}</p>
+                            <p className="text-xs text-foreground/70">
+                              {event.details}
+                            </p>
                             <p className="text-[10px] text-slate-400 mt-0.5">
                               {formatDateTime(event.date)}
                             </p>
                           </div>
-                          <Badge variant="secondary" className="text-[10px] capitalize">
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] capitalize"
+                          >
                             {event.type}
                           </Badge>
                         </div>

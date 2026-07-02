@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAppStore } from '@/lib/store';
-import { xssTypes } from '@/lib/data';
-import CodeBlock from './CodeBlock';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from "react";
+import { useAppStore } from "@/lib/store";
+import { xssTypes } from "@/lib/data";
+import CodeBlock from "./CodeBlock";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
   CheckCircle2,
@@ -21,17 +21,17 @@ import {
   EyeOff,
   XCircle,
   Lightbulb,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function XSSLab() {
-  const xssCompletedLevels = useAppStore(s => s.xssCompletedLevels);
-  const addXssLevel = useAppStore(s => s.addXssLevel);
-  const completeModule = useAppStore(s => s.completeModule);
-  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const xssCompletedLevels = useAppStore((s) => s.xssCompletedLevels);
+  const addXssLevel = useAppStore((s) => s.addXssLevel);
+  const completeModule = useAppStore((s) => s.completeModule);
+  const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sanitized, setSanitized] = useState(false);
   const [showAttack, setShowAttack] = useState(false);
-  const [userPayload, setUserPayload] = useState('');
+  const [userPayload, setUserPayload] = useState("");
   const [showPayloadResult, setShowPayloadResult] = useState(false);
 
   const currentXss = xssTypes[currentIndex];
@@ -43,7 +43,7 @@ export default function XSSLab() {
       addXssLevel(id);
       const { xssCompletedLevels: updatedCompleted } = useAppStore.getState();
       if (updatedCompleted.length === xssTypes.length) {
-        completeModule('xss');
+        completeModule("xss");
       }
     }
   };
@@ -53,7 +53,7 @@ export default function XSSLab() {
       setCurrentIndex(currentIndex + 1);
       setShowAttack(false);
       setSanitized(false);
-      setUserPayload('');
+      setUserPayload("");
       setShowPayloadResult(false);
     }
   };
@@ -63,7 +63,7 @@ export default function XSSLab() {
       setCurrentIndex(currentIndex - 1);
       setShowAttack(false);
       setSanitized(false);
-      setUserPayload('');
+      setUserPayload("");
       setShowPayloadResult(false);
     }
   };
@@ -72,52 +72,62 @@ export default function XSSLab() {
     const text = payload || currentXss.attackDemo;
     if (sanitized) {
       const escaped = text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
       return (
         <div className="bg-card rounded-lg p-4 border border-emerald-200">
-          <p className="text-xs text-muted-foreground mb-2">Безопасный вывод (textContent / экранирование):</p>
+          <p className="text-xs text-muted-foreground mb-2">
+            Безопасный вывод (textContent / экранирование):
+          </p>
           <code className="text-xs bg-muted px-2 py-1 rounded block font-mono break-all whitespace-pre-wrap">
             {escaped}
           </code>
           <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1.5">
-            <CheckCircle2 size={14} /> Код не выполнен — все спецсимволы закодированы
+            <CheckCircle2 size={14} /> Код не выполнен — все спецсимволы
+            закодированы
           </p>
         </div>
       );
     }
     return (
       <div className="bg-card rounded-lg p-4 border border-red-200">
-        <p className="text-xs text-muted-foreground mb-2">Небезопасный вывод (innerHTML):</p>
+        <p className="text-xs text-muted-foreground mb-2">
+          Небезопасный вывод (innerHTML):
+        </p>
         <div className="bg-red-50 rounded-lg p-3 border border-red-200">
           <code className="text-xs font-mono text-red-700 break-all whitespace-pre-wrap">
             {text}
           </code>
         </div>
         <p className="text-xs text-red-600 mt-2 font-medium flex items-center gap-1.5">
-          <AlertTriangle size={14} /> В реальном приложении этот скрипт БЫ ВЫПОЛНЕН в браузере жертвы!
+          <AlertTriangle size={14} /> В реальном приложении этот скрипт БЫ
+          ВЫПОЛНЕН в браузере жертвы!
         </p>
       </div>
     );
   };
 
   const badgeTexts: Record<string, string> = {
-    reflected: 'Самый распространённый',
-    stored: 'Самый опасный',
-    dom: 'Невидимый для сервера',
-    svg: 'Через изображения',
-    markdown: 'Через парсеры MD',
-    pdf: 'Через документы',
+    reflected: "Самый распространённый",
+    stored: "Самый опасный",
+    dom: "Невидимый для сервера",
+    svg: "Через изображения",
+    markdown: "Через парсеры MD",
+    pdf: "Через документы",
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCurrentPage("dashboard")}
+        >
           <ChevronLeft size={20} />
         </Button>
         <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
@@ -125,7 +135,9 @@ export default function XSSLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Лаборатория XSS-атак</h1>
-          <p className="text-xs text-muted-foreground">6 типов Cross-Site Scripting уязвимостей</p>
+          <p className="text-xs text-muted-foreground">
+            6 типов Cross-Site Scripting уязвимостей
+          </p>
         </div>
       </div>
 
@@ -136,19 +148,29 @@ export default function XSSLab() {
             <span className="text-sm font-medium">
               Изучено: {xssCompletedLevels.length}/{xssTypes.length}
             </span>
-            {allCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
+            {allCompleted && (
+              <Badge className="bg-emerald-600 text-white">
+                Модуль завершён!
+              </Badge>
+            )}
           </div>
           <div className="flex gap-2">
             {xssTypes.map((x, i) => (
               <button
                 key={x.id}
-                onClick={() => { setCurrentIndex(i); setShowAttack(false); setSanitized(false); setUserPayload(''); setShowPayloadResult(false); }}
+                onClick={() => {
+                  setCurrentIndex(i);
+                  setShowAttack(false);
+                  setSanitized(false);
+                  setUserPayload("");
+                  setShowPayloadResult(false);
+                }}
                 className={`flex-1 h-2 rounded-full transition-all ${
                   xssCompletedLevels.includes(x.id)
-                    ? 'bg-emerald-500'
+                    ? "bg-emerald-500"
                     : i === currentIndex
-                      ? 'bg-emerald-300'
-                      : 'bg-slate-200'
+                      ? "bg-emerald-300"
+                      : "bg-slate-200"
                 }`}
                 title={x.title}
               />
@@ -162,15 +184,33 @@ export default function XSSLab() {
         {xssTypes.map((x, i) => (
           <button
             key={x.id}
-            onClick={() => { setCurrentIndex(i); setShowAttack(false); setSanitized(false); setUserPayload(''); setShowPayloadResult(false); }}
+            onClick={() => {
+              setCurrentIndex(i);
+              setShowAttack(false);
+              setSanitized(false);
+              setUserPayload("");
+              setShowPayloadResult(false);
+            }}
             className={`px-3 py-2 rounded-lg text-xs font-medium border-2 transition-all text-center ${
               i === currentIndex
-                ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                : 'border-border bg-card text-muted-foreground hover:border-border'
+                ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                : "border-border bg-card text-muted-foreground hover:border-border"
             }`}
           >
-            {x.id === 'reflected' ? 'Отражённый' : x.id === 'stored' ? 'Хранимый' : x.id === 'dom' ? 'DOM-based' : x.id === 'svg' ? 'SVG' : x.id === 'markdown' ? 'Markdown' : 'PDF'}
-            {xssCompletedLevels.includes(x.id) && <CheckCircle2 size={12} className="inline ml-1" />}
+            {x.id === "reflected"
+              ? "Отражённый"
+              : x.id === "stored"
+                ? "Хранимый"
+                : x.id === "dom"
+                  ? "DOM-based"
+                  : x.id === "svg"
+                    ? "SVG"
+                    : x.id === "markdown"
+                      ? "Markdown"
+                      : "PDF"}
+            {xssCompletedLevels.includes(x.id) && (
+              <CheckCircle2 size={12} className="inline ml-1" />
+            )}
           </button>
         ))}
       </div>
@@ -185,22 +225,26 @@ export default function XSSLab() {
                 Переключатель санитизации
               </h3>
               <p className="text-xs text-muted-foreground mt-1">
-                Включите, чтобы увидеть разницу между безопасным и опасным выводом
+                Включите, чтобы увидеть разницу между безопасным и опасным
+                выводом
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant={sanitized ? 'default' : 'destructive'} className="text-[10px]">
-                {sanitized ? 'Защищённый' : 'Уязвимый'}
+              <Badge
+                variant={sanitized ? "default" : "destructive"}
+                className="text-[10px]"
+              >
+                {sanitized ? "Защищённый" : "Уязвимый"}
               </Badge>
               <button
                 onClick={() => setSanitized(!sanitized)}
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  sanitized ? 'bg-emerald-500' : 'bg-slate-300'
+                  sanitized ? "bg-emerald-500" : "bg-slate-300"
                 }`}
               >
                 <span
                   className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform ${
-                    sanitized ? 'translate-x-6' : 'translate-x-0'
+                    sanitized ? "translate-x-6" : "translate-x-0"
                   }`}
                 />
               </button>
@@ -225,10 +269,12 @@ export default function XSSLab() {
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="font-semibold">{currentXss.title}</h2>
                 <Badge variant="secondary" className="text-[10px]">
-                  {badgeTexts[currentXss.id] || ''}
+                  {badgeTexts[currentXss.id] || ""}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{currentXss.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {currentXss.description}
+              </p>
             </CardContent>
           </Card>
 
@@ -238,7 +284,11 @@ export default function XSSLab() {
               <h3 className="text-xs font-semibold text-red-600 mb-2 flex items-center gap-1.5">
                 <XCircle size={14} /> Уязвимый код
               </h3>
-              <CodeBlock code={currentXss.vulnerableCode} language="html" title="vulnerable.html" />
+              <CodeBlock
+                code={currentXss.vulnerableCode}
+                language="html"
+                title="vulnerable.html"
+              />
             </CardContent>
           </Card>
 
@@ -248,7 +298,11 @@ export default function XSSLab() {
               <h3 className="text-xs font-semibold text-emerald-600 mb-2 flex items-center gap-1.5">
                 <CheckCircle2 size={14} /> Безопасный код
               </h3>
-              <CodeBlock code={currentXss.secureCode} language="html" title="secure.html" />
+              <CodeBlock
+                code={currentXss.secureCode}
+                language="html"
+                title="secure.html"
+              />
             </CardContent>
           </Card>
 
@@ -265,7 +319,7 @@ export default function XSSLab() {
                   size="sm"
                   onClick={() => setShowAttack(!showAttack)}
                 >
-                  {showAttack ? 'Скрыть демо' : 'Показать атаку'}
+                  {showAttack ? "Скрыть демо" : "Показать атаку"}
                 </Button>
               </div>
 
@@ -273,12 +327,14 @@ export default function XSSLab() {
                 {showAttack && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
+                    animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     className="space-y-4"
                   >
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Payload атаки:</p>
+                      <p className="text-xs text-muted-foreground mb-1">
+                        Payload атаки:
+                      </p>
                       <div className="bg-secondary rounded-lg p-3">
                         <code className="text-xs font-mono text-red-600 break-all whitespace-pre-wrap">
                           {currentXss.attackDemo}
@@ -286,34 +342,49 @@ export default function XSSLab() {
                       </div>
                     </div>
 
-                    <p className="text-xs text-muted-foreground">Результат вывода:</p>
+                    <p className="text-xs text-muted-foreground">
+                      Результат вывода:
+                    </p>
                     {renderSimulatedPreview()}
 
                     {/* Custom payload input */}
                     <div className="space-y-2 pt-2 border-t">
-                      <h4 className="text-xs font-semibold">Попробуйте свой payload:</h4>
+                      <h4 className="text-xs font-semibold">
+                        Попробуйте свой payload:
+                      </h4>
                       <div className="flex gap-2">
                         <Input
                           value={userPayload}
-                          onChange={(e) => { setUserPayload(e.target.value); setShowPayloadResult(false); }}
+                          onChange={(e) => {
+                            setUserPayload(e.target.value);
+                            setShowPayloadResult(false);
+                          }}
                           placeholder="<script>alert('XSS')</script>"
                           className="font-mono text-xs"
-                          onKeyDown={(e) => e.key === 'Enter' && setShowPayloadResult(true)}
+                          onKeyDown={(e) =>
+                            e.key === "Enter" && setShowPayloadResult(true)
+                          }
                         />
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setShowPayloadResult(!showPayloadResult)}
+                          onClick={() =>
+                            setShowPayloadResult(!showPayloadResult)
+                          }
                           disabled={!userPayload.trim()}
                         >
-                          {showPayloadResult ? <EyeOff size={14} /> : <Eye size={14} />}
+                          {showPayloadResult ? (
+                            <EyeOff size={14} />
+                          ) : (
+                            <Eye size={14} />
+                          )}
                         </Button>
                       </div>
                       <AnimatePresence>
                         {showPayloadResult && userPayload && (
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
+                            animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
                           >
                             {renderSimulatedPreview(userPayload)}
@@ -326,7 +397,9 @@ export default function XSSLab() {
                       <h4 className="text-xs font-semibold text-blue-700 mb-1 flex items-center gap-1.5">
                         <Lightbulb size={14} /> Защита
                       </h4>
-                      <p className="text-xs text-blue-600">{currentXss.mitigation}</p>
+                      <p className="text-xs text-blue-600">
+                        {currentXss.mitigation}
+                      </p>
                     </div>
                   </motion.div>
                 )}
@@ -352,16 +425,27 @@ export default function XSSLab() {
 
       {/* Navigation */}
       <div className="flex justify-between">
-        <Button variant="outline" size="sm" onClick={prevType} disabled={currentIndex === 0}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={prevType}
+          disabled={currentIndex === 0}
+        >
           <ArrowLeft size={14} className="mr-1" /> Предыдущий тип
         </Button>
         {currentIndex < xssTypes.length - 1 ? (
-          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={nextType}>
+          <Button
+            size="sm"
+            className="bg-emerald-600 hover:bg-emerald-700"
+            onClick={nextType}
+          >
             Следующий тип <ArrowRight size={14} className="ml-1" />
           </Button>
         ) : (
           allCompleted && (
-            <Badge className="bg-emerald-600 text-white">Все типы изучены!</Badge>
+            <Badge className="bg-emerald-600 text-white">
+              Все типы изучены!
+            </Badge>
           )
         )}
       </div>

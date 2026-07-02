@@ -1,42 +1,51 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Loader2, AlertTriangle, Download, Filter } from "lucide-react";
 import {
-  Loader2, AlertTriangle, Download, Filter,
-} from 'lucide-react';
-import { getGradebook, getAllUsers, type GradebookData, type User as UserType } from '@/lib/auth-store';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import StudentDrillDown from './StudentDrillDown';
+  getGradebook,
+  getAllUsers,
+  type GradebookData,
+  type User as UserType,
+} from "@/lib/auth-store";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import StudentDrillDown from "./StudentDrillDown";
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
+  { key: 7, label: "7д" },
+  { key: 30, label: "30д" },
+  { key: 90, label: "90д" },
+  { key: 180, label: "180д" },
 ];
 
 function getScoreColor(score: number | null): string {
-  if (score === null) return 'bg-muted text-slate-400';
-  if (score >= 70) return 'bg-emerald-100 text-emerald-700';
-  if (score >= 50) return 'bg-amber-100 text-amber-700';
-  return 'bg-red-100 text-red-700';
+  if (score === null) return "bg-muted text-slate-400";
+  if (score >= 70) return "bg-emerald-100 text-emerald-700";
+  if (score >= 50) return "bg-amber-100 text-amber-700";
+  return "bg-red-100 text-red-700";
 }
 
-export default function GradebookView({ groupId: controlledGroupId, days: controlledDays }: { groupId?: string; days?: number } = {}) {
-  const [internalGroupId, setInternalGroupId] = useState('');
+export default function GradebookView({
+  groupId: controlledGroupId,
+  days: controlledDays,
+}: { groupId?: string; days?: number } = {}) {
+  const [internalGroupId, setInternalGroupId] = useState("");
   const [internalDays, setInternalDays] = useState(30);
-  const groupId = controlledGroupId !== undefined ? controlledGroupId : internalGroupId;
+  const groupId =
+    controlledGroupId !== undefined ? controlledGroupId : internalGroupId;
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [data, setData] = useState<GradebookData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     getAllUsers().then(setAllUsers);
@@ -47,33 +56,57 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
     setLoading(true);
     setError(null);
     getGradebook({ groupId: groupId || undefined, days })
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((e) => { if (!cancelled) { setError(e.message || 'Ошибка загрузки'); setLoading(false); } });
-    return () => { cancelled = true; };
+      .then((d) => {
+        if (!cancelled) {
+          setData(d);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e.message || "Ошибка загрузки");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [days, groupId]);
 
-  const groups = Array.from(new Set(allUsers.filter((u) => u.group).map((u) => u.group)));
+  const groups = Array.from(
+    new Set(allUsers.filter((u) => u.group).map((u) => u.group)),
+  );
 
-  const filteredStudents = data?.students.filter((s) =>
-    searchTerm === '' || s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || s.email.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredStudents =
+    data?.students.filter(
+      (s) =>
+        searchTerm === "" ||
+        s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.email.toLowerCase().includes(searchTerm.toLowerCase()),
+    ) || [];
 
   const handleExportCSV = () => {
     if (!data) return;
-    const headers = ['Студент', 'Email', 'Группа', 'Ср. балл', ...data.modules.map((m) => m.moduleId)];
+    const headers = [
+      "Студент",
+      "Email",
+      "Группа",
+      "Ср. балл",
+      ...data.modules.map((m) => m.moduleId),
+    ];
     const rows = data.students.map((s) => [
       s.fullName,
       s.email,
       s.group,
       s.avgQuizScore,
-      ...data.modules.map((m) => s.moduleScores[m.moduleId]?.score ?? 'N/A'),
+      ...data.modules.map((m) => s.moduleScores[m.moduleId]?.score ?? "N/A"),
     ]);
-    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `gradebook-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `gradebook-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -91,7 +124,9 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">
+          {error || "Нет данных"}
+        </p>
       </div>
     );
   }
@@ -107,7 +142,9 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
                 key={key}
                 onClick={() => setInternalDays(key)}
                 className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                  days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
+                  days === key
+                    ? "bg-background text-foreground shadow-sm font-medium"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {label}
@@ -126,7 +163,9 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
             >
               <option value="">Все группы</option>
               {groups.map((g) => (
-                <option key={g} value={g}>{g}</option>
+                <option key={g} value={g}>
+                  {g}
+                </option>
               ))}
             </select>
           </div>
@@ -157,19 +196,29 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
                   <th className="sticky left-0 bg-secondary text-left p-3 font-semibold z-10 min-w-[200px]">
                     Студент
                   </th>
-                  <th className="text-left p-3 font-semibold min-w-[100px]">Группа</th>
+                  <th className="text-left p-3 font-semibold min-w-[100px]">
+                    Группа
+                  </th>
                   {data.modules.map((module) => (
-                    <th key={module.moduleId} className="text-center p-3 font-semibold min-w-[80px]">
+                    <th
+                      key={module.moduleId}
+                      className="text-center p-3 font-semibold min-w-[80px]"
+                    >
                       <span className="text-xs">{module.moduleName}</span>
                     </th>
                   ))}
-                  <th className="text-center p-3 font-semibold min-w-[100px]">Ср. балл</th>
+                  <th className="text-center p-3 font-semibold min-w-[100px]">
+                    Ср. балл
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStudents.length === 0 ? (
                   <tr>
-                    <td colSpan={data.modules.length + 3} className="text-center p-8 text-slate-400">
+                    <td
+                      colSpan={data.modules.length + 3}
+                      className="text-center p-8 text-slate-400"
+                    >
                       Нет студентов
                     </td>
                   </tr>
@@ -191,7 +240,11 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
                         </button>
                       </td>
                       <td className="p-3">
-                        {student.group && <Badge variant="secondary" className="text-xs">{student.group}</Badge>}
+                        {student.group && (
+                          <Badge variant="secondary" className="text-xs">
+                            {student.group}
+                          </Badge>
+                        )}
                       </td>
                       {data.modules.map((module) => {
                         const scoreData = student.moduleScores[module.moduleId];
@@ -210,9 +263,15 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
                       })}
                       <td className="text-center p-3">
                         <Badge
-                          className={getScoreColor(student.avgQuizScore > 0 ? student.avgQuizScore : null)}
+                          className={getScoreColor(
+                            student.avgQuizScore > 0
+                              ? student.avgQuizScore
+                              : null,
+                          )}
                         >
-                          {student.avgQuizScore > 0 ? `${student.avgQuizScore}%` : '—'}
+                          {student.avgQuizScore > 0
+                            ? `${student.avgQuizScore}%`
+                            : "—"}
                         </Badge>
                       </td>
                     </motion.tr>
@@ -222,13 +281,22 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
               {filteredStudents.length > 0 && (
                 <tfoot>
                   <tr className="bg-secondary border-t-2 border-border font-semibold">
-                    <td className="sticky left-0 bg-secondary p-3 z-10">Средние значения</td>
+                    <td className="sticky left-0 bg-secondary p-3 z-10">
+                      Средние значения
+                    </td>
                     <td className="p-3"></td>
                     {data.modules.map((module) => {
                       const scores = filteredStudents
                         .map((s) => s.moduleScores[module.moduleId]?.score)
-                        .filter((s): s is number => s !== null && s !== undefined);
-                      const avg = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+                        .filter(
+                          (s): s is number => s !== null && s !== undefined,
+                        );
+                      const avg =
+                        scores.length > 0
+                          ? Math.round(
+                              scores.reduce((a, b) => a + b, 0) / scores.length,
+                            )
+                          : null;
                       return (
                         <td key={module.moduleId} className="text-center p-3">
                           {avg !== null ? (
@@ -241,10 +309,23 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
                     })}
                     <td className="text-center p-3">
                       {filteredStudents.length > 0 ? (
-                        <Badge className={getScoreColor(
-                          Math.round(filteredStudents.reduce((sum, s) => sum + s.avgQuizScore, 0) / filteredStudents.length)
-                        )}>
-                          {Math.round(filteredStudents.reduce((sum, s) => sum + s.avgQuizScore, 0) / filteredStudents.length)}%
+                        <Badge
+                          className={getScoreColor(
+                            Math.round(
+                              filteredStudents.reduce(
+                                (sum, s) => sum + s.avgQuizScore,
+                                0,
+                              ) / filteredStudents.length,
+                            ),
+                          )}
+                        >
+                          {Math.round(
+                            filteredStudents.reduce(
+                              (sum, s) => sum + s.avgQuizScore,
+                              0,
+                            ) / filteredStudents.length,
+                          )}
+                          %
                         </Badge>
                       ) : (
                         <span className="text-slate-300">—</span>
@@ -262,7 +343,9 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
       <div className="grid grid-cols-3 gap-4">
         <Card className="border-border">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-indigo-600">{filteredStudents.length}</p>
+            <p className="text-3xl font-bold text-indigo-600">
+              {filteredStudents.length}
+            </p>
             <p className="text-xs text-muted-foreground mt-1">Студентов</p>
           </CardContent>
         </Card>
@@ -271,15 +354,23 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
             <p className="text-3xl font-bold text-emerald-600">
               {filteredStudents.filter((s) => s.avgQuizScore >= 70).length}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Средний балл ≥ 70%</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Средний балл ≥ 70%
+            </p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-amber-600">
-              {filteredStudents.filter((s) => s.avgQuizScore < 50 && s.avgQuizScore > 0).length}
+              {
+                filteredStudents.filter(
+                  (s) => s.avgQuizScore < 50 && s.avgQuizScore > 0,
+                ).length
+              }
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Средний балл {'<'} 50%</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Средний балл {"<"} 50%
+            </p>
           </CardContent>
         </Card>
       </div>

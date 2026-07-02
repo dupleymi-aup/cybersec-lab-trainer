@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
-import { Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 
 interface OTPModalProps {
   otp: string;
@@ -13,14 +13,21 @@ interface OTPModalProps {
   onResend?: () => void;
 }
 
-export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalProps) {
-  const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
+export default function OTPModal({
+  otp,
+  onSubmit,
+  onClose,
+  onResend,
+}: OTPModalProps) {
+  const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
   const [showOtp, setShowOtp] = useState(false);
   const [cooldown, setCooldown] = useState(30);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   const cooldownRef = useRef(cooldown);
-  useEffect(() => { cooldownRef.current = cooldown; }, [cooldown]);
+  useEffect(() => {
+    cooldownRef.current = cooldown;
+  }, [cooldown]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -52,14 +59,14 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !digits[index] && index > 0) {
+    if (e.key === "Backspace" && !digits[index] && index > 0) {
       inputsRef.current[index - 1]?.focus();
     }
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData('text').slice(0, 6);
+    const pasted = e.clipboardData.getData("text").slice(0, 6);
     if (!/^\d+$/.test(pasted)) return;
     const newDigits = [...digits];
     for (let i = 0; i < pasted.length && i < 6; i++) {
@@ -71,9 +78,9 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
   };
 
   const handleSubmit = () => {
-    const code = digits.join('');
+    const code = digits.join("");
     if (code.length !== 6) {
-      toast.error('Введите все 6 цифр');
+      toast.error("Введите все 6 цифр");
       return;
     }
     onSubmit(code);
@@ -82,7 +89,7 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
   const handleResend = () => {
     if (cooldown > 0) return;
     setCooldown(30);
-    setDigits(['', '', '', '', '', '']);
+    setDigits(["", "", "", "", "", ""]);
     onResend?.();
     inputsRef.current[0]?.focus();
   };
@@ -101,7 +108,9 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
           {digits.map((digit, i) => (
             <Input
               key={i}
-              ref={(el) => { inputsRef.current[i] = el; }}
+              ref={(el) => {
+                inputsRef.current[i] = el;
+              }}
               type="text"
               inputMode="numeric"
               maxLength={1}
@@ -143,11 +152,15 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
             type="button"
             onClick={handleResend}
             disabled={cooldown > 0}
-            className={`text-violet-600 ${cooldown > 0 ? 'opacity-50 cursor-not-allowed' : 'hover:underline'}`}
+            className={`text-violet-600 ${cooldown > 0 ? "opacity-50 cursor-not-allowed" : "hover:underline"}`}
           >
-            Отправить снова {cooldown > 0 ? `(${cooldown}с)` : ''}
+            Отправить снова {cooldown > 0 ? `(${cooldown}с)` : ""}
           </button>
-          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground/70">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground/70"
+          >
             Отмена
           </button>
         </div>

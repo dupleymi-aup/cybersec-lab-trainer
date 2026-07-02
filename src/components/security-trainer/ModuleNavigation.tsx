@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAppStore, type PageType } from '@/lib/store';
-import { modules } from '@/lib/data';
+import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAppStore, type PageType } from "@/lib/store";
+import { modules } from "@/lib/data";
 
 const modulePageIds: PageType[] = modules.map((m) => m.id as PageType);
 
 export default function ModuleNavigation({ currentId }: { currentId: string }) {
-  const setCurrentPage = useAppStore(s => s.setCurrentPage);
-  const completedModules = useAppStore(s => s.completedModules);
+  const setCurrentPage = useAppStore((s) => s.setCurrentPage);
+  const completedModules = useAppStore((s) => s.completedModules);
 
   const idx = modulePageIds.indexOf(currentId as PageType);
   if (idx === -1) return null;
@@ -30,7 +30,9 @@ export default function ModuleNavigation({ currentId }: { currentId: string }) {
           >
             <ArrowLeft size={14} className="mr-1.5" />
             <div className="text-left">
-              <div className="text-[10px] text-slate-400 font-normal">Предыдущий</div>
+              <div className="text-[10px] text-slate-400 font-normal">
+                Предыдущий
+              </div>
               <div className="text-xs font-medium">{prevMod.title}</div>
             </div>
           </Button>
@@ -53,7 +55,9 @@ export default function ModuleNavigation({ currentId }: { currentId: string }) {
             className="text-xs"
           >
             <div className="text-right">
-              <div className="text-[10px] text-slate-400 font-normal">Следующий</div>
+              <div className="text-[10px] text-slate-400 font-normal">
+                Следующий
+              </div>
               <div className="text-xs font-medium">{nextMod.title}</div>
             </div>
             <ArrowRight size={14} className="ml-1.5" />

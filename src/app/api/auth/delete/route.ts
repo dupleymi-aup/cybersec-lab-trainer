@@ -1,7 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, checkRateLimit, getClientIp } from '@/lib/api-middleware';
-import { verifyPassword } from '@/lib/auth-utils';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  checkRateLimit,
+  getClientIp,
+} from "@/lib/api-middleware";
+import { verifyPassword } from "@/lib/auth-utils";
 
 export async function DELETE(request: NextRequest) {
   const auth = await authenticate(request);
@@ -12,8 +17,11 @@ export async function DELETE(request: NextRequest) {
   const rateResult = checkRateLimit(rateKey, 3, 3600_000);
   if (!rateResult.allowed) {
     return NextResponse.json(
-      { error: 'Слишком много попыток удаления. Подождите', retryAfter: rateResult.retryAfter },
-      { status: 429 }
+      {
+        error: "Слишком много попыток удаления. Подождите",
+        retryAfter: rateResult.retryAfter,
+      },
+      { status: 429 },
     );
   }
 
@@ -22,8 +30,11 @@ export async function DELETE(request: NextRequest) {
   const ipRateResult = checkRateLimit(ipRateKey, 5, 3600_000);
   if (!ipRateResult.allowed) {
     return NextResponse.json(
-      { error: 'Слишком много попыток. Подождите', retryAfter: ipRateResult.retryAfter },
-      { status: 429 }
+      {
+        error: "Слишком много попыток. Подождите",
+        retryAfter: ipRateResult.retryAfter,
+      },
+      { status: 429 },
     );
   }
 
@@ -32,7 +43,10 @@ export async function DELETE(request: NextRequest) {
   const { currentPassword } = body;
 
   if (!currentPassword) {
-    return NextResponse.json({ error: 'Требуется подтверждение пароля' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Требуется подтверждение пароля" },
+      { status: 400 },
+    );
   }
 
   const user = await prisma.user.findUnique({ where: { id: auth.id } });
@@ -40,7 +54,7 @@ export async function DELETE(request: NextRequest) {
 
   const isValid = await verifyPassword(currentPassword, user.passwordHash);
   if (!isValid) {
-    return NextResponse.json({ error: 'Неверный пароль' }, { status: 401 });
+    return NextResponse.json({ error: "Неверный пароль" }, { status: 401 });
   }
 
   await prisma.user.delete({ where: { id: auth.id } });

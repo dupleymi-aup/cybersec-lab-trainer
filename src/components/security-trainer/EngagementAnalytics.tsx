@@ -1,47 +1,72 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line,
-} from 'recharts';
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
 import {
-  TrendingUp, Users, Loader2, AlertTriangle, Flame, Clock,
-} from 'lucide-react';
-import { getEngagementAnalytics, getAllUsers, type EngagementData, type User as UserType } from '@/lib/auth-store';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import KPICard from './KPICard';
+  TrendingUp,
+  Users,
+  Loader2,
+  AlertTriangle,
+  Flame,
+  Clock,
+} from "lucide-react";
+import {
+  getEngagementAnalytics,
+  getAllUsers,
+  type EngagementData,
+  type User as UserType,
+} from "@/lib/auth-store";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import KPICard from "./KPICard";
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
+  { key: 7, label: "7д" },
+  { key: 30, label: "30д" },
+  { key: 90, label: "90д" },
+  { key: 180, label: "180д" },
 ];
 
-const DAY_NAMES = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+const DAY_NAMES = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
 
 export interface EngagementAnalyticsProps {
   groupId?: string;
   days?: number;
 }
 
-export default function EngagementAnalytics({ groupId: propGroupId, days: propDays }: EngagementAnalyticsProps = {}) {
+export default function EngagementAnalytics({
+  groupId: propGroupId,
+  days: propDays,
+}: EngagementAnalyticsProps = {}) {
   const [data, setData] = useState<EngagementData | null>(null);
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId, setInternalGroupId] = useState('');
+  const [internalGroupId, setInternalGroupId] = useState("");
 
   const days = propDays ?? internalDays;
   const showPeriodSelector = propDays === undefined;
   const showGroupSelector = propGroupId === undefined;
 
   useEffect(() => {
-    getAllUsers().then(setAllUsers).catch((err) => { if (process.env.NODE_ENV === 'development') console.error("EngagementAnalytics: Failed to load users:", err); });
+    getAllUsers()
+      .then(setAllUsers)
+      .catch((err) => {
+        if (process.env.NODE_ENV === "development")
+          console.error("EngagementAnalytics: Failed to load users:", err);
+      });
   }, []);
 
   useEffect(() => {
@@ -49,12 +74,26 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
     setLoading(true);
     setError(null);
     getEngagementAnalytics(days, propGroupId || internalGroupId || undefined)
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((e) => { if (!cancelled) { setError(e.message || 'Ошибка загрузки'); setLoading(false); } });
-    return () => { cancelled = true; };
+      .then((d) => {
+        if (!cancelled) {
+          setData(d);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e.message || "Ошибка загрузки");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [days, propGroupId, internalGroupId]);
 
-  const groups = Array.from(new Set(allUsers.filter((u) => u.group).map((u) => u.group)));
+  const groups = Array.from(
+    new Set(allUsers.filter((u) => u.group).map((u) => u.group)),
+  );
 
   if (loading) {
     return (
@@ -69,23 +108,43 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">
+          {error || "Нет данных"}
+        </p>
       </div>
     );
   }
 
-  const { scoreDistribution, hourlyActivity, weeklyPattern, streakLeaderboard, engagementTrend } = data;
+  const {
+    scoreDistribution,
+    hourlyActivity,
+    weeklyPattern,
+    streakLeaderboard,
+    engagementTrend,
+  } = data;
 
   const totalStudents = scoreDistribution.reduce((sum, d) => sum + d.count, 0);
-  const avgStreak = streakLeaderboard.length > 0
-    ? Math.round(streakLeaderboard.reduce((sum, s) => sum + s.streakDays, 0) / streakLeaderboard.length)
-    : 0;
-  const peakHour = hourlyActivity.length > 0
-    ? hourlyActivity.reduce((max, h) => h.count > max.count ? h : max, hourlyActivity[0])
-    : { hour: 0, count: 0 };
-  const peakDay = weeklyPattern.length > 0
-    ? weeklyPattern.reduce((max, d) => d.avgActivities > max.avgActivities ? d : max, weeklyPattern[0])
-    : { day: 0, avgActivities: 0 };
+  const avgStreak =
+    streakLeaderboard.length > 0
+      ? Math.round(
+          streakLeaderboard.reduce((sum, s) => sum + s.streakDays, 0) /
+            streakLeaderboard.length,
+        )
+      : 0;
+  const peakHour =
+    hourlyActivity.length > 0
+      ? hourlyActivity.reduce(
+          (max, h) => (h.count > max.count ? h : max),
+          hourlyActivity[0],
+        )
+      : { hour: 0, count: 0 };
+  const peakDay =
+    weeklyPattern.length > 0
+      ? weeklyPattern.reduce(
+          (max, d) => (d.avgActivities > max.avgActivities ? d : max),
+          weeklyPattern[0],
+        )
+      : { day: 0, avgActivities: 0 };
 
   return (
     <div className="space-y-6">
@@ -98,7 +157,9 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
                 key={key}
                 onClick={() => setInternalDays(key)}
                 className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                  days === key ? 'bg-background text-foreground shadow-sm font-medium' : 'text-muted-foreground hover:text-foreground'
+                  days === key
+                    ? "bg-background text-foreground shadow-sm font-medium"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {label}
@@ -115,7 +176,9 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
           >
             <option value="">Все группы</option>
             {groups.map((g) => (
-              <option key={g} value={g}>{g}</option>
+              <option key={g} value={g}>
+                {g}
+              </option>
             ))}
           </select>
         )}
@@ -156,7 +219,9 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       {/* Score Distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Распределение вовлечённости</h3>
+          <h3 className="font-semibold text-sm mb-4">
+            Распределение вовлечённости
+          </h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={scoreDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -188,7 +253,9 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       {/* Weekly Pattern */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Активность по дням недели</h3>
+          <h3 className="font-semibold text-sm mb-4">
+            Активность по дням недели
+          </h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={weeklyPattern}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -216,7 +283,13 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="avgScore" stroke="#6366f1" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="avgScore"
+                  stroke="#6366f1"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -241,12 +314,17 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
                   className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:bg-secondary"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                      i === 0 ? 'bg-amber-100 text-amber-700' :
-                      i === 1 ? 'bg-muted text-foreground/70' :
-                      i === 2 ? 'bg-orange-100 text-orange-700' :
-                      'bg-secondary text-muted-foreground'
-                    }`}>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                        i === 0
+                          ? "bg-amber-100 text-amber-700"
+                          : i === 1
+                            ? "bg-muted text-foreground/70"
+                            : i === 2
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
                       {i + 1}
                     </div>
                     <div>

@@ -5,7 +5,11 @@
 
 type AuthStoreRef = {
   getUserId: () => string;
-  saveProgressSnapshot: (moduleId: string, score: number, completed: boolean) => Promise<void>;
+  saveProgressSnapshot: (
+    moduleId: string,
+    score: number,
+    completed: boolean,
+  ) => Promise<void>;
 };
 
 let _ref: AuthStoreRef | null = null;
@@ -14,14 +18,21 @@ let _ref: AuthStoreRef | null = null;
  * Initialize the bridge with auth store references.
  * Called once during app startup from a place where both stores are available.
  */
-export function initAuthBridge(getUserId: () => string, saveProgressSnapshot: (moduleId: string, score: number, completed: boolean) => Promise<void>) {
+export function initAuthBridge(
+  getUserId: () => string,
+  saveProgressSnapshot: (
+    moduleId: string,
+    score: number,
+    completed: boolean,
+  ) => Promise<void>,
+) {
   _ref = { getUserId, saveProgressSnapshot };
 }
 
 function getRef(): AuthStoreRef {
   if (!_ref) {
     return {
-      getUserId: () => 'anonymous',
+      getUserId: () => "anonymous",
       saveProgressSnapshot: () => Promise.resolve(),
     };
   }
@@ -32,6 +43,10 @@ export function getCurrentUserId(): string {
   return getRef().getUserId();
 }
 
-export function saveProgressSnapshotProxy(moduleId: string, score: number, completed: boolean): Promise<void> {
+export function saveProgressSnapshotProxy(
+  moduleId: string,
+  score: number,
+  completed: boolean,
+): Promise<void> {
   return getRef().saveProgressSnapshot(moduleId, score, completed);
 }

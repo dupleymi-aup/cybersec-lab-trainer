@@ -1,10 +1,10 @@
-'use client';
-import Link from 'next/link';
-import { Shield, ArrowLeft, Home } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
+"use client";
+import Link from "next/link";
+import { Shield, ArrowLeft, Home } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function NotFound() {
-  const t = useTranslations('errors');
+  const t = useTranslations("errors");
   const locale = useLocale();
 
   return (
@@ -20,9 +20,11 @@ export default function NotFound() {
         </div>
 
         <h1 className="text-8xl font-bold text-foreground mb-2">404</h1>
-        <p className="text-2xl text-foreground font-semibold mb-3">{t('notFound')}</p>
+        <p className="text-2xl text-foreground font-semibold mb-3">
+          {t("notFound")}
+        </p>
         <p className="text-muted-foreground mb-10 max-w-sm mx-auto">
-          {t('notFoundDescription')}
+          {t("notFoundDescription")}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -31,14 +33,14 @@ export default function NotFound() {
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl transition-all hover:scale-105 shadow-lg shadow-violet-600/25"
           >
             <Home className="w-5 h-5" aria-hidden="true" />
-            {t('goHome')}
+            {t("goHome")}
           </Link>
           <button
             onClick={() => window.history.back()}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-secondary hover:bg-secondary/80 border border-border text-secondary-foreground font-semibold rounded-xl transition-all hover:scale-105"
           >
             <ArrowLeft className="w-5 h-5" aria-hidden="true" />
-            {t('goBack')}
+            {t("goBack")}
           </button>
         </div>
       </div>

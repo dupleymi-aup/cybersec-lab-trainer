@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 // GET /api/announcements - get active announcements (public access)
 export async function GET(_request: NextRequest) {
@@ -11,7 +11,7 @@ export async function GET(_request: NextRequest) {
         active: true,
         OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }],
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         title: true,
@@ -24,14 +24,17 @@ export async function GET(_request: NextRequest) {
     });
 
     return NextResponse.json({
-      announcements: announcements.map(a => ({
+      announcements: announcements.map((a) => ({
         ...a,
         expiresAt: a.expiresAt?.toISOString() ?? null,
         createdAt: a.createdAt.toISOString(),
       })),
     });
   } catch (error) {
-    logger.error('Failed to fetch announcements', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to fetch announcements' }, { status: 500 });
+    logger.error("Failed to fetch announcements", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to fetch announcements" },
+      { status: 500 },
+    );
   }
 }

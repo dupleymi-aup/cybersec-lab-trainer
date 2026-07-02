@@ -195,38 +195,19 @@
       "sections": {
         "platform": {
           "title": "平台",
-          "links": [
-            "模块",
-            "功能",
-            "定价",
-            "LTI集成"
-          ]
+          "links": ["模块", "功能", "定价", "LTI集成"]
         },
         "resources": {
           "title": "资源",
-          "links": [
-            "文档",
-            "指南",
-            "博客",
-            "OWASP Top 10"
-          ]
+          "links": ["文档", "指南", "博客", "OWASP Top 10"]
         },
         "company": {
           "title": "公司",
-          "links": [
-            "关于",
-            "联系",
-            "招聘",
-            "合作伙伴"
-          ]
+          "links": ["关于", "联系", "招聘", "合作伙伴"]
         },
         "legal": {
           "title": "法律",
-          "links": [
-            "隐私",
-            "条款",
-            "Cookie"
-          ]
+          "links": ["隐私", "条款", "Cookie"]
         }
       },
       "copyright": "(c) {year} CyberSec Lab. 保留所有权利。",
@@ -1180,18 +1161,38 @@
         "step4Title": "验证",
         "step4Desc": "服务器将客户端代码与自己的计算结果比较。允许 ±1 步（30 秒）以补偿网络延迟。",
         "without2fa": "无 2FA",
-        "without2faItems": ["仅密码——单点故障", "数据库泄露 = 即时访问", "钓鱼 = 完全妥协", "暴力破解 = 最终访问"],
+        "without2faItems": [
+          "仅密码——单点故障",
+          "数据库泄露 = 即时访问",
+          "钓鱼 = 完全妥协",
+          "暴力破解 = 最终访问"
+        ],
         "with2fa": "有 2FA (TOTP)",
-        "with2faItems": ["需要密码 + TOTP 设备", "代码仅有效 30 秒", "密钥不在网络上传输", "防钓鱼和暴力破解"]
+        "with2faItems": [
+          "需要密码 + TOTP 设备",
+          "代码仅有效 30 秒",
+          "密钥不在网络上传输",
+          "防钓鱼和暴力破解"
+        ]
       },
       "sessions": {
         "title": "会话安全",
         "jwtTitle": "JWT（JSON Web Token）",
         "jwtDescription": "JWT 是一种紧凑的令牌，用于在客户端和服务器之间传输信息。由三部分组成: Header（签名算法）、Payload（数据: 用户 ID、角色、有效期）和 Signature（完整性校验签名）。令牌可以存储在 localStorage 或 HttpOnly cookie 中。",
         "unsafe": "不安全",
-        "unsafeItems": ["JWT 存储在 localStorage（可通过 XSS 访问）", "有效期超过 24 小时", "无刷新令牌", "密钥在客户端代码中"],
+        "unsafeItems": [
+          "JWT 存储在 localStorage（可通过 XSS 访问）",
+          "有效期超过 24 小时",
+          "无刷新令牌",
+          "密钥在客户端代码中"
+        ],
         "safe": "安全",
-        "safeItems": ["HttpOnly + Secure cookie 存储", "短期有效期（15-30 分钟）+ 刷新令牌", "每次请求验证签名", "被泄露令牌黑名单"]
+        "safeItems": [
+          "HttpOnly + Secure cookie 存储",
+          "短期有效期（15-30 分钟）+ 刷新令牌",
+          "每次请求验证签名",
+          "被泄露令牌黑名单"
+        ]
       },
       "completeModule": "标记模块为已完成",
       "moduleCompleted": "模块已完成！"

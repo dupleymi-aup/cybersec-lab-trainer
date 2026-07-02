@@ -1,10 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useAppStore, type PageType } from '@/lib/store';
-import { modules, quizCategories } from '@/lib/data';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, LayoutDashboard, Database, FileText, Link, Lock, Code, Shield, HelpCircle, BookOpen, Trophy, GraduationCap } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useAppStore, type PageType } from "@/lib/store";
+import { modules, quizCategories } from "@/lib/data";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search,
+  X,
+  LayoutDashboard,
+  Database,
+  FileText,
+  Link,
+  Lock,
+  Code,
+  Shield,
+  HelpCircle,
+  BookOpen,
+  Trophy,
+  GraduationCap,
+} from "lucide-react";
 
 interface SearchResult {
   id: string;
@@ -25,37 +39,37 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 const pageNavItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
-  { id: 'dashboard', label: 'Главная', icon: <LayoutDashboard size={16} /> },
-  { id: 'achievements', label: 'Достижения', icon: <Trophy size={16} /> },
-  { id: 'quiz', label: 'Квизы', icon: <HelpCircle size={16} /> },
-  { id: 'profile', label: 'Профиль', icon: <GraduationCap size={16} /> },
+  { id: "dashboard", label: "Главная", icon: <LayoutDashboard size={16} /> },
+  { id: "achievements", label: "Достижения", icon: <Trophy size={16} /> },
+  { id: "quiz", label: "Квизы", icon: <HelpCircle size={16} /> },
+  { id: "profile", label: "Профиль", icon: <GraduationCap size={16} /> },
 ];
 
 export default function GlobalSearch() {
-  const setCurrentPage = useAppStore(s => s.setCurrentPage);
+  const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Cmd+K shortcut
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setOpen(false);
       }
     };
-    document.addEventListener('keydown', handleKeydown);
-    return () => document.removeEventListener('keydown', handleKeydown);
+    document.addEventListener("keydown", handleKeydown);
+    return () => document.removeEventListener("keydown", handleKeydown);
   }, []);
 
   // Focus input when opened
   useEffect(() => {
     if (open) {
-      setQuery('');
+      setQuery("");
       const timer = setTimeout(() => inputRef.current?.focus(), 50);
       return () => clearTimeout(timer);
     }
@@ -69,13 +83,22 @@ export default function GlobalSearch() {
     // Navigation
     for (const nav of pageNavItems) {
       if (nav.label.toLowerCase().includes(q)) {
-        items.push({ id: `nav-${nav.id}`, title: nav.label, subtitle: 'Навигация', icon: nav.icon, page: nav.id });
+        items.push({
+          id: `nav-${nav.id}`,
+          title: nav.label,
+          subtitle: "Навигация",
+          icon: nav.icon,
+          page: nav.id,
+        });
       }
     }
 
     // Modules
     for (const mod of modules) {
-      if (mod.title.toLowerCase().includes(q) || mod.description.toLowerCase().includes(q)) {
+      if (
+        mod.title.toLowerCase().includes(q) ||
+        mod.description.toLowerCase().includes(q)
+      ) {
         items.push({
           id: `mod-${mod.id}`,
           title: mod.title,
@@ -94,7 +117,7 @@ export default function GlobalSearch() {
           title: cat.name,
           subtitle: `Квиз · ${cat.count} вопросов`,
           icon: <HelpCircle size={16} />,
-          page: 'quiz',
+          page: "quiz",
         });
       }
     }
@@ -150,7 +173,12 @@ export default function GlobalSearch() {
                     placeholder="Поиск модулей, квизов, терминов..."
                     className="flex-1 text-sm outline-none bg-transparent placeholder:text-slate-400"
                   />
-                  <button type="button" onClick={() => setOpen(false)} aria-label="Закрыть поиск" className="text-slate-400 hover:text-muted-foreground">
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    aria-label="Закрыть поиск"
+                    className="text-slate-400 hover:text-muted-foreground"
+                  >
                     <X size={16} />
                   </button>
                 </div>
@@ -158,10 +186,14 @@ export default function GlobalSearch() {
                 {/* Results */}
                 <div className="max-h-[60vh] overflow-y-auto p-2">
                   {query.trim() && results.length === 0 && (
-                    <p className="text-sm text-slate-400 text-center py-8">Ничего не найдено</p>
+                    <p className="text-sm text-slate-400 text-center py-8">
+                      Ничего не найдено
+                    </p>
                   )}
                   {!query.trim() && (
-                    <p className="text-sm text-slate-400 text-center py-8">Начните вводить для поиска</p>
+                    <p className="text-sm text-slate-400 text-center py-8">
+                      Начните вводить для поиска
+                    </p>
                   )}
                   {results.map((result) => (
                     <button
@@ -169,10 +201,16 @@ export default function GlobalSearch() {
                       onClick={() => handleSelect(result.page)}
                       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors text-left"
                     >
-                      <span className="text-muted-foreground shrink-0">{result.icon}</span>
+                      <span className="text-muted-foreground shrink-0">
+                        {result.icon}
+                      </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{result.title}</p>
-                        <p className="text-xs text-slate-400 truncate">{result.subtitle}</p>
+                        <p className="text-sm font-medium truncate">
+                          {result.title}
+                        </p>
+                        <p className="text-xs text-slate-400 truncate">
+                          {result.subtitle}
+                        </p>
                       </div>
                     </button>
                   ))}

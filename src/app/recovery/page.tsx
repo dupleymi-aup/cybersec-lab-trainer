@@ -1,5 +1,5 @@
-import {redirect} from '@/routing';
+import { redirect } from "@/routing";
 
 export default function RecoveryRedirect() {
-  redirect({href: '/login', locale: 'ru'});
+  redirect({ href: "/login", locale: "ru" });
 }

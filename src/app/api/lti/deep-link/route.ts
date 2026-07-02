@@ -1,7 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
-import { modules } from '@/lib/data';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireRole,
+} from "@/lib/api-middleware";
+import { modules } from "@/lib/data";
+import { logger } from "@/lib/logger";
 
 /**
  * POST /api/lti/deep-link
@@ -11,14 +16,14 @@ export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  if (!requireRole(auth.role, 'admin', 'teacher')) return forbidden();
+  if (!requireRole(auth.role, "admin", "teacher")) return forbidden();
 
   try {
     const body = await request.json();
     const { platformId, type } = body;
 
     // type can be: 'all', 'modules', 'quizzes'
-    const contentType = type || 'all';
+    const contentType = type || "all";
 
     const contentItems: Array<{
       type: string;
@@ -28,36 +33,36 @@ export async function POST(request: NextRequest) {
       description?: string;
     }> = [];
 
-    if (contentType === 'all' || contentType === 'modules') {
+    if (contentType === "all" || contentType === "modules") {
       contentItems.push(
         ...modules.map((m) => ({
-          type: 'ltiResourceLink',
+          type: "ltiResourceLink",
           title: m.title,
-          url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/?module=${m.id}`,
+          url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/?module=${m.id}`,
           icon: m.icon,
           description: m.description,
         })),
       );
     }
 
-    if (contentType === 'all' || contentType === 'quizzes') {
+    if (contentType === "all" || contentType === "quizzes") {
       const quizCategories = [
-        { id: 'general', title: 'General Security Quiz' },
-        { id: 'sql', title: 'SQL Injection Quiz' },
-        { id: 'xss', title: 'XSS Quiz' },
-        { id: 'csrf', title: 'CSRF Quiz' },
-        { id: 'auth', title: 'Authentication Quiz' },
-        { id: 'owasp', title: 'OWASP Top 10 Quiz' },
-        { id: 'coding', title: 'Secure Coding Quiz' },
-        { id: 'network', title: 'Network Security Quiz' },
-        { id: 'social', title: 'Social Engineering Quiz' },
+        { id: "general", title: "General Security Quiz" },
+        { id: "sql", title: "SQL Injection Quiz" },
+        { id: "xss", title: "XSS Quiz" },
+        { id: "csrf", title: "CSRF Quiz" },
+        { id: "auth", title: "Authentication Quiz" },
+        { id: "owasp", title: "OWASP Top 10 Quiz" },
+        { id: "coding", title: "Secure Coding Quiz" },
+        { id: "network", title: "Network Security Quiz" },
+        { id: "social", title: "Social Engineering Quiz" },
       ];
 
       contentItems.push(
         ...quizCategories.map((q) => ({
-          type: 'ltiResourceLink',
+          type: "ltiResourceLink",
           title: q.title,
-          url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/?quiz=${q.id}`,
+          url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/?quiz=${q.id}`,
           description: `Quiz category: ${q.title}`,
         })),
       );
@@ -68,9 +73,9 @@ export async function POST(request: NextRequest) {
       platformId,
     });
   } catch (error) {
-    logger.error('LTI deep link error', { error: String(error) });
+    logger.error("LTI deep link error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 },
     );
   }
@@ -86,7 +91,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type') || 'all';
+    const type = searchParams.get("type") || "all";
 
     const items: Array<{
       id: string;
@@ -97,11 +102,11 @@ export async function GET(request: NextRequest) {
       description?: string;
     }> = [];
 
-    if (type === 'all' || type === 'modules') {
+    if (type === "all" || type === "modules") {
       items.push(
         ...modules.map((m) => ({
           id: m.id,
-          type: 'module',
+          type: "module",
           title: m.title,
           url: `/?module=${m.id}`,
           icon: m.icon,
@@ -110,23 +115,23 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (type === 'all' || type === 'quizzes') {
+    if (type === "all" || type === "quizzes") {
       const quizCategories = [
-        { id: 'general', title: 'General Security Quiz' },
-        { id: 'sql', title: 'SQL Injection Quiz' },
-        { id: 'xss', title: 'XSS Quiz' },
-        { id: 'csrf', title: 'CSRF Quiz' },
-        { id: 'auth', title: 'Authentication Quiz' },
-        { id: 'owasp', title: 'OWASP Top 10 Quiz' },
-        { id: 'coding', title: 'Secure Coding Quiz' },
-        { id: 'network', title: 'Network Security Quiz' },
-        { id: 'social', title: 'Social Engineering Quiz' },
+        { id: "general", title: "General Security Quiz" },
+        { id: "sql", title: "SQL Injection Quiz" },
+        { id: "xss", title: "XSS Quiz" },
+        { id: "csrf", title: "CSRF Quiz" },
+        { id: "auth", title: "Authentication Quiz" },
+        { id: "owasp", title: "OWASP Top 10 Quiz" },
+        { id: "coding", title: "Secure Coding Quiz" },
+        { id: "network", title: "Network Security Quiz" },
+        { id: "social", title: "Social Engineering Quiz" },
       ];
 
       items.push(
         ...quizCategories.map((q) => ({
           id: q.id,
-          type: 'quiz',
+          type: "quiz",
           title: q.title,
           url: `/?quiz=${q.id}`,
           description: `Quiz category: ${q.title}`,
@@ -136,9 +141,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(items);
   } catch (error) {
-    logger.error('LTI deep link GET error', { error: String(error) });
+    logger.error("LTI deep link GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 },
     );
   }

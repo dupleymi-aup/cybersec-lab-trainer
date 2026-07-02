@@ -1,7 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import {
+  authenticate,
+  unauthorized,
+  forbidden,
+  requireRole,
+  checkRateLimit,
+  getClientIp,
+} from "@/lib/api-middleware";
+import { logger } from "@/lib/logger";
 
 interface ClearRequestBody {
   olderThan?: string;
@@ -14,14 +21,14 @@ interface ClearRequestBody {
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  if (!requireRole(auth.role, "admin")) return forbidden();
 
   // Rate limit: 3 per minute (dangerous operation)
   const rateLimit = checkRateLimit(`audit-clear:${auth.id}`, 3, 60_000);
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: 'Too many requests', retryAfter: rateLimit.retryAfter },
-      { status: 429 }
+      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
+      { status: 429 },
     );
   }
 
@@ -29,8 +36,8 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch (e) {
-    logger.error('Invalid JSON in audit logs clear', { error: String(e) });
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    logger.error("Invalid JSON in audit logs clear", { error: String(e) });
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const { olderThan, action, maxCount, dryRun } = body;
@@ -38,21 +45,30 @@ export async function POST(request: NextRequest) {
   // Safety: NEVER allow clearing all logs without a date filter
   if (!olderThan) {
     return NextResponse.json(
-      { error: 'olderThan date filter is required. Cannot clear all audit logs without a date constraint.' },
-      { status: 400 }
+      {
+        error:
+          "olderThan date filter is required. Cannot clear all audit logs without a date constraint.",
+      },
+      { status: 400 },
     );
   }
 
   // Validate olderThan is a valid ISO date
   const olderThanDate = new Date(olderThan);
   if (isNaN(olderThanDate.getTime())) {
-    return NextResponse.json({ error: 'Invalid olderThan date format. Use ISO 8601 format.' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid olderThan date format. Use ISO 8601 format." },
+      { status: 400 },
+    );
   }
 
   // Validate and cap maxCount
   let limit = maxCount ?? 1000;
-  if (typeof limit !== 'number' || limit < 1) {
-    return NextResponse.json({ error: 'maxCount must be a positive number' }, { status: 400 });
+  if (typeof limit !== "number" || limit < 1) {
+    return NextResponse.json(
+      { error: "maxCount must be a positive number" },
+      { status: 400 },
+    );
   }
   if (limit > 5000) {
     limit = 5000;
@@ -89,7 +105,7 @@ export async function POST(request: NextRequest) {
 
   let deletedCount = 0;
   if (recordsToDelete.length > 0) {
-    const ids = recordsToDelete.map(r => r.id);
+    const ids = recordsToDelete.map((r) => r.id);
     const deleteResult = await prisma.auditLog.deleteMany({
       where: { id: { in: ids } },
     });
@@ -104,17 +120,17 @@ export async function POST(request: NextRequest) {
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'audit_logs_cleared',
-        targetId: 'audit-logs',
+        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
+        action: "audit_logs_cleared",
+        targetId: "audit-logs",
         targetName: `${deletedCount} logs deleted`,
-        details: `Admin ${auth.id} cleared ${deletedCount} audit logs older than ${olderThan}${action ? ` with action="${action}"` : ''} [IP: ${ip}]`,
+        details: `Admin ${auth.id} cleared ${deletedCount} audit logs older than ${olderThan}${action ? ` with action="${action}"` : ""} [IP: ${ip}]`,
       },
     });
   } catch (error) {
     // Audit logging is best-effort
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('Audit logging failed:', error);
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Audit logging failed:", error);
     }
   }
 

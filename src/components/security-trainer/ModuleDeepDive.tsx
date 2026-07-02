@@ -1,27 +1,34 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from 'recharts';
-import {
-  Loader2, AlertTriangle, BookOpen, BarChart3,
-} from 'lucide-react';
-import { getModuleDeepDive, type ModuleDeepDiveData } from '@/lib/auth-store';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Loader2, AlertTriangle, BookOpen, BarChart3 } from "lucide-react";
+import { getModuleDeepDive, type ModuleDeepDiveData } from "@/lib/auth-store";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface ModuleDeepDiveProps {
   groupId?: string;
   days?: number;
 }
 
-export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }: ModuleDeepDiveProps = {}) {
+export default function ModuleDeepDive({
+  groupId: propGroupId,
+  days: propDays,
+}: ModuleDeepDiveProps = {}) {
   const [data, setData] = useState<ModuleDeepDiveData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId] = useState('');
+  const [internalGroupId] = useState("");
 
   const days = propDays ?? internalDays;
 
@@ -30,9 +37,21 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
     setLoading(true);
     setError(null);
     getModuleDeepDive(days, propGroupId || internalGroupId || undefined)
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((e) => { if (!cancelled) { setError(e.message || 'Ошибка загрузки'); setLoading(false); } });
-    return () => { cancelled = true; };
+      .then((d) => {
+        if (!cancelled) {
+          setData(d);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e.message || "Ошибка загрузки");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [days, propGroupId, internalGroupId]);
 
   if (loading) {
@@ -48,7 +67,9 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">{error || 'Нет данных'}</p>
+        <p className="text-sm text-muted-foreground font-medium ml-3">
+          {error || "Нет данных"}
+        </p>
       </div>
     );
   }
@@ -76,31 +97,45 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
       <Tabs defaultValue={data[0]?.moduleId}>
         <TabsList className="w-fit flex flex-wrap">
           {data.map((m) => (
-            <TabsTrigger key={m.moduleId} value={m.moduleId} className="text-xs">
+            <TabsTrigger
+              key={m.moduleId}
+              value={m.moduleId}
+              className="text-xs"
+            >
               {m.moduleName}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {data.map((m) => (
-          <TabsContent key={m.moduleId} value={m.moduleId} className="mt-4 space-y-4">
+          <TabsContent
+            key={m.moduleId}
+            value={m.moduleId}
+            className="mt-4 space-y-4"
+          >
             {/* Summary cards */}
             <div className="grid grid-cols-3 gap-3">
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-indigo-600">{m.totalStudents}</p>
+                  <p className="text-2xl font-bold text-indigo-600">
+                    {m.totalStudents}
+                  </p>
                   <p className="text-xs text-muted-foreground">Студентов</p>
                 </CardContent>
               </Card>
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-emerald-600">{m.completionRate}%</p>
+                  <p className="text-2xl font-bold text-emerald-600">
+                    {m.completionRate}%
+                  </p>
                   <p className="text-xs text-muted-foreground">Завершение</p>
                 </CardContent>
               </Card>
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-amber-600">{m.avgScore}%</p>
+                  <p className="text-2xl font-bold text-amber-600">
+                    {m.avgScore}%
+                  </p>
                   <p className="text-xs text-muted-foreground">Ср. балл</p>
                 </CardContent>
               </Card>
@@ -114,13 +149,29 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
                 </h3>
                 <div className="h-[250px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={m.levels.map((l) => ({ level: `Ур. ${l.level}`, started: l.started, completed: l.completed }))}>
+                    <BarChart
+                      data={m.levels.map((l) => ({
+                        level: `Ур. ${l.level}`,
+                        started: l.started,
+                        completed: l.completed,
+                      }))}
+                    >
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                       <XAxis dataKey="level" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Bar dataKey="started" name="Начали" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="completed" name="Завершили" fill="#10b981" radius={[4, 4, 0, 0]} />
+                      <Bar
+                        dataKey="started"
+                        name="Начали"
+                        fill="#94a3b8"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="completed"
+                        name="Завершили"
+                        fill="#10b981"
+                        radius={[4, 4, 0, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -148,7 +199,9 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
             {/* Challenge scores */}
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">Распределение баллов за челленджи</h3>
+                <h3 className="font-semibold text-sm mb-4">
+                  Распределение баллов за челленджи
+                </h3>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={m.challengeScores}>
@@ -156,7 +209,12 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
                       <XAxis dataKey="range" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Bar dataKey="count" name="Студентов" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                      <Bar
+                        dataKey="count"
+                        name="Студентов"
+                        fill="#6366f1"
+                        radius={[4, 4, 0, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -167,15 +225,25 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
             {m.studiedItemsCoverage && m.studiedItemsCoverage.length > 0 && (
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-3">Покрытие тем OWASP Top 10</h3>
+                  <h3 className="font-semibold text-sm mb-3">
+                    Покрытие тем OWASP Top 10
+                  </h3>
                   <div className="space-y-2">
                     {m.studiedItemsCoverage.map((item) => (
-                      <div key={item.item} className="flex items-center gap-3 text-xs">
+                      <div
+                        key={item.item}
+                        className="flex items-center gap-3 text-xs"
+                      >
                         <span className="w-40 truncate">{item.item}</span>
                         <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
-                          <div className="h-full bg-violet-500 rounded-full" style={{ width: `${item.studiedRate}%` }} />
+                          <div
+                            className="h-full bg-violet-500 rounded-full"
+                            style={{ width: `${item.studiedRate}%` }}
+                          />
                         </div>
-                        <span className="w-12 text-right">{item.studiedRate}%</span>
+                        <span className="w-12 text-right">
+                          {item.studiedRate}%
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -187,7 +255,9 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
             {m.secureCodingDistribution && (
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-4">Распределение правильных ответов (Безопасное кодирование)</h3>
+                  <h3 className="font-semibold text-sm mb-4">
+                    Распределение правильных ответов (Безопасное кодирование)
+                  </h3>
                   <div className="h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={m.secureCodingDistribution}>
@@ -195,7 +265,12 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
                         <XAxis dataKey="correctRange" tick={{ fontSize: 10 }} />
                         <YAxis tick={{ fontSize: 10 }} />
                         <Tooltip />
-                        <Bar dataKey="count" name="Студентов" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                        <Bar
+                          dataKey="count"
+                          name="Студентов"
+                          fill="#f59e0b"
+                          radius={[4, 4, 0, 0]}
+                        />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>

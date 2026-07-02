@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { authenticate, unauthorized } from '@/lib/api-middleware';
-import { updateUserSchema } from '@/lib/validations/api';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { authenticate, unauthorized } from "@/lib/api-middleware";
+import { updateUserSchema } from "@/lib/validations/api";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -10,10 +10,20 @@ export async function GET(request: NextRequest) {
   const user = await prisma.user.findUnique({
     where: { id: auth.id },
     select: {
-      id: true, email: true, phone: true, fullName: true,
-      group: true, course: true, university: true, avatar: true,
-      bio: true, role: true, createdAt: true, lastLoginAt: true,
-      loginCount: true, isBlocked: true,
+      id: true,
+      email: true,
+      phone: true,
+      fullName: true,
+      group: true,
+      course: true,
+      university: true,
+      avatar: true,
+      bio: true,
+      role: true,
+      createdAt: true,
+      lastLoginAt: true,
+      loginCount: true,
+      isBlocked: true,
     },
   });
 
@@ -33,11 +43,17 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
   const parsed = updateUserSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.issues[0].message },
+      { status: 400 },
+    );
   }
 
   if (Object.keys(parsed.data).length === 0) {
-    return NextResponse.json({ error: 'Необходимо указать хотя бы одно поле для обновления' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Необходимо указать хотя бы одно поле для обновления" },
+      { status: 400 },
+    );
   }
 
   const user = await prisma.user.update({
