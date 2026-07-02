@@ -1,0 +1,45 @@
+# Development files
+.env
+.env.local
+.env.*.local
+*.env
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+*.test.ts
+*.spec.ts
+tests/
+e2e/
+playwright-report/
+
+# Documentation
+*.md
+docs/
+other-repo/
+
+# Build artifacts
+.next/
+node_modules/
+coverage/
+
+# Prisma
+prisma/*.db
+prisma/*.sqlite
+*.db-journal
+
+# Logs
+*.log
+npm-debug.log*

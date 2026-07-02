@@ -1,0 +1,579 @@
+{
+  "landing": {
+    "header": {
+      "logo": "CyberSec Lab",
+      "login": "登录",
+      "register": "注册",
+      "dashboard": "控制台",
+      "howItWorks": {
+        "title": "使用方式"
+      },
+      "features": {
+        "title": "功能",
+        "titleShort": "功能"
+      },
+      "reviews": {
+        "badge": "评价"
+      },
+      "about": {
+        "title": "关于"
+      },
+      "subtitle": "网络安全培训"
+    },
+    "hero": {
+      "badge": "专业 09.03.04 软件工程",
+      "title": "网络安全",
+      "titleHighlight": "培训平台",
+      "subtitle": "学习 Web 应用程序漏洞，完成交互式测验并获得证书。面向学生和开发者的实用网络安全教育。",
+      "startLearning": "开始学习",
+      "learnMore": "了解更多"
+    },
+    "stats": {
+      "modules": "模块",
+      "quizQuestions": "测验题目",
+      "achievements": "成就",
+      "careerPaths": "职业路径"
+    },
+    "howItWorks": {
+      "badge": "简单流程",
+      "title": "使用方式",
+      "subtitle": "从注册到获得证书仅需四个步骤",
+      "steps": {
+        "1": {
+          "title": "注册账号",
+          "description": "30 秒内创建账号"
+        },
+        "2": {
+          "title": "选择模块",
+          "description": "OWASP Top 10、SQL 注入、XSS、CSRF 等"
+        },
+        "3": {
+          "title": "完成测验",
+          "description": "136+ 道练习题，即时反馈"
+        },
+        "4": {
+          "title": "获得证书",
+          "description": "完成模块并获得技能认证"
+        }
+      }
+    },
+    "features": {
+      "title": "网络安全学习的一切所需",
+      "subtitle": "理论、实践和分析整合为一个系统",
+      "items": {
+        "interactiveModules": {
+          "title": "8 个交互模块",
+          "description": "OWASP Top 10、SQL 注入、XSS、CSRF 等，配有实践练习"
+        },
+        "quizQuestions": {
+          "title": "136+ 道测验题",
+          "description": "在 9 个类别中测试您的知识"
+        },
+        "achievements": {
+          "title": "成就系统",
+          "description": "因进步获得奖励，保持学习动力"
+        },
+        "analytics": {
+          "title": "进度分析",
+          "description": "通过图表和报告跟踪进度"
+        },
+        "ltiIntegration": {
+          "title": "LTI 集成",
+          "description": "与 Moodle、Canvas 等 LMS 系统集成"
+        },
+        "teacherAdmin": {
+          "title": "教师和管理员角色",
+          "description": "管理学生、小组和课程"
+        }
+      }
+    },
+    "demoModules": {
+      "title": "免费试用",
+      "subtitle": "从这些模块开始",
+      "lessons": "课程",
+      "try": "试用",
+      "registerCTA": "注册并获取所有模块访问权限",
+      "difficulties": {
+        "Beginner": "初级",
+        "Medium": "中级",
+        "Advanced": "高级"
+      },
+      "modules": {
+        "owasp": {
+          "title": "OWASP Top 10",
+          "description": "学习 10 个关键 Web 安全风险"
+        },
+        "auth": {
+          "title": "身份认证",
+          "description": "构建可靠的认证系统"
+        },
+        "tools": {
+          "title": "安全工具",
+          "description": "掌握安全分析工具"
+        },
+        "phishing": {
+          "title": "钓鱼分析器",
+          "description": "识别钓鱼和社会工程学攻击"
+        }
+      }
+    },
+    "reviews": {
+      "badge": "学生评价",
+      "title": "用户评价",
+      "subtitle": "超过 1000 名学生完成培训",
+      "items": [
+        {
+          "name": "阿列克谢·彼得罗夫",
+          "role": "学生，莫斯科国立大学",
+          "text": "平台帮助我理解了 OWASP Top 10。交互式测验比阅读理论好得多。",
+          "achievement": "完成 OWASP Top 10"
+        },
+        {
+          "name": "玛丽亚·伊万诺娃",
+          "role": "开发者，Yandex",
+          "text": "完成模块后开始编写更安全的代码。",
+          "achievement": "XSS 模块 100%"
+        },
+        {
+          "name": "德米特里·科兹洛夫",
+          "role": "讲师，ITMO 大学",
+          "text": "LTI 集成与 Moodle 运行良好。",
+          "achievement": "50+ 学生"
+        },
+        {
+          "name": "叶莲娜·斯米尔诺娃",
+          "role": "实习生，卡巴斯基实验室",
+          "text": "为实际工作提供了出色的实践准备。",
+          "achievement": "前 10 名进度"
+        },
+        {
+          "name": "阿尔乔姆·沃尔科夫",
+          "role": "开发者，Sberbank",
+          "text": "一个月内完成了所有 8 个模块。",
+          "achievement": "完成全部模块"
+        },
+        {
+          "name": "奥尔加·诺维科娃",
+          "role": "学生，圣彼得堡国立大学",
+          "text": "帮助我准备了安全奥林匹克竞赛。",
+          "achievement": "奥林匹克获奖者"
+        }
+      ]
+    },
+    "cta": {
+      "title": "准备好开始学习了吗？",
+      "subtitle": "加入成千上万学习网络安全的学生",
+      "students": "学生",
+      "certificates": "证书",
+      "registration": "注册",
+      "startFree": "免费开始",
+      "disclaimer": "无需信用卡 · 免费模块 · 即时访问"
+    },
+    "faq": {
+      "badge": "常见问题",
+      "title": "常见问题",
+      "subtitle": "关于平台的答案",
+      "items": [
+        {
+          "question": "平台免费吗？",
+          "answer": "是的，基础模块免费。高级功能需要订阅。"
+        },
+        {
+          "question": "需要编程知识吗？",
+          "answer": "基础模块不需要深入编程知识。"
+        },
+        {
+          "question": "LTI 集成如何工作？",
+          "answer": "通过 LTI 1.3 连接到 Moodle 或 Canvas。"
+        },
+        {
+          "question": "可以跟踪学生进度吗？",
+          "answer": "是的，教师可以获得详细分析报告。"
+        },
+        {
+          "question": "有证书吗？",
+          "answer": "是的，完成每个模块后获得数字证书。"
+        },
+        {
+          "question": "涵盖哪些主题？",
+          "answer": "8 个模块：OWASP、SQL 注入、XSS、CSRF、密码学等。"
+        },
+        {
+          "question": "如何注册教师账号？",
+          "answer": "正常注册后联系管理员获取教师角色。"
+        }
+      ]
+    },
+    "footer": {
+      "description": "网络安全教育交互平台。学习漏洞、完成测验并获得证书。",
+      "sections": {
+        "platform": {
+          "title": "平台",
+          "links": [
+            "模块",
+            "功能",
+            "定价",
+            "LTI 集成"
+          ]
+        },
+        "resources": {
+          "title": "资源",
+          "links": [
+            "文档",
+            "指南",
+            "博客",
+            "OWASP Top 10"
+          ]
+        },
+        "company": {
+          "title": "公司",
+          "links": [
+            "关于",
+            "联系",
+            "招聘",
+            "合作伙伴"
+          ]
+        },
+        "legal": {
+          "title": "法律",
+          "links": [
+            "隐私",
+            "条款",
+            "Cookie"
+          ]
+        }
+      },
+      "copyright": "© CyberSec Lab. 保留所有权利。",
+      "statsModules": "8 个模块",
+      "statsStudents": "1000+ 名学生",
+      "statsQuizzes": "136+ 道测验"
+    },
+    "codeTerminal": {
+      "comment": "// 有漏洞的代码 - 找出错误！",
+      "alert": "检测到 SQL 注入漏洞！",
+      "alertDescription": "在 CyberSec Lab 中学习如何修复漏洞"
+    },
+    "skipToContent": "跳转到主要内容",
+    "securityTopics": {
+      "badge": "学习主题",
+      "title": "网络安全关键主题",
+      "subtitle": "涵盖 Web 应用程序安全所有方面的综合学习计划"
+    },
+    "certification": {
+      "badge": "认证",
+      "title": "您的成就认可",
+      "subtitle": "获得官方证书，开启新的职业机会"
+    },
+    "gettingStarted": {
+      "badge": "开始使用",
+      "title": "4 个简单步骤开始",
+      "subtitle": "从注册到认证——只需几步",
+      "cta": "立即开始学习"
+    }
+  },
+  "technologies": {
+    "badge": "技术与标准",
+    "title": "学习关键技术",
+    "subtitle": "课程涵盖 Web 应用程序网络安全的所有主要方面",
+    "modules": {
+      "owasp": {
+        "title": "OWASP Top 10",
+        "description": "学习 10 个最关键的 Web 应用程序漏洞"
+      },
+      "headers": {
+        "title": "安全标头",
+        "description": "配置安全标头以保护您的应用程序"
+      },
+      "coding": {
+        "title": "安全编码",
+        "description": "掌握安全代码开发原则"
+      },
+      "pentest": {
+        "title": "渗透测试",
+        "description": "学习测试应用程序漏洞"
+      },
+      "sql": {
+        "title": "SQL 安全",
+        "description": "保护数据库免受攻击和泄露"
+      },
+      "network": {
+        "title": "网络安全",
+        "description": "确保网络级安全"
+      }
+    },
+    "stats": {
+      "coverage": "OWASP Top 10 覆盖",
+      "labs": "实验作业",
+      "certificates": "证书",
+      "students": "学生"
+    }
+  },
+  "forWho": {
+    "badge": "课程适合人群",
+    "title": "适合每个人",
+    "subtitle": "无论您的技能水平如何，都能找到合适的学习形式",
+    "audiences": {
+      "students": {
+        "title": "学生",
+        "description": "获得网络安全职业生涯的实用技能",
+        "benefits": [
+          "互动实验作业",
+          "136 道自测题",
+          "完成模块后获得证书",
+          "游戏化学习",
+          "面试准备"
+        ],
+        "cta": "开始学习"
+      },
+      "teachers": {
+        "title": "教师",
+        "description": "现成的安全教学材料",
+        "benefits": [
+          "8 个现成的学习模块",
+          "自动作业评分",
+          "学生进度跟踪",
+          "教学材料",
+          "LMS 集成"
+        ],
+        "cta": "面向教师"
+      },
+      "companies": {
+        "title": "企业",
+        "description": "提升员工的网络安全技能",
+        "benefits": [
+          "企业定价",
+          "员工分析",
+          "定制课程",
+          "团队认证",
+          "降低泄露风险"
+        ],
+        "cta": "面向企业"
+      }
+    },
+    "features": [
+      "24/7 在线访问",
+      "安全环境",
+      "快速入门",
+      "证书",
+      "进度分析",
+      "导师支持"
+    ]
+  },
+  "learningPath": {
+    "badge": "学习计划",
+    "title": "从初学者到专家",
+    "subtitle": "8 个模块将引导您了解 Web 应用程序网络安全的所有方面",
+    "cta": "免费开始学习",
+    "modules": "模块",
+    "lessons": "课程",
+    "quizzes": "测验",
+    "duration": "周"
+  },
+  "testimonials": {
+    "badge": "成功故事",
+    "title": "用户评价",
+    "subtitle": "超过 10,000 名学生和公司已经使用 CyberSec Lab",
+    "achievements": {
+      "students": "学生",
+      "certificates": "证书",
+      "completion": "课程完成率",
+      "rating": "评分"
+    }
+  },
+  "partners": {
+    "badge": "合作伙伴与客户",
+    "title": "领先公司信赖我们",
+    "subtitle": "CyberSec Lab 被俄罗斯大型公司和大学用于培训员工和学生",
+    "benefits": {
+      "security": {
+        "title": "安全",
+        "description": "根据 OWASP 标准认证的教材"
+      },
+      "business": {
+        "title": "面向企业",
+        "description": "企业员工培训课程"
+      },
+      "education": {
+        "title": "面向大学",
+        "description": "LMS 集成和现成课程"
+      },
+      "startup": {
+        "title": "初创公司",
+        "description": "为科技公司提供特殊条件"
+      }
+    },
+    "cta": "成为 CyberSec Lab 合作伙伴"
+  },
+  "common": {
+    "language": "语言"
+  },
+  "about": {
+    "badge": "关于项目",
+    "title": "网络安全教育",
+    "subtitle": "新一代教育平台，学习 Web 应用程序漏洞和安全开发",
+    "mission": {
+      "title": "我们的使命",
+      "description": "让每个人都能够获得网络安全教育。我们创建交互式模块，帮助学生和开发人员理解并防止实际项目中的漏洞。"
+    },
+    "vision": {
+      "title": "我们的愿景",
+      "description": "成为俄语地区领先的网络安全教育平台。我们致力于培养新一代能够保护数字基础设施的专业人才。"
+    },
+    "values": {
+      "title": "我们的价值观",
+      "subtitle": "构成我们项目基础的原则"
+    },
+    "timeline": {
+      "title": "项目历史",
+      "subtitle": "3 年内从创意到国际平台"
+    },
+    "cta": {
+      "title": "加入我们",
+      "subtitle": "今天开始学习，成为网络安全社区的一部分",
+      "start": "开始学习",
+      "contact": "联系我们"
+    }
+  },
+  "contact": {
+    "badge": "联系方式",
+    "title": "与我们联系",
+    "subtitle": "我们随时准备回答您的问题并帮助您开始学习",
+    "form": {
+      "title": "发送消息",
+      "name": "您的姓名",
+      "namePlaceholder": "张三",
+      "email": "邮箱",
+      "emailPlaceholder": "zhang@example.com",
+      "subject": "主题",
+      "subjectSelect": "选择主题",
+      "subjects": {
+        "partnership": "合作",
+        "education": "教育",
+        "support": "技术支持",
+        "other": "其他"
+      },
+      "message": "消息",
+      "messagePlaceholder": "描述您的问题...",
+      "submit": "发送",
+      "success": "消息已发送！",
+      "description": "我们将在 24 小时内回复您"
+    },
+    "info": {
+      "title": "常见问题",
+      "hours": {
+        "title": "工作时间",
+        "weekdays": "周一至周五：上午 9:00 - 下午 6:00（莫斯科时间）",
+        "weekend": "周六至周日：休息"
+      }
+    }
+  },
+  "pricing": {
+    "badge": "定价",
+    "title": "透明定价",
+    "subtitle": "选择合适的学习计划。免费开始，随需升级",
+    "comparison": {
+      "title": "方案比较",
+      "subtitle": "每个方案功能的详细比较",
+      "feature": "功能"
+    },
+    "faq": {
+      "title": "定价常见问题",
+      "subtitle": "关于支付和订阅的常见问题解答"
+    },
+    "cta": {
+      "title": "准备好开始了吗？",
+      "subtitle": "加入数千名学生，今天开始学习",
+      "start": "免费开始",
+      "contact": "联系我们"
+    }
+  },
+  "dashboard": {
+    "welcome": "欢迎",
+    "welcomeWithName": "欢迎，{name}！",
+    "subtitle": "学习 Web 应用程序漏洞、攻击方法和防御机制的交互平台。在安全环境中练习。",
+    "program": "09.03.04 软件工程",
+    "modules": "模块",
+    "quizzes": "测验",
+    "avgScore": "平均分",
+    "achievements": "成就",
+    "streak": "连续",
+    "noStreak": "无连续",
+    "level": "等级",
+    "completed": "已完成",
+    "total": "总计",
+    "progress": "进度",
+    "modulesCompleted": "{count} 个模块",
+    "progressPct": "{pct}% 进度",
+    "avgScoreValue": "平均分：{score}%",
+    "takeQuiz": "参加测验",
+    "achievementsCount": "{count} 个成就",
+    "learningModules": "学习模块",
+    "lessons": "课",
+    "passed": "已通过",
+    "recommendation": "推荐",
+    "nextAchievement": "下一个成就",
+    "bestStreak": "最佳：{count} 天",
+    "daysShort": "天",
+    "classOverview": "班级概览",
+    "totalStudents": "总学生数",
+    "activeStudents": "30天内活跃",
+    "avgCompletion": "平均完成率",
+    "atRisk": "风险中",
+    "upcomingDeadlines": "即将到期",
+    "overdue": "已逾期",
+    "today": "今天",
+    "tomorrow": "明天",
+    "course": "课程",
+    "quizPrefix": "测验：",
+    "failedToLoadAnnouncements": "加载公告失败",
+    "important": "重要",
+    "hideAnnouncement": "关闭公告"
+  },
+  "sidebar": {
+    "cybersecLab": "CyberSec Lab",
+    "programCode": "09.03.04 • 网络安全",
+    "completed": "已完成",
+    "total": "总计",
+    "progress": "进度",
+    "modules": "模块",
+    "tools": "工具",
+    "home": "主页",
+    "quizzes": "测验",
+    "assignments": "作业",
+    "achievements": "成就",
+    "cheatSheets": "速查表",
+    "passwordChecker": "密码检查",
+    "leaderboard": "排行榜",
+    "careerPaths": "职业路径",
+    "teacherPanel": "教师面板",
+    "adminPanel": "管理员面板",
+    "logout": "退出",
+    "closeSidebar": "关闭侧边栏",
+    "avatar": "头像"
+  },
+  "proficiency": {
+    "beginner": "初学者",
+    "novice": "新手",
+    "practitioner": "实践者",
+    "advanced": "进阶",
+    "expert": "专家"
+  },
+  "recommendations": {
+    "adminDefault": "管理用户和系统设置。",
+    "teacherDefault": "查看分析和学生进度。",
+    "greatStreak": "出色的连续记录 — {count} 天！继续前进并解锁新成就。",
+    "inactiveDays": "您已经 {count} 天没有学习了。回来继续吧！",
+    "startOwasp": "从 OWASP Top 10 开始 — 网络安全的基础。",
+    "trySql": "试试 SQL 注入 — 最常见的漏洞。",
+    "tryXss": "学习 XSS 攻击 — 每三个网站就有一个存在。",
+    "tryCsrf": "学习 CSRF 攻击 — 冒充用户伪造请求。",
+    "tryHeaders": "掌握安全标头 — CSP、HSTS 和其他安全标头。",
+    "tryAuth": "尝试身份验证模块 — 密码、哈希和双因素认证。",
+    "tryCoding": "练习安全编码 — 15 道代码审查题。",
+    "tryTools": "试试工具：密码、编码和密码生成器。",
+    "tryApi": "学习 OWASP API 安全 Top 10 — 现代 API 漏洞。",
+    "tryQuizzes": "通过测验测试您的知识 — 11 个类别，可按难度筛选！",
+    "finishModules": "完成剩余模块以完成全部课程！",
+    "allDone": "太棒了！您已完成所有模块。查看您的成就！"
+  }
+}

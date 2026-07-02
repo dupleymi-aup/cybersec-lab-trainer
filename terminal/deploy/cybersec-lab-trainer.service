@@ -1,0 +1,41 @@
+[Unit]
+Description=CyberSec Lab Trainer Application
+After=network.target
+Requires=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=nextjs
+Group=nextjs
+WorkingDirectory=/opt/cybersec-lab-trainer
+Environment=NODE_ENV=production
+
+# Environment variables (или используйте /etc/default/cybersec-lab)
+Environment=PORT=3000
+Environment=HOSTNAME=0.0.0.0
+Environment=DATABASE_URL=postgresql://user:password@localhost:5432/cybersec_lab
+Environment=TOKEN_SECRET=your-super-secret-token-key
+
+# ExecStart
+ExecStart=/usr/bin/node /opt/cybersec-lab-trainer/server.js
+
+# Restart policy
+Restart=always
+RestartSec=5
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Resource limits (опционально)
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=cybersec-lab
+
+[Install]
+WantedBy=multi-user.target

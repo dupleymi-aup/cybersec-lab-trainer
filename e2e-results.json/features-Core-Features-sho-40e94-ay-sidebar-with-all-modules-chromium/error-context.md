@@ -1,0 +1,1537 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: features.spec.ts >> Core Features >> should display sidebar with all modules
+- Location: e2e\features.spec.ts:34:7
+
+# Error details
+
+```
+Error: locator.fill: Error: Element is not an <input>, <textarea>, <select> or [contenteditable] and does not have a role allowing [aria-readonly]
+Call log:
+  - waiting for getByLabel(/почта|телефон|email/i).first()
+    - locator resolved to <a tabindex="0" aria-label="Email" href="mailto:contact@cyberseclab.ru" class="bg-accent text-muted-foreground border-border flex h-10 w-10 items-center justify-center rounded-xl border transition-all hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-500">…</a>
+    - fill("admin@cybersec.lab")
+  - attempting fill action
+    - waiting for element to be visible, enabled and editable
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Перейти к основному содержимому" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=e4]:
+    - generic [ref=e7]:
+      - link "CyberSec Lab Cybersecurity Training" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img [ref=e10]
+        - generic [ref=e12]:
+          - generic [ref=e13]: CyberSec Lab
+          - paragraph [ref=e14]: Cybersecurity Training
+      - navigation [ref=e15]:
+        - link "How It Works" [ref=e16] [cursor=pointer]:
+          - /url: "#how-it-works"
+          - img [ref=e17]
+          - text: How It Works
+        - link "Features" [ref=e19] [cursor=pointer]:
+          - /url: "#features"
+          - img [ref=e20]
+          - text: Features
+        - link "Reviews" [ref=e22] [cursor=pointer]:
+          - /url: "#reviews"
+          - img [ref=e23]
+          - text: Reviews
+        - link "FAQ" [ref=e25] [cursor=pointer]:
+          - /url: "#faq"
+          - img [ref=e26]
+          - text: FAQ
+        - link "About" [ref=e29] [cursor=pointer]:
+          - /url: /about
+          - img [ref=e30]
+          - text: About
+      - generic [ref=e35]:
+        - button "Выбрать язык" [ref=e37]:
+          - img [ref=e38]
+          - generic [ref=e41]: EN
+        - button "Сменить тему" [ref=e43]
+        - link "Log In" [ref=e45] [cursor=pointer]:
+          - /url: /login
+          - button "Log In" [ref=e46]
+        - link "Register" [ref=e47] [cursor=pointer]:
+          - /url: /register
+          - button "Register" [ref=e48]
+    - generic [ref=e49]:
+      - generic:
+        - generic:
+          - img
+        - generic:
+          - img
+        - generic:
+          - img
+        - generic:
+          - img
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - img [ref=e54]
+            - generic [ref=e56]: Program 09.03.04 Software Engineering
+          - heading "Cybersecurity Training Platform" [level=1] [ref=e57]
+          - paragraph [ref=e58]: Learn web application vulnerabilities, complete interactive quizzes, and earn certificates. Practical cybersecurity education for students and developers.
+          - generic [ref=e59]:
+            - link "Start Learning" [ref=e60] [cursor=pointer]:
+              - /url: /register
+              - button "Start Learning" [ref=e61]:
+                - text: Start Learning
+                - img
+            - link "Learn More" [ref=e62] [cursor=pointer]:
+              - /url: "#how-it-works"
+              - button "Learn More" [ref=e63]:
+                - img
+                - text: Learn More
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - img [ref=e66]
+              - generic [ref=e69]: 8 модулей
+            - generic [ref=e70]:
+              - img [ref=e71]
+              - generic [ref=e74]: 136 квизов
+            - generic [ref=e75]:
+              - img [ref=e76]
+              - generic [ref=e79]: 16 лабораторных
+        - generic [ref=e82]:
+          - img "Code terminal" [ref=e84]:
+            - generic [ref=e86]:
+              - generic [ref=e91]:
+                - img [ref=e92]
+                - generic [ref=e94]: vulnerability.js
+              - generic [ref=e95]:
+                - img [ref=e96]
+                - img [ref=e97]
+                - img [ref=e99]
+          - generic [ref=e103]:
+            - generic [ref=e104]:
+              - img [ref=e106]
+              - generic [ref=e108]:
+                - paragraph [ref=e109]: Модулей
+                - paragraph [ref=e110]: "8"
+            - generic [ref=e111]:
+              - img [ref=e112]
+              - generic [ref=e115]: Актуально 2026
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - img [ref=e119]
+              - generic [ref=e123]:
+                - paragraph [ref=e124]: Квизов
+                - paragraph [ref=e125]: "136"
+            - generic [ref=e126]:
+              - img [ref=e127]
+              - generic [ref=e130]: С проверкой
+          - generic [ref=e131]:
+            - generic [ref=e132]:
+              - img [ref=e134]
+              - generic [ref=e137]:
+                - paragraph [ref=e138]: Лабораторных
+                - paragraph [ref=e139]: "16"
+            - generic [ref=e140]:
+              - img [ref=e141]
+              - generic [ref=e144]: Практика
+          - generic [ref=e145]:
+            - generic [ref=e146]:
+              - img [ref=e148]
+              - generic [ref=e151]:
+                - paragraph [ref=e152]: Достижений
+                - paragraph [ref=e153]: 20+
+            - generic [ref=e154]:
+              - img [ref=e155]
+              - generic [ref=e158]: Геймификация
+    - region "Statistics" [ref=e159]:
+      - generic [ref=e162]:
+        - generic [ref=e163]:
+          - generic:
+            - generic: Статистика платформы
+          - heading "Масштабное обучение" [level=2] [ref=e164]
+          - paragraph [ref=e165]: Комплексная программа по кибербезопасности с практическими заданиями
+        - generic [ref=e166]:
+          - generic [ref=e167]:
+            - img [ref=e169]
+            - generic [ref=e171]: "0"
+            - generic [ref=e172]: Modules
+          - generic [ref=e173]:
+            - img [ref=e175]
+            - generic [ref=e180]: 0+
+            - generic [ref=e181]: Quiz Questions
+          - generic [ref=e182]:
+            - img [ref=e184]
+            - generic [ref=e190]: "0"
+            - generic [ref=e191]: Achievements
+          - generic [ref=e192]:
+            - img [ref=e194]
+            - generic [ref=e199]: "0"
+            - generic [ref=e200]: Career Paths
+    - region "Key Cybersecurity Topics" [ref=e201]:
+      - generic [ref=e202]:
+        - generic [ref=e203]:
+          - generic [ref=e204]:
+            - img [ref=e205]
+            - generic [ref=e207]: Learning Topics
+          - heading "Key Cybersecurity Topics" [level=2] [ref=e208]
+          - paragraph [ref=e209]: Comprehensive learning program covering all aspects of web application security
+        - generic [ref=e210]:
+          - generic [ref=e211]:
+            - img [ref=e213]
+            - heading "OWASP Top 10" [level=3] [ref=e215]
+            - paragraph [ref=e216]: Изучите 10 наиболее критических уязвимостей веб-приложений
+            - list [ref=e217]:
+              - listitem [ref=e218]:
+                - generic [ref=e220]: Инъекции
+              - listitem [ref=e221]:
+                - generic [ref=e223]: XSS атаки
+              - listitem [ref=e224]:
+                - generic [ref=e226]: Небезопасная аутентификация
+              - listitem [ref=e227]:
+                - generic [ref=e229]: XXE уязвимости
+          - generic [ref=e230]:
+            - img [ref=e232]
+            - heading "Криптография" [level=3] [ref=e235]
+            - paragraph [ref=e236]: Основы шифрования и защиты данных
+            - list [ref=e237]:
+              - listitem [ref=e238]:
+                - generic [ref=e240]: Хеширование
+              - listitem [ref=e241]:
+                - generic [ref=e243]: Симметричное шифрование
+              - listitem [ref=e244]:
+                - generic [ref=e246]: Асимметричное шифрование
+              - listitem [ref=e247]:
+                - generic [ref=e249]: Цифровые подписи
+          - generic [ref=e250]:
+            - img [ref=e252]
+            - heading "Secure Coding" [level=3] [ref=e255]
+            - paragraph [ref=e256]: Принципы безопасного программирования
+            - list [ref=e257]:
+              - listitem [ref=e258]:
+                - generic [ref=e260]: Валидация входных данных
+              - listitem [ref=e261]:
+                - generic [ref=e263]: Санитизация вывода
+              - listitem [ref=e264]:
+                - generic [ref=e266]: Обработка ошибок
+              - listitem [ref=e267]:
+                - generic [ref=e269]: Логирование
+          - generic [ref=e270]:
+            - img [ref=e272]
+            - heading "Защита данных" [level=3] [ref=e276]
+            - paragraph [ref=e277]: Безопасное хранение и обработка информации
+            - list [ref=e278]:
+              - listitem [ref=e279]:
+                - generic [ref=e281]: SQL инъекции
+              - listitem [ref=e282]:
+                - generic [ref=e284]: NoSQL инъекции
+              - listitem [ref=e285]:
+                - generic [ref=e287]: Защита PII
+              - listitem [ref=e288]:
+                - generic [ref=e290]: GDPR compliance
+          - generic [ref=e291]:
+            - img [ref=e293]
+            - heading "Сетевая безопасность" [level=3] [ref=e296]
+            - paragraph [ref=e297]: Защита сетевых протоколов и коммуникаций
+            - list [ref=e298]:
+              - listitem [ref=e299]:
+                - generic [ref=e301]: HTTPS/TLS
+              - listitem [ref=e302]:
+                - generic [ref=e304]: CORS политики
+              - listitem [ref=e305]:
+                - generic [ref=e307]: Content Security Policy
+              - listitem [ref=e308]:
+                - generic [ref=e310]: Защита от DDoS
+          - generic [ref=e311]:
+            - img [ref=e313]
+            - heading "Пентестинг" [level=3] [ref=e315]
+            - paragraph [ref=e316]: Методологии тестирования на проникновение
+            - list [ref=e317]:
+              - listitem [ref=e318]:
+                - generic [ref=e320]: Разведка
+              - listitem [ref=e321]:
+                - generic [ref=e323]: Сканирование
+              - listitem [ref=e324]:
+                - generic [ref=e326]: Эксплуатация
+              - listitem [ref=e327]:
+                - generic [ref=e329]: Постэксплуатация
+          - generic [ref=e330]:
+            - img [ref=e332]
+            - heading "Bug Bounty" [level=3] [ref=e341]
+            - paragraph [ref=e342]: Поиск и описание уязвимостей для программ вознаграждений
+            - list [ref=e343]:
+              - listitem [ref=e344]:
+                - generic [ref=e346]: Поиск уязвимостей
+              - listitem [ref=e347]:
+                - generic [ref=e349]: Написание отчётов
+              - listitem [ref=e350]:
+                - generic [ref=e352]: Triaging
+              - listitem [ref=e353]:
+                - generic [ref=e355]: Responsible disclosure
+          - generic [ref=e356]:
+            - img [ref=e358]
+            - heading "Аутентификация" [level=3] [ref=e362]
+            - paragraph [ref=e363]: Системы управления доступом и идентификации
+            - list [ref=e364]:
+              - listitem [ref=e365]:
+                - generic [ref=e367]: OAuth 2.0
+              - listitem [ref=e368]:
+                - generic [ref=e370]: JWT токены
+              - listitem [ref=e371]:
+                - generic [ref=e373]: MFA/2FA
+              - listitem [ref=e374]:
+                - generic [ref=e376]: Session management
+    - region "How It Works" [ref=e377]:
+      - generic [ref=e380]:
+        - generic [ref=e381]:
+          - generic:
+            - generic: Simple Process
+          - heading "How It Works" [level=2] [ref=e382]
+          - paragraph [ref=e383]: Four simple steps from registration to certification
+        - generic [ref=e384]:
+          - generic [ref=e387]:
+            - generic [ref=e388]:
+              - img [ref=e390]
+              - generic [ref=e393]: "1"
+            - heading "Sign Up" [level=3] [ref=e394]
+            - paragraph [ref=e395]: Create an account in 30 seconds
+            - generic [ref=e396]:
+              - img [ref=e397]
+              - text: Начать сейчас
+          - generic [ref=e401]:
+            - generic [ref=e402]:
+              - img [ref=e404]
+              - generic [ref=e406]: "2"
+            - heading "Choose a Module" [level=3] [ref=e407]
+            - paragraph [ref=e408]: OWASP Top 10, SQL Injection, XSS, CSRF, and more
+            - generic [ref=e409]:
+              - img [ref=e410]
+              - text: Начать сейчас
+          - generic [ref=e414]:
+            - generic [ref=e415]:
+              - img [ref=e417]
+              - generic [ref=e420]: "3"
+            - heading "Solve Quizzes" [level=3] [ref=e421]
+            - paragraph [ref=e422]: 136+ hands-on exercises with instant feedback
+            - generic [ref=e423]:
+              - img [ref=e424]
+              - text: Начать сейчас
+          - generic [ref=e427]:
+            - generic [ref=e428]:
+              - img [ref=e430]
+              - generic [ref=e433]: "4"
+            - heading "Get Certified" [level=3] [ref=e434]
+            - paragraph [ref=e435]: Complete a module and earn a certificate
+            - generic [ref=e436]:
+              - img [ref=e437]
+              - text: Начать сейчас
+    - region "Everything for Cybersecurity Learning" [ref=e439]:
+      - generic [ref=e442]:
+        - generic [ref=e443]:
+          - generic:
+            - generic: Возможности платформы
+          - heading "Everything for Cybersecurity Learning" [level=2] [ref=e444]
+          - paragraph [ref=e445]: Theory, practice, and analytics in one system
+        - generic [ref=e446]:
+          - generic [ref=e448]:
+            - img [ref=e451]
+            - heading "8 Interactive Modules" [level=3] [ref=e453]
+            - paragraph [ref=e454]: OWASP Top 10, SQL Injection, XSS, CSRF, and more with hands-on exercises
+            - generic [ref=e455]:
+              - img [ref=e456]
+              - generic [ref=e459]: Включено в программу
+          - generic [ref=e461]:
+            - img [ref=e464]
+            - heading "136+ Quiz Questions" [level=3] [ref=e466]
+            - paragraph [ref=e467]: Test knowledge across 9 categories
+            - generic [ref=e468]:
+              - img [ref=e469]
+              - generic [ref=e472]: Включено в программу
+          - generic [ref=e474]:
+            - img [ref=e477]
+            - heading "Achievement System" [level=3] [ref=e483]
+            - paragraph [ref=e484]: Earn rewards and stay motivated
+            - generic [ref=e485]:
+              - img [ref=e486]
+              - generic [ref=e489]: Включено в программу
+          - generic [ref=e491]:
+            - img [ref=e494]
+            - heading "Progress Analytics" [level=3] [ref=e496]
+            - paragraph [ref=e497]: Track progress with charts and reports
+            - generic [ref=e498]:
+              - img [ref=e499]
+              - generic [ref=e502]: Включено в программу
+          - generic [ref=e504]:
+            - img [ref=e507]
+            - heading "LTI Integration" [level=3] [ref=e510]
+            - paragraph [ref=e511]: Integration with Moodle, Canvas via LTI 1.3
+            - generic [ref=e512]:
+              - img [ref=e513]
+              - generic [ref=e516]: Включено в программу
+          - generic [ref=e518]:
+            - img [ref=e521]
+            - heading "Teacher and Admin Roles" [level=3] [ref=e526]
+            - paragraph [ref=e527]: Manage students, groups, and courses
+            - generic [ref=e528]:
+              - img [ref=e529]
+              - generic [ref=e532]: Включено в программу
+    - generic [ref=e534]:
+      - generic [ref=e535]:
+        - generic [ref=e536]:
+          - img [ref=e537]
+          - generic [ref=e539]: Technologies & Standards
+        - heading "Learn Key Technologies" [level=2] [ref=e540]
+        - paragraph [ref=e541]: The course program covers all major aspects of web application cybersecurity
+      - generic [ref=e542]:
+        - generic [ref=e543]:
+          - img [ref=e545]
+          - heading "OWASP Top 10" [level=3] [ref=e547]
+          - paragraph [ref=e548]: Learn the 10 most critical web application vulnerabilities
+          - generic [ref=e549]:
+            - generic [ref=e550]: Injection
+            - generic [ref=e551]: XSS
+            - generic [ref=e552]: CSRF
+            - generic [ref=e553]: SSRF
+        - generic [ref=e555]:
+          - img [ref=e557]
+          - heading "Security Headers" [level=3] [ref=e560]
+          - paragraph [ref=e561]: Configure security headers to protect your application
+          - generic [ref=e562]:
+            - generic [ref=e563]: CSP
+            - generic [ref=e564]: HSTS
+            - generic [ref=e565]: X-Frame-Options
+            - generic [ref=e566]: CORS
+        - generic [ref=e568]:
+          - img [ref=e570]
+          - heading "Secure Coding" [level=3] [ref=e573]
+          - paragraph [ref=e574]: Master the principles of secure code development
+          - generic [ref=e575]:
+            - generic [ref=e576]: Валидация
+            - generic [ref=e577]: Санитизация
+            - generic [ref=e578]: Шифрование
+            - generic [ref=e579]: Хеширование
+        - generic [ref=e581]:
+          - img [ref=e583]
+          - heading "Penetration Testing" [level=3] [ref=e585]
+          - paragraph [ref=e586]: Learn to test applications for vulnerabilities
+          - generic [ref=e587]:
+            - generic [ref=e588]: Reconnaissance
+            - generic [ref=e589]: Scanning
+            - generic [ref=e590]: Exploitation
+            - generic [ref=e591]: Reporting
+        - generic [ref=e593]:
+          - img [ref=e595]
+          - heading "SQL Security" [level=3] [ref=e599]
+          - paragraph [ref=e600]: Protect databases from attacks and leaks
+          - generic [ref=e601]:
+            - generic [ref=e602]: Prepared Statements
+            - generic [ref=e603]: ORM Security
+            - generic [ref=e604]: Access Control
+            - generic [ref=e605]: Audit
+        - generic [ref=e607]:
+          - img [ref=e609]
+          - heading "Network Security" [level=3] [ref=e612]
+          - paragraph [ref=e613]: Ensure network-level security
+          - generic [ref=e614]:
+            - generic [ref=e615]: TLS/SSL
+            - generic [ref=e616]: Firewall
+            - generic [ref=e617]: DDoS Protection
+            - generic [ref=e618]: VPN
+      - generic [ref=e620]:
+        - generic [ref=e621]:
+          - img [ref=e622]
+          - generic [ref=e625]: 100%
+          - generic [ref=e626]: OWASP Top 10 Coverage
+        - generic [ref=e627]:
+          - img [ref=e628]
+          - generic [ref=e630]: "16"
+          - generic [ref=e631]: Laboratory Works
+        - generic [ref=e632]:
+          - img [ref=e633]
+          - generic [ref=e636]: "8"
+          - generic [ref=e637]: Certificates
+        - generic [ref=e638]:
+          - img [ref=e639]
+          - generic [ref=e644]: 1000+
+          - generic [ref=e645]: Students
+    - generic [ref=e647]:
+      - generic [ref=e648]:
+        - generic [ref=e649]:
+          - img [ref=e650]
+          - generic [ref=e652]: Программа обучения
+        - heading "Путь от новичка до профи" [level=2] [ref=e653]
+        - paragraph [ref=e654]: 8 модулей, которые проведут вас через все аспекты кибербезопасности веб-приложений
+      - generic [ref=e657]:
+        - generic [ref=e660]:
+          - generic [ref=e661]:
+            - img [ref=e663]
+            - generic [ref=e665]: "01"
+          - generic [ref=e666]:
+            - generic [ref=e667]:
+              - generic [ref=e668]: Модуль 01
+              - generic [ref=e669]:
+                - img [ref=e670]
+                - text: 2 недели
+            - heading "OWASP Top 10" [level=3] [ref=e673]
+            - paragraph [ref=e674]: Изучите 10 наиболее критических уязвимостей веб-приложений
+            - generic [ref=e675]:
+              - generic [ref=e676]: Injection
+              - generic [ref=e677]: Broken Authentication
+              - generic [ref=e678]: XSS
+              - generic [ref=e679]: Insecure Deserialization
+            - generic [ref=e680]:
+              - generic [ref=e681]:
+                - img [ref=e682]
+                - generic [ref=e684]: 12 уроков
+              - generic [ref=e685]:
+                - img [ref=e686]
+                - generic [ref=e689]: 18 квизов
+          - img [ref=e691]
+        - generic [ref=e696]:
+          - generic [ref=e697]:
+            - img [ref=e699]
+            - generic [ref=e702]: "02"
+          - generic [ref=e703]:
+            - generic [ref=e704]:
+              - generic [ref=e705]: Модуль 02
+              - generic [ref=e706]:
+                - img [ref=e707]
+                - text: 1 неделя
+            - heading "Security Headers" [level=3] [ref=e710]
+            - paragraph [ref=e711]: Настройте заголовки HTTP для защиты от атак
+            - generic [ref=e712]:
+              - generic [ref=e713]: CSP
+              - generic [ref=e714]: HSTS
+              - generic [ref=e715]: X-Frame-Options
+              - generic [ref=e716]: CORS
+            - generic [ref=e717]:
+              - generic [ref=e718]:
+                - img [ref=e719]
+                - generic [ref=e721]: 8 уроков
+              - generic [ref=e722]:
+                - img [ref=e723]
+                - generic [ref=e726]: 14 квизов
+          - img [ref=e728]
+        - generic [ref=e733]:
+          - generic [ref=e734]:
+            - img [ref=e736]
+            - generic [ref=e739]: "03"
+          - generic [ref=e740]:
+            - generic [ref=e741]:
+              - generic [ref=e742]: Модуль 03
+              - generic [ref=e743]:
+                - img [ref=e744]
+                - text: 2 недели
+            - heading "Secure Coding" [level=3] [ref=e747]
+            - paragraph [ref=e748]: Принципы написания безопасного кода
+            - generic [ref=e749]:
+              - generic [ref=e750]: Input Validation
+              - generic [ref=e751]: Output Encoding
+              - generic [ref=e752]: Error Handling
+              - generic [ref=e753]: Logging
+            - generic [ref=e754]:
+              - generic [ref=e755]:
+                - img [ref=e756]
+                - generic [ref=e758]: 15 уроков
+              - generic [ref=e759]:
+                - img [ref=e760]
+                - generic [ref=e763]: 20 квизов
+          - img [ref=e765]
+        - generic [ref=e770]:
+          - generic [ref=e771]:
+            - img [ref=e773]
+            - generic [ref=e777]: "04"
+          - generic [ref=e778]:
+            - generic [ref=e779]:
+              - generic [ref=e780]: Модуль 04
+              - generic [ref=e781]:
+                - img [ref=e782]
+                - text: 1.5 недели
+            - heading "SQL Security" [level=3] [ref=e785]
+            - paragraph [ref=e786]: Защита баз данных от атак и утечек
+            - generic [ref=e787]:
+              - generic [ref=e788]: SQL Injection
+              - generic [ref=e789]: Prepared Statements
+              - generic [ref=e790]: Access Control
+              - generic [ref=e791]: Encryption
+            - generic [ref=e792]:
+              - generic [ref=e793]:
+                - img [ref=e794]
+                - generic [ref=e796]: 10 уроков
+              - generic [ref=e797]:
+                - img [ref=e798]
+                - generic [ref=e801]: 16 квизов
+          - img [ref=e803]
+        - generic [ref=e808]:
+          - generic [ref=e809]:
+            - img [ref=e811]
+            - generic [ref=e814]: "05"
+          - generic [ref=e815]:
+            - generic [ref=e816]:
+              - generic [ref=e817]: Модуль 05
+              - generic [ref=e818]:
+                - img [ref=e819]
+                - text: 1.5 недели
+            - heading "XSS & CSRF" [level=3] [ref=e822]
+            - paragraph [ref=e823]: Защита от межсайтовых атак
+            - generic [ref=e824]:
+              - generic [ref=e825]: Reflected XSS
+              - generic [ref=e826]: Stored XSS
+              - generic [ref=e827]: DOM XSS
+              - generic [ref=e828]: CSRF Tokens
+            - generic [ref=e829]:
+              - generic [ref=e830]:
+                - img [ref=e831]
+                - generic [ref=e833]: 11 уроков
+              - generic [ref=e834]:
+                - img [ref=e835]
+                - generic [ref=e838]: 15 квизов
+          - img [ref=e840]
+        - generic [ref=e845]:
+          - generic [ref=e846]:
+            - img [ref=e848]
+            - generic [ref=e851]: "06"
+          - generic [ref=e852]:
+            - generic [ref=e853]:
+              - generic [ref=e854]: Модуль 06
+              - generic [ref=e855]:
+                - img [ref=e856]
+                - text: 2 недели
+            - heading "Network Security" [level=3] [ref=e859]
+            - paragraph [ref=e860]: Безопасность сетевого уровня
+            - generic [ref=e861]:
+              - generic [ref=e862]: TLS/SSL
+              - generic [ref=e863]: Firewall
+              - generic [ref=e864]: DDoS Protection
+              - generic [ref=e865]: VPN
+            - generic [ref=e866]:
+              - generic [ref=e867]:
+                - img [ref=e868]
+                - generic [ref=e870]: 14 уроков
+              - generic [ref=e871]:
+                - img [ref=e872]
+                - generic [ref=e875]: 18 квизов
+          - img [ref=e877]
+        - generic [ref=e882]:
+          - generic [ref=e883]:
+            - img [ref=e885]
+            - generic [ref=e887]: "07"
+          - generic [ref=e888]:
+            - generic [ref=e889]:
+              - generic [ref=e890]: Модуль 07
+              - generic [ref=e891]:
+                - img [ref=e892]
+                - text: 1.5 недели
+            - heading "Security Tools" [level=3] [ref=e895]
+            - paragraph [ref=e896]: Инструменты для тестирования безопасности
+            - generic [ref=e897]:
+              - generic [ref=e898]: Burp Suite
+              - generic [ref=e899]: OWASP ZAP
+              - generic [ref=e900]: Nmap
+              - generic [ref=e901]: Wireshark
+            - generic [ref=e902]:
+              - generic [ref=e903]:
+                - img [ref=e904]
+                - generic [ref=e906]: 12 уроков
+              - generic [ref=e907]:
+                - img [ref=e908]
+                - generic [ref=e911]: 16 квизов
+          - img [ref=e913]
+        - generic [ref=e918]:
+          - generic [ref=e919]:
+            - img [ref=e921]
+            - generic [ref=e924]: "08"
+          - generic [ref=e925]:
+            - generic [ref=e926]:
+              - generic [ref=e927]: Модуль 08
+              - generic [ref=e928]:
+                - img [ref=e929]
+                - text: 3 недели
+            - heading "Final Project" [level=3] [ref=e932]
+            - paragraph [ref=e933]: Комплексный проект по аудиту безопасности
+            - generic [ref=e934]:
+              - generic [ref=e935]: Security Audit
+              - generic [ref=e936]: Penetration Test
+              - generic [ref=e937]: Report Writing
+              - generic [ref=e938]: Remediation
+            - generic [ref=e939]:
+              - generic [ref=e940]:
+                - img [ref=e941]
+                - generic [ref=e943]: 5 уроков
+              - generic [ref=e944]:
+                - img [ref=e945]
+                - generic [ref=e948]: 19 квизов
+          - img [ref=e950]
+      - link "Начать обучение бесплатно" [ref=e954] [cursor=pointer]:
+        - /url: /register
+        - button "Начать обучение бесплатно" [ref=e955]:
+          - text: Начать обучение бесплатно
+          - img
+    - region "Start in 4 Simple Steps" [ref=e956]:
+      - generic [ref=e957]:
+        - generic [ref=e958]:
+          - generic [ref=e959]:
+            - img [ref=e960]
+            - generic [ref=e965]: Getting Started
+          - heading "Start in 4 Simple Steps" [level=2] [ref=e966]
+          - paragraph [ref=e967]: From registration to certification — just a few steps away
+        - generic [ref=e968]:
+          - generic [ref=e970]:
+            - generic [ref=e971]:
+              - generic [ref=e973]:
+                - generic [ref=e974]: "01"
+                - heading "Выберите модуль" [level=3] [ref=e975]
+                - paragraph [ref=e976]: Начните с базового модуля или выберите тему по интересам
+                - list [ref=e977]:
+                  - listitem [ref=e978]:
+                    - generic [ref=e979]: OWASP Top 10
+                    - img [ref=e980]
+                  - listitem [ref=e983]:
+                    - generic [ref=e984]: Криптография
+                    - img [ref=e985]
+                  - listitem [ref=e988]:
+                    - generic [ref=e989]: Secure Coding
+                    - img [ref=e990]
+                  - listitem [ref=e993]:
+                    - generic [ref=e994]: Пентестинг
+                    - img [ref=e995]
+              - img [ref=e999]
+            - generic [ref=e1001]:
+              - generic [ref=e1003]:
+                - generic [ref=e1004]: "02"
+                - heading "Изучайте теорию" [level=3] [ref=e1005]
+                - paragraph [ref=e1006]: Пройдите интерактивные уроки с примерами кода
+                - list [ref=e1007]:
+                  - listitem [ref=e1008]:
+                    - img [ref=e1009]
+                    - generic [ref=e1012]: Видеолекции
+                  - listitem [ref=e1013]:
+                    - img [ref=e1014]
+                    - generic [ref=e1017]: Статьи
+                  - listitem [ref=e1018]:
+                    - img [ref=e1019]
+                    - generic [ref=e1022]: Примеры кода
+                  - listitem [ref=e1023]:
+                    - img [ref=e1024]
+                    - generic [ref=e1027]: Диаграммы
+              - img [ref=e1029]
+            - generic [ref=e1031]:
+              - generic [ref=e1033]:
+                - generic [ref=e1034]: "03"
+                - heading "Практикуйтесь" [level=3] [ref=e1035]
+                - paragraph [ref=e1036]: Решайте практические задания в безопасной среде
+                - list [ref=e1037]:
+                  - listitem [ref=e1038]:
+                    - generic [ref=e1039]: Песочницы
+                    - img [ref=e1040]
+                  - listitem [ref=e1043]:
+                    - generic [ref=e1044]: CTF задачи
+                    - img [ref=e1045]
+                  - listitem [ref=e1048]:
+                    - generic [ref=e1049]: Реальные кейсы
+                    - img [ref=e1050]
+                  - listitem [ref=e1053]:
+                    - generic [ref=e1054]: Автотесты
+                    - img [ref=e1055]
+              - img [ref=e1059]
+            - generic [ref=e1062]:
+              - generic [ref=e1064]:
+                - generic [ref=e1065]: "04"
+                - heading "Получите сертификат" [level=3] [ref=e1066]
+                - paragraph [ref=e1067]: Сдайте финальный тест и получите сертификат
+                - list [ref=e1068]:
+                  - listitem [ref=e1069]:
+                    - img [ref=e1070]
+                    - generic [ref=e1073]: Онлайн экзамен
+                  - listitem [ref=e1074]:
+                    - img [ref=e1075]
+                    - generic [ref=e1078]: Сертификат с ID
+                  - listitem [ref=e1079]:
+                    - img [ref=e1080]
+                    - generic [ref=e1083]: Верификация
+                  - listitem [ref=e1084]:
+                    - img [ref=e1085]
+                    - generic [ref=e1088]: LinkedIn
+              - img [ref=e1090]
+          - link "Start Learning Now" [ref=e1094] [cursor=pointer]:
+            - /url: /register
+            - text: Start Learning Now
+            - img [ref=e1095]
+    - generic [ref=e1098]:
+      - generic [ref=e1099]:
+        - generic [ref=e1100]:
+          - img [ref=e1101]
+          - generic [ref=e1104]: Who This Course Is For
+        - heading "Perfect for Everyone" [level=2] [ref=e1105]
+        - paragraph [ref=e1106]: Regardless of your skill level, you'll find the right learning format
+      - generic [ref=e1107]:
+        - generic [ref=e1108]:
+          - img [ref=e1110]
+          - heading "For Students" [level=3] [ref=e1112]
+          - paragraph [ref=e1113]: Practical skills to start a career in cybersecurity
+          - list [ref=e1114]:
+            - listitem [ref=e1115]:
+              - img [ref=e1116]
+              - generic [ref=e1119]: Interactive laboratory works
+            - listitem [ref=e1120]:
+              - img [ref=e1121]
+              - generic [ref=e1124]: 136 quizzes for self-assessment
+            - listitem [ref=e1125]:
+              - img [ref=e1126]
+              - generic [ref=e1129]: Certificates upon module completion
+            - listitem [ref=e1130]:
+              - img [ref=e1131]
+              - generic [ref=e1134]: Gamified learning
+            - listitem [ref=e1135]:
+              - img [ref=e1136]
+              - generic [ref=e1139]: Interview preparation
+          - link "Start Learning" [ref=e1140] [cursor=pointer]:
+            - /url: /register
+            - button "Start Learning" [ref=e1141]:
+              - text: Start Learning
+              - img
+        - generic [ref=e1143]:
+          - img [ref=e1145]
+          - heading "For Teachers" [level=3] [ref=e1149]
+          - paragraph [ref=e1150]: Ready-made materials for teaching security
+          - list [ref=e1151]:
+            - listitem [ref=e1152]:
+              - img [ref=e1153]
+              - generic [ref=e1156]: 8 ready-to-use learning modules
+            - listitem [ref=e1157]:
+              - img [ref=e1158]
+              - generic [ref=e1161]: Automatic assignment grading
+            - listitem [ref=e1162]:
+              - img [ref=e1163]
+              - generic [ref=e1166]: Student progress tracking
+            - listitem [ref=e1167]:
+              - img [ref=e1168]
+              - generic [ref=e1171]: Teaching materials
+            - listitem [ref=e1172]:
+              - img [ref=e1173]
+              - generic [ref=e1176]: LMS integration
+          - link "For Teachers" [ref=e1177] [cursor=pointer]:
+            - /url: /register
+            - button "For Teachers" [ref=e1178]:
+              - text: For Teachers
+              - img
+        - generic [ref=e1180]:
+          - img [ref=e1182]
+          - heading "For Companies" [level=3] [ref=e1186]
+          - paragraph [ref=e1187]: Employee upskilling in cybersecurity
+          - list [ref=e1188]:
+            - listitem [ref=e1189]:
+              - img [ref=e1190]
+              - generic [ref=e1193]: Corporate pricing
+            - listitem [ref=e1194]:
+              - img [ref=e1195]
+              - generic [ref=e1198]: Employee analytics
+            - listitem [ref=e1199]:
+              - img [ref=e1200]
+              - generic [ref=e1203]: Custom programs
+            - listitem [ref=e1204]:
+              - img [ref=e1205]
+              - generic [ref=e1208]: Team certification
+            - listitem [ref=e1209]:
+              - img [ref=e1210]
+              - generic [ref=e1213]: Reduced leak risks
+          - link "For Business" [ref=e1214] [cursor=pointer]:
+            - /url: /register
+            - button "For Business" [ref=e1215]:
+              - text: For Business
+              - img
+      - generic [ref=e1217]:
+        - generic [ref=e1218]:
+          - img [ref=e1219]
+          - text: 24/7 Online Access
+        - generic [ref=e1221]:
+          - img [ref=e1222]
+          - text: Secure Environment
+        - generic [ref=e1224]:
+          - img [ref=e1225]
+          - text: Quick Start
+        - generic [ref=e1227]:
+          - img [ref=e1228]
+          - text: Certificates
+        - generic [ref=e1231]:
+          - img [ref=e1232]
+          - text: Progress Analytics
+        - generic [ref=e1234]:
+          - img [ref=e1235]
+          - text: Mentor Support
+    - region "Recognition of Your Achievements" [ref=e1238]:
+      - generic [ref=e1239]:
+        - generic [ref=e1240]:
+          - generic [ref=e1241]:
+            - img [ref=e1242]
+            - generic [ref=e1245]: Certification
+          - heading "Recognition of Your Achievements" [level=2] [ref=e1246]
+          - paragraph [ref=e1247]: Get official certificates and unlock new career opportunities
+        - generic [ref=e1248]:
+          - generic [ref=e1249]:
+            - img [ref=e1251]
+            - heading "Официальные сертификаты" [level=3] [ref=e1254]
+            - paragraph [ref=e1255]: Получите сертификаты с уникальным ID для проверки работодателем
+          - generic [ref=e1256]:
+            - img [ref=e1258]
+            - heading "Верификация навыков" [level=3] [ref=e1261]
+            - paragraph [ref=e1262]: Подтвердите свои знания перед потенциальными работодателями
+          - generic [ref=e1263]:
+            - img [ref=e1265]
+            - heading "Геймификация" [level=3] [ref=e1271]
+            - paragraph [ref=e1272]: Зарабатывайте баллы, достижения и поднимайтесь в рейтинге
+          - generic [ref=e1273]:
+            - img [ref=e1275]
+            - heading "Карьерный рост" [level=3] [ref=e1278]
+            - paragraph [ref=e1279]: Наши выпускники работают в ведущих IT-компаниях
+          - generic [ref=e1280]:
+            - img [ref=e1282]
+            - heading "Сообщество" [level=3] [ref=e1287]
+            - paragraph [ref=e1288]: Присоединяйтесь к сообществу из 10000+ студентов и экспертов
+          - generic [ref=e1289]:
+            - img [ref=e1291]
+            - heading "Международное признание" [level=3] [ref=e1294]
+            - paragraph [ref=e1295]: Сертификаты признаются работодателями по всему миру
+          - generic [ref=e1296]:
+            - img [ref=e1298]
+            - heading "Быстрый старт" [level=3] [ref=e1300]
+            - paragraph [ref=e1301]: Начните обучение бесплатно и получите первые навыки за 1 день
+        - generic [ref=e1302]:
+          - generic [ref=e1303]:
+            - generic [ref=e1304]: 85%
+            - paragraph [ref=e1305]: Выпускников находят работу в течение 3 месяцев
+          - generic [ref=e1306]:
+            - generic [ref=e1307]: "8"
+            - paragraph [ref=e1308]: Интерактивных модулей
+          - generic [ref=e1309]:
+            - generic [ref=e1310]: 10000+
+            - paragraph [ref=e1311]: Успешных выпускников
+          - generic [ref=e1312]:
+            - generic [ref=e1313]: 95%
+            - paragraph [ref=e1314]: Рекомендуют платформу друзьям
+    - region "Try for Free" [ref=e1315]:
+      - generic [ref=e1318]:
+        - generic [ref=e1319]:
+          - generic:
+            - generic: Популярные модули
+          - heading "Try for Free" [level=2] [ref=e1320]
+          - paragraph [ref=e1321]: Start with these modules
+        - generic [ref=e1322]:
+          - generic [ref=e1324]:
+            - generic [ref=e1326]:
+              - generic [ref=e1327]:
+                - img [ref=e1329]
+                - generic [ref=e1331]: Beginner
+              - generic [ref=e1332]: OWASP Top 10
+              - generic [ref=e1333]: Learn the 10 most critical web security risks
+            - generic [ref=e1334]:
+              - generic [ref=e1335]:
+                - generic [ref=e1336]:
+                  - img [ref=e1337]
+                  - generic [ref=e1339]: 10 lessons
+                - generic [ref=e1340]:
+                  - img [ref=e1341]
+                  - generic [ref=e1344]: ~150 мин
+              - generic [ref=e1345]:
+                - generic [ref=e1346]:
+                  - generic [ref=e1347]:
+                    - generic [ref=e1348]: A
+                    - generic [ref=e1349]: M
+                    - generic [ref=e1350]: D
+                  - generic [ref=e1351]: +120 прошли
+                - link "Try Now" [ref=e1352] [cursor=pointer]:
+                  - /url: /register
+                  - button "Try Now" [ref=e1353]:
+                    - text: Try Now
+                    - img
+          - generic [ref=e1355]:
+            - generic [ref=e1357]:
+              - generic [ref=e1358]:
+                - img [ref=e1360]
+                - generic [ref=e1363]: Beginner
+              - generic [ref=e1364]: Authentication
+              - generic [ref=e1365]: Build reliable authentication systems
+            - generic [ref=e1366]:
+              - generic [ref=e1367]:
+                - generic [ref=e1368]:
+                  - img [ref=e1369]
+                  - generic [ref=e1371]: 5 lessons
+                - generic [ref=e1372]:
+                  - img [ref=e1373]
+                  - generic [ref=e1376]: ~75 мин
+              - generic [ref=e1377]:
+                - generic [ref=e1378]:
+                  - generic [ref=e1379]:
+                    - generic [ref=e1380]: A
+                    - generic [ref=e1381]: M
+                    - generic [ref=e1382]: D
+                  - generic [ref=e1383]: +120 прошли
+                - link "Try Now" [ref=e1384] [cursor=pointer]:
+                  - /url: /register
+                  - button "Try Now" [ref=e1385]:
+                    - text: Try Now
+                    - img
+          - generic [ref=e1387]:
+            - generic [ref=e1389]:
+              - generic [ref=e1390]:
+                - img [ref=e1392]
+                - generic [ref=e1395]: Beginner
+              - generic [ref=e1396]: Security Tools
+              - generic [ref=e1397]: Master security analysis tools
+            - generic [ref=e1398]:
+              - generic [ref=e1399]:
+                - generic [ref=e1400]:
+                  - img [ref=e1401]
+                  - generic [ref=e1403]: 4 lessons
+                - generic [ref=e1404]:
+                  - img [ref=e1405]
+                  - generic [ref=e1408]: ~60 мин
+              - generic [ref=e1409]:
+                - generic [ref=e1410]:
+                  - generic [ref=e1411]:
+                    - generic [ref=e1412]: A
+                    - generic [ref=e1413]: M
+                    - generic [ref=e1414]: D
+                  - generic [ref=e1415]: +120 прошли
+                - link "Try Now" [ref=e1416] [cursor=pointer]:
+                  - /url: /register
+                  - button "Try Now" [ref=e1417]:
+                    - text: Try Now
+                    - img
+          - generic [ref=e1419]:
+            - generic [ref=e1421]:
+              - generic [ref=e1422]:
+                - img [ref=e1424]
+                - generic [ref=e1427]: Medium
+              - generic [ref=e1428]: Phishing Analyzer
+              - generic [ref=e1429]: Identify phishing and social engineering
+            - generic [ref=e1430]:
+              - generic [ref=e1431]:
+                - generic [ref=e1432]:
+                  - img [ref=e1433]
+                  - generic [ref=e1435]: 6 lessons
+                - generic [ref=e1436]:
+                  - img [ref=e1437]
+                  - generic [ref=e1440]: ~90 мин
+              - generic [ref=e1441]:
+                - generic [ref=e1442]:
+                  - generic [ref=e1443]:
+                    - generic [ref=e1444]: A
+                    - generic [ref=e1445]: M
+                    - generic [ref=e1446]: D
+                  - generic [ref=e1447]: +120 прошли
+                - link "Try Now" [ref=e1448] [cursor=pointer]:
+                  - /url: /register
+                  - button "Try Now" [ref=e1449]:
+                    - text: Try Now
+                    - img
+        - link "Register and access all modules" [ref=e1451] [cursor=pointer]:
+          - /url: /register
+          - button "Register and access all modules" [ref=e1452]
+    - region "What Our Students Say" [ref=e1453]:
+      - generic [ref=e1456]:
+        - generic [ref=e1457]:
+          - generic:
+            - generic: Student Reviews
+          - heading "What Our Students Say" [level=2] [ref=e1458]
+          - paragraph [ref=e1459]: Reviews from AUP University students
+        - generic [ref=e1460]:
+          - generic [ref=e1462]:
+            - img [ref=e1464]
+            - generic [ref=e1467]:
+              - generic [ref=e1468]: АК
+              - generic [ref=e1469]:
+                - heading "Andrey Kuznetsov" [level=4] [ref=e1470]
+                - paragraph [ref=e1471]: 3rd year student, AUP University
+            - 'img "Rating: 5 out of 5" [ref=e1472]'
+            - paragraph [ref=e1473]: The platform helped me understand SQL injection in practice. Theory in textbooks is one thing, but when you write queries yourself and see the result — that's a completely different experience.
+            - generic [ref=e1474]:
+              - img [ref=e1475]
+              - generic [ref=e1477]: SQL Injection module
+            - generic [ref=e1478]:
+              - img [ref=e1479]
+              - generic [ref=e1482]: Проверенный отзыв
+          - generic [ref=e1484]:
+            - img [ref=e1486]
+            - generic [ref=e1489]:
+              - generic [ref=e1490]: ДМ
+              - generic [ref=e1491]:
+                - heading "Daria Morozova" [level=4] [ref=e1492]
+                - paragraph [ref=e1493]: 2nd year student, AUP University
+            - 'img "Rating: 5 out of 5" [ref=e1494]'
+            - paragraph [ref=e1495]: The XSS module opened my eyes to how vulnerable real websites are. Now I notice potential issues immediately when reviewing code.
+            - generic [ref=e1496]:
+              - img [ref=e1497]
+              - generic [ref=e1500]: 100% in XSS Module
+            - generic [ref=e1501]:
+              - img [ref=e1502]
+              - generic [ref=e1505]: Проверенный отзыв
+          - generic [ref=e1507]:
+            - img [ref=e1509]
+            - generic [ref=e1512]:
+              - generic [ref=e1513]: МВ
+              - generic [ref=e1514]:
+                - heading "Maxim Volkov" [level=4] [ref=e1515]
+                - paragraph [ref=e1516]: 4th year student, AUP University
+            - 'img "Rating: 5 out of 5" [ref=e1517]'
+            - paragraph [ref=e1518]: Completed all modules before graduation. At a job interview in an IT company, they asked cybersecurity questions — everything came in handy.
+            - generic [ref=e1519]:
+              - img [ref=e1520]
+              - generic [ref=e1523]: All modules done
+            - generic [ref=e1524]:
+              - img [ref=e1525]
+              - generic [ref=e1528]: Проверенный отзыв
+          - generic [ref=e1530]:
+            - img [ref=e1532]
+            - generic [ref=e1535]:
+              - generic [ref=e1536]: ЕЛ
+              - generic [ref=e1537]:
+                - heading "Ekaterina Lebedeva" [level=4] [ref=e1538]
+                - paragraph [ref=e1539]: 1st year student, AUP University
+            - 'img "Rating: 5 out of 5" [ref=e1540]'
+            - paragraph [ref=e1541]: Started from scratch, was afraid it would be difficult. But the platform explains everything in simple language with examples. Highly recommend for beginners.
+            - generic [ref=e1542]:
+              - img [ref=e1543]
+              - generic [ref=e1545]: Beginning Analyst
+            - generic [ref=e1546]:
+              - img [ref=e1547]
+              - generic [ref=e1550]: Проверенный отзыв
+          - generic [ref=e1552]:
+            - img [ref=e1554]
+            - generic [ref=e1557]:
+              - generic [ref=e1558]: ПС
+              - generic [ref=e1559]:
+                - heading "Pavel Sidorov" [level=4] [ref=e1560]
+                - paragraph [ref=e1561]: 3rd year student, AUP University
+            - 'img "Rating: 5 out of 5" [ref=e1562]'
+            - paragraph [ref=e1563]: Interactive lab sessions are much better than just reading about vulnerabilities. You see the attack firsthand and understand how to defend against it.
+            - generic [ref=e1564]:
+              - img [ref=e1565]
+              - generic [ref=e1568]: CSRF module
+            - generic [ref=e1569]:
+              - img [ref=e1570]
+              - generic [ref=e1573]: Проверенный отзыв
+          - generic [ref=e1575]:
+            - img [ref=e1577]
+            - generic [ref=e1580]:
+              - generic [ref=e1581]: АП
+              - generic [ref=e1582]:
+                - heading "Anastasia Popova" [level=4] [ref=e1583]
+                - paragraph [ref=e1584]: 2nd year student, AUP University
+            - 'img "Rating: 5 out of 5" [ref=e1585]'
+            - paragraph [ref=e1586]: Thanks to the platform, I successfully completed an internship in the information security department. The supervisor praised my practical skills.
+            - generic [ref=e1587]:
+              - img [ref=e1588]
+              - generic [ref=e1591]: Internship completed
+            - generic [ref=e1592]:
+              - img [ref=e1593]
+              - generic [ref=e1596]: Проверенный отзыв
+        - generic [ref=e1598]:
+          - generic [ref=e1599]:
+            - generic [ref=e1600]:
+              - generic [ref=e1601]: АК
+              - generic [ref=e1602]: ДМ
+              - generic [ref=e1603]: МВ
+              - generic [ref=e1604]: ЕЛ
+            - generic [ref=e1605]: Студенты ЧОУ ВО АУП
+          - generic [ref=e1607]:
+            - img [ref=e1608]
+            - generic [ref=e1611]: 98% рекомендуют
+    - generic [ref=e1613]:
+      - generic [ref=e1614]:
+        - heading "Screenshot Gallery" [level=2] [ref=e1615]
+        - paragraph [ref=e1616]: See what the platform looks like from the inside
+      - generic [ref=e1617]:
+        - button "All" [ref=e1618]
+        - button "Interface" [ref=e1619]
+        - button "Modules" [ref=e1620]
+        - button "Labs" [ref=e1621]
+        - button "Tools" [ref=e1622]
+        - button "Quiz" [ref=e1623]
+        - button "Achievements" [ref=e1624]
+      - generic [ref=e1625]:
+        - generic [ref=e1626] [cursor=pointer]:
+          - img "Main Page" [ref=e1627]
+          - generic [ref=e1629]:
+            - paragraph [ref=e1630]: Main Page
+            - generic [ref=e1631]:
+              - generic [ref=e1632]: interface
+              - img [ref=e1633]
+        - generic [ref=e1638] [cursor=pointer]:
+          - img "Registration" [ref=e1639]
+          - generic [ref=e1641]:
+            - paragraph [ref=e1642]: Registration
+            - generic [ref=e1643]:
+              - generic [ref=e1644]: interface
+              - img [ref=e1645]
+        - generic [ref=e1650] [cursor=pointer]:
+          - img "Profile" [ref=e1651]
+          - generic [ref=e1653]:
+            - paragraph [ref=e1654]: Profile
+            - generic [ref=e1655]:
+              - generic [ref=e1656]: interface
+              - img [ref=e1657]
+        - generic [ref=e1662] [cursor=pointer]:
+          - img "Learning Modules" [ref=e1663]
+          - generic [ref=e1665]:
+            - paragraph [ref=e1666]: Learning Modules
+            - generic [ref=e1667]:
+              - generic [ref=e1668]: modules
+              - img [ref=e1669]
+        - generic [ref=e1674] [cursor=pointer]:
+          - img "OWASP Top 10" [ref=e1675]
+          - generic [ref=e1677]:
+            - paragraph [ref=e1678]: OWASP Top 10
+            - generic [ref=e1679]:
+              - generic [ref=e1680]: modules
+              - img [ref=e1681]
+        - generic [ref=e1686] [cursor=pointer]:
+          - img "SQL Injection" [ref=e1687]
+          - generic [ref=e1689]:
+            - paragraph [ref=e1690]: SQL Injection
+            - generic [ref=e1691]:
+              - generic [ref=e1692]: modules
+              - img [ref=e1693]
+        - generic [ref=e1698] [cursor=pointer]:
+          - img "CSRF Attacks" [ref=e1699]
+          - generic [ref=e1701]:
+            - paragraph [ref=e1702]: CSRF Attacks
+            - generic [ref=e1703]:
+              - generic [ref=e1704]: modules
+              - img [ref=e1705]
+        - generic [ref=e1710] [cursor=pointer]:
+          - img "XSS Attack Lab" [ref=e1711]
+          - generic [ref=e1713]:
+            - paragraph [ref=e1714]: XSS Attack Lab
+            - generic [ref=e1715]:
+              - generic [ref=e1716]: labs
+              - img [ref=e1717]
+        - generic [ref=e1722] [cursor=pointer]:
+          - img "Secure Coding" [ref=e1723]
+          - generic [ref=e1725]:
+            - paragraph [ref=e1726]: Secure Coding
+            - generic [ref=e1727]:
+              - generic [ref=e1728]: modules
+              - img [ref=e1729]
+        - generic [ref=e1734] [cursor=pointer]:
+          - img "Security Headers" [ref=e1735]
+          - generic [ref=e1737]:
+            - paragraph [ref=e1738]: Security Headers
+            - generic [ref=e1739]:
+              - generic [ref=e1740]: tools
+              - img [ref=e1741]
+        - generic [ref=e1746] [cursor=pointer]:
+          - img "Security Tools" [ref=e1747]
+          - generic [ref=e1749]:
+            - paragraph [ref=e1750]: Security Tools
+            - generic [ref=e1751]:
+              - generic [ref=e1752]: tools
+              - img [ref=e1753]
+        - generic [ref=e1758] [cursor=pointer]:
+          - img "Quizzes" [ref=e1759]
+          - generic [ref=e1761]:
+            - paragraph [ref=e1762]: Quizzes
+            - generic [ref=e1763]:
+              - generic [ref=e1764]: quiz
+              - img [ref=e1765]
+        - generic [ref=e1770] [cursor=pointer]:
+          - img "Achievements" [ref=e1771]
+          - generic [ref=e1773]:
+            - paragraph [ref=e1774]: Achievements
+            - generic [ref=e1775]:
+              - generic [ref=e1776]: achievements
+              - img [ref=e1777]
+        - generic [ref=e1782] [cursor=pointer]:
+          - img "Glossary" [ref=e1783]
+          - generic [ref=e1785]:
+            - paragraph [ref=e1786]: Glossary
+            - generic [ref=e1787]:
+              - generic [ref=e1788]: interface
+              - img [ref=e1789]
+    - region "Call to action" [ref=e1794]:
+      - generic [ref=e1801]:
+        - generic [ref=e1802]:
+          - heading "Ready to Start Learning?" [level=2] [ref=e1803]
+          - paragraph [ref=e1804]: Join thousands of students learning cybersecurity
+        - generic [ref=e1805]:
+          - generic [ref=e1806]:
+            - img [ref=e1808]
+            - generic [ref=e1813]: 1000+
+            - generic [ref=e1814]: Студентов обучается
+          - generic [ref=e1815]:
+            - img [ref=e1817]
+            - generic [ref=e1823]: 500+
+            - generic [ref=e1824]: Сертификатов
+          - generic [ref=e1825]:
+            - img [ref=e1827]
+            - generic [ref=e1830]: 30 сек
+            - generic [ref=e1831]: На регистрацию
+        - generic [ref=e1832]:
+          - link "Start for Free" [ref=e1834] [cursor=pointer]:
+            - /url: /register
+            - button "Start for Free" [ref=e1835]:
+              - img [ref=e1837]
+              - generic [ref=e1839]: Start for Free
+              - img [ref=e1840]
+          - generic [ref=e1842]:
+            - generic [ref=e1843]:
+              - img [ref=e1844]
+              - generic [ref=e1847]: Бесплатный доступ
+            - generic [ref=e1848]:
+              - img [ref=e1849]
+              - generic [ref=e1852]: Без кредитной карты
+            - generic [ref=e1853]:
+              - img [ref=e1854]
+              - generic [ref=e1857]: Мгновенный старт
+          - paragraph [ref=e1858]: No credit card · Free modules · Instant access
+    - region "Frequently Asked Questions" [ref=e1859]:
+      - generic [ref=e1862]:
+        - generic [ref=e1863]:
+          - generic:
+            - generic: FAQ
+          - heading "Frequently Asked Questions" [level=2] [ref=e1864]
+          - paragraph [ref=e1865]: Popular questions about the platform
+        - generic [ref=e1867]:
+          - heading "Is the platform free?" [level=3] [ref=e1870]:
+            - button "Is the platform free?" [ref=e1871]:
+              - generic [ref=e1872]:
+                - img [ref=e1874]
+                - generic [ref=e1876]: Is the platform free?
+              - img [ref=e1878]
+              - img
+          - heading "Do I need programming knowledge?" [level=3] [ref=e1882]:
+            - button "Do I need programming knowledge?" [ref=e1883]:
+              - generic [ref=e1884]:
+                - img [ref=e1886]
+                - generic [ref=e1888]: Do I need programming knowledge?
+              - img [ref=e1890]
+              - img
+          - heading "How does LTI integration work?" [level=3] [ref=e1894]:
+            - button "How does LTI integration work?" [ref=e1895]:
+              - generic [ref=e1896]:
+                - img [ref=e1898]
+                - generic [ref=e1903]: How does LTI integration work?
+              - img [ref=e1905]
+              - img
+          - heading "Can I track student progress?" [level=3] [ref=e1909]:
+            - button "Can I track student progress?" [ref=e1910]:
+              - generic [ref=e1911]:
+                - img [ref=e1913]
+                - generic [ref=e1916]: Can I track student progress?
+              - img [ref=e1918]
+              - img
+          - heading "Are there certificates?" [level=3] [ref=e1922]:
+            - button "Are there certificates?" [ref=e1923]:
+              - generic [ref=e1924]:
+                - img [ref=e1926]
+                - generic [ref=e1928]: Are there certificates?
+              - img [ref=e1930]
+              - img
+          - heading "What topics are covered?" [level=3] [ref=e1934]:
+            - button "What topics are covered?" [ref=e1935]:
+              - generic [ref=e1936]:
+                - img [ref=e1938]
+                - generic [ref=e1940]: What topics are covered?
+              - img [ref=e1942]
+              - img
+          - heading "How to register a teacher account?" [level=3] [ref=e1946]:
+            - button "How to register a teacher account?" [ref=e1947]:
+              - generic [ref=e1948]:
+                - img [ref=e1950]
+                - generic [ref=e1955]: How to register a teacher account?
+              - img [ref=e1957]
+              - img
+        - generic [ref=e1959]:
+          - paragraph [ref=e1960]: Не нашли ответ на свой вопрос?
+          - generic [ref=e1961]:
+            - img [ref=e1962]
+            - generic [ref=e1965]: Напишите нам в поддержку
+    - generic [ref=e1967]:
+      - generic [ref=e1968]:
+        - generic [ref=e1970]:
+          - link "CyberSec Lab" [ref=e1971] [cursor=pointer]:
+            - /url: /
+            - img [ref=e1973]
+            - generic [ref=e1975]: CyberSec Lab
+          - paragraph [ref=e1976]: Interactive cybersecurity education platform.
+          - generic [ref=e1977]:
+            - link "GitHub" [ref=e1978] [cursor=pointer]:
+              - /url: https://github.com
+              - img [ref=e1979]
+            - link "Email" [ref=e1982] [cursor=pointer]:
+              - /url: mailto:contact@cyberseclab.ru
+              - img [ref=e1983]
+          - generic [ref=e1986]:
+            - generic [ref=e1987]: Сделано с
+            - img [ref=e1988]
+            - generic [ref=e1990]: для образования
+        - navigation "Footer navigation" [ref=e1991]:
+          - generic [ref=e1992]:
+            - heading "Platform" [level=4] [ref=e1993]:
+              - img [ref=e1994]
+              - text: Platform
+            - list [ref=e1996]:
+              - listitem [ref=e1997]:
+                - link "Modules" [ref=e1998] [cursor=pointer]:
+                  - /url: /#demo
+                  - img [ref=e1999]
+                  - text: Modules
+              - listitem [ref=e2001]:
+                - link "Features" [ref=e2002] [cursor=pointer]:
+                  - /url: /#features
+                  - img [ref=e2003]
+                  - text: Features
+              - listitem [ref=e2005]:
+                - link "Pricing" [ref=e2006] [cursor=pointer]:
+                  - /url: /pricing
+                  - img [ref=e2007]
+                  - text: Pricing
+              - listitem [ref=e2009]:
+                - link "LTI Integration" [ref=e2010] [cursor=pointer]:
+                  - /url: /#features
+                  - img [ref=e2011]
+                  - text: LTI Integration
+          - generic [ref=e2013]:
+            - heading "Resources" [level=4] [ref=e2014]:
+              - img [ref=e2015]
+              - text: Resources
+            - list [ref=e2017]:
+              - listitem [ref=e2018]:
+                - link "Documentation" [ref=e2019] [cursor=pointer]:
+                  - /url: "#"
+                  - img [ref=e2020]
+                  - text: Documentation
+              - listitem [ref=e2022]:
+                - link "Guide" [ref=e2023] [cursor=pointer]:
+                  - /url: "#"
+                  - img [ref=e2024]
+                  - text: Guide
+              - listitem [ref=e2026]:
+                - link "Blog" [ref=e2027] [cursor=pointer]:
+                  - /url: "#"
+                  - img [ref=e2028]
+                  - text: Blog
+              - listitem [ref=e2030]:
+                - link "OWASP Top 10" [ref=e2031] [cursor=pointer]:
+                  - /url: "#"
+                  - img [ref=e2032]
+                  - text: OWASP Top 10
+          - generic [ref=e2034]:
+            - heading "Company" [level=4] [ref=e2035]:
+              - img [ref=e2036]
+              - text: Company
+            - list [ref=e2039]:
+              - listitem [ref=e2040]:
+                - link "About" [ref=e2041] [cursor=pointer]:
+                  - /url: /about
+                  - img [ref=e2042]
+                  - text: About
+              - listitem [ref=e2044]:
+                - link "Contact" [ref=e2045] [cursor=pointer]:
+                  - /url: /contact
+                  - img [ref=e2046]
+                  - text: Contact
+              - listitem [ref=e2048]:
+                - link "Careers" [ref=e2049] [cursor=pointer]:
+                  - /url: /about
+                  - img [ref=e2050]
+                  - text: Careers
+          - generic [ref=e2052]:
+            - heading "Legal" [level=4] [ref=e2053]:
+              - img [ref=e2054]
+              - text: Legal
+            - list [ref=e2057]:
+              - listitem [ref=e2058]:
+                - link "Privacy" [ref=e2059] [cursor=pointer]:
+                  - /url: "#"
+                  - img [ref=e2060]
+                  - text: Privacy
+              - listitem [ref=e2062]:
+                - link "Terms" [ref=e2063] [cursor=pointer]:
+                  - /url: "#"
+                  - img [ref=e2064]
+                  - text: Terms
+              - listitem [ref=e2066]:
+                - link "Cookies" [ref=e2067] [cursor=pointer]:
+                  - /url: "#"
+                  - img [ref=e2068]
+                  - text: Cookies
+      - generic [ref=e2071]:
+        - paragraph [ref=e2072]: © CyberSec Lab. All rights reserved. 2026
+        - generic [ref=e2073]:
+          - generic [ref=e2074]:
+            - img [ref=e2075]
+            - generic [ref=e2077]: 8 modules
+          - generic [ref=e2078]:
+            - img [ref=e2079]
+            - generic [ref=e2082]: 1000+ students
+          - generic [ref=e2083]:
+            - img [ref=e2084]
+            - generic [ref=e2087]: 136+ quizzes
+  - region "Notifications alt+T"
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '@playwright/test';
+  2  | 
+  3  | test.describe('Core Features', () => {
+  4  |   test.beforeEach(async ({ page }) => {
+  5  |     // Login before each test
+  6  |     await page.goto('/');
+  7  |     await page
+  8  |       .getByLabel(/почта|телефон|email/i)
+  9  |       .first()
+> 10 |       .fill('admin@cybersec.lab');
+     |        ^ Error: locator.fill: Error: Element is not an <input>, <textarea>, <select> or [contenteditable] and does not have a role allowing [aria-readonly]
+  11 |     await page
+  12 |       .getByLabel(/пароль/i)
+  13 |       .first()
+  14 |       .fill('Admin@123');
+  15 |     await page.getByRole('button', { name: /войти/i }).click();
+  16 |     await expect(page.getByRole('heading', { name: /панель/i })).toBeVisible({ timeout: 10000 });
+  17 |   });
+  18 | 
+  19 |   test('should navigate to OWASP Top 10 module', async ({ page }) => {
+  20 |     await page.getByRole('button', { name: /OWASP/i }).click();
+  21 |     await expect(page.getByRole('heading', { name: /OWASP Top 10/i })).toBeVisible();
+  22 |   });
+  23 | 
+  24 |   test('should navigate to SQL Injection lab', async ({ page }) => {
+  25 |     await page.getByRole('button', { name: /SQL/i }).click();
+  26 |     await expect(page.getByRole('heading', { name: /SQL/i })).toBeVisible();
+  27 |   });
+  28 | 
+  29 |   test('should navigate to Quiz system', async ({ page }) => {
+  30 |     await page.getByRole('button', { name: /квиз|тест/i }).click();
+  31 |     await expect(page.getByRole('heading', { name: /квиз|тестирование/i })).toBeVisible();
+  32 |   });
+  33 | 
+  34 |   test('should display sidebar with all modules', async ({ page }) => {
+  35 |     const sidebar = page.getByRole('navigation');
+  36 |     await expect(sidebar).toBeVisible();
+  37 | 
+  38 |     // Check key modules are present
+  39 |     await expect(sidebar.getByText(/OWASP/i)).toBeVisible();
+  40 |     await expect(sidebar.getByText(/SQL/i)).toBeVisible();
+  41 |     await expect(sidebar.getByText(/XSS/i)).toBeVisible();
+  42 |     await expect(sidebar.getByText(/CSRF/i)).toBeVisible();
+  43 |     await expect(sidebar.getByText(/квиз|тест/i)).toBeVisible();
+  44 |   });
+  45 | 
+  46 |   test('should access profile page', async ({ page }) => {
+  47 |     await page.getByRole('button', { name: /профиль/i }).click();
+  48 |     await expect(page.getByRole('heading', { name: /профиль/i })).toBeVisible();
+  49 |   });
+  50 | });
+  51 | 
+```

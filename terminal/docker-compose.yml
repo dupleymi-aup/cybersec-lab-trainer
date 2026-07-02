@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cybersec_lab
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    profiles: ["postgres"]
+
+  migrate:
+    image: node:24-alpine
+    working_dir: /app
+    volumes:
+      - ./prisma:/app/prisma
+      - ./package.json:/app/package.json
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/cybersec_lab
+    command: sh -c "npx prisma db push --accept-data-loss"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["postgres"]
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/cybersec_lab
+      - TOKEN_SECRET=${TOKEN_SECRET:-change-me-in-production}
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - OTP_SECRET=${OTP_SECRET:-change-otp-secret}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

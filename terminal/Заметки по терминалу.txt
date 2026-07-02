@@ -1,0 +1,23 @@
+[ Созданные файлы ]
+1) src/lib/data/terminal-data.ts — данные с 5 интерактивными сценариями:
+🔍 Сетевая разведка — ping, traceroute, nslookup, nmap (5 заданий)
+💥 Тестирование SQL-инъекций — curl-запросы, payload-ы, исправления (5 заданий)
+💉 Обнаружение XSS — reflected/stored XSS, санитизация (3 задания)
+🔬 Анализ логов — чтение access/error логов, блокировка IP (4 задания)
+🛡️ Аудит заголовков — curl -I, применение security headers (2 задания)
+2) src/components/security-trainer/CyberTerminal.tsx — полноценный интерактивный терминал:
+Эмулятор терминала с вводом команд, историей (↑↓), автозавершением (Tab)
+Цветной вывод (команды, ошибки, успех, системные сообщения, нарратив)
+Прогресс-бар по заданиям, подсказки (hint), очистка (clear)
+Красивый UI в стиле macOS-терминала с кнопками управления
+Отслеживание прогресса и завершение модуля
+
+[ Изменённые файлы ]
+3) src/lib/store.ts — добавлен 'cyber-terminal' в PageType
+4) src/lib/data/modules-data.ts — модуль «Кибер-терминал» добавлен в список
+5) src/lib/data/index.ts — экспорт terminal-data
+6) src/lib/module-constants.ts — MODULE_IDS и MODULE_NAMES обновлены
+7) src/app/dashboard-app/page.tsx — lazy-загрузка и регистрация страницы
+8) src/components/security-trainer/Sidebar.tsx — иконка Terminal в навигации
+9) src/components/security-trainer/Dashboard.tsx — иконка Terminal в карточках
+10) src/messages/ru.json, en.json, zh.json — i18n для 3 языков
