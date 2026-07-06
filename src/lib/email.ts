@@ -136,7 +136,7 @@ export async function sendOTPRecoveryEmail(to: string, fullName: string, otp: st
     });
     return true;
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') logger.warn('sendOTPRecoveryEmail failed', { error: e });
+logger.warn('sendOTPRecoveryEmail failed', { error: e });
     return false;
   }
 }
@@ -166,7 +166,7 @@ export async function sendDeadlineReminderEmail(
     });
     return true;
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') logger.warn('sendDeadlineReminderEmail failed', { error: e });
+logger.warn('sendDeadlineReminderEmail failed', { error: e });
     return false;
   }
 }

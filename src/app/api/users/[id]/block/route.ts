@@ -64,9 +64,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
       logger.warn('Audit logging failed', { error });
-    }
+
   }
 
   return NextResponse.json({

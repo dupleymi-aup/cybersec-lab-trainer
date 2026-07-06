@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     try {
       return JSON.parse(val);
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('progress parseJsonField failed', { error: e });
+logger.warn('progress parseJsonField failed', { error: e });
       return val;
     }
   };

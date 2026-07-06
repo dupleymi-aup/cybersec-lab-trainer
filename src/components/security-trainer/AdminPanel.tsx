@@ -169,7 +169,7 @@ export default function AdminPanel() {
     getAllUsers()
       .then(setAllUsers)
       .catch((err) => {
-        if (process.env.NODE_ENV === 'development') logger.error('AdminPanel failed to load users', { error: err });
+logger.error('AdminPanel failed to load users', { error: err });
       })
       .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
@@ -315,7 +315,7 @@ export default function AdminPanel() {
         toast.success(t('actions.csvImported', { created, skipped }));
         refresh();
       } catch (e) {
-        if (process.env.NODE_ENV === 'development') logger.warn('AdminPanel handleCSVImport failed', { error: e });
+logger.warn('AdminPanel handleCSVImport failed', { error: e });
         toast.error(t('actions.csvParseError'));
       }
     };

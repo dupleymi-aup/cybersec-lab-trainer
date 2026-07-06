@@ -117,7 +117,7 @@ export default function StudentAssignments() {
         setSubmissions(subMap);
       }
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('StudentAssignments fetchData failed', { error: e });
+logger.warn('StudentAssignments fetchData failed', { error: e });
       toast.error('Ошибка загрузки заданий');
     } finally {
       setLoading(false);
@@ -186,7 +186,7 @@ export default function StudentAssignments() {
         toast.error(err.error || 'Не удалось отправить');
       }
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('StudentAssignments handleSubmit failed', { error: e });
+logger.warn('StudentAssignments handleSubmit failed', { error: e });
       toast.error('Ошибка сети');
     } finally {
       setSubmitting(false);

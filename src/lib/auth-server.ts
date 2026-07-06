@@ -60,7 +60,7 @@ export async function verifyToken(token: string): Promise<TokenPayload | null> {
       exp: payload.exp as number,
     };
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') logger.warn('verifyToken failed', { error: e });
+logger.warn('verifyToken failed', { error: e });
     return null;
   }
 }

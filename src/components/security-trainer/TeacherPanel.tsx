@@ -296,7 +296,7 @@ export default function TeacherPanel() {
           if (data.deadlines) setDeadlines(data.deadlines);
         }
       } catch (e) {
-        if (process.env.NODE_ENV === 'development') logger.warn('TeacherPanel loadProgress failed', { error: e });
+logger.warn('TeacherPanel loadProgress failed', { error: e });
       }
 
       try {
@@ -307,7 +307,7 @@ export default function TeacherPanel() {
           if (data.results) setDeadlineReminders(data.results);
         }
       } catch (e) {
-        if (process.env.NODE_ENV === 'development') logger.warn('TeacherPanel loadReminders failed', { error: e });
+logger.warn('TeacherPanel loadReminders failed', { error: e });
       }
     })();
   }, []);
@@ -344,7 +344,7 @@ export default function TeacherPanel() {
         }
       }
     } catch (err) {
-      if (process.env.NODE_ENV === 'development') logger.error('Failed to create deadline', { error: err });
+logger.error('Failed to create deadline', { error: err });
     }
   };
 
@@ -360,7 +360,7 @@ export default function TeacherPanel() {
         setDeadlineReminders((prev) => prev.filter((r) => r.deadline.id !== id));
       }
     } catch (err) {
-      if (process.env.NODE_ENV === 'development') logger.error('Failed to delete deadline', { error: err });
+logger.error('Failed to delete deadline', { error: err });
     }
   };
 

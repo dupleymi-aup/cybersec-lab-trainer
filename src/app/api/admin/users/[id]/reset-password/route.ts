@@ -68,9 +68,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
       logger.warn('Audit logging failed', { error });
-    }
+
   }
 
   return NextResponse.json({ success: true });

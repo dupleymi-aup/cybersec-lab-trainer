@@ -112,7 +112,7 @@ export default function AtRiskReport({
       await generateAtRiskPDF(pdfData);
       setExportStatus('success');
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('AtRiskReport handlePdfExport failed', { error: e });
+logger.warn('AtRiskReport handlePdfExport failed', { error: e });
       setExportStatus('idle');
     }
     setTimeout(() => setExportStatus('idle'), 4000);

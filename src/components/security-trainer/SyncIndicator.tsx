@@ -24,7 +24,7 @@ export default function SyncIndicator() {
       await syncWithDatabase();
       toast.success('Прогресс синхронизирован');
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('SyncIndicator handleManualSync failed', { error: e });
+logger.warn('SyncIndicator handleManualSync failed', { error: e });
       toast.error('Ошибка синхронизации');
     } finally {
       setIsManualSyncing(false);

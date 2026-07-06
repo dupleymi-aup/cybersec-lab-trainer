@@ -18,7 +18,7 @@ function loadAll(): Announcement[] {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') logger.warn('TeacherMessaging loadAll failed', { error: e });
+logger.warn('TeacherMessaging loadAll failed', { error: e });
   }
   return [];
 }

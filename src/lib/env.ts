@@ -21,7 +21,7 @@ function validateEnv(): EnvConfig {
   try {
     new URL(appUrl);
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') logger.warn('validateEnv failed', { error: e });
+logger.warn('validateEnv failed', { error: e });
     throw new Error(`Invalid NEXT_PUBLIC_APP_URL: ${appUrl}. Must be a valid URL.`, { cause: e });
   }
 

@@ -168,6 +168,6 @@ export async function loadAnnouncementsIntoNotifications() {
       }
     }
   } catch (e) {
-    if (process.env.NODE_ENV === 'development') logger.warn('loadAnnouncementsIntoNotifications failed', { error: e });
+logger.warn('loadAnnouncementsIntoNotifications failed', { error: e });
   }
 }

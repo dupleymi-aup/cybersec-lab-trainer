@@ -92,7 +92,7 @@ export default function LtiPlatformManager() {
         toast.error('Failed to load platforms');
       }
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('LtiPlatformManager loadPlatforms failed', { error: e });
+logger.warn('LtiPlatformManager loadPlatforms failed', { error: e });
       toast.error('Network error');
     } finally {
       setLoading(false);
@@ -115,7 +115,7 @@ export default function LtiPlatformManager() {
         setGradeSyncs(data);
       }
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('LtiPlatformManager loadGradeSyncs failed', { error: e });
+logger.warn('LtiPlatformManager loadGradeSyncs failed', { error: e });
       // ignore
     } finally {
       setLoadingSyncs(false);
@@ -151,7 +151,7 @@ export default function LtiPlatformManager() {
         toast.error(error.error || 'Ошибка сохранения');
       }
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('LtiPlatformManager handleSubmit failed', { error: e });
+logger.warn('LtiPlatformManager handleSubmit failed', { error: e });
       toast.error('Network error');
     }
   };
@@ -175,7 +175,7 @@ export default function LtiPlatformManager() {
         toast.error('Ошибка удаления');
       }
     } catch (e) {
-      if (process.env.NODE_ENV === 'development') logger.warn('LtiPlatformManager handleDelete failed', { error: e });
+logger.warn('LtiPlatformManager handleDelete failed', { error: e });
       toast.error('Network error');
     }
   };
