@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { validateEmail, validatePhone, validatePassword } from "./auth-utils";
+import { logger } from "@/lib/logger";
 
 import type {
   UserRole,
@@ -171,7 +172,7 @@ export async function getAllUsers(): Promise<User[]> {
     return data.users || [];
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] getAllUsers failed:", e);
+      logger.warn("getAllUsers failed", { error: e });
     return [];
   }
 }
@@ -190,7 +191,7 @@ export async function changeUserRole(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] changeUserRole failed:", e);
+      logger.warn("changeUserRole failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
@@ -205,7 +206,7 @@ export async function deleteUser(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] deleteUser failed:", e);
+      logger.warn("deleteUser failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
@@ -243,7 +244,7 @@ export async function createUser(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] createUser failed:", e);
+      logger.warn("createUser failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
@@ -267,7 +268,7 @@ export async function updateUser(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] updateUser failed:", e);
+      logger.warn("updateUser failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
@@ -295,7 +296,7 @@ export async function toggleUserBlock(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] toggleUserBlock failed:", e);
+      logger.warn("toggleUserBlock failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
@@ -366,7 +367,7 @@ export async function addAuditLogEntry(
     });
   } catch (err) {
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", err);
+      logger.warn("Audit logging failed", { error: err });
     }
   }
 }
@@ -379,7 +380,7 @@ export async function getAuditLogEntries(): Promise<AuditLogEntry[]> {
     return data.logs || [];
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] getAuditLogEntries failed:", e);
+      logger.warn("getAuditLogEntries failed", { error: e });
     return [];
   }
 }
@@ -451,7 +452,7 @@ export async function resetUserPassword(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] resetUserPassword failed:", e);
+      logger.warn("resetUserPassword failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
@@ -494,7 +495,7 @@ export async function startImpersonation(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] startImpersonation failed:", e);
+      logger.warn("startImpersonation failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
@@ -522,8 +523,8 @@ export async function stopImpersonation(): Promise<{
     if (!res.ok) {
       // Fallback: restore from localStorage but warn that session may be invalid
       if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[auth-store] impersonate/stop failed, falling back to local restore",
+        logger.warn(
+          "impersonate/stop failed, falling back to local restore",
         );
     }
 
@@ -540,7 +541,7 @@ export async function stopImpersonation(): Promise<{
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] stopImpersonation failed:", e);
+      logger.warn("stopImpersonation failed", { error: e });
     return { success: false, error: "Ошибка завершения имперсонации" };
   }
 }
@@ -576,7 +577,7 @@ export function getImpersonationState(): {
     };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] getImpersonationState failed:", e);
+      logger.warn("getImpersonationState failed", { error: e });
     return {
       isImpersonating: false,
       originalUserId: null,
@@ -687,7 +688,7 @@ export async function getStudentProgress(
     return await res.json();
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] getStudentProgress failed:", e);
+      logger.warn("getStudentProgress failed", { error: e });
     return { progress: [], quizResults: [] };
   }
 }
@@ -710,7 +711,7 @@ export async function getBatchStudentProgress(
     return await res.json();
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] getBatchStudentProgress failed:", e);
+      logger.warn("getBatchStudentProgress failed", { error: e });
     return {};
   }
 }
@@ -726,7 +727,7 @@ export async function getLoginActivity(
     return data.activities || [];
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-store] getLoginActivity failed:", e);
+      logger.warn("getLoginActivity failed", { error: e });
     return [];
   }
 }
@@ -817,7 +818,7 @@ export const useAuthStore = create<AuthState>()(
             .then(({ invalidateTokenCache }) => invalidateTokenCache())
             .catch((e) => {
               if (process.env.NODE_ENV === "development")
-                console.warn("[auth-store] invalidateTokenCache failed:", e);
+                logger.warn("invalidateTokenCache failed", { error: e });
             });
 
           // Migrate anonymous progress to user
@@ -831,13 +832,13 @@ export const useAuthStore = create<AuthState>()(
             .loadFromDatabase(data.user.id)
             .catch((e) => {
               if (process.env.NODE_ENV === "development")
-                console.warn("[auth-store] loadFromDatabase failed:", e);
+                logger.warn("loadFromDatabase failed", { error: e });
             });
 
           return { success: true };
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] login failed:", e);
+            logger.warn("login failed", { error: e });
           return { success: false, error: "Network error" };
         }
       },
@@ -863,7 +864,7 @@ export const useAuthStore = create<AuthState>()(
           return { success: true };
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] register failed:", e);
+            logger.warn("register failed", { error: e });
           return { success: false, error: "Network error" };
         }
       },
@@ -873,7 +874,7 @@ export const useAuthStore = create<AuthState>()(
           .then(({ invalidateTokenCache }) => invalidateTokenCache())
           .catch((e) => {
             if (process.env.NODE_ENV === "development")
-              console.warn("[auth-store] invalidateTokenCache failed:", e);
+              logger.warn("invalidateTokenCache failed", { error: e });
           });
 
         // Clear server-side httpOnly cookie
@@ -884,7 +885,7 @@ export const useAuthStore = create<AuthState>()(
           });
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] logout API call failed:", e);
+            logger.warn("logout API call failed", { error: e });
         }
 
         set({
@@ -899,7 +900,7 @@ export const useAuthStore = create<AuthState>()(
           })
           .catch((e) => {
             if (process.env.NODE_ENV === "development")
-              console.warn("[auth-store] setUserId failed:", e);
+              logger.warn("setUserId failed", { error: e });
           });
       },
 
@@ -923,7 +924,7 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] updateProfile failed:", e);
+            logger.warn("updateProfile failed", { error: e });
           // Update locally even if API fails
           set({ user: { ...user, ...data } });
         }
@@ -947,7 +948,7 @@ export const useAuthStore = create<AuthState>()(
           return { success: true };
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] updatePassword failed:", e);
+            logger.warn("updatePassword failed", { error: e });
           return { success: false, error: "Network error" };
         }
       },
@@ -972,7 +973,7 @@ export const useAuthStore = create<AuthState>()(
           return { success: true, otp: data.otp };
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] sendRecoveryOTP failed:", e);
+            logger.warn("sendRecoveryOTP failed", { error: e });
           return { success: false, error: "Network error" };
         }
       },
@@ -994,7 +995,7 @@ export const useAuthStore = create<AuthState>()(
           return res.ok;
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] verifyRecoveryOTP failed:", e);
+            logger.warn("verifyRecoveryOTP failed", { error: e });
           return false;
         }
       },
@@ -1023,7 +1024,7 @@ export const useAuthStore = create<AuthState>()(
           return { success: true };
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] resetPassword failed:", e);
+            logger.warn("resetPassword failed", { error: e });
           return { success: false, error: "Network error" };
         }
       },
@@ -1052,7 +1053,7 @@ export const useAuthStore = create<AuthState>()(
           return { success: true };
         } catch (e) {
           if (process.env.NODE_ENV === "development")
-            console.warn("[auth-store] deleteAccount failed:", e);
+            logger.warn("deleteAccount failed", { error: e });
           return { success: false, error: "Network error" };
         }
       },
@@ -1071,7 +1072,7 @@ export const useAuthStore = create<AuthState>()(
           })
           .catch((e) => {
             if (process.env.NODE_ENV === "development")
-              console.warn("[auth-store] loadFromDatabase failed:", e);
+              logger.warn("loadFromDatabase failed", { error: e });
           });
       },
     }),

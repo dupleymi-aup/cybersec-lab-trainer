@@ -24,6 +24,7 @@ import {
   Loader2,
   BarChart3,
 } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 interface CohortRetention {
   week1: number;
@@ -126,7 +127,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       .then((g) => setGroups(g))
       .catch((err) => {
         if (process.env.NODE_ENV === "development")
-          console.error("CohortAnalysis: Failed to load groups:", err);
+          logger.error("CohortAnalysis failed to load groups", { error: err });
         setGroups([]);
       });
     return () => {

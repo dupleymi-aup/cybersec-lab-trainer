@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useDateFormatter } from "@/lib/format";
 import type { Announcement } from "@/lib/auth-types";
+import { logger } from "@/lib/logger";
 
 const STORAGE_KEY = "cybersec-announcements";
 
@@ -18,7 +19,7 @@ function loadAll(): Announcement[] {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[TeacherMessaging.tsx] loadAll failed:", e);
+      logger.warn("TeacherMessaging loadAll failed", { error: e });
   }
   return [];
 }

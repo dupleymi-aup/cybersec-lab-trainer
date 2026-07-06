@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
 
 export interface TokenPayload {
   id: string;
@@ -60,7 +61,7 @@ export async function verifyToken(token: string): Promise<TokenPayload | null> {
     };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[auth-server.ts] verifyToken failed:", e);
+      logger.warn("verifyToken failed", { error: e });
     return null;
   }
 }

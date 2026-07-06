@@ -42,6 +42,7 @@ import ThemeToggle from "./ThemeToggle";
 import GlobalSearch from "./GlobalSearch";
 import SyncIndicator from "./SyncIndicator";
 import NotificationBell from "./NotificationBell";
+import { logger } from "@/lib/logger";
 
 const iconMap: Record<string, React.ReactNode> = {
   LayoutDashboard: <LayoutDashboard size={18} />,
@@ -178,7 +179,7 @@ export default function Sidebar() {
       })
       .catch((err) => {
         if (process.env.NODE_ENV === "development")
-          console.error("Sidebar: Failed to load deadlines:", err);
+          logger.error("Sidebar failed to load deadlines", { error: err });
       });
     return () => controller.abort();
   }, []);

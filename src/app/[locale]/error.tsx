@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { logger } from "@/lib/logger";
 
 export default function Error({
   error,
@@ -13,7 +14,7 @@ export default function Error({
   const t = useTranslations("errors");
 
   useEffect(() => {
-    console.error("Application error:", error);
+    logger.error("Application error", { error });
   }, [error]);
 
   return (

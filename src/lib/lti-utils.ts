@@ -6,6 +6,7 @@ import {
   type JWK,
 } from "jose";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 export interface LtiClaims {
   sub: string;
@@ -113,7 +114,7 @@ export async function verifyLtiLaunch(
       break;
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[lti-utils.ts] verifyLtiLaunch failed:", e);
+        logger.warn("verifyLtiLaunch failed", { error: e });
       // Try next key
     }
   }

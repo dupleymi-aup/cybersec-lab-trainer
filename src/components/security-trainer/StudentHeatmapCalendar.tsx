@@ -12,6 +12,7 @@ import {
 import { getAllUsers, type User } from "@/lib/auth-store";
 import { Card, CardContent } from "@/components/ui/card";
 import KPICard from "./KPICard";
+import { logger } from "@/lib/logger";
 
 const DAY_LABELS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
@@ -105,7 +106,7 @@ export default function StudentHeatmapCalendar({
         max = Math.max(1, ...Object.values(data));
       } catch (e) {
         if (process.env.NODE_ENV === "development")
-          console.warn("[StudentHeatmapCalendar.tsx] loadStudents failed:", e);
+          logger.warn("StudentHeatmapCalendar loadStudents failed", { error: e });
         // ignore
       }
     }

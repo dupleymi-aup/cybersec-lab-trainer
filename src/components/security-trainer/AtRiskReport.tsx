@@ -36,6 +36,7 @@ import {
 import RiskScoreBar from "./RiskScoreBar";
 import KPICard from "./KPICard";
 import StudentDrillDown from "./StudentDrillDown";
+import { logger } from "@/lib/logger";
 
 const PERIOD_OPTIONS = [
   { key: 7, label: "7д" },
@@ -139,7 +140,7 @@ export default function AtRiskReport({
       setExportStatus("success");
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[AtRiskReport.tsx] handlePdfExport failed:", e);
+        logger.warn("AtRiskReport handlePdfExport failed", { error: e });
       setExportStatus("idle");
     }
     setTimeout(() => setExportStatus("idle"), 4000);

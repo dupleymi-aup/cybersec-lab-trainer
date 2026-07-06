@@ -30,6 +30,7 @@ import {
 import { toast } from "sonner";
 import { modules } from "@/lib/data";
 import { getAuthHeaders } from "@/lib/store";
+import { logger } from "@/lib/logger";
 
 interface Assignment {
   id: string;
@@ -148,7 +149,7 @@ export default function AssignmentBuilder() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[AssignmentBuilder.tsx] AssignmentBuilder failed:", e);
+        logger.warn("AssignmentBuilder fetchAssignments failed", { error: e });
       toast.error("Ошибка сети при загрузке заданий");
     } finally {
       setLoading(false);
@@ -230,7 +231,7 @@ export default function AssignmentBuilder() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[AssignmentBuilder.tsx] handleSubmit failed:", e);
+        logger.warn("AssignmentBuilder handleSubmit failed", { error: e });
       toast.error("Ошибка сети");
     } finally {
       setSaving(false);
@@ -254,7 +255,7 @@ export default function AssignmentBuilder() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[AssignmentBuilder.tsx] handleDelete failed:", e);
+        logger.warn("AssignmentBuilder handleDelete failed", { error: e });
       toast.error("Ошибка сети");
     }
   };
@@ -273,7 +274,7 @@ export default function AssignmentBuilder() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[AssignmentBuilder.tsx] togglePublished failed:", e);
+        logger.warn("AssignmentBuilder togglePublished failed", { error: e });
       toast.error("Ошибка");
     }
   };

@@ -23,6 +23,7 @@ import {
   Code,
 } from "lucide-react";
 import { useDateTimeFormatter } from "@/lib/format";
+import { logger } from "@/lib/logger";
 
 interface UserActivityModalProps {
   user: User;
@@ -72,7 +73,7 @@ function getUserProgress(userId: string): UserProgressData {
     const raw = localStorage.getItem(key);
     if (raw) return JSON.parse(raw);
   } catch (error) {
-    console.warn("Failed to parse user progress from localStorage:", error);
+    logger.warn("Failed to parse user progress from localStorage", { error });
   }
   return {
     completedModules: [],
@@ -91,7 +92,7 @@ function getLoginActivity(): LoginActivityEntry[] {
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[UserActivityModal.tsx] getLoginActivity failed:", e);
+      logger.warn("UserActivityModal getLoginActivity failed", { error: e });
     // Intentionally empty — non-critical localStorage parse, return empty array as fallback
     return [];
   }

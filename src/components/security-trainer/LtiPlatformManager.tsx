@@ -25,6 +25,7 @@ import {
   Upload,
   TrendingUp,
 } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 interface LtiPlatform {
   id: string;
@@ -96,7 +97,7 @@ export default function LtiPlatformManager() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[LtiPlatformManager.tsx] loadPlatforms failed:", e);
+        logger.warn("LtiPlatformManager loadPlatforms failed", { error: e });
       toast.error("Network error");
     } finally {
       setLoading(false);
@@ -120,7 +121,7 @@ export default function LtiPlatformManager() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[LtiPlatformManager.tsx] loadGradeSyncs failed:", e);
+        logger.warn("LtiPlatformManager loadGradeSyncs failed", { error: e });
       // ignore
     } finally {
       setLoadingSyncs(false);
@@ -177,7 +178,7 @@ export default function LtiPlatformManager() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[LtiPlatformManager.tsx] handleSubmit failed:", e);
+        logger.warn("LtiPlatformManager handleSubmit failed", { error: e });
       toast.error("Network error");
     }
   };
@@ -202,7 +203,7 @@ export default function LtiPlatformManager() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[LtiPlatformManager.tsx] handleDelete failed:", e);
+        logger.warn("LtiPlatformManager handleDelete failed", { error: e });
       toast.error("Network error");
     }
   };
@@ -223,7 +224,7 @@ export default function LtiPlatformManager() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[LtiPlatformManager.tsx] handleToggleActive failed:", e);
+        logger.warn("LtiPlatformManager handleToggleActive failed", { error: e });
       toast.error("Network error");
     }
   };

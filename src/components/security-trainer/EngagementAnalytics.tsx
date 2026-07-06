@@ -30,6 +30,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import KPICard from "./KPICard";
+import { logger } from "@/lib/logger";
 
 const PERIOD_OPTIONS = [
   { key: 7, label: "7д" },
@@ -65,7 +66,7 @@ export default function EngagementAnalytics({
       .then(setAllUsers)
       .catch((err) => {
         if (process.env.NODE_ENV === "development")
-          console.error("EngagementAnalytics: Failed to load users:", err);
+          logger.error("EngagementAnalytics failed to load users", { error: err });
       });
   }, []);
 

@@ -46,6 +46,7 @@ import {
 } from "@/lib/export-utils";
 import { modules } from "@/lib/data";
 import { useDateFormatter } from "@/lib/format";
+import { logger } from "@/lib/logger";
 
 interface AnalyticsExportPanelProps {
   students?: Array<{
@@ -234,11 +235,7 @@ export default function AnalyticsExportPanel(
                 );
               }
             } catch (e) {
-              if (process.env.NODE_ENV === "development")
-                console.warn(
-                  "[AnalyticsExportPanel.tsx] handleGradebookExport failed:",
-                  e,
-                );
+              logger.warn("AnalyticsExportPanel gradebook localStorage parse failed", { error: e });
               // Intentionally empty — non-critical localStorage parse, fallback to default values
             }
           }
@@ -267,8 +264,7 @@ export default function AnalyticsExportPanel(
         `Экспортировано ${studentData.length} студентов`,
       );
     } catch (error) {
-      if (process.env.NODE_ENV === "development")
-        console.error("Gradebook export failed:", error);
+      logger.error("Gradebook export failed", { error });
       setStatus("gradebook", "error", "Ошибка экспорта");
     } finally {
       endExport("gradebook");
@@ -335,8 +331,7 @@ export default function AnalyticsExportPanel(
 
       setStatus("studentReport", "success", "Отчёт студента экспортирован");
     } catch (error) {
-      if (process.env.NODE_ENV === "development")
-        console.error("Student report export failed:", error);
+      logger.error("Student report export failed", { error });
       setStatus("studentReport", "error", "Ошибка экспорта");
     }
 
@@ -365,11 +360,7 @@ export default function AnalyticsExportPanel(
       downloadCSV(csv, `analytics-${effectiveDays}d-${date}.csv`);
       setStatus("analytics", "success", "Аналитика экспортирована");
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleAnalyticsExport failed:",
-          e,
-        );
+      logger.warn("Analytics export failed", { error: e });
       setStatus("analytics", "error", "Ошибка при экспорте аналитики");
     }
     scheduleReset("analytics", 4000);
@@ -395,11 +386,7 @@ export default function AnalyticsExportPanel(
         `Экспортировано ${data.atRiskStudents.length} студентов`,
       );
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleAtRiskExport failed:",
-          e,
-        );
+      logger.warn("At-risk export failed", { error: e });
       setStatus("atRisk", "error", "Ошибка при экспорте");
     }
     scheduleReset("atRisk", 4000);
@@ -434,11 +421,7 @@ export default function AnalyticsExportPanel(
         `Экспортировано ${data.dimensions.length} групп`,
       );
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleGroupComparisonExport failed:",
-          e,
-        );
+      logger.warn("Group comparison export failed", { error: e });
       setStatus("groupComparison", "error", "Ошибка при экспорте");
     }
     scheduleReset("groupComparison", 4000);
@@ -459,11 +442,7 @@ export default function AnalyticsExportPanel(
         `Экспортировано ${moduleData.length} модулей`,
       );
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleModulePerformanceExport failed:",
-          e,
-        );
+      logger.warn("Module performance export failed", { error: e });
       setStatus("modulePerformance", "error", "Ошибка при экспорте");
     }
     scheduleReset("modulePerformance", 4000);
@@ -507,11 +486,7 @@ export default function AnalyticsExportPanel(
         `PDF экспортирован: ${studentData.length} студентов`,
       );
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleGradebookPdfExport failed:",
-          e,
-        );
+      logger.warn("Gradebook PDF export failed", { error: e });
       setStatus("gradebookPdf", "error", "Ошибка при создании PDF");
     }
     scheduleReset("gradebookPdf", 4000);
@@ -540,11 +515,7 @@ export default function AnalyticsExportPanel(
         `PDF экспортирован: ${atRiskData.length} студентов`,
       );
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleAtRiskPdfExport failed:",
-          e,
-        );
+      logger.warn("At-risk PDF export failed", { error: e });
       setStatus("atRiskPdf", "error", "Ошибка при создании PDF");
     }
     scheduleReset("atRiskPdf", 4000);
@@ -559,11 +530,7 @@ export default function AnalyticsExportPanel(
       await generateAnalyticsPDF(summary, summary.moduleDistribution);
       setStatus("analyticsPdf", "success", "Аналитический PDF экспортирован");
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleAnalyticsPdfExport failed:",
-          e,
-        );
+      logger.warn("Analytics PDF export failed", { error: e });
       setStatus("analyticsPdf", "error", "Ошибка при создании PDF");
     }
     scheduleReset("analyticsPdf", 4000);
@@ -582,11 +549,7 @@ export default function AnalyticsExportPanel(
         `PDF экспортирован: ${moduleData.length} модулей`,
       );
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleModulePerformancePdfExport failed:",
-          e,
-        );
+      logger.warn("Module performance PDF export failed", { error: e });
       setStatus("modulePerformancePdf", "error", "Ошибка при создании PDF");
     }
     scheduleReset("modulePerformancePdf", 4000);
@@ -605,11 +568,7 @@ export default function AnalyticsExportPanel(
         `PDF экспортирован: ${data.dimensions.length} групп`,
       );
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleGroupComparisonPdfExport failed:",
-          e,
-        );
+      logger.warn("Group comparison PDF export failed", { error: e });
       setStatus("groupComparisonPdf", "error", "Ошибка при создании PDF");
     }
     scheduleReset("groupComparisonPdf", 4000);
@@ -675,11 +634,7 @@ export default function AnalyticsExportPanel(
       );
       setStatus("studentReportPdf", "success", "PDF студента экспортирован");
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleStudentReportPdfExport failed:",
-          e,
-        );
+      logger.warn("Student report PDF export failed", { error: e });
       setStatus("studentReportPdf", "error", "Ошибка при создании PDF");
     }
     scheduleReset("studentReportPdf", 4000);
@@ -697,11 +652,7 @@ export default function AnalyticsExportPanel(
       );
       setStatus("quizRetryPdf", "success", "PDF повторов экспортирован");
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[AnalyticsExportPanel.tsx] handleQuizRetryPdfExport failed:",
-          e,
-        );
+      logger.warn("Quiz retry PDF export failed", { error: e });
       setStatus("quizRetryPdf", "error", "Ошибка при создании PDF");
     }
     scheduleReset("quizRetryPdf", 4000);
@@ -1085,11 +1036,7 @@ export default function AnalyticsExportPanel(
                       moduleCount = (data.completedModules || []).length;
                       quizCount = Object.keys(data.quizScores || {}).length;
                     } catch (e) {
-                      if (process.env.NODE_ENV === "development")
-                        console.warn(
-                          "[AnalyticsExportPanel.tsx] handleQuizRetryPdfExport failed:",
-                          e,
-                        );
+                      logger.warn("AnalyticsExportPanel localStorage parse failed", { error: e });
                       // Intentionally empty — non-critical localStorage parse, defaults to zero
                     }
                   }

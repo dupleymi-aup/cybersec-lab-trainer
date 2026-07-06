@@ -23,6 +23,7 @@ import { useAuthStore } from "@/lib/auth-store";
 import { getAuthHeaders } from "@/lib/store";
 import { useDateFormatter } from "@/lib/format";
 import { modules } from "@/lib/data";
+import { logger } from "@/lib/logger";
 
 interface Assignment {
   id: string;
@@ -109,9 +110,9 @@ export default function StudentAssignments() {
             }
           } catch (e) {
             if (process.env.NODE_ENV === "development")
-              console.warn(
-                "[StudentAssignments.tsx] StudentAssignments failed:",
-                e,
+              logger.warn(
+                "StudentAssignments failed to fetch submissions",
+                { error: e },
               );
             return { id: a.id, subs: [] };
           }
@@ -126,7 +127,7 @@ export default function StudentAssignments() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[StudentAssignments.tsx] StudentAssignments failed:", e);
+        logger.warn("StudentAssignments fetchData failed", { error: e });
       toast.error("Ошибка загрузки заданий");
     } finally {
       setLoading(false);
@@ -196,7 +197,7 @@ export default function StudentAssignments() {
       }
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[StudentAssignments.tsx] handleSubmit failed:", e);
+        logger.warn("StudentAssignments handleSubmit failed", { error: e });
       toast.error("Ошибка сети");
     } finally {
       setSubmitting(false);

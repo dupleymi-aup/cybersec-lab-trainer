@@ -33,6 +33,7 @@ import {
   Flame,
   ChevronRight,
 } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 const iconMap: Record<string, React.ReactNode> = {
   Database: <Database size={20} />,
@@ -193,7 +194,7 @@ export default function QuizSystem() {
 
         apiClient.saveQuizResults(catId, score, q.length).catch((err) => {
           if (process.env.NODE_ENV === "development")
-            console.warn("QuizSystem: Failed to save quiz results:", err);
+            logger.warn("QuizSystem failed to save quiz results", { error: err });
         });
 
         setQuizState("result");

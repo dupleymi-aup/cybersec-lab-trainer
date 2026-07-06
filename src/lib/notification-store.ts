@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { logger } from "@/lib/logger";
 
 export type NotificationType =
   | "achievement"
@@ -198,9 +199,9 @@ export async function loadAnnouncementsIntoNotifications() {
     }
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn(
-        "[notification-store.ts] loadAnnouncementsIntoNotifications failed:",
-        e,
+      logger.warn(
+        "loadAnnouncementsIntoNotifications failed",
+        { error: e },
       );
   }
 }

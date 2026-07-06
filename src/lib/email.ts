@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { logger } from "@/lib/logger";
 
 function escapeHtml(str: string): string {
   return str
@@ -149,7 +150,7 @@ export async function sendOTPRecoveryEmail(
     return true;
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[email.ts] sendOTPRecoveryEmail failed:", e);
+      logger.warn("sendOTPRecoveryEmail failed", { error: e });
     return false;
   }
 }
@@ -184,7 +185,7 @@ export async function sendDeadlineReminderEmail(
     return true;
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[email.ts] sendDeadlineReminderEmail failed:", e);
+      logger.warn("sendDeadlineReminderEmail failed", { error: e });
     return false;
   }
 }

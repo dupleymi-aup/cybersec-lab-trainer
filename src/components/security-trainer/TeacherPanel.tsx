@@ -65,6 +65,7 @@ import ModuleDeepDive from "./ModuleDeepDive";
 import CertificationReadiness from "./CertificationReadiness";
 import QuizSessionAnalytics from "./QuizSessionAnalytics";
 import AssignmentBuilder from "./AssignmentBuilder";
+import { logger } from "@/lib/logger";
 
 interface StudentProgress {
   userId: string;
@@ -319,7 +320,7 @@ export default function TeacherPanel() {
         }
       } catch (e) {
         if (process.env.NODE_ENV === "development")
-          console.warn("[TeacherPanel.tsx] loadProgress failed:", e);
+          logger.warn("TeacherPanel loadProgress failed", { error: e });
       }
 
       try {
@@ -331,7 +332,7 @@ export default function TeacherPanel() {
         }
       } catch (e) {
         if (process.env.NODE_ENV === "development")
-          console.warn("[TeacherPanel.tsx] loadReminders failed:", e);
+          logger.warn("TeacherPanel loadReminders failed", { error: e });
       }
     })();
   }, []);
@@ -369,8 +370,8 @@ export default function TeacherPanel() {
         }
       }
     } catch (err) {
-      if (process.env.NODE_ENV === "development")
-        console.error("Failed to create deadline:", err);
+        if (process.env.NODE_ENV === "development")
+          logger.error("Failed to create deadline", { error: err });
     }
   };
 
@@ -388,8 +389,8 @@ export default function TeacherPanel() {
         );
       }
     } catch (err) {
-      if (process.env.NODE_ENV === "development")
-        console.error("Failed to delete deadline:", err);
+        if (process.env.NODE_ENV === "development")
+          logger.error("Failed to delete deadline", { error: err });
     }
   };
 

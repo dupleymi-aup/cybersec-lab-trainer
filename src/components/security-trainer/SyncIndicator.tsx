@@ -11,6 +11,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 export default function SyncIndicator() {
   const syncStatus = useAppStore((s) => s.syncStatus);
@@ -30,7 +31,7 @@ export default function SyncIndicator() {
       toast.success("Прогресс синхронизирован");
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[SyncIndicator.tsx] handleManualSync failed:", e);
+        logger.warn("SyncIndicator handleManualSync failed", { error: e });
       toast.error("Ошибка синхронизации");
     } finally {
       setIsManualSyncing(false);

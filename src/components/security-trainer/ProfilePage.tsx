@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { logger } from "@/lib/logger";
 
 export default function ProfilePage() {
   const t = useTranslations("profile");
@@ -206,7 +207,7 @@ export default function ProfilePage() {
       });
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[ProfilePage.tsx] ProfilePage failed:", e);
+        logger.warn("ProfilePage formatDate failed", { error: e });
       return iso;
     }
   };
@@ -341,7 +342,7 @@ export default function ProfilePage() {
         toast.success(t("progressImported"));
       } catch (e) {
         if (process.env.NODE_ENV === "development")
-          console.warn("[ProfilePage.tsx] handlePasswordChange failed:", e);
+          logger.warn("ProfilePage handleImportProgress failed", { error: e });
         toast.error(t("fileReadError"));
       }
     };

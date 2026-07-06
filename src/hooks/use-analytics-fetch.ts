@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { logger } from "@/lib/logger";
 
 interface UseAnalyticsFetchOptions<_T> {
   /** API endpoint URL (e.g., '/api/analytics/engagement') */
@@ -70,11 +71,7 @@ export function useAnalyticsFetch<T = unknown>({
       .catch((err) => {
         if (!cancelled) {
           if (err.name === "AbortError") return;
-          if (process.env.NODE_ENV === "development")
-            console.error(
-              `useAnalyticsFetch: Failed to fetch ${endpoint}:`,
-              err,
-            );
+          logger.error(`useAnalyticsFetch: Failed to fetch ${endpoint}`, { error: err });
           setError(err.message || "Ошибка загрузки данных");
           setLoading(false);
         }

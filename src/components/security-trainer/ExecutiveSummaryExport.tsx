@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { getComprehensiveSummary } from "@/lib/auth-store";
 import { useDateFormatter } from "@/lib/format";
 import { modules } from "@/lib/data";
+import { logger } from "@/lib/logger";
 
 async function downloadPDF(pdfBlob: Blob, filename: string): Promise<void> {
   const url = URL.createObjectURL(pdfBlob);
@@ -230,13 +231,12 @@ export default function ExecutiveSummaryExport({
       toast.success("Итоговый отчёт скачан");
     } catch (error) {
       toast.error("Ошибка генерации отчёта");
-      if (process.env.NODE_ENV === "development") {
-        if (process.env.NODE_ENV === "development")
-          console.error(
-            "[ExecutiveSummaryExport] PDF generation failed:",
-            error,
+        if (process.env.NODE_ENV === "development") {
+          logger.error(
+            "ExecutiveSummaryExport PDF generation failed",
+            { error },
           );
-      }
+        }
     } finally {
       setGenerating(false);
     }

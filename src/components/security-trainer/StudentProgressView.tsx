@@ -48,6 +48,7 @@ import type {
   ComprehensiveSummary,
   TrendPoint,
 } from "@/lib/auth-store";
+import { logger } from "@/lib/logger";
 
 function getStudentProgressLocal(userId: string): {
   completedModules: string[];
@@ -68,9 +69,9 @@ function getStudentProgressLocal(userId: string): {
     }
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn(
-        "[StudentProgressView.tsx] getStudentProgressLocal failed:",
-        e,
+      logger.warn(
+        "StudentProgressView getStudentProgressLocal failed",
+        { error: e },
       );
     // Intentionally silent — fallback to defaults if localStorage fails
   }
@@ -129,9 +130,9 @@ export default function StudentProgressView({
       })
       .catch((err) => {
         if (process.env.NODE_ENV === "development")
-          console.error(
-            "StudentProgressView: Failed to load student data:",
-            err,
+          logger.error(
+            "StudentProgressView failed to load student data",
+            { error: err },
           );
       })
       .finally(() => setLoading(false));

@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { AnimatePresence, motion } from "framer-motion";
 import { Trash2, Shield, Ban, CheckCircle, X, Users } from "lucide-react";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 interface BulkActionsBarProps {
   selectedIds: string[];
@@ -40,7 +41,7 @@ export default function BulkActionsBar({
       })
       .catch((err) => {
         if (process.env.NODE_ENV === "development")
-          console.error("BulkActionsBar: Failed to load groups:", err);
+          logger.error("BulkActionsBar failed to load groups", { error: err });
       });
     return () => {
       controller.abort();

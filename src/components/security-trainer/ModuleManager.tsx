@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 interface ModuleConfig {
   moduleId: string;
@@ -38,7 +39,7 @@ function loadConfig(): StoredConfig {
     if (raw) return JSON.parse(raw);
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[ModuleManager.tsx] loadConfig failed:", e);
+      logger.warn("ModuleManager loadConfig failed", { error: e });
     // Intentionally silent — fallback to defaults if localStorage fails
   }
   return { modules: {}, order: [] };

@@ -16,6 +16,7 @@ import {
 import { Loader2, Target } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import KPICard from "./KPICard";
+import { logger } from "@/lib/logger";
 
 interface DifficultyBreakdown {
   difficulty: string;
@@ -83,7 +84,7 @@ export default function QuizDifficultyAnalysis({
       .then(setData)
       .catch((err) => {
         if (process.env.NODE_ENV === "development")
-          console.error("QuizDifficultyAnalysis: Failed to load data:", err);
+          logger.error("QuizDifficultyAnalysis failed to load data", { error: err });
         setData(null);
       })
       .finally(() => setLoading(false));

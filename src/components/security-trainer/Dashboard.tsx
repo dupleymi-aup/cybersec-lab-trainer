@@ -60,6 +60,7 @@ import {
 } from "lucide-react";
 import type { PageType } from "@/lib/store";
 import type { Announcement } from "@/lib/auth-types";
+import { logger } from "@/lib/logger";
 
 interface UpcomingDeadline {
   id: string;
@@ -163,8 +164,7 @@ async function fetchActiveAnnouncements(): Promise<Announcement[]> {
     const data = await res.json();
     return (data.announcements || []) as Announcement[];
   } catch (e) {
-    if (process.env.NODE_ENV === "development")
-      console.warn("[Dashboard.tsx] fetchActiveAnnouncements failed:", e);
+    logger.warn("Dashboard fetchActiveAnnouncements failed", { error: e });
     return [];
   }
 }
@@ -203,16 +203,14 @@ export default function Dashboard() {
     fetchActiveAnnouncements()
       .then(setAnnouncements)
       .catch((e) => {
-        if (process.env.NODE_ENV === "development")
-          console.warn("[Dashboard] fetchActiveAnnouncements failed:", e);
+        logger.warn("Dashboard fetchActiveAnnouncements failed", { error: e });
       });
     loadAnnouncementsIntoNotifications();
     const interval = setInterval(() => {
       fetchActiveAnnouncements()
         .then(setAnnouncements)
         .catch((e) => {
-          if (process.env.NODE_ENV === "development")
-            console.warn("[Dashboard] fetchActiveAnnouncements failed:", e);
+          logger.warn("Dashboard fetchActiveAnnouncements failed", { error: e });
         });
       loadAnnouncementsIntoNotifications();
     }, 60000);
@@ -235,7 +233,7 @@ export default function Dashboard() {
       })
       .catch((err) => {
         if (process.env.NODE_ENV === "development")
-          console.error("Dashboard: Failed to load notifications:", err);
+          logger.error("Dashboard failed to load notifications", { error: err });
       });
   }, []);
 
@@ -257,8 +255,7 @@ export default function Dashboard() {
         }
       })
       .catch((err) => {
-        if (process.env.NODE_ENV === "development")
-          console.warn("Dashboard: Failed to load teacher stats:", err);
+        logger.warn("Dashboard failed to load teacher stats", { error: err });
       });
   }, [user?.role]);
 

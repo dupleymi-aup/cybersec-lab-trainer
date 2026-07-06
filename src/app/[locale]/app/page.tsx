@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useAppStore, type PageType } from "@/lib/store";
+import { logger } from "@/lib/logger";
 import {
   useAuthStore,
   hasRole,
@@ -364,8 +365,7 @@ export default function DashboardAppPage() {
             }
           }
         } catch (e) {
-          if (process.env.NODE_ENV === "development")
-            console.warn("[page.tsx] processLTI profile fetch failed:", e);
+          logger.warn("processLTI profile fetch failed", { error: e });
         }
 
         if (

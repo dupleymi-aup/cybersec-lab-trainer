@@ -50,6 +50,7 @@ import {
   downloadCSV,
 } from "@/lib/export-utils";
 import KPICard from "./KPICard";
+import { logger } from "@/lib/logger";
 
 const PERIOD_OPTIONS = [
   { key: 7, label: "7д" },
@@ -194,9 +195,9 @@ export default function StudentPerformanceReport({
       setExportStatus("success");
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn(
-          "[StudentPerformanceReport.tsx] handlePdfExport failed:",
-          e,
+        logger.warn(
+          "StudentPerformanceReport handlePdfExport failed",
+          { error: e },
         );
       setExportStatus("idle");
     }

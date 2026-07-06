@@ -29,6 +29,7 @@ import { useDateFormatter } from "@/lib/format";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import KPICard from "./KPICard";
+import { logger } from "@/lib/logger";
 
 const PERIOD_OPTIONS = [
   { key: 7, label: "7д" },
@@ -152,7 +153,7 @@ export default function AdvancedAnalytics({
       .catch((err) => {
         if (!cancelled) {
           if (process.env.NODE_ENV === "development")
-            console.error("AdvancedAnalytics: Failed to load data:", err);
+            logger.error("AdvancedAnalytics failed to load data", { error: err });
           setLoading(false);
         }
       });

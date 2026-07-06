@@ -127,6 +127,7 @@ import DataQualityMonitor from "./DataQualityMonitor";
 import PeriodComparison from "./PeriodComparison";
 import LtiPlatformManager from "./LtiPlatformManager";
 import { Link } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 const roleColors: Record<UserRole, string> = {
   student:
@@ -177,7 +178,7 @@ export default function AdminPanel() {
       .then(setAllUsers)
       .catch((err) => {
         if (process.env.NODE_ENV === "development")
-          console.error("AdminPanel: Failed to load users:", err);
+          logger.error("AdminPanel failed to load users", { error: err });
       })
       .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
@@ -346,7 +347,7 @@ export default function AdminPanel() {
         refresh();
       } catch (e) {
         if (process.env.NODE_ENV === "development")
-          console.warn("[AdminPanel] handleCSVImport failed:", e);
+          logger.warn("AdminPanel handleCSVImport failed", { error: e });
         toast.error(t("actions.csvParseError"));
       }
     };

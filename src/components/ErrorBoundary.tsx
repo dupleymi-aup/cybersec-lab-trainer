@@ -2,6 +2,7 @@
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { logger } from "@/lib/logger";
 import {
   AlertTriangle,
   Copy,
@@ -147,11 +148,10 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(
-      `ErrorBoundary [${this.props.name || "root"}] caught:`,
+    logger.error(`ErrorBoundary [${this.props.name || "root"}] caught`, {
       error,
-      errorInfo,
-    );
+      componentStack: errorInfo.componentStack,
+    });
     this.setState({ errorInfo });
   }
 

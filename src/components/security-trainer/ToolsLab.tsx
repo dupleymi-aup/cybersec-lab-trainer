@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { motion } from "framer-motion";
 import { useDateTimeFormatter } from "@/lib/format";
+import { logger } from "@/lib/logger";
 import {
   ChevronLeft,
   KeyRound,
@@ -124,7 +125,7 @@ function xorDecrypt(hex: string, key: string): string {
       .join("");
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[ToolsLab.tsx] xorDecrypt failed:", e);
+      logger.warn("ToolsLab xorDecrypt failed", { error: e });
     return "Ошибка декодирования";
   }
 }
@@ -137,7 +138,7 @@ function base64Encode(text: string): string {
     return btoa(unescape(encodeURIComponent(text)));
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[ToolsLab] base64Encode failed:", e);
+      logger.warn("ToolsLab base64Encode failed", { error: e });
     return "Ошибка кодирования";
   }
 }
@@ -146,7 +147,7 @@ function base64Decode(text: string): string {
     return decodeURIComponent(escape(atob(text)));
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[ToolsLab] base64Decode failed:", e);
+      logger.warn("ToolsLab base64Decode failed", { error: e });
     return "Ошибка декодирования";
   }
 }
@@ -162,7 +163,7 @@ function urlDecode(text: string): string {
     return decodeURIComponent(text);
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[ToolsLab] urlDecode failed:", e);
+      logger.warn("ToolsLab urlDecode failed", { error: e });
     return "Ошибка декодирования";
   }
 }
@@ -335,7 +336,7 @@ export default function ToolsLab() {
       return new TextDecoder().decode(result);
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[ToolsLab.tsx] ToolsLab failed:", e);
+        logger.warn("ToolsLab aesDecrypt failed", { error: e });
       return "❌ Ошибка: неверный ключ или повреждённые данные";
     }
   };

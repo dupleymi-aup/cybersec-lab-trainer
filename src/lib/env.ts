@@ -2,6 +2,7 @@
  * Environment variable validation.
  * Validates required env vars at startup.
  */
+import { logger } from "@/lib/logger";
 
 export interface EnvConfig {
   nodeEnv: "development" | "production" | "test";
@@ -23,7 +24,7 @@ function validateEnv(): EnvConfig {
     new URL(appUrl);
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[env.ts] validateEnv failed:", e);
+      logger.warn("validateEnv failed", { error: e });
     throw new Error(
       `Invalid NEXT_PUBLIC_APP_URL: ${appUrl}. Must be a valid URL.`,
       { cause: e },
@@ -33,7 +34,7 @@ function validateEnv(): EnvConfig {
   const databaseUrl = process.env.DATABASE_URL || "";
   if (!databaseUrl && ["production", "development"].includes(nodeEnv)) {
     if (nodeEnv === "development") {
-      console.warn(
+      logger.warn(
         "DATABASE_URL not set. Database features will be disabled. Set DATABASE_URL in .env to enable Prisma.",
       );
     }

@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useDateFormatter } from "@/lib/format";
 import type { Announcement } from "@/lib/auth-types";
+import { logger } from "@/lib/logger";
 
 const PRIORITY_CONFIG = {
   high: {
@@ -55,7 +56,7 @@ async function fetchAnnouncements(activeOnly = false): Promise<Announcement[]> {
     return data.announcements || [];
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[SystemAnnouncements.tsx] fetchAnnouncements failed:", e);
+      logger.warn("SystemAnnouncements fetchAnnouncements failed", { error: e });
     return [];
   }
 }
@@ -82,7 +83,7 @@ async function createAnnouncement(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[SystemAnnouncements.tsx] createAnnouncement failed:", e);
+      logger.warn("SystemAnnouncements createAnnouncement failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
@@ -102,7 +103,7 @@ async function deleteAnnouncement(
     return { success: true };
   } catch (e) {
     if (process.env.NODE_ENV === "development")
-      console.warn("[SystemAnnouncements.tsx] deleteAnnouncement failed:", e);
+      logger.warn("SystemAnnouncements deleteAnnouncement failed", { error: e });
     return { success: false, error: "Network error" };
   }
 }
