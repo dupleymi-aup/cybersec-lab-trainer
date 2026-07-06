@@ -10,6 +10,7 @@ import {
 } from "@/lib/api-middleware";
 import { hashPassword, validatePassword } from "@/lib/auth-utils";
 import { createUserSchema } from "@/lib/validations/api";
+import { parseBody } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
@@ -120,7 +121,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data as Record<string, unknown>;
   const parsed = createUserSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

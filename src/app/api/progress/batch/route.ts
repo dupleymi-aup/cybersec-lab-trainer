@@ -6,6 +6,7 @@ import {
   forbidden,
   requireRole,
 } from "@/lib/api-middleware";
+import { parseBody } from "@/lib/utils";
 
 // GET /api/progress/batch?userIds=id1,id2,id3
 // Fetch progress for multiple students at once (teacher/admin only)
@@ -141,7 +142,9 @@ export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data as Record<string, unknown>;
   const { progress, quizResults } = body;
 
   if (!progress && !quizResults) {

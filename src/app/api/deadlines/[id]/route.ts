@@ -7,6 +7,7 @@ import {
   requireRole,
 } from "@/lib/api-middleware";
 import { updateDeadlineSchema } from "@/lib/validations/api";
+import { parseBody } from "@/lib/utils";
 
 export async function PUT(
   request: NextRequest,
@@ -23,7 +24,9 @@ export async function PUT(
   if (existing.createdBy !== auth.id && auth.role !== "admin")
     return forbidden();
 
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data as Record<string, unknown>;
   const parsed = updateDeadlineSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

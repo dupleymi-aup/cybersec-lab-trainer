@@ -36,7 +36,13 @@ export async function POST(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, "admin")) return forbidden();
 
-  const body = await request.json();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
   const { action, targetId, targetName, details } = body;
 
   if (!action || !targetId) {

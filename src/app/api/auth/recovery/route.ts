@@ -7,7 +7,12 @@ import { checkRateLimit, getClientIp } from "@/lib/api-middleware";
 import { recoveryRequestEmailPhoneSchema } from "@/lib/validations/api";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
   const parsed = recoveryRequestEmailPhoneSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

@@ -10,6 +10,7 @@ import {
 } from "@/lib/api-middleware";
 import { logger } from "@/lib/logger";
 import { validateUuid } from "@/lib/validate-uuid";
+import { parseBody } from "@/lib/utils";
 
 // GET /api/users/[id] - get single user
 export async function GET(
@@ -71,7 +72,10 @@ export async function PUT(
     );
   }
 
-  const body = await request.json();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bodyResult = await parseBody<any>(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data;
   const { fullName, phone, group, course, university, avatar, bio, role } =
     body;
 

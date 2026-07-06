@@ -7,6 +7,7 @@ import {
 } from "@/lib/api-middleware";
 import { quizCategories } from "@/lib/data";
 import { quizSubmissionSchema } from "@/lib/validations/api";
+import { parseBody } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
@@ -25,7 +26,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data as Record<string, unknown>;
   const parsed = quizSubmissionSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

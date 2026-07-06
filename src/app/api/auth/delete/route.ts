@@ -39,7 +39,13 @@ export async function DELETE(request: NextRequest) {
   }
 
   // Require password confirmation to prevent deletion via stolen tokens
-  const body = await request.json();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
   const { currentPassword } = body;
 
   if (!currentPassword) {

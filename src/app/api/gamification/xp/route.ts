@@ -8,6 +8,7 @@ import {
 } from "@/lib/api-middleware";
 import { getLevel, XP_REWARDS } from "@/lib/xp-utils";
 import { xpActionSchema } from "@/lib/validations/api";
+import { parseBody } from "@/lib/utils";
 
 const XP_RATE_LIMIT_MAX = 20; // max XP awards per window
 const XP_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -31,7 +32,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data as Record<string, unknown>;
   const parsed = xpActionSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

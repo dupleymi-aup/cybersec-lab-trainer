@@ -7,6 +7,7 @@ import {
   requireCapability,
 } from "@/lib/api-middleware";
 import { createDeadlineSchema } from "@/lib/validations/api";
+import { parseBody } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -48,7 +49,10 @@ export async function POST(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireCapability(auth, "deadlines:create")) return forbidden();
 
-  const body = await request.json();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bodyResult = await parseBody<any>(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data;
   const parsed = createDeadlineSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
