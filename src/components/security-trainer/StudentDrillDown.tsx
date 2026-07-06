@@ -97,7 +97,7 @@ export default function StudentDrillDown({
               <Button onClick={handleExport} variant="outline" size="sm" disabled={!data}>
                 <Download size={14} className="mr-1" /> Экспорт
               </Button>
-              <Button variant="ghost" size="icon" onClick={onClose}>
+              <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
                 <X size={18} />
               </Button>
             </div>

@@ -100,7 +100,7 @@ export default function OWASPTop10() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
             <ChevronLeft size={20} />
           </Button>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
@@ -231,6 +231,7 @@ export default function OWASPTop10() {
             onClick={() => {
               setView('overview');
             }}
+            aria-label="Back"
           >
             <ChevronLeft size={20} />
           </Button>
@@ -307,7 +308,7 @@ export default function OWASPTop10() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setView('overview')}>
+        <Button variant="ghost" size="icon" onClick={() => setView('overview')} aria-label="Back">
           <ChevronLeft size={20} />
         </Button>
         <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${item.severityColor} text-white`}>

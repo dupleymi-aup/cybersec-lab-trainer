@@ -370,6 +370,7 @@ export default function QuizSystem() {
             resetQuiz();
             setCurrentPage('dashboard');
           }}
+          aria-label="Back"
         >
           <ChevronLeft size={20} />
         </Button>

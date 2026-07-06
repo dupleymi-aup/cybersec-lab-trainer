@@ -139,6 +139,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                         size="icon"
                         onClick={() => handleRename(name)}
                         className="text-emerald-600"
+                        aria-label="Confirm rename"
                       >
                         <Check size={16} />
                       </Button>
@@ -149,6 +150,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                           setEditingGroup(null);
                           setEditValue('');
                         }}
+                        aria-label="Cancel rename"
                       >
                         <X size={16} />
                       </Button>
@@ -173,6 +175,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                             setEditValue(name);
                           }}
                           className="text-muted-foreground hover:text-emerald-700"
+                          aria-label="Edit group"
                         >
                           <Pencil size={14} />
                         </Button>
@@ -181,6 +184,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                           size="icon"
                           onClick={() => handleDelete(name)}
                           className="text-muted-foreground hover:text-red-700"
+                          aria-label="Delete group"
                         >
                           <Trash2 size={14} />
                         </Button>

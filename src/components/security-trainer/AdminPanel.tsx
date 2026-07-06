@@ -359,7 +359,7 @@ export default function AdminPanel() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
             <ChevronLeft size={20} />
           </Button>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100">
@@ -580,6 +580,7 @@ export default function AdminPanel() {
                                   size="icon"
                                   className="text-muted-foreground hover:bg-emerald-50 hover:text-emerald-700"
                                   onClick={() => setEditModalUser(u)}
+                                  aria-label="Edit user"
                                 >
                                   <Pencil size={16} />
                                 </Button>
@@ -600,16 +601,11 @@ export default function AdminPanel() {
                                     const result = await startImpersonation(u.id, user?.id || '');
                                     if (result.success) {
                                       toast.success(
-                                        t('actions.loggedInAs', {
-                                          name: u.fullName,
-                                        }),
+                                        t('users.impersonationStarted'),
                                       );
-                                      setCurrentPage('dashboard');
-                                    } else {
-                                      toast.error(result.error);
                                     }
                                   }}
-                                  title={t('users.loginAs')}
+                                  aria-label="Impersonate user"
                                 >
                                   <LogIn size={16} />
                                 </Button>
@@ -623,6 +619,7 @@ export default function AdminPanel() {
                                   size="icon"
                                   className="text-red-500 hover:bg-red-50 hover:text-red-700"
                                   onClick={() => handleDeleteUser(u.id, u.fullName)}
+                                  aria-label="Delete user"
                                 >
                                   <Trash2 size={16} />
                                 </Button>

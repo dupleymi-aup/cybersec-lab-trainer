@@ -301,6 +301,7 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
                       size="icon"
                       className="flex-shrink-0 text-slate-400 hover:bg-red-50 hover:text-red-600"
                       onClick={() => handleDelete(ann.id)}
+                      aria-label="Delete announcement"
                     >
                       <Trash2 size={14} />
                     </Button>

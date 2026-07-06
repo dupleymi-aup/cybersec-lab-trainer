@@ -200,7 +200,7 @@ function CopyButton({ text }: { text: string }) {
     }
   };
   return (
-    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={handleCopy}>
+    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={handleCopy} aria-label="Copy">
       {copied ? <CheckCircle2 size={14} className="text-emerald-500" /> : <Copy size={14} />}
     </Button>
   );
@@ -368,7 +368,7 @@ export default function ToolsLab() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
           <ChevronLeft size={20} />
         </Button>
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100">
@@ -854,6 +854,7 @@ function vigenereEncrypt(text, key) {
                   size="icon"
                   className="text-slate-400 hover:text-white"
                   onClick={() => setShowPw(!showPw)}
+                  aria-label={showPw ? "Hide password" : "Show password"}
                 >
                   {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                 </Button>

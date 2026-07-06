@@ -500,7 +500,7 @@ export default function LtiPlatformManager() {
                     >
                       <TrendingUp size={14} className="mr-1" /> Синхронизация
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => startEdit(p)}>
+                    <Button variant="ghost" size="icon" onClick={() => startEdit(p)} aria-label="Edit platform">
                       <Pencil size={14} />
                     </Button>
                     <Switch
@@ -513,6 +513,7 @@ export default function LtiPlatformManager() {
                       size="icon"
                       className="text-red-500 hover:bg-red-50 hover:text-red-700"
                       onClick={() => handleDelete(p.id, p.name)}
+                      aria-label="Delete platform"
                     >
                       <Trash2 size={14} />
                     </Button>
