@@ -15,8 +15,8 @@ export async function GET() {
 </head>
 <body>
   <div id="swagger-ui"></div>
-  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
-  <script>
+  <${'script'} src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin><${'/script'}>
+  <${'script'}>
     window.onload = () => {
       window.ui = SwaggerUIBundle({
         url: '/openapi.yaml',
@@ -38,7 +38,7 @@ export async function GET() {
         persistAuthorization: true,
       });
     };
-  </script>
+  <${'/script'}>
 </body>
 </html>`;
 
