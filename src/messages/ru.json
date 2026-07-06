@@ -245,6 +245,8 @@
       "description": "Создайте аккаунт для начала обучения",
       "fullName": "ФИО",
       "fullNamePlaceholder": "Иванов Иван Иванович",
+      "contact": "Email или телефон",
+      "contactPlaceholder": "example@mail.com или +7...",
       "email": "Email",
       "emailPlaceholder": "example@mail.com",
       "phone": "Телефон",
@@ -613,7 +615,20 @@
     "maxStreak": "Максимальная серия: {streak} подряд",
     "timeTaken": "Затраченное время: {seconds}с",
     "answerBreakdown": "Разбор ответов",
-    "correctAnswer": "Правильный ответ: {answer}"
+    "correctAnswer": "Правильный ответ: {answer}",
+    "categories": {
+      "web": "Веб-безопасность",
+      "crypto": "Криптография",
+      "network": "Сетевая безопасность",
+      "auth": "Аутентификация",
+      "api": "Безопасность API",
+      "social": "Социальная инженерия",
+      "owasp": "OWASP Top 10",
+      "mobile": "Мобильная безопасность",
+      "cloud": "Облачная безопасность",
+      "devops": "DevSecOps",
+      "iot": "Безопасность IoT"
+    }
   },
   "errors": {
     "notFound": "Страница не найдена",
@@ -908,7 +923,8 @@
       "neverLoggedIn": "Не входил",
       "activity": "Активность пользователя",
       "resetPassword": "Сброс пароля",
-      "loginAs": "Войти как"
+      "loginAs": "Войти как",
+      "impersonationStarted": "Вход выполнен от имени пользователя"
     },
     "database": {
       "usersByRole": "Пользователи по ролям",

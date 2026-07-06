@@ -245,6 +245,8 @@
       "description": "Create an account to start learning",
       "fullName": "Full Name",
       "fullNamePlaceholder": "John Doe",
+      "contact": "Email or phone",
+      "contactPlaceholder": "example@mail.com or +7...",
       "email": "Email",
       "emailPlaceholder": "example@mail.com",
       "phone": "Phone",
@@ -613,7 +615,20 @@
     "maxStreak": "Max Streak: {streak} in a row",
     "timeTaken": "Time Taken: {seconds}s",
     "answerBreakdown": "Answer Breakdown",
-    "correctAnswer": "Correct Answer: {answer}"
+    "correctAnswer": "Correct Answer: {answer}",
+    "categories": {
+      "web": "Web Security",
+      "crypto": "Cryptography",
+      "network": "Network Security",
+      "auth": "Authentication",
+      "api": "API Security",
+      "social": "Social Engineering",
+      "owasp": "OWASP Top 10",
+      "mobile": "Mobile Security",
+      "cloud": "Cloud Security",
+      "devops": "DevSecOps",
+      "iot": "IoT Security"
+    }
   },
   "errors": {
     "notFound": "Page Not Found",
@@ -909,7 +924,8 @@
       "neverLoggedIn": "Never logged in",
       "activity": "User Activity",
       "resetPassword": "Reset Password",
-      "loginAs": "Log In As"
+      "loginAs": "Log In As",
+      "impersonationStarted": "Impersonation started"
     },
     "database": {
       "usersByRole": "Users by Role",

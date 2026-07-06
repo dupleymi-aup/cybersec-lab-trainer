@@ -440,15 +440,15 @@ logger.error('Failed to delete deadline', { error: err });
           : 999;
 
         const reasons: string[] = [];
-        if (daysSinceActive > 7) reasons.push(`Не активен ${daysSinceActive} дн.`);
-        if (avgScore < 50 && scores.length > 0) reasons.push(`Низкий балл (${Math.round(avgScore)}%)`);
-        if (progress.completedModules.length < 2) reasons.push('Мало модулей');
+        if (daysSinceActive > 7) reasons.push(t('atRisk.inactiveDays', { days: daysSinceActive }));
+        if (avgScore < 50 && scores.length > 0) reasons.push(t('atRisk.lowScore', { score: Math.round(avgScore) }));
+        if (progress.completedModules.length < 2) reasons.push(t('atRisk.fewModules'));
 
         return { student: s, progress, avgScore, daysSinceActive, reasons };
       })
       .filter((s) => s.reasons.length > 0)
       .sort((a, b) => b.reasons.length - a.reasons.length || b.daysSinceActive - a.daysSinceActive);
-  }, [students, progressMap]);
+  }, [students, progressMap, t]);
 
   // Group comparison data
   const groupComparisonData = useMemo(() => {
@@ -666,13 +666,13 @@ logger.error('Failed to delete deadline', { error: err });
                         {t('student')}
                       </th>
                       {modules.map((m) => (
-                        <th
-                          key={m.id}
-                          className="text-muted-foreground min-w-[60px] p-2 text-center font-medium"
-                          title={m.title}
-                        >
-                          {m.title.split(' ').slice(0, 2).join(' ')}
-                        </th>
+                      <th
+                        key={m.id}
+                        className="text-muted-foreground min-w-[60px] p-2 text-center font-medium"
+                        title={t(`modules.${m.id}.title`)}
+                      >
+                        {t(`modules.${m.id}.title`).split(' ').slice(0, 2).join(' ')}
+                      </th>
                       ))}
                       <th className="text-muted-foreground p-2 text-center font-medium">{t('avgScore')}</th>
                     </tr>
@@ -805,7 +805,7 @@ logger.error('Failed to delete deadline', { error: err });
                           <option value="">{t('selectModule')}</option>
                           {modules.map((m) => (
                             <option key={m.id} value={m.id}>
-                              {m.title}
+                              {t(`modules.${m.id}.title`)}
                             </option>
                           ))}
                         </select>
@@ -823,7 +823,7 @@ logger.error('Failed to delete deadline', { error: err });
                           <option value="">{t('selectQuiz')}</option>
                           {quizCategories.map((q) => (
                             <option key={q.id} value={q.id}>
-                              {q.name}
+                              {t(`categories.${q.id}`)}
                             </option>
                           ))}
                         </select>
@@ -905,8 +905,8 @@ logger.error('Failed to delete deadline', { error: err });
                       d.scope === 'course'
                         ? t('course')
                         : d.scope === 'module'
-                          ? modules.find((m) => m.id === d.scopeId)?.title || d.scopeId
-                          : quizCategories.find((q) => q.id === d.scopeId)?.name || d.scopeId;
+                          ? t(`modules.${d.scopeId}.title`)
+                          : t(`categories.${d.scopeId}`) || d.scopeId;
 
                     return (
                       <div

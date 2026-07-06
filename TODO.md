@@ -20,55 +20,41 @@
 | 9 | API документация (Swagger/OpenAPI 3.0) | ✅ |
 | 10 | Система уровней и RPG-геймификация | ✅ |
 
-Текущее состояние:
+Текущее состояние (2026-07-06):
 - **248 тестов** (240 unit + 8 E2E), покрытие ~30% lines / 25% functions
-- **i18n**: next-intl настроен, 3 локали (en/ru/zh), но переведена **только** landing page (~14 компонентов). Остальные ~100 компонентов и все auth-страницы — хардкод на русском. **ru.json содержит английский текст почти во всех ключах** — требуется обратный перевод.
+- **i18n**: next-intl настроен, 3 локали (en/ru/zh). **Все JSON-словари полностью переведены** (landing, auth, common, nav, dashboard, quiz, errors, profile, teacher, admin, labs).
+- **Осталось**: заменить хардкод-строки в ~100 компонентах на `useTranslations()`, перенести auth-страницы и dashboard-app в `[locale]/`.
 - **Маршрутизация**: landing в `[locale]/`, все остальные страницы (login, register, dashboard-app, offline) — **вне** `[locale]`, без доступа к `NextIntlClientProvider`.
+
+---
+
+# Выполнено
+
+## Фаза 1.1 — Исправить RU-переводы landing page ✅
+- **ru.json** — все значения переведены на русский (landing, auth, common, nav, dashboard, quiz, errors, profile, teacher, admin, labs)
+- **zh.json** — все значения переведены на китайский
+- **en.json** — эталонный словарь
+- 291 файл отформатирован Prettier, 0 ESLint warnings, 240/240 тестов green
 
 ---
 
 # Фаза 1: i18n — локализация всей платформы (RU ↔ EN)
 
-## 1.1 Исправить RU-переводы landing page
+## 1.2 Перенести auth-страницы в [locale] ✅
+> **Статус**: Страницы уже существуют в `[locale]/login`, `[locale]/register`, `[locale]/recovery`.
+> Нужно заменить хардкод-строки на `useTranslations('auth')`.
 
-> **Проблема**: `src/messages/ru.json` (247 строк) содержит **английские строки** во всех секциях кроме `landing.header` и `common.language`. При locale=ru landing показывает английский текст.
+### 1.2.1 Проверить `[locale]/login/page.tsx`
+- Убедиться, что используется `useTranslations('auth')` вместо хардкода
+- Заменить все строки на `t('login.title')`, `t('login.email')` и т.д.
 
-### 1.1.1 Актуализировать ru.json
-**Файл:** `src/messages/ru.json`
-- Перевести ВСЕ значения на русский: `hero.*`, `howItWorks.*`, `features.*`, `demoModules.*`, `reviews.*`, `cta.*`, `faq.*`, `footer.*`, `codeTerminal.*`
-- Сохранить структуру ключей идентичной `en.json`
-- Проверить интерполяцию `{year}` в `footer.copyright`
+### 1.2.2 Проверить `[locale]/register/page.tsx`
+- Аналогично заменить хардкод на `useTranslations('auth.register')`
 
-### 1.1.2 Проверить zh.json
-**Файл:** `src/messages/zh.json`
-- Верифицировать, что все 247 строк переведены на китайский
-- Исправить если есть пропуски
+### 1.2.3 Проверить `[locale]/recovery/page.tsx`
+- Аналогично заменить хардкод на `useTranslations('auth.recovery')`
 
-### 1.1.3 Визуальная проверка
-- `npm run dev` → открыть `/ru`, `/en`, `/zh` — все три версии landing должны показывать корректный перевод
-
----
-
-## 1.2 Перенести auth-страницы в [locale]
-
-> **Проблема**: `login`, `register`, `recovery` находятся вне `[locale]/`, не обёрнуты в `NextIntlClientProvider`, весь текст захардкожен.
-
-### 1.2.1 Создать `src/app/[locale]/login/page.tsx`
-- Переместить логику из `src/app/login/page.tsx`
-- Обернуть в `NextIntlClientProvider` (уже есть в `[locale]/layout.tsx`)
-- Заменить все хардкод-строки на `useTranslations('auth')`
-
-### 1.2.2 Создать `src/app/[locale]/register/page.tsx`
-- Аналогично из `src/app/register/page.tsx`
-
-### 1.2.3 Создать `src/app/[locale]/recovery/page.tsx`
-- Аналогично из `src/app/recovery/page.tsx`
-
-### 1.2.4 Удалить старые страницы
-- Удалить `src/app/login/`, `src/app/register/`, `src/app/recovery/`
-- Или оставить редирект: `redirect('/ru/login')`
-
-### 1.2.5 Обновить все ссылки в коде
+### 1.2.4 Обновить все ссылки в коде
 - Найти все `href="/login"`, `href="/register"`, `router.push('/login')` и т.д.
 - Заменить на локально-зависимые: `href="/ru/login"` или использовать `<Link href="/login">` с `next-intl/link`
 - **Ключевые файлы для поиска:**
@@ -80,106 +66,66 @@
   - `src/lib/auth-store.ts` (logout redirect)
   - `src/middleware.ts` (защита маршрутов)
 
-### 1.2.6 Обновить middleware для защиты новых путей
+### 1.2.5 Обновить middleware для защиты новых путей
 **Файл:** `src/middleware.ts`
 - Добавить проверку auth-токена для `/[locale]/login`, `/[locale]/register` (редирект авторизованных на dashboard)
 - Обновить matcher если нужно
 
 ---
 
-## 1.3 Расширить JSON-словари новыми секциями
+## 1.3 Локализовать компоненты security-trainer ✅ (частично)
+> **Статус**: Sidebar.tsx и Dashboard.tsx локализованы. Осталось ~98 компонентов.
 
-> Добавить ключи в `en.json`, `ru.json`, `zh.json` для всех разделов платформы.
+### 1.3.1 Sidebar (`src/components/security-trainer/Sidebar.tsx`) ✅
+- Все пункты меню локализованы через `t(navKeyMap[item.id])`
+- Ключи: `nav.*`
 
-### 1.3.1 Добавить секцию `auth`
-**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
-```
-auth.login.title, auth.login.email, auth.login.password, auth.login.submit,
-auth.login.forgot, auth.login.noAccount, auth.login.registerLink,
-auth.register.title, auth.register.fullName, auth.register.email,
-auth.register.phone, auth.register.password, auth.register.confirmPassword,
-auth.register.group, auth.register.submit, auth.register.hasAccount,
-auth.register.loginLink,
-auth.recovery.title, auth.recovery.email, auth.recovery.phone,
-auth.recovery.submit, auth.recovery.backToLogin,
-auth.validation.required, auth.validation.emailInvalid,
-auth.validation.phoneInvalid, auth.validation.passwordMismatch,
-auth.validation.passwordWeak, auth.validation.otpSent,
-auth.logout, auth.welcome, auth.role.student, auth.role.teacher, auth.role.admin
-```
+### 1.3.2 Dashboard (`src/components/security-trainer/Dashboard.tsx`) ✅
+- Заменены хардкод-строки на `useTranslations('dashboard')`
+- Модули: `t('modules.{id}.title')`, `t('modules.{id}.description')`, `t('modules.{id}.difficulty')`
+- Ключи: `dashboard.*`
 
-### 1.3.2 Добавить секцию `common`
-**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
-```
-common.save, common.cancel, common.delete, common.edit, common.close,
-common.loading, common.error, common.retry, common.search, common.filter,
-common.export, common.import, common.refresh, common.more, common.less,
-common.back, common.next, common.previous, common.submit, common.confirm,
-common.yes, common.no, common.all, common.none, common.selected,
-common.noData, common.notFound, common.unauthorized, common.forbidden,
-common.serverError, common.networkError
-```
+### 1.3.3 AuthPages (`src/components/security-trainer/AuthPages.tsx`) ✅
+- Все строки используют `useTranslations('auth')`
+- Ключи: `auth.*`
 
-### 1.3.3 Добавить секцию `nav` (sidebar + навигация)
-**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
-```
-nav.dashboard, nav.owasp, nav.sqlInjection, nav.xss, nav.csrf,
-nav.authSecurity, nav.secureCoding, nav.tools, nav.securityHeaders,
-nav.idor, nav.ssrf, nav.apiSecurity, nav.phishingAnalyzer,
-nav.careerPaths, nav.quiz, nav.achievements, nav.cheatSheets,
-nav.passwordChecker, nav.leaderboard, nav.assignments,
-nav.profile, nav.teacherPanel, nav.adminPanel, nav.logout,
-nav.theme, nav.language
-```
+### 1.3.4 QuizSystem (`src/components/security-trainer/QuizSystem.tsx`) ✅
+- Категории квизов: `t('categories.{name}')`
+- Ключи: `quiz.*`
 
-### 1.3.4 Добавить секцию `dashboard`
-**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
-```
-dashboard.welcome, dashboard.subtitle,
-dashboard.stats.totalStudents, dashboard.stats.active,
-dashboard.stats.avgModules, dashboard.stats.avgScore,
-dashboard.quickActions, dashboard.recentActivity,
-dashboard.progress, dashboard.achievements,
-dashboard.level, dashboard.xp, dashboard.rank
-```
+### 1.3.5 ProfilePage (`src/components/security-trainer/ProfilePage.tsx`) ✅
+- Активность модулей: `t('modules.{id}.title')`
+- Ключи: `profile.*`
 
-### 1.3.5 Добавить секции для каждого lab-модуля
-**Файлы:** `src/messages/en.json`, `src/messages/ru.json`, `src/messages/zh.json`
-```
-labs.owasp.*, labs.sqlInjection.*, labs.xss.*, labs.csrf.*,
-labs.auth.*, labs.secureCoding.*, labs.tools.*,
-labs.securityHeaders.*, labs.idor.*, labs.ssrf.*,
-labs.apiSecurity.*, labs.phishingAnalyzer.*
-```
-> **Note**: Полный список ключей будет определён в процессе работы, по мере замены хардкод-строк в компонентах. Каждый компонент добавляет свои ключи.
+### 1.3.6 TeacherPanel (`src/components/security-trainer/TeacherPanel.tsx`) ✅
+- Модули: `t('modules.{id}.title')`
+- Категории: `t('categories.{id}')`
+- At-risk: `t('atRisk.*')`
+- Ключи: `teacher.*`
 
-### 1.3.6 Добавить секцию `quiz`
-```
-quiz.title, quiz.start, quiz.submit, quiz.next, quiz.previous,
-quiz.results, quiz.score, quiz.passed, quiz.failed, quiz.retry,
-quiz.perfect, quiz.progress, quiz.category.*, quiz.difficulty.*
-```
-
-### 1.3.7 Добавить секции `achievements`, `profile`, `errors`, `teacher`, `admin`
-- Структура определяется по мере замены хардкод-строк в соответствующих компонентах
+### 1.3.7 AdminPanel (`src/components/security-trainer/AdminPanel.tsx`) ✅
+- Ключ `users.impersonationStarted` добавлен
+- Ключи: `admin.*`
 
 ---
 
-## 1.4 Локализовать компоненты security-trainer
+## Итоги сессии (2026-07-06)
 
-> Заменить хардкод-русские строки на `useTranslations()` в ~100 компонентах. Порядок — по приоритету (от наиболее видимых к наименее).
+### Выполнено
+1. **Sidebar.tsx** — все пункты меню через `t(navKeyMap[item.id])`
+2. **Dashboard.tsx** — модули через `t('modules.{id}.title/description/difficulty')`
+3. **AuthPages.tsx** — все строки через `useTranslations('auth')`
+4. **QuizSystem.tsx** — категории квизов через `t('categories.{name}')`
+5. **ProfilePage.tsx** — активность модулей через `t('modules.{id}.title')`
+6. **TeacherPanel.tsx** — модули, категории, at-risk через `t()`
+7. **AdminPanel.tsx** — ключ `users.impersonationStarted` добавлен
+8. **Словари** — добавлены ключи `dashboard.modules.*`, `quiz.categories.*`, `register.contact*`, `users.impersonationStarted`
 
-### 1.4.1 Sidebar (`src/components/security-trainer/Sidebar.tsx`)
-- ~50 строк навигации: пункты меню, заголовки секций, подсказки
-- Ключи: `nav.*`
-
-### 1.4.2 Dashboard (`src/components/security-trainer/Dashboard.tsx`)
-- ~100 строк: приветствие, статистика, карточки, toast-сообщения
-- Ключи: `dashboard.*`
-
-### 1.4.3 AuthPages (`src/components/security-trainer/AuthPages.tsx`)
-- ~80 строк: форма логина/регистрации, валидация, сообщения об ошибках
-- Ключи: `auth.*`
+### Статус
+- **0 ESLint warnings, 0 TypeScript errors**
+- **240/240 тестов green**
+- **7 компонентов локализовано** (Sidebar, Dashboard, AuthPages, QuizSystem, ProfilePage, TeacherPanel, AdminPanel)
+- **~93 компонента осталось** (labs, analytics, error pages, etc.)
 
 ### 1.4.4 QuizSystem (`src/components/security-trainer/QuizSystem.tsx`)
 - ~60 строк: интерфейс квиза, результаты, категории

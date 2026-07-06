@@ -245,6 +245,8 @@
       "description": "创建账号开始学习",
       "fullName": "姓名",
       "fullNamePlaceholder": "张三",
+      "contact": "邮箱或手机号",
+      "contactPlaceholder": "example@mail.com 或 +7...",
       "email": "邮箱",
       "emailPlaceholder": "example@mail.com",
       "phone": "手机号",
@@ -613,7 +615,20 @@
     "maxStreak": "最大连续：{streak} 次",
     "timeTaken": "用时：{seconds}秒",
     "answerBreakdown": "答案解析",
-    "correctAnswer": "正确答案：{answer}"
+    "correctAnswer": "正确答案：{answer}",
+    "categories": {
+      "web": "Web安全",
+      "crypto": "密码学",
+      "network": "网络安全",
+      "auth": "身份认证",
+      "api": "API安全",
+      "social": "社会工程学",
+      "owasp": "OWASP Top 10",
+      "mobile": "移动安全",
+      "cloud": "云安全",
+      "devops": "DevSecOps",
+      "iot": "物联网安全"
+    }
   },
   "errors": {
     "notFound": "页面未找到",
@@ -908,7 +923,8 @@
       "neverLoggedIn": "从未登录",
       "activity": "用户活动",
       "resetPassword": "重置密码",
-      "loginAs": "以身份登录"
+      "loginAs": "以身份登录",
+      "impersonationStarted": "已以用户身份登录"
     },
     "database": {
       "usersByRole": "按角色统计用户",

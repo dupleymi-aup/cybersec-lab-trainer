@@ -454,7 +454,7 @@ export default function QuizSystem() {
                         {iconMap[cat.icon]}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-semibold">{cat.name}</h3>
+                        <h3 className="text-sm font-semibold">{t(`categories.${cat.id}`)}</h3>
                         <p className="text-muted-foreground text-xs">
                           {t('questionsCount', { count: available.length })}
                         </p>

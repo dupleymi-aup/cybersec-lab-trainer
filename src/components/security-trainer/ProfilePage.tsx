@@ -143,14 +143,14 @@ export default function ProfilePage() {
     const events: Array<{ date: Date; type: string; label: string }> = [];
     for (const [moduleId, ts] of Object.entries(timestamps.modules)) {
       const mod = modules.find((m) => m.id === moduleId);
-      if (mod) events.push({ date: new Date(ts), type: 'module', label: mod.title });
+      if (mod) events.push({ date: new Date(ts), type: 'module', label: t(`modules.${mod.id}.title`) });
     }
     for (const [quizId, ts] of Object.entries(timestamps.quizzes)) {
       const cat = modules.find((m) => m.id === quizId);
       events.push({
         date: new Date(ts),
         type: 'quiz',
-        label: cat?.title || t('activityQuizPrefix', { id: quizId }),
+        label: cat?.title ? t(`modules.${cat.id}.title`) : t('activityQuizPrefix', { id: quizId }),
       });
     }
     return events.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 10);

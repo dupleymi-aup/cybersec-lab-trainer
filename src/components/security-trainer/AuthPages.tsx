@@ -573,7 +573,7 @@ export default function AuthPages() {
                           }`}
                         >
                           <Mail className="h-4 w-4" />
-                          Email
+                          {t('register.email')}
                         </button>
                         <button
                           type="button"
@@ -590,14 +590,14 @@ export default function AuthPages() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="recovery-contact" className="text-slate-300">
-                          {recoveryMethod === 'email' ? 'Email' : t('register.phone')}
+                          {t('register.contact')}
                         </Label>
                         <Input
                           id="recovery-contact"
                           type={recoveryMethod === 'email' ? 'email' : 'tel'}
                           value={recoveryContact}
                           onChange={(e) => setRecoveryContact(e.target.value)}
-                          placeholder={recoveryMethod === 'email' ? 'example@mail.com' : '+7 (999) 123-45-67'}
+                          placeholder={t('register.contactPlaceholder')}
                           className="placeholder:text-muted-foreground border-slate-600 bg-slate-900/50 text-white"
                         />
                       </div>
