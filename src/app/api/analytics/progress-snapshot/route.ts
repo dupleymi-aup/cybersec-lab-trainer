@@ -4,14 +4,21 @@ import { authenticate, unauthorized } from "@/lib/api-middleware";
 import { logger } from "@/lib/logger";
 import { parseBody } from "@/lib/utils";
 
+interface ProgressSnapshotBody {
+  moduleId?: string;
+  score?: number;
+  completed?: boolean;
+  userId?: string;
+}
+
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  const bodyResult = await parseBody(request);
+  const bodyResult = await parseBody<ProgressSnapshotBody>(request);
   if (!bodyResult.ok) return bodyResult.response;
-  const body = bodyResult.data as Record<string, unknown>;
-  const { moduleId, score, completed, userId } = body as Record<string, any>;
+  const body = bodyResult.data;
+  const { moduleId, score, completed, userId } = body ?? {};
 
   if (!moduleId || score === undefined || completed === undefined) {
     return NextResponse.json(

@@ -101,9 +101,10 @@ export async function PUT(
   if (!requireRole(auth.role, "admin")) return forbidden();
 
   const { id } = await params;
-  const bodyResult = await parseBody(request);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bodyResult = await parseBody<any>(request);
   if (!bodyResult.ok) return bodyResult.response;
-  const body = bodyResult.data as Record<string, unknown>;
+  const body = bodyResult.data;
 
   try {
     const platform = await prisma.ltiPlatform.update({

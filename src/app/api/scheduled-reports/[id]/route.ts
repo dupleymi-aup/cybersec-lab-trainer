@@ -54,10 +54,11 @@ export async function PATCH(
       return unauthorized();
     }
 
-    const bodyResult = await parseBody(request);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const bodyResult = await parseBody<any>(request);
     if (!bodyResult.ok) return bodyResult.response;
-    const body = bodyResult.data as Record<string, unknown>;
-    const { isActive, lastGenerated, ...updates } = body as Record<string, any>;
+    const body = bodyResult.data;
+    const { isActive, lastGenerated, ...updates } = body;
 
     const report = await prisma.scheduledReport.update({
       where: { id },

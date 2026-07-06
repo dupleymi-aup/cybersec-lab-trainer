@@ -40,9 +40,10 @@ export async function POST(
     );
   }
 
-  const bodyResult = await parseBody(request);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bodyResult = await parseBody<any>(request);
   if (!bodyResult.ok) return bodyResult.response;
-  const body = bodyResult.data as Record<string, unknown>;
+  const body = bodyResult.data;
   const { newPassword } = body;
 
   if (!newPassword) {
