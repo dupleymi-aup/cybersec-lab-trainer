@@ -8,6 +8,7 @@ import {
   checkRateLimit,
   getClientIp,
 } from "@/lib/api-middleware";
+import { logger } from "@/lib/logger";
 import { validateUuid } from "@/lib/validate-uuid";
 
 // GET /api/users/[id] - get single user
@@ -163,9 +164,8 @@ export async function PUT(
       },
     });
   } catch (error) {
-    // Audit logging is best-effort
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", error);
+      logger.warn("Audit logging failed", { error });
     }
   }
 
@@ -248,9 +248,8 @@ export async function DELETE(
       },
     });
   } catch (error) {
-    // Audit logging is best-effort
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", error);
+      logger.warn("Audit logging failed", { error });
     }
   }
 

@@ -180,9 +180,8 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (error) {
-      // Audit logging is best-effort
       if (process.env.NODE_ENV === "development") {
-        console.warn("Audit logging failed:", error);
+        logger.warn("Audit logging failed", { error });
       }
     }
 

@@ -9,6 +9,7 @@ import {
 } from "@/lib/api-middleware";
 import { hashPassword, validatePassword } from "@/lib/auth-utils";
 import { validateUuid } from "@/lib/validate-uuid";
+import { logger } from "@/lib/logger";
 
 // POST /api/admin/users/[id]/reset-password - admin resets another user's password
 export async function POST(
@@ -84,9 +85,8 @@ export async function POST(
       },
     });
   } catch (error) {
-    // Audit logging is best-effort
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", error);
+      logger.warn("Audit logging failed", { error });
     }
   }
 

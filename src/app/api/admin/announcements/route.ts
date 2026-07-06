@@ -124,9 +124,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    // Audit log failure should not block the response
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", error);
+      logger.warn("Audit logging failed", { error });
     }
   }
 
@@ -231,9 +230,8 @@ export async function PUT(request: NextRequest) {
       },
     });
   } catch (error) {
-    // Audit log failure should not block the response
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", error);
+      logger.warn("Audit logging failed", { error });
     }
   }
 
@@ -325,9 +323,8 @@ export async function DELETE(request: NextRequest) {
       },
     });
   } catch (error) {
-    // Audit log failure should not block the response
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", error);
+      logger.warn("Audit logging failed", { error });
     }
   }
 

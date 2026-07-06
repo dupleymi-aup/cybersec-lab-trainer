@@ -8,6 +8,7 @@ import {
   checkRateLimit,
   getClientIp,
 } from "@/lib/api-middleware";
+import { logger } from "@/lib/logger";
 import { validateUuid } from "@/lib/validate-uuid";
 
 export async function PUT(
@@ -79,9 +80,8 @@ export async function PUT(
       },
     });
   } catch (error) {
-    // Audit logging is best-effort
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", error);
+      logger.warn("Audit logging failed", { error });
     }
   }
 

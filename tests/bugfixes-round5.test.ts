@@ -1,4 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+vi.mock('@/lib/db', () => ({
+  prisma: {
+    user: { findUnique: vi.fn(), findMany: vi.fn() },
+  },
+}));
+
 import { checkRateLimit } from '@/lib/api-middleware';
 
 describe('XP rate limiting', () => {

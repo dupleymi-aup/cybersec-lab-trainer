@@ -10,6 +10,7 @@ import {
 } from "@/lib/api-middleware";
 import { hashPassword, validatePassword } from "@/lib/auth-utils";
 import { createUserSchema } from "@/lib/validations/api";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -192,9 +193,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    // Audit logging is best-effort
     if (process.env.NODE_ENV === "development") {
-      console.warn("Audit logging failed:", error);
+      logger.warn("Audit logging failed", { error });
     }
   }
 

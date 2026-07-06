@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       return JSON.parse(val);
     } catch (e) {
       if (process.env.NODE_ENV === "development")
-        console.warn("[progress] parseJsonField failed:", e);
+        logger.warn("progress parseJsonField failed", { error: e });
       return val;
     }
   };

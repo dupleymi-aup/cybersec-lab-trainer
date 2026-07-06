@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import {
   authenticate,
   unauthorized,
@@ -290,7 +291,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ cohorts, overallRetention });
   } catch (error) {
-    console.error("[analytics/cohort] GET error:", error);
+    logger.error("analytics/cohort GET error", { error });
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

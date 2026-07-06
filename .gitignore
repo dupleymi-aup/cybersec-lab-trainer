@@ -13,6 +13,9 @@ public/fallback-*.js
 prisma/dev.db
 cyberlab-mtusi/
 .lint_output.txt
+coverage/
+playwright-report/
+test-results/
 
 # Translation generation scripts
 _gen_translations.mjs
