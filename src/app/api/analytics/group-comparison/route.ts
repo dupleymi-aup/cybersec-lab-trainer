@@ -6,6 +6,7 @@ import {
   forbidden,
   requireRole,
 } from "@/lib/api-middleware";
+import { parseDays } from "@/lib/utils";
 
 const MODULE_NAMES: Record<string, string> = {
   owasp: "OWASP Top 10",
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
   if (!requireRole(auth.role, "teacher")) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const days = parseInt(searchParams.get("days") || "30", 10);
+  const days = parseDays(searchParams);
   const dimension = searchParams.get("dimension") || "group";
 
   const now = new Date();

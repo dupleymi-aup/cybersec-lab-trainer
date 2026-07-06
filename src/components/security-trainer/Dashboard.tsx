@@ -218,8 +218,11 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     getAuthHeaders()
-      .then((headers) => fetch("/api/deadlines/upcoming", { headers }))
+      .then((headers) =>
+        fetch("/api/deadlines/upcoming", { headers, signal: controller.signal }),
+      )
       .then((r) => r.json())
       .then((data) => {
         if (data.upcoming) {
@@ -232,16 +235,21 @@ export default function Dashboard() {
         }
       })
       .catch((err) => {
-        if (process.env.NODE_ENV === "development")
+        if (err.name !== "AbortError")
           logger.error("Dashboard failed to load notifications", { error: err });
       });
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
     if (user?.role !== "teacher" && user?.role !== "admin") return;
+    const controller = new AbortController();
     getAuthHeaders()
       .then((h) =>
-        fetch("/api/analytics/admin-summary?days=30", { headers: h }),
+        fetch("/api/analytics/admin-summary?days=30", {
+          headers: h,
+          signal: controller.signal,
+        }),
       )
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
@@ -255,8 +263,10 @@ export default function Dashboard() {
         }
       })
       .catch((err) => {
-        logger.warn("Dashboard failed to load teacher stats", { error: err });
+        if (err.name !== "AbortError")
+          logger.warn("Dashboard failed to load teacher stats", { error: err });
       });
+    return () => controller.abort();
   }, [user?.role]);
 
   const dismissAnnouncement = (id: string) => {

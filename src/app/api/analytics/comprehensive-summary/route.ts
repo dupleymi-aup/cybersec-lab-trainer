@@ -6,6 +6,7 @@ import {
   forbidden,
   requireRole,
 } from "@/lib/api-middleware";
+import { parseDays } from "@/lib/utils";
 
 // In-memory response cache with 30s TTL
 const cache = new Map<string, { data: unknown; expiresAt: number }>();
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
     return forbidden("Требуется роль администратора");
 
   const { searchParams } = new URL(request.url);
-  const days = parseInt(searchParams.get("days") || "30", 10);
+  const days = parseDays(searchParams);
   const groupId = searchParams.get("groupId");
 
   // Check cache

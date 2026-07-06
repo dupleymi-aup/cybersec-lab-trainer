@@ -6,6 +6,7 @@ import {
   forbidden,
   requireRole,
 } from "@/lib/api-middleware";
+import { parseDays } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 import type { Prisma } from "@prisma/client";
 
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     if (!requireRole(auth.role, "teacher")) return forbidden();
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get("days") || "30", 10);
+    const days = parseDays(searchParams);
     const groupId = searchParams.get("groupId");
 
     const now = new Date();

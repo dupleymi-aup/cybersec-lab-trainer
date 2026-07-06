@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 interface TrendIndicatorProps {
@@ -9,7 +10,7 @@ interface TrendIndicatorProps {
   size?: "sm" | "md";
 }
 
-export default function TrendIndicator({
+export default memo(function TrendIndicator({
   trend,
   value,
   suffix = "",
@@ -46,4 +47,4 @@ export default function TrendIndicator({
       )}
     </span>
   );
-}
+});

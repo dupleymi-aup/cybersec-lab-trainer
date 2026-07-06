@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { authenticate, unauthorized, requireRole } from "@/lib/api-middleware";
+import { parseDays } from "@/lib/utils";
 import { getModuleName } from "@/lib/module-names";
 
 export async function GET(
@@ -15,7 +16,7 @@ export async function GET(
     return unauthorized();
 
   const { searchParams } = new URL(request.url);
-  const days = parseInt(searchParams.get("days") || "30", 10);
+  const days = parseDays(searchParams);
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
   const userId = resolvedParams.userId;

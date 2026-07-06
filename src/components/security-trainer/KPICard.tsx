@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +17,7 @@ interface KPICardProps {
   iconColor?: string;
 }
 
-export default function KPICard({
+export default memo(function KPICard({
   icon,
   value,
   label,
@@ -80,4 +81,4 @@ export default function KPICard({
       </Card>
     </motion.div>
   );
-}
+});

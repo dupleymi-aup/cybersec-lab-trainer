@@ -6,6 +6,7 @@ import {
   forbidden,
   requireRole,
 } from "@/lib/api-middleware";
+import { parseDays } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const groupId = searchParams.get("groupId") || "";
-  const days = parseInt(searchParams.get("days") || "30", 10);
+  const days = parseDays(searchParams);
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 

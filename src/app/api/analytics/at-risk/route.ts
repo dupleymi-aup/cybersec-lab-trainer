@@ -6,6 +6,7 @@ import {
   forbidden,
   requireRole,
 } from "@/lib/api-middleware";
+import { parseDays } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   if (!requireRole(auth.role, "teacher")) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const days = parseInt(searchParams.get("days") || "30", 10);
+  const days = parseDays(searchParams);
   const inactivityDays = parseInt(
     searchParams.get("inactivityDays") || "7",
     10,

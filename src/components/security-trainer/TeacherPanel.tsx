@@ -147,6 +147,7 @@ export default function TeacherPanel() {
   // Load all student progress from batch API (avoids N concurrent requests)
   useEffect(() => {
     if (students.length === 0) return;
+    let cancelled = false;
     const loadProgress = async () => {
       const headers = await getAuthHeaders();
       const batchResult: Record<string, StudentProgress> = {};
@@ -154,6 +155,7 @@ export default function TeacherPanel() {
       const batchSize = 100;
 
       for (let i = 0; i < userIds.length; i += batchSize) {
+        if (cancelled) return;
         const chunk = userIds.slice(i, i + batchSize);
         try {
           const res = await fetch(
@@ -261,6 +263,9 @@ export default function TeacherPanel() {
       setStudentProgress(batchResult);
     };
     loadProgress();
+    return () => {
+      cancelled = true;
+    };
   }, [students]);
 
   // Deadlines state

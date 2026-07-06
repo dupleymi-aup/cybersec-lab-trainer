@@ -1,12 +1,14 @@
 "use client";
 
+import { memo } from "react";
+
 interface RiskScoreBarProps {
   score: number; // 0-100
   className?: string;
   showLabel?: boolean;
 }
 
-export default function RiskScoreBar({
+export default memo(function RiskScoreBar({
   score,
   className = "",
   showLabel = true,
@@ -54,4 +56,4 @@ export default function RiskScoreBar({
       )}
     </div>
   );
-}
+});

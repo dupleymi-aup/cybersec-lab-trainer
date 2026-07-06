@@ -6,6 +6,7 @@ import {
   forbidden,
   requireRole,
 } from "@/lib/api-middleware";
+import { parseDays } from "@/lib/utils";
 import { CORE_MODULE_IDS } from "@/lib/module-constants";
 
 export async function GET(request: NextRequest) {
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
   if (!requireRole(auth.role, "teacher")) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const _days = parseInt(searchParams.get("days") || "30", 10);
+  const _days = parseDays(searchParams);
   const groupId = searchParams.get("groupId") || "";
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
