@@ -32,11 +32,3 @@ export function useAnalyticsFilters(): AnalyticsContextValue {
   }
   return ctx;
 }
-
-export function daysToLabel(days: number): string {
-  if (days === 7) return '7 дней';
-  if (days === 30) return '30 дней';
-  if (days === 90) return '90 дней';
-  if (days === 180) return '180 дней';
-  return `${days} дней`;
-}

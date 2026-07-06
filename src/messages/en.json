@@ -501,6 +501,68 @@
     "quickActions": {
       "adminPanel": "Admin Panel",
       "teacherPanel": "Teacher Panel"
+    },
+    "modules": {
+      "owasp": {
+        "title": "OWASP Top 10",
+        "description": "Interactive guide to the 10 most critical web security threats with code examples, real cases, and protection methods.",
+        "difficulty": "Beginner"
+      },
+      "sql-injection": {
+        "title": "SQL Injection",
+        "description": "Practical lab: 11 challenges from simple auth bypass to WAF Bypass, Out-of-band and Polyglot attacks.",
+        "difficulty": "Intermediate"
+      },
+      "xss": {
+        "title": "XSS Attacks",
+        "description": "Learn 9 types of XSS: reflected, stored, DOM-based, SVG, Markdown, PDF, Angular, template literals and localStorage. Interactive attack demos.",
+        "difficulty": "Intermediate"
+      },
+      "csrf": {
+        "title": "CSRF Attacks",
+        "description": "CSRF attacks: simulation, 5 interactive challenges, 3 real examples, SameSite cookies and protection mechanisms.",
+        "difficulty": "Intermediate"
+      },
+      "auth": {
+        "title": "Authentication",
+        "description": "Trainers: password strength checker, brute force visualization, bcrypt hashing demo, interactive TOTP/2FA, JWT session security.",
+        "difficulty": "Beginner"
+      },
+      "secure-coding": {
+        "title": "Secure Coding",
+        "description": "34 code review tasks: find the vulnerability (SQLi, XSS, IDOR, SSRF, XXE, SSTI, Prototype Pollution, LDAP Injection, Mass Assignment) and choose the right fix.",
+        "difficulty": "Advanced"
+      },
+      "tools": {
+        "title": "Security Tools",
+        "description": "Interactive tools: ciphers (Caesar, Vigenere, XOR), encoding (Base64, URL), hash functions and password generator.",
+        "difficulty": "Beginner"
+      },
+      "security-headers": {
+        "title": "Security Headers",
+        "description": "Interactive guide to HTTP security headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, COOP, COEP, CORP, Cache-Control, X-DNS-Prefetch-Control, Clear-Site-Data.",
+        "difficulty": "Intermediate"
+      },
+      "idor": {
+        "title": "IDOR Attacks",
+        "description": "Lab for studying Insecure Direct Object Reference: 7 scenarios with code, vulnerability analysis and fixing practice.",
+        "difficulty": "Intermediate"
+      },
+      "ssrf": {
+        "title": "SSRF Attacks",
+        "description": "Lab for studying Server-Side Request Forgery: 7 scenarios including DNS rebinding, redirects and blind SSRF.",
+        "difficulty": "Advanced"
+      },
+      "api-security": {
+        "title": "API Security",
+        "description": "Interactive guide to OWASP API Security Top 10 (2023): BOLA, BFLA, SSRF, rate limiting, inventory management and other threats.",
+        "difficulty": "Advanced"
+      },
+      "phishing-analyzer": {
+        "title": "Phishing Analyzer",
+        "description": "Interactive phishing recognition trainer: 6 emails of varying difficulty, header analysis, DKIM/SPF/DMARC, phishing indicators.",
+        "difficulty": "Intermediate"
+      }
     }
   },
   "quiz": {

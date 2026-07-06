@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -7,7 +8,7 @@ interface CodeBlockProps {
   title?: string;
 }
 
-export default function CodeBlock({ code, language = 'javascript', title }: CodeBlockProps) {
+export default memo(function CodeBlock({ code, language = 'javascript', title }: CodeBlockProps) {
   return (
     <div className="my-3 overflow-hidden rounded-lg border border-slate-700">
       {title && (
@@ -23,4 +24,4 @@ export default function CodeBlock({ code, language = 'javascript', title }: Code
       </SyntaxHighlighter>
     </div>
   );
-}
+});

@@ -1,10 +1,11 @@
 'use client';
 
+import { memo } from 'react';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 
-export default function ThemeToggle() {
+export default memo(function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
 
   const cycleTheme = () => {
@@ -28,4 +29,4 @@ export default function ThemeToggle() {
       {theme === 'system' ? <Monitor size={18} /> : isDark ? <Sun size={18} /> : <Moon size={18} />}
     </Button>
   );
-}
+});

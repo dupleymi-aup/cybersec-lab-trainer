@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { useAuthStore, type UserRole, hasRole, getRoleLabel } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ interface RoleGuardProps {
   children: React.ReactNode;
 }
 
-export default function RoleGuard({ requiredRole, fallback, children }: RoleGuardProps) {
+export default memo(function RoleGuard({ requiredRole, fallback, children }: RoleGuardProps) {
   const user = useAuthStore((s) => s.user);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
 
@@ -40,4 +41,4 @@ export default function RoleGuard({ requiredRole, fallback, children }: RoleGuar
   }
 
   return <>{children}</>;
-}
+});

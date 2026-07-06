@@ -501,6 +501,68 @@
     "quickActions": {
       "adminPanel": "管理面板",
       "teacherPanel": "教师面板"
+    },
+    "modules": {
+      "owasp": {
+        "title": "OWASP Top 10",
+        "description": "交互式指南，介绍10个最关键的Web安全威胁，包含代码示例、真实案例和保护方法。",
+        "difficulty": "初级"
+      },
+      "sql-injection": {
+        "title": "SQL注入",
+        "description": "实践实验室：11个挑战，从简单的认证绕过到WAF绕过、带外攻击和Polyglot攻击。",
+        "difficulty": "中级"
+      },
+      "xss": {
+        "title": "XSS攻击",
+        "description": "学习9种XSS类型：反射型、存储型、DOM-based、SVG、Markdown、PDF、Angular、模板字面量和localStorage。交互式攻击演示。",
+        "difficulty": "中级"
+      },
+      "csrf": {
+        "title": "CSRF攻击",
+        "description": "CSRF攻击：模拟、5个交互式挑战、3个真实示例、SameSite cookies和保护机制。",
+        "difficulty": "中级"
+      },
+      "auth": {
+        "title": "身份认证",
+        "description": "训练器：密码强度检查器、暴力破解可视化、bcrypt哈希演示、交互式TOTP/2FA、JWT会话安全。",
+        "difficulty": "初级"
+      },
+      "secure-coding": {
+        "title": "安全编码",
+        "description": "34个代码审查任务：找出漏洞（SQLi、XSS、IDOR、SSRF、XXE、SSTI、原型污染、LDAP注入、批量赋值）并选择正确的修复方法。",
+        "difficulty": "高级"
+      },
+      "tools": {
+        "title": "安全工具",
+        "description": "交互式工具：密码（凯撒、维吉尼亚、XOR）、编码（Base64、URL）、哈希函数和密码生成器。",
+        "difficulty": "初级"
+      },
+      "security-headers": {
+        "title": "安全头部",
+        "description": "HTTP安全头部交互式指南：CSP、HSTS、X-Frame-Options、X-Content-Type-Options、Referrer-Policy、Permissions-Policy、COOP、COEP、CORP、Cache-Control、X-DNS-Prefetch-Control、Clear-Site-Data。",
+        "difficulty": "中级"
+      },
+      "idor": {
+        "title": "IDOR攻击",
+        "description": "研究不安全的直接对象引用实验室：7个包含代码、漏洞分析和修复实践的案例。",
+        "difficulty": "中级"
+      },
+      "ssrf": {
+        "title": "SSRF攻击",
+        "description": "研究服务器端请求伪造实验室：7个场景，包括DNS重绑定、重定向和盲SSRF。",
+        "difficulty": "高级"
+      },
+      "api-security": {
+        "title": "API安全",
+        "description": "OWASP API安全Top 10（2023）交互式指南：BOLA、BFLA、SSRF、速率限制、库存管理和其他威胁。",
+        "difficulty": "高级"
+      },
+      "phishing-analyzer": {
+        "title": "钓鱼分析器",
+        "description": "交互式钓鱼识别训练器：6封不同难度的邮件、头部分析、DKIM/SPF/DMARC、钓鱼指标。",
+        "difficulty": "中级"
+      }
     }
   },
   "quiz": {

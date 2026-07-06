@@ -14,15 +14,3 @@ export async function safeJson<T = unknown>(
     return fallback;
   }
 }
-
-/**
- * Safely parse a JSON string, returning null on failure.
- */
-export function safeJsonParse<T = unknown>(text: string | null, fallback: T | null = null): T | null {
-  if (!text) return fallback;
-  try {
-    return JSON.parse(text) as T;
-  } catch {
-    return fallback;
-  }
-}

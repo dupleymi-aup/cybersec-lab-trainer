@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppStore, type PageType } from '@/lib/store';
@@ -7,7 +8,7 @@ import { modules } from '@/lib/data';
 
 const modulePageIds: PageType[] = modules.map((m) => m.id as PageType);
 
-export default function ModuleNavigation({ currentId }: { currentId: string }) {
+export default memo(function ModuleNavigation({ currentId }: { currentId: string }) {
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
 
@@ -54,4 +55,4 @@ export default function ModuleNavigation({ currentId }: { currentId: string }) {
       </div>
     </div>
   );
-}
+});
