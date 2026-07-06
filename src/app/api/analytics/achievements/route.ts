@@ -1,28 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import {
-  achievements,
-  isAchievementUnlocked,
-} from "@/lib/data/achievements-data";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { achievements, isAchievementUnlocked } from '@/lib/data/achievements-data';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const groupId = searchParams.get("groupId");
+  const groupId = searchParams.get('groupId');
 
   // Get all students, optionally filtered by group
   const students = await prisma.user.findMany({
     where: {
-      role: "student",
+      role: 'student',
       ...(groupId && { group: groupId }),
     },
     select: { id: true },
@@ -39,7 +31,7 @@ export async function GET(request: NextRequest) {
         unlockedCount: 0,
         totalCount: 0,
         unlockRate: 0,
-        rarity: "common" as const,
+        rarity: 'common' as const,
       })),
     });
   }
@@ -129,17 +121,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const unlockRate =
-      totalCount > 0
-        ? Math.round((unlockedCount / totalCount) * 10000) / 100
-        : 0;
+    const unlockRate = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 10000) / 100 : 0;
 
     // Assign rarity based on unlock rate
     let rarity: string;
-    if (unlockRate > 60) rarity = "common";
-    else if (unlockRate >= 30) rarity = "uncommon";
-    else if (unlockRate >= 10) rarity = "rare";
-    else rarity = "epic";
+    if (unlockRate > 60) rarity = 'common';
+    else if (unlockRate >= 30) rarity = 'uncommon';
+    else if (unlockRate >= 10) rarity = 'rare';
+    else rarity = 'epic';
 
     return {
       id: achievement.id,

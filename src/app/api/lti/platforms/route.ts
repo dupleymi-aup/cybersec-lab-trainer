@@ -1,12 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from 'next/server';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/lti/platforms
@@ -16,7 +11,7 @@ export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  if (!requireRole(auth.role, "admin", "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'admin', 'teacher')) return forbidden();
 
   const platforms = await prisma.ltiPlatform.findMany({
     select: {
@@ -38,7 +33,7 @@ export async function GET(request: NextRequest) {
         },
       },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
   });
 
   return NextResponse.json(platforms);
@@ -52,35 +47,16 @@ export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  if (!requireRole(auth.role, "admin")) return forbidden();
+  if (!requireRole(auth.role, 'admin')) return forbidden();
 
   try {
     const body = await request.json();
-    const {
-      name,
-      issuer,
-      clientId,
-      authUrl,
-      tokenUrl,
-      keysetUrl,
-      deploymentId,
-      publicKey,
-      privateKey,
-    } = body;
+    const { name, issuer, clientId, authUrl, tokenUrl, keysetUrl, deploymentId, publicKey, privateKey } = body;
 
-    if (
-      !name ||
-      !issuer ||
-      !clientId ||
-      !authUrl ||
-      !tokenUrl ||
-      !keysetUrl ||
-      !deploymentId
-    ) {
+    if (!name || !issuer || !clientId || !authUrl || !tokenUrl || !keysetUrl || !deploymentId) {
       return NextResponse.json(
         {
-          error:
-            "Missing required fields: name, issuer, clientId, authUrl, tokenUrl, keysetUrl, deploymentId",
+          error: 'Missing required fields: name, issuer, clientId, authUrl, tokenUrl, keysetUrl, deploymentId',
         },
         { status: 400 },
       );
@@ -91,18 +67,12 @@ export async function POST(request: NextRequest) {
     for (const [fieldName, urlValue] of Object.entries(urlFields)) {
       try {
         const parsed = new URL(urlValue as string);
-        if (!["http:", "https:"].includes(parsed.protocol)) {
-          return NextResponse.json(
-            { error: `${fieldName} must use http: or https: protocol` },
-            { status: 400 },
-          );
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          return NextResponse.json({ error: `${fieldName} must use http: or https: protocol` }, { status: 400 });
         }
       } catch (e) {
-        logger.error("Invalid JSON in platforms POST", { error: String(e) });
-        return NextResponse.json(
-          { error: `${fieldName} is not a valid URL` },
-          { status: 400 },
-        );
+        logger.error('Invalid JSON in platforms POST', { error: String(e) });
+        return NextResponse.json({ error: `${fieldName} is not a valid URL` }, { status: 400 });
       }
     }
 
@@ -115,7 +85,7 @@ export async function POST(request: NextRequest) {
         tokenUrl,
         keysetUrl,
         deploymentId,
-        publicKey: publicKey || "",
+        publicKey: publicKey || '',
         privateKey: privateKey || null,
       },
     });
@@ -126,8 +96,8 @@ export async function POST(request: NextRequest) {
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
-        action: "lti_platform_created",
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: 'lti_platform_created',
         targetId: platform.id,
         targetName: platform.name,
         details: `LTI platform created: ${name}`,
@@ -136,16 +106,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(platform, { status: 201 });
   } catch (error) {
-    if (error instanceof Error && "code" in error && error.code === "P2002") {
-      return NextResponse.json(
-        { error: "Platform with this issuer or client ID already exists" },
-        { status: 409 },
-      );
+    if (error instanceof Error && 'code' in error && error.code === 'P2002') {
+      return NextResponse.json({ error: 'Platform with this issuer or client ID already exists' }, { status: 409 });
     }
-    logger.error("Failed to create LTI platform", { error: String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    logger.error('Failed to create LTI platform', { error: String(error) });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

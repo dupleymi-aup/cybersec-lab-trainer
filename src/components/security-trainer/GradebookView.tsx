@@ -1,51 +1,43 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Loader2, AlertTriangle, Download, Filter } from "lucide-react";
-import {
-  getGradebook,
-  getAllUsers,
-  type GradebookData,
-  type User as UserType,
-} from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import StudentDrillDown from "./StudentDrillDown";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Loader2, AlertTriangle, Download, Filter } from 'lucide-react';
+import { getGradebook, getAllUsers, type GradebookData, type User as UserType } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import StudentDrillDown from './StudentDrillDown';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: "7д" },
-  { key: 30, label: "30д" },
-  { key: 90, label: "90д" },
-  { key: 180, label: "180д" },
+  { key: 7, label: '7д' },
+  { key: 30, label: '30д' },
+  { key: 90, label: '90д' },
+  { key: 180, label: '180д' },
 ];
 
 function getScoreColor(score: number | null): string {
-  if (score === null) return "bg-muted text-slate-400";
-  if (score >= 70) return "bg-emerald-100 text-emerald-700";
-  if (score >= 50) return "bg-amber-100 text-amber-700";
-  return "bg-red-100 text-red-700";
+  if (score === null) return 'bg-muted text-slate-400';
+  if (score >= 70) return 'bg-emerald-100 text-emerald-700';
+  if (score >= 50) return 'bg-amber-100 text-amber-700';
+  return 'bg-red-100 text-red-700';
 }
 
 export default function GradebookView({
   groupId: controlledGroupId,
   days: controlledDays,
 }: { groupId?: string; days?: number } = {}) {
-  const [internalGroupId, setInternalGroupId] = useState("");
+  const [internalGroupId, setInternalGroupId] = useState('');
   const [internalDays, setInternalDays] = useState(30);
-  const groupId =
-    controlledGroupId !== undefined ? controlledGroupId : internalGroupId;
+  const groupId = controlledGroupId !== undefined ? controlledGroupId : internalGroupId;
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [data, setData] = useState<GradebookData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
-    null,
-  );
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
   useEffect(() => {
     getAllUsers().then(setAllUsers);
@@ -64,7 +56,7 @@ export default function GradebookView({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -73,40 +65,32 @@ export default function GradebookView({
     };
   }, [days, groupId]);
 
-  const groups = Array.from(
-    new Set(allUsers.filter((u) => u.group).map((u) => u.group)),
-  );
+  const groups = Array.from(new Set(allUsers.filter((u) => u.group).map((u) => u.group)));
 
   const filteredStudents =
     data?.students.filter(
       (s) =>
-        searchTerm === "" ||
+        searchTerm === '' ||
         s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.email.toLowerCase().includes(searchTerm.toLowerCase()),
     ) || [];
 
   const handleExportCSV = () => {
     if (!data) return;
-    const headers = [
-      "Студент",
-      "Email",
-      "Группа",
-      "Ср. балл",
-      ...data.modules.map((m) => m.moduleId),
-    ];
+    const headers = ['Студент', 'Email', 'Группа', 'Ср. балл', ...data.modules.map((m) => m.moduleId)];
     const rows = data.students.map((s) => [
       s.fullName,
       s.email,
       s.group,
       s.avgQuizScore,
-      ...data.modules.map((m) => s.moduleScores[m.moduleId]?.score ?? "N/A"),
+      ...data.modules.map((m) => s.moduleScores[m.moduleId]?.score ?? 'N/A'),
     ]);
-    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
+    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `gradebook-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `gradebook-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -115,7 +99,7 @@ export default function GradebookView({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -124,9 +108,7 @@ export default function GradebookView({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -134,17 +116,17 @@ export default function GradebookView({
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex flex-wrap items-center gap-3">
         {controlledDays === undefined && (
-          <div className="flex gap-1 p-1 bg-muted rounded-lg">
+          <div className="bg-muted flex gap-1 rounded-lg p-1">
             {PERIOD_OPTIONS.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setInternalDays(key)}
-                className={`px-3 py-1.5 text-xs rounded-md transition-all ${
+                className={`rounded-md px-3 py-1.5 text-xs transition-all ${
                   days === key
-                    ? "bg-background text-foreground shadow-sm font-medium"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? 'bg-background text-foreground font-medium shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {label}
@@ -159,7 +141,7 @@ export default function GradebookView({
             <select
               value={internalGroupId}
               onChange={(e) => setInternalGroupId(e.target.value)}
-              className="px-3 py-2 border border-border rounded-md text-sm bg-card"
+              className="border-border bg-card rounded-md border px-3 py-2 text-sm"
             >
               <option value="">Все группы</option>
               {groups.map((g) => (
@@ -171,7 +153,7 @@ export default function GradebookView({
           </div>
         )}
 
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative min-w-[200px] flex-1">
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -192,33 +174,21 @@ export default function GradebookView({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-secondary border-b border-border">
-                  <th className="sticky left-0 bg-secondary text-left p-3 font-semibold z-10 min-w-[200px]">
-                    Студент
-                  </th>
-                  <th className="text-left p-3 font-semibold min-w-[100px]">
-                    Группа
-                  </th>
+                <tr className="bg-secondary border-border border-b">
+                  <th className="bg-secondary sticky left-0 z-10 min-w-[200px] p-3 text-left font-semibold">Студент</th>
+                  <th className="min-w-[100px] p-3 text-left font-semibold">Группа</th>
                   {data.modules.map((module) => (
-                    <th
-                      key={module.moduleId}
-                      className="text-center p-3 font-semibold min-w-[80px]"
-                    >
+                    <th key={module.moduleId} className="min-w-[80px] p-3 text-center font-semibold">
                       <span className="text-xs">{module.moduleName}</span>
                     </th>
                   ))}
-                  <th className="text-center p-3 font-semibold min-w-[100px]">
-                    Ср. балл
-                  </th>
+                  <th className="min-w-[100px] p-3 text-center font-semibold">Ср. балл</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStudents.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={data.modules.length + 3}
-                      className="text-center p-8 text-slate-400"
-                    >
+                    <td colSpan={data.modules.length + 3} className="p-8 text-center text-slate-400">
                       Нет студентов
                     </td>
                   </tr>
@@ -229,12 +199,12 @@ export default function GradebookView({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.02 }}
-                      className="border-b border-slate-100 hover:bg-secondary"
+                      className="hover:bg-secondary border-b border-slate-100"
                     >
-                      <td className="sticky left-0 bg-card p-3 font-medium z-10">
+                      <td className="bg-card sticky left-0 z-10 p-3 font-medium">
                         <button
                           onClick={() => setSelectedStudentId(student.id)}
-                          className="text-blue-600 hover:text-blue-800 hover:underline text-left"
+                          className="text-left text-blue-600 hover:text-blue-800 hover:underline"
                         >
                           {student.fullName}
                         </button>
@@ -250,28 +220,18 @@ export default function GradebookView({
                         const scoreData = student.moduleScores[module.moduleId];
                         const score = scoreData?.score ?? null;
                         return (
-                          <td key={module.moduleId} className="text-center p-3">
+                          <td key={module.moduleId} className="p-3 text-center">
                             {score !== null ? (
-                              <Badge className={getScoreColor(score)}>
-                                {score}%
-                              </Badge>
+                              <Badge className={getScoreColor(score)}>{score}%</Badge>
                             ) : (
                               <span className="text-slate-300">—</span>
                             )}
                           </td>
                         );
                       })}
-                      <td className="text-center p-3">
-                        <Badge
-                          className={getScoreColor(
-                            student.avgQuizScore > 0
-                              ? student.avgQuizScore
-                              : null,
-                          )}
-                        >
-                          {student.avgQuizScore > 0
-                            ? `${student.avgQuizScore}%`
-                            : "—"}
+                      <td className="p-3 text-center">
+                        <Badge className={getScoreColor(student.avgQuizScore > 0 ? student.avgQuizScore : null)}>
+                          {student.avgQuizScore > 0 ? `${student.avgQuizScore}%` : '—'}
                         </Badge>
                       </td>
                     </motion.tr>
@@ -280,25 +240,17 @@ export default function GradebookView({
               </tbody>
               {filteredStudents.length > 0 && (
                 <tfoot>
-                  <tr className="bg-secondary border-t-2 border-border font-semibold">
-                    <td className="sticky left-0 bg-secondary p-3 z-10">
-                      Средние значения
-                    </td>
+                  <tr className="bg-secondary border-border border-t-2 font-semibold">
+                    <td className="bg-secondary sticky left-0 z-10 p-3">Средние значения</td>
                     <td className="p-3"></td>
                     {data.modules.map((module) => {
                       const scores = filteredStudents
                         .map((s) => s.moduleScores[module.moduleId]?.score)
-                        .filter(
-                          (s): s is number => s !== null && s !== undefined,
-                        );
+                        .filter((s): s is number => s !== null && s !== undefined);
                       const avg =
-                        scores.length > 0
-                          ? Math.round(
-                              scores.reduce((a, b) => a + b, 0) / scores.length,
-                            )
-                          : null;
+                        scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
                       return (
-                        <td key={module.moduleId} className="text-center p-3">
+                        <td key={module.moduleId} className="p-3 text-center">
                           {avg !== null ? (
                             <Badge className={getScoreColor(avg)}>{avg}%</Badge>
                           ) : (
@@ -307,23 +259,17 @@ export default function GradebookView({
                         </td>
                       );
                     })}
-                    <td className="text-center p-3">
+                    <td className="p-3 text-center">
                       {filteredStudents.length > 0 ? (
                         <Badge
                           className={getScoreColor(
                             Math.round(
-                              filteredStudents.reduce(
-                                (sum, s) => sum + s.avgQuizScore,
-                                0,
-                              ) / filteredStudents.length,
+                              filteredStudents.reduce((sum, s) => sum + s.avgQuizScore, 0) / filteredStudents.length,
                             ),
                           )}
                         >
                           {Math.round(
-                            filteredStudents.reduce(
-                              (sum, s) => sum + s.avgQuizScore,
-                              0,
-                            ) / filteredStudents.length,
+                            filteredStudents.reduce((sum, s) => sum + s.avgQuizScore, 0) / filteredStudents.length,
                           )}
                           %
                         </Badge>
@@ -343,10 +289,8 @@ export default function GradebookView({
       <div className="grid grid-cols-3 gap-4">
         <Card className="border-border">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-indigo-600">
-              {filteredStudents.length}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">Студентов</p>
+            <p className="text-3xl font-bold text-indigo-600">{filteredStudents.length}</p>
+            <p className="text-muted-foreground mt-1 text-xs">Студентов</p>
           </CardContent>
         </Card>
         <Card className="border-border">
@@ -354,34 +298,22 @@ export default function GradebookView({
             <p className="text-3xl font-bold text-emerald-600">
               {filteredStudents.filter((s) => s.avgQuizScore >= 70).length}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Средний балл ≥ 70%
-            </p>
+            <p className="text-muted-foreground mt-1 text-xs">Средний балл ≥ 70%</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-amber-600">
-              {
-                filteredStudents.filter(
-                  (s) => s.avgQuizScore < 50 && s.avgQuizScore > 0,
-                ).length
-              }
+              {filteredStudents.filter((s) => s.avgQuizScore < 50 && s.avgQuizScore > 0).length}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Средний балл {"<"} 50%
-            </p>
+            <p className="text-muted-foreground mt-1 text-xs">Средний балл {'<'} 50%</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Student Drill Down */}
       {selectedStudentId && (
-        <StudentDrillDown
-          userId={selectedStudentId}
-          days={days}
-          onClose={() => setSelectedStudentId(null)}
-        />
+        <StudentDrillDown userId={selectedStudentId} days={days} onClose={() => setSelectedStudentId(null)} />
       )}
     </div>
   );

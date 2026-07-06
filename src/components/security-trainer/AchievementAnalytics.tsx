@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import {
   BarChart,
   Bar,
@@ -13,15 +13,12 @@ import {
   Cell,
   PieChart,
   Pie,
-} from "recharts";
-import { Award, Loader2 } from "lucide-react";
-import {
-  getAchievementAnalytics,
-  type AchievementStat,
-} from "@/lib/auth-store";
-import { achievements } from "@/lib/data/achievements-data";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from 'recharts';
+import { Award, Loader2 } from 'lucide-react';
+import { getAchievementAnalytics, type AchievementStat } from '@/lib/auth-store';
+import { achievements } from '@/lib/data/achievements-data';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface AchievementAnalyticsProps {
   groupId?: string;
@@ -29,30 +26,27 @@ interface AchievementAnalyticsProps {
 }
 
 const rarityColors: Record<string, string> = {
-  epic: "#ef4444",
-  rare: "#f97316",
-  uncommon: "#eab308",
-  common: "#22c55e",
+  epic: '#ef4444',
+  rare: '#f97316',
+  uncommon: '#eab308',
+  common: '#22c55e',
 };
 
 const rarityBgColors: Record<string, string> = {
-  epic: "bg-red-100 text-red-700",
-  rare: "bg-orange-100 text-orange-700",
-  uncommon: "bg-yellow-100 text-yellow-700",
-  common: "bg-green-100 text-green-700",
+  epic: 'bg-red-100 text-red-700',
+  rare: 'bg-orange-100 text-orange-700',
+  uncommon: 'bg-yellow-100 text-yellow-700',
+  common: 'bg-green-100 text-green-700',
 };
 
 const rarityLabels: Record<string, string> = {
-  epic: "Эпическое",
-  rare: "Редкое",
-  uncommon: "Необычное",
-  common: "Обычное",
+  epic: 'Эпическое',
+  rare: 'Редкое',
+  uncommon: 'Необычное',
+  common: 'Обычное',
 };
 
-export default function AchievementAnalytics({
-  groupId,
-  students,
-}: AchievementAnalyticsProps) {
+export default function AchievementAnalytics({ groupId, students }: AchievementAnalyticsProps) {
   const [data, setData] = useState<AchievementStat[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -65,10 +59,7 @@ export default function AchievementAnalytics({
   }, [groupId]);
 
   const achievementMap = useMemo(() => {
-    const map = new Map<
-      string,
-      { title: string; description: string; icon?: string }
-    >();
+    const map = new Map<string, { title: string; description: string; icon?: string }>();
     achievements.forEach((a) => {
       map.set(a.id, { title: a.title, description: a.description });
     });
@@ -111,7 +102,7 @@ export default function AchievementAnalytics({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-slate-400">
-        <Loader2 size={32} className="animate-spin mb-3" />
+        <Loader2 size={32} className="mb-3 animate-spin" />
         <p className="text-sm">Загрузка аналитики достижений...</p>
       </div>
     );
@@ -119,7 +110,7 @@ export default function AchievementAnalytics({
 
   if (data.length === 0) {
     return (
-      <div className="text-center py-12 text-slate-400">
+      <div className="py-12 text-center text-slate-400">
         <Award size={40} className="mx-auto mb-3 opacity-50" />
         <p className="text-sm">Нет данных о достижениях</p>
       </div>
@@ -129,50 +120,29 @@ export default function AchievementAnalytics({
   return (
     <div className="space-y-6">
       {/* Charts row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Achievement unlock rates - horizontal bar chart */}
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Частота разблокировки достижений
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Частота разблокировки достижений</h3>
             <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  layout="vertical"
-                  data={barData}
-                  margin={{ left: 80 }}
-                >
+                <BarChart layout="vertical" data={barData} margin={{ left: 80 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis
-                    type="number"
-                    domain={[0, 100]}
-                    tick={{ fontSize: 10 }}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    width={80}
-                    tick={{ fontSize: 9 }}
-                  />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 9 }} />
                   <Tooltip
                     formatter={(value: unknown, _name, props) => {
                       const p = props.payload as {
                         unlocked?: number;
                         total?: number;
                       };
-                      return [
-                        `${value}%`,
-                        `${p.unlocked ?? 0} из ${p.total ?? 0}`,
-                      ];
+                      return [`${value}%`, `${p.unlocked ?? 0} из ${p.total ?? 0}`];
                     }}
                   />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
                     {barData.map((entry, index) => (
-                      <Cell
-                        key={index}
-                        fill={rarityColors[entry.rarity] || "#94a3b8"}
-                      />
+                      <Cell key={index} fill={rarityColors[entry.rarity] || '#94a3b8'} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -184,9 +154,7 @@ export default function AchievementAnalytics({
         {/* Rarity distribution pie chart */}
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Распределение по редкости
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Распределение по редкости</h3>
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
                 <PieChart>
@@ -205,15 +173,11 @@ export default function AchievementAnalytics({
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    formatter={(value: unknown) => `${value} достижений`}
-                  />
+                  <Tooltip formatter={(value: unknown) => `${value} достижений`} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-center text-xs text-slate-400 py-8">
-                Нет данных
-              </p>
+              <p className="py-8 text-center text-xs text-slate-400">Нет данных</p>
             )}
           </CardContent>
         </Card>
@@ -221,13 +185,12 @@ export default function AchievementAnalytics({
 
       {/* Achievement cards grid */}
       <div>
-        <h3 className="font-semibold text-sm mb-4">Все достижения</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <h3 className="mb-4 text-sm font-semibold">Все достижения</h3>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {data.map((item, i) => {
             const achievementInfo = achievementMap.get(item.id);
             const title = achievementInfo?.title || item.title;
-            const description =
-              achievementInfo?.description || item.description;
+            const description = achievementInfo?.description || item.description;
             const totalStudents = item.totalCount || students?.length || 0;
 
             return (
@@ -237,41 +200,31 @@ export default function AchievementAnalytics({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
               >
-                <Card className="border-border hover:border-emerald-200 transition-colors">
+                <Card className="border-border transition-colors hover:border-emerald-200">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0`}
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl`}
                         style={{
                           backgroundColor: `${rarityColors[item.rarity]}20`,
                         }}
                       >
-                        <Award
-                          size={20}
-                          style={{ color: rarityColors[item.rarity] }}
-                        />
+                        <Award size={20} style={{ color: rarityColors[item.rarity] }} />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-semibold text-sm truncate">
-                            {title}
-                          </p>
-                          <Badge
-                            className={`text-[10px] border-0 ${rarityBgColors[item.rarity]}`}
-                          >
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex items-center gap-2">
+                          <p className="truncate text-sm font-semibold">{title}</p>
+                          <Badge className={`border-0 text-[10px] ${rarityBgColors[item.rarity]}`}>
                             {rarityLabels[item.rarity]}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                          {description}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1.5">
+                        <p className="text-muted-foreground mb-2 line-clamp-2 text-xs">{description}</p>
+                        <div className="text-muted-foreground mb-1.5 flex items-center gap-2 text-xs">
                           <span>
-                            {item.unlockedCount} из {totalStudents} студентов
-                            разблокировали
+                            {item.unlockedCount} из {totalStudents} студентов разблокировали
                           </span>
                         </div>
-                        <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                        <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
                           <motion.div
                             className="h-full rounded-full"
                             style={{

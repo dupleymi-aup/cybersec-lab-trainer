@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { logger } from "@/lib/logger";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { logger } from '@/lib/logger';
 
 interface UseAnalyticsFetchOptions<_T> {
   /** API endpoint URL (e.g., '/api/analytics/engagement') */
@@ -29,7 +29,7 @@ interface UseAnalyticsFetchResult<T> {
  */
 export function useAnalyticsFetch<T = unknown>({
   endpoint,
-  params = "",
+  params = '',
   enabled = true,
 }: UseAnalyticsFetchOptions<T>): UseAnalyticsFetchResult<T> {
   const [data, setData] = useState<T | null>(null);
@@ -70,9 +70,9 @@ export function useAnalyticsFetch<T = unknown>({
       })
       .catch((err) => {
         if (!cancelled) {
-          if (err.name === "AbortError") return;
+          if (err.name === 'AbortError') return;
           logger.error(`useAnalyticsFetch: Failed to fetch ${endpoint}`, { error: err });
-          setError(err.message || "Ошибка загрузки данных");
+          setError(err.message || 'Ошибка загрузки данных');
           setLoading(false);
         }
       });
@@ -127,9 +127,7 @@ export function useAnalyticsFetcher<T = unknown>(
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : "Ошибка загрузки данных",
-          );
+          setError(err instanceof Error ? err.message : 'Ошибка загрузки данных');
           setLoading(false);
         }
       });
@@ -156,7 +154,7 @@ export function useAnalyticsMutation<TResult = unknown, TBody = unknown>() {
   const mutate = useCallback(
     async (
       endpoint: string,
-      method: "POST" | "PUT" | "DELETE" | "PATCH" = "POST",
+      method: 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'POST',
       body?: TBody,
     ): Promise<TResult | null> => {
       // Cancel any in-flight request
@@ -171,17 +169,17 @@ export function useAnalyticsMutation<TResult = unknown, TBody = unknown>() {
 
       try {
         const headers: Record<string, string> = {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         };
         const csrfToken =
-          typeof document !== "undefined"
+          typeof document !== 'undefined'
             ? document.cookie
-                .split(";")
-                .find((c) => c.trim().startsWith("csrf-token="))
-                ?.split("=")[1]
+                .split(';')
+                .find((c) => c.trim().startsWith('csrf-token='))
+                ?.split('=')[1]
             : undefined;
         if (csrfToken) {
-          headers["x-csrf-token"] = csrfToken;
+          headers['x-csrf-token'] = csrfToken;
         }
 
         const res = await fetch(endpoint, {
@@ -207,9 +205,8 @@ export function useAnalyticsMutation<TResult = unknown, TBody = unknown>() {
         setLoading(false);
         return result;
       } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") return null;
-        const message =
-          err instanceof Error ? err.message : "Ошибка выполнения";
+        if (err instanceof Error && err.name === 'AbortError') return null;
+        const message = err instanceof Error ? err.message : 'Ошибка выполнения';
         setError(message);
         setLoading(false);
         return null;

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   BarChart,
   Bar,
@@ -13,25 +13,18 @@ import {
   Legend,
   ScatterChart,
   Scatter,
-} from "recharts";
-import {
-  TrendingUp,
-  Loader2,
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle,
-  Target,
-} from "lucide-react";
-import { getPredictiveRisk, type PredictiveRiskData } from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import KPICard from "./KPICard";
+} from 'recharts';
+import { TrendingUp, Loader2, AlertTriangle, AlertCircle, CheckCircle, Target } from 'lucide-react';
+import { getPredictiveRisk, type PredictiveRiskData } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import KPICard from './KPICard';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: "7д" },
-  { key: 30, label: "30д" },
-  { key: 90, label: "90д" },
-  { key: 180, label: "180д" },
+  { key: 7, label: '7д' },
+  { key: 30, label: '30д' },
+  { key: 90, label: '90д' },
+  { key: 180, label: '180д' },
 ];
 
 export default function PredictiveRiskDashboard({
@@ -57,7 +50,7 @@ export default function PredictiveRiskDashboard({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -70,7 +63,7 @@ export default function PredictiveRiskDashboard({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -79,9 +72,7 @@ export default function PredictiveRiskDashboard({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -98,22 +89,22 @@ export default function PredictiveRiskDashboard({
 
   // Risk distribution
   const riskDistribution = [
-    { name: "Высокий риск", value: summary.highRisk, color: "#ef4444" },
-    { name: "Средний риск", value: summary.mediumRisk, color: "#f59e0b" },
-    { name: "Низкий риск", value: summary.lowRisk, color: "#10b981" },
+    { name: 'Высокий риск', value: summary.highRisk, color: '#ef4444' },
+    { name: 'Средний риск', value: summary.mediumRisk, color: '#f59e0b' },
+    { name: 'Низкий риск', value: summary.lowRisk, color: '#10b981' },
   ];
 
   return (
     <div className="space-y-6">
       {/* Period selector */}
       {controlledDays === undefined && (
-        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               type="button"
               key={key}
               onClick={() => setInternalDays(key)}
-              className={`px-3 py-1.5 text-xs rounded-md transition-all ${days === key ? "bg-background text-foreground shadow-sm font-medium" : "text-muted-foreground hover:text-foreground"}`}
+              className={`rounded-md px-3 py-1.5 text-xs transition-all ${days === key ? 'bg-background text-foreground font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
               {label}
             </button>
@@ -122,7 +113,7 @@ export default function PredictiveRiskDashboard({
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <KPICard
           icon={<TrendingUp size={18} />}
           value={summary.totalStudents}
@@ -163,7 +154,7 @@ export default function PredictiveRiskDashboard({
       {/* Risk Distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Распределение рисков</h3>
+          <h3 className="mb-4 text-sm font-semibold">Распределение рисков</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={riskDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -183,9 +174,7 @@ export default function PredictiveRiskDashboard({
       {/* Dropout Probability Scatter Plot */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Вероятность отсева vs Риск-скор
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">Вероятность отсева vs Риск-скор</h3>
           <ResponsiveContainer width="100%" height={300}>
             <ScatterChart>
               <CartesianGrid strokeDasharray="3 3" />
@@ -195,8 +184,8 @@ export default function PredictiveRiskDashboard({
                 domain={[0, 100]}
                 tick={{ fontSize: 11 }}
                 label={{
-                  value: "Риск-скор",
-                  position: "insideBottom",
+                  value: 'Риск-скор',
+                  position: 'insideBottom',
                   offset: -5,
                 }}
               />
@@ -206,15 +195,12 @@ export default function PredictiveRiskDashboard({
                 domain={[0, 100]}
                 tick={{ fontSize: 11 }}
                 label={{
-                  value: "Вероятность отсева (%)",
+                  value: 'Вероятность отсева (%)',
                   angle: -90,
-                  position: "insideLeft",
+                  position: 'insideLeft',
                 }}
               />
-              <Tooltip
-                cursor={{ strokeDasharray: "3 3" }}
-                formatter={(v) => [`${v ?? 0}%`]}
-              />
+              <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v) => [`${v ?? 0}%`]} />
               <Legend />
               <Scatter name="Студенты" data={scatterData} fill="#6366f1" />
             </ScatterChart>
@@ -226,10 +212,9 @@ export default function PredictiveRiskDashboard({
       {students.filter((s) => s.riskScore >= 70).length > 0 && (
         <Card className="border-border border-red-200">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4 text-red-600 flex items-center gap-2">
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-red-600">
               <AlertTriangle size={16} />
-              Студенты с высоким риском (
-              {students.filter((s) => s.riskScore >= 70).length})
+              Студенты с высоким риском ({students.filter((s) => s.riskScore >= 70).length})
             </h3>
             <div className="space-y-4">
               {students
@@ -241,39 +226,27 @@ export default function PredictiveRiskDashboard({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="p-4 rounded-lg border border-red-100 bg-red-50/30"
+                    className="rounded-lg border border-red-100 bg-red-50/30 p-4"
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="mb-2 flex items-center justify-between">
                       <div>
                         <p className="font-semibold">{student.fullName}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {student.group || "без группы"}
-                        </p>
+                        <p className="text-muted-foreground text-xs">{student.group || 'без группы'}</p>
                       </div>
-                      <div className="flex gap-3 items-center">
+                      <div className="flex items-center gap-3">
                         <div className="text-right">
-                          <p className="text-2xl font-bold text-red-600">
-                            {student.riskScore}
-                          </p>
-                          <p className="text-xs text-muted-foreground">Риск</p>
+                          <p className="text-2xl font-bold text-red-600">{student.riskScore}</p>
+                          <p className="text-muted-foreground text-xs">Риск</p>
                         </div>
-                        <Badge variant="destructive">
-                          {Math.round(student.dropoutProbability * 100)}% отсев
-                        </Badge>
+                        <Badge variant="destructive">{Math.round(student.dropoutProbability * 100)}% отсев</Badge>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {student.recommendedInterventions
-                        .slice(0, 3)
-                        .map((rec, j) => (
-                          <Badge
-                            key={j}
-                            variant="secondary"
-                            className="text-[10px]"
-                          >
-                            {rec}
-                          </Badge>
-                        ))}
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {student.recommendedInterventions.slice(0, 3).map((rec, j) => (
+                        <Badge key={j} variant="secondary" className="text-[10px]">
+                          {rec}
+                        </Badge>
+                      ))}
                     </div>
                   </motion.div>
                 ))}
@@ -285,29 +258,17 @@ export default function PredictiveRiskDashboard({
       {/* All Students Risk Table */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Все студенты</h3>
+          <h3 className="mb-4 text-sm font-semibold">Все студенты</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                    ФИО
-                  </th>
-                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Группа
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Риск
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Отсев
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Неделя отсева
-                  </th>
-                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Рекомендации
-                  </th>
+                <tr className="border-border border-b">
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">ФИО</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Группа</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Риск</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Отсев</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Неделя отсева</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Рекомендации</th>
                 </tr>
               </thead>
               <tbody>
@@ -317,42 +278,28 @@ export default function PredictiveRiskDashboard({
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.02 }}
-                    className={`border-b border-slate-100 hover:bg-secondary transition-colors ${student.riskScore >= 70 ? "bg-red-50/30" : student.riskScore >= 40 ? "bg-amber-50/30" : ""}`}
+                    className={`hover:bg-secondary border-b border-slate-100 transition-colors ${student.riskScore >= 70 ? 'bg-red-50/30' : student.riskScore >= 40 ? 'bg-amber-50/30' : ''}`}
                   >
-                    <td className="py-2.5 px-3 font-medium">
-                      {student.fullName}
-                    </td>
-                    <td className="py-2.5 px-3 text-xs">
-                      {student.group || "-"}
-                    </td>
-                    <td className="py-2.5 px-3 text-right">
+                    <td className="px-3 py-2.5 font-medium">{student.fullName}</td>
+                    <td className="px-3 py-2.5 text-xs">{student.group || '-'}</td>
+                    <td className="px-3 py-2.5 text-right">
                       <span
-                        className={`font-bold ${student.riskScore >= 70 ? "text-red-600" : student.riskScore >= 40 ? "text-amber-600" : "text-emerald-600"}`}
+                        className={`font-bold ${student.riskScore >= 70 ? 'text-red-600' : student.riskScore >= 40 ? 'text-amber-600' : 'text-emerald-600'}`}
                       >
                         {student.riskScore}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-right">
-                      {Math.round(student.dropoutProbability * 100)}%
+                    <td className="px-3 py-2.5 text-right">{Math.round(student.dropoutProbability * 100)}%</td>
+                    <td className="px-3 py-2.5 text-right">
+                      {student.predictedDropoutWeek ? `${student.predictedDropoutWeek} нед.` : '—'}
                     </td>
-                    <td className="py-2.5 px-3 text-right">
-                      {student.predictedDropoutWeek
-                        ? `${student.predictedDropoutWeek} нед.`
-                        : "—"}
-                    </td>
-                    <td className="py-2.5 px-3">
+                    <td className="px-3 py-2.5">
                       <div className="flex flex-wrap gap-1">
-                        {student.recommendedInterventions
-                          .slice(0, 2)
-                          .map((rec, j) => (
-                            <Badge
-                              key={j}
-                              variant="outline"
-                              className="text-[10px]"
-                            >
-                              {rec}
-                            </Badge>
-                          ))}
+                        {student.recommendedInterventions.slice(0, 2).map((rec, j) => (
+                          <Badge key={j} variant="outline" className="text-[10px]">
+                            {rec}
+                          </Badge>
+                        ))}
                       </div>
                     </td>
                   </motion.tr>

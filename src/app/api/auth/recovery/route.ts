@@ -1,24 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { generateOTP } from "@/lib/auth-utils";
-import { otpStore, ensureOtpCapacity } from "@/lib/otp-store";
-import { sendOTPRecoveryEmail } from "@/lib/email";
-import { checkRateLimit, getClientIp } from "@/lib/api-middleware";
-import { recoveryRequestEmailPhoneSchema } from "@/lib/validations/api";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { generateOTP } from '@/lib/auth-utils';
+import { otpStore, ensureOtpCapacity } from '@/lib/otp-store';
+import { sendOTPRecoveryEmail } from '@/lib/email';
+import { checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { recoveryRequestEmailPhoneSchema } from '@/lib/validations/api';
 
 export async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
   const parsed = recoveryRequestEmailPhoneSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0].message },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
   const { emailOrPhone } = parsed.data;
 
@@ -28,7 +25,7 @@ export async function POST(request: NextRequest) {
   if (!rateResult.allowed) {
     return NextResponse.json(
       {
-        error: "Слишком много запросов. Подождите",
+        error: 'Слишком много запросов. Подождите',
         retryAfter: rateResult.retryAfter,
       },
       { status: 429 },
@@ -41,7 +38,7 @@ export async function POST(request: NextRequest) {
   if (!ipRateResult.allowed) {
     return NextResponse.json(
       {
-        error: "Слишком много запросов. Подождите",
+        error: 'Слишком много запросов. Подождите',
         retryAfter: ipRateResult.retryAfter,
       },
       { status: 429 },
@@ -55,7 +52,7 @@ export async function POST(request: NextRequest) {
   // Always return same message to prevent user enumeration
   const response = {
     success: true,
-    message: "Если пользователь найден, OTP отправлен на email",
+    message: 'Если пользователь найден, OTP отправлен на email',
   };
 
   if (!user) {
@@ -67,11 +64,7 @@ export async function POST(request: NextRequest) {
   ensureOtpCapacity();
   otpStore.set(user.id, { otp, expiresAt });
 
-  const emailSent = await sendOTPRecoveryEmail(
-    user.email,
-    user.fullName || user.email,
-    otp,
-  );
+  const emailSent = await sendOTPRecoveryEmail(user.email, user.fullName || user.email, otp);
   if (!emailSent) {
     // In development, check console for email delivery issues
     // OTP is still stored in memory for verification

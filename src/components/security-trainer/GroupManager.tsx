@@ -1,17 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import {
-  getAllGroups,
-  renameGroup,
-  deleteGroup,
-  getAllUsers,
-} from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { Pencil, Trash2, Users, Plus, Check, X } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { getAllGroups, renameGroup, deleteGroup, getAllUsers } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { Pencil, Trash2, Users, Plus, Check, X } from 'lucide-react';
 
 interface GroupManagerProps {
   onRefresh: () => void;
@@ -21,8 +16,8 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
   const [groups, setGroups] = useState<string[]>([]);
   const [groupCounts, setGroupCounts] = useState<Record<string, number>>({});
   const [editingGroup, setEditingGroup] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState("");
-  const [newGroupName, setNewGroupName] = useState("");
+  const [editValue, setEditValue] = useState('');
+  const [newGroupName, setNewGroupName] = useState('');
 
   const loadData = async () => {
     const allGroups = await getAllGroups();
@@ -41,16 +36,14 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
 
   const handleRename = async (oldName: string) => {
     if (!editValue.trim()) {
-      toast.error("Название не может быть пустым");
+      toast.error('Название не может быть пустым');
       return;
     }
     const result = await renameGroup(oldName, editValue);
     if (result.success) {
-      toast.success(
-        `Группа переименована, ${result.count} пользователей обновлено`,
-      );
+      toast.success(`Группа переименована, ${result.count} пользователей обновлено`);
       setEditingGroup(null);
-      setEditValue("");
+      setEditValue('');
       loadData();
       onRefresh();
     } else {
@@ -60,12 +53,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
 
   const handleDelete = async (name: string) => {
     const count = groupCounts[name] || 0;
-    if (
-      !confirm(
-        `Удалить группу "${name}"? ${count} пользователей потеряют привязку к группе.`,
-      )
-    )
-      return;
+    if (!confirm(`Удалить группу "${name}"? ${count} пользователей потеряют привязку к группе.`)) return;
     const result = await deleteGroup(name);
     if (result.success) {
       toast.success(`Группа удалена, ${result.count} пользователей отвязано`);
@@ -78,17 +66,15 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
 
   const handleCreate = () => {
     if (!newGroupName.trim()) {
-      toast.error("Введите название группы");
+      toast.error('Введите название группы');
       return;
     }
     if (groups.includes(newGroupName.trim())) {
-      toast.error("Группа уже существует");
+      toast.error('Группа уже существует');
       return;
     }
-    toast.success(
-      `Группа "${newGroupName.trim()}" создана. Назначьте пользователей через массовые действия.`,
-    );
-    setNewGroupName("");
+    toast.success(`Группа "${newGroupName.trim()}" создана. Назначьте пользователей через массовые действия.`);
+    setNewGroupName('');
     loadData();
     onRefresh();
   };
@@ -98,7 +84,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
       {/* Create new group */}
       <Card className="border-border">
         <CardContent className="p-4">
-          <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
             <Plus size={14} className="text-emerald-500" /> Создать группу
           </h3>
           <div className="flex gap-2">
@@ -106,7 +92,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
               placeholder="Название группы (например, ИС-101)"
-              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
             />
             <Button onClick={handleCreate} size="sm">
               <Plus size={14} className="mr-1" /> Создать
@@ -118,35 +104,33 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
       {/* Groups list */}
       <Card className="border-border">
         <CardContent className="p-4">
-          <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-            <Users size={14} className="text-sky-500" /> Группы ({groups.length}
-            )
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+            <Users size={14} className="text-sky-500" /> Группы ({groups.length})
           </h3>
 
           {groups.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              Нет групп. Назначьте пользователям поле «Группа» или создайте
-              группу выше.
+            <p className="text-muted-foreground py-4 text-center text-sm">
+              Нет групп. Назначьте пользователям поле «Группа» или создайте группу выше.
             </p>
           ) : (
             <div className="space-y-2">
               {groups.map((name) => (
                 <div
                   key={name}
-                  className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-border transition-colors"
+                  className="hover:border-border flex items-center justify-between rounded-lg border border-slate-100 p-3 transition-colors"
                 >
                   {editingGroup === name ? (
-                    <div className="flex items-center gap-2 flex-1">
+                    <div className="flex flex-1 items-center gap-2">
                       <Input
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
                         className="text-sm"
                         autoFocus
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") handleRename(name);
-                          if (e.key === "Escape") {
+                          if (e.key === 'Enter') handleRename(name);
+                          if (e.key === 'Escape') {
                             setEditingGroup(null);
-                            setEditValue("");
+                            setEditValue('');
                           }
                         }}
                       />
@@ -163,7 +147,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                         size="icon"
                         onClick={() => {
                           setEditingGroup(null);
-                          setEditValue("");
+                          setEditValue('');
                         }}
                       >
                         <X size={16} />
@@ -172,14 +156,12 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                   ) : (
                     <>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-100">
                           <Users size={16} className="text-sky-600" />
                         </div>
                         <div>
-                          <p className="font-medium text-sm">{name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {groupCounts[name] || 0} пользователей
-                          </p>
+                          <p className="text-sm font-medium">{name}</p>
+                          <p className="text-muted-foreground text-xs">{groupCounts[name] || 0} пользователей</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -212,11 +194,10 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
         </CardContent>
       </Card>
 
-      <div className="p-3 bg-secondary border border-border rounded-lg">
-        <p className="text-xs text-muted-foreground">
-          <strong>Совет:</strong> Для назначения пользователей в группу выберите
-          их в списке пользователей и используйте кнопку «Назначить группу» в
-          панели массовых действий.
+      <div className="bg-secondary border-border rounded-lg border p-3">
+        <p className="text-muted-foreground text-xs">
+          <strong>Совет:</strong> Для назначения пользователей в группу выберите их в списке пользователей и используйте
+          кнопку «Назначить группу» в панели массовых действий.
         </p>
       </div>
     </div>

@@ -1,34 +1,23 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { Loader2, AlertTriangle, BookOpen, BarChart3 } from "lucide-react";
-import { getModuleDeepDive, type ModuleDeepDiveData } from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Loader2, AlertTriangle, BookOpen, BarChart3 } from 'lucide-react';
+import { getModuleDeepDive, type ModuleDeepDiveData } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export interface ModuleDeepDiveProps {
   groupId?: string;
   days?: number;
 }
 
-export default function ModuleDeepDive({
-  groupId: propGroupId,
-  days: propDays,
-}: ModuleDeepDiveProps = {}) {
+export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }: ModuleDeepDiveProps = {}) {
   const [data, setData] = useState<ModuleDeepDiveData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId] = useState("");
+  const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 
@@ -45,7 +34,7 @@ export default function ModuleDeepDive({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -58,7 +47,7 @@ export default function ModuleDeepDive({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -67,9 +56,7 @@ export default function ModuleDeepDive({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -85,7 +72,7 @@ export default function ModuleDeepDive({
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
+            className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
             <option value={7}>7 дней</option>
             <option value={30}>30 дней</option>
@@ -95,48 +82,34 @@ export default function ModuleDeepDive({
       </div>
 
       <Tabs defaultValue={data[0]?.moduleId}>
-        <TabsList className="w-fit flex flex-wrap">
+        <TabsList className="flex w-fit flex-wrap">
           {data.map((m) => (
-            <TabsTrigger
-              key={m.moduleId}
-              value={m.moduleId}
-              className="text-xs"
-            >
+            <TabsTrigger key={m.moduleId} value={m.moduleId} className="text-xs">
               {m.moduleName}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {data.map((m) => (
-          <TabsContent
-            key={m.moduleId}
-            value={m.moduleId}
-            className="mt-4 space-y-4"
-          >
+          <TabsContent key={m.moduleId} value={m.moduleId} className="mt-4 space-y-4">
             {/* Summary cards */}
             <div className="grid grid-cols-3 gap-3">
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-indigo-600">
-                    {m.totalStudents}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Студентов</p>
+                  <p className="text-2xl font-bold text-indigo-600">{m.totalStudents}</p>
+                  <p className="text-muted-foreground text-xs">Студентов</p>
                 </CardContent>
               </Card>
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-emerald-600">
-                    {m.completionRate}%
-                  </p>
-                  <p className="text-xs text-muted-foreground">Завершение</p>
+                  <p className="text-2xl font-bold text-emerald-600">{m.completionRate}%</p>
+                  <p className="text-muted-foreground text-xs">Завершение</p>
                 </CardContent>
               </Card>
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold text-amber-600">
-                    {m.avgScore}%
-                  </p>
-                  <p className="text-xs text-muted-foreground">Ср. балл</p>
+                  <p className="text-2xl font-bold text-amber-600">{m.avgScore}%</p>
+                  <p className="text-muted-foreground text-xs">Ср. балл</p>
                 </CardContent>
               </Card>
             </div>
@@ -144,7 +117,7 @@ export default function ModuleDeepDive({
             {/* Level progress */}
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <BarChart3 size={16} /> Прогресс по уровням
                 </h3>
                 <div className="h-[250px]">
@@ -160,18 +133,8 @@ export default function ModuleDeepDive({
                       <XAxis dataKey="level" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Bar
-                        dataKey="started"
-                        name="Начали"
-                        fill="#94a3b8"
-                        radius={[4, 4, 0, 0]}
-                      />
-                      <Bar
-                        dataKey="completed"
-                        name="Завершили"
-                        fill="#10b981"
-                        radius={[4, 4, 0, 0]}
-                      />
+                      <Bar dataKey="started" name="Начали" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="completed" name="Завершили" fill="#10b981" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -183,12 +146,9 @@ export default function ModuleDeepDive({
               {m.levels.map((l) => (
                 <div key={l.level} className="flex items-center gap-3 text-xs">
                   <span className="w-12 font-medium">Ур. {l.level}</span>
-                  <div className="flex-1 bg-muted rounded-full h-4 overflow-hidden relative">
-                    <div
-                      className="h-full bg-emerald-500 rounded-full"
-                      style={{ width: `${l.completionRate}%` }}
-                    />
-                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-foreground/70">
+                  <div className="bg-muted relative h-4 flex-1 overflow-hidden rounded-full">
+                    <div className="h-full rounded-full bg-emerald-500" style={{ width: `${l.completionRate}%` }} />
+                    <span className="text-foreground/70 absolute inset-0 flex items-center justify-center text-[10px] font-medium">
                       {l.completed} / {l.started} ({l.completionRate}%)
                     </span>
                   </div>
@@ -199,9 +159,7 @@ export default function ModuleDeepDive({
             {/* Challenge scores */}
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">
-                  Распределение баллов за челленджи
-                </h3>
+                <h3 className="mb-4 text-sm font-semibold">Распределение баллов за челленджи</h3>
                 <div className="h-[200px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={m.challengeScores}>
@@ -209,12 +167,7 @@ export default function ModuleDeepDive({
                       <XAxis dataKey="range" tick={{ fontSize: 10 }} />
                       <YAxis tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Bar
-                        dataKey="count"
-                        name="Студентов"
-                        fill="#6366f1"
-                        radius={[4, 4, 0, 0]}
-                      />
+                      <Bar dataKey="count" name="Студентов" fill="#6366f1" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -225,25 +178,18 @@ export default function ModuleDeepDive({
             {m.studiedItemsCoverage && m.studiedItemsCoverage.length > 0 && (
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-3">
-                    Покрытие тем OWASP Top 10
-                  </h3>
+                  <h3 className="mb-3 text-sm font-semibold">Покрытие тем OWASP Top 10</h3>
                   <div className="space-y-2">
                     {m.studiedItemsCoverage.map((item) => (
-                      <div
-                        key={item.item}
-                        className="flex items-center gap-3 text-xs"
-                      >
+                      <div key={item.item} className="flex items-center gap-3 text-xs">
                         <span className="w-40 truncate">{item.item}</span>
-                        <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
+                        <div className="bg-muted h-3 flex-1 overflow-hidden rounded-full">
                           <div
-                            className="h-full bg-violet-500 rounded-full"
+                            className="h-full rounded-full bg-violet-500"
                             style={{ width: `${item.studiedRate}%` }}
                           />
                         </div>
-                        <span className="w-12 text-right">
-                          {item.studiedRate}%
-                        </span>
+                        <span className="w-12 text-right">{item.studiedRate}%</span>
                       </div>
                     ))}
                   </div>
@@ -255,7 +201,7 @@ export default function ModuleDeepDive({
             {m.secureCodingDistribution && (
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-4">
+                  <h3 className="mb-4 text-sm font-semibold">
                     Распределение правильных ответов (Безопасное кодирование)
                   </h3>
                   <div className="h-[200px]">
@@ -265,12 +211,7 @@ export default function ModuleDeepDive({
                         <XAxis dataKey="correctRange" tick={{ fontSize: 10 }} />
                         <YAxis tick={{ fontSize: 10 }} />
                         <Tooltip />
-                        <Bar
-                          dataKey="count"
-                          name="Студентов"
-                          fill="#f59e0b"
-                          radius={[4, 4, 0, 0]}
-                        />
+                        <Bar dataKey="count" name="Студентов" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>

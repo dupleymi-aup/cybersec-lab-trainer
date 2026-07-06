@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 import {
   authenticate,
   unauthorized,
@@ -7,43 +7,31 @@ import {
   requireCapability,
   checkRateLimit,
   getClientIp,
-} from "@/lib/api-middleware";
-import { logger } from "@/lib/logger";
-import { validateUuid } from "@/lib/validate-uuid";
+} from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
+import { validateUuid } from '@/lib/validate-uuid';
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireCapability(auth, "users:change_role")) return forbidden();
+  if (!requireCapability(auth, 'users:change_role')) return forbidden();
 
   // Rate limit: 20 role changes per minute per admin
   const rateLimit = checkRateLimit(`role:${auth.id}`, 20, 60_000);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
   const { id } = await params;
 
   // Validate UUID format
   if (!validateUuid(id)) {
-    return NextResponse.json(
-      { error: "Invalid user ID format" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
   }
 
   // Prevent self-role-change
   if (id === auth.id) {
-    return NextResponse.json(
-      { error: "Нельзя изменить свою роль" },
-      { status: 403 },
-    );
+    return NextResponse.json({ error: 'Нельзя изменить свою роль' }, { status: 403 });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,12 +39,12 @@ export async function PUT(
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
   const { role } = body;
 
-  if (!role || !["student", "teacher", "admin"].includes(role)) {
-    return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+  if (!role || !['student', 'teacher', 'admin'].includes(role)) {
+    return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
   }
 
   const user = await prisma.user.update({
@@ -75,16 +63,16 @@ export async function PUT(
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
-        action: "role_change",
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: 'role_change',
         targetId: id,
         targetName: user.fullName || user.email,
         details: `Admin ${auth.id} changed role to '${role}' for user ${user.email} [IP: ${ip}]`,
       },
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      logger.warn("Audit logging failed", { error });
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('Audit logging failed', { error });
     }
   }
 

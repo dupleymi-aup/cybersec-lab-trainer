@@ -1,43 +1,23 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-} from "recharts";
-import {
-  Loader2,
-  AlertTriangle,
-  LogIn,
-  Users,
-  AlertCircle,
-  Clock,
-} from "lucide-react";
-import { getLoginPatterns, type LoginPatternsData } from "@/lib/auth-store";
-import { useDateFormatter } from "@/lib/format";
-import { useAnalyticsFetcher } from "@/hooks/use-analytics-fetch";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { Loader2, AlertTriangle, LogIn, Users, AlertCircle, Clock } from 'lucide-react';
+import { getLoginPatterns, type LoginPatternsData } from '@/lib/auth-store';
+import { useDateFormatter } from '@/lib/format';
+import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export interface LoginPatternsProps {
   groupId?: string;
   days?: number;
 }
 
-export default function LoginPatterns({
-  groupId: propGroupId,
-  days: propDays,
-}: LoginPatternsProps = {}) {
+export default function LoginPatterns({ groupId: propGroupId, days: propDays }: LoginPatternsProps = {}) {
   const formatDate = useDateFormatter();
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId] = useState("");
+  const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 
@@ -50,7 +30,7 @@ export default function LoginPatterns({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -59,20 +39,12 @@ export default function LoginPatterns({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
 
-  const {
-    loginFrequency,
-    failedLogins,
-    dormantAccounts,
-    hourlyDistribution,
-    dailyDistribution,
-  } = data;
+  const { loginFrequency, failedLogins, dormantAccounts, hourlyDistribution, dailyDistribution } = data;
 
   const totalLogins = loginFrequency.reduce((sum, l) => sum + l.loginCount, 0);
 
@@ -87,7 +59,7 @@ export default function LoginPatterns({
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
+            className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
             <option value={7}>7 дней</option>
             <option value={30}>30 дней</option>
@@ -97,39 +69,33 @@ export default function LoginPatterns({
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <LogIn size={18} className="mx-auto mb-1 text-sky-600" />
             <p className="text-2xl font-bold text-sky-600">{totalLogins}</p>
-            <p className="text-xs text-muted-foreground">Входов</p>
+            <p className="text-muted-foreground text-xs">Входов</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Users size={18} className="mx-auto mb-1 text-indigo-600" />
-            <p className="text-2xl font-bold text-indigo-600">
-              {loginFrequency.length}
-            </p>
-            <p className="text-xs text-muted-foreground">Студентов</p>
+            <p className="text-2xl font-bold text-indigo-600">{loginFrequency.length}</p>
+            <p className="text-muted-foreground text-xs">Студентов</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <AlertCircle size={18} className="mx-auto mb-1 text-amber-600" />
-            <p className="text-2xl font-bold text-amber-600">
-              {failedLogins.length}
-            </p>
-            <p className="text-xs text-muted-foreground">С ошибками входа</p>
+            <p className="text-2xl font-bold text-amber-600">{failedLogins.length}</p>
+            <p className="text-muted-foreground text-xs">С ошибками входа</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Clock size={18} className="mx-auto mb-1 text-red-600" />
-            <p className="text-2xl font-bold text-red-600">
-              {dormantAccounts.length}
-            </p>
-            <p className="text-xs text-muted-foreground">Спящих аккаунтов</p>
+            <p className="text-2xl font-bold text-red-600">{dormantAccounts.length}</p>
+            <p className="text-muted-foreground text-xs">Спящих аккаунтов</p>
           </CardContent>
         </Card>
       </div>
@@ -137,9 +103,7 @@ export default function LoginPatterns({
       {/* Hourly distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Распределение входов по часам
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">Распределение входов по часам</h3>
           <div className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hourlyDistribution}>
@@ -147,12 +111,7 @@ export default function LoginPatterns({
                 <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Bar
-                  dataKey="loginCount"
-                  name="Входов"
-                  fill="#6366f1"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="loginCount" name="Входов" fill="#6366f1" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -163,16 +122,12 @@ export default function LoginPatterns({
       {dailyDistribution.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">Входы по дням</h3>
+            <h3 className="mb-4 text-sm font-semibold">Входы по дням</h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={dailyDistribution}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis
-                    dataKey="day"
-                    tick={{ fontSize: 10 }}
-                    tickFormatter={(v: string) => v.slice(5)}
-                  />
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} tickFormatter={(v: string) => v.slice(5)} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Line
@@ -192,40 +147,30 @@ export default function LoginPatterns({
 
       {/* Failed logins */}
       {failedLogins.length > 0 && (
-        <Card className="border-l-4 border-l-amber-400 border-border">
+        <Card className="border-border border-l-4 border-l-amber-400">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-3 flex items-center gap-2 text-amber-600">
-              <AlertCircle size={16} /> Частые ошибки входа (
-              {failedLogins.length} студентов)
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-600">
+              <AlertCircle size={16} /> Частые ошибки входа ({failedLogins.length} студентов)
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-secondary border-b border-border">
+                <thead className="bg-secondary border-border border-b">
                   <tr>
-                    <th className="text-left p-2 font-medium text-muted-foreground">
-                      Студент
-                    </th>
-                    <th className="p-2 font-medium text-muted-foreground text-center">
-                      Ошибок
-                    </th>
-                    <th className="p-2 font-medium text-muted-foreground text-center">
-                      Последние попытки
-                    </th>
+                    <th className="text-muted-foreground p-2 text-left font-medium">Студент</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">Ошибок</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">Последние попытки</th>
                   </tr>
                 </thead>
                 <tbody>
                   {failedLogins.slice(0, 15).map((f) => (
-                    <tr
-                      key={f.userId}
-                      className="border-b border-slate-100 hover:bg-secondary"
-                    >
+                    <tr key={f.userId} className="hover:bg-secondary border-b border-slate-100">
                       <td className="p-2 font-medium">{f.fullName}</td>
                       <td className="p-2 text-center">
                         <Badge variant="destructive" className="text-[10px]">
                           {f.count}
                         </Badge>
                       </td>
-                      <td className="p-2 text-center text-muted-foreground">
+                      <td className="text-muted-foreground p-2 text-center">
                         {f.recentAttempts.map((a, i) => (
                           <span key={i} className="mr-2">
                             {formatDate(a.timestamp)} ({a.ip})
@@ -243,42 +188,27 @@ export default function LoginPatterns({
 
       {/* Dormant accounts */}
       {dormantAccounts.length > 0 && (
-        <Card className="border-l-4 border-l-red-400 border-border">
+        <Card className="border-border border-l-4 border-l-red-400">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-3 flex items-center gap-2 text-red-600">
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-red-600">
               <Clock size={16} /> Спящие аккаунты ({dormantAccounts.length})
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-secondary border-b border-border">
+                <thead className="bg-secondary border-border border-b">
                   <tr>
-                    <th className="text-left p-2 font-medium text-muted-foreground">
-                      Студент
-                    </th>
-                    <th className="p-2 font-medium text-muted-foreground">
-                      Группа
-                    </th>
-                    <th className="p-2 font-medium text-muted-foreground text-center">
-                      Последний вход
-                    </th>
-                    <th className="p-2 font-medium text-muted-foreground text-center">
-                      Дней неактивен
-                    </th>
+                    <th className="text-muted-foreground p-2 text-left font-medium">Студент</th>
+                    <th className="text-muted-foreground p-2 font-medium">Группа</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">Последний вход</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">Дней неактивен</th>
                   </tr>
                 </thead>
                 <tbody>
                   {dormantAccounts.slice(0, 20).map((d) => (
-                    <tr
-                      key={d.userId}
-                      className="border-b border-slate-100 hover:bg-secondary"
-                    >
+                    <tr key={d.userId} className="hover:bg-secondary border-b border-slate-100">
                       <td className="p-2 font-medium">{d.fullName}</td>
-                      <td className="p-2 text-muted-foreground">
-                        {d.group || "—"}
-                      </td>
-                      <td className="p-2 text-center text-muted-foreground">
-                        {formatDate(d.lastLogin)}
-                      </td>
+                      <td className="text-muted-foreground p-2">{d.group || '—'}</td>
+                      <td className="text-muted-foreground p-2 text-center">{formatDate(d.lastLogin)}</td>
                       <td className="p-2 text-center">
                         <Badge variant="destructive" className="text-[10px]">
                           {d.daysInactive} дн.

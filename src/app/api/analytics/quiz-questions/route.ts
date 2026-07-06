@@ -1,12 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { quizQuestions } from "@/lib/data/quiz-data";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { quizQuestions } from '@/lib/data/quiz-data';
 
 // Build a lookup map for question data
 const questionMap = new Map(
@@ -23,11 +18,11 @@ const questionMap = new Map(
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const category = searchParams.get("category");
-  const difficulty = searchParams.get("difficulty");
+  const category = searchParams.get('category');
+  const difficulty = searchParams.get('difficulty');
 
   // Build filter for QuizAttempt
   const where: Record<string, unknown> = {};
@@ -83,10 +78,7 @@ export async function GET(request: NextRequest) {
         difficulty: qData?.difficulty || stat.difficulty,
         totalAttempts: stat.totalAttempts,
         correctCount: stat.correctCount,
-        correctRate:
-          stat.totalAttempts > 0
-            ? Math.round((stat.correctCount / stat.totalAttempts) * 10000) / 100
-            : 0,
+        correctRate: stat.totalAttempts > 0 ? Math.round((stat.correctCount / stat.totalAttempts) * 10000) / 100 : 0,
       };
     })
     .sort((a, b) => a.correctRate - b.correctRate); // hardest first

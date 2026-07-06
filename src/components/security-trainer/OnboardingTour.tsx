@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useAuthStore } from "@/lib/auth-store";
-import { UserRole } from "@/lib/auth-types";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { useAuthStore } from '@/lib/auth-store';
+import { UserRole } from '@/lib/auth-types';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
   ChevronRight,
@@ -15,8 +15,8 @@ import {
   HelpCircle,
   Users,
   ShieldCheck,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TourStep {
   title: string;
@@ -28,147 +28,147 @@ interface TourStep {
 const roleTourSteps: Record<UserRole, TourStep[]> = {
   student: [
     {
-      title: "Welcome to CyberSec Lab!",
+      title: 'Welcome to CyberSec Lab!',
       description:
-        "An interactive platform for learning information security fundamentals. As a student, you will explore interactive modules, take quizzes, complete assignments, and track your progress as you build cybersecurity skills.",
+        'An interactive platform for learning information security fundamentals. As a student, you will explore interactive modules, take quizzes, complete assignments, and track your progress as you build cybersecurity skills.',
       icon: <BookOpen className="h-8 w-8 text-emerald-500" />,
     },
     {
-      title: "Modules",
+      title: 'Modules',
       description:
-        "Explore interactive security training modules covering topics like OWASP Top 10, SQL injection, XSS, CSRF, authentication, secure coding, security headers, and cryptographic tools.",
+        'Explore interactive security training modules covering topics like OWASP Top 10, SQL injection, XSS, CSRF, authentication, secure coding, security headers, and cryptographic tools.',
       icon: <BookOpen className="h-8 w-8 text-blue-500" />,
-      action: "Access any module from the sidebar menu",
+      action: 'Access any module from the sidebar menu',
     },
     {
-      title: "Quizzes",
+      title: 'Quizzes',
       description:
-        "Test your knowledge with 136+ questions across 9 security categories. Take timed quizzes with difficulty filtering. Your scores contribute to your achievements and overall progress.",
+        'Test your knowledge with 136+ questions across 9 security categories. Take timed quizzes with difficulty filtering. Your scores contribute to your achievements and overall progress.',
       icon: <HelpCircle className="h-8 w-8 text-amber-500" />,
       action: 'Navigate to "Quizzes" in the sidebar',
     },
     {
-      title: "Assignments",
+      title: 'Assignments',
       description:
-        "Complete assignments created by your teachers. Submit your work and receive grades with detailed feedback to help you improve your cybersecurity skills.",
+        'Complete assignments created by your teachers. Submit your work and receive grades with detailed feedback to help you improve your cybersecurity skills.',
       icon: <BookOpen className="h-8 w-8 text-violet-500" />,
       action: 'Navigate to "Assignments" in the sidebar',
     },
     {
-      title: "Achievements",
+      title: 'Achievements',
       description:
-        "Earn 16 achievement badges as you progress through modules and quizzes. Unlock new badges by completing modules and scoring high on quizzes.",
+        'Earn 16 achievement badges as you progress through modules and quizzes. Unlock new badges by completing modules and scoring high on quizzes.',
       icon: <Trophy className="h-8 w-8 text-violet-500" />,
       action: 'Track your progress in the "Achievements" section',
     },
     {
-      title: "Tips for Learning",
+      title: 'Tips for Learning',
       description:
-        "Start with OWASP Top 10 - it is the foundation of web security. Take quizzes immediately after studying modules while concepts are fresh. Review your mistakes to reinforce learning.",
+        'Start with OWASP Top 10 - it is the foundation of web security. Take quizzes immediately after studying modules while concepts are fresh. Review your mistakes to reinforce learning.',
       icon: <Check className="h-8 w-8 text-emerald-600" />,
     },
   ],
   teacher: [
     {
-      title: "Welcome to CyberSec Lab!",
+      title: 'Welcome to CyberSec Lab!',
       description:
-        "An interactive platform for teaching information security. As a teacher, you can create assignments, grade student submissions, manage deadlines, and view analytics to track your students progress.",
+        'An interactive platform for teaching information security. As a teacher, you can create assignments, grade student submissions, manage deadlines, and view analytics to track your students progress.',
       icon: <Users className="h-8 w-8 text-emerald-500" />,
     },
     {
-      title: "Modules Overview",
+      title: 'Modules Overview',
       description:
-        "Browse all available training modules. Assign specific modules to your classes and track which students have completed them.",
+        'Browse all available training modules. Assign specific modules to your classes and track which students have completed them.',
       icon: <BookOpen className="h-8 w-8 text-blue-500" />,
       action: 'Navigate to "Modules" in the sidebar',
     },
     {
-      title: "Create Assignments",
+      title: 'Create Assignments',
       description:
-        "Design custom assignments by selecting modules, defining questions, and setting grading criteria. Assignments can target individual classes or specific students.",
+        'Design custom assignments by selecting modules, defining questions, and setting grading criteria. Assignments can target individual classes or specific students.',
       icon: <Shield className="h-8 w-8 text-violet-500" />,
       action: 'Click "Create Assignment" in the Assignments section',
     },
     {
-      title: "Grade Submissions",
+      title: 'Grade Submissions',
       description:
-        "Review and grade student submissions efficiently. Provide detailed feedback and rubric-based scoring to help students understand their performance.",
+        'Review and grade student submissions efficiently. Provide detailed feedback and rubric-based scoring to help students understand their performance.',
       icon: <Check className="h-8 w-8 text-amber-500" />,
       action: 'Navigate to "Assignments" > "Pending Review"',
     },
     {
-      title: "View Analytics",
+      title: 'View Analytics',
       description:
-        "Access detailed analytics on class and individual student performance. Identify knowledge gaps and track improvement over time with visual dashboards.",
+        'Access detailed analytics on class and individual student performance. Identify knowledge gaps and track improvement over time with visual dashboards.',
       icon: <Trophy className="h-8 w-8 text-sky-500" />,
       action: 'Navigate to "Analytics" in the sidebar',
     },
     {
-      title: "Manage Deadlines",
+      title: 'Manage Deadlines',
       description:
-        "Set and adjust deadlines for assignments and modules. Send reminders to students and monitor completion rates before due dates.",
+        'Set and adjust deadlines for assignments and modules. Send reminders to students and monitor completion rates before due dates.',
       icon: <HelpCircle className="h-8 w-8 text-blue-500" />,
-      action: "Configure deadlines in each assignment settings",
+      action: 'Configure deadlines in each assignment settings',
     },
     {
-      title: "Tips for Teaching",
+      title: 'Tips for Teaching',
       description:
-        "Use analytics to identify struggling students early. Create scaffolded assignments that build on previous knowledge. Provide timely, actionable feedback to maximize student engagement.",
+        'Use analytics to identify struggling students early. Create scaffolded assignments that build on previous knowledge. Provide timely, actionable feedback to maximize student engagement.',
       icon: <Check className="h-8 w-8 text-emerald-600" />,
     },
   ],
   admin: [
     {
-      title: "Welcome to CyberSec Lab!",
+      title: 'Welcome to CyberSec Lab!',
       description:
-        "An interactive platform for teaching information security. As an administrator, you have full access to manage users, configure system settings, review audit logs, and monitor platform-wide analytics.",
+        'An interactive platform for teaching information security. As an administrator, you have full access to manage users, configure system settings, review audit logs, and monitor platform-wide analytics.',
       icon: <ShieldCheck className="h-8 w-8 text-emerald-500" />,
     },
     {
-      title: "Full Access",
+      title: 'Full Access',
       description:
-        "You have access to all features across the platform. Navigate to any section to manage content, users, and system configurations.",
+        'You have access to all features across the platform. Navigate to any section to manage content, users, and system configurations.',
       icon: <ShieldCheck className="h-8 w-8 text-blue-500" />,
     },
     {
-      title: "User Management",
+      title: 'User Management',
       description:
-        "Create, update, and deactivate user accounts. Assign roles (student, teacher, admin) and manage class enrollments and teacher assignments.",
+        'Create, update, and deactivate user accounts. Assign roles (student, teacher, admin) and manage class enrollments and teacher assignments.',
       icon: <Users className="h-8 w-8 text-violet-500" />,
       action: 'Navigate to "Users" in the admin panel',
     },
     {
-      title: "Audit Logs",
+      title: 'Audit Logs',
       description:
-        "Review comprehensive audit logs tracking all system activities, user actions, and security events. Export logs for compliance and reporting purposes.",
+        'Review comprehensive audit logs tracking all system activities, user actions, and security events. Export logs for compliance and reporting purposes.',
       icon: <Shield className="h-8 w-8 text-amber-500" />,
       action: 'Navigate to "Audit" in the admin panel',
     },
     {
-      title: "System Settings",
+      title: 'System Settings',
       description:
-        "Configure platform-wide settings including authentication methods, notification preferences, module availability, and integration with external systems.",
+        'Configure platform-wide settings including authentication methods, notification preferences, module availability, and integration with external systems.',
       icon: <HelpCircle className="h-8 w-8 text-sky-500" />,
       action: 'Navigate to "Settings" in the admin panel',
     },
     {
-      title: "Advanced Analytics",
+      title: 'Advanced Analytics',
       description:
-        "Access platform-wide analytics dashboards showing adoption rates, completion metrics, and performance trends across all classes and departments.",
+        'Access platform-wide analytics dashboards showing adoption rates, completion metrics, and performance trends across all classes and departments.',
       icon: <Trophy className="h-8 w-8 text-violet-500" />,
       action: 'Navigate to "Analytics" in the admin panel',
     },
     {
-      title: "Announcements",
+      title: 'Announcements',
       description:
-        "Create and broadcast announcements to specific user groups or the entire platform. Schedule announcements and track read receipts.",
+        'Create and broadcast announcements to specific user groups or the entire platform. Schedule announcements and track read receipts.',
       icon: <BookOpen className="h-8 w-8 text-blue-500" />,
       action: 'Navigate to "Announcements" in the admin panel',
     },
     {
-      title: "Tips for Administration",
+      title: 'Tips for Administration',
       description:
-        "Regularly review audit logs for security compliance. Use analytics to identify underutilized modules and drive adoption. Keep system settings documented and communicate changes to users proactively.",
+        'Regularly review audit logs for security compliance. Use analytics to identify underutilized modules and drive adoption. Keep system settings documented and communicate changes to users proactively.',
       icon: <Check className="h-8 w-8 text-emerald-600" />,
     },
   ],
@@ -181,27 +181,25 @@ const roleIconMap: Record<UserRole, React.ReactNode> = {
 };
 
 const roleLabelMap: Record<UserRole, string> = {
-  student: "Student",
-  teacher: "Teacher",
-  admin: "Admin",
+  student: 'Student',
+  teacher: 'Teacher',
+  admin: 'Admin',
 };
 
 export default function OnboardingTour() {
   const user = useAuthStore((s) => s.user);
-  const role = (user?.role ?? "student") as UserRole;
+  const role = (user?.role ?? 'student') as UserRole;
   const steps = roleTourSteps[role] ?? roleTourSteps.student;
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [isComplete, setIsComplete] = useState(() => {
-    return localStorage.getItem(`cybersec-onboarding-seen-${role}`) === "true";
+    return localStorage.getItem(`cybersec-onboarding-seen-${role}`) === 'true';
   });
 
   useEffect(() => {
     const storageKey = `cybersec-onboarding-seen-${role}`;
     const hasSeenTour = localStorage.getItem(storageKey);
-    const isNewUser =
-      user?.createdAt &&
-      Date.now() - new Date(user.createdAt).getTime() < 24 * 60 * 60 * 1000;
+    const isNewUser = user?.createdAt && Date.now() - new Date(user.createdAt).getTime() < 24 * 60 * 60 * 1000;
     if (!hasSeenTour && (!user?.createdAt || isNewUser)) {
       setIsOpen(true);
     }
@@ -209,13 +207,13 @@ export default function OnboardingTour() {
 
   useEffect(() => {
     const storageKey = `cybersec-onboarding-seen-${role}`;
-    setIsComplete(localStorage.getItem(storageKey) === "true");
+    setIsComplete(localStorage.getItem(storageKey) === 'true');
     setCurrentStep(0);
   }, [role]);
 
   const handleClose = () => {
     const storageKey = `cybersec-onboarding-seen-${role}`;
-    localStorage.setItem(storageKey, "true");
+    localStorage.setItem(storageKey, 'true');
     setIsOpen(false);
     setIsComplete(true);
   };
@@ -251,7 +249,7 @@ export default function OnboardingTour() {
       {!isOpen && !isComplete && (
         <button
           onClick={handleStartTour}
-          className="fixed bottom-6 right-6 z-50 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full p-3 shadow-lg transition-all hover:scale-105"
+          className="fixed right-6 bottom-6 z-50 rounded-full bg-emerald-600 p-3 text-white shadow-lg transition-all hover:scale-105 hover:bg-emerald-700"
           title="Start onboarding tour"
         >
           <Shield className="h-6 w-6" />
@@ -265,7 +263,7 @@ export default function OnboardingTour() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.6 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black z-[100]"
+              className="fixed inset-0 z-[100] bg-black"
             />
 
             <motion.div
@@ -275,36 +273,32 @@ export default function OnboardingTour() {
               transition={{ duration: 0.3 }}
               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
             >
-              <div className="bg-card rounded-2xl shadow-2xl border max-w-lg w-full overflow-hidden">
-                <div className="flex items-center justify-between p-5 border-b">
+              <div className="bg-card w-full max-w-lg overflow-hidden rounded-2xl border shadow-2xl">
+                <div className="flex items-center justify-between border-b p-5">
                   <div className="flex items-center gap-3">
                     {steps[currentStep].icon}
-                    <h2 className="text-lg font-bold">
-                      {steps[currentStep].title}
-                    </h2>
+                    <h2 className="text-lg font-bold">{steps[currentStep].title}</h2>
                   </div>
                   <button
                     onClick={handleSkip}
-                    className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                    className="hover:bg-muted rounded-lg p-1.5 transition-colors"
                     title="Skip"
                   >
                     <X size={18} />
                   </button>
                 </div>
 
-                <div className="px-5 pt-3 flex items-center gap-2">
+                <div className="flex items-center gap-2 px-5 pt-3">
                   {roleIconMap[role]}
-                  <span className="text-xs font-medium uppercase tracking-wider text-blue-600">
+                  <span className="text-xs font-medium tracking-wider text-blue-600 uppercase">
                     {roleLabelMap[role]}
                   </span>
                 </div>
                 <div className="p-6">
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {steps[currentStep].description}
-                  </p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{steps[currentStep].description}</p>
                   {steps[currentStep].action && (
-                    <div className="mt-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                      <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                    <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-900/20">
+                      <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
                         {steps[currentStep].action}
                       </p>
                     </div>
@@ -315,21 +309,15 @@ export default function OnboardingTour() {
                   {steps.map((_, i) => (
                     <div
                       key={i}
-                      className={`w-2 h-2 rounded-full transition-colors $\{
-                        i === currentStep
-                          ? 'bg-emerald-500'
-                          : i < currentStep
-                            ? 'bg-emerald-300'
-                            : 'bg-slate-200 dark:bg-slate-700'
-                      }`}
+                      className={`$\{ i === currentStep ? 'bg-emerald-500' : i < currentStep ? 'bg-emerald-300' : 'bg-slate-200 dark:bg-slate-700' } h-2 w-2 rounded-full transition-colors`}
                     />
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between p-5 border-t bg-muted/30">
+                <div className="bg-muted/30 flex items-center justify-between border-t p-5">
                   <button
                     onClick={handleSkip}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                   >
                     Skip tour
                   </button>
@@ -340,11 +328,7 @@ export default function OnboardingTour() {
                         Previous
                       </Button>
                     )}
-                    <Button
-                      size="sm"
-                      onClick={handleNext}
-                      className="bg-emerald-600 hover:bg-emerald-700"
-                    >
+                    <Button size="sm" onClick={handleNext} className="bg-emerald-600 hover:bg-emerald-700">
                       {currentStep === steps.length - 1 ? (
                         <>
                           Get Started

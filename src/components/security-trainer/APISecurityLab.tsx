@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useAppStore } from "@/lib/store";
-import { apiSecurityTopics } from "@/lib/data/api-security-data";
-import CodeBlock from "./CodeBlock";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion } from "framer-motion";
+import { useState } from 'react';
+import { useAppStore } from '@/lib/store';
+import { apiSecurityTopics } from '@/lib/data/api-security-data';
+import CodeBlock from './CodeBlock';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { motion } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,7 +19,7 @@ import {
   Code2,
   BookOpen,
   Lightbulb,
-} from "lucide-react";
+} from 'lucide-react';
 
 const iconMap: Record<string, React.ReactNode> = {
   Unlock: <Shield size={18} />,
@@ -150,9 +150,7 @@ const iconMap: Record<string, React.ReactNode> = {
 
 export default function APISecurityLab() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [completedTopics, setCompletedTopics] = useState<Set<string>>(
-    new Set(),
-  );
+  const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
   const completeModule = useAppStore((s) => s.completeModule);
   const addStudiedOwasp = useAppStore((s) => s.addStudiedOwasp);
 
@@ -179,32 +177,25 @@ export default function APISecurityLab() {
     if (currentIndex < apiSecurityTopics.length - 1) {
       handleNext();
     } else {
-      completeModule("api-security");
+      completeModule('api-security');
     }
   };
 
   // Extract defense recommendations from content
-  const defenseItems =
-    topic.content.match(/• (.+)/g)?.map((item) => item.replace("• ", "")) || [];
+  const defenseItems = topic.content.match(/• (.+)/g)?.map((item) => item.replace('• ', '')) || [];
 
   // Render theory content, skipping code blocks
   const renderTheory = () => {
-    const lines = topic.content.split("\n");
+    const lines = topic.content.split('\n');
     const elements: React.ReactNode[] = [];
     let inCodeBlock = false;
-    let codeContent = "";
+    let codeContent = '';
 
     lines.forEach((line, i) => {
-      if (line.startsWith("```")) {
+      if (line.startsWith('```')) {
         if (inCodeBlock) {
-          elements.push(
-            <CodeBlock
-              key={`code-${i}`}
-              code={codeContent.trim()}
-              language="javascript"
-            />,
-          );
-          codeContent = "";
+          elements.push(<CodeBlock key={`code-${i}`} code={codeContent.trim()} language="javascript" />);
+          codeContent = '';
           inCodeBlock = false;
         } else {
           inCodeBlock = true;
@@ -213,36 +204,28 @@ export default function APISecurityLab() {
       }
 
       if (inCodeBlock) {
-        codeContent += line + "\n";
+        codeContent += line + '\n';
         return;
       }
 
-      if (line.startsWith("**") && line.endsWith("**")) {
+      if (line.startsWith('**') && line.endsWith('**')) {
         elements.push(
-          <h3
-            key={i}
-            className="text-base font-semibold text-foreground mt-4 mb-2"
-          >
-            {line.replace(/\*\*/g, "")}
+          <h3 key={i} className="text-foreground mt-4 mb-2 text-base font-semibold">
+            {line.replace(/\*\*/g, '')}
           </h3>,
         );
-      } else if (line.startsWith("•")) {
+      } else if (line.startsWith('•')) {
         elements.push(
-          <div key={i} className="flex items-start gap-2 my-1">
-            <ChevronRight
-              size={14}
-              className="text-violet-500 shrink-0 mt-0.5"
-            />
-            <span className="text-sm text-muted-foreground">
-              {line.replace("• ", "")}
-            </span>
+          <div key={i} className="my-1 flex items-start gap-2">
+            <ChevronRight size={14} className="mt-0.5 shrink-0 text-violet-500" />
+            <span className="text-muted-foreground text-sm">{line.replace('• ', '')}</span>
           </div>,
         );
-      } else if (line.trim() === "") {
+      } else if (line.trim() === '') {
         elements.push(<br key={i} />);
       } else {
         elements.push(
-          <p key={i} className="text-sm text-muted-foreground leading-relaxed">
+          <p key={i} className="text-muted-foreground text-sm leading-relaxed">
             {line}
           </p>,
         );
@@ -253,31 +236,22 @@ export default function APISecurityLab() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+        <div className="mb-2 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-600">
             <Shield className="text-white" size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">
-              Безопасность API
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              OWASP API Security Top 10 (2023)
-            </p>
+            <h1 className="text-foreground text-xl font-bold">Безопасность API</h1>
+            <p className="text-muted-foreground text-sm">OWASP API Security Top 10 (2023)</p>
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
-          Интерактивный гид по 10 самым критическим угрозам безопасности API с
-          примерами кода и мерами защиты.
+          Интерактивный гид по 10 самым критическим угрозам безопасности API с примерами кода и мерами защиты.
         </p>
-        <div className="flex items-center gap-2 mt-3">
+        <div className="mt-3 flex items-center gap-2">
           <Badge variant="secondary" className="text-xs">
             10 тем
           </Badge>
@@ -285,13 +259,13 @@ export default function APISecurityLab() {
             Продвинутый
           </Badge>
           <div className="flex-1" />
-          <span className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground text-xs">
             {completedTopics.size} / {apiSecurityTopics.length} изучено
           </span>
         </div>
-        <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+        <div className="bg-muted mt-2 h-1.5 w-full rounded-full">
           <div
-            className="bg-gradient-to-r from-violet-500 to-purple-600 h-1.5 rounded-full transition-all duration-300"
+            className="h-1.5 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 transition-all duration-300"
             style={{
               width: `${(completedTopics.size / apiSecurityTopics.length) * 100}%`,
             }}
@@ -300,22 +274,19 @@ export default function APISecurityLab() {
       </div>
 
       {/* Topic Navigation */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
         {apiSecurityTopics.map((t, idx) => {
-          const shortLabel = t.id
-            .replace("api-0", "")
-            .replace("api-", "")
-            .split("-")[0];
+          const shortLabel = t.id.replace('api-0', '').replace('api-', '').split('-')[0];
           return (
             <button
               key={t.id}
               onClick={() => setCurrentIndex(idx)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+              className={`flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
                 idx === currentIndex
-                  ? "bg-violet-600 text-white"
+                  ? 'bg-violet-600 text-white'
                   : completedTopics.has(t.id)
-                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {idx + 1}. {shortLabel}
@@ -327,23 +298,15 @@ export default function APISecurityLab() {
       {/* Topic Content */}
       <Card className="border-border/50">
         <CardContent className="p-6">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400 shrink-0">
+          <div className="mb-4 flex items-start gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400">
               {iconMap[topic.icon] || <Shield size={18} />}
             </div>
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-foreground">
-                {topic.title}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {topic.description}
-              </p>
+              <h2 className="text-foreground text-lg font-semibold">{topic.title}</h2>
+              <p className="text-muted-foreground mt-1 text-sm">{topic.description}</p>
             </div>
-            <Badge
-              className={`${topic.riskBg} ${topic.riskColor} text-xs font-medium`}
-            >
-              {topic.risk}
-            </Badge>
+            <Badge className={`${topic.riskBg} ${topic.riskColor} text-xs font-medium`}>{topic.risk}</Badge>
           </div>
 
           <Tabs defaultValue="theory" className="mt-4">
@@ -367,7 +330,7 @@ export default function APISecurityLab() {
               <div className="space-y-4">
                 {topic.codeExample && (
                   <div>
-                    <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                    <h4 className="text-foreground mb-2 flex items-center gap-2 text-sm font-medium">
                       <Code2 size={16} className="text-violet-500" />
                       Пример кода
                     </h4>
@@ -378,19 +341,16 @@ export default function APISecurityLab() {
             </TabsContent>
 
             <TabsContent value="defense" className="mt-4">
-              <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+              <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20">
                 <CardContent className="p-4">
-                  <h4 className="text-sm font-semibold text-green-800 dark:text-green-400 mb-3 flex items-center gap-2">
+                  <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold text-green-800 dark:text-green-400">
                     <CheckCircle2 size={16} />
                     Рекомендации по защите
                   </h4>
                   <ul className="space-y-2">
                     {defenseItems.map((item, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-2 text-sm text-green-700 dark:text-green-300"
-                      >
-                        <CheckCircle2 size={14} className="shrink-0 mt-0.5" />
+                      <li key={i} className="flex items-start gap-2 text-sm text-green-700 dark:text-green-300">
+                        <CheckCircle2 size={14} className="mt-0.5 shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -418,9 +378,7 @@ export default function APISecurityLab() {
               size="sm"
               onClick={handleComplete}
               className={`flex items-center gap-1 ${
-                isCompleted
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-violet-600 hover:bg-violet-700"
+                isCompleted ? 'bg-green-600 hover:bg-green-700' : 'bg-violet-600 hover:bg-violet-700'
               } text-white`}
             >
               {isCompleted ? (

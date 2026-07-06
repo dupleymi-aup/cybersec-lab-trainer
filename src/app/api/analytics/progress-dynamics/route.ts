@@ -1,28 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { parseDays } from "@/lib/utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { parseDays } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
   const days = parseDays(searchParams);
-  const groupId = searchParams.get("groupId");
-  const course = searchParams.get("course");
-  const university = searchParams.get("university");
+  const groupId = searchParams.get('groupId');
+  const course = searchParams.get('course');
+  const university = searchParams.get('university');
 
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-  const userWhere: Record<string, unknown> = { role: "student" };
+  const userWhere: Record<string, unknown> = { role: 'student' };
   if (groupId) userWhere.group = groupId;
   if (course) userWhere.course = course;
   if (university) userWhere.university = university;
@@ -40,7 +35,7 @@ export async function GET(request: NextRequest) {
         totalModulesCompleted: 0,
         totalQuizAttempts: 0,
         avgDailyActive: 0,
-        trend: "stable" as const,
+        trend: 'stable' as const,
       },
     });
   }
@@ -86,7 +81,7 @@ export async function GET(request: NextRequest) {
   >();
 
   for (let d = new Date(since); d <= now; d.setDate(d.getDate() + 1)) {
-    const dateStr = d.toISOString().split("T")[0];
+    const dateStr = d.toISOString().split('T')[0];
     dailyMap.set(dateStr, {
       modulesCompleted: 0,
       modulesStarted: 0,
@@ -99,7 +94,7 @@ export async function GET(request: NextRequest) {
 
   // Process progress records
   for (const p of progressRecords) {
-    const dateStr = p.updatedAt.toISOString().split("T")[0];
+    const dateStr = p.updatedAt.toISOString().split('T')[0];
     const entry = dailyMap.get(dateStr);
     if (entry) {
       entry.activeStudents.add(p.userId);
@@ -114,7 +109,7 @@ export async function GET(request: NextRequest) {
 
   // Process quiz results
   for (const q of quizResults) {
-    const dateStr = q.updatedAt.toISOString().split("T")[0];
+    const dateStr = q.updatedAt.toISOString().split('T')[0];
     const entry = dailyMap.get(dateStr);
     if (entry) {
       entry.activeStudents.add(q.userId);
@@ -125,10 +120,10 @@ export async function GET(request: NextRequest) {
 
   // Process login activity
   for (const l of loginActivity) {
-    const dateStr = l.timestamp.toISOString().split("T")[0];
+    const dateStr = l.timestamp.toISOString().split('T')[0];
     const entry = dailyMap.get(dateStr);
     if (entry) {
-      entry.activeStudents.add(l.userId || "");
+      entry.activeStudents.add(l.userId || '');
     }
   }
 
@@ -141,43 +136,25 @@ export async function GET(request: NextRequest) {
       quizAttempts: data.quizAttempts,
       avgQuizScore:
         data.quizScores.length > 0
-          ? Math.round(
-              (data.quizScores.reduce((a, b) => a + b, 0) /
-                data.quizScores.length) *
-                10,
-            ) / 10
+          ? Math.round((data.quizScores.reduce((a, b) => a + b, 0) / data.quizScores.length) * 10) / 10
           : 0,
       activeStudents: data.activeStudents.size,
       newCompletions: data.newCompletions,
     }));
 
   // Compute summary
-  const totalModulesCompleted = daily.reduce(
-    (sum, d) => sum + d.modulesCompleted,
-    0,
-  );
+  const totalModulesCompleted = daily.reduce((sum, d) => sum + d.modulesCompleted, 0);
   const totalQuizAttempts = daily.reduce((sum, d) => sum + d.quizAttempts, 0);
   const avgDailyActive =
-    daily.length > 0
-      ? Math.round(
-          (daily.reduce((sum, d) => sum + d.activeStudents, 0) / daily.length) *
-            10,
-        ) / 10
-      : 0;
+    daily.length > 0 ? Math.round((daily.reduce((sum, d) => sum + d.activeStudents, 0) / daily.length) * 10) / 10 : 0;
 
   // Determine trend based on last 7 days vs previous 7 days
   const last7 = daily.slice(-7);
   const prev7 = daily.slice(-14, -7);
-  const last7Avg =
-    last7.length > 0
-      ? last7.reduce((sum, d) => sum + d.activeStudents, 0) / last7.length
-      : 0;
-  const prev7Avg =
-    prev7.length > 0
-      ? prev7.reduce((sum, d) => sum + d.activeStudents, 0) / prev7.length
-      : 0;
+  const last7Avg = last7.length > 0 ? last7.reduce((sum, d) => sum + d.activeStudents, 0) / last7.length : 0;
+  const prev7Avg = prev7.length > 0 ? prev7.reduce((sum, d) => sum + d.activeStudents, 0) / prev7.length : 0;
   const trendDiff = last7Avg - prev7Avg;
-  const trend = trendDiff > 2 ? "up" : trendDiff < -2 ? "down" : "stable";
+  const trend = trendDiff > 2 ? 'up' : trendDiff < -2 ? 'down' : 'stable';
 
   return NextResponse.json({
     daily,

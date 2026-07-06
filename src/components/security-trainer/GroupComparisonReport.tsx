@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   BarChart,
   Bar,
@@ -16,47 +16,32 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-} from "recharts";
-import { Loader2, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
-import {
-  getGroupComparison,
-  type GroupComparisonDimension,
-} from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
+} from 'recharts';
+import { Loader2, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
+import { getGroupComparison, type GroupComparisonDimension } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: "7д" },
-  { key: 30, label: "30д" },
-  { key: 90, label: "90д" },
-  { key: 180, label: "180д" },
+  { key: 7, label: '7д' },
+  { key: 30, label: '30д' },
+  { key: 90, label: '90д' },
+  { key: 180, label: '180д' },
 ];
 
 const DIMENSION_OPTIONS = [
-  { key: "group" as const, label: "По группе" },
-  { key: "course" as const, label: "По курсу" },
-  { key: "university" as const, label: "По университету" },
+  { key: 'group' as const, label: 'По группе' },
+  { key: 'course' as const, label: 'По курсу' },
+  { key: 'university' as const, label: 'По университету' },
 ];
 
-const COLORS = [
-  "#6366f1",
-  "#8b5cf6",
-  "#a78bfa",
-  "#c4b5fd",
-  "#818cf8",
-  "#7c3aed",
-  "#a855f7",
-  "#d8b4fe",
-];
+const COLORS = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#818cf8', '#7c3aed', '#a855f7', '#d8b4fe'];
 
 export interface GroupComparisonReportProps {
   groupId?: string;
   days?: number;
 }
 
-export default function GroupComparisonReport({
-  groupId,
-  days: controlledDays,
-}: GroupComparisonReportProps = {}) {
+export default function GroupComparisonReport({ groupId, days: controlledDays }: GroupComparisonReportProps = {}) {
   const [dimensions, setDimensions] = useState<GroupComparisonDimension[]>([]);
   const [_rankings, setRankings] = useState({
     byCompletion: [] as Array<{ name: string; value: number }>,
@@ -66,9 +51,7 @@ export default function GroupComparisonReport({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [dimension, setDimension] = useState<"group" | "course" | "university">(
-    "group",
-  );
+  const [dimension, setDimension] = useState<'group' | 'course' | 'university'>('group');
 
   const days = controlledDays ?? internalDays;
   const isControlled = controlledDays !== undefined;
@@ -87,7 +70,7 @@ export default function GroupComparisonReport({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -99,11 +82,8 @@ export default function GroupComparisonReport({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2
-          size={32}
-          className="animate-spin text-indigo-500 mx-auto mb-3"
-        />
-        <p className="text-sm text-muted-foreground">Загрузка данных...</p>
+        <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
+        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -111,8 +91,8 @@ export default function GroupComparisonReport({
   if (error) {
     return (
       <div className="flex items-center justify-center py-16">
-        <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-        <p className="text-sm text-muted-foreground font-medium">{error}</p>
+        <AlertTriangle size={32} className="mx-auto mb-3 text-red-500" />
+        <p className="text-muted-foreground text-sm font-medium">{error}</p>
       </div>
     );
   }
@@ -127,9 +107,7 @@ export default function GroupComparisonReport({
   }));
 
   // Radar chart data (top 5 by completion)
-  const top5 = [...dimensions]
-    .sort((a, b) => b.avgCompletionRate - a.avgCompletionRate)
-    .slice(0, 5);
+  const top5 = [...dimensions].sort((a, b) => b.avgCompletionRate - a.avgCompletionRate).slice(0, 5);
   const radarData = top5.map((d, i) => ({
     name: d.name,
     completion: d.avgCompletionRate,
@@ -139,32 +117,24 @@ export default function GroupComparisonReport({
   }));
 
   const bestGroup =
-    dimensions.length > 0
-      ? [...dimensions].sort(
-          (a, b) => b.avgCompletionRate - a.avgCompletionRate,
-        )[0]
-      : null;
+    dimensions.length > 0 ? [...dimensions].sort((a, b) => b.avgCompletionRate - a.avgCompletionRate)[0] : null;
   const worstGroup =
-    dimensions.length > 0
-      ? [...dimensions].sort(
-          (a, b) => a.avgCompletionRate - b.avgCompletionRate,
-        )[0]
-      : null;
+    dimensions.length > 0 ? [...dimensions].sort((a, b) => a.avgCompletionRate - b.avgCompletionRate)[0] : null;
 
   return (
     <div className="space-y-6">
       {/* Period + dimension selector */}
-      <div className="flex gap-3 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-3">
         {!isControlled && (
-          <div className="flex gap-1 p-1 bg-muted rounded-lg">
+          <div className="bg-muted flex gap-1 rounded-lg p-1">
             {PERIOD_OPTIONS.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setInternalDays(key)}
-                className={`px-3 py-1.5 text-xs rounded-md transition-all ${
+                className={`rounded-md px-3 py-1.5 text-xs transition-all ${
                   days === key
-                    ? "bg-background text-foreground shadow-sm font-medium"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? 'bg-background text-foreground font-medium shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {label}
@@ -172,15 +142,15 @@ export default function GroupComparisonReport({
             ))}
           </div>
         )}
-        <div className="flex gap-1 p-1 bg-muted rounded-lg">
+        <div className="bg-muted flex gap-1 rounded-lg p-1">
           {DIMENSION_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setDimension(key)}
-              className={`px-3 py-1.5 text-xs rounded-md transition-all ${
+              className={`rounded-md px-3 py-1.5 text-xs transition-all ${
                 dimension === key
-                  ? "bg-background text-foreground shadow-sm font-medium"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? 'bg-background text-foreground font-medium shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -191,19 +161,16 @@ export default function GroupComparisonReport({
 
       {/* Best/Worst callouts */}
       {bestGroup && worstGroup && bestGroup.name !== worstGroup.name && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Card className="border-emerald-200 bg-emerald-50/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <TrendingUp size={18} className="text-emerald-600" />
                 <div>
-                  <p className="text-xs text-emerald-600 font-medium">Лучший</p>
-                  <p className="text-sm font-bold text-emerald-700">
-                    {bestGroup.name}
-                  </p>
+                  <p className="text-xs font-medium text-emerald-600">Лучший</p>
+                  <p className="text-sm font-bold text-emerald-700">{bestGroup.name}</p>
                   <p className="text-xs text-emerald-600">
-                    Завершение: {bestGroup.avgCompletionRate}%, Балл:{" "}
-                    {bestGroup.avgQuizScore}%
+                    Завершение: {bestGroup.avgCompletionRate}%, Балл: {bestGroup.avgQuizScore}%
                   </p>
                 </div>
               </div>
@@ -214,15 +181,10 @@ export default function GroupComparisonReport({
               <div className="flex items-center gap-2">
                 <TrendingDown size={18} className="text-red-600" />
                 <div>
-                  <p className="text-xs text-red-600 font-medium">
-                    Требует внимания
-                  </p>
-                  <p className="text-sm font-bold text-red-700">
-                    {worstGroup.name}
-                  </p>
+                  <p className="text-xs font-medium text-red-600">Требует внимания</p>
+                  <p className="text-sm font-bold text-red-700">{worstGroup.name}</p>
                   <p className="text-xs text-red-600">
-                    Завершение: {worstGroup.avgCompletionRate}%, Балл:{" "}
-                    {worstGroup.avgQuizScore}%
+                    Завершение: {worstGroup.avgCompletionRate}%, Балл: {worstGroup.avgQuizScore}%
                   </p>
                 </div>
               </div>
@@ -234,71 +196,47 @@ export default function GroupComparisonReport({
       {/* Grouped bar chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Сравнительная диаграмма
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">Сравнительная диаграмма</h3>
           {barData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={barData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e2e8f0" }}
-                />
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
                 <YAxis
                   tick={{ fontSize: 11 }}
                   tickLine={false}
-                  axisLine={{ stroke: "#e2e8f0" }}
+                  axisLine={{ stroke: '#e2e8f0' }}
                   domain={[0, 100]}
                   tickFormatter={(v) => `${v}%`}
                 />
                 <Tooltip
                   formatter={(value, name) => {
                     const labels: Record<string, string> = {
-                      avgCompletionRate: "Завершение",
-                      avgQuizScore: "Ср. балл",
-                      activeRate: "Активность",
+                      avgCompletionRate: 'Завершение',
+                      avgQuizScore: 'Ср. балл',
+                      activeRate: 'Активность',
                     };
-                    return [`${value}%`, name ? labels[name] || name : ""];
+                    return [`${value}%`, name ? labels[name] || name : ''];
                   }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
                   formatter={(value) => {
                     const labels: Record<string, string> = {
-                      avgCompletionRate: "Завершение",
-                      avgQuizScore: "Ср. балл",
-                      activeRate: "Активность",
+                      avgCompletionRate: 'Завершение',
+                      avgQuizScore: 'Ср. балл',
+                      activeRate: 'Активность',
                     };
                     return labels[value] || value;
                   }}
                 />
-                <Bar
-                  dataKey="avgCompletionRate"
-                  name="avgCompletionRate"
-                  fill="#10b981"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="avgQuizScore"
-                  name="avgQuizScore"
-                  fill="#6366f1"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="activeRate"
-                  name="activeRate"
-                  fill="#3b82f6"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="avgCompletionRate" name="avgCompletionRate" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="avgQuizScore" name="avgQuizScore" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="activeRate" name="activeRate" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-slate-400 text-center py-12">
-              Нет данных
-            </p>
+            <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
           )}
         </CardContent>
       </Card>
@@ -307,30 +245,24 @@ export default function GroupComparisonReport({
       {radarData.length >= 2 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Радар сравнения (топ 5)
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Радар сравнения (топ 5)</h3>
             <ResponsiveContainer width="100%" height={300}>
               <RadarChart data={radarData}>
                 <PolarGrid />
                 <PolarAngleAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <PolarRadiusAxis
-                  domain={[0, 100]}
-                  tick={{ fontSize: 10 }}
-                  tickFormatter={(v) => `${v}%`}
-                />
+                <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
                 {top5.map((_, i) => (
                   <Radar
                     key={i}
                     name={radarData[i].name}
-                    dataKey={["completion", "quiz", "activity"][i % 3]}
+                    dataKey={['completion', 'quiz', 'activity'][i % 3]}
                     stroke={COLORS[i % COLORS.length]}
                     fill={COLORS[i % COLORS.length]}
                     fillOpacity={0.15}
                     strokeWidth={2}
                   />
                 ))}
-                <Tooltip formatter={(value) => [`${value}%`, ""]} />
+                <Tooltip formatter={(value) => [`${value}%`, '']} />
               </RadarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -340,40 +272,22 @@ export default function GroupComparisonReport({
       {/* Ranking table */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Рейтинг</h3>
+          <h3 className="mb-4 text-sm font-semibold">Рейтинг</h3>
           {dimensions.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                      #
+                  <tr className="border-border border-b">
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">#</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">
+                      {dimension === 'group' ? 'Группа' : dimension === 'course' ? 'Курс' : 'Университет'}
                     </th>
-                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                      {dimension === "group"
-                        ? "Группа"
-                        : dimension === "course"
-                          ? "Курс"
-                          : "Университет"}
-                    </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                      Студенты
-                    </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                      Завершение
-                    </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                      Ср. балл
-                    </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                      Активность
-                    </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                      Лучший модуль
-                    </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                      Слабый модуль
-                    </th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Студенты</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершение</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Ср. балл</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Активность</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Лучший модуль</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Слабый модуль</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -385,61 +299,49 @@ export default function GroupComparisonReport({
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.03 }}
-                        className="border-b border-slate-100 hover:bg-secondary transition-colors"
+                        className="hover:bg-secondary border-b border-slate-100 transition-colors"
                       >
-                        <td className="py-2.5 px-3">
+                        <td className="px-3 py-2.5">
                           <span
-                            className={`w-6 h-6 rounded-full inline-flex items-center justify-center text-xs font-bold ${
+                            className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
                               i === 0
-                                ? "bg-amber-100 text-amber-700"
+                                ? 'bg-amber-100 text-amber-700'
                                 : i === 1
-                                  ? "bg-slate-200 text-muted-foreground"
+                                  ? 'text-muted-foreground bg-slate-200'
                                   : i === 2
-                                    ? "bg-orange-100 text-orange-700"
-                                    : "bg-muted text-muted-foreground"
+                                    ? 'bg-orange-100 text-orange-700'
+                                    : 'bg-muted text-muted-foreground'
                             }`}
                           >
                             {i + 1}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 font-medium">{d.name}</td>
-                        <td className="py-2.5 px-3 text-right">
-                          {d.studentCount}
-                        </td>
-                        <td className="py-2.5 px-3 text-right">
+                        <td className="px-3 py-2.5 font-medium">{d.name}</td>
+                        <td className="px-3 py-2.5 text-right">{d.studentCount}</td>
+                        <td className="px-3 py-2.5 text-right">
                           <span
-                            className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+                            className={`inline-flex rounded px-2 py-0.5 text-xs font-medium ${
                               d.avgCompletionRate >= 70
-                                ? "bg-emerald-100 text-emerald-700"
+                                ? 'bg-emerald-100 text-emerald-700'
                                 : d.avgCompletionRate >= 40
-                                  ? "bg-amber-100 text-amber-700"
-                                  : "bg-red-100 text-red-700"
+                                  ? 'bg-amber-100 text-amber-700'
+                                  : 'bg-red-100 text-red-700'
                             }`}
                           >
                             {d.avgCompletionRate}%
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-right font-medium">
-                          {d.avgQuizScore}%
-                        </td>
-                        <td className="py-2.5 px-3 text-right">
-                          {d.activeRate}%
-                        </td>
-                        <td className="py-2.5 px-3 text-right text-xs text-emerald-600">
-                          {d.topModule}
-                        </td>
-                        <td className="py-2.5 px-3 text-right text-xs text-red-600">
-                          {d.weakestModule}
-                        </td>
+                        <td className="px-3 py-2.5 text-right font-medium">{d.avgQuizScore}%</td>
+                        <td className="px-3 py-2.5 text-right">{d.activeRate}%</td>
+                        <td className="px-3 py-2.5 text-right text-xs text-emerald-600">{d.topModule}</td>
+                        <td className="px-3 py-2.5 text-right text-xs text-red-600">{d.weakestModule}</td>
                       </motion.tr>
                     ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="text-sm text-slate-400 text-center py-8">
-              Нет данных
-            </p>
+            <p className="py-8 text-center text-sm text-slate-400">Нет данных</p>
           )}
         </CardContent>
       </Card>

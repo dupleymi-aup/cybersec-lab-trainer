@@ -1,42 +1,30 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { getProgressTrends, type TrendPoint } from "@/lib/auth-store";
-import { motion } from "framer-motion";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-import { Card, CardContent } from "@/components/ui/card";
-import { Clock } from "lucide-react";
-import { CHART_COLORS } from "@/lib/constants";
+import { useState, useEffect } from 'react';
+import { getProgressTrends, type TrendPoint } from '@/lib/auth-store';
+import { motion } from 'framer-motion';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Card, CardContent } from '@/components/ui/card';
+import { Clock } from 'lucide-react';
+import { CHART_COLORS } from '@/lib/constants';
 
 interface ProgressTrendsChartProps {
   students?: Array<{ id: string; fullName: string }>;
   groupId?: string;
 }
 
-type DateRange = "7d" | "30d" | "90d" | "all";
+type DateRange = '7d' | '30d' | '90d' | 'all';
 
 const dateRangeOptions: { value: DateRange; label: string }[] = [
-  { value: "7d", label: "7 дней" },
-  { value: "30d", label: "30 дней" },
-  { value: "90d", label: "90 дней" },
-  { value: "all", label: "Всё время" },
+  { value: '7d', label: '7 дней' },
+  { value: '30d', label: '30 дней' },
+  { value: '90d', label: '90 дней' },
+  { value: 'all', label: 'Всё время' },
 ];
 
-export default function ProgressTrendsChart({
-  students,
-  groupId: _groupId,
-}: ProgressTrendsChartProps) {
-  const [dateRange, setDateRange] = useState<DateRange>("30d");
-  const [selectedUserId, setSelectedUserId] = useState<string>("");
+export default function ProgressTrendsChart({ students, groupId: _groupId }: ProgressTrendsChartProps) {
+  const [dateRange, setDateRange] = useState<DateRange>('30d');
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [trends, setTrends] = useState<TrendPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,22 +37,18 @@ export default function ProgressTrendsChart({
   }, [dateRange, selectedUserId]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <Card className="border-border bg-card rounded-xl">
         <CardContent className="p-5">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-            <h3 className="font-semibold text-sm">Динамика прогресса</h3>
+          <div className="mb-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+            <h3 className="text-sm font-semibold">Динамика прогресса</h3>
 
             <div className="flex flex-wrap items-center gap-2">
               {students && students.length > 0 && (
                 <select
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
-                  className="px-3 py-1.5 border border-border rounded-md text-xs bg-card"
+                  className="border-border bg-card rounded-md border px-3 py-1.5 text-xs"
                 >
                   <option value="">Все студенты</option>
                   {students.map((s) => (
@@ -75,15 +59,15 @@ export default function ProgressTrendsChart({
                 </select>
               )}
 
-              <div className="flex items-center gap-1 bg-muted rounded-md p-0.5">
+              <div className="bg-muted flex items-center gap-1 rounded-md p-0.5">
                 {dateRangeOptions.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setDateRange(opt.value)}
-                    className={`px-2.5 py-1 text-xs rounded transition-colors ${
+                    className={`rounded px-2.5 py-1 text-xs transition-colors ${
                       dateRange === opt.value
-                        ? "bg-background text-foreground shadow-sm font-medium"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? 'bg-background text-foreground font-medium shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {opt.label}
@@ -94,12 +78,12 @@ export default function ProgressTrendsChart({
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center h-[300px] text-slate-400">
-              <Clock size={20} className="animate-spin mr-2" />
+            <div className="flex h-[300px] items-center justify-center text-slate-400">
+              <Clock size={20} className="mr-2 animate-spin" />
               Загрузка...
             </div>
           ) : trends.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[300px] text-slate-400">
+            <div className="flex h-[300px] flex-col items-center justify-center text-slate-400">
               <Clock size={40} className="mb-3 opacity-50" />
               <p className="text-sm">Нет данных</p>
             </div>
@@ -107,22 +91,15 @@ export default function ProgressTrendsChart({
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={trends}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke={CHART_COLORS.grid}
-                  />
-                  <XAxis
-                    dataKey="date"
-                    tick={{ fontSize: 11 }}
-                    interval="preserveStartEnd"
-                  />
+                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
                   <YAxis
                     yAxisId="left"
                     tick={{ fontSize: 11 }}
                     label={{
-                      value: "Модули",
+                      value: 'Модули',
                       angle: -90,
-                      position: "insideLeft",
+                      position: 'insideLeft',
                       fontSize: 11,
                     }}
                   />
@@ -132,9 +109,9 @@ export default function ProgressTrendsChart({
                     domain={[0, 100]}
                     tick={{ fontSize: 11 }}
                     label={{
-                      value: "Балл (%)",
+                      value: 'Балл (%)',
                       angle: 90,
-                      position: "insideRight",
+                      position: 'insideRight',
                       fontSize: 11,
                     }}
                   />

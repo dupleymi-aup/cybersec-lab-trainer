@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useAppStore, type PageType } from "@/lib/store";
-import { modules, quizCategories } from "@/lib/data";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useAppStore, type PageType } from '@/lib/store';
+import { modules, quizCategories } from '@/lib/data';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
   X,
@@ -18,7 +18,7 @@ import {
   BookOpen,
   Trophy,
   GraduationCap,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface SearchResult {
   id: string;
@@ -39,37 +39,37 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 const pageNavItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
-  { id: "dashboard", label: "Главная", icon: <LayoutDashboard size={16} /> },
-  { id: "achievements", label: "Достижения", icon: <Trophy size={16} /> },
-  { id: "quiz", label: "Квизы", icon: <HelpCircle size={16} /> },
-  { id: "profile", label: "Профиль", icon: <GraduationCap size={16} /> },
+  { id: 'dashboard', label: 'Главная', icon: <LayoutDashboard size={16} /> },
+  { id: 'achievements', label: 'Достижения', icon: <Trophy size={16} /> },
+  { id: 'quiz', label: 'Квизы', icon: <HelpCircle size={16} /> },
+  { id: 'profile', label: 'Профиль', icon: <GraduationCap size={16} /> },
 ];
 
 export default function GlobalSearch() {
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Cmd+K shortcut
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setOpen((prev) => !prev);
       }
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         setOpen(false);
       }
     };
-    document.addEventListener("keydown", handleKeydown);
-    return () => document.removeEventListener("keydown", handleKeydown);
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
   }, []);
 
   // Focus input when opened
   useEffect(() => {
     if (open) {
-      setQuery("");
+      setQuery('');
       const timer = setTimeout(() => inputRef.current?.focus(), 50);
       return () => clearTimeout(timer);
     }
@@ -86,7 +86,7 @@ export default function GlobalSearch() {
         items.push({
           id: `nav-${nav.id}`,
           title: nav.label,
-          subtitle: "Навигация",
+          subtitle: 'Навигация',
           icon: nav.icon,
           page: nav.id,
         });
@@ -95,10 +95,7 @@ export default function GlobalSearch() {
 
     // Modules
     for (const mod of modules) {
-      if (
-        mod.title.toLowerCase().includes(q) ||
-        mod.description.toLowerCase().includes(q)
-      ) {
+      if (mod.title.toLowerCase().includes(q) || mod.description.toLowerCase().includes(q)) {
         items.push({
           id: `mod-${mod.id}`,
           title: mod.title,
@@ -117,7 +114,7 @@ export default function GlobalSearch() {
           title: cat.name,
           subtitle: `Квиз · ${cat.count} вопросов`,
           icon: <HelpCircle size={16} />,
-          page: "quiz",
+          page: 'quiz',
         });
       }
     }
@@ -135,11 +132,11 @@ export default function GlobalSearch() {
       {/* Trigger button — shown in sidebar header or dashboard */}
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card/50 text-sm text-slate-400 hover:border-border hover:text-muted-foreground transition-colors"
+        className="border-border bg-card/50 hover:border-border hover:text-muted-foreground flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-sm text-slate-400 transition-colors"
       >
         <Search size={14} />
         <span className="flex-1 text-left">Поиск...</span>
-        <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono text-muted-foreground">
+        <kbd className="bg-muted text-muted-foreground hidden items-center gap-0.5 rounded px-1.5 py-0.5 font-mono text-[10px] md:inline-flex">
           ⌘K
         </kbd>
       </button>
@@ -152,7 +149,7 @@ export default function GlobalSearch() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 z-50"
+              className="fixed inset-0 z-50 bg-black/40"
               onClick={() => setOpen(false)}
             />
             <motion.div
@@ -160,24 +157,24 @@ export default function GlobalSearch() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
               transition={{ duration: 0.15 }}
-              className="fixed top-[15vh] left-1/2 -translate-x-1/2 w-full max-w-lg z-50"
+              className="fixed top-[15vh] left-1/2 z-50 w-full max-w-lg -translate-x-1/2"
             >
-              <div className="bg-card rounded-xl shadow-2xl border border-border overflow-hidden mx-4">
+              <div className="bg-card border-border mx-4 overflow-hidden rounded-xl border shadow-2xl">
                 {/* Search input */}
-                <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
-                  <Search size={18} className="text-slate-400 shrink-0" />
+                <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
+                  <Search size={18} className="shrink-0 text-slate-400" />
                   <input
                     ref={inputRef}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Поиск модулей, квизов, терминов..."
-                    className="flex-1 text-sm outline-none bg-transparent placeholder:text-slate-400"
+                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
                   />
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
                     aria-label="Закрыть поиск"
-                    className="text-slate-400 hover:text-muted-foreground"
+                    className="hover:text-muted-foreground text-slate-400"
                   >
                     <X size={16} />
                   </button>
@@ -186,38 +183,28 @@ export default function GlobalSearch() {
                 {/* Results */}
                 <div className="max-h-[60vh] overflow-y-auto p-2">
                   {query.trim() && results.length === 0 && (
-                    <p className="text-sm text-slate-400 text-center py-8">
-                      Ничего не найдено
-                    </p>
+                    <p className="py-8 text-center text-sm text-slate-400">Ничего не найдено</p>
                   )}
                   {!query.trim() && (
-                    <p className="text-sm text-slate-400 text-center py-8">
-                      Начните вводить для поиска
-                    </p>
+                    <p className="py-8 text-center text-sm text-slate-400">Начните вводить для поиска</p>
                   )}
                   {results.map((result) => (
                     <button
                       key={result.id}
                       onClick={() => handleSelect(result.page)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors text-left"
+                      className="hover:bg-secondary flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors"
                     >
-                      <span className="text-muted-foreground shrink-0">
-                        {result.icon}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {result.title}
-                        </p>
-                        <p className="text-xs text-slate-400 truncate">
-                          {result.subtitle}
-                        </p>
+                      <span className="text-muted-foreground shrink-0">{result.icon}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{result.title}</p>
+                        <p className="truncate text-xs text-slate-400">{result.subtitle}</p>
                       </div>
                     </button>
                   ))}
                 </div>
 
                 {/* Footer */}
-                <div className="px-4 py-2 border-t border-slate-100 flex items-center gap-4 text-[10px] text-slate-400">
+                <div className="flex items-center gap-4 border-t border-slate-100 px-4 py-2 text-[10px] text-slate-400">
                   <span>⌘K — открыть</span>
                   <span>Esc — закрыть</span>
                 </div>

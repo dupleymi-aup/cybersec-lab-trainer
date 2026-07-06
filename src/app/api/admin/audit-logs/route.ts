@@ -1,42 +1,33 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-  checkRateLimit,
-} from "@/lib/api-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit } from '@/lib/api-middleware';
 
 // GET /api/admin/audit-logs - view audit logs with filtering and pagination
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "admin")) return forbidden();
+  if (!requireRole(auth.role, 'admin')) return forbidden();
 
   // Rate limit: 60 requests per minute
   const rateLimit = checkRateLimit(`audit-logs:${auth.id}`, 60, 60_000);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
   const { searchParams } = new URL(request.url);
 
   // Pagination
-  const page = parseInt(searchParams.get("page") || "1");
-  const limit = parseInt(searchParams.get("limit") || "20");
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '20');
   const skip = (page - 1) * Math.min(limit, 100);
 
   // Filters
-  const action = searchParams.get("action") || undefined;
-  const adminId = searchParams.get("adminId") || undefined;
-  const targetId = searchParams.get("targetId") || undefined;
-  const search = searchParams.get("search") || undefined;
-  const dateFrom = searchParams.get("dateFrom") || undefined;
-  const dateTo = searchParams.get("dateTo") || undefined;
+  const action = searchParams.get('action') || undefined;
+  const adminId = searchParams.get('adminId') || undefined;
+  const targetId = searchParams.get('targetId') || undefined;
+  const search = searchParams.get('search') || undefined;
+  const dateFrom = searchParams.get('dateFrom') || undefined;
+  const dateTo = searchParams.get('dateTo') || undefined;
 
   const where: Record<string, unknown> = {};
   if (action) where.action = action;
@@ -44,23 +35,21 @@ export async function GET(request: NextRequest) {
   if (targetId) where.targetId = targetId;
   if (search) {
     where.OR = [
-      { adminName: { contains: search, mode: "insensitive" as const } },
-      { targetName: { contains: search, mode: "insensitive" as const } },
-      { details: { contains: search, mode: "insensitive" as const } },
+      { adminName: { contains: search, mode: 'insensitive' as const } },
+      { targetName: { contains: search, mode: 'insensitive' as const } },
+      { details: { contains: search, mode: 'insensitive' as const } },
     ];
   }
   if (dateFrom || dateTo) {
     where.timestamp = {};
-    if (dateFrom)
-      (where.timestamp as Record<string, unknown>).gte = new Date(dateFrom);
-    if (dateTo)
-      (where.timestamp as Record<string, unknown>).lte = new Date(dateTo);
+    if (dateFrom) (where.timestamp as Record<string, unknown>).gte = new Date(dateFrom);
+    if (dateTo) (where.timestamp as Record<string, unknown>).lte = new Date(dateTo);
   }
 
   const [logs, total] = await Promise.all([
     prisma.auditLog.findMany({
       where,
-      orderBy: { timestamp: "desc" },
+      orderBy: { timestamp: 'desc' },
       skip,
       take: Math.min(limit, 100),
       include: {

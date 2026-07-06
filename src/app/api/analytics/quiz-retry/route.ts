@@ -1,20 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { parseDays } from "@/lib/utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { parseDays } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const groupId = searchParams.get("groupId") || "";
+  const groupId = searchParams.get('groupId') || '';
   const days = parseDays(searchParams);
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
@@ -29,7 +24,7 @@ export async function GET(request: NextRequest) {
       attemptedAt: true,
       category: true,
     },
-    orderBy: { attemptedAt: "asc" },
+    orderBy: { attemptedAt: 'asc' },
   });
 
   // Get user info
@@ -37,18 +32,10 @@ export async function GET(request: NextRequest) {
     select: { id: true, fullName: true, group: true },
   });
   const userMap = new Map(users.map((u) => [u.id, u]));
-  const filteredUsers = new Set(
-    users.filter((u) => !groupId || u.group === groupId).map((u) => u.id),
-  );
+  const filteredUsers = new Set(users.filter((u) => !groupId || u.group === groupId).map((u) => u.id));
 
   // Group attempts by user+quiz to find session boundaries
-  const userQuizMap = new Map<
-    string,
-    Map<
-      string,
-      Array<{ correct: boolean; attemptedAt: Date; category: string }>
-    >
-  >();
+  const userQuizMap = new Map<string, Map<string, Array<{ correct: boolean; attemptedAt: Date; category: string }>>>();
   for (const attempt of attempts) {
     if (!filteredUsers.has(attempt.userId)) continue;
 
@@ -103,7 +90,7 @@ export async function GET(request: NextRequest) {
         fullName: user.fullName,
         group: user.group,
         quizId,
-        category: attemptList[0]?.category || "",
+        category: attemptList[0]?.category || '',
         attempts: estimatedAttempts,
         firstScore: score,
         lastScore: score,
@@ -147,8 +134,7 @@ export async function GET(request: NextRequest) {
       category,
       totalAttempts: data.totalAttempts,
       uniqueStudents: data.count,
-      avgAttemptsPerStudent:
-        Math.round((data.totalAttempts / data.count) * 10) / 10,
+      avgAttemptsPerStudent: Math.round((data.totalAttempts / data.count) * 10) / 10,
     }))
     .sort((a, b) => b.totalAttempts - a.totalAttempts);
 
@@ -163,10 +149,10 @@ export async function GET(request: NextRequest) {
   }
 
   const retryDistribution = [
-    { range: "Без повторов", count: 0 },
-    { range: "1 повтор", count: 0 },
-    { range: "2 повтора", count: 0 },
-    { range: "3+ повторов", count: 0 },
+    { range: 'Без повторов', count: 0 },
+    { range: '1 повтор', count: 0 },
+    { range: '2 повтора', count: 0 },
+    { range: '3+ повторов', count: 0 },
   ];
   for (const count of userRetryCounts.values()) {
     if (count === 0) retryDistribution[0].count++;
@@ -181,8 +167,8 @@ export async function GET(request: NextRequest) {
       const user = userMap.get(userId);
       return {
         userId,
-        fullName: user?.fullName || "",
-        group: user?.group || "",
+        fullName: user?.fullName || '',
+        group: user?.group || '',
         retryCount: count,
       };
     })
@@ -191,9 +177,9 @@ export async function GET(request: NextRequest) {
 
   // Score improvement by retry attempts
   const improvementByRetries = [
-    { attempts: "1 попытка", avgScore: 0, count: 0 },
-    { attempts: "2 попытки", avgScore: 0, count: 0 },
-    { attempts: "3+ попыток", avgScore: 0, count: 0 },
+    { attempts: '1 попытка', avgScore: 0, count: 0 },
+    { attempts: '2 попытки', avgScore: 0, count: 0 },
+    { attempts: '3+ попыток', avgScore: 0, count: 0 },
   ];
 
   for (const r of retryData) {

@@ -1,13 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { prisma } from "@/lib/db";
-import { syncGradesToPlatform } from "@/lib/lti-utils";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from 'next/server';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { prisma } from '@/lib/db';
+import { syncGradesToPlatform } from '@/lib/lti-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/lti/sync-grades
@@ -17,17 +12,14 @@ export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  if (!requireRole(auth.role, "teacher", "admin")) return forbidden();
+  if (!requireRole(auth.role, 'teacher', 'admin')) return forbidden();
 
   try {
     const body = await request.json();
     const { platformId, userId, moduleId, score, maximumScore, label } = body;
 
     if (!platformId || !userId || !moduleId) {
-      return NextResponse.json(
-        { error: "Missing required fields: platformId, userId, moduleId" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Missing required fields: platformId, userId, moduleId' }, { status: 400 });
     }
 
     const result = await syncGradesToPlatform(
@@ -40,19 +32,13 @@ export async function POST(request: NextRequest) {
     );
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error, status: "failed" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: result.error, status: 'failed' }, { status: 400 });
     }
 
-    return NextResponse.json({ status: "synced" });
+    return NextResponse.json({ status: 'synced' });
   } catch (error) {
-    logger.error("LTI grade sync error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    logger.error('LTI grade sync error', { error: String(error) });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -64,10 +50,10 @@ export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  if (!requireRole(auth.role, "teacher", "admin")) return forbidden();
+  if (!requireRole(auth.role, 'teacher', 'admin')) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const platformId = searchParams.get("platformId");
+  const platformId = searchParams.get('platformId');
 
   if (!platformId) {
     // Return all platforms with sync stats
@@ -81,7 +67,7 @@ export async function GET(request: NextRequest) {
             status: true,
             syncedAt: true,
           },
-          orderBy: { syncedAt: "desc" },
+          orderBy: { syncedAt: 'desc' },
           take: 10,
         },
       },
@@ -92,7 +78,7 @@ export async function GET(request: NextRequest) {
 
   const syncs = await prisma.ltiGradeSync.findMany({
     where: { platformId },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
     take: 50,
   });
 

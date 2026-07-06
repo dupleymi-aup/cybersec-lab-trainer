@@ -1,27 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import { Repeat, Loader2, AlertTriangle } from "lucide-react";
-import { getQuizRetryAnalytics, type QuizRetryData } from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import KPICard from "./KPICard";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Repeat, Loader2, AlertTriangle } from 'lucide-react';
+import { getQuizRetryAnalytics, type QuizRetryData } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import KPICard from './KPICard';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: "7д" },
-  { key: 30, label: "30д" },
-  { key: 90, label: "90д" },
-  { key: 180, label: "180д" },
+  { key: 7, label: '7д' },
+  { key: 30, label: '30д' },
+  { key: 90, label: '90д' },
+  { key: 180, label: '180д' },
 ];
 
 export default function QuizRetryAnalytics({
@@ -47,7 +38,7 @@ export default function QuizRetryAnalytics({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -60,7 +51,7 @@ export default function QuizRetryAnalytics({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -69,26 +60,18 @@ export default function QuizRetryAnalytics({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
 
-  const {
-    retryDistribution,
-    improvementByRetries,
-    topRetryers,
-    categoryRetryStats,
-    totalRetries,
-    totalUniqueQuizzes,
-  } = data;
+  const { retryDistribution, improvementByRetries, topRetryers, categoryRetryStats, totalRetries, totalUniqueQuizzes } =
+    data;
 
   const avgAttempts =
     retryDistribution.reduce((sum, b) => {
-      const num = parseInt(b.range.split("+")[0].split(" ")[0]) || 0;
-      return sum + b.count * (b.range.includes("+") ? 3 : num);
+      const num = parseInt(b.range.split('+')[0].split(' ')[0]) || 0;
+      return sum + b.count * (b.range.includes('+') ? 3 : num);
     }, 0) /
     Math.max(
       1,
@@ -99,13 +82,13 @@ export default function QuizRetryAnalytics({
     <div className="space-y-6">
       {/* Period selector */}
       {controlledDays === undefined && (
-        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               type="button"
               key={key}
               onClick={() => setInternalDays(key)}
-              className={`px-3 py-1.5 text-xs rounded-md transition-all ${days === key ? "bg-background text-foreground shadow-sm font-medium" : "text-muted-foreground hover:text-foreground"}`}
+              className={`rounded-md px-3 py-1.5 text-xs transition-all ${days === key ? 'bg-background text-foreground font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
               {label}
             </button>
@@ -114,7 +97,7 @@ export default function QuizRetryAnalytics({
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KPICard
           icon={<Repeat size={18} />}
           value={totalRetries}
@@ -148,19 +131,14 @@ export default function QuizRetryAnalytics({
       {/* Retry Distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Распределение повторов</h3>
+          <h3 className="mb-4 text-sm font-semibold">Распределение повторов</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={retryDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="range" tick={{ fontSize: 12 }} />
               <YAxis allowDecimals={false} />
               <Tooltip />
-              <Bar
-                dataKey="count"
-                fill="#6366f1"
-                name="Студенты"
-                radius={[4, 4, 0, 0]}
-              />
+              <Bar dataKey="count" fill="#6366f1" name="Студенты" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -169,9 +147,7 @@ export default function QuizRetryAnalytics({
       {/* Improvement by Retries */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Балл по количеству попыток
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">Балл по количеству попыток</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={improvementByRetries}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -179,12 +155,7 @@ export default function QuizRetryAnalytics({
               <YAxis domain={[0, 100]} />
               <Tooltip />
               <Legend />
-              <Bar
-                dataKey="avgScore"
-                fill="#10b981"
-                name="Ср. балл (%)"
-                radius={[4, 4, 0, 0]}
-              />
+              <Bar dataKey="avgScore" fill="#10b981" name="Ср. балл (%)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -193,25 +164,15 @@ export default function QuizRetryAnalytics({
       {/* Category Retry Stats */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Статистика по категориям
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">Статистика по категориям</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Категория
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Попытки
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Студенты
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Ср. попыток
-                  </th>
+                <tr className="border-border border-b">
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Категория</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Попытки</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Студенты</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Ср. попыток</th>
                 </tr>
               </thead>
               <tbody>
@@ -221,18 +182,12 @@ export default function QuizRetryAnalytics({
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.02 }}
-                    className="border-b border-slate-100 hover:bg-secondary transition-colors"
+                    className="hover:bg-secondary border-b border-slate-100 transition-colors"
                   >
-                    <td className="py-2.5 px-3 font-medium">{cat.category}</td>
-                    <td className="py-2.5 px-3 text-right">
-                      {cat.totalAttempts}
-                    </td>
-                    <td className="py-2.5 px-3 text-right">
-                      {cat.uniqueStudents}
-                    </td>
-                    <td className="py-2.5 px-3 text-right">
-                      {cat.avgAttemptsPerStudent}
-                    </td>
+                    <td className="px-3 py-2.5 font-medium">{cat.category}</td>
+                    <td className="px-3 py-2.5 text-right">{cat.totalAttempts}</td>
+                    <td className="px-3 py-2.5 text-right">{cat.uniqueStudents}</td>
+                    <td className="px-3 py-2.5 text-right">{cat.avgAttemptsPerStudent}</td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -245,25 +200,15 @@ export default function QuizRetryAnalytics({
       {topRetryers.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Топ студентов по повторам
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Топ студентов по повторам</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                      #
-                    </th>
-                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                      ФИО
-                    </th>
-                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                      Группа
-                    </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                      Повторы
-                    </th>
+                  <tr className="border-border border-b">
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">#</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">ФИО</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Группа</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Повторы</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -273,16 +218,12 @@ export default function QuizRetryAnalytics({
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.02 }}
-                      className="border-b border-slate-100 hover:bg-secondary transition-colors"
+                      className="hover:bg-secondary border-b border-slate-100 transition-colors"
                     >
-                      <td className="py-2.5 px-3 text-muted-foreground">
-                        {i + 1}
-                      </td>
-                      <td className="py-2.5 px-3 font-medium">{r.fullName}</td>
-                      <td className="py-2.5 px-3 text-xs">{r.group || "-"}</td>
-                      <td className="py-2.5 px-3 text-right font-medium">
-                        {r.retryCount}
-                      </td>
+                      <td className="text-muted-foreground px-3 py-2.5">{i + 1}</td>
+                      <td className="px-3 py-2.5 font-medium">{r.fullName}</td>
+                      <td className="px-3 py-2.5 text-xs">{r.group || '-'}</td>
+                      <td className="px-3 py-2.5 text-right font-medium">{r.retryCount}</td>
                     </motion.tr>
                   ))}
                 </tbody>

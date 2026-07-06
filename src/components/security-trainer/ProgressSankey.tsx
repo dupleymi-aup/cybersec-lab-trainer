@@ -1,31 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import {
-  GitBranch,
-  Loader2,
-  AlertTriangle,
-  Users,
-  BookOpen,
-  Trophy,
-  CheckCircle,
-} from "lucide-react";
-import {
-  getComprehensiveSummary,
-  type ComprehensiveSummary,
-} from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import KPICard from "./KPICard";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { GitBranch, Loader2, AlertTriangle, Users, BookOpen, Trophy, CheckCircle } from 'lucide-react';
+import { getComprehensiveSummary, type ComprehensiveSummary } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import KPICard from './KPICard';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: "7д" },
-  { key: 30, label: "30д" },
-  { key: 90, label: "90д" },
-  { key: 180, label: "180д" },
+  { key: 7, label: '7д' },
+  { key: 30, label: '30д' },
+  { key: 90, label: '90д' },
+  { key: 180, label: '180д' },
 ];
 
-const STAGE_COLORS = ["#6366f1", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
+const STAGE_COLORS = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
 
 export default function ProgressSankey({
   groupId: controlledGroupId,
@@ -50,7 +39,7 @@ export default function ProgressSankey({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -63,7 +52,7 @@ export default function ProgressSankey({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -72,9 +61,7 @@ export default function ProgressSankey({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -84,44 +71,40 @@ export default function ProgressSankey({
   // Build funnel stages
   const totalStudents = kpis.totalStudents;
   const activeStudents = kpis.activeStudents;
-  const completedAtLeastOne = Math.round(
-    (kpis.avgCompletionRate / 100) * totalStudents,
-  );
+  const completedAtLeastOne = Math.round((kpis.avgCompletionRate / 100) * totalStudents);
   const passedAtLeastOne = scoreDistribution.good + scoreDistribution.excellent;
-  const fullyCompleted = Math.round(
-    (kpis.avgCompletionRate / 100) * activeStudents * 0.3,
-  );
+  const fullyCompleted = Math.round((kpis.avgCompletionRate / 100) * activeStudents * 0.3);
 
   const stages = [
     {
-      label: "Зарегистрированы",
+      label: 'Зарегистрированы',
       value: totalStudents,
       icon: Users,
-      color: "#6366f1",
+      color: '#6366f1',
     },
     {
-      label: "Активные",
+      label: 'Активные',
       value: activeStudents,
       icon: Loader2,
-      color: "#8b5cf6",
+      color: '#8b5cf6',
     },
     {
-      label: "Начали модули",
+      label: 'Начали модули',
       value: completedAtLeastOne,
       icon: BookOpen,
-      color: "#10b981",
+      color: '#10b981',
     },
     {
-      label: "Сдали квизы",
+      label: 'Сдали квизы',
       value: passedAtLeastOne,
       icon: Trophy,
-      color: "#f59e0b",
+      color: '#f59e0b',
     },
     {
-      label: "Завершили курс",
+      label: 'Завершили курс',
       value: fullyCompleted,
       icon: CheckCircle,
-      color: "#ef4444",
+      color: '#ef4444',
     },
   ];
 
@@ -149,13 +132,13 @@ export default function ProgressSankey({
     <div className="space-y-6">
       {/* Period selector */}
       {controlledDays === undefined && (
-        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               type="button"
               key={key}
               onClick={() => setInternalDays(key)}
-              className={`px-3 py-1.5 text-xs rounded-md transition-all ${days === key ? "bg-background text-foreground shadow-sm font-medium" : "text-muted-foreground hover:text-foreground"}`}
+              className={`rounded-md px-3 py-1.5 text-xs transition-all ${days === key ? 'bg-background text-foreground font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
               {label}
             </button>
@@ -164,7 +147,7 @@ export default function ProgressSankey({
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         {stages.map((stage) => (
           <KPICard
             key={stage.label}
@@ -180,14 +163,13 @@ export default function ProgressSankey({
       {/* Main Funnel Visualization */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-6 flex items-center gap-2">
+          <h3 className="mb-6 flex items-center gap-2 text-sm font-semibold">
             <GitBranch size={16} className="text-indigo-500" />
             Воронка прогресса студентов
           </h3>
           <div className="space-y-3">
             {stages.map((stage, idx) => {
-              const widthPercent =
-                totalStudents > 0 ? (stage.value / totalStudents) * 100 : 0;
+              const widthPercent = totalStudents > 0 ? (stage.value / totalStudents) * 100 : 0;
               return (
                 <motion.div
                   key={stage.label}
@@ -196,30 +178,26 @@ export default function ProgressSankey({
                   transition={{ delay: idx * 0.1 }}
                   className="flex items-center gap-4"
                 >
-                  <div className="w-40 text-right flex-shrink-0">
+                  <div className="w-40 flex-shrink-0 text-right">
                     <p className="text-sm font-medium">{stage.label}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {stage.value} студ.
-                    </p>
+                    <p className="text-muted-foreground text-xs">{stage.value} студ.</p>
                   </div>
-                  <div className="flex-1 relative">
+                  <div className="relative flex-1">
                     <div
-                      className="h-10 rounded-lg transition-all duration-500 flex items-center px-4"
+                      className="flex h-10 items-center rounded-lg px-4 transition-all duration-500"
                       style={{
                         width: `${Math.max(widthPercent, 5)}%`,
                         backgroundColor: stage.color,
                         opacity: 0.8 + idx * 0.05,
                       }}
                     >
-                      <span className="text-white font-bold text-sm">
-                        {stage.value}
-                      </span>
+                      <span className="text-sm font-bold text-white">{stage.value}</span>
                     </div>
                   </div>
                   {idx < stages.length - 1 && (
-                    <div className="w-16 text-center flex-shrink-0">
+                    <div className="w-16 flex-shrink-0 text-center">
                       <span
-                        className={`text-xs font-semibold ${conversions[idx].rate >= 70 ? "text-emerald-600" : conversions[idx].rate >= 40 ? "text-amber-600" : "text-red-600"}`}
+                        className={`text-xs font-semibold ${conversions[idx].rate >= 70 ? 'text-emerald-600' : conversions[idx].rate >= 40 ? 'text-amber-600' : 'text-red-600'}`}
                       >
                         {conversions[idx].rate}%
                       </span>
@@ -235,29 +213,25 @@ export default function ProgressSankey({
       {/* Conversion Details */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Конверсия между этапами
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <h3 className="mb-4 text-sm font-semibold">Конверсия между этапами</h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {conversions.map((conv, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={`p-4 rounded-lg border ${conv.rate >= 70 ? "border-emerald-200 bg-emerald-50/50" : conv.rate >= 40 ? "border-amber-200 bg-amber-50/50" : "border-red-200 bg-red-50/50"}`}
+                className={`rounded-lg border p-4 ${conv.rate >= 70 ? 'border-emerald-200 bg-emerald-50/50' : conv.rate >= 40 ? 'border-amber-200 bg-amber-50/50' : 'border-red-200 bg-red-50/50'}`}
               >
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {conv.from} → {conv.to}
                 </p>
                 <p
-                  className={`text-2xl font-bold mt-1 ${conv.rate >= 70 ? "text-emerald-600" : conv.rate >= 40 ? "text-amber-600" : "text-red-600"}`}
+                  className={`mt-1 text-2xl font-bold ${conv.rate >= 70 ? 'text-emerald-600' : conv.rate >= 40 ? 'text-amber-600' : 'text-red-600'}`}
                 >
                   {conv.rate}%
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Отток: {conv.dropoff} студ.
-                </p>
+                <p className="text-muted-foreground mt-1 text-xs">Отток: {conv.dropoff} студ.</p>
               </motion.div>
             ))}
           </div>
@@ -267,61 +241,41 @@ export default function ProgressSankey({
       {/* Module Progress Flow */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Прогресс по модулям</h3>
+          <h3 className="mb-4 text-sm font-semibold">Прогресс по модулям</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Модуль
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Начали
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Завершили
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Сдали
-                  </th>
-                  <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground">
-                    Конверсия
-                  </th>
+                <tr className="border-border border-b">
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Модуль</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Начали</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершили</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Сдали</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Конверсия</th>
                 </tr>
               </thead>
               <tbody>
                 {moduleFlow.slice(0, 8).map((mod, i) => {
-                  const conversion =
-                    mod.started > 0
-                      ? Math.round((mod.passed / mod.started) * 100)
-                      : 0;
+                  const conversion = mod.started > 0 ? Math.round((mod.passed / mod.started) * 100) : 0;
                   return (
                     <motion.tr
                       key={mod.moduleId}
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.02 }}
-                      className="border-b border-slate-100 hover:bg-secondary transition-colors"
+                      className="hover:bg-secondary border-b border-slate-100 transition-colors"
                     >
-                      <td className="py-2.5 px-3 font-medium">
+                      <td className="px-3 py-2.5 font-medium">
                         <div className="flex items-center gap-2">
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: mod.color }}
-                          />
+                          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: mod.color }} />
                           {mod.moduleName}
                         </div>
                       </td>
-                      <td className="py-2.5 px-3 text-right">{mod.started}</td>
-                      <td className="py-2.5 px-3 text-right">
-                        {mod.completed}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-medium">
-                        {mod.passed}
-                      </td>
-                      <td className="py-2.5 px-3 text-right">
+                      <td className="px-3 py-2.5 text-right">{mod.started}</td>
+                      <td className="px-3 py-2.5 text-right">{mod.completed}</td>
+                      <td className="px-3 py-2.5 text-right font-medium">{mod.passed}</td>
+                      <td className="px-3 py-2.5 text-right">
                         <span
-                          className={`font-semibold ${conversion >= 70 ? "text-emerald-600" : conversion >= 40 ? "text-amber-600" : "text-red-600"}`}
+                          className={`font-semibold ${conversion >= 70 ? 'text-emerald-600' : conversion >= 40 ? 'text-amber-600' : 'text-red-600'}`}
                         >
                           {conversion}%
                         </span>

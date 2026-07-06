@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { authenticate, unauthorized } from "@/lib/api-middleware";
-import { getLevel, getXpForNextLevel, getRank } from "@/lib/xp-utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { getLevel, getXpForNextLevel, getRank } from '@/lib/xp-utils';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
   const computed = getLevel(user.xp);
@@ -32,11 +32,7 @@ export async function GET(request: NextRequest) {
       needed: progress.needed,
       nextLevel: progress.nextLevel,
       percentage:
-        progress.needed > 0
-          ? Math.round(
-              (progress.current / (progress.current + progress.needed)) * 100,
-            )
-          : 100,
+        progress.needed > 0 ? Math.round((progress.current / (progress.current + progress.needed)) * 100) : 100,
     },
   });
 }

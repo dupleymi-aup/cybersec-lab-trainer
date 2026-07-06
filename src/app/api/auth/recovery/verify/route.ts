@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { otpStore } from "@/lib/otp-store";
-import { checkRateLimit } from "@/lib/api-middleware";
-import { timingSafeEqual } from "crypto";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { otpStore } from '@/lib/otp-store';
+import { checkRateLimit } from '@/lib/api-middleware';
+import { timingSafeEqual } from 'crypto';
 
 export async function POST(request: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -10,15 +10,12 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
   const { emailOrPhone, otp } = body;
 
   if (!emailOrPhone || !otp) {
-    return NextResponse.json(
-      { error: "Email/phone and OTP required" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Email/phone and OTP required' }, { status: 400 });
   }
 
   // Find user to get the OTP store key
@@ -34,17 +31,14 @@ export async function POST(request: NextRequest) {
   if (!rateResult.allowed) {
     return NextResponse.json(
       {
-        error: "Слишком много попыток. Подождите",
+        error: 'Слишком много попыток. Подождите',
         retryAfter: rateResult.retryAfter,
       },
       { status: 429 },
     );
   }
 
-  const genericError = NextResponse.json(
-    { error: "Неверный или просроченный OTP" },
-    { status: 400 },
-  );
+  const genericError = NextResponse.json({ error: 'Неверный или просроченный OTP' }, { status: 400 });
 
   if (!user) {
     return genericError;
@@ -57,9 +51,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Use timing-safe comparison to prevent timing attacks
-  const isValid =
-    entry.otp.length === otp.length &&
-    timingSafeEqual(Buffer.from(entry.otp), Buffer.from(otp));
+  const isValid = entry.otp.length === otp.length && timingSafeEqual(Buffer.from(entry.otp), Buffer.from(otp));
 
   if (!isValid) {
     return genericError;

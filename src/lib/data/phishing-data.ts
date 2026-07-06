@@ -4,8 +4,8 @@
 
 export interface PhishingIndicator {
   id: string;
-  type: "header" | "content" | "link" | "urgency" | "sender" | "attachment";
-  severity: "critical" | "high" | "medium" | "low";
+  type: 'header' | 'content' | 'link' | 'urgency' | 'sender' | 'attachment';
+  severity: 'critical' | 'high' | 'medium' | 'low';
   title: string;
   description: string;
   lineRef?: string;
@@ -13,7 +13,7 @@ export interface PhishingIndicator {
 
 export interface PhishingEmail {
   id: number;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: 'easy' | 'medium' | 'hard';
   subject: string;
   from: string;
   to: string;
@@ -28,11 +28,11 @@ export interface PhishingEmail {
 export const phishingEmails: PhishingEmail[] = [
   {
     id: 1,
-    difficulty: "easy",
-    subject: "Срочно: Ваш аккаунт будет заблокирован!",
-    from: "support@sberbank-security.com",
-    to: "user@gmail.com",
-    date: "2024-01-15 09:23:45",
+    difficulty: 'easy',
+    subject: 'Срочно: Ваш аккаунт будет заблокирован!',
+    from: 'support@sberbank-security.com',
+    to: 'user@gmail.com',
+    date: '2024-01-15 09:23:45',
     headers: `From: "Sberbank Security" <support@sberbank-security.com>
 To: user@gmail.com
 Subject: Срочно: Ваш аккаунт будет заблокирован!
@@ -59,64 +59,61 @@ Reply-To: phishing@evil.com`,
     isPhishing: true,
     indicators: [
       {
-        id: "urgency-1",
-        type: "urgency",
-        severity: "high",
-        title: "Искусственная срочность",
+        id: 'urgency-1',
+        type: 'urgency',
+        severity: 'high',
+        title: 'Искусственная срочность',
         description:
-          "«Будет заблокирован в течение 24 часов» — классический приём создания паники, чтобы жертва действовала не думая.",
+          '«Будет заблокирован в течение 24 часов» — классический приём создания паники, чтобы жертва действовала не думая.',
       },
       {
-        id: "sender-1",
-        type: "sender",
-        severity: "critical",
-        title: "Подозрительный домен отправителя",
+        id: 'sender-1',
+        type: 'sender',
+        severity: 'critical',
+        title: 'Подозрительный домен отправителя',
         description:
-          "Домен sberbank-security.com — не официальный домен Сбербанка (sberbank.ru). Злоумышленники регистрируют похожие домены.",
+          'Домен sberbank-security.com — не официальный домен Сбербанка (sberbank.ru). Злоумышленники регистрируют похожие домены.',
       },
       {
-        id: "link-1",
-        type: "link",
-        severity: "critical",
-        title: "Фишинговая ссылка",
+        id: 'link-1',
+        type: 'link',
+        severity: 'critical',
+        title: 'Фишинговая ссылка',
         description:
-          "Ссылка ведёт на sberbank-verify.ru — не официальный сайт Сбербанка. Официальный сайт: online.sberbank.ru.",
+          'Ссылка ведёт на sberbank-verify.ru — не официальный сайт Сбербанка. Официальный сайт: online.sberbank.ru.',
       },
       {
-        id: "header-1",
-        type: "header",
-        severity: "critical",
-        title: "Подозрительный Return-Path",
-        description:
-          "Return-Path: noreply@phishing-kit.ru — явно указывает на использование фишинг-набора.",
+        id: 'header-1',
+        type: 'header',
+        severity: 'critical',
+        title: 'Подозрительный Return-Path',
+        description: 'Return-Path: noreply@phishing-kit.ru — явно указывает на использование фишинг-набора.',
       },
       {
-        id: "header-2",
-        type: "header",
-        severity: "high",
-        title: "Подозрительный X-Mailer",
-        description:
-          "PHPMailer 5.2.23 — массовая рассылка через скрипт, а не через корпоративную почту.",
+        id: 'header-2',
+        type: 'header',
+        severity: 'high',
+        title: 'Подозрительный X-Mailer',
+        description: 'PHPMailer 5.2.23 — массовая рассылка через скрипт, а не через корпоративную почту.',
       },
       {
-        id: "header-3",
-        type: "header",
-        severity: "medium",
-        title: "IP отправителя из динамического диапазона",
-        description:
-          "Received from dynamic.isp.com — легитимные банки отправляют с фиксированных серверов.",
+        id: 'header-3',
+        type: 'header',
+        severity: 'medium',
+        title: 'IP отправителя из динамического диапазона',
+        description: 'Received from dynamic.isp.com — легитимные банки отправляют с фиксированных серверов.',
       },
     ],
     explanation:
-      "Это классическое фишинговое письмо. Злоумышленник создал домен, похожий на официальный, использует искусственную срочность и отправляет через массовый скрипт. Return-Path явно указывает на фишинг-набор.",
+      'Это классическое фишинговое письмо. Злоумышленник создал домен, похожий на официальный, использует искусственную срочность и отправляет через массовый скрипт. Return-Path явно указывает на фишинг-набор.',
   },
   {
     id: 2,
-    difficulty: "medium",
-    subject: "Обновление политики конфиденциальности Google",
-    from: "noreply@google.com",
-    to: "user@gmail.com",
-    date: "2024-03-20 14:00:00",
+    difficulty: 'medium',
+    subject: 'Обновление политики конфиденциальности Google',
+    from: 'noreply@google.com',
+    to: 'user@gmail.com',
+    date: '2024-03-20 14:00:00',
     headers: `From: "Google" <noreply@google.com>
 To: user@gmail.com
 Subject: Обновление политики конфиденциальности Google
@@ -147,15 +144,15 @@ Received: from mail-sor-f33.google.com (mail-sor-f33.google.com [142.250.80.33])
     isPhishing: false,
     indicators: [],
     explanation:
-      "Это легитимное письмо от Google. DKIM-подпись пройдена, SPF Pass, отправитель с официального IP Google (142.250.80.33), ссылка ведёт на policies.google.com — официальный домен.",
+      'Это легитимное письмо от Google. DKIM-подпись пройдена, SPF Pass, отправитель с официального IP Google (142.250.80.33), ссылка ведёт на policies.google.com — официальный домен.',
   },
   {
     id: 3,
-    difficulty: "hard",
-    subject: "Re: Invoice #4521 — Payment Confirmation",
-    from: "accounting@micr0soft.com",
-    to: "finance@company.com",
-    date: "2024-05-10 11:45:22",
+    difficulty: 'hard',
+    subject: 'Re: Invoice #4521 — Payment Confirmation',
+    from: 'accounting@micr0soft.com',
+    to: 'finance@company.com',
+    date: '2024-05-10 11:45:22',
     headers: `From: "Microsoft Billing" <accounting@micr0soft.com>
 To: finance@company.com
 Subject: Re: Invoice #4521 — Payment Confirmation
@@ -184,36 +181,35 @@ Reply-To: support@micr0soft.com`,
     isPhishing: true,
     indicators: [
       {
-        id: "sender-3a",
-        type: "sender",
-        severity: "critical",
-        title: "Омографическая атака (typosquatting)",
+        id: 'sender-3a',
+        type: 'sender',
+        severity: 'critical',
+        title: 'Омографическая атака (typosquatting)',
         description:
           'Домен micr0soft.com — вместо буквы "o" использован ноль "0". Это классическая омографическая атака. Официальный домен: microsoft.com.',
       },
       {
-        id: "link-3a",
-        type: "link",
-        severity: "critical",
-        title: "Ссылка на поддельный домен",
+        id: 'link-3a',
+        type: 'link',
+        severity: 'critical',
+        title: 'Ссылка на поддельный домен',
         description:
-          "Ссылка ведёт на micr0soft.com (с нулём), а не microsoft.com. Злоумышленник контролирует весь домен.",
+          'Ссылка ведёт на micr0soft.com (с нулём), а не microsoft.com. Злоумышленник контролирует весь домен.',
       },
       {
-        id: "header-3a",
-        type: "header",
-        severity: "high",
-        title: "DKIM подписан поддельным доменом",
+        id: 'header-3a',
+        type: 'header',
+        severity: 'high',
+        title: 'DKIM подписан поддельным доменом',
         description:
-          "DKIM прошёл, но для домена micr0soft.com — это не значит что домен легитимный. Злоумышленник настроил DKIM для своего домена.",
+          'DKIM прошёл, но для домена micr0soft.com — это не значит что домен легитимный. Злоумышленник настроил DKIM для своего домена.',
       },
       {
-        id: "content-3a",
-        type: "content",
-        severity: "medium",
-        title: "Вложение/ссылка на «инвойс»",
-        description:
-          "Ссылка на PDF может вести на вредоносный файл или страницу загрузки малвари.",
+        id: 'content-3a',
+        type: 'content',
+        severity: 'medium',
+        title: 'Вложение/ссылка на «инвойс»',
+        description: 'Ссылка на PDF может вести на вредоносный файл или страницу загрузки малвари.',
       },
     ],
     explanation:
@@ -221,11 +217,11 @@ Reply-To: support@micr0soft.com`,
   },
   {
     id: 4,
-    difficulty: "easy",
-    subject: "Вы выиграли iPhone 15 Pro! Нажмите здесь!",
-    from: "winner@free-iphone-2024.xyz",
-    to: "user@mail.ru",
-    date: "2024-02-28 03:15:00",
+    difficulty: 'easy',
+    subject: 'Вы выиграли iPhone 15 Pro! Нажмите здесь!',
+    from: 'winner@free-iphone-2024.xyz',
+    to: 'user@mail.ru',
+    date: '2024-02-28 03:15:00',
     headers: `From: "Apple Prizes" <winner@free-iphone-2024.xyz>
 To: user@mail.ru
 Subject: Вы выиграли iPhone 15 Pro! Нажмите здесь!
@@ -248,56 +244,53 @@ Received: from spam-server-12.hosting.com ([185.234.219.45])
     isPhishing: true,
     indicators: [
       {
-        id: "urgency-4a",
-        type: "urgency",
-        severity: "high",
-        title: "Фейковая срочность",
-        description:
-          "«Осталось 2 часа» — попытка заставить действовать быстро, без размышлений.",
+        id: 'urgency-4a',
+        type: 'urgency',
+        severity: 'high',
+        title: 'Фейковая срочность',
+        description: '«Осталось 2 часа» — попытка заставить действовать быстро, без размышлений.',
       },
       {
-        id: "sender-4a",
-        type: "sender",
-        severity: "critical",
-        title: "Подозрительный домен",
-        description:
-          "free-iphone-2024.xyz — явно мошеннический домен. Apple не проводит розыгрыши через email.",
+        id: 'sender-4a',
+        type: 'sender',
+        severity: 'critical',
+        title: 'Подозрительный домен',
+        description: 'free-iphone-2024.xyz — явно мошеннический домен. Apple не проводит розыгрыши через email.',
       },
       {
-        id: "content-4a",
-        type: "content",
-        severity: "high",
-        title: "Слишком хорошо, чтобы быть правдой",
+        id: 'content-4a',
+        type: 'content',
+        severity: 'high',
+        title: 'Слишком хорошо, чтобы быть правдой',
         description:
-          "«Вы выиграли iPhone» — классическая схема. Если вы не участвовали в розыгрыше, это мошенничество.",
+          '«Вы выиграли iPhone» — классическая схема. Если вы не участвовали в розыгрыше, это мошенничество.',
       },
       {
-        id: "header-4a",
-        type: "header",
-        severity: "high",
-        title: "Массовая рассылка",
+        id: 'header-4a',
+        type: 'header',
+        severity: 'high',
+        title: 'Массовая рассылка',
         description:
-          "X-Mailer: BulkMailer Pro 3.1 — софт для спам-рассылок. Apple использует корпоративные почтовые системы.",
+          'X-Mailer: BulkMailer Pro 3.1 — софт для спам-рассылок. Apple использует корпоративные почтовые системы.',
       },
       {
-        id: "header-4b",
-        type: "header",
-        severity: "medium",
-        title: "Отправка в 3 часа ночи",
-        description:
-          "Письмо отправлено в 03:15 — массовые рассылки часто запускают ночью.",
+        id: 'header-4b',
+        type: 'header',
+        severity: 'medium',
+        title: 'Отправка в 3 часа ночи',
+        description: 'Письмо отправлено в 03:15 — массовые рассылки часто запускают ночью.',
       },
     ],
     explanation:
-      "Очевидное фишинговое письмо. Розыгрыши Apple через email не проводятся. Домен-однодневка, BulkMailer для рассылки, агрессивный дизайн — всё указывает на мошенничество.",
+      'Очевидное фишинговое письмо. Розыгрыши Apple через email не проводятся. Домен-однодневка, BulkMailer для рассылки, агрессивный дизайн — всё указывает на мошенничество.',
   },
   {
     id: 5,
-    difficulty: "medium",
-    subject: "Ваш заказ #78234 отправлен",
-    from: "noreply@wildberries.ru",
-    to: "user@gmail.com",
-    date: "2024-06-05 16:30:12",
+    difficulty: 'medium',
+    subject: 'Ваш заказ #78234 отправлен',
+    from: 'noreply@wildberries.ru',
+    to: 'user@gmail.com',
+    date: '2024-06-05 16:30:12',
     headers: `From: "Wildberries" <noreply@wildberries.ru>
 To: user@gmail.com
 Subject: Ваш заказ #78234 отправлен
@@ -324,15 +317,15 @@ Received: from smtp-batch-3.wildberries.ru (smtp-batch-3.wildberries.ru [95.163.
     isPhishing: false,
     indicators: [],
     explanation:
-      "Легитимное письмо от Wildberries. DKIM, SPF и DMARC пройдены для официального домена wildberries.ru. Ссылка ведёт на www.wildberries.ru. Нет признаков фишинга.",
+      'Легитимное письмо от Wildberries. DKIM, SPF и DMARC пройдены для официального домена wildberries.ru. Ссылка ведёт на www.wildberries.ru. Нет признаков фишинга.',
   },
   {
     id: 6,
-    difficulty: "hard",
-    subject: "Действия требуются: обновление данных карты",
-    from: "security@netflix.com.ru",
-    to: "user@gmail.com",
-    date: "2024-07-12 08:55:33",
+    difficulty: 'hard',
+    subject: 'Действия требуются: обновление данных карты',
+    from: 'security@netflix.com.ru',
+    to: 'user@gmail.com',
+    date: '2024-07-12 08:55:33',
     headers: `From: "Netflix Security" <security@netflix.com.ru>
 To: user@gmail.com
 Subject: Действия требуются: обновление данных карты
@@ -363,48 +356,45 @@ Received: from o167890.x.netflix.com.ru (o167890.x.netflix.com.ru [167.89.45.20]
     isPhishing: true,
     indicators: [
       {
-        id: "sender-6a",
-        type: "sender",
-        severity: "critical",
-        title: "Поддомен-имперсонация",
+        id: 'sender-6a',
+        type: 'sender',
+        severity: 'critical',
+        title: 'Поддомен-имперсонация',
         description:
-          "Домен netflix.com.ru — это НЕ netflix.com. Это российский домен com.ru с поддоменом netflix. Официальный домен Netflix: netflix.com.",
+          'Домен netflix.com.ru — это НЕ netflix.com. Это российский домен com.ru с поддоменом netflix. Официальный домен Netflix: netflix.com.',
       },
       {
-        id: "link-6a",
-        type: "link",
-        severity: "critical",
-        title: "Ссылка на поддельный сайт",
+        id: 'link-6a',
+        type: 'link',
+        severity: 'critical',
+        title: 'Ссылка на поддельный сайт',
         description:
-          "Ссылка ведёт на netflix.com.ru/account/billing/update — поддельная страница для сбора данных карт.",
+          'Ссылка ведёт на netflix.com.ru/account/billing/update — поддельная страница для сбора данных карт.',
       },
       {
-        id: "urgency-6a",
-        type: "urgency",
-        severity: "high",
-        title: "Дедлайн в 48 часов",
-        description:
-          "«В течение 48 часов аккаунт будет приостановлен» — искусственная срочность.",
+        id: 'urgency-6a',
+        type: 'urgency',
+        severity: 'high',
+        title: 'Дедлайн в 48 часов',
+        description: '«В течение 48 часов аккаунт будет приостановлен» — искусственная срочность.',
       },
       {
-        id: "header-6a",
-        type: "header",
-        severity: "medium",
-        title: "Использование SendGrid",
-        description:
-          "Netflix использует собственную инфраструктуру, а не SendGrid для security-уведомлений.",
+        id: 'header-6a',
+        type: 'header',
+        severity: 'medium',
+        title: 'Использование SendGrid',
+        description: 'Netflix использует собственную инфраструктуру, а не SendGrid для security-уведомлений.',
       },
       {
-        id: "content-6a",
-        type: "content",
-        severity: "medium",
-        title: "Логотип с поддельного домена",
-        description:
-          "Изображение загружается с netflix.com.ru — злоумышленник загрузил копию логотипа на свой сервер.",
+        id: 'content-6a',
+        type: 'content',
+        severity: 'medium',
+        title: 'Логотип с поддельного домена',
+        description: 'Изображение загружается с netflix.com.ru — злоумышленник загрузил копию логотипа на свой сервер.',
       },
     ],
     explanation:
-      "Sophisticated фишинг с использованием домена-подражателя. netflix.com.ru выглядит похоже на netflix.com, но это完全不同的 домен. DKIM/SPF пройдены, но для поддельного домена. Это один из самых опасных типов фишинга.",
+      'Sophisticated фишинг с использованием домена-подражателя. netflix.com.ru выглядит похоже на netflix.com, но это完全不同的 домен. DKIM/SPF пройдены, но для поддельного домена. Это один из самых опасных типов фишинга.',
   },
 ];
 
@@ -414,51 +404,50 @@ Received: from o167890.x.netflix.com.ru (o167890.x.netflix.com.ru [167.89.45.20]
 
 export const phishingEducationContent = {
   whatIsPhishing: {
-    title: "Что такое фишинг?",
+    title: 'Что такое фишинг?',
     description:
-      "Фишинг — это вид интернет-мошенничества, целью которого является получение доступа к конфиденциальным данным пользователей: логинам, паролям, номерам банковских карт и другой личной информации.",
+      'Фишинг — это вид интернет-мошенничества, целью которого является получение доступа к конфиденциальным данным пользователей: логинам, паролям, номерам банковских карт и другой личной информации.',
   },
   commonTypes: [
     {
-      type: "Email-фишинг",
-      description:
-        "Массовая рассылка писем от имени известных компаний с просьбой перейти по ссылке и ввести данные.",
-      icon: "Mail",
+      type: 'Email-фишинг',
+      description: 'Массовая рассылка писем от имени известных компаний с просьбой перейти по ссылке и ввести данные.',
+      icon: 'Mail',
     },
     {
-      type: "Spear phishing",
+      type: 'Spear phishing',
       description:
-        "Целевая атака на конкретного человека или организацию. Письмо персонализировано и содержит информацию о жертве.",
-      icon: "Target",
+        'Целевая атака на конкретного человека или организацию. Письмо персонализировано и содержит информацию о жертве.',
+      icon: 'Target',
     },
     {
-      type: "Whaling",
+      type: 'Whaling',
       description:
-        "Атака на топ-менеджеров и руководителей. Особенно тщательно подготовленные письма с большими суммами.",
-      icon: "Crown",
+        'Атака на топ-менеджеров и руководителей. Особенно тщательно подготовленные письма с большими суммами.',
+      icon: 'Crown',
     },
     {
-      type: "Clone phishing",
+      type: 'Clone phishing',
       description:
-        "Копирование легитимного письма с заменой ссылки на фишинговую. Отправляется как «обновлённая версия».",
-      icon: "Copy",
+        'Копирование легитимного письма с заменой ссылки на фишинговую. Отправляется как «обновлённая версия».',
+      icon: 'Copy',
     },
   ],
   howToSpot: [
-    "Проверяйте адрес отправителя — обратите внимание на омографические атаки (micr0soft vs microsoft)",
-    "Наводите на ссылки перед кликом — смотрите, куда ведёт ссылка на самом деле",
-    "Обращайте внимание на срочность и угрозы — «срочно», «немедленно», «аккаунт будет заблокирован»",
-    "Проверяйте email-заголовки — SPF, DKIM, DMARC, Return-Path, IP отправителя",
-    "Если предложение слишком привлекательное — скорее всего, это мошенничество",
-    "Не открывайте вложения от неизвестных отправителей",
-    "Легитимные компании не просят пароли и полные данные карт по email",
+    'Проверяйте адрес отправителя — обратите внимание на омографические атаки (micr0soft vs microsoft)',
+    'Наводите на ссылки перед кликом — смотрите, куда ведёт ссылка на самом деле',
+    'Обращайте внимание на срочность и угрозы — «срочно», «немедленно», «аккаунт будет заблокирован»',
+    'Проверяйте email-заголовки — SPF, DKIM, DMARC, Return-Path, IP отправителя',
+    'Если предложение слишком привлекательное — скорее всего, это мошенничество',
+    'Не открывайте вложения от неизвестных отправителей',
+    'Легитимные компании не просят пароли и полные данные карт по email',
   ],
   whatToDo: [
-    "Не переходите по ссылкам и не открывайте вложения",
-    "Не отвечайте на письмо",
-    "Перешлите письмо в службу безопасности компании (если письмо от её имени)",
-    "Удалите письмо",
-    "Если вы уже перешли по ссылке и ввели данные — немедленно смените пароль и обратитесь в банк",
-    "Сообщите о фишинге: в России — в Центробанк (cbr.ru) и Роскомнадзор",
+    'Не переходите по ссылкам и не открывайте вложения',
+    'Не отвечайте на письмо',
+    'Перешлите письмо в службу безопасности компании (если письмо от её имени)',
+    'Удалите письмо',
+    'Если вы уже перешли по ссылке и ввели данные — немедленно смените пароль и обратитесь в банк',
+    'Сообщите о фишинге: в России — в Центробанк (cbr.ru) и Роскомнадзор',
   ],
 };

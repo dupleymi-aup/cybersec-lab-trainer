@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -12,11 +12,11 @@ import {
   Legend,
   LineChart,
   Line,
-} from "recharts";
-import { Loader2, Target } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import KPICard from "./KPICard";
-import { logger } from "@/lib/logger";
+} from 'recharts';
+import { Loader2, Target } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import KPICard from './KPICard';
+import { logger } from '@/lib/logger';
 
 interface DifficultyBreakdown {
   difficulty: string;
@@ -55,36 +55,30 @@ interface QuizDifficultyData {
 }
 
 const DIFFICULTY_LABELS: Record<string, string> = {
-  easy: "Лёгкие",
-  medium: "Средние",
-  hard: "Сложные",
+  easy: 'Лёгкие',
+  medium: 'Средние',
+  hard: 'Сложные',
 };
 const DIFFICULTY_COLORS: Record<string, string> = {
-  easy: "#10b981",
-  medium: "#f59e0b",
-  hard: "#ef4444",
+  easy: '#10b981',
+  medium: '#f59e0b',
+  hard: '#ef4444',
 };
 
-export default function QuizDifficultyAnalysis({
-  groupId,
-  days,
-}: {
-  groupId?: string;
-  days?: number;
-}) {
+export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: string; days?: number }) {
   const [data, setData] = useState<QuizDifficultyData | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     const params = new URLSearchParams({ days: String(days || 30) });
-    if (groupId) params.set("groupId", groupId);
+    if (groupId) params.set('groupId', groupId);
     fetch(`/api/analytics/quiz-difficulty?${params}`)
       .then((res) => res.json())
       .then(setData)
       .catch((err) => {
-        if (process.env.NODE_ENV === "development")
-          logger.error("QuizDifficultyAnalysis failed to load data", { error: err });
+        if (process.env.NODE_ENV === 'development')
+          logger.error('QuizDifficultyAnalysis failed to load data', { error: err });
         setData(null);
       })
       .finally(() => setLoading(false));
@@ -93,7 +87,7 @@ export default function QuizDifficultyAnalysis({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 size={24} className="animate-spin text-muted-foreground" />
+        <Loader2 size={24} className="text-muted-foreground animate-spin" />
       </div>
     );
   }
@@ -101,7 +95,7 @@ export default function QuizDifficultyAnalysis({
   if (!data || !data.difficultyBreakdown.length) {
     return (
       <Card className="border-border">
-        <CardContent className="p-8 text-center text-muted-foreground">
+        <CardContent className="text-muted-foreground p-8 text-center">
           <Target size={40} className="mx-auto mb-3 opacity-50" />
           <p>Нет данных о квизах за выбранный период</p>
         </CardContent>
@@ -110,24 +104,14 @@ export default function QuizDifficultyAnalysis({
   }
 
   // Summary KPIs
-  const totalAttempts = data.difficultyBreakdown.reduce(
-    (sum, d) => sum + d.totalAttempts,
-    0,
-  );
+  const totalAttempts = data.difficultyBreakdown.reduce((sum, d) => sum + d.totalAttempts, 0);
   const avgCorrectRate =
     totalAttempts > 0
       ? Math.round(
-          (data.difficultyBreakdown.reduce(
-            (sum, d) => sum + d.correctRate * d.totalAttempts,
-            0,
-          ) /
-            totalAttempts) *
-            10,
+          (data.difficultyBreakdown.reduce((sum, d) => sum + d.correctRate * d.totalAttempts, 0) / totalAttempts) * 10,
         ) / 10
       : 0;
-  const totalStudents = new Set(
-    data.studentPerformanceByDifficulty.map((s) => s.userId),
-  ).size;
+  const totalStudents = new Set(data.studentPerformanceByDifficulty.map((s) => s.userId)).size;
 
   // Grouped bar chart data: correct rate by difficulty
   const barChartData = data.difficultyBreakdown.map((d) => ({
@@ -138,16 +122,11 @@ export default function QuizDifficultyAnalysis({
   }));
 
   // Category × difficulty heatmap data
-  const categories = Array.from(
-    new Set(data.categoryByDifficulty.map((c) => c.category)),
-  );
+  const categories = Array.from(new Set(data.categoryByDifficulty.map((c) => c.category)));
   const heatmapData = categories.map((cat) => {
     const entry: Record<string, string | number> = { category: cat };
-    for (const item of data.categoryByDifficulty.filter(
-      (c) => c.category === cat,
-    )) {
-      entry[DIFFICULTY_LABELS[item.difficulty] || item.difficulty] =
-        item.correctRate;
+    for (const item of data.categoryByDifficulty.filter((c) => c.category === cat)) {
+      entry[DIFFICULTY_LABELS[item.difficulty] || item.difficulty] = item.correctRate;
     }
     return entry;
   });
@@ -169,27 +148,11 @@ export default function QuizDifficultyAnalysis({
   return (
     <div className="space-y-4">
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <KPICard
-          icon={<Target size={18} />}
-          value={totalAttempts}
-          label="Всего попыток"
-        />
-        <KPICard
-          icon={<Target size={18} />}
-          value={`${avgCorrectRate}%`}
-          label="Средний балл"
-        />
-        <KPICard
-          icon={<Target size={18} />}
-          value={totalStudents}
-          label="Студентов"
-        />
-        <KPICard
-          icon={<Target size={18} />}
-          value={data.difficultyBreakdown.length}
-          label="Уровней сложности"
-        />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <KPICard icon={<Target size={18} />} value={totalAttempts} label="Всего попыток" />
+        <KPICard icon={<Target size={18} />} value={`${avgCorrectRate}%`} label="Средний балл" />
+        <KPICard icon={<Target size={18} />} value={totalStudents} label="Студентов" />
+        <KPICard icon={<Target size={18} />} value={data.difficultyBreakdown.length} label="Уровней сложности" />
       </div>
 
       {/* Difficulty Summary Cards */}
@@ -197,33 +160,22 @@ export default function QuizDifficultyAnalysis({
         {data.difficultyBreakdown.map((d) => (
           <Card key={d.difficulty} className="border-border">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: DIFFICULTY_COLORS[d.difficulty] }}
-                />
-                <span className="font-semibold text-sm">
-                  {DIFFICULTY_LABELS[d.difficulty] || d.difficulty}
-                </span>
+              <div className="mb-2 flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: DIFFICULTY_COLORS[d.difficulty] }} />
+                <span className="text-sm font-semibold">{DIFFICULTY_LABELS[d.difficulty] || d.difficulty}</span>
               </div>
-              <div className="space-y-1 text-xs text-muted-foreground">
+              <div className="text-muted-foreground space-y-1 text-xs">
                 <div className="flex justify-between">
                   <span>Попыток:</span>
-                  <span className="font-medium text-foreground">
-                    {d.totalAttempts}
-                  </span>
+                  <span className="text-foreground font-medium">{d.totalAttempts}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Правильных:</span>
-                  <span className="font-medium text-foreground">
-                    {d.correctRate}%
-                  </span>
+                  <span className="text-foreground font-medium">{d.correctRate}%</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Студентов:</span>
-                  <span className="font-medium text-foreground">
-                    {d.uniqueStudents}
-                  </span>
+                  <span className="text-foreground font-medium">{d.uniqueStudents}</span>
                 </div>
               </div>
             </CardContent>
@@ -234,25 +186,14 @@ export default function QuizDifficultyAnalysis({
       {/* Bar Chart: Correct Rate by Difficulty */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Процент правильных по сложности
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">Процент правильных по сложности</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={barChartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="difficulty" tick={{ fontSize: 12 }} />
-              <YAxis
-                domain={[0, 100]}
-                tick={{ fontSize: 12 }}
-                tickFormatter={(v) => `${v}%`}
-              />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
               <Tooltip formatter={(value) => `${value ?? 0}%`} />
-              <Bar
-                dataKey="correctRate"
-                fill="#6366f1"
-                name="Правильных (%)"
-                radius={[4, 4, 0, 0]}
-              />
+              <Bar dataKey="correctRate" fill="#6366f1" name="Правильных (%)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -262,34 +203,16 @@ export default function QuizDifficultyAnalysis({
       {heatmapData.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Категории по сложности
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Категории по сложности</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={heatmapData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis
-                  dataKey="category"
-                  tick={{ fontSize: 10 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(v) => `${v}%`}
-                />
+                <XAxis dataKey="category" tick={{ fontSize: 10 }} angle={-45} textAnchor="end" height={60} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
                 <Tooltip formatter={(value) => `${value ?? 0}%`} />
                 <Legend />
                 {Object.entries(DIFFICULTY_LABELS).map(([key, label]) => (
-                  <Bar
-                    key={key}
-                    dataKey={label}
-                    fill={DIFFICULTY_COLORS[key]}
-                    name={label}
-                    radius={[2, 2, 0, 0]}
-                  />
+                  <Bar key={key} dataKey={label} fill={DIFFICULTY_COLORS[key]} name={label} radius={[2, 2, 0, 0]} />
                 ))}
               </BarChart>
             </ResponsiveContainer>
@@ -301,18 +224,12 @@ export default function QuizDifficultyAnalysis({
       {trendData.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Тренд по сложности (еженедельно)
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Тренд по сложности (еженедельно)</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="week" tick={{ fontSize: 10 }} />
-                <YAxis
-                  domain={[0, 100]}
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(v) => `${v}%`}
-                />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
                 <Tooltip formatter={(value) => `${value ?? 0}%`} />
                 <Legend />
                 <Line
@@ -349,49 +266,26 @@ export default function QuizDifficultyAnalysis({
       {topStudents.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Лучшие по сложным вопросам (мин. 5 попыток)
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Лучшие по сложным вопросам (мин. 5 попыток)</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-2 px-3 font-semibold text-muted-foreground">
-                      Студент
-                    </th>
-                    <th className="text-right py-2 px-3 font-semibold text-muted-foreground">
-                      Лёгкие
-                    </th>
-                    <th className="text-right py-2 px-3 font-semibold text-muted-foreground">
-                      Средние
-                    </th>
-                    <th className="text-right py-2 px-3 font-semibold text-muted-foreground">
-                      Сложные
-                    </th>
-                    <th className="text-right py-2 px-3 font-semibold text-muted-foreground">
-                      Всего
-                    </th>
+                  <tr className="border-border border-b">
+                    <th className="text-muted-foreground px-3 py-2 text-left font-semibold">Студент</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">Лёгкие</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">Средние</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">Сложные</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">Всего</th>
                   </tr>
                 </thead>
                 <tbody>
                   {topStudents.map((s) => (
-                    <tr
-                      key={s.userId}
-                      className="border-b border-border/50 hover:bg-muted/50"
-                    >
-                      <td className="py-2 px-3 font-medium">{s.fullName}</td>
-                      <td className="py-2 px-3 text-right text-emerald-600">
-                        {s.easyRate}%
-                      </td>
-                      <td className="py-2 px-3 text-right text-amber-600">
-                        {s.mediumRate}%
-                      </td>
-                      <td className="py-2 px-3 text-right text-red-600 font-semibold">
-                        {s.hardRate}%
-                      </td>
-                      <td className="py-2 px-3 text-right text-muted-foreground">
-                        {s.totalAttempts}
-                      </td>
+                    <tr key={s.userId} className="border-border/50 hover:bg-muted/50 border-b">
+                      <td className="px-3 py-2 font-medium">{s.fullName}</td>
+                      <td className="px-3 py-2 text-right text-emerald-600">{s.easyRate}%</td>
+                      <td className="px-3 py-2 text-right text-amber-600">{s.mediumRate}%</td>
+                      <td className="px-3 py-2 text-right font-semibold text-red-600">{s.hardRate}%</td>
+                      <td className="text-muted-foreground px-3 py-2 text-right">{s.totalAttempts}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -13,9 +13,8 @@ export interface SSRFScenario {
 export const ssrfScenarios: SSRFScenario[] = [
   {
     id: 1,
-    title: "Загрузка изображения по URL",
-    description:
-      "Функция загрузки аватара по ссылке принимает любой URL, включая внутренние адреса.",
+    title: 'Загрузка изображения по URL',
+    description: 'Функция загрузки аватара по ссылке принимает любой URL, включая внутренние адреса.',
     code: `app.post('/api/avatar/load', authenticate, (req, res) => {
   const { url } = req.body;
   // Загружаем изображение по указанному URL
@@ -28,10 +27,9 @@ export const ssrfScenarios: SSRFScenario[] = [
 // {"url": "http://169.254.169.254/latest/meta-data/"}
 // {"url": "http://localhost:3306"}
 // {"url": "http://internal-api.company.com/secrets"}`,
-    vulnerability:
-      "Сервер выполняет HTTP-запрос по любому URL, включая внутренние ресурсы.",
+    vulnerability: 'Сервер выполняет HTTP-запрос по любому URL, включая внутренние ресурсы.',
     explanation:
-      "SSRF позволяет атакующему заставить сервер обращаться к внутренним сервисам, которые недоступны извне. Метаданные облачных провайдеров (169.254.169.254) содержат чувствительную информацию.",
+      'SSRF позволяет атакующему заставить сервер обращаться к внутренним сервисам, которые недоступны извне. Метаданные облачных провайдеров (169.254.169.254) содержат чувствительную информацию.',
     fix: `const ALLOWED_HOSTS = ['cdn.example.com', 'avatars.example.com'];
 
 app.post('/api/avatar/load', authenticate, async (req, res) => {
@@ -49,23 +47,21 @@ app.post('/api/avatar/load', authenticate, async (req, res) => {
   const image = await response.buffer();
   res.json({ success: true, size: image.length });
 });`,
-    fixExplanation:
-      "Белый список разрешённых доменов + проверка на внутренние IP-адреса.",
+    fixExplanation: 'Белый список разрешённых доменов + проверка на внутренние IP-адреса.',
     options: [
-      { text: "Проверять, что URL начинается с http://", correct: false },
+      { text: 'Проверять, что URL начинается с http://', correct: false },
       {
-        text: "Использовать белый список разрешённых доменов и блокировать внутренние IP",
+        text: 'Использовать белый список разрешённых доменов и блокировать внутренние IP',
         correct: true,
       },
-      { text: "Ограничить размер загружаемого файла", correct: false },
-      { text: "Использовать POST вместо GET", correct: false },
+      { text: 'Ограничить размер загружаемого файла', correct: false },
+      { text: 'Использовать POST вместо GET', correct: false },
     ],
   },
   {
     id: 2,
-    title: "Вебхуки и обратные вызовы",
-    description:
-      "Система уведомлений отправляет POST-запросы на URL, указанный пользователем.",
+    title: 'Вебхуки и обратные вызовы',
+    description: 'Система уведомлений отправляет POST-запросы на URL, указанный пользователем.',
     code: `app.post('/api/webhooks/register', authenticate, async (req, res) => {
   const { url, events } = req.body;
   // Сохраняем вебхук
@@ -80,10 +76,9 @@ async function triggerWebhook(webhook) {
     body: JSON.stringify({ event: 'order.created' }),
   });
 }`,
-    vulnerability:
-      "Пользователь может указать внутренний URL и получить данные из внутренних сервисов.",
+    vulnerability: 'Пользователь может указать внутренний URL и получить данные из внутренних сервисов.',
     explanation:
-      "Атакующий регистрирует вебхук на http://localhost:8080/admin и получает содержимое ответа при каждом событии.",
+      'Атакующий регистрирует вебхук на http://localhost:8080/admin и получает содержимое ответа при каждом событии.',
     fix: `async function triggerWebhook(webhook) {
   const parsed = new URL(webhook.url);
   // Проверяем, что URL не внутренний
@@ -108,21 +103,21 @@ async function triggerWebhook(webhook) {
     clearTimeout(timeout);
   }
 }`,
-    fixExplanation: "Проверка IP, требование HTTPS, таймаут запроса.",
+    fixExplanation: 'Проверка IP, требование HTTPS, таймаут запроса.',
     options: [
-      { text: "Разрешить только HTTPS URL", correct: false },
-      { text: "Комбинация: HTTPS + проверка IP + таймаут", correct: true },
+      { text: 'Разрешить только HTTPS URL', correct: false },
+      { text: 'Комбинация: HTTPS + проверка IP + таймаут', correct: true },
       {
-        text: "Ограничить количество вебхуков на пользователя",
+        text: 'Ограничить количество вебхуков на пользователя',
         correct: false,
       },
-      { text: "Валидировать JSON тела запроса", correct: false },
+      { text: 'Валидировать JSON тела запроса', correct: false },
     ],
   },
   {
     id: 3,
-    title: "Proxy-эндпоинт для PDF-генерации",
-    description: "Сервис генерирует PDF из веб-страницы по заданному URL.",
+    title: 'Proxy-эндпоинт для PDF-генерации',
+    description: 'Сервис генерирует PDF из веб-страницы по заданному URL.',
     code: `app.post('/api/pdf/generate', async (req, res) => {
   const { url } = req.body;
   const browser = await puppeteer.launch();
@@ -132,10 +127,9 @@ async function triggerWebhook(webhook) {
   res.setHeader('Content-Type', 'application/pdf');
   res.send(pdf);
 });`,
-    vulnerability:
-      "Puppeteer загружает страницу с внутреннего сервера, раскрывая её содержимое в PDF.",
+    vulnerability: 'Puppeteer загружает страницу с внутреннего сервера, раскрывая её содержимое в PDF.',
     explanation:
-      "Атакующий передаёт http://internal-admin-panel:3000/dashboard и получает PDF с содержимым внутренней админ-панели.",
+      'Атакующий передаёт http://internal-admin-panel:3000/dashboard и получает PDF с содержимым внутренней админ-панели.',
     fix: `app.post('/api/pdf/generate', async (req, res) => {
   const { url } = req.body;
   const parsed = new URL(url);
@@ -160,21 +154,21 @@ async function triggerWebhook(webhook) {
   res.setHeader('Content-Type', 'application/pdf');
   res.send(pdf);
 });`,
-    fixExplanation: "HTTPS + проверка IP + ограничение портов + таймаут.",
+    fixExplanation: 'HTTPS + проверка IP + ограничение портов + таймаут.',
     options: [
-      { text: "Запретить Puppeteer", correct: false },
+      { text: 'Запретить Puppeteer', correct: false },
       {
-        text: "Валидировать URL: HTTPS, не внутренний IP, стандартные порты",
+        text: 'Валидировать URL: HTTPS, не внутренний IP, стандартные порты',
         correct: true,
       },
-      { text: "Ограничить размер PDF", correct: false },
-      { text: "Добавить CAPTCHA", correct: false },
+      { text: 'Ограничить размер PDF', correct: false },
+      { text: 'Добавить CAPTCHA', correct: false },
     ],
   },
   {
     id: 4,
-    title: "DNS Rebinding атака",
-    description: "Обход блокировки по IP через DNS rebinding.",
+    title: 'DNS Rebinding атака',
+    description: 'Обход блокировки по IP через DNS rebinding.',
     code: `// Сервер проверяет IP при валидации:
 function validateUrl(url) {
   const parsed = new URL(url);
@@ -186,10 +180,9 @@ function validateUrl(url) {
 // Но при запросе DNS может вернуть другой IP:
 // 1. Валидация: evil.com → 93.184.216.34 (OK)
 // 2. Запрос:   evil.com → 127.0.0.1 (SSRF!)`,
-    vulnerability:
-      "Проверка IP и фактический запрос — две разные DNS-резолвинг операции. TTL может истечь.",
+    vulnerability: 'Проверка IP и фактический запрос — две разные DNS-резолвинг операции. TTL может истечь.',
     explanation:
-      "Атакующий контролирует DNS evil.com и меняет ответ между проверкой и запросом. Это называется DNS rebinding.",
+      'Атакующий контролирует DNS evil.com и меняет ответ между проверкой и запросом. Это называется DNS rebinding.',
     fix: `// 1. Резолвим один раз и используем тот же IP
 async function safeFetch(url) {
   const parsed = new URL(url);
@@ -213,22 +206,21 @@ function resolveWithPinning(hostname) {
   }
   return dnsCache.get(hostname);
 }`,
-    fixExplanation:
-      "DNS pinning: резолвим один раз, кэшируем результат, используем тот же IP для запроса.",
+    fixExplanation: 'DNS pinning: резолвим один раз, кэшируем результат, используем тот же IP для запроса.',
     options: [
-      { text: "Проверять IP перед каждым запросом", correct: false },
+      { text: 'Проверять IP перед каждым запросом', correct: false },
       {
-        text: "Резолвить DNS один раз, кэшировать и использовать тот же IP",
+        text: 'Резолвить DNS один раз, кэшировать и использовать тот же IP',
         correct: true,
       },
-      { text: "Использовать только IP вместо доменов", correct: false },
-      { text: "Запретить DNS-резолвинг", correct: false },
+      { text: 'Использовать только IP вместо доменов', correct: false },
+      { text: 'Запретить DNS-резолвинг', correct: false },
     ],
   },
   {
     id: 5,
-    title: "SSRF через редиректы",
-    description: "Обход валидации URL через цепочку редиректов.",
+    title: 'SSRF через редиректы',
+    description: 'Обход валидации URL через цепочку редиректов.',
     code: `function validateUrl(url) {
   const parsed = new URL(url);
   if (isInternalIP(dns.lookupSync(parsed.hostname).address)) {
@@ -241,10 +233,9 @@ function resolveWithPinning(hostname) {
 // 1. Размещает redirect на своём сервере: http://evil.com → http://169.254.169.254
 // 2. Проходит валидацию: evil.com → внешний IP ✓
 // 3. fetch следует редиректу → метаданные`,
-    vulnerability:
-      "Проверка происходит до редиректа, а fetch автоматически следует редиректам.",
+    vulnerability: 'Проверка происходит до редиректа, а fetch автоматически следует редиректам.',
     explanation:
-      "Даже если URL проходит валидацию, сервер может сделать редирект на внутренний адрес. Библиотеки обычно следуют редиректам автоматически.",
+      'Даже если URL проходит валидацию, сервер может сделать редирект на внутренний адрес. Библиотеки обычно следуют редиректам автоматически.',
     fix: `async function safeFetch(url) {
   const parsed = new URL(url);
   // Проверяем начальный URL
@@ -267,22 +258,21 @@ function resolveWithPinning(hostname) {
   }
   return response;
 }`,
-    fixExplanation:
-      "Отключаем автоматические редиректы и проверяем каждый redirect URL.",
+    fixExplanation: 'Отключаем автоматические редиректы и проверяем каждый redirect URL.',
     options: [
-      { text: "Разрешить только один редирект", correct: false },
+      { text: 'Разрешить только один редирект', correct: false },
       {
-        text: "Отключить автоматические редиректы или проверять каждый redirect URL",
+        text: 'Отключить автоматические редиректы или проверять каждый redirect URL',
         correct: true,
       },
-      { text: "Использовать HEAD запрос для проверки", correct: false },
-      { text: "Добавить User-Agent header", correct: false },
+      { text: 'Использовать HEAD запрос для проверки', correct: false },
+      { text: 'Добавить User-Agent header', correct: false },
     ],
   },
   {
     id: 6,
-    title: "File/FTP/Gopher протоколы",
-    description: "Использование не-HTTP протоколов для SSRF.",
+    title: 'File/FTP/Gopher протоколы',
+    description: 'Использование не-HTTP протоколов для SSRF.',
     code: `// Некоторые библиотеки поддерживают multiple protocols:
 // file:///etc/passwd
 // ftp://internal-ftp:21
@@ -296,9 +286,9 @@ app.post('/api/fetch', async (req, res) => {
   res.json({ data: result });
 });`,
     vulnerability:
-      "Библиотеки с поддержкой нескольких протоколов позволяют читать файлы или обращаться к не-HTTP сервисам.",
+      'Библиотеки с поддержкой нескольких протоколов позволяют читать файлы или обращаться к не-HTTP сервисам.',
     explanation:
-      "file:// позволяет читать локальные файлы, gopher:// и dict:// могут взаимодействовать с Redis, Memcached и другими сервисами.",
+      'file:// позволяет читать локальные файлы, gopher:// и dict:// могут взаимодействовать с Redis, Memcached и другими сервисами.',
     fix: `app.post('/api/fetch', async (req, res) => {
   const { url } = req.body;
   const parsed = new URL(url);
@@ -315,18 +305,18 @@ app.post('/api/fetch', async (req, res) => {
   const response = await fetch(url);
   res.json({ data: await response.text() });
 });`,
-    fixExplanation: "Строгая проверка протокола: только http и https.",
+    fixExplanation: 'Строгая проверка протокола: только http и https.',
     options: [
-      { text: "Запретить file:// протокол", correct: false },
-      { text: "Разрешить только http: и https: протоколы", correct: true },
-      { text: "Ограничить размер ответа", correct: false },
-      { text: "Использовать sandbox", correct: false },
+      { text: 'Запретить file:// протокол', correct: false },
+      { text: 'Разрешить только http: и https: протоколы', correct: true },
+      { text: 'Ограничить размер ответа', correct: false },
+      { text: 'Использовать sandbox', correct: false },
     ],
   },
   {
     id: 7,
-    title: "Blind SSRF — безответная атака",
-    description: "SSRF без возврата данных, но с побочными эффектами.",
+    title: 'Blind SSRF — безответная атака',
+    description: 'SSRF без возврата данных, но с побочными эффектами.',
     code: `// Приложение не возвращает ответ, но атакующий
 // может определить существование сервиса по:
 // - времени ответа (таймаут = сервис не существует)
@@ -341,10 +331,9 @@ app.post('/api/ping', async (req, res) => {
     .catch(() => console.log('Unreachable'));
   res.json({ status: 'checking' });
 });`,
-    vulnerability:
-      "Даже без возврата данных SSRF можно использовать для сканирования сети и обнаружения сервисов.",
+    vulnerability: 'Даже без возврата данных SSRF можно использовать для сканирования сети и обнаружения сервисов.',
     explanation:
-      "Blind SSRF использует временные стороны-каналы: если сервис существует — запрос быстрый, если нет — таймаут. Также можно использовать DNS-экфильтрацию.",
+      'Blind SSRF использует временные стороны-каналы: если сервис существует — запрос быстрый, если нет — таймаут. Также можно использовать DNS-экфильтрацию.',
     fix: `// 1. Валидация URL перед фоновым запросом
 // 2. Мониторинг и rate limiting
 // 3. Network segmentation
@@ -371,32 +360,31 @@ app.post('/api/ping', authenticate, async (req, res) => {
   auditLog.info({ event: 'ping', userId: key, url });
   res.json({ status: 'checking' });
 });`,
-    fixExplanation:
-      "Валидация + rate limiting + логирование для обнаружения blind SSRF.",
+    fixExplanation: 'Валидация + rate limiting + логирование для обнаружения blind SSRF.',
     options: [
-      { text: "Blind SSRF не опасен, т.к. нет данных", correct: false },
+      { text: 'Blind SSRF не опасен, т.к. нет данных', correct: false },
       {
-        text: "Blind SSRF позволяет сканировать сеть и обнаруживать сервисы",
+        text: 'Blind SSRF позволяет сканировать сеть и обнаруживать сервисы',
         correct: true,
       },
-      { text: "Нужно отключить все фоновые запросы", correct: false },
-      { text: "Достаточно только логирования", correct: false },
+      { text: 'Нужно отключить все фоновые запросы', correct: false },
+      { text: 'Достаточно только логирования', correct: false },
     ],
   },
 ];
 
 export const ssrfDefenseMechanisms = [
   {
-    title: "Белый список доменов",
-    description: "Разрешайте только конкретные домены или IP-адреса.",
+    title: 'Белый список доменов',
+    description: 'Разрешайте только конкретные домены или IP-адреса.',
     code: `const ALLOWED_HOSTS = new Set(['api.example.com', 'cdn.example.com']);
 if (!ALLOWED_HOSTS.has(parsed.hostname)) {
   throw new Error('Host not allowed');
 }`,
   },
   {
-    title: "Блокировка внутренних IP",
-    description: "Проверяйте, что целевой IP не является внутренним.",
+    title: 'Блокировка внутренних IP',
+    description: 'Проверяйте, что целевой IP не является внутренним.',
     code: `function isInternalIP(ip) {
   return ip.startsWith('10.')
     || ip.startsWith('192.168.')
@@ -407,8 +395,8 @@ if (!ALLOWED_HOSTS.has(parsed.hostname)) {
 }`,
   },
   {
-    title: "DNS Pinning",
-    description: "Резолвите DNS один раз и используйте тот же IP для запроса.",
+    title: 'DNS Pinning',
+    description: 'Резолвите DNS один раз и используйте тот же IP для запроса.',
     code: `const ip = await dns.promises.lookup(hostname);
 // Фиксируем IP, подменяя hostname
 urlObj.hostname = ip.address;
@@ -416,16 +404,16 @@ urlObj.hostname = ip.address;
 fetch(urlObj, { headers: { Host: hostname } });`,
   },
   {
-    title: "Отключение редиректов",
-    description: "Не следуйте редиректам автоматически или проверяйте каждый.",
+    title: 'Отключение редиректов',
+    description: 'Не следуйте редиректам автоматически или проверяйте каждый.',
     code: `const response = await fetch(url, { redirect: 'manual' });
 if ([301, 302, 307].includes(response.status)) {
   throw new Error('Redirects not allowed');
 }`,
   },
   {
-    title: "Network сегментация",
-    description: "Изолируйте внутренние сервисы на уровне сети.",
+    title: 'Network сегментация',
+    description: 'Изолируйте внутренние сервисы на уровне сети.',
     code: `# Docker network segmentation
 services:
   web:

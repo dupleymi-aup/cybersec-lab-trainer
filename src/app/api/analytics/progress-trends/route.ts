@@ -1,30 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-  const dateRange = searchParams.get("dateRange") || "30d";
-  const groupId = searchParams.get("groupId");
-  const userWhere = groupId
-    ? { role: "student" as const, group: groupId }
-    : { role: "student" as const };
+  const userId = searchParams.get('userId');
+  const dateRange = searchParams.get('dateRange') || '30d';
+  const groupId = searchParams.get('groupId');
+  const userWhere = groupId ? { role: 'student' as const, group: groupId } : { role: 'student' as const };
 
   // Calculate cutoff date
   let cutoffDate: Date | undefined;
   const now = new Date();
-  if (dateRange !== "all") {
-    const days = dateRange === "7d" ? 7 : dateRange === "30d" ? 30 : 90;
+  if (dateRange !== 'all') {
+    const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90;
     cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
   }
 
@@ -34,13 +27,10 @@ export async function GET(request: NextRequest) {
     // Check that the target user exists and is a student (or user is admin viewing any user)
     const targetUser = await prisma.user.findUnique({ where: { id: userId } });
     if (!targetUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    if (targetUser.role !== "student" && auth.role !== "admin") {
-      return NextResponse.json(
-        { error: "Can only view student progress trends" },
-        { status: 403 },
-      );
+    if (targetUser.role !== 'student' && auth.role !== 'admin') {
+      return NextResponse.json({ error: 'Can only view student progress trends' }, { status: 403 });
     }
     studentIds = [userId];
   } else {
@@ -90,7 +80,7 @@ export async function GET(request: NextRequest) {
   >();
 
   function getDateKey(date: Date): string {
-    return date.toISOString().split("T")[0]; // YYYY-MM-DD
+    return date.toISOString().split('T')[0]; // YYYY-MM-DD
   }
 
   // Process progress records
@@ -133,14 +123,9 @@ export async function GET(request: NextRequest) {
   const totalStudents = studentIds.length;
   const trends = Array.from(dailyMap.entries())
     .map(([date, data]) => {
-      const avgModulesCompleted =
-        data.modulesCompleted.length > 0
-          ? data.modulesCompleted.length / totalStudents
-          : 0;
+      const avgModulesCompleted = data.modulesCompleted.length > 0 ? data.modulesCompleted.length / totalStudents : 0;
       const avgQuizScore =
-        data.quizScores.length > 0
-          ? data.quizScores.reduce((a, b) => a + b, 0) / data.quizScores.length
-          : 0;
+        data.quizScores.length > 0 ? data.quizScores.reduce((a, b) => a + b, 0) / data.quizScores.length : 0;
       return {
         date,
         modulesCompleted: Math.round(avgModulesCompleted * 100) / 100,

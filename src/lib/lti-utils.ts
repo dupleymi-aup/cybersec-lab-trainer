@@ -1,12 +1,6 @@
-import {
-  generateKeyPair,
-  importPKCS8,
-  SignJWT,
-  jwtVerify,
-  type JWK,
-} from "jose";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { generateKeyPair, importPKCS8, SignJWT, jwtVerify, type JWK } from 'jose';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 export interface LtiClaims {
   sub: string;
@@ -14,28 +8,28 @@ export interface LtiClaims {
   name: string;
   email: string;
   roles: string[];
-  "https://purl.imsglobal.org/spec/lti/claim/target_link_uri"?: string;
-  "https://purl.imsglobal.org/spec/lti/claim/deployment_id"?: string;
-  "https://purl.imsglobal.org/spec/lti/claim/message_type"?: string;
-  "https://purl.imsglobal.org/spec/lti/claim/version"?: string;
-  "https://purl.imsglobal.org/spec/lti/claim/resource_link"?: {
+  'https://purl.imsglobal.org/spec/lti/claim/target_link_uri'?: string;
+  'https://purl.imsglobal.org/spec/lti/claim/deployment_id'?: string;
+  'https://purl.imsglobal.org/spec/lti/claim/message_type'?: string;
+  'https://purl.imsglobal.org/spec/lti/claim/version'?: string;
+  'https://purl.imsglobal.org/spec/lti/claim/resource_link'?: {
     id: string;
     title?: string;
   };
-  "https://purl.imsglobal.org/spec/lti/claim/lis"?: {
+  'https://purl.imsglobal.org/spec/lti/claim/lis'?: {
     person_sourcedid?: string;
     course_offering_sourcedid?: string;
   };
-  "https://purl.imsglobal.org/spec/lti/claim/context"?: {
+  'https://purl.imsglobal.org/spec/lti/claim/context'?: {
     id: string;
     label?: string;
     title?: string;
   };
-  "https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice"?: {
+  'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'?: {
     context_memberships_url: string;
     service_versions: string[];
   };
-  "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"?: {
+  'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'?: {
     scope: string[];
     lineitems: string;
     lineitem: string;
@@ -57,17 +51,13 @@ export async function generateToolKeyPair(): Promise<{
   publicKey: string;
   privateKey: string;
 }> {
-  const { publicKey, privateKey } = await generateKeyPair("RS256");
-  const pubKey = new Uint8Array(
-    await crypto.subtle.exportKey("spki", publicKey),
-  );
-  const privKey = new Uint8Array(
-    await crypto.subtle.exportKey("pkcs8", privateKey),
-  );
+  const { publicKey, privateKey } = await generateKeyPair('RS256');
+  const pubKey = new Uint8Array(await crypto.subtle.exportKey('spki', publicKey));
+  const privKey = new Uint8Array(await crypto.subtle.exportKey('pkcs8', privateKey));
 
   return {
-    publicKey: Buffer.from(pubKey).toString("base64"),
-    privateKey: Buffer.from(privKey).toString("base64"),
+    publicKey: Buffer.from(pubKey).toString('base64'),
+    privateKey: Buffer.from(privKey).toString('base64'),
   };
 }
 
@@ -82,9 +72,7 @@ export async function fetchPlatformJwks(keysetUrl: string): Promise<JWK[]> {
 
   const response = await fetch(keysetUrl);
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch JWKS from ${keysetUrl}: ${response.status}`,
-    );
+    throw new Error(`Failed to fetch JWKS from ${keysetUrl}: ${response.status}`);
   }
 
   const jwks = await response.json();
@@ -113,14 +101,13 @@ export async function verifyLtiLaunch(
       verified = true;
       break;
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        logger.warn("verifyLtiLaunch failed", { error: e });
+      if (process.env.NODE_ENV === 'development') logger.warn('verifyLtiLaunch failed', { error: e });
       // Try next key
     }
   }
 
   if (!verified || !result) {
-    throw new Error("Invalid LTI launch token");
+    throw new Error('Invalid LTI launch token');
   }
 
   const payload = result.payload as unknown as LtiClaims;
@@ -131,23 +118,16 @@ export async function verifyLtiLaunch(
   }
 
   if (!payload.sub) {
-    throw new Error("Missing sub claim");
+    throw new Error('Missing sub claim');
   }
 
-  const deploymentClaim =
-    payload["https://purl.imsglobal.org/spec/lti/claim/deployment_id"];
+  const deploymentClaim = payload['https://purl.imsglobal.org/spec/lti/claim/deployment_id'];
   if (deploymentClaim !== deploymentId) {
-    throw new Error(
-      `Deployment ID mismatch: expected ${deploymentId}, got ${deploymentClaim}`,
-    );
+    throw new Error(`Deployment ID mismatch: expected ${deploymentId}, got ${deploymentClaim}`);
   }
 
-  const messageType =
-    payload["https://purl.imsglobal.org/spec/lti/claim/message_type"];
-  if (
-    messageType !== "LtiResourceLinkRequest" &&
-    messageType !== "LtiDeepLinkingRequest"
-  ) {
+  const messageType = payload['https://purl.imsglobal.org/spec/lti/claim/message_type'];
+  if (messageType !== 'LtiResourceLinkRequest' && messageType !== 'LtiDeepLinkingRequest') {
     throw new Error(`Invalid LTI message type: ${messageType}`);
   }
 
@@ -157,12 +137,8 @@ export async function verifyLtiLaunch(
 /**
  * Sign a JWT for AGS grade passback
  */
-export async function signAgsToken(
-  privateKeyPem: string,
-  tokenUrl: string,
-  clientId: string,
-): Promise<string> {
-  const privateKey = await importPKCS8(privateKeyPem, "RS256");
+export async function signAgsToken(privateKeyPem: string, tokenUrl: string, clientId: string): Promise<string> {
+  const privateKey = await importPKCS8(privateKeyPem, 'RS256');
 
   const now = Math.floor(Date.now() / 1000);
 
@@ -174,7 +150,7 @@ export async function signAgsToken(
     exp: now + 3600,
     jti: crypto.randomUUID(),
   })
-    .setProtectedHeader({ alg: "RS256" })
+    .setProtectedHeader({ alg: 'RS256' })
     .sign(privateKey);
 }
 
@@ -195,32 +171,28 @@ export async function syncGradesToPlatform(
     });
 
     if (!platform) {
-      return { success: false, error: "Platform not found" };
+      return { success: false, error: 'Platform not found' };
     }
 
     if (!platform.privateKey) {
-      return { success: false, error: "Platform private key not configured" };
+      return { success: false, error: 'Platform private key not configured' };
     }
 
-    const agsToken = await signAgsToken(
-      platform.privateKey,
-      platform.tokenUrl,
-      platform.clientId,
-    );
+    const agsToken = await signAgsToken(platform.privateKey, platform.tokenUrl, platform.clientId);
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      return { success: false, error: "User not found" };
+      return { success: false, error: 'User not found' };
     }
 
     const lineitemUrl = `${platform.tokenUrl}/lineitems`;
 
     // Create lineitem if needed
     const lineitemResponse = await fetch(lineitemUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${agsToken}`,
-        "Content-Type": "application/vnd.ims.lis.v2.lineitem+json",
+        'Content-Type': 'application/vnd.ims.lis.v2.lineitem+json',
       },
       body: JSON.stringify({
         scoreMaximum: maximumScore,
@@ -241,17 +213,17 @@ export async function syncGradesToPlatform(
     // Send score
     const scoresUrl = `${lineitemId}/scores`;
     const scoreResponse = await fetch(scoresUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${agsToken}`,
-        "Content-Type": "application/vnd.ims.lis.v1.score+json",
+        'Content-Type': 'application/vnd.ims.lis.v1.score+json',
       },
       body: JSON.stringify({
         userId: user.email,
         scoreGiven: score,
         scoreMaximum: maximumScore,
-        activityProgress: "Completed",
-        gradingProgress: "FullyGraded",
+        activityProgress: 'Completed',
+        gradingProgress: 'FullyGraded',
         timestamp: new Date().toISOString(),
       }),
     });
@@ -270,14 +242,14 @@ export async function syncGradesToPlatform(
         lineitemLabel: label,
         score,
         scoreMaximum: maximumScore,
-        status: "synced",
+        status: 'synced',
         syncedAt: new Date(),
       },
     });
 
     return { success: true };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return { success: false, error: message };
   }
 }
@@ -290,16 +262,14 @@ export async function fetchNrpsMembers(
   tokenUrl: string,
   clientId: string,
   privateKeyPem: string,
-): Promise<
-  Array<{ userId: string; email: string; name: string; status: string }>
-> {
+): Promise<Array<{ userId: string; email: string; name: string; status: string }>> {
   try {
     const agsToken = await signAgsToken(privateKeyPem, tokenUrl, clientId);
 
     const response = await fetch(contextMembershipsUrl, {
       headers: {
         Authorization: `Bearer ${agsToken}`,
-        Accept: "application/vnd.ims.lti-nrps.v2.membershipcontainer+json",
+        Accept: 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json',
       },
     });
 
@@ -309,13 +279,13 @@ export async function fetchNrpsMembers(
 
     const data = await response.json();
     return (data.members || []).map((member: Record<string, unknown>) => ({
-      userId: (member.user_id as string) || "",
-      email: (member.email as string) || "",
-      name: (member.name as string) || "",
-      status: (member.status as string) || "Active",
+      userId: (member.user_id as string) || '',
+      email: (member.email as string) || '',
+      name: (member.name as string) || '',
+      status: (member.status as string) || 'Active',
     }));
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
+    const message = error instanceof Error ? error.message : 'Unknown error';
     throw new Error(`NRPS sync failed: ${message}`, { cause: error });
   }
 }

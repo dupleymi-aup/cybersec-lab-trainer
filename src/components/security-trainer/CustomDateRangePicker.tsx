@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { Calendar, ChevronDown } from "lucide-react";
+import { useState, useRef, useEffect } from 'react';
+import { Calendar, ChevronDown } from 'lucide-react';
 
 interface Props {
   days: number;
@@ -10,26 +10,22 @@ interface Props {
 }
 
 const PRESETS = [
-  { key: 7, label: "7д" },
-  { key: 30, label: "30д" },
-  { key: 90, label: "90д" },
-  { key: 180, label: "180д" },
-  { key: 365, label: "1г" },
-  { key: -1, label: "Всё время" },
+  { key: 7, label: '7д' },
+  { key: 30, label: '30д' },
+  { key: 90, label: '90д' },
+  { key: 180, label: '180д' },
+  { key: 365, label: '1г' },
+  { key: -1, label: 'Всё время' },
 ];
 
 function daysToDateRange(days: number): string {
-  if (days === -1) return "За всё время";
+  if (days === -1) return 'За всё время';
   return `Последние ${days} дн.`;
 }
 
-export default function CustomDateRangePicker({
-  days,
-  onChange,
-  customLabel,
-}: Props) {
+export default function CustomDateRangePicker({ days, onChange, customLabel }: Props) {
   const [customOpen, setCustomOpen] = useState(false);
-  const [customDays, setCustomDays] = useState("");
+  const [customDays, setCustomDays] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -43,7 +39,7 @@ export default function CustomDateRangePicker({
     if (n > 0 && n <= 3650) {
       onChange(n);
       setCustomOpen(false);
-      setCustomDays("");
+      setCustomDays('');
     }
   };
 
@@ -51,15 +47,15 @@ export default function CustomDateRangePicker({
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex gap-1 p-1 bg-muted rounded-lg">
+      <div className="bg-muted flex gap-1 rounded-lg p-1">
         {PRESETS.map((p) => (
           <button
             key={p.key}
             onClick={() => onChange(p.key)}
-            className={`px-3 py-1.5 text-xs rounded-md transition-all ${
+            className={`rounded-md px-3 py-1.5 text-xs transition-all ${
               days === p.key
-                ? "bg-background text-foreground shadow-sm font-medium"
-                : "text-muted-foreground hover:text-foreground"
+                ? 'bg-background text-foreground font-medium shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {p.label}
@@ -70,24 +66,20 @@ export default function CustomDateRangePicker({
       <div className="relative">
         <button
           onClick={() => setCustomOpen(!customOpen)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md border transition-all ${
+          className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs transition-all ${
             !isPreset
-              ? "bg-indigo-50 border-indigo-200 text-indigo-700 font-medium"
-              : "border-border text-muted-foreground hover:border-border"
+              ? 'border-indigo-200 bg-indigo-50 font-medium text-indigo-700'
+              : 'border-border text-muted-foreground hover:border-border'
           }`}
         >
           <Calendar size={13} />
-          <span>
-            {customLabel || (isPreset ? daysToDateRange(days) : `${days} дн.`)}
-          </span>
+          <span>{customLabel || (isPreset ? daysToDateRange(days) : `${days} дн.`)}</span>
           <ChevronDown size={12} />
         </button>
 
         {customOpen && (
-          <div className="absolute right-0 top-full mt-1 z-20 bg-card border border-border rounded-lg shadow-lg p-3 min-w-[200px]">
-            <p className="text-xs font-medium text-foreground/70 mb-2">
-              Свой период
-            </p>
+          <div className="bg-card border-border absolute top-full right-0 z-20 mt-1 min-w-[200px] rounded-lg border p-3 shadow-lg">
+            <p className="text-foreground/70 mb-2 text-xs font-medium">Свой период</p>
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -97,15 +89,15 @@ export default function CustomDateRangePicker({
                 value={customDays}
                 onChange={(e) => setCustomDays(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleCustomSubmit();
+                  if (e.key === 'Enter') handleCustomSubmit();
                 }}
                 placeholder="Кол-во дней"
-                className="flex-1 px-3 py-1.5 border border-border rounded-md text-xs"
+                className="border-border flex-1 rounded-md border px-3 py-1.5 text-xs"
               />
               <button
                 onClick={handleCustomSubmit}
                 disabled={!customDays || parseInt(customDays) <= 0}
-                className="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700 disabled:opacity-50"
               >
                 OK
               </button>

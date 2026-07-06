@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
+import { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface OTPModalProps {
   otp: string;
@@ -13,13 +13,8 @@ interface OTPModalProps {
   onResend?: () => void;
 }
 
-export default function OTPModal({
-  otp,
-  onSubmit,
-  onClose,
-  onResend,
-}: OTPModalProps) {
-  const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
+export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalProps) {
+  const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [showOtp, setShowOtp] = useState(false);
   const [cooldown, setCooldown] = useState(30);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
@@ -59,14 +54,14 @@ export default function OTPModal({
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !digits[index] && index > 0) {
+    if (e.key === 'Backspace' && !digits[index] && index > 0) {
       inputsRef.current[index - 1]?.focus();
     }
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").slice(0, 6);
+    const pasted = e.clipboardData.getData('text').slice(0, 6);
     if (!/^\d+$/.test(pasted)) return;
     const newDigits = [...digits];
     for (let i = 0; i < pasted.length && i < 6; i++) {
@@ -78,9 +73,9 @@ export default function OTPModal({
   };
 
   const handleSubmit = () => {
-    const code = digits.join("");
+    const code = digits.join('');
     if (code.length !== 6) {
-      toast.error("Введите все 6 цифр");
+      toast.error('Введите все 6 цифр');
       return;
     }
     onSubmit(code);
@@ -89,22 +84,20 @@ export default function OTPModal({
   const handleResend = () => {
     if (cooldown > 0) return;
     setCooldown(30);
-    setDigits(["", "", "", "", "", ""]);
+    setDigits(['', '', '', '', '', '']);
     onResend?.();
     inputsRef.current[0]?.focus();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-card rounded-2xl shadow-xl p-6 w-full max-w-sm">
-        <h3 className="text-xl font-bold text-slate-900 mb-2 text-center">
-          Введите код подтверждения
-        </h3>
-        <p className="text-sm text-muted-foreground mb-4 text-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-card w-full max-w-sm rounded-2xl p-6 shadow-xl">
+        <h3 className="mb-2 text-center text-xl font-bold text-slate-900">Введите код подтверждения</h3>
+        <p className="text-muted-foreground mb-4 text-center text-sm">
           Мы отправили 6-значный код для восстановления доступа
         </p>
 
-        <div className="flex gap-2 justify-center mb-4" onPaste={handlePaste}>
+        <div className="mb-4 flex justify-center gap-2" onPaste={handlePaste}>
           {digits.map((digit, i) => (
             <Input
               key={i}
@@ -117,33 +110,33 @@ export default function OTPModal({
               value={digit}
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
-              className="w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 border-border focus:border-violet-500 focus:ring-violet-500"
+              className="border-border h-14 w-12 rounded-xl border-2 text-center text-2xl font-bold focus:border-violet-500 focus:ring-violet-500"
             />
           ))}
         </div>
 
-        <div className="text-center mb-4">
+        <div className="mb-4 text-center">
           <button
             type="button"
             onClick={() => setShowOtp(!showOtp)}
-            className="text-xs text-slate-400 bg-muted px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 hover:bg-slate-200 transition"
+            className="bg-muted inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-slate-400 transition hover:bg-slate-200"
           >
             {showOtp ? (
               <>
-                <EyeOff className="w-3 h-3" />
+                <EyeOff className="h-3 w-3" />
                 <span className="text-foreground/70 font-mono">{otp}</span>
                 <span className="text-muted-foreground">скрыть</span>
               </>
             ) : (
               <>
-                <Eye className="w-3 h-3" />
+                <Eye className="h-3 w-3" />
                 Показать код
               </>
             )}
           </button>
         </div>
 
-        <Button onClick={handleSubmit} className="w-full mb-3">
+        <Button onClick={handleSubmit} className="mb-3 w-full">
           Подтвердить
         </Button>
 
@@ -152,15 +145,11 @@ export default function OTPModal({
             type="button"
             onClick={handleResend}
             disabled={cooldown > 0}
-            className={`text-violet-600 ${cooldown > 0 ? "opacity-50 cursor-not-allowed" : "hover:underline"}`}
+            className={`text-violet-600 ${cooldown > 0 ? 'cursor-not-allowed opacity-50' : 'hover:underline'}`}
           >
-            Отправить снова {cooldown > 0 ? `(${cooldown}с)` : ""}
+            Отправить снова {cooldown > 0 ? `(${cooldown}с)` : ''}
           </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground/70"
-          >
+          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground/70">
             Отмена
           </button>
         </div>

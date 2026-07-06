@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import { getAllUsers, useAuthStore } from "@/lib/auth-store";
-import { useDateFormatter } from "@/lib/format";
-import { useAppStore, getAuthHeaders } from "@/lib/store";
-import { quizCategories, modules } from "@/lib/data";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { getAllUsers, useAuthStore } from '@/lib/auth-store';
+import { useDateFormatter } from '@/lib/format';
+import { useAppStore, getAuthHeaders } from '@/lib/store';
+import { quizCategories, modules } from '@/lib/data';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { motion } from 'framer-motion';
 import {
   BarChart,
   Bar,
@@ -24,7 +24,7 @@ import {
   PieChart,
   Pie,
   Cell,
-} from "recharts";
+} from 'recharts';
 import {
   ChevronLeft,
   Users,
@@ -51,21 +51,21 @@ import {
   FileBarChart,
   ClipboardList,
   Loader2,
-} from "lucide-react";
-import ProgressTrendsChart from "./ProgressTrendsChart";
-import QuizQuestionAnalytics from "./QuizQuestionAnalytics";
-import AchievementAnalytics from "./AchievementAnalytics";
-import AnalyticsExportPanel from "./AnalyticsExportPanel";
-import CompetencyRadar from "./CompetencyRadar";
-import WeaknessAnalyzer from "./WeaknessAnalyzer";
-import PredictiveInsights from "./PredictiveInsights";
-import TeacherMessaging from "./TeacherMessaging";
-import StudentProgressView from "./StudentProgressView";
-import ModuleDeepDive from "./ModuleDeepDive";
-import CertificationReadiness from "./CertificationReadiness";
-import QuizSessionAnalytics from "./QuizSessionAnalytics";
-import AssignmentBuilder from "./AssignmentBuilder";
-import { logger } from "@/lib/logger";
+} from 'lucide-react';
+import ProgressTrendsChart from './ProgressTrendsChart';
+import QuizQuestionAnalytics from './QuizQuestionAnalytics';
+import AchievementAnalytics from './AchievementAnalytics';
+import AnalyticsExportPanel from './AnalyticsExportPanel';
+import CompetencyRadar from './CompetencyRadar';
+import WeaknessAnalyzer from './WeaknessAnalyzer';
+import PredictiveInsights from './PredictiveInsights';
+import TeacherMessaging from './TeacherMessaging';
+import StudentProgressView from './StudentProgressView';
+import ModuleDeepDive from './ModuleDeepDive';
+import CertificationReadiness from './CertificationReadiness';
+import QuizSessionAnalytics from './QuizSessionAnalytics';
+import AssignmentBuilder from './AssignmentBuilder';
+import { logger } from '@/lib/logger';
 
 interface StudentProgress {
   userId: string;
@@ -82,7 +82,7 @@ interface StudentProgress {
 }
 
 const EMPTY_PROGRESS: StudentProgress = {
-  userId: "",
+  userId: '',
   completedModules: [],
   quizScores: {},
   moduleTimestamps: {},
@@ -96,30 +96,26 @@ const EMPTY_PROGRESS: StudentProgress = {
 
 export default function TeacherPanel() {
   const formatDate = useDateFormatter();
-  const t = useTranslations("teacher");
+  const t = useTranslations('teacher');
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const user = useAuthStore((s) => s.user);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [groupFilter, setGroupFilter] = useState("");
-  const [gradebookSort, setGradebookSort] = useState<
-    "name" | "modules" | "score"
-  >("name");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [groupFilter, setGroupFilter] = useState('');
+  const [gradebookSort, setGradebookSort] = useState<'name' | 'modules' | 'score'>('name');
   const [analyticsSubTab, setAnalyticsSubTab] = useState<
-    | "overview"
-    | "trends"
-    | "questions"
-    | "achievements"
-    | "competency"
-    | "weaknesses"
-    | "predictive"
-    | "export"
-    | "module-deep-dive"
-    | "certification"
-    | "quiz-session"
-  >("overview");
-  const [_selectedStudentId, setSelectedStudentId] = useState<string | null>(
-    null,
-  );
+    | 'overview'
+    | 'trends'
+    | 'questions'
+    | 'achievements'
+    | 'competency'
+    | 'weaknesses'
+    | 'predictive'
+    | 'export'
+    | 'module-deep-dive'
+    | 'certification'
+    | 'quiz-session'
+  >('overview');
+  const [_selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [students, setStudents] = useState<
     Array<{
       id: string;
@@ -129,18 +125,13 @@ export default function TeacherPanel() {
       avatar: string;
     }>
   >([]);
-  const [studentProgress, setStudentProgress] = useState<
-    Record<string, StudentProgress>
-  >({});
-  const getSp = useCallback(
-    (id: string) => studentProgress[id] ?? EMPTY_PROGRESS,
-    [studentProgress],
-  );
+  const [studentProgress, setStudentProgress] = useState<Record<string, StudentProgress>>({});
+  const getSp = useCallback((id: string) => studentProgress[id] ?? EMPTY_PROGRESS, [studentProgress]);
   const [loadingStudents, setLoadingStudents] = useState(true);
 
   useEffect(() => {
     getAllUsers()
-      .then((users) => setStudents(users.filter((u) => u.role === "student")))
+      .then((users) => setStudents(users.filter((u) => u.role === 'student')))
       .finally(() => setLoadingStudents(false));
   }, []);
 
@@ -158,10 +149,7 @@ export default function TeacherPanel() {
         if (cancelled) return;
         const chunk = userIds.slice(i, i + batchSize);
         try {
-          const res = await fetch(
-            `/api/progress/batch?userIds=${chunk.join(",")}`,
-            { headers },
-          );
+          const res = await fetch(`/api/progress/batch?userIds=${chunk.join(',')}`, { headers });
           if (!res.ok) continue;
           const data = await res.json();
 
@@ -203,27 +191,14 @@ export default function TeacherPanel() {
                 moduleTimestamps[p.moduleId] = p.updatedAt;
                 timestamps.push(p.updatedAt);
               }
-              if (p.studiedOwaspItems)
-                studiedOwaspItems = [
-                  ...new Set([...studiedOwaspItems, ...p.studiedOwaspItems]),
-                ];
+              if (p.studiedOwaspItems) studiedOwaspItems = [...new Set([...studiedOwaspItems, ...p.studiedOwaspItems])];
               if (p.sqlLevels)
-                sqlCompletedLevels = [
-                  ...sqlCompletedLevels,
-                  ...(Array.isArray(p.sqlLevels) ? p.sqlLevels : []),
-                ];
+                sqlCompletedLevels = [...sqlCompletedLevels, ...(Array.isArray(p.sqlLevels) ? p.sqlLevels : [])];
               if (p.xssLevels)
-                xssCompletedLevels = [
-                  ...xssCompletedLevels,
-                  ...(Array.isArray(p.xssLevels) ? p.xssLevels : []),
-                ];
+                xssCompletedLevels = [...xssCompletedLevels, ...(Array.isArray(p.xssLevels) ? p.xssLevels : [])];
               if (p.csrfSteps)
-                csrfCompletedSteps = [
-                  ...csrfCompletedSteps,
-                  ...(Array.isArray(p.csrfSteps) ? p.csrfSteps : []),
-                ];
-              if (p.secureCodingCorrectCount)
-                secureCodingCorrectCount += p.secureCodingCorrectCount;
+                csrfCompletedSteps = [...csrfCompletedSteps, ...(Array.isArray(p.csrfSteps) ? p.csrfSteps : [])];
+              if (p.secureCodingCorrectCount) secureCodingCorrectCount += p.secureCodingCorrectCount;
             }
 
             const quizScores: Record<string, number> = {};
@@ -236,10 +211,7 @@ export default function TeacherPanel() {
               }
             }
 
-            const lastActive =
-              timestamps.length > 0
-                ? timestamps.sort().reverse()[0]
-                : undefined;
+            const lastActive = timestamps.length > 0 ? timestamps.sort().reverse()[0] : undefined;
 
             batchResult[userId] = {
               userId,
@@ -306,67 +278,64 @@ export default function TeacherPanel() {
   >([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newDeadline, setNewDeadline] = useState({
-    scope: "module" as string,
-    scopeId: "",
-    dueAt: "",
-    title: "",
-    description: "",
-    group: "",
+    scope: 'module' as string,
+    scopeId: '',
+    dueAt: '',
+    title: '',
+    description: '',
+    group: '',
   });
 
   useEffect(() => {
     (async () => {
       try {
         const headers = await getAuthHeaders();
-        const r1 = await fetch("/api/deadlines", { headers });
+        const r1 = await fetch('/api/deadlines', { headers });
         if (r1.ok) {
           const data = await r1.json();
           if (data.deadlines) setDeadlines(data.deadlines);
         }
       } catch (e) {
-        if (process.env.NODE_ENV === "development")
-          logger.warn("TeacherPanel loadProgress failed", { error: e });
+        if (process.env.NODE_ENV === 'development') logger.warn('TeacherPanel loadProgress failed', { error: e });
       }
 
       try {
         const headers = await getAuthHeaders();
-        const r2 = await fetch("/api/deadlines/teacher/reminders", { headers });
+        const r2 = await fetch('/api/deadlines/teacher/reminders', { headers });
         if (r2.ok) {
           const data = await r2.json();
           if (data.results) setDeadlineReminders(data.results);
         }
       } catch (e) {
-        if (process.env.NODE_ENV === "development")
-          logger.warn("TeacherPanel loadReminders failed", { error: e });
+        if (process.env.NODE_ENV === 'development') logger.warn('TeacherPanel loadReminders failed', { error: e });
       }
     })();
   }, []);
 
   const createDeadline = async () => {
-    if (!newDeadline.title || !newDeadline.dueAt || !newDeadline.scopeId)
-      return;
+    if (!newDeadline.title || !newDeadline.dueAt || !newDeadline.scopeId) return;
     try {
       const headers = await getAuthHeaders();
-      const res = await fetch("/api/deadlines", {
-        method: "POST",
-        headers: { ...headers, "Content-Type": "application/json" },
+      const res = await fetch('/api/deadlines', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify(newDeadline),
       });
       if (res.ok) {
         const data = await res.json();
         setDeadlines((prev) => [...prev, data.deadline]);
         setNewDeadline({
-          scope: "module",
-          scopeId: "",
-          dueAt: "",
-          title: "",
-          description: "",
-          group: "",
+          scope: 'module',
+          scopeId: '',
+          dueAt: '',
+          title: '',
+          description: '',
+          group: '',
         });
         setShowCreateForm(false);
         // Refresh reminders
         const r2Headers = await getAuthHeaders();
-        const r2 = await fetch("/api/deadlines/teacher/reminders", {
+        const r2 = await fetch('/api/deadlines/teacher/reminders', {
           headers: r2Headers,
         });
         if (r2.ok) {
@@ -375,8 +344,7 @@ export default function TeacherPanel() {
         }
       }
     } catch (err) {
-        if (process.env.NODE_ENV === "development")
-          logger.error("Failed to create deadline", { error: err });
+      if (process.env.NODE_ENV === 'development') logger.error('Failed to create deadline', { error: err });
     }
   };
 
@@ -384,18 +352,15 @@ export default function TeacherPanel() {
     try {
       const headers = await getAuthHeaders();
       const res = await fetch(`/api/deadlines/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers,
       });
       if (res.ok) {
         setDeadlines((prev) => prev.filter((d) => d.id !== id));
-        setDeadlineReminders((prev) =>
-          prev.filter((r) => r.deadline.id !== id),
-        );
+        setDeadlineReminders((prev) => prev.filter((r) => r.deadline.id !== id));
       }
     } catch (err) {
-        if (process.env.NODE_ENV === "development")
-          logger.error("Failed to delete deadline", { error: err });
+      if (process.env.NODE_ENV === 'development') logger.error('Failed to delete deadline', { error: err });
     }
   };
 
@@ -403,20 +368,17 @@ export default function TeacherPanel() {
     () =>
       students.filter((s) => {
         const matchesSearch =
-          searchTerm === "" ||
+          searchTerm === '' ||
           s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           s.email.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesGroup = groupFilter === "" || s.group === groupFilter;
+        const matchesGroup = groupFilter === '' || s.group === groupFilter;
         return matchesSearch && matchesGroup;
       }),
     [students, searchTerm, groupFilter],
   );
 
   // Get unique groups
-  const groups = useMemo(
-    () => [...new Set(students.map((s) => s.group).filter(Boolean))],
-    [students],
-  );
+  const groups = useMemo(() => [...new Set(students.map((s) => s.group).filter(Boolean))], [students]);
 
   // Memoize student progress to avoid repeated localStorage reads
   const progressMap = useMemo(() => {
@@ -472,32 +434,20 @@ export default function TeacherPanel() {
             reasons: [] as string[],
           };
         const scores = Object.values(progress.quizScores);
-        const avgScore =
-          scores.length > 0
-            ? scores.reduce((a, b) => a + b, 0) / scores.length
-            : 0;
+        const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
         const daysSinceActive = progress.lastActive
-          ? Math.floor(
-              (now.getTime() - new Date(progress.lastActive).getTime()) /
-                (1000 * 60 * 60 * 24),
-            )
+          ? Math.floor((now.getTime() - new Date(progress.lastActive).getTime()) / (1000 * 60 * 60 * 24))
           : 999;
 
         const reasons: string[] = [];
-        if (daysSinceActive > 7)
-          reasons.push(`Не активен ${daysSinceActive} дн.`);
-        if (avgScore < 50 && scores.length > 0)
-          reasons.push(`Низкий балл (${Math.round(avgScore)}%)`);
-        if (progress.completedModules.length < 2) reasons.push("Мало модулей");
+        if (daysSinceActive > 7) reasons.push(`Не активен ${daysSinceActive} дн.`);
+        if (avgScore < 50 && scores.length > 0) reasons.push(`Низкий балл (${Math.round(avgScore)}%)`);
+        if (progress.completedModules.length < 2) reasons.push('Мало модулей');
 
         return { student: s, progress, avgScore, daysSinceActive, reasons };
       })
       .filter((s) => s.reasons.length > 0)
-      .sort(
-        (a, b) =>
-          b.reasons.length - a.reasons.length ||
-          b.daysSinceActive - a.daysSinceActive,
-      );
+      .sort((a, b) => b.reasons.length - a.reasons.length || b.daysSinceActive - a.daysSinceActive);
   }, [students, progressMap]);
 
   // Group comparison data
@@ -521,39 +471,23 @@ export default function TeacherPanel() {
       return {
         name: group,
         students: groupStudents.length,
-        avgModules:
-          groupStudents.length > 0
-            ? Math.round((totalMods / groupStudents.length) * 10) / 10
-            : 0,
+        avgModules: groupStudents.length > 0 ? Math.round((totalMods / groupStudents.length) * 10) / 10 : 0,
         avgScore: scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0,
-        activityRate:
-          groupStudents.length > 0
-            ? Math.round((activeCount / groupStudents.length) * 100)
-            : 0,
+        activityRate: groupStudents.length > 0 ? Math.round((activeCount / groupStudents.length) * 100) : 0,
       };
     });
   }, [groups, students, getSp]);
 
   const sortedStudents = useMemo(() => {
     const sorted = [...filteredStudents];
-    if (gradebookSort === "modules")
-      sorted.sort(
-        (a, b) =>
-          getSp(b.id).completedModules.length -
-          getSp(a.id).completedModules.length,
-      );
-    if (gradebookSort === "score")
+    if (gradebookSort === 'modules')
+      sorted.sort((a, b) => getSp(b.id).completedModules.length - getSp(a.id).completedModules.length);
+    if (gradebookSort === 'score')
       sorted.sort((a, b) => {
         const aScores = Object.values(getSp(a.id).quizScores);
         const bScores = Object.values(getSp(b.id).quizScores);
-        const aAvg =
-          aScores.length > 0
-            ? aScores.reduce((x, y) => x + y, 0) / aScores.length
-            : 0;
-        const bAvg =
-          bScores.length > 0
-            ? bScores.reduce((x, y) => x + y, 0) / bScores.length
-            : 0;
+        const aAvg = aScores.length > 0 ? aScores.reduce((x, y) => x + y, 0) / aScores.length : 0;
+        const bAvg = bScores.length > 0 ? bScores.reduce((x, y) => x + y, 0) / bScores.length : 0;
         return bAvg - aAvg;
       });
     return sorted;
@@ -564,19 +498,15 @@ export default function TeacherPanel() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCurrentPage("dashboard")}
-          >
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
             <ChevronLeft size={20} />
           </Button>
-          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100">
             <Users size={20} className="text-amber-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">{t("title")}</h1>
-            <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
+            <h1 className="text-xl font-bold">{t('title')}</h1>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
         <AnalyticsExportPanel students={students} />
@@ -589,9 +519,9 @@ export default function TeacherPanel() {
           <select
             value={groupFilter}
             onChange={(e) => setGroupFilter(e.target.value)}
-            className="text-sm border rounded-md px-3 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="bg-background text-foreground rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
           >
-            <option value="">{t("allGroups")}</option>
+            <option value="">{t('allGroups')}</option>
             {groups.map((g) => (
               <option key={g} value={g}>
                 {g}
@@ -600,100 +530,91 @@ export default function TeacherPanel() {
           </select>
           {groupFilter && (
             <button
-              onClick={() => setGroupFilter("")}
-              className="text-xs text-muted-foreground hover:text-foreground px-2 py-1"
+              onClick={() => setGroupFilter('')}
+              className="text-muted-foreground hover:text-foreground px-2 py-1 text-xs"
             >
-              {t("reset")}
+              {t('reset')}
             </button>
           )}
         </div>
       )}
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
         {[
           {
-            label: t("totalStudents"),
+            label: t('totalStudents'),
             value: totalStudents,
             icon: Users,
-            color: "text-sky-600",
-            bg: "bg-sky-50",
+            color: 'text-sky-600',
+            bg: 'bg-sky-50',
           },
           {
-            label: t("active"),
+            label: t('active'),
             value: activeStudents,
             icon: GraduationCap,
-            color: "text-emerald-600",
-            bg: "bg-emerald-50",
+            color: 'text-emerald-600',
+            bg: 'bg-emerald-50',
           },
           {
-            label: t("avgModules"),
+            label: t('avgModules'),
             value: avgCompletion,
             icon: BookOpen,
-            color: "text-violet-600",
-            bg: "bg-violet-50",
+            color: 'text-violet-600',
+            bg: 'bg-violet-50',
           },
           {
-            label: t("avgScore"),
+            label: t('avgScore'),
             value: `${avgQuizScore}%`,
             icon: Trophy,
-            color: "text-amber-600",
-            bg: "bg-amber-50",
+            color: 'text-amber-600',
+            bg: 'bg-amber-50',
           },
         ].map((stat) => (
-          <Card
-            key={stat.label}
-            className="border-none shadow-sm bg-card hover:shadow-md transition-shadow"
-          >
+          <Card key={stat.label} className="bg-card border-none shadow-sm transition-shadow hover:shadow-md">
             <CardContent className="p-4">
-              <div
-                className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center mb-2`}
-              >
+              <div className={`h-10 w-10 rounded-lg ${stat.bg} mb-2 flex items-center justify-center`}>
                 <stat.icon size={18} className={stat.color} />
               </div>
               <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+              <p className="text-muted-foreground mt-1 text-xs">{stat.label}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <Tabs defaultValue="progress">
-        <div className="overflow-x-auto pb-2 scrollbar-thin">
-          <TabsList className="grid w-full grid-cols-5 md:grid-cols-9 min-w-[640px] md:min-w-0">
+        <div className="scrollbar-thin overflow-x-auto pb-2">
+          <TabsList className="grid w-full min-w-[640px] grid-cols-5 md:min-w-0 md:grid-cols-9">
             <TabsTrigger value="progress" className="text-xs">
-              <BarChart3 size={14} className="mr-1" /> {t("tabs.progress")}
+              <BarChart3 size={14} className="mr-1" /> {t('tabs.progress')}
             </TabsTrigger>
             <TabsTrigger value="gradebook" className="text-xs">
-              <Table2 size={14} className="mr-1" /> {t("tabs.gradebook")}
+              <Table2 size={14} className="mr-1" /> {t('tabs.gradebook')}
             </TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs">
-              <Filter size={14} className="mr-1" /> {t("tabs.analytics")}
+              <Filter size={14} className="mr-1" /> {t('tabs.analytics')}
             </TabsTrigger>
             <TabsTrigger value="deadlines" className="text-xs">
-              <Calendar size={14} className="mr-1" /> {t("tabs.deadlines")}
+              <Calendar size={14} className="mr-1" /> {t('tabs.deadlines')}
             </TabsTrigger>
             <TabsTrigger value="groups" className="text-xs">
-              <Users size={14} className="mr-1" /> {t("tabs.groups")}
+              <Users size={14} className="mr-1" /> {t('tabs.groups')}
             </TabsTrigger>
-            <TabsTrigger value="compare" className="text-xs hidden md:block">
-              <GitCompare size={14} className="mr-1" /> {t("tabs.comparison")}
+            <TabsTrigger value="compare" className="hidden text-xs md:block">
+              <GitCompare size={14} className="mr-1" /> {t('tabs.comparison')}
             </TabsTrigger>
-            <TabsTrigger value="at-risk" className="text-xs hidden md:block">
-              <AlertTriangle size={14} className="mr-1" /> {t("tabs.atRisk")}
+            <TabsTrigger value="at-risk" className="hidden text-xs md:block">
+              <AlertTriangle size={14} className="mr-1" /> {t('tabs.atRisk')}
             </TabsTrigger>
-            <TabsTrigger value="messages" className="text-xs hidden lg:block">
-              <MessageSquare size={14} className="mr-1" /> {t("tabs.messages")}
+            <TabsTrigger value="messages" className="hidden text-xs lg:block">
+              <MessageSquare size={14} className="mr-1" /> {t('tabs.messages')}
             </TabsTrigger>
-            <TabsTrigger value="reports" className="text-xs hidden lg:block">
-              <FileBarChart size={14} className="mr-1" /> {t("tabs.reports")}
+            <TabsTrigger value="reports" className="hidden text-xs lg:block">
+              <FileBarChart size={14} className="mr-1" /> {t('tabs.reports')}
             </TabsTrigger>
-            <TabsTrigger
-              value="assignments"
-              className="text-xs hidden md:block"
-            >
-              <ClipboardList size={14} className="mr-1" />{" "}
-              {t("tabs.assignments")}
+            <TabsTrigger value="assignments" className="hidden text-xs md:block">
+              <ClipboardList size={14} className="mr-1" /> {t('tabs.assignments')}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -710,59 +631,50 @@ export default function TeacherPanel() {
         {/* Gradebook Tab */}
         <TabsContent value="gradebook" className="mt-4 space-y-4">
           {loadingStudents ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
               <Loader2 size={32} className="mb-3 animate-spin opacity-50" />
-              <p className="text-sm">{t("loading")}</p>
+              <p className="text-sm">{t('loading')}</p>
             </div>
           ) : (
             <>
-              <div className="flex gap-3 items-center">
+              <div className="flex items-center gap-3">
                 <div className="relative flex-1">
-                  <Search
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  />
+                  <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
                   <Input
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder={t("searchStudent")}
+                    placeholder={t('searchStudent')}
                     className="pl-10"
                   />
                 </div>
                 <select
                   value={gradebookSort}
-                  onChange={(e) =>
-                    setGradebookSort(
-                      e.target.value as "name" | "modules" | "score",
-                    )
-                  }
-                  className="px-3 py-2 border border-border rounded-md text-sm bg-card"
+                  onChange={(e) => setGradebookSort(e.target.value as 'name' | 'modules' | 'score')}
+                  className="border-border bg-card rounded-md border px-3 py-2 text-sm"
                 >
-                  <option value="name">{t("sortByName")}</option>
-                  <option value="modules">{t("sortByModules")}</option>
-                  <option value="score">{t("sortByScore")}</option>
+                  <option value="name">{t('sortByName')}</option>
+                  <option value="modules">{t('sortByModules')}</option>
+                  <option value="score">{t('sortByScore')}</option>
                 </select>
               </div>
 
-              <div className="border border-border rounded-lg overflow-x-auto">
+              <div className="border-border overflow-x-auto rounded-lg border">
                 <table className="w-full text-xs">
-                  <thead className="bg-secondary border-b border-border">
+                  <thead className="bg-secondary border-border border-b">
                     <tr>
-                      <th className="text-left p-2 font-medium text-muted-foreground sticky left-0 bg-secondary z-10">
-                        {t("student")}
+                      <th className="text-muted-foreground bg-secondary sticky left-0 z-10 p-2 text-left font-medium">
+                        {t('student')}
                       </th>
                       {modules.map((m) => (
                         <th
                           key={m.id}
-                          className="p-2 font-medium text-muted-foreground text-center min-w-[60px]"
+                          className="text-muted-foreground min-w-[60px] p-2 text-center font-medium"
                           title={m.title}
                         >
-                          {m.title.split(" ").slice(0, 2).join(" ")}
+                          {m.title.split(' ').slice(0, 2).join(' ')}
                         </th>
                       ))}
-                      <th className="p-2 font-medium text-muted-foreground text-center">
-                        {t("avgScore")}
-                      </th>
+                      <th className="text-muted-foreground p-2 text-center font-medium">{t('avgScore')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -770,56 +682,34 @@ export default function TeacherPanel() {
                       const progress = getSp(student.id);
                       const scores = Object.entries(progress.quizScores);
                       const avgScore =
-                        scores.length > 0
-                          ? Math.round(
-                              scores.reduce((a, [, v]) => a + v, 0) /
-                                scores.length,
-                            )
-                          : 0;
+                        scores.length > 0 ? Math.round(scores.reduce((a, [, v]) => a + v, 0) / scores.length) : 0;
 
                       return (
-                        <tr
-                          key={student.id}
-                          className="border-b border-slate-100 hover:bg-secondary"
-                        >
-                          <td className="p-2 font-medium sticky left-0 bg-card z-10">
+                        <tr key={student.id} className="hover:bg-secondary border-b border-slate-100">
+                          <td className="bg-card sticky left-0 z-10 p-2 font-medium">
                             <div>
-                              <div className="truncate max-w-[120px]">
-                                {student.fullName}
-                              </div>
-                              {student.group && (
-                                <div className="text-[10px] text-slate-400">
-                                  {student.group}
-                                </div>
-                              )}
+                              <div className="max-w-[120px] truncate">{student.fullName}</div>
+                              {student.group && <div className="text-[10px] text-slate-400">{student.group}</div>}
                             </div>
                           </td>
                           {modules.map((m) => {
-                            const done = progress.completedModules.includes(
-                              m.id,
-                            );
+                            const done = progress.completedModules.includes(m.id);
                             return (
                               <td key={m.id} className="p-2 text-center">
                                 <span
-                                  className={`inline-block w-5 h-5 rounded-full text-[10px] leading-5 ${done ? "bg-emerald-100 text-emerald-700" : "bg-muted text-slate-300"}`}
+                                  className={`inline-block h-5 w-5 rounded-full text-[10px] leading-5 ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-slate-300'}`}
                                 >
-                                  {done ? "✓" : "·"}
+                                  {done ? '✓' : '·'}
                                 </span>
                               </td>
                             );
                           })}
                           <td className="p-2 text-center">
                             <Badge
-                              variant={
-                                avgScore >= 70
-                                  ? "default"
-                                  : avgScore >= 50
-                                    ? "secondary"
-                                    : "destructive"
-                              }
-                              className="text-[10px] min-w-[36px]"
+                              variant={avgScore >= 70 ? 'default' : avgScore >= 50 ? 'secondary' : 'destructive'}
+                              className="min-w-[36px] text-[10px]"
                             >
-                              {scores.length > 0 ? `${avgScore}%` : "—"}
+                              {scores.length > 0 ? `${avgScore}%` : '—'}
                             </Badge>
                           </td>
                         </tr>
@@ -834,10 +724,7 @@ export default function TeacherPanel() {
 
         {/* Messages Tab */}
         <TabsContent value="messages" className="mt-4 space-y-4">
-          <TeacherMessaging
-            currentUser={user?.fullName || t("defaultTeacherName")}
-            groups={groups}
-          />
+          <TeacherMessaging currentUser={user?.fullName || t('defaultTeacherName')} groups={groups} />
         </TabsContent>
 
         {/* Deadlines Tab */}
@@ -845,10 +732,10 @@ export default function TeacherPanel() {
           {/* Create deadline form */}
           <Card className="border-border">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-sm flex items-center gap-2">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <Calendar size={16} className="text-orange-500" />
-                  {t("manageDeadlines")}
+                  {t('manageDeadlines')}
                 </h3>
                 <Button
                   size="sm"
@@ -857,16 +744,16 @@ export default function TeacherPanel() {
                   className="text-xs"
                 >
                   <Plus size={14} className="mr-1" />
-                  {showCreateForm ? t("cancel") : t("newDeadline")}
+                  {showCreateForm ? t('cancel') : t('newDeadline')}
                 </Button>
               </div>
 
               {showCreateForm && (
-                <div className="space-y-3 p-4 bg-orange-50 rounded-lg border border-orange-200">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-3 rounded-lg border border-orange-200 bg-orange-50 p-4">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                        {t("deadlineType")}
+                      <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                        {t('deadlineType')}
                       </label>
                       <select
                         value={newDeadline.scope}
@@ -874,37 +761,37 @@ export default function TeacherPanel() {
                           setNewDeadline({
                             ...newDeadline,
                             scope: e.target.value,
-                            scopeId: "",
+                            scopeId: '',
                           })
                         }
-                        className="w-full px-3 py-2 border border-border rounded-md text-sm"
+                        className="border-border w-full rounded-md border px-3 py-2 text-sm"
                       >
-                        <option value="module">{t("module")}</option>
-                        <option value="quiz">{t("quiz")}</option>
-                        <option value="course">{t("course")}</option>
+                        <option value="module">{t('module')}</option>
+                        <option value="quiz">{t('quiz')}</option>
+                        <option value="course">{t('course')}</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                        {newDeadline.scope === "module"
-                          ? t("module")
-                          : newDeadline.scope === "quiz"
-                            ? t("quiz")
-                            : t("deadlineTitle")}
+                      <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                        {newDeadline.scope === 'module'
+                          ? t('module')
+                          : newDeadline.scope === 'quiz'
+                            ? t('quiz')
+                            : t('deadlineTitle')}
                       </label>
-                      {newDeadline.scope === "course" ? (
+                      {newDeadline.scope === 'course' ? (
                         <Input
                           value={newDeadline.title}
                           onChange={(e) =>
                             setNewDeadline({
                               ...newDeadline,
                               title: e.target.value,
-                              scopeId: "course",
+                              scopeId: 'course',
                             })
                           }
-                          placeholder={t("deadlineTitle")}
+                          placeholder={t('deadlineTitle')}
                         />
-                      ) : newDeadline.scope === "module" ? (
+                      ) : newDeadline.scope === 'module' ? (
                         <select
                           value={newDeadline.scopeId}
                           onChange={(e) =>
@@ -913,9 +800,9 @@ export default function TeacherPanel() {
                               scopeId: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-border rounded-md text-sm"
+                          className="border-border w-full rounded-md border px-3 py-2 text-sm"
                         >
-                          <option value="">{t("selectModule")}</option>
+                          <option value="">{t('selectModule')}</option>
                           {modules.map((m) => (
                             <option key={m.id} value={m.id}>
                               {m.title}
@@ -931,9 +818,9 @@ export default function TeacherPanel() {
                               scopeId: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-border rounded-md text-sm"
+                          className="border-border w-full rounded-md border px-3 py-2 text-sm"
                         >
-                          <option value="">{t("selectQuiz")}</option>
+                          <option value="">{t('selectQuiz')}</option>
                           {quizCategories.map((q) => (
                             <option key={q.id} value={q.id}>
                               {q.name}
@@ -943,8 +830,8 @@ export default function TeacherPanel() {
                       )}
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                        {t("deadlineDate")}
+                      <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                        {t('deadlineDate')}
                       </label>
                       <Input
                         type="datetime-local"
@@ -958,8 +845,8 @@ export default function TeacherPanel() {
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                        {t("deadlineGroup")}
+                      <label className="text-muted-foreground mb-1 block text-xs font-medium">
+                        {t('deadlineGroup')}
                       </label>
                       <select
                         value={newDeadline.group}
@@ -969,9 +856,9 @@ export default function TeacherPanel() {
                             group: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-border rounded-md text-sm"
+                        className="border-border w-full rounded-md border px-3 py-2 text-sm"
                       >
-                        <option value="">{t("allStudents")}</option>
+                        <option value="">{t('allStudents')}</option>
                         {groups.map((g) => (
                           <option key={g} value={g}>
                             {g}
@@ -981,9 +868,7 @@ export default function TeacherPanel() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                      {t("description")}
-                    </label>
+                    <label className="text-muted-foreground mb-1 block text-xs font-medium">{t('description')}</label>
                     <Input
                       value={newDeadline.description}
                       onChange={(e) =>
@@ -992,19 +877,15 @@ export default function TeacherPanel() {
                           description: e.target.value,
                         })
                       }
-                      placeholder={t("optional")}
+                      placeholder={t('optional')}
                     />
                   </div>
                   <div className="flex justify-end gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setShowCreateForm(false)}
-                    >
-                      {t("cancel")}
+                    <Button size="sm" variant="outline" onClick={() => setShowCreateForm(false)}>
+                      {t('cancel')}
                     </Button>
                     <Button size="sm" onClick={createDeadline}>
-                      {t("saveDeadline")}
+                      {t('saveDeadline')}
                     </Button>
                   </div>
                 </div>
@@ -1012,91 +893,65 @@ export default function TeacherPanel() {
 
               {/* Active deadliness list */}
               {deadlines.length > 0 ? (
-                <div className="space-y-3 mt-3">
+                <div className="mt-3 space-y-3">
                   {deadlines.map((d) => {
-                    const reminder = deadlineReminders.find(
-                      (r) => r.deadline.id === d.id,
-                    );
+                    const reminder = deadlineReminders.find((r) => r.deadline.id === d.id);
                     const dueDate = new Date(d.dueAt);
                     const now = new Date();
-                    const diffDays = Math.ceil(
-                      (dueDate.getTime() - now.getTime()) /
-                        (1000 * 60 * 60 * 24),
-                    );
+                    const diffDays = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
                     const isOverdue = diffDays < 0;
 
                     const scopeLabel =
-                      d.scope === "course"
-                        ? t("course")
-                        : d.scope === "module"
-                          ? modules.find((m) => m.id === d.scopeId)?.title ||
-                            d.scopeId
-                          : quizCategories.find((q) => q.id === d.scopeId)
-                              ?.name || d.scopeId;
+                      d.scope === 'course'
+                        ? t('course')
+                        : d.scope === 'module'
+                          ? modules.find((m) => m.id === d.scopeId)?.title || d.scopeId
+                          : quizCategories.find((q) => q.id === d.scopeId)?.name || d.scopeId;
 
                     return (
                       <div
                         key={d.id}
-                        className={`rounded-lg border-l-4 p-4 ${isOverdue ? "border-l-red-500 bg-red-50/50" : diffDays <= 3 ? "border-l-orange-500 bg-orange-50/50" : "border-l-emerald-500 bg-emerald-50/50"}`}
+                        className={`rounded-lg border-l-4 p-4 ${isOverdue ? 'border-l-red-500 bg-red-50/50' : diffDays <= 3 ? 'border-l-orange-500 bg-orange-50/50' : 'border-l-emerald-500 bg-emerald-50/50'}`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <p className="text-sm font-semibold text-foreground/80">
-                                {d.title}
-                              </p>
+                            <div className="mb-1 flex items-center gap-2">
+                              <p className="text-foreground/80 text-sm font-semibold">{d.title}</p>
                               <Badge
-                                variant={
-                                  isOverdue
-                                    ? "destructive"
-                                    : diffDays <= 3
-                                      ? "secondary"
-                                      : "default"
-                                }
+                                variant={isOverdue ? 'destructive' : diffDays <= 3 ? 'secondary' : 'default'}
                                 className="text-[10px]"
                               >
                                 {isOverdue
-                                  ? t("overdueDays", {
+                                  ? t('overdueDays', {
                                       days: Math.abs(diffDays),
                                     })
                                   : diffDays === 0
-                                    ? t("today")
+                                    ? t('today')
                                     : diffDays === 1
-                                      ? t("tomorrow")
-                                      : t("daysLeft", { days: diffDays })}
+                                      ? t('tomorrow')
+                                      : t('daysLeft', { days: diffDays })}
                               </Badge>
                               {d.group && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-[10px]"
-                                >
+                                <Badge variant="outline" className="text-[10px]">
                                   {d.group}
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                              {scopeLabel} —{" "}
+                            <p className="text-muted-foreground text-xs">
+                              {scopeLabel} —{' '}
                               {dueDate.toLocaleDateString(undefined, {
-                                day: "numeric",
-                                month: "long",
-                                hour: "2-digit",
-                                minute: "2-digit",
+                                day: 'numeric',
+                                month: 'long',
+                                hour: '2-digit',
+                                minute: '2-digit',
                               })}
                             </p>
-                            {d.description && (
-                              <p className="text-xs text-slate-400 mt-1">
-                                {d.description}
-                              </p>
-                            )}
+                            {d.description && <p className="mt-1 text-xs text-slate-400">{d.description}</p>}
                             {reminder && (
-                              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                              <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
                                 <span className="flex items-center gap-1">
-                                  <CheckCircle
-                                    size={12}
-                                    className="text-emerald-500"
-                                  />{" "}
-                                  {reminder.completedCount}/
-                                  {reminder.totalStudents} {t("completed")}
+                                  <CheckCircle size={12} className="text-emerald-500" /> {reminder.completedCount}/
+                                  {reminder.totalStudents} {t('completed')}
                                 </span>
                                 <span>{reminder.completionRate}%</span>
                               </div>
@@ -1104,8 +959,8 @@ export default function TeacherPanel() {
                           </div>
                           <button
                             onClick={() => deleteDeadline(d.id)}
-                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors shrink-0"
-                            title={t("deleteDeadline")}
+                            className="shrink-0 rounded p-1.5 text-red-400 transition-colors hover:bg-red-100 hover:text-red-600"
+                            title={t('deleteDeadline')}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -1114,34 +969,26 @@ export default function TeacherPanel() {
                         {/* Student status expandable */}
                         {reminder && reminder.studentStatus.length > 0 && (
                           <details className="mt-3">
-                            <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground/70">
-                              {t("studentStatus", {
+                            <summary className="text-muted-foreground hover:text-foreground/70 cursor-pointer text-xs">
+                              {t('studentStatus', {
                                 count: reminder.studentStatus.length,
                               })}
                             </summary>
-                            <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
+                            <div className="mt-2 max-h-40 space-y-1 overflow-y-auto">
                               {reminder.studentStatus.map((s) => (
-                                <div
-                                  key={s.id}
-                                  className="flex items-center justify-between text-xs py-1"
-                                >
-                                  <span className="text-foreground/70">
-                                    {s.fullName}
-                                  </span>
+                                <div key={s.id} className="flex items-center justify-between py-1 text-xs">
+                                  <span className="text-foreground/70">{s.fullName}</span>
                                   <span className="flex items-center gap-1">
                                     {s.completed ? (
-                                      <span className="text-emerald-600 flex items-center gap-0.5">
-                                        <CheckCircle size={10} />{" "}
-                                        {t("completed")}
+                                      <span className="flex items-center gap-0.5 text-emerald-600">
+                                        <CheckCircle size={10} /> {t('completed')}
                                       </span>
                                     ) : s.isOverdue ? (
-                                      <span className="text-red-600 flex items-center gap-0.5">
-                                        <XCircle size={10} /> {t("overdue")}
+                                      <span className="flex items-center gap-0.5 text-red-600">
+                                        <XCircle size={10} /> {t('overdue')}
                                       </span>
                                     ) : (
-                                      <span className="text-orange-500">
-                                        {t("inProgress")}
-                                      </span>
+                                      <span className="text-orange-500">{t('inProgress')}</span>
                                     )}
                                   </span>
                                 </div>
@@ -1154,9 +1001,9 @@ export default function TeacherPanel() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-slate-400">
+                <div className="py-8 text-center text-slate-400">
                   <Calendar size={32} className="mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">{t("noDeadlines")}</p>
+                  <p className="text-sm">{t('noDeadlines')}</p>
                 </div>
               )}
             </CardContent>
@@ -1166,36 +1013,28 @@ export default function TeacherPanel() {
         {/* Groups Tab */}
         <TabsContent value="groups" className="mt-4 space-y-4">
           {groups.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {groups.map((group) => {
                 const groupStudents = students.filter((s) => s.group === group);
                 return (
                   <Card key={group} className="border-border">
                     <CardContent className="p-4">
-                      <h3 className="font-semibold text-sm mb-2">{group}</h3>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        {t("studentsCount", { count: groupStudents.length })}
+                      <h3 className="mb-2 text-sm font-semibold">{group}</h3>
+                      <p className="text-muted-foreground mb-3 text-xs">
+                        {t('studentsCount', { count: groupStudents.length })}
                       </p>
                       <div className="space-y-1">
                         {groupStudents.slice(0, 5).map((s) => (
-                          <div
-                            key={s.id}
-                            className="flex items-center gap-2 text-xs"
-                          >
-                            <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center">
-                              <GraduationCap
-                                size={12}
-                                className="text-violet-600"
-                              />
+                          <div key={s.id} className="flex items-center gap-2 text-xs">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-100">
+                              <GraduationCap size={12} className="text-violet-600" />
                             </div>
-                            <span className="text-foreground/70">
-                              {s.fullName}
-                            </span>
+                            <span className="text-foreground/70">{s.fullName}</span>
                           </div>
                         ))}
                         {groupStudents.length > 5 && (
                           <p className="text-xs text-slate-400 italic">
-                            {t("more", { count: groupStudents.length - 5 })}
+                            {t('more', { count: groupStudents.length - 5 })}
                           </p>
                         )}
                       </div>
@@ -1205,9 +1044,9 @@ export default function TeacherPanel() {
               })}
             </div>
           ) : (
-            <div className="text-center py-12 text-slate-400">
+            <div className="py-12 text-center text-slate-400">
               <Users size={40} className="mx-auto mb-3 opacity-50" />
-              <p className="text-sm">{t("noGroups")}</p>
+              <p className="text-sm">{t('noGroups')}</p>
             </div>
           )}
         </TabsContent>
@@ -1215,71 +1054,71 @@ export default function TeacherPanel() {
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="mt-4 space-y-4">
           {/* Sub-tab selector */}
-          <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
+          <div className="bg-muted flex w-fit flex-wrap gap-1 rounded-lg p-1">
             {[
               {
-                key: "overview" as const,
-                label: t("analytics.overview"),
+                key: 'overview' as const,
+                label: t('analytics.overview'),
                 icon: BarChart3,
               },
               {
-                key: "trends" as const,
-                label: t("analytics.trends"),
+                key: 'trends' as const,
+                label: t('analytics.trends'),
                 icon: TrendingUp,
               },
               {
-                key: "questions" as const,
-                label: t("analytics.questions"),
+                key: 'questions' as const,
+                label: t('analytics.questions'),
                 icon: HelpCircle,
               },
               {
-                key: "achievements" as const,
-                label: t("analytics.achievements"),
+                key: 'achievements' as const,
+                label: t('analytics.achievements'),
                 icon: Award,
               },
               {
-                key: "competency" as const,
-                label: t("analytics.competency"),
+                key: 'competency' as const,
+                label: t('analytics.competency'),
                 icon: BarChart3,
               },
               {
-                key: "weaknesses" as const,
-                label: t("analytics.weaknesses"),
+                key: 'weaknesses' as const,
+                label: t('analytics.weaknesses'),
                 icon: AlertTriangle,
               },
               {
-                key: "predictive" as const,
-                label: t("analytics.predictive"),
+                key: 'predictive' as const,
+                label: t('analytics.predictive'),
                 icon: TrendingUp,
               },
               {
-                key: "module-deep-dive" as const,
-                label: t("analytics.moduleDeepDive"),
+                key: 'module-deep-dive' as const,
+                label: t('analytics.moduleDeepDive'),
                 icon: BookOpen,
               },
               {
-                key: "certification" as const,
-                label: t("analytics.certification"),
+                key: 'certification' as const,
+                label: t('analytics.certification'),
                 icon: Trophy,
               },
               {
-                key: "quiz-session" as const,
-                label: t("analytics.quizSession"),
+                key: 'quiz-session' as const,
+                label: t('analytics.quizSession'),
                 icon: Clock,
               },
               {
-                key: "export" as const,
-                label: t("analytics.export"),
+                key: 'export' as const,
+                label: t('analytics.export'),
                 icon: Download,
               },
             ].map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => setAnalyticsSubTab(key)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
                   analyticsSubTab === key
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Icon size={13} />
@@ -1289,14 +1128,12 @@ export default function TeacherPanel() {
           </div>
 
           {/* Overview sub-tab */}
-          {analyticsSubTab === "overview" && (
+          {analyticsSubTab === 'overview' && (
             <>
               {/* Category averages bar chart */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-4">
-                    Средний балл по категориям квизов
-                  </h3>
+                  <h3 className="mb-4 text-sm font-semibold">Средний балл по категориям квизов</h3>
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -1306,14 +1143,9 @@ export default function TeacherPanel() {
                               .map((s) => getSp(s.id).quizScores[cat.id])
                               .filter((v) => v !== undefined && v > 0);
                             const avg =
-                              scores.length > 0
-                                ? Math.round(
-                                    scores.reduce((a, b) => a + b, 0) /
-                                      scores.length,
-                                  )
-                                : 0;
+                              scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
                             return {
-                              name: cat.name.replace(" квизы", ""),
+                              name: cat.name.replace(' квизы', ''),
                               avg,
                               attempted: scores.length,
                             };
@@ -1331,11 +1163,7 @@ export default function TeacherPanel() {
                         />
                         <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
                         <Tooltip formatter={(value: unknown) => `${value}%`} />
-                        <Bar
-                          dataKey="avg"
-                          fill="#6366f1"
-                          radius={[4, 4, 0, 0]}
-                        />
+                        <Bar dataKey="avg" fill="#6366f1" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -1343,52 +1171,41 @@ export default function TeacherPanel() {
               </Card>
 
               {/* Distribution and activity charts */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* Score distribution pie chart */}
                 <Card className="border-border">
                   <CardContent className="p-5">
-                    <h3 className="font-semibold text-sm mb-4">
-                      Распределение оценок
-                    </h3>
+                    <h3 className="mb-4 text-sm font-semibold">Распределение оценок</h3>
                     {(() => {
-                      const allScores = students.flatMap((s) =>
-                        Object.values(getSp(s.id).quizScores),
-                      );
+                      const allScores = students.flatMap((s) => Object.values(getSp(s.id).quizScores));
                       const excellent = allScores.filter((s) => s >= 80).length;
-                      const good = allScores.filter(
-                        (s) => s >= 60 && s < 80,
-                      ).length;
-                      const average = allScores.filter(
-                        (s) => s >= 40 && s < 60,
-                      ).length;
-                      const poor = allScores.filter(
-                        (s) => s > 0 && s < 40,
-                      ).length;
+                      const good = allScores.filter((s) => s >= 60 && s < 80).length;
+                      const average = allScores.filter((s) => s >= 40 && s < 60).length;
+                      const poor = allScores.filter((s) => s > 0 && s < 40).length;
                       const notAttempted =
-                        students.length * quizCategories.length -
-                        allScores.filter((s) => s > 0).length;
+                        students.length * quizCategories.length - allScores.filter((s) => s > 0).length;
 
                       const data = [
                         {
-                          name: "Отлично (80%+)",
+                          name: 'Отлично (80%+)',
                           value: excellent,
-                          color: "#10b981",
+                          color: '#10b981',
                         },
                         {
-                          name: "Хорошо (60-79%)",
+                          name: 'Хорошо (60-79%)',
                           value: good,
-                          color: "#3b82f6",
+                          color: '#3b82f6',
                         },
                         {
-                          name: "Средне (40-59%)",
+                          name: 'Средне (40-59%)',
                           value: average,
-                          color: "#f59e0b",
+                          color: '#f59e0b',
                         },
-                        { name: "Плохо (<40%)", value: poor, color: "#ef4444" },
+                        { name: 'Плохо (<40%)', value: poor, color: '#ef4444' },
                         {
-                          name: "Не сдано",
+                          name: 'Не сдано',
                           value: notAttempted,
-                          color: "#e2e8f0",
+                          color: '#e2e8f0',
                         },
                       ].filter((d) => d.value > 0);
 
@@ -1407,21 +1224,14 @@ export default function TeacherPanel() {
                               style={{ fontSize: 10 }}
                             >
                               {data.map((entry) => (
-                                <Cell
-                                  key={entry.color + entry.name}
-                                  fill={entry.color}
-                                />
+                                <Cell key={entry.color + entry.name} fill={entry.color} />
                               ))}
                             </Pie>
-                            <Tooltip
-                              formatter={(value: unknown) => `${value}`}
-                            />
+                            <Tooltip formatter={(value: unknown) => `${value}`} />
                           </PieChart>
                         </ResponsiveContainer>
                       ) : (
-                        <p className="text-center text-xs text-slate-400 py-8">
-                          Нет данных
-                        </p>
+                        <p className="py-8 text-center text-xs text-slate-400">Нет данных</p>
                       );
                     })()}
                   </CardContent>
@@ -1430,20 +1240,16 @@ export default function TeacherPanel() {
                 {/* Activity pie chart */}
                 <Card className="border-border">
                   <CardContent className="p-5">
-                    <h3 className="font-semibold text-sm mb-4">
-                      Активность студентов
-                    </h3>
+                    <h3 className="mb-4 text-sm font-semibold">Активность студентов</h3>
                     {(() => {
-                      const active = students.filter(
-                        (s) => getSp(s.id).completedModules.length > 0,
-                      ).length;
+                      const active = students.filter((s) => getSp(s.id).completedModules.length > 0).length;
                       const inactive = students.length - active;
                       const data = [
-                        { name: "Активные", value: active, color: "#10b981" },
+                        { name: 'Активные', value: active, color: '#10b981' },
                         {
-                          name: "Неактивные",
+                          name: 'Неактивные',
                           value: inactive,
-                          color: "#e2e8f0",
+                          color: '#e2e8f0',
                         },
                       ].filter((d) => d.value > 0);
 
@@ -1462,21 +1268,14 @@ export default function TeacherPanel() {
                               style={{ fontSize: 10 }}
                             >
                               {data.map((entry) => (
-                                <Cell
-                                  key={entry.color + entry.name}
-                                  fill={entry.color}
-                                />
+                                <Cell key={entry.color + entry.name} fill={entry.color} />
                               ))}
                             </Pie>
-                            <Tooltip
-                              formatter={(value: unknown) => `${value}`}
-                            />
+                            <Tooltip formatter={(value: unknown) => `${value}`} />
                           </PieChart>
                         </ResponsiveContainer>
                       ) : (
-                        <p className="text-center text-xs text-slate-400 py-8">
-                          Нет данных
-                        </p>
+                        <p className="py-8 text-center text-xs text-slate-400">Нет данных</p>
                       );
                     })()}
                   </CardContent>
@@ -1486,9 +1285,7 @@ export default function TeacherPanel() {
               {/* Top students ranking */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-4">
-                    Рейтинг студентов
-                  </h3>
+                  <h3 className="mb-4 text-sm font-semibold">Рейтинг студентов</h3>
                   {(() => {
                     const studentRankings = students
                       .map((s) => {
@@ -1496,15 +1293,8 @@ export default function TeacherPanel() {
                         const mods = p.completedModules.length;
                         const scores = Object.values(p.quizScores);
                         const avgQ =
-                          scores.length > 0
-                            ? Math.round(
-                                scores.reduce((a, b) => a + b, 0) /
-                                  scores.length,
-                              )
-                            : 0;
-                        const lastActive = p.lastActive
-                          ? formatDate(p.lastActive)
-                          : "—";
+                          scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+                        const lastActive = p.lastActive ? formatDate(p.lastActive) : '—';
                         return {
                           userId: s.id,
                           fullName: s.fullName,
@@ -1520,52 +1310,37 @@ export default function TeacherPanel() {
                     return (
                       <div className="space-y-2">
                         {studentRankings.slice(0, 10).map((s, i) => (
-                          <div
-                            key={s.userId}
-                            className="flex items-center justify-between text-sm"
-                          >
+                          <div key={s.userId} className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-3">
                               <span
-                                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
                                   i === 0
-                                    ? "bg-amber-100 text-amber-700"
+                                    ? 'bg-amber-100 text-amber-700'
                                     : i === 1
-                                      ? "bg-slate-200 text-muted-foreground"
+                                      ? 'text-muted-foreground bg-slate-200'
                                       : i === 2
-                                        ? "bg-orange-100 text-orange-700"
-                                        : "bg-muted text-muted-foreground"
+                                        ? 'bg-orange-100 text-orange-700'
+                                        : 'bg-muted text-muted-foreground'
                                 }`}
                               >
                                 {i + 1}
                               </span>
                               <div>
-                                <span className="font-medium">
-                                  {s.fullName}
-                                </span>
-                                {s.group && (
-                                  <span className="text-xs text-slate-400 ml-2">
-                                    {s.group}
-                                  </span>
-                                )}
+                                <span className="font-medium">{s.fullName}</span>
+                                {s.group && <span className="ml-2 text-xs text-slate-400">{s.group}</span>}
                               </div>
                             </div>
-                            <div className="flex gap-4 text-xs items-center">
-                              <span className="text-muted-foreground">
-                                {s.mods} модулей
-                              </span>
-                              <span className="text-muted-foreground">
-                                квизы: {s.avgQ}%
-                              </span>
-                              <span className="text-slate-400 flex items-center gap-0.5">
+                            <div className="flex items-center gap-4 text-xs">
+                              <span className="text-muted-foreground">{s.mods} модулей</span>
+                              <span className="text-muted-foreground">квизы: {s.avgQ}%</span>
+                              <span className="flex items-center gap-0.5 text-slate-400">
                                 <Clock size={10} /> {s.lastActive}
                               </span>
                             </div>
                           </div>
                         ))}
                         {studentRankings.length === 0 && (
-                          <p className="text-center text-xs text-slate-400 py-4">
-                            Нет данных
-                          </p>
+                          <p className="py-4 text-center text-xs text-slate-400">Нет данных</p>
                         )}
                       </div>
                     );
@@ -1576,70 +1351,70 @@ export default function TeacherPanel() {
           )}
 
           {/* Trends sub-tab */}
-          {analyticsSubTab === "trends" && (
+          {analyticsSubTab === 'trends' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <ProgressTrendsChart students={students} groupId={groupFilter} />
             </motion.div>
           )}
 
           {/* Questions sub-tab */}
-          {analyticsSubTab === "questions" && (
+          {analyticsSubTab === 'questions' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <QuizQuestionAnalytics />
             </motion.div>
           )}
 
           {/* Achievements sub-tab */}
-          {analyticsSubTab === "achievements" && (
+          {analyticsSubTab === 'achievements' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <AchievementAnalytics students={students} groupId={groupFilter} />
             </motion.div>
           )}
 
           {/* Competency sub-tab */}
-          {analyticsSubTab === "competency" && (
+          {analyticsSubTab === 'competency' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <CompetencyRadar groupId={groupFilter || undefined} />
             </motion.div>
           )}
 
           {/* Weaknesses sub-tab */}
-          {analyticsSubTab === "weaknesses" && (
+          {analyticsSubTab === 'weaknesses' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <WeaknessAnalyzer groupId={groupFilter || undefined} />
             </motion.div>
           )}
 
           {/* Predictive sub-tab */}
-          {analyticsSubTab === "predictive" && (
+          {analyticsSubTab === 'predictive' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <PredictiveInsights groupId={groupFilter || undefined} />
             </motion.div>
           )}
 
           {/* Module Deep-Dive sub-tab */}
-          {analyticsSubTab === "module-deep-dive" && (
+          {analyticsSubTab === 'module-deep-dive' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <ModuleDeepDive groupId={groupFilter} />
             </motion.div>
           )}
 
           {/* Certification Readiness sub-tab */}
-          {analyticsSubTab === "certification" && (
+          {analyticsSubTab === 'certification' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <CertificationReadiness groupId={groupFilter} />
             </motion.div>
           )}
 
           {/* Quiz Session sub-tab */}
-          {analyticsSubTab === "quiz-session" && (
+          {analyticsSubTab === 'quiz-session' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <QuizSessionAnalytics groupId={groupFilter} />
             </motion.div>
           )}
 
           {/* Export sub-tab */}
-          {analyticsSubTab === "export" && (
+          {analyticsSubTab === 'export' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <AnalyticsExportPanel students={students} />
             </motion.div>
@@ -1652,9 +1427,7 @@ export default function TeacherPanel() {
             <>
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-4">
-                    Сравнение групп
-                  </h3>
+                  <h3 className="mb-4 text-sm font-semibold">Сравнение групп</h3>
                   <div className="h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={groupComparisonData}>
@@ -1663,81 +1436,46 @@ export default function TeacherPanel() {
                         <YAxis tick={{ fontSize: 10 }} />
                         <Tooltip />
                         <Legend />
-                        <Bar
-                          dataKey="avgModules"
-                          name="Ср. модулей"
-                          fill="#6366f1"
-                          radius={[4, 4, 0, 0]}
-                        />
-                        <Bar
-                          dataKey="avgScore"
-                          name="Ср. балл (%)"
-                          fill="#10b981"
-                          radius={[4, 4, 0, 0]}
-                        />
-                        <Bar
-                          dataKey="activityRate"
-                          name="Активность (%)"
-                          fill="#f59e0b"
-                          radius={[4, 4, 0, 0]}
-                        />
+                        <Bar dataKey="avgModules" name="Ср. модулей" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="avgScore" name="Ср. балл (%)" fill="#10b981" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="activityRate" name="Активность (%)" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </CardContent>
               </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {groupComparisonData.map((g) => {
-                  const best = groupComparisonData.reduce((a, b) =>
-                    b.avgScore > a.avgScore ? b : a,
-                  );
-                  const worst = groupComparisonData.reduce((a, b) =>
-                    b.avgScore < a.avgScore ? b : a,
-                  );
+                  const best = groupComparisonData.reduce((a, b) => (b.avgScore > a.avgScore ? b : a));
+                  const worst = groupComparisonData.reduce((a, b) => (b.avgScore < a.avgScore ? b : a));
                   return (
                     <Card
                       key={g.name}
-                      className={`border-border ${g.name === best.name ? "border-emerald-300 ring-1 ring-emerald-100" : g.name === worst.name ? "border-red-300 ring-1 ring-red-100" : ""}`}
+                      className={`border-border ${g.name === best.name ? 'border-emerald-300 ring-1 ring-emerald-100' : g.name === worst.name ? 'border-red-300 ring-1 ring-red-100' : ''}`}
                     >
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h3 className="font-semibold text-sm">{g.name}</h3>
+                        <div className="mb-3 flex items-center justify-between">
+                          <h3 className="text-sm font-semibold">{g.name}</h3>
                           {g.name === best.name && (
-                            <Badge className="bg-emerald-100 text-emerald-700 border-0 text-[10px]">
-                              Лучшая
-                            </Badge>
+                            <Badge className="border-0 bg-emerald-100 text-[10px] text-emerald-700">Лучшая</Badge>
                           )}
                           {g.name === worst.name && (
-                            <Badge className="bg-red-100 text-red-700 border-0 text-[10px]">
-                              Требует внимания
-                            </Badge>
+                            <Badge className="border-0 bg-red-100 text-[10px] text-red-700">Требует внимания</Badge>
                           )}
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
                           <div>
-                            <p className="text-lg font-bold text-foreground/70">
-                              {g.students}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground">
-                              Студентов
-                            </p>
+                            <p className="text-foreground/70 text-lg font-bold">{g.students}</p>
+                            <p className="text-muted-foreground text-[10px]">Студентов</p>
                           </div>
                           <div>
-                            <p className="text-lg font-bold text-foreground/70">
-                              {g.avgModules}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground">
-                              Ср. модулей
-                            </p>
+                            <p className="text-foreground/70 text-lg font-bold">{g.avgModules}</p>
+                            <p className="text-muted-foreground text-[10px]">Ср. модулей</p>
                           </div>
                           <div>
-                            <p className="text-lg font-bold text-foreground/70">
-                              {g.avgScore}%
-                            </p>
-                            <p className="text-[10px] text-muted-foreground">
-                              Ср. балл
-                            </p>
+                            <p className="text-foreground/70 text-lg font-bold">{g.avgScore}%</p>
+                            <p className="text-muted-foreground text-[10px]">Ср. балл</p>
                           </div>
                         </div>
                       </CardContent>
@@ -1747,12 +1485,9 @@ export default function TeacherPanel() {
               </div>
             </>
           ) : (
-            <div className="text-center py-12 text-slate-400">
+            <div className="py-12 text-center text-slate-400">
               <GitCompare size={40} className="mx-auto mb-3 opacity-50" />
-              <p className="text-sm">
-                Нет данных для сравнения. Студенты должны быть распределены по
-                группам.
-              </p>
+              <p className="text-sm">Нет данных для сравнения. Студенты должны быть распределены по группам.</p>
             </div>
           )}
         </TabsContent>
@@ -1761,111 +1496,82 @@ export default function TeacherPanel() {
         <TabsContent value="at-risk" className="mt-4 space-y-4">
           {atRiskStudents.length > 0 ? (
             <div className="space-y-3">
-              {atRiskStudents.map(
-                (
-                  { student, progress, avgScore, daysSinceActive, reasons },
-                  i,
-                ) => (
-                  <motion.div
-                    key={student.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.03 }}
+              {atRiskStudents.map(({ student, progress, avgScore, daysSinceActive, reasons }, i) => (
+                <motion.div
+                  key={student.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                >
+                  <Card
+                    className={`border-l-4 ${reasons.length >= 3 ? 'border-border border-l-red-500' : reasons.length >= 2 ? 'border-border border-l-amber-500' : 'border-border border-l-orange-400'}`}
                   >
-                    <Card
-                      className={`border-l-4 ${reasons.length >= 3 ? "border-l-red-500 border-border" : reasons.length >= 2 ? "border-l-amber-500 border-border" : "border-l-orange-400 border-border"}`}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
-                              <AlertTriangle
-                                size={18}
-                                className={
-                                  reasons.length >= 3
-                                    ? "text-red-500"
-                                    : reasons.length >= 2
-                                      ? "text-amber-500"
-                                      : "text-orange-400"
-                                }
-                              />
-                            </div>
-                            <div>
-                              <p className="font-semibold text-sm">
-                                {student.fullName}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {student.email}
-                              </p>
-                              {student.group && (
-                                <Badge
-                                  variant="secondary"
-                                  className="text-[10px] mt-0.5"
-                                >
-                                  {student.group}
-                                </Badge>
-                              )}
-                            </div>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
+                            <AlertTriangle
+                              size={18}
+                              className={
+                                reasons.length >= 3
+                                  ? 'text-red-500'
+                                  : reasons.length >= 2
+                                    ? 'text-amber-500'
+                                    : 'text-orange-400'
+                              }
+                            />
                           </div>
-                          <div className="flex items-center gap-4 text-right">
-                            <div>
-                              <p className="text-xs text-muted-foreground">
-                                Модули
-                              </p>
-                              <p className="text-sm font-bold">
-                                {progress
-                                  ? progress.completedModules.length
-                                  : 0}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground">
-                                Ср. балл
-                              </p>
-                              <p className="text-sm font-bold">
-                                {progress &&
-                                Object.values(progress.quizScores).length > 0
-                                  ? `${Math.round(avgScore)}%`
-                                  : "—"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground">
-                                Последняя активность
-                              </p>
-                              <p className="text-sm font-bold">
-                                {progress
-                                  ? progress.lastActive
-                                    ? `${daysSinceActive} дн. назад`
-                                    : "Никогда"
-                                  : "Никогда"}
-                              </p>
-                            </div>
+                          <div>
+                            <p className="text-sm font-semibold">{student.fullName}</p>
+                            <p className="text-muted-foreground text-xs">{student.email}</p>
+                            {student.group && (
+                              <Badge variant="secondary" className="mt-0.5 text-[10px]">
+                                {student.group}
+                              </Badge>
+                            )}
                           </div>
                         </div>
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          {reasons.map((r, _i) => (
-                            <Badge
-                              key={r}
-                              variant="destructive"
-                              className="text-[10px]"
-                            >
-                              {r}
-                            </Badge>
-                          ))}
+                        <div className="flex items-center gap-4 text-right">
+                          <div>
+                            <p className="text-muted-foreground text-xs">Модули</p>
+                            <p className="text-sm font-bold">{progress ? progress.completedModules.length : 0}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs">Ср. балл</p>
+                            <p className="text-sm font-bold">
+                              {progress && Object.values(progress.quizScores).length > 0
+                                ? `${Math.round(avgScore)}%`
+                                : '—'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground text-xs">Последняя активность</p>
+                            <p className="text-sm font-bold">
+                              {progress
+                                ? progress.lastActive
+                                  ? `${daysSinceActive} дн. назад`
+                                  : 'Никогда'
+                                : 'Никогда'}
+                            </p>
+                          </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ),
-              )}
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {reasons.map((r, _i) => (
+                          <Badge key={r} variant="destructive" className="text-[10px]">
+                            {r}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-slate-400">
+            <div className="py-12 text-center text-slate-400">
               <AlertTriangle size={40} className="mx-auto mb-3 opacity-50" />
-              <p className="text-sm">
-                Все студенты в порядке! Нет студентов с признаками риска.
-              </p>
+              <p className="text-sm">Все студенты в порядке! Нет студентов с признаками риска.</p>
             </div>
           )}
         </TabsContent>
@@ -1873,18 +1579,16 @@ export default function TeacherPanel() {
         {/* Reports Tab */}
         <TabsContent value="reports" className="mt-4 space-y-4">
           {/* Class Overview KPIs */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <Card className="border-border">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100">
                     <Users size={20} className="text-indigo-600" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{totalStudents}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Всего студентов
-                    </p>
+                    <p className="text-muted-foreground text-xs">Всего студентов</p>
                   </div>
                 </div>
               </CardContent>
@@ -1892,12 +1596,12 @@ export default function TeacherPanel() {
             <Card className="border-border">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
                     <TrendingUp size={20} className="text-emerald-600" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{activeStudents}</p>
-                    <p className="text-xs text-muted-foreground">Активных</p>
+                    <p className="text-muted-foreground text-xs">Активных</p>
                   </div>
                 </div>
               </CardContent>
@@ -1905,12 +1609,12 @@ export default function TeacherPanel() {
             <Card className="border-border">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100">
                     <BookOpen size={20} className="text-amber-600" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{avgCompletion}</p>
-                    <p className="text-xs text-muted-foreground">Ср. модулей</p>
+                    <p className="text-muted-foreground text-xs">Ср. модулей</p>
                   </div>
                 </div>
               </CardContent>
@@ -1918,14 +1622,12 @@ export default function TeacherPanel() {
             <Card className="border-border">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100">
                     <Trophy size={20} className="text-violet-600" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{avgQuizScore}%</p>
-                    <p className="text-xs text-muted-foreground">
-                      Ср. балл квизов
-                    </p>
+                    <p className="text-muted-foreground text-xs">Ср. балл квизов</p>
                   </div>
                 </div>
               </CardContent>
@@ -1936,9 +1638,7 @@ export default function TeacherPanel() {
           {groupComparisonData.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">
-                  Завершение модулей по группам
-                </h3>
+                <h3 className="mb-4 text-sm font-semibold">Завершение модулей по группам</h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={groupComparisonData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -1946,11 +1646,7 @@ export default function TeacherPanel() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar
-                      dataKey="avgModules"
-                      fill="#6366f1"
-                      name="Ср. модулей"
-                    />
+                    <Bar dataKey="avgModules" fill="#6366f1" name="Ср. модулей" />
                     <Bar dataKey="avgScore" fill="#10b981" name="Ср. балл" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -1961,16 +1657,14 @@ export default function TeacherPanel() {
           {/* Quiz Score Distribution */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">
-                Распределение баллов квизов
-              </h3>
+              <h3 className="mb-4 text-sm font-semibold">Распределение баллов квизов</h3>
               {(() => {
                 const ranges = [
-                  { label: "0-20%", min: 0, max: 20, color: "#ef4444" },
-                  { label: "21-40%", min: 21, max: 40, color: "#f97316" },
-                  { label: "41-60%", min: 41, max: 60, color: "#f59e0b" },
-                  { label: "61-80%", min: 61, max: 80, color: "#84cc16" },
-                  { label: "81-100%", min: 81, max: 100, color: "#10b981" },
+                  { label: '0-20%', min: 0, max: 20, color: '#ef4444' },
+                  { label: '21-40%', min: 21, max: 40, color: '#f97316' },
+                  { label: '41-60%', min: 41, max: 60, color: '#f59e0b' },
+                  { label: '61-80%', min: 61, max: 80, color: '#84cc16' },
+                  { label: '81-100%', min: 81, max: 100, color: '#10b981' },
                 ];
                 const distribution = ranges.map((range) => {
                   let count = 0;
@@ -1978,8 +1672,7 @@ export default function TeacherPanel() {
                     const progress = getSp(s.id);
                     const scores = Object.values(progress.quizScores);
                     if (scores.length > 0) {
-                      const avg =
-                        scores.reduce((a, b) => a + b, 0) / scores.length;
+                      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
                       if (avg >= range.min && avg <= range.max) count++;
                     }
                   });
@@ -1995,15 +1688,10 @@ export default function TeacherPanel() {
                         outerRadius={80}
                         dataKey="count"
                         nameKey="range"
-                        label={(entry) =>
-                          `${entry.name} (${((entry.percent ?? 0) * 100).toFixed(0)}%)`
-                        }
+                        label={(entry) => `${entry.name} (${((entry.percent ?? 0) * 100).toFixed(0)}%)`}
                       >
                         {distribution.map((entry) => (
-                          <Cell
-                            key={entry.color + entry.range}
-                            fill={entry.color}
-                          />
+                          <Cell key={entry.color + entry.range} fill={entry.color} />
                         ))}
                       </Pie>
                       <Tooltip />
@@ -2017,7 +1705,7 @@ export default function TeacherPanel() {
           {/* Engagement Leaderboard */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+              <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                 <Trophy size={16} className="text-amber-500" />
                 Лидеры по вовлечённости
               </h3>
@@ -2028,39 +1716,15 @@ export default function TeacherPanel() {
                     .map((s) => {
                       const progress = getSp(s.id);
                       const scores = Object.values(progress.quizScores);
-                      const avgScore =
-                        scores.length > 0
-                          ? scores.reduce((a, b) => a + b, 0) / scores.length
-                          : 0;
+                      const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
                       const daysSinceActive = progress.lastActive
-                        ? Math.floor(
-                            (now.getTime() -
-                              new Date(progress.lastActive).getTime()) /
-                              (1000 * 60 * 60 * 24),
-                          )
+                        ? Math.floor((now.getTime() - new Date(progress.lastActive).getTime()) / (1000 * 60 * 60 * 24))
                         : 999;
-                      const activityFactor = Math.min(
-                        25,
-                        Math.round(
-                          (Math.max(0, 30 - daysSinceActive) / 30) * 25,
-                        ),
-                      );
-                      const completionFactor = Math.min(
-                        25,
-                        Math.round(
-                          (progress.completedModules.length / 12) * 25,
-                        ),
-                      );
+                      const activityFactor = Math.min(25, Math.round((Math.max(0, 30 - daysSinceActive) / 30) * 25));
+                      const completionFactor = Math.min(25, Math.round((progress.completedModules.length / 12) * 25));
                       const quizFactor = Math.round((avgScore / 100) * 25);
-                      const attemptsFactor = Math.min(
-                        25,
-                        Math.round((scores.length / 10) * 25),
-                      );
-                      const engagementScore =
-                        activityFactor +
-                        completionFactor +
-                        quizFactor +
-                        attemptsFactor;
+                      const attemptsFactor = Math.min(25, Math.round((scores.length / 10) * 25));
+                      const engagementScore = activityFactor + completionFactor + quizFactor + attemptsFactor;
                       return {
                         ...s,
                         progress,
@@ -2078,48 +1742,41 @@ export default function TeacherPanel() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.03 }}
-                      className="flex items-center justify-between p-3 rounded-lg border border-slate-100"
+                      className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
                             i === 0
-                              ? "bg-amber-100 text-amber-700"
+                              ? 'bg-amber-100 text-amber-700'
                               : i === 1
-                                ? "bg-slate-100 text-slate-600"
+                                ? 'bg-slate-100 text-slate-600'
                                 : i === 2
-                                  ? "bg-orange-100 text-orange-700"
-                                  : "bg-muted text-muted-foreground"
+                                  ? 'bg-orange-100 text-orange-700'
+                                  : 'bg-muted text-muted-foreground'
                           }`}
                         >
                           {i + 1}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold">
-                            {student.fullName}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            {student.group} • Модулей:{" "}
-                            {student.progress.completedModules.length}
+                          <p className="text-sm font-semibold">{student.fullName}</p>
+                          <p className="text-muted-foreground text-[10px]">
+                            {student.group} • Модулей: {student.progress.completedModules.length}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="text-xs font-bold">
-                            {Math.round(student.avgScore)}%
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            Квиз
-                          </p>
+                          <p className="text-xs font-bold">{Math.round(student.avgScore)}%</p>
+                          <p className="text-muted-foreground text-[10px]">Квиз</p>
                         </div>
                         <Badge
                           variant={
                             student.engagementScore >= 70
-                              ? "default"
+                              ? 'default'
                               : student.engagementScore >= 40
-                                ? "secondary"
-                                : "destructive"
+                                ? 'secondary'
+                                : 'destructive'
                           }
                         >
                           {student.engagementScore}
@@ -2134,9 +1791,9 @@ export default function TeacherPanel() {
 
           {/* At-Risk Alerts */}
           {atRiskStudents.length > 0 && (
-            <Card className="border-l-4 border-l-red-500 border-border">
+            <Card className="border-border border-l-4 border-l-red-500">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <AlertTriangle size={16} className="text-red-500" />
                   Студенты с признаками риска ({atRiskStudents.length})
                 </h3>
@@ -2151,31 +1808,19 @@ export default function TeacherPanel() {
                         daysSinceActive: _daysSinceActive,
                         reasons,
                       }) => (
-                        <div
-                          key={student.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-red-50/50"
-                        >
+                        <div key={student.id} className="flex items-center justify-between rounded-lg bg-red-50/50 p-2">
                           <div className="flex items-center gap-2">
                             <AlertTriangle size={14} className="text-red-500" />
-                            <span className="text-sm font-medium">
-                              {student.fullName}
-                            </span>
+                            <span className="text-sm font-medium">{student.fullName}</span>
                             {student.group && (
-                              <Badge
-                                variant="secondary"
-                                className="text-[10px]"
-                              >
+                              <Badge variant="secondary" className="text-[10px]">
                                 {student.group}
                               </Badge>
                             )}
                           </div>
                           <div className="flex flex-wrap gap-1">
                             {reasons.slice(0, 2).map((r) => (
-                              <Badge
-                                key={r}
-                                variant="destructive"
-                                className="text-[10px]"
-                              >
+                              <Badge key={r} variant="destructive" className="text-[10px]">
                                 {r}
                               </Badge>
                             ))}

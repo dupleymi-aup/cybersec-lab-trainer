@@ -1,37 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { parseDays } from "@/lib/utils";
-import type { Prisma } from "@prisma/client";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { parseDays } from '@/lib/utils';
+import type { Prisma } from '@prisma/client';
 
-const _DAY_NAMES = [
-  "Воскресенье",
-  "Понедельник",
-  "Вторник",
-  "Среда",
-  "Четверг",
-  "Пятница",
-  "Суббота",
-];
+const _DAY_NAMES = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
   const days = parseDays(searchParams);
-  const groupId = searchParams.get("groupId");
+  const groupId = searchParams.get('groupId');
 
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-  const userFilter: Prisma.UserWhereInput = { role: "student" };
+  const userFilter: Prisma.UserWhereInput = { role: 'student' };
   if (groupId) userFilter.group = groupId;
 
   const students = await prisma.user.findMany({
@@ -50,7 +37,7 @@ export async function GET(request: NextRequest) {
   const loginActivities = await prisma.loginActivity.findMany({
     where: { userId: { in: studentIds }, timestamp: { gte: since } },
     select: { userId: true, success: true, ip: true, timestamp: true },
-    orderBy: { timestamp: "desc" },
+    orderBy: { timestamp: 'desc' },
   });
 
   // Login frequency per student
@@ -59,17 +46,14 @@ export async function GET(request: NextRequest) {
       const userLogins = loginActivities.filter((l) => l.userId === s.id);
       const successCount = userLogins.filter((l) => l.success).length;
       const totalCount = userLogins.length;
-      const lastLogin = s.lastLoginAt ? s.lastLoginAt.toISOString() : "";
+      const lastLogin = s.lastLoginAt ? s.lastLoginAt.toISOString() : '';
       return {
         userId: s.id,
         fullName: s.fullName,
         group: s.group,
         loginCount: totalCount,
         lastLogin,
-        successRate:
-          totalCount > 0
-            ? Math.round((successCount / totalCount) * 10000) / 100
-            : 0,
+        successRate: totalCount > 0 ? Math.round((successCount / totalCount) * 10000) / 100 : 0,
       };
     })
     .sort((a, b) => b.loginCount - a.loginCount);
@@ -117,9 +101,7 @@ export async function GET(request: NextRequest) {
     .filter((s) => !activeUserIds.has(s.id) && s.lastLoginAt)
     .map((s) => {
       const lastLogin = s.lastLoginAt ?? new Date(0);
-      const daysInactive = Math.floor(
-        (now.getTime() - lastLogin.getTime()) / (24 * 60 * 60 * 1000),
-      );
+      const daysInactive = Math.floor((now.getTime() - lastLogin.getTime()) / (24 * 60 * 60 * 1000));
       return {
         userId: s.id,
         fullName: s.fullName,
@@ -144,7 +126,7 @@ export async function GET(request: NextRequest) {
   // Daily distribution
   const dailyCounts = new Map<string, number>();
   for (const activity of loginActivities) {
-    const dayKey = activity.timestamp.toISOString().split("T")[0];
+    const dayKey = activity.timestamp.toISOString().split('T')[0];
     dailyCounts.set(dayKey, (dailyCounts.get(dayKey) || 0) + 1);
   }
   const dailyDistribution = Array.from(dailyCounts.entries())

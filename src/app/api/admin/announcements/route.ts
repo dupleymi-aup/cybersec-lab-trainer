@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 import {
   authenticate,
   unauthorized,
@@ -7,33 +7,27 @@ import {
   requireCapability,
   checkRateLimit,
   getClientIp,
-} from "@/lib/api-middleware";
-import {
-  createAnnouncementSchema,
-  updateAnnouncementSchema,
-} from "@/lib/validations/api";
-import { logger } from "@/lib/logger";
+} from '@/lib/api-middleware';
+import { createAnnouncementSchema, updateAnnouncementSchema } from '@/lib/validations/api';
+import { logger } from '@/lib/logger';
 
 // GET /api/admin/announcements - List all announcements
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireCapability(auth, "announcements:read")) return forbidden();
+  if (!requireCapability(auth, 'announcements:read')) return forbidden();
 
   // Rate limit: 60 requests per minute
   const rateLimit = checkRateLimit(`announcements-get:${auth.id}`, 60, 60_000);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
   const { searchParams } = new URL(request.url);
-  const activeFilter = searchParams.get("active");
+  const activeFilter = searchParams.get('active');
 
   let where: Record<string, unknown> = {};
-  if (activeFilter === "true") {
+  if (activeFilter === 'true') {
     where = {
       active: true,
       OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }],
@@ -42,7 +36,7 @@ export async function GET(request: NextRequest) {
 
   const announcements = await prisma.announcement.findMany({
     where,
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
   });
 
   return NextResponse.json({
@@ -62,36 +56,30 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireCapability(auth, "announcements:create")) return forbidden();
+  if (!requireCapability(auth, 'announcements:create')) return forbidden();
 
   // Rate limit: 20 requests per minute
   const rateLimit = checkRateLimit(`announcements-post:${auth.id}`, 20, 60_000);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
   let body: Record<string, unknown>;
   try {
     body = await request.json();
   } catch (e) {
-    logger.error("Invalid JSON body in announcements POST", {
+    logger.error('Invalid JSON body in announcements POST', {
       error: String(e),
     });
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
   const parsed = createAnnouncementSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0].message },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
 
-  const { title, content, priority = "medium", expiresAt } = parsed.data;
+  const { title, content, priority = 'medium', expiresAt } = parsed.data;
 
   const parsedExpiresAt = expiresAt ? new Date(expiresAt) : null;
 
@@ -104,7 +92,7 @@ export async function POST(request: NextRequest) {
       id: announcementId,
       title,
       content,
-      author: adminUser?.fullName || adminUser?.email || "Unknown",
+      author: adminUser?.fullName || adminUser?.email || 'Unknown',
       priority: priority,
       expiresAt: parsedExpiresAt,
     },
@@ -116,16 +104,16 @@ export async function POST(request: NextRequest) {
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
-        action: "announcement_create",
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: 'announcement_create',
         targetId: announcement.id,
         targetName: announcement.title,
         details: `Admin ${auth.id} created announcement "${announcement.title}" [IP: ${ip}]`,
       },
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      logger.warn("Audit logging failed", { error });
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('Audit logging failed', { error });
     }
   }
 
@@ -138,9 +126,7 @@ export async function POST(request: NextRequest) {
         content: announcement.content,
         priority: announcement.priority,
         active: announcement.active,
-        expiresAt: announcement.expiresAt
-          ? announcement.expiresAt.toISOString()
-          : null,
+        expiresAt: announcement.expiresAt ? announcement.expiresAt.toISOString() : null,
         createdAt: announcement.createdAt.toISOString(),
       },
     },
@@ -152,51 +138,37 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireCapability(auth, "announcements:edit")) return forbidden();
+  if (!requireCapability(auth, 'announcements:edit')) return forbidden();
 
   // Rate limit: 20 requests per minute
   const rateLimit = checkRateLimit(`announcements-put:${auth.id}`, 20, 60_000);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
   let body: Record<string, unknown>;
   try {
     body = await request.json();
   } catch (e) {
-    logger.error("Invalid JSON body in announcements PUT", {
+    logger.error('Invalid JSON body in announcements PUT', {
       error: String(e),
     });
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
   const parsed = updateAnnouncementSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0].message },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
 
   const { id, title, content, priority, active, expiresAt } = parsed.data;
 
   const existing = await prisma.announcement.findUnique({ where: { id } });
   if (!existing) {
-    return NextResponse.json(
-      { error: "Announcement not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Announcement not found' }, { status: 404 });
   }
 
-  const parsedExpiresAt =
-    expiresAt === null
-      ? null
-      : expiresAt !== undefined
-        ? new Date(expiresAt)
-        : undefined;
+  const parsedExpiresAt = expiresAt === null ? null : expiresAt !== undefined ? new Date(expiresAt) : undefined;
 
   const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
   const ip = getClientIp(request);
@@ -206,12 +178,8 @@ export async function PUT(request: NextRequest) {
     data: {
       ...(title !== undefined ? { title } : {}),
       ...(content !== undefined ? { content } : {}),
-      ...(priority !== undefined && typeof priority === "string"
-        ? { priority }
-        : {}),
-      ...(active !== undefined && typeof active === "boolean"
-        ? { active }
-        : {}),
+      ...(priority !== undefined && typeof priority === 'string' ? { priority } : {}),
+      ...(active !== undefined && typeof active === 'boolean' ? { active } : {}),
       ...(parsedExpiresAt !== undefined ? { expiresAt: parsedExpiresAt } : {}),
     },
   });
@@ -222,16 +190,16 @@ export async function PUT(request: NextRequest) {
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
-        action: "announcement_update",
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: 'announcement_update',
         targetId: announcement.id,
         targetName: announcement.title,
         details: `Admin ${auth.id} updated announcement "${announcement.title}" [IP: ${ip}]`,
       },
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      logger.warn("Audit logging failed", { error });
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('Audit logging failed', { error });
     }
   }
 
@@ -243,9 +211,7 @@ export async function PUT(request: NextRequest) {
       content: announcement.content,
       priority: announcement.priority,
       active: announcement.active,
-      expiresAt: announcement.expiresAt
-        ? announcement.expiresAt.toISOString()
-        : null,
+      expiresAt: announcement.expiresAt ? announcement.expiresAt.toISOString() : null,
       createdAt: announcement.createdAt.toISOString(),
     },
   });
@@ -255,26 +221,19 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireCapability(auth, "announcements:delete")) return forbidden();
+  if (!requireCapability(auth, 'announcements:delete')) return forbidden();
 
   // Rate limit: 20 requests per minute
-  const rateLimit = checkRateLimit(
-    `announcements-delete:${auth.id}`,
-    20,
-    60_000,
-  );
+  const rateLimit = checkRateLimit(`announcements-delete:${auth.id}`, 20, 60_000);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
   const { searchParams } = new URL(request.url);
   let id: string | undefined;
 
   // Try to get id from query param first
-  id = searchParams.get("id") || undefined;
+  id = searchParams.get('id') || undefined;
 
   // If not in query, try to get from body
   if (!id) {
@@ -282,26 +241,20 @@ export async function DELETE(request: NextRequest) {
       const body = await request.json();
       id = body?.id;
     } catch (e) {
-      logger.error("Invalid JSON body in announcements DELETE", {
+      logger.error('Invalid JSON body in announcements DELETE', {
         error: String(e),
       });
       // No JSON body
     }
   }
 
-  if (!id || typeof id !== "string") {
-    return NextResponse.json(
-      { error: "Announcement ID is required" },
-      { status: 400 },
-    );
+  if (!id || typeof id !== 'string') {
+    return NextResponse.json({ error: 'Announcement ID is required' }, { status: 400 });
   }
 
   const existing = await prisma.announcement.findUnique({ where: { id } });
   if (!existing) {
-    return NextResponse.json(
-      { error: "Announcement not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Announcement not found' }, { status: 404 });
   }
 
   const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
@@ -315,16 +268,16 @@ export async function DELETE(request: NextRequest) {
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
-        action: "announcement_delete",
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: 'announcement_delete',
         targetId: id,
         targetName: existing.title,
         details: `Admin ${auth.id} deleted announcement "${existing.title}" [IP: ${ip}]`,
       },
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      logger.warn("Audit logging failed", { error });
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('Audit logging failed', { error });
     }
   }
 

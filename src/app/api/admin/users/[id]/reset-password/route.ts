@@ -1,22 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  checkRateLimit,
-  getClientIp,
-} from "@/lib/api-middleware";
-import { hashPassword, validatePassword } from "@/lib/auth-utils";
-import { validateUuid } from "@/lib/validate-uuid";
-import { logger } from "@/lib/logger";
-import { parseBody } from "@/lib/utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { hashPassword, validatePassword } from '@/lib/auth-utils';
+import { validateUuid } from '@/lib/validate-uuid';
+import { logger } from '@/lib/logger';
+import { parseBody } from '@/lib/utils';
 
 // POST /api/admin/users/[id]/reset-password - admin resets another user's password
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (!requireAdmin(auth)) return forbidden();
@@ -24,20 +15,14 @@ export async function POST(
   // Rate limit: 10 password resets per minute per admin
   const rateLimit = checkRateLimit(`reset-pw:${auth.id}`, 10, 60_000);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
   const { id } = await params;
 
   // Validate UUID format
   if (!validateUuid(id)) {
-    return NextResponse.json(
-      { error: "Invalid user ID format" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,24 +32,18 @@ export async function POST(
   const { newPassword } = body;
 
   if (!newPassword) {
-    return NextResponse.json(
-      { error: "New password is required" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'New password is required' }, { status: 400 });
   }
 
   // Validate password strength
   const pwValidation = validatePassword(newPassword);
   if (!pwValidation.valid) {
-    return NextResponse.json(
-      { error: pwValidation.errors.join(", ") },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: pwValidation.errors.join(', ') }, { status: 400 });
   }
 
   const targetUser = await prisma.user.findUnique({ where: { id } });
   if (!targetUser) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
   const passwordHash = await hashPassword(newPassword);
@@ -81,16 +60,16 @@ export async function POST(
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
-        action: "password_reset",
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: 'password_reset',
         targetId: id,
         targetName: targetUser.fullName || targetUser.email,
         details: `Admin ${auth.id} reset password for user ${targetUser.email} [IP: ${ip}]`,
       },
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      logger.warn("Audit logging failed", { error });
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('Audit logging failed', { error });
     }
   }
 
@@ -98,5 +77,5 @@ export async function POST(
 }
 
 function requireAdmin(auth: { id: string; role: string }): boolean {
-  return auth.role === "admin";
+  return auth.role === 'admin';
 }

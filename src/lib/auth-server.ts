@@ -1,6 +1,6 @@
-import { SignJWT, jwtVerify } from "jose";
-import { env } from "@/lib/env";
-import { logger } from "@/lib/logger";
+import { SignJWT, jwtVerify } from 'jose';
+import { env } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 export interface TokenPayload {
   id: string;
@@ -12,7 +12,7 @@ export interface TokenPayload {
 }
 
 const JWT_SECRET = new TextEncoder().encode(env.tokenSecret);
-const JWT_ALGORITHM = "HS256";
+const JWT_ALGORITHM = 'HS256';
 
 export async function generateToken(
   userId: string,
@@ -25,7 +25,7 @@ export async function generateToken(
   },
 ): Promise<string> {
   const { rememberMe, group, fullName, tokenVersion } = options || {};
-  const expiry = rememberMe ? "30d" : "7d";
+  const expiry = rememberMe ? '30d' : '7d';
   return new SignJWT({ id: userId, role, group, fullName, tokenVersion })
     .setProtectedHeader({ alg: JWT_ALGORITHM })
     .setExpirationTime(expiry)
@@ -60,22 +60,17 @@ export async function verifyToken(token: string): Promise<TokenPayload | null> {
       exp: payload.exp as number,
     };
   } catch (e) {
-    if (process.env.NODE_ENV === "development")
-      logger.warn("verifyToken failed", { error: e });
+    if (process.env.NODE_ENV === 'development') logger.warn('verifyToken failed', { error: e });
     return null;
   }
 }
 
-export async function getTokenPayload(
-  token: string | null,
-): Promise<TokenPayload | null> {
+export async function getTokenPayload(token: string | null): Promise<TokenPayload | null> {
   if (!token) return null;
   return verifyToken(token);
 }
 
-export async function authenticate(
-  token: string | null,
-): Promise<{ id: string; role: string } | null> {
+export async function authenticate(token: string | null): Promise<{ id: string; role: string } | null> {
   const payload = await getTokenPayload(token);
   if (!payload) return null;
   return { id: payload.id, role: payload.role };

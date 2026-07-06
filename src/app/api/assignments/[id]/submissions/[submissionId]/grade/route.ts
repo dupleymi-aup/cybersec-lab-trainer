@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { authenticate, unauthorized, forbidden } from "@/lib/api-middleware";
-import { gradeSubmissionSchema } from "@/lib/validations/api";
-import { parseBody } from "@/lib/utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
+import { gradeSubmissionSchema } from '@/lib/validations/api';
+import { parseBody } from '@/lib/utils';
 
 export async function POST(
   request: NextRequest,
@@ -10,7 +10,7 @@ export async function POST(
 ) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (auth.role !== "teacher" && auth.role !== "admin") return forbidden();
+  if (auth.role !== 'teacher' && auth.role !== 'admin') return forbidden();
 
   const { id, submissionId } = await params;
 
@@ -20,13 +20,10 @@ export async function POST(
   });
 
   if (!assignment) {
-    return NextResponse.json(
-      { error: "Assignment not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
   }
 
-  if (assignment.createdBy !== auth.id && auth.role !== "admin") {
+  if (assignment.createdBy !== auth.id && auth.role !== 'admin') {
     return forbidden();
   }
 
@@ -35,10 +32,7 @@ export async function POST(
   });
 
   if (!submission || submission.assignmentId !== id) {
-    return NextResponse.json(
-      { error: "Submission not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
   }
 
   const bodyResult = await parseBody(request);
@@ -46,22 +40,14 @@ export async function POST(
   const body = bodyResult.data;
   const parsed = gradeSubmissionSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0].message },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
 
   if (parsed.data.score > assignment.maxScore) {
-    return NextResponse.json(
-      { error: `Score cannot exceed max score of ${assignment.maxScore}` },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: `Score cannot exceed max score of ${assignment.maxScore}` }, { status: 400 });
   }
 
-  const percentage = Math.round(
-    (parsed.data.score / assignment.maxScore) * 100,
-  );
+  const percentage = Math.round((parsed.data.score / assignment.maxScore) * 100);
 
   const updated = await prisma.assignmentSubmission.update({
     where: { id: submissionId },

@@ -72,13 +72,13 @@ const XP_TABLE: number[] = [
 
 const MAX_LEVEL = 50;
 
-export type UserRank = "Junior" | "Mid" | "Senior" | "Lead";
+export type UserRank = 'Junior' | 'Mid' | 'Senior' | 'Lead';
 
 export function getRank(level: number): UserRank {
-  if (level <= 10) return "Junior";
-  if (level <= 20) return "Mid";
-  if (level <= 35) return "Senior";
-  return "Lead";
+  if (level <= 10) return 'Junior';
+  if (level <= 20) return 'Mid';
+  if (level <= 35) return 'Senior';
+  return 'Lead';
 }
 
 export function getLevel(xp: number): { level: number; rank: UserRank } {

@@ -1,20 +1,20 @@
-import nodemailer from "nodemailer";
-import { logger } from "@/lib/logger";
+import nodemailer from 'nodemailer';
+import { logger } from '@/lib/logger';
 
 function escapeHtml(str: string): string {
   return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
 }
 
 function getTransporter() {
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: process.env.SMTP_PORT === "465",
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_PORT === '465',
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -23,22 +23,17 @@ function getTransporter() {
 }
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  return date.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
-function renderDeadlineEmail(
-  fullName: string,
-  deadlineTitle: string,
-  dueAt: Date,
-  isOverdue: boolean,
-): string {
-  const subject = isOverdue ? "Просрочен дедлайн" : "Напоминание о дедлайне";
+function renderDeadlineEmail(fullName: string, deadlineTitle: string, dueAt: Date, isOverdue: boolean): string {
+  const subject = isOverdue ? 'Просрочен дедлайн' : 'Напоминание о дедлайне';
 
   return `
     <!DOCTYPE html>
@@ -48,7 +43,7 @@ function renderDeadlineEmail(
       <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f8fafc; }
         .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .header { background: ${isOverdue ? "#ef4444" : "#f59e0b"}; padding: 24px; text-align: center; color: white; }
+        .header { background: ${isOverdue ? '#ef4444' : '#f59e0b'}; padding: 24px; text-align: center; color: white; }
         .header h1 { margin: 0; font-size: 20px; }
         .content { padding: 24px; }
         .content p { margin: 0 0 12px; color: #334155; line-height: 1.6; }
@@ -75,7 +70,7 @@ function renderDeadlineEmail(
             <p>Срок: ${formatDate(dueAt)}</p>
           </div>
           <p>Пожалуйста, завершите задание как можно скорее.</p>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}" class="cta">Перейти к обучению</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" class="cta">Перейти к обучению</a>
         </div>
         <div class="footer">
           CyberSec Lab Trainer — автоматическое уведомление
@@ -86,20 +81,12 @@ function renderDeadlineEmail(
   `;
 }
 
-export async function sendOTPRecoveryEmail(
-  to: string,
-  fullName: string,
-  otp: string,
-): Promise<boolean> {
-  if (
-    !process.env.SMTP_HOST ||
-    !process.env.SMTP_USER ||
-    !process.env.SMTP_PASS
-  ) {
+export async function sendOTPRecoveryEmail(to: string, fullName: string, otp: string): Promise<boolean> {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return false;
   }
 
-  const subject = "CyberSec Lab — Код восстановления пароля";
+  const subject = 'CyberSec Lab — Код восстановления пароля';
   const html = `
     <!DOCTYPE html>
     <html>
@@ -142,15 +129,14 @@ export async function sendOTPRecoveryEmail(
   try {
     const transporter = getTransporter();
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || "noreply@cyberseclab.com",
+      from: process.env.SMTP_FROM || 'noreply@cyberseclab.com',
       to,
       subject,
       html,
     });
     return true;
   } catch (e) {
-    if (process.env.NODE_ENV === "development")
-      logger.warn("sendOTPRecoveryEmail failed", { error: e });
+    if (process.env.NODE_ENV === 'development') logger.warn('sendOTPRecoveryEmail failed', { error: e });
     return false;
   }
 }
@@ -162,11 +148,7 @@ export async function sendDeadlineReminderEmail(
   dueAt: Date,
   isOverdue: boolean,
 ): Promise<boolean> {
-  if (
-    !process.env.SMTP_HOST ||
-    !process.env.SMTP_USER ||
-    !process.env.SMTP_PASS
-  ) {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return false; // email not configured
   }
 
@@ -177,15 +159,14 @@ export async function sendDeadlineReminderEmail(
   try {
     const transporter = getTransporter();
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || "noreply@cyberseclab.com",
+      from: process.env.SMTP_FROM || 'noreply@cyberseclab.com',
       to,
       subject,
       html: renderDeadlineEmail(fullName, deadlineTitle, dueAt, isOverdue),
     });
     return true;
   } catch (e) {
-    if (process.env.NODE_ENV === "development")
-      logger.warn("sendDeadlineReminderEmail failed", { error: e });
+    if (process.env.NODE_ENV === 'development') logger.warn('sendDeadlineReminderEmail failed', { error: e });
     return false;
   }
 }

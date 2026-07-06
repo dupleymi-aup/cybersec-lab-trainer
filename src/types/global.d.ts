@@ -1,5 +1,5 @@
-declare module "react-syntax-highlighter" {
-  import { ComponentType, CSSProperties } from "react";
+declare module 'react-syntax-highlighter' {
+  import { ComponentType, CSSProperties } from 'react';
 
   export interface SyntaxHighlighterProps {
     language?: string;
@@ -20,7 +20,7 @@ declare module "react-syntax-highlighter" {
   export default Prism;
 }
 
-declare module "react-syntax-highlighter/dist/esm/styles/prism" {
-  import { CSSProperties } from "react";
+declare module 'react-syntax-highlighter/dist/esm/styles/prism' {
+  import { CSSProperties } from 'react';
   export const oneDark: { [key: string]: CSSProperties };
 }

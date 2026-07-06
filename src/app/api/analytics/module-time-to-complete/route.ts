@@ -1,20 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { parseDays } from "@/lib/utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { parseDays } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const groupId = searchParams.get("groupId") || "";
+  const groupId = searchParams.get('groupId') || '';
   const days = parseDays(searchParams);
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
@@ -37,9 +32,7 @@ export async function GET(request: NextRequest) {
   });
 
   const userMap = new Map(users.map((u) => [u.id, u]));
-  const filteredUsers = new Set(
-    users.filter((u) => !groupId || u.group === groupId).map((u) => u.id),
-  );
+  const filteredUsers = new Set(users.filter((u) => !groupId || u.group === groupId).map((u) => u.id));
 
   // Filter progress to only include filtered users
   const progress = allProgress.filter((p) => filteredUsers.has(p.userId));
@@ -66,7 +59,7 @@ export async function GET(request: NextRequest) {
       recordedAt: { gte: since },
     },
     select: { userId: true, moduleId: true, recordedAt: true },
-    orderBy: { recordedAt: "asc" },
+    orderBy: { recordedAt: 'asc' },
   });
 
   const userModuleStarts = new Map<string, Map<string, Date>>();
@@ -85,10 +78,7 @@ export async function GET(request: NextRequest) {
 
   // Calculate time-to-complete per module
   const moduleTimes = new Map<string, number[]>();
-  const studentSpeeds = new Map<
-    string,
-    { userId: string; fullName: string; group: string; times: number[] }
-  >();
+  const studentSpeeds = new Map<string, { userId: string; fullName: string; group: string; times: number[] }>();
 
   for (const [userId, completions] of userModuleTimelines) {
     const user = userMap.get(userId);
@@ -97,17 +87,11 @@ export async function GET(request: NextRequest) {
     const userTimes: number[] = [];
 
     for (const [moduleId, completionDate] of completions) {
-      const progressEntry = progress.find(
-        (p) => p.userId === userId && p.moduleId === moduleId && p.completed,
-      );
+      const progressEntry = progress.find((p) => p.userId === userId && p.moduleId === moduleId && p.completed);
       if (!progressEntry) continue;
 
-      const startDate =
-        userModuleStarts.get(userId)?.get(moduleId) || completionDate;
-      const hours = Math.max(
-        0.1,
-        (completionDate.getTime() - startDate.getTime()) / (1000 * 60 * 60),
-      );
+      const startDate = userModuleStarts.get(userId)?.get(moduleId) || completionDate;
+      const hours = Math.max(0.1, (completionDate.getTime() - startDate.getTime()) / (1000 * 60 * 60));
 
       if (!moduleTimes.has(moduleId)) {
         moduleTimes.set(moduleId, []);
@@ -137,11 +121,9 @@ export async function GET(request: NextRequest) {
 
   // Calculate statistics per module
   function calcStats(times: number[]) {
-    if (times.length === 0)
-      return { avg: 0, median: 0, p25: 0, p75: 0, count: 0 };
+    if (times.length === 0) return { avg: 0, median: 0, p25: 0, p75: 0, count: 0 };
     const sorted = [...times].sort((a, b) => a - b);
-    const avg =
-      Math.round((sorted.reduce((s, t) => s + t, 0) / sorted.length) * 10) / 10;
+    const avg = Math.round((sorted.reduce((s, t) => s + t, 0) / sorted.length) * 10) / 10;
     const median =
       sorted.length % 2 === 0
         ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
@@ -170,9 +152,7 @@ export async function GET(request: NextRequest) {
       userId: s.userId,
       fullName: s.fullName,
       group: s.group,
-      avgHoursPerModule:
-        Math.round((s.times.reduce((a, b) => a + b, 0) / s.times.length) * 10) /
-        10,
+      avgHoursPerModule: Math.round((s.times.reduce((a, b) => a + b, 0) / s.times.length) * 10) / 10,
       modulesCompleted: s.times.length,
     }))
     .sort((a, b) => a.avgHoursPerModule - b.avgHoursPerModule);
@@ -181,11 +161,11 @@ export async function GET(request: NextRequest) {
   const timeDistribution = moduleTimeResults.map(({ moduleId, ...rest }) => {
     const times = moduleTimes.get(moduleId) || [];
     const ranges = [
-      { range: "0-2ч", min: 0, max: 2, count: 0 },
-      { range: "2-6ч", min: 2, max: 6, count: 0 },
-      { range: "6-12ч", min: 6, max: 12, count: 0 },
-      { range: "12-24ч", min: 12, max: 24, count: 0 },
-      { range: "24ч+", min: 24, max: Infinity, count: 0 },
+      { range: '0-2ч', min: 0, max: 2, count: 0 },
+      { range: '2-6ч', min: 2, max: 6, count: 0 },
+      { range: '6-12ч', min: 6, max: 12, count: 0 },
+      { range: '12-24ч', min: 12, max: 24, count: 0 },
+      { range: '24ч+', min: 24, max: Infinity, count: 0 },
     ];
     for (const t of times) {
       for (const r of ranges) {

@@ -1,14 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  generateToken,
-  getClientIp,
-} from "@/lib/api-middleware";
-import { setAuthCookie } from "@/lib/cookie-auth";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from 'next/server';
+import { authenticate, unauthorized, forbidden, generateToken, getClientIp } from '@/lib/api-middleware';
+import { setAuthCookie } from '@/lib/cookie-auth';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,8 +10,8 @@ export async function POST(request: NextRequest) {
     if (!auth) return unauthorized();
 
     // Only admins can stop impersonation
-    if (auth.role !== "admin") {
-      return forbidden("Только администраторы могут остановить имперсонацию");
+    if (auth.role !== 'admin') {
+      return forbidden('Только администраторы могут остановить имперсонацию');
     }
 
     // Re-issue a proper JWT for the admin with current tokenVersion from DB
@@ -51,7 +45,7 @@ export async function POST(request: NextRequest) {
           id: crypto.randomUUID(),
           adminId: admin.id,
           adminName: admin.fullName || admin.id,
-          action: "impersonation_stop",
+          action: 'impersonation_stop',
           targetId: admin.id,
           targetName: admin.fullName || admin.id,
           details: `Admin ${admin.fullName || admin.id} stopped impersonation [IP: ${ip}]`,
@@ -64,16 +58,13 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({ success: true });
     setAuthCookie(response, token);
 
-    logger.info("Impersonation stopped", { adminId: admin.id });
+    logger.info('Impersonation stopped', { adminId: admin.id });
 
     return response;
   } catch (error) {
-    logger.error("Stop impersonation failed", {
-      error: error instanceof Error ? error.message : "Unknown",
+    logger.error('Stop impersonation failed', {
+      error: error instanceof Error ? error.message : 'Unknown',
     });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

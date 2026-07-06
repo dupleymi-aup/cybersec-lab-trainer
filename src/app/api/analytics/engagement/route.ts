@@ -1,30 +1,25 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { parseDays } from "@/lib/utils";
-import { logger } from "@/lib/logger";
-import type { Prisma } from "@prisma/client";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { parseDays } from '@/lib/utils';
+import { logger } from '@/lib/logger';
+import type { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await authenticate(request);
     if (!auth) return unauthorized();
-    if (!requireRole(auth.role, "teacher")) return forbidden();
+    if (!requireRole(auth.role, 'teacher')) return forbidden();
 
     const { searchParams } = new URL(request.url);
     const days = parseDays(searchParams);
-    const groupId = searchParams.get("groupId");
+    const groupId = searchParams.get('groupId');
 
     const now = new Date();
     const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
     // Build user filter
-    const userFilter: Prisma.UserWhereInput = { role: "student" };
+    const userFilter: Prisma.UserWhereInput = { role: 'student' };
     if (groupId) userFilter.group = groupId;
 
     // Get students
@@ -116,8 +111,7 @@ export async function GET(request: NextRequest) {
 
       const avgQuizScore =
         studentQuizResults.length > 0
-          ? studentQuizResults.reduce((sum, q) => sum + q.percentage, 0) /
-            studentQuizResults.length
+          ? studentQuizResults.reduce((sum, q) => sum + q.percentage, 0) / studentQuizResults.length
           : 0;
 
       // Calculate last active days
@@ -126,12 +120,9 @@ export async function GET(request: NextRequest) {
         ...studentProgress.map((p) => p.updatedAt.getTime()),
         ...studentQuizzes.map((q) => q.attemptedAt.getTime()),
       ];
-      const lastActiveDate =
-        allDates.length > 0 ? new Date(Math.max(...allDates)) : null;
+      const lastActiveDate = allDates.length > 0 ? new Date(Math.max(...allDates)) : null;
       const lastActiveDays = lastActiveDate
-        ? Math.floor(
-            (now.getTime() - lastActiveDate.getTime()) / (24 * 60 * 60 * 1000),
-          )
+        ? Math.floor((now.getTime() - lastActiveDate.getTime()) / (24 * 60 * 60 * 1000))
         : 999;
 
       // Engagement score — sum factors first, then round once to avoid accumulated errors
@@ -139,26 +130,23 @@ export async function GET(request: NextRequest) {
       const completionFactor = (studentCompletedModules / totalModules) * 25;
       const quizFactor = (avgQuizScore / 100) * 25;
       const attemptsFactor = Math.min(25, (studentQuizzes.length / 50) * 25);
-      const rawScore =
-        activityFactor + completionFactor + quizFactor + attemptsFactor;
+      const rawScore = activityFactor + completionFactor + quizFactor + attemptsFactor;
       const engagementScore = Math.min(100, Math.round(rawScore));
 
       engagementScores.push(engagementScore);
 
       // Calculate streak (consecutive active days)
-      const uniqueDays = new Set(
-        allDates.map((t) => new Date(t).toISOString().split("T")[0]),
-      );
+      const uniqueDays = new Set(allDates.map((t) => new Date(t).toISOString().split('T')[0]));
       let streakDays = 0;
       let currentDate = new Date(now);
-      const todayStr = currentDate.toISOString().split("T")[0];
+      const todayStr = currentDate.toISOString().split('T')[0];
 
       // If no activity today, start checking from yesterday
       if (!uniqueDays.has(todayStr)) {
         currentDate = new Date(currentDate.getTime() - 86400000);
       }
 
-      while (uniqueDays.has(currentDate.toISOString().split("T")[0])) {
+      while (uniqueDays.has(currentDate.toISOString().split('T')[0])) {
         streakDays++;
         currentDate = new Date(currentDate.getTime() - 86400000);
       }
@@ -172,11 +160,11 @@ export async function GET(request: NextRequest) {
 
     // Engagement score distribution
     const scoreDistribution = [
-      { range: "0-20", count: 0 },
-      { range: "21-40", count: 0 },
-      { range: "41-60", count: 0 },
-      { range: "61-80", count: 0 },
-      { range: "81-100", count: 0 },
+      { range: '0-20', count: 0 },
+      { range: '21-40', count: 0 },
+      { range: '41-60', count: 0 },
+      { range: '61-80', count: 0 },
+      { range: '81-100', count: 0 },
     ];
 
     for (const score of engagementScores) {
@@ -196,24 +184,18 @@ export async function GET(request: NextRequest) {
 
     // Weekly activity pattern
     const weeklyCounts = new Array(7).fill(0);
-    const weeklyActivityDates = new Array(7)
-      .fill(0)
-      .map(() => new Set<string>());
+    const weeklyActivityDates = new Array(7).fill(0).map(() => new Set<string>());
 
     for (const login of loginActivity) {
       const dayOfWeek = login.timestamp.getDay();
       weeklyCounts[dayOfWeek]++;
-      weeklyActivityDates[dayOfWeek].add(
-        login.timestamp.toISOString().split("T")[0],
-      );
+      weeklyActivityDates[dayOfWeek].add(login.timestamp.toISOString().split('T')[0]);
     }
 
     const weeklyPattern = weeklyCounts.map((count, day) => ({
       day,
       avgActivities:
-        weeklyActivityDates[day].size > 0
-          ? Math.round((count / weeklyActivityDates[day].size) * 10) / 10
-          : 0,
+        weeklyActivityDates[day].size > 0 ? Math.round((count / weeklyActivityDates[day].size) * 10) / 10 : 0,
     }));
 
     // Streak leaderboard (top 10)
@@ -227,17 +209,12 @@ export async function GET(request: NextRequest) {
     }> = [];
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-      const dateStr = date.toISOString().split("T")[0];
+      const dateStr = date.toISOString().split('T')[0];
       const dayStart = new Date(dateStr);
       const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
 
-      const dayLogins = loginActivity.filter(
-        (l) => l.timestamp >= dayStart && l.timestamp < dayEnd,
-      );
-      const avgLoginsPerStudent =
-        totalStudents > 0
-          ? Math.round((dayLogins.length / totalStudents) * 1000) / 10
-          : 0;
+      const dayLogins = loginActivity.filter((l) => l.timestamp >= dayStart && l.timestamp < dayEnd);
+      const avgLoginsPerStudent = totalStudents > 0 ? Math.round((dayLogins.length / totalStudents) * 1000) / 10 : 0;
 
       engagementTrend.push({ date: dateStr, avgLoginsPerStudent });
     }
@@ -250,10 +227,7 @@ export async function GET(request: NextRequest) {
       engagementTrend,
     });
   } catch (error) {
-    logger.error("Engagement analytics failed", { error: String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    logger.error('Engagement analytics failed', { error: String(error) });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

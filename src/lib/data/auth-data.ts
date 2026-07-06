@@ -13,15 +13,15 @@ export interface PasswordCheck {
 }
 
 export const PASSWORD_CHECKS: PasswordCheck[] = [
-  { label: "Минимум 8 символов", minLength: 8 },
-  { label: "Строчные буквы (a-z)", regex: /[a-z]/ },
-  { label: "Заглавные буквы (A-Z)", regex: /[A-Z]/ },
-  { label: "Цифры (0-9)", regex: /[0-9]/ },
-  { label: "Спецсимволы (!@#$...)", regex: /[^a-zA-Z0-9]/ },
-  { label: "Минимум 12 символов", minLength: 12 },
-  { label: "Нет повторяющихся символов", regex: /(.)\1{2,}/, inverted: true },
+  { label: 'Минимум 8 символов', minLength: 8 },
+  { label: 'Строчные буквы (a-z)', regex: /[a-z]/ },
+  { label: 'Заглавные буквы (A-Z)', regex: /[A-Z]/ },
+  { label: 'Цифры (0-9)', regex: /[0-9]/ },
+  { label: 'Спецсимволы (!@#$...)', regex: /[^a-zA-Z0-9]/ },
+  { label: 'Минимум 12 символов', minLength: 12 },
+  { label: 'Нет повторяющихся символов', regex: /(.)\1{2,}/, inverted: true },
   {
-    label: "Нет последовательностей (abc, 123)",
+    label: 'Нет последовательностей (abc, 123)',
     regex: /(?:abc|bcd|cde|def|efg|012|123|234|345|456|567|678|789)/i,
     inverted: true,
   },
@@ -35,15 +35,15 @@ export interface StrengthLevel {
 }
 
 export const PASSWORD_STRENGTH_LEVELS: StrengthLevel[] = [
-  { maxPassed: 2, score: 20, label: "Очень слабый", color: "bg-red-500" },
-  { maxPassed: 3, score: 40, label: "Слабый", color: "bg-red-400" },
-  { maxPassed: 5, score: 60, label: "Средний", color: "bg-yellow-500" },
-  { maxPassed: 6, score: 80, label: "Надёжный", color: "bg-emerald-500" },
+  { maxPassed: 2, score: 20, label: 'Очень слабый', color: 'bg-red-500' },
+  { maxPassed: 3, score: 40, label: 'Слабый', color: 'bg-red-400' },
+  { maxPassed: 5, score: 60, label: 'Средний', color: 'bg-yellow-500' },
+  { maxPassed: 6, score: 80, label: 'Надёжный', color: 'bg-emerald-500' },
   {
     maxPassed: Infinity,
     score: 100,
-    label: "Отличный",
-    color: "bg-emerald-600",
+    label: 'Отличный',
+    color: 'bg-emerald-600',
   },
 ] as const;
 
@@ -56,10 +56,10 @@ export interface ComplexityOption {
 }
 
 export const BRUTE_FORCE_COMPLEXITY_LEVELS: ComplexityOption[] = [
-  { value: 1, charsetSize: 26, description: "26 (a-z)" },
-  { value: 2, charsetSize: 52, description: "52 (a-z, A-Z)" },
-  { value: 3, charsetSize: 62, description: "62 (+0-9)" },
-  { value: 4, charsetSize: 94, description: "94 (+спецсимволы)" },
+  { value: 1, charsetSize: 26, description: '26 (a-z)' },
+  { value: 2, charsetSize: 52, description: '52 (a-z, A-Z)' },
+  { value: 3, charsetSize: 62, description: '62 (+0-9)' },
+  { value: 4, charsetSize: 94, description: '94 (+спецсимволы)' },
 ] as const;
 
 // Note: Modern GPU clusters can exceed 100B attempts/sec for weak hashes (MD5, SHA1).
@@ -74,13 +74,12 @@ export const BRUTE_FORCE_DEFAULT_COMPLEXITY = 1;
 
 // WARNING: This is a static salt for DEMONSTRATION ONLY. In production, always use bcrypt.genSalt() to generate unique per-user salts.
 // NEVER use a hardcoded static salt in real applications!
-export const HASH_SALT = "a1b2c3d4e5f6";
-export const HASH_ALGORITHM_PREFIX = "$2b$12$";
-export const HASH_ALGORITHM_DESCRIPTION =
-  "алгоритм (bcrypt) и стоимость (12 раундов)";
+export const HASH_SALT = 'a1b2c3d4e5f6';
+export const HASH_ALGORITHM_PREFIX = '$2b$12$';
+export const HASH_ALGORITHM_DESCRIPTION = 'алгоритм (bcrypt) и стоимость (12 раундов)';
 export const HASH_SALT_DESCRIPTION =
-  "соль (ДЕМО: в реальном приложении используйте bcrypt.genSalt() для уникальной соли)";
-export const HASH_VALUE_DESCRIPTION = "собственно хеш пароля";
+  'соль (ДЕМО: в реальном приложении используйте bcrypt.genSalt() для уникальной соли)';
+export const HASH_VALUE_DESCRIPTION = 'собственно хеш пароля';
 
 export const BCRYPT_CODE_EXAMPLE = `// Пример использования bcrypt в Node.js
 const bcrypt = require('bcrypt');
@@ -101,10 +100,10 @@ async function verify(password, hash) {
 }`;
 
 export const BCRYPT_BENEFITS = [
-  "Автоматически добавляет соль — защита от rainbow tables",
-  "Настраиваемая стоимость (cost factor) — замедляет перебор",
-  "Устойчив к GPU-атакам (памятекоёмкий алгоритм)",
-  "Однонаправленный — невозможно восстановить пароль из хеша",
+  'Автоматически добавляет соль — защита от rainbow tables',
+  'Настраиваемая стоимость (cost factor) — замедляет перебор',
+  'Устойчив к GPU-атакам (памятекоёмкий алгоритм)',
+  'Однонаправленный — невозможно восстановить пароль из хеша',
 ] as const;
 
 // --- OTP / TOTP ---
@@ -120,24 +119,24 @@ export interface TOTPStep {
 
 export const TOTP_STEPS: TOTPStep[] = [
   {
-    step: "1",
-    title: "Секретный ключ",
-    desc: "Сервер генерирует случайный секрет (обычно 16-32 символа Base32) и передаёт его пользователю (QR-код).",
+    step: '1',
+    title: 'Секретный ключ',
+    desc: 'Сервер генерирует случайный секрет (обычно 16-32 символа Base32) и передаёт его пользователю (QR-код).',
   },
   {
-    step: "2",
-    title: "Вычисление HMAC",
-    desc: "Клиент и сервер вычисляют HMAC-SHA1 от секрета и текущего временного шага (timestamp / 30).",
+    step: '2',
+    title: 'Вычисление HMAC',
+    desc: 'Клиент и сервер вычисляют HMAC-SHA1 от секрета и текущего временного шага (timestamp / 30).',
   },
   {
-    step: "3",
-    title: "Динамическое усечение",
-    desc: "Из HMAC извлекаются 4 байта, преобразуются в 31-битное число, затем берётся по модулю 10^6 = 6-значный код.",
+    step: '3',
+    title: 'Динамическое усечение',
+    desc: 'Из HMAC извлекаются 4 байта, преобразуются в 31-битное число, затем берётся по модулю 10^6 = 6-значный код.',
   },
   {
-    step: "4",
-    title: "Сверка",
-    desc: "Сервер сравнивает код клиента с собственным вычислением. Допускается ±1 шаг (30 сек) для компенсации задержки.",
+    step: '4',
+    title: 'Сверка',
+    desc: 'Сервер сравнивает код клиента с собственным вычислением. Допускается ±1 шаг (30 сек) для компенсации задержки.',
   },
 ] as const;
 
@@ -161,17 +160,17 @@ const isValid = authenticator.check(token, user.secret);
 // Даже при утечке пароля — аккаунт защищён`;
 
 export const WITHOUT_2FA_RISKS = [
-  "Только пароль — одна точка отказа",
-  "Утечка из БД = мгновенный доступ",
-  "Фишинг = полный компромисс",
-  "Брутфорс = eventual access",
+  'Только пароль — одна точка отказа',
+  'Утечка из БД = мгновенный доступ',
+  'Фишинг = полный компромисс',
+  'Брутфорс = eventual access',
 ] as const;
 
 export const WITH_2FA_BENEFITS = [
-  "Нужен пароль + устройство с TOTP",
-  "Код действует только 30 секунд",
-  "Секрет не передаётся по сети",
-  "Защита от фишинга и брутфорса",
+  'Нужен пароль + устройство с TOTP',
+  'Код действует только 30 секунд',
+  'Секрет не передаётся по сети',
+  'Защита от фишинга и брутфорса',
 ] as const;
 
 // --- Session Security / JWT ---
@@ -204,31 +203,31 @@ function authenticate(req, res, next) {
 }`;
 
 export const JWT_INSECURE_PRACTICES = [
-  "Хранение JWT в localStorage (доступен через XSS)",
-  "Срок действия больше 24 часов",
-  "Отсутствие refresh-токенов",
-  "Секрет в клиентском коде",
+  'Хранение JWT в localStorage (доступен через XSS)',
+  'Срок действия больше 24 часов',
+  'Отсутствие refresh-токенов',
+  'Секрет в клиентском коде',
 ] as const;
 
 export const JWT_SECURE_PRACTICES = [
-  "Хранение в HttpOnly + Secure куках",
-  "Короткий срок (15-30 мин) + refresh-токен",
-  "Проверка подписи на каждом запросе",
-  "Чёрный список compromised токенов",
+  'Хранение в HttpOnly + Secure куках',
+  'Короткий срок (15-30 мин) + refresh-токен',
+  'Проверка подписи на каждом запросе',
+  'Чёрный список compromised токенов',
 ] as const;
 
 // --- Time Formatting ---
 
 export const TIME_LABELS = {
-  instant: "Мгновенно",
-  seconds: "сек",
-  minutes: "мин",
-  hours: "ч",
-  days: "дн",
-  years: "лет",
-  thousandsOfYears: "тыс. лет",
-  millionsOfYears: "млн лет",
-  infinite: "Бесконечно",
+  instant: 'Мгновенно',
+  seconds: 'сек',
+  minutes: 'мин',
+  hours: 'ч',
+  days: 'дн',
+  years: 'лет',
+  thousandsOfYears: 'тыс. лет',
+  millionsOfYears: 'млн лет',
+  infinite: 'Бесконечно',
 } as const;
 
 export const SECONDS_PER_MINUTE = 60;

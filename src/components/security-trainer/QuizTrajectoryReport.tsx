@@ -1,34 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
-import { useDateFormatter } from "@/lib/format";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import {
-  Loader2,
-  AlertTriangle,
-  TrendingUp,
-  Target,
-  BarChart3,
-} from "lucide-react";
-import { getQuizTrajectory, type QuizTrajectoryPoint } from "@/lib/auth-store";
-import { CHART_COLORS } from "@/lib/constants";
-import { Card, CardContent } from "@/components/ui/card";
-import KPICard from "./KPICard";
+import { useState, useEffect, useMemo } from 'react';
+import { useDateFormatter } from '@/lib/format';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Loader2, AlertTriangle, TrendingUp, Target, BarChart3 } from 'lucide-react';
+import { getQuizTrajectory, type QuizTrajectoryPoint } from '@/lib/auth-store';
+import { CHART_COLORS } from '@/lib/constants';
+import { Card, CardContent } from '@/components/ui/card';
+import KPICard from './KPICard';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: "7d" },
-  { key: 30, label: "30d" },
-  { key: 90, label: "90d" },
-  { key: 180, label: "180d" },
+  { key: 7, label: '7d' },
+  { key: 30, label: '30d' },
+  { key: 90, label: '90d' },
+  { key: 180, label: '180d' },
 ];
 
 // Consistent color palette for categories — derived from central chart palette
@@ -49,10 +34,7 @@ export interface QuizTrajectoryReportProps {
 
 const DEFAULT_DAYS = 30;
 
-export default function QuizTrajectoryReport({
-  groupId,
-  days: controlledDays,
-}: QuizTrajectoryReportProps = {}) {
+export default function QuizTrajectoryReport({ groupId, days: controlledDays }: QuizTrajectoryReportProps = {}) {
   const formatDateLocale = useDateFormatter();
   const [trajectories, setTrajectories] = useState<QuizTrajectoryPoint[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -77,7 +59,7 @@ export default function QuizTrajectoryReport({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -101,9 +83,7 @@ export default function QuizTrajectoryReport({
       }
     }
 
-    return Array.from(weekMap.values()).sort((a, b) =>
-      (a.week as string).localeCompare(b.week as string),
-    );
+    return Array.from(weekMap.values()).sort((a, b) => (a.week as string).localeCompare(b.week as string));
   }, [trajectories]);
 
   // Summary computations
@@ -112,10 +92,7 @@ export default function QuizTrajectoryReport({
       return { bestImproved: null, highestAvg: null, mostAttempts: null };
     }
 
-    const catStats = new Map<
-      string,
-      { scores: number[]; totalAttempts: number; weeks: string[] }
-    >();
+    const catStats = new Map<string, { scores: number[]; totalAttempts: number; weeks: string[] }>();
 
     for (const t of trajectories) {
       const stat = catStats.get(t.category) || {
@@ -136,24 +113,15 @@ export default function QuizTrajectoryReport({
     for (const [cat, stat] of catStats) {
       // Improvement: last score - first score
       const sortedWeeks = [...stat.weeks].sort();
-      const firstWeekData = trajectories.find(
-        (t) => t.week === sortedWeeks[0] && t.category === cat,
-      );
+      const firstWeekData = trajectories.find((t) => t.week === sortedWeeks[0] && t.category === cat);
       const lastWeekData = trajectories.find(
-        (t) =>
-          t.week === sortedWeeks[sortedWeeks.length - 1] && t.category === cat,
+        (t) => t.week === sortedWeeks[sortedWeeks.length - 1] && t.category === cat,
       );
-      const improvement =
-        firstWeekData && lastWeekData
-          ? lastWeekData.avgScore - firstWeekData.avgScore
-          : 0;
+      const improvement = firstWeekData && lastWeekData ? lastWeekData.avgScore - firstWeekData.avgScore : 0;
 
       const avgScore =
         stat.scores.length > 0
-          ? Math.round(
-              (stat.scores.reduce((a, b) => a + b, 0) / stat.scores.length) *
-                100,
-            ) / 100
+          ? Math.round((stat.scores.reduce((a, b) => a + b, 0) / stat.scores.length) * 100) / 100
           : 0;
 
       if (!bestImproved || improvement > bestImproved.improvement) {
@@ -175,17 +143,14 @@ export default function QuizTrajectoryReport({
 
   const formatDate = (weekStr: string) => {
     const d = new Date(weekStr);
-    return formatDateLocale(d, { day: "numeric", month: "short" });
+    return formatDateLocale(d, { day: 'numeric', month: 'short' });
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2
-          size={32}
-          className="animate-spin text-indigo-500 mx-auto mb-3"
-        />
-        <p className="text-sm text-muted-foreground">Загрузка данных...</p>
+        <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
+        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -193,8 +158,8 @@ export default function QuizTrajectoryReport({
   if (error) {
     return (
       <div className="flex items-center justify-center py-16">
-        <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-        <p className="text-sm text-muted-foreground font-medium">{error}</p>
+        <AlertTriangle size={32} className="mx-auto mb-3 text-red-500" />
+        <p className="text-muted-foreground text-sm font-medium">{error}</p>
       </div>
     );
   }
@@ -203,15 +168,15 @@ export default function QuizTrajectoryReport({
     <div className="space-y-6">
       {/* Period selector (hidden when controlled externally) */}
       {!isControlled && (
-        <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
-              className={`px-3 py-1.5 text-xs rounded-md transition-all ${
+              className={`rounded-md px-3 py-1.5 text-xs transition-all ${
                 days === key
-                  ? "bg-background text-foreground shadow-sm font-medium"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? 'bg-background text-foreground font-medium shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -221,7 +186,7 @@ export default function QuizTrajectoryReport({
       )}
 
       {/* Summary cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {summary.bestImproved && (
           <KPICard
             icon={<TrendingUp size={18} />}
@@ -255,19 +220,11 @@ export default function QuizTrajectoryReport({
       {/* Trajectory chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Траектория квизов по категориям
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">Траектория квизов по категориям</h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={350}>
-              <LineChart
-                data={chartData}
-                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke={CHART_COLORS.grid}
-                />
+              <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
                 <XAxis
                   dataKey="week"
                   tick={{ fontSize: 10 }}
@@ -289,9 +246,8 @@ export default function QuizTrajectoryReport({
                     border: `1px solid ${CHART_COLORS.grid}`,
                   }}
                   formatter={(value, name) => {
-                    const nameStr = String(name || "");
-                    if (nameStr.endsWith("_attempts"))
-                      return [value, "Попытки"];
+                    const nameStr = String(name || '');
+                    if (nameStr.endsWith('_attempts')) return [value, 'Попытки'];
                     return [`${value}%`, name];
                   }}
                   labelFormatter={(label) => formatDate(String(label))}
@@ -312,9 +268,7 @@ export default function QuizTrajectoryReport({
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-slate-400 text-center py-12">
-              Нет данных
-            </p>
+            <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
           )}
         </CardContent>
       </Card>

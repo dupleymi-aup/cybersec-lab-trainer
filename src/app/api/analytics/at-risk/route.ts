@@ -1,30 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { parseDays } from "@/lib/utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { parseDays } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "teacher")) return forbidden();
+  if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { searchParams } = new URL(request.url);
   const days = parseDays(searchParams);
-  const inactivityDays = parseInt(
-    searchParams.get("inactivityDays") || "7",
-    10,
-  );
-  const minScore = parseInt(searchParams.get("minScore") || "50", 10);
-  const minModules = parseInt(searchParams.get("minModules") || "2", 10);
-  const groupId = searchParams.get("groupId");
-  const userWhere = groupId
-    ? { role: "student" as const, group: groupId }
-    : { role: "student" as const };
+  const inactivityDays = parseInt(searchParams.get('inactivityDays') || '7', 10);
+  const minScore = parseInt(searchParams.get('minScore') || '50', 10);
+  const minModules = parseInt(searchParams.get('minModules') || '2', 10);
+  const groupId = searchParams.get('groupId');
+  const userWhere = groupId ? { role: 'student' as const, group: groupId } : { role: 'student' as const };
 
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
@@ -79,7 +69,7 @@ export async function GET(request: NextRequest) {
     modulesCompleted: number;
     avgQuizScore: number;
     quizAttempts: number;
-    trend: "improving" | "declining" | "stable";
+    trend: 'improving' | 'declining' | 'stable';
   }> = [];
 
   // Pre-index records by userId for O(1) lookups
@@ -108,11 +98,8 @@ export async function GET(request: NextRequest) {
     const modulesCompleted = studentProgress.filter((p) => p.completed).length;
     const avgQuizScore =
       studentQuizResults.length > 0
-        ? Math.round(
-            (studentQuizResults.reduce((sum, q) => sum + q.percentage, 0) /
-              studentQuizResults.length) *
-              10,
-          ) / 10
+        ? Math.round((studentQuizResults.reduce((sum, q) => sum + q.percentage, 0) / studentQuizResults.length) * 10) /
+          10
         : 0;
 
     // Days since last activity
@@ -126,43 +113,28 @@ export async function GET(request: NextRequest) {
         )
       : null;
     const lastActiveDays = lastActivityDate
-      ? Math.floor(
-          (now.getTime() - lastActivityDate.getTime()) / (24 * 60 * 60 * 1000),
-        )
+      ? Math.floor((now.getTime() - lastActivityDate.getTime()) / (24 * 60 * 60 * 1000))
       : 999;
 
     // Trend calculation: compare last 2 weeks vs previous 2 weeks
     const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     const fourWeeksAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000);
-    const recentActivity = studentQuizResults.filter(
-      (q) => q.updatedAt >= twoWeeksAgo,
-    ).length;
+    const recentActivity = studentQuizResults.filter((q) => q.updatedAt >= twoWeeksAgo).length;
     const previousActivity = studentQuizResults.filter(
       (q) => q.updatedAt >= fourWeeksAgo && q.updatedAt < twoWeeksAgo,
     ).length;
-    const recentScores = studentQuizResults
-      .filter((q) => q.updatedAt >= twoWeeksAgo)
-      .map((q) => q.percentage);
+    const recentScores = studentQuizResults.filter((q) => q.updatedAt >= twoWeeksAgo).map((q) => q.percentage);
     const previousScores = studentQuizResults
       .filter((q) => q.updatedAt >= fourWeeksAgo && q.updatedAt < twoWeeksAgo)
       .map((q) => q.percentage);
-    const recentAvg =
-      recentScores.length > 0
-        ? recentScores.reduce((a, b) => a + b, 0) / recentScores.length
-        : 0;
+    const recentAvg = recentScores.length > 0 ? recentScores.reduce((a, b) => a + b, 0) / recentScores.length : 0;
     const previousAvg =
-      previousScores.length > 0
-        ? previousScores.reduce((a, b) => a + b, 0) / previousScores.length
-        : 0;
+      previousScores.length > 0 ? previousScores.reduce((a, b) => a + b, 0) / previousScores.length : 0;
 
-    let trend: "improving" | "declining" | "stable" = "stable";
-    if (recentAvg > previousAvg + 5 || recentActivity > previousActivity + 2)
-      trend = "improving";
-    else if (
-      recentAvg < previousAvg - 5 ||
-      (recentActivity < previousActivity - 2 && previousActivity > 0)
-    )
-      trend = "declining";
+    let trend: 'improving' | 'declining' | 'stable' = 'stable';
+    if (recentAvg > previousAvg + 5 || recentActivity > previousActivity + 2) trend = 'improving';
+    else if (recentAvg < previousAvg - 5 || (recentActivity < previousActivity - 2 && previousActivity > 0))
+      trend = 'declining';
 
     // Risk score calculation (0-100, higher = more at risk)
     let riskScore = 0;
@@ -170,10 +142,7 @@ export async function GET(request: NextRequest) {
 
     // Inactivity factor (up to 35 points)
     if (lastActiveDays > inactivityDays) {
-      const inactivityScore = Math.min(
-        35,
-        Math.round((lastActiveDays / 30) * 35),
-      );
+      const inactivityScore = Math.min(35, Math.round((lastActiveDays / 30) * 35));
       riskScore += inactivityScore;
       reasons.push(`Неактивен ${lastActiveDays} дн.`);
     }
@@ -185,22 +154,20 @@ export async function GET(request: NextRequest) {
       reasons.push(`Ср. балл квизов ${avgQuizScore}%`);
     } else if (studentQuizResults.length === 0 && days > 7) {
       riskScore += 15;
-      reasons.push("Нет попыток квизов");
+      reasons.push('Нет попыток квизов');
     }
 
     // Module completion factor (up to 25 points)
     if (modulesCompleted < minModules) {
-      const moduleRisk = Math.round(
-        ((minModules - modulesCompleted) / minModules) * 25,
-      );
+      const moduleRisk = Math.round(((minModules - modulesCompleted) / minModules) * 25);
       riskScore += moduleRisk;
       reasons.push(`Завершено модулей: ${modulesCompleted}`);
     }
 
     // Trend factor (up to 15 points)
-    if (trend === "declining") {
+    if (trend === 'declining') {
       riskScore += 15;
-      reasons.push("Снижающийся тренд");
+      reasons.push('Снижающийся тренд');
     }
 
     riskScore = Math.min(100, riskScore);
@@ -234,10 +201,7 @@ export async function GET(request: NextRequest) {
     summary: {
       totalStudents,
       atRiskCount: atRiskStudents.length,
-      atRiskPercentage:
-        totalStudents > 0
-          ? Math.round((atRiskStudents.length / totalStudents) * 10000) / 100
-          : 0,
+      atRiskPercentage: totalStudents > 0 ? Math.round((atRiskStudents.length / totalStudents) * 10000) / 100 : 0,
       criticalCount,
     },
   });

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   PieChart,
   Pie,
@@ -13,23 +13,11 @@ import {
   Radar,
   ResponsiveContainer,
   Tooltip,
-} from "recharts";
-import {
-  Loader2,
-  AlertTriangle,
-  Award,
-  CheckCircle,
-  XCircle,
-  TrendingUp,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
-import {
-  getCertificationReadiness,
-  type CertificationReadinessData,
-} from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from 'recharts';
+import { Loader2, AlertTriangle, Award, CheckCircle, XCircle, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
+import { getCertificationReadiness, type CertificationReadinessData } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export interface CertificationReadinessProps {
   groupId?: string;
@@ -38,23 +26,23 @@ export interface CertificationReadinessProps {
 
 const TIER_CONFIG = {
   ready: {
-    label: "Готов",
-    color: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    label: 'Готов',
+    color: 'bg-emerald-100 text-emerald-700 border-emerald-200',
     icon: CheckCircle,
   },
   almost: {
-    label: "Почти готов",
-    color: "bg-blue-100 text-blue-700 border-blue-200",
+    label: 'Почти готов',
+    color: 'bg-blue-100 text-blue-700 border-blue-200',
     icon: TrendingUp,
   },
-  "needs-work": {
-    label: "Нужна работа",
-    color: "bg-amber-100 text-amber-700 border-amber-200",
+  'needs-work': {
+    label: 'Нужна работа',
+    color: 'bg-amber-100 text-amber-700 border-amber-200',
     icon: AlertTriangle,
   },
-  "not-ready": {
-    label: "Не готов",
-    color: "bg-red-100 text-red-700 border-red-200",
+  'not-ready': {
+    label: 'Не готов',
+    color: 'bg-red-100 text-red-700 border-red-200',
     icon: XCircle,
   },
 };
@@ -67,7 +55,7 @@ export default function CertificationReadiness({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-  const [internalGroupId] = useState("");
+  const [internalGroupId] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const days = propDays ?? internalDays;
@@ -85,7 +73,7 @@ export default function CertificationReadiness({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -98,7 +86,7 @@ export default function CertificationReadiness({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -107,9 +95,7 @@ export default function CertificationReadiness({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -117,17 +103,17 @@ export default function CertificationReadiness({
   const { summary, students } = data;
 
   const tierData = [
-    { name: TIER_CONFIG.ready.label, value: summary.ready, color: "#10b981" },
-    { name: TIER_CONFIG.almost.label, value: summary.almost, color: "#3b82f6" },
+    { name: TIER_CONFIG.ready.label, value: summary.ready, color: '#10b981' },
+    { name: TIER_CONFIG.almost.label, value: summary.almost, color: '#3b82f6' },
     {
-      name: TIER_CONFIG["needs-work"].label,
+      name: TIER_CONFIG['needs-work'].label,
       value: summary.needsWork,
-      color: "#f59e0b",
+      color: '#f59e0b',
     },
     {
-      name: TIER_CONFIG["not-ready"].label,
+      name: TIER_CONFIG['not-ready'].label,
       value: summary.notReady,
-      color: "#ef4444",
+      color: '#ef4444',
     },
   ].filter((d) => d.value > 0);
 
@@ -142,7 +128,7 @@ export default function CertificationReadiness({
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
+            className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
             <option value={7}>7 дней</option>
             <option value={30}>30 дней</option>
@@ -152,13 +138,11 @@ export default function CertificationReadiness({
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <Card className="border-border">
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-indigo-600">
-              {summary.avgReadinessScore}
-            </p>
-            <p className="text-xs text-muted-foreground">Ср. балл готовности</p>
+            <p className="text-2xl font-bold text-indigo-600">{summary.avgReadinessScore}</p>
+            <p className="text-muted-foreground text-xs">Ср. балл готовности</p>
           </CardContent>
         </Card>
         {Object.entries(TIER_CONFIG).map(([key, config]) => {
@@ -169,14 +153,14 @@ export default function CertificationReadiness({
               <CardContent className="p-4 text-center">
                 <Icon
                   size={20}
-                  className={`mx-auto mb-1 ${key === "ready" ? "text-emerald-600" : key === "almost" ? "text-blue-600" : key === "needs-work" ? "text-amber-600" : "text-red-600"}`}
+                  className={`mx-auto mb-1 ${key === 'ready' ? 'text-emerald-600' : key === 'almost' ? 'text-blue-600' : key === 'needs-work' ? 'text-amber-600' : 'text-red-600'}`}
                 />
                 <p
-                  className={`text-2xl font-bold ${key === "ready" ? "text-emerald-600" : key === "almost" ? "text-blue-600" : key === "needs-work" ? "text-amber-600" : "text-red-600"}`}
+                  className={`text-2xl font-bold ${key === 'ready' ? 'text-emerald-600' : key === 'almost' ? 'text-blue-600' : key === 'needs-work' ? 'text-amber-600' : 'text-red-600'}`}
                 >
                   {count}
                 </p>
-                <p className="text-xs text-muted-foreground">{config.label}</p>
+                <p className="text-muted-foreground text-xs">{config.label}</p>
               </CardContent>
             </Card>
           );
@@ -187,9 +171,7 @@ export default function CertificationReadiness({
       {tierData.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Распределение по уровням готовности
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Распределение по уровням готовности</h3>
             <div className="h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -221,46 +203,32 @@ export default function CertificationReadiness({
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
-              <thead className="bg-secondary border-b border-border">
+              <thead className="bg-secondary border-border border-b">
                 <tr>
-                  <th className="text-left p-2 font-medium text-muted-foreground">
-                    Студент
-                  </th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">
-                    Группа
-                  </th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">
-                    Балл
-                  </th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">
-                    Уровень
-                  </th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">
-                    Модули
-                  </th>
-                  <th className="p-2 font-medium text-muted-foreground text-center">
-                    Достижения
-                  </th>
-                  <th className="p-2 font-medium text-muted-foreground"></th>
+                  <th className="text-muted-foreground p-2 text-left font-medium">Студент</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">Группа</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">Балл</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">Уровень</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">Модули</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">Достижения</th>
+                  <th className="text-muted-foreground p-2 font-medium"></th>
                 </tr>
               </thead>
               <tbody>
                 {students.map((s) => (
                   <motion.tr
                     key={s.userId}
-                    className="border-b border-slate-100 hover:bg-secondary"
+                    className="hover:bg-secondary border-b border-slate-100"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
                     <td className="p-2 font-medium">{s.fullName}</td>
-                    <td className="p-2 text-center text-muted-foreground">
-                      {s.group || "—"}
-                    </td>
+                    <td className="text-muted-foreground p-2 text-center">{s.group || '—'}</td>
                     <td className="p-2 text-center">
-                      <div className="flex items-center gap-2 justify-center">
-                        <div className="w-16 bg-muted rounded-full h-2.5">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="bg-muted h-2.5 w-16 rounded-full">
                           <div
-                            className={`h-full rounded-full ${s.readinessScore >= 75 ? "bg-emerald-500" : s.readinessScore >= 55 ? "bg-blue-500" : s.readinessScore >= 35 ? "bg-amber-500" : "bg-red-500"}`}
+                            className={`h-full rounded-full ${s.readinessScore >= 75 ? 'bg-emerald-500' : s.readinessScore >= 55 ? 'bg-blue-500' : s.readinessScore >= 35 ? 'bg-amber-500' : 'bg-red-500'}`}
                             style={{ width: `${s.readinessScore}%` }}
                           />
                         </div>
@@ -268,9 +236,7 @@ export default function CertificationReadiness({
                       </div>
                     </td>
                     <td className="p-2 text-center">
-                      <Badge
-                        className={`text-[10px] ${TIER_CONFIG[s.readinessTier].color}`}
-                      >
+                      <Badge className={`text-[10px] ${TIER_CONFIG[s.readinessTier].color}`}>
                         {TIER_CONFIG[s.readinessTier].label}
                       </Badge>
                     </td>
@@ -281,18 +247,10 @@ export default function CertificationReadiness({
                     <td className="p-2 text-center">
                       <button
                         type="button"
-                        onClick={() =>
-                          setExpandedId(
-                            expandedId === s.userId ? null : s.userId,
-                          )
-                        }
-                        className="text-slate-400 hover:text-muted-foreground"
+                        onClick={() => setExpandedId(expandedId === s.userId ? null : s.userId)}
+                        className="hover:text-muted-foreground text-slate-400"
                       >
-                        {expandedId === s.userId ? (
-                          <ChevronUp size={14} />
-                        ) : (
-                          <ChevronDown size={14} />
-                        )}
+                        {expandedId === s.userId ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                       </button>
                     </td>
                   </motion.tr>
@@ -309,15 +267,13 @@ export default function CertificationReadiness({
               return (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  className="p-4 bg-secondary border-t border-border"
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="bg-secondary border-border border-t p-4"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {/* Radar chart */}
                     <div>
-                      <h4 className="font-semibold text-sm mb-2">
-                        Готовность по категориям
-                      </h4>
+                      <h4 className="mb-2 text-sm font-semibold">Готовность по категориям</h4>
                       <div className="h-[250px]">
                         <ResponsiveContainer width="100%" height="100%">
                           <RadarChart
@@ -328,21 +284,9 @@ export default function CertificationReadiness({
                             }))}
                           >
                             <PolarGrid />
-                            <PolarAngleAxis
-                              dataKey="name"
-                              tick={{ fontSize: 9 }}
-                            />
-                            <PolarRadiusAxis
-                              domain={[0, 100]}
-                              tick={{ fontSize: 8 }}
-                            />
-                            <Radar
-                              name="Балл"
-                              dataKey="score"
-                              stroke="#6366f1"
-                              fill="#6366f1"
-                              fillOpacity={0.4}
-                            />
+                            <PolarAngleAxis dataKey="name" tick={{ fontSize: 9 }} />
+                            <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8 }} />
+                            <Radar name="Балл" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.4} />
                           </RadarChart>
                         </ResponsiveContainer>
                       </div>
@@ -352,15 +296,10 @@ export default function CertificationReadiness({
                     <div className="space-y-3">
                       {s.strengths.length > 0 && (
                         <div>
-                          <h4 className="font-semibold text-sm text-emerald-700 mb-1">
-                            Сильные стороны
-                          </h4>
+                          <h4 className="mb-1 text-sm font-semibold text-emerald-700">Сильные стороны</h4>
                           <div className="flex flex-wrap gap-1">
                             {s.strengths.map((w) => (
-                              <Badge
-                                key={w}
-                                className="bg-emerald-100 text-emerald-700 text-[10px]"
-                              >
+                              <Badge key={w} className="bg-emerald-100 text-[10px] text-emerald-700">
                                 {w}
                               </Badge>
                             ))}
@@ -369,15 +308,10 @@ export default function CertificationReadiness({
                       )}
                       {s.weaknesses.length > 0 && (
                         <div>
-                          <h4 className="font-semibold text-sm text-amber-700 mb-1">
-                            Зоны роста
-                          </h4>
+                          <h4 className="mb-1 text-sm font-semibold text-amber-700">Зоны роста</h4>
                           <div className="flex flex-wrap gap-1">
                             {s.weaknesses.map((w) => (
-                              <Badge
-                                key={w}
-                                className="bg-amber-100 text-amber-700 text-[10px]"
-                              >
+                              <Badge key={w} className="bg-amber-100 text-[10px] text-amber-700">
                                 {w}
                               </Badge>
                             ))}
@@ -386,19 +320,14 @@ export default function CertificationReadiness({
                       )}
                       {s.recommendations.length > 0 && (
                         <div>
-                          <h4 className="font-semibold text-sm text-indigo-700 mb-1">
-                            Рекомендации
-                          </h4>
+                          <h4 className="mb-1 text-sm font-semibold text-indigo-700">Рекомендации</h4>
                           <ul className="space-y-1">
                             {s.recommendations.map((r, _i) => (
                               <li
                                 key={s.readinessTier + r}
-                                className="text-xs text-muted-foreground flex items-start gap-1"
+                                className="text-muted-foreground flex items-start gap-1 text-xs"
                               >
-                                <span className="text-indigo-500 mt-0.5">
-                                  •
-                                </span>{" "}
-                                {r}
+                                <span className="mt-0.5 text-indigo-500">•</span> {r}
                               </li>
                             ))}
                           </ul>

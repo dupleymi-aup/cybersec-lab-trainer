@@ -4,7 +4,7 @@
  */
 export async function safeJson<T = unknown>(
   response: Response,
-  fallback: T = { error: "Invalid JSON response" } as T,
+  fallback: T = { error: 'Invalid JSON response' } as T,
 ): Promise<T> {
   try {
     const text = await response.text();
@@ -18,10 +18,7 @@ export async function safeJson<T = unknown>(
 /**
  * Safely parse a JSON string, returning null on failure.
  */
-export function safeJsonParse<T = unknown>(
-  text: string | null,
-  fallback: T | null = null,
-): T | null {
+export function safeJsonParse<T = unknown>(text: string | null, fallback: T | null = null): T | null {
   if (!text) return fallback;
   try {
     return JSON.parse(text) as T;

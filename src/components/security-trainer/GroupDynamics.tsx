@@ -1,30 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-} from "recharts";
-import {
-  Loader2,
-  AlertTriangle,
-  Users,
-  TrendingUp,
-  Heart,
-  ArrowUpRight,
-  ArrowDownRight,
-  Minus,
-} from "lucide-react";
-import { getGroupDynamics, type GroupDynamicsData } from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from 'react';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
+import { Loader2, AlertTriangle, Users, TrendingUp, Heart, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { getGroupDynamics, type GroupDynamicsData } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export interface GroupDynamicsProps {
   groupId?: string;
@@ -38,20 +19,17 @@ const TREND_ICONS = {
 };
 
 const TREND_COLORS = {
-  improving: "text-emerald-600",
-  stable: "text-muted-foreground",
-  declining: "text-red-600",
+  improving: 'text-emerald-600',
+  stable: 'text-muted-foreground',
+  declining: 'text-red-600',
 };
 
-export default function GroupDynamics({
-  groupId: propGroupId,
-  days: propDays,
-}: GroupDynamicsProps = {}) {
+export default function GroupDynamics({ groupId: propGroupId, days: propDays }: GroupDynamicsProps = {}) {
   const [data, setData] = useState<GroupDynamicsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(90);
-  const [internalGroupId] = useState("");
+  const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 
@@ -68,7 +46,7 @@ export default function GroupDynamics({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -81,7 +59,7 @@ export default function GroupDynamics({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -90,9 +68,7 @@ export default function GroupDynamics({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
@@ -101,11 +77,9 @@ export default function GroupDynamics({
 
   if (groups.length === 0) {
     return (
-      <div className="text-center py-12 text-slate-400">
+      <div className="py-12 text-center text-slate-400">
         <Users size={40} className="mx-auto mb-3 opacity-50" />
-        <p className="text-sm">
-          Нет данных о группах. Студенты должны быть распределены по группам.
-        </p>
+        <p className="text-sm">Нет данных о группах. Студенты должны быть распределены по группам.</p>
       </div>
     );
   }
@@ -121,7 +95,7 @@ export default function GroupDynamics({
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
+            className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
             <option value={30}>30 дней</option>
             <option value={90}>90 дней</option>
@@ -131,61 +105,43 @@ export default function GroupDynamics({
       </div>
 
       {/* Group cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {groups.map((g) => {
           const TrendIcon = TREND_ICONS[g.trend];
           return (
             <Card
               key={g.groupName}
-              className={`border-border ${g.trend === "improving" ? "border-emerald-200" : g.trend === "declining" ? "border-red-200" : ""}`}
+              className={`border-border ${g.trend === 'improving' ? 'border-emerald-200' : g.trend === 'declining' ? 'border-red-200' : ''}`}
             >
               <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold text-sm">{g.groupName}</h3>
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-bold">{g.groupName}</h3>
                   <div className="flex items-center gap-1">
                     <TrendIcon size={14} className={TREND_COLORS[g.trend]} />
                     <Badge
-                      className={`text-[10px] ${g.trend === "improving" ? "bg-emerald-100 text-emerald-700" : g.trend === "declining" ? "bg-red-100 text-red-700" : "bg-muted text-muted-foreground"}`}
+                      className={`text-[10px] ${g.trend === 'improving' ? 'bg-emerald-100 text-emerald-700' : g.trend === 'declining' ? 'bg-red-100 text-red-700' : 'bg-muted text-muted-foreground'}`}
                     >
-                      {g.trend === "improving"
-                        ? "Улучшение"
-                        : g.trend === "declining"
-                          ? "Снижение"
-                          : "Стабильно"}
+                      {g.trend === 'improving' ? 'Улучшение' : g.trend === 'declining' ? 'Снижение' : 'Стабильно'}
                     </Badge>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-2 text-center mb-3">
+                <div className="mb-3 grid grid-cols-4 gap-2 text-center">
                   <div>
-                    <p className="text-lg font-bold text-indigo-600">
-                      {g.studentCount}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      Студентов
-                    </p>
+                    <p className="text-lg font-bold text-indigo-600">{g.studentCount}</p>
+                    <p className="text-muted-foreground text-[10px]">Студентов</p>
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-violet-600">
-                      {g.healthScore}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      Здоровье
-                    </p>
+                    <p className="text-lg font-bold text-violet-600">{g.healthScore}</p>
+                    <p className="text-muted-foreground text-[10px]">Здоровье</p>
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-amber-600">
-                      {g.performanceVariance}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      Вариация
-                    </p>
+                    <p className="text-lg font-bold text-amber-600">{g.performanceVariance}</p>
+                    <p className="text-muted-foreground text-[10px]">Вариация</p>
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-emerald-600">
-                      {g.peerInfluenceScore}%
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">Влияние</p>
+                    <p className="text-lg font-bold text-emerald-600">{g.peerInfluenceScore}%</p>
+                    <p className="text-muted-foreground text-[10px]">Влияние</p>
                   </div>
                 </div>
 
@@ -195,11 +151,7 @@ export default function GroupDynamics({
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={g.activityTimeline}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                        <XAxis
-                          dataKey="week"
-                          tick={{ fontSize: 9 }}
-                          tickFormatter={(v: string) => v.slice(5)}
-                        />
+                        <XAxis dataKey="week" tick={{ fontSize: 9 }} tickFormatter={(v: string) => v.slice(5)} />
                         <YAxis tick={{ fontSize: 9 }} />
                         <Tooltip />
                         <Area
@@ -234,18 +186,14 @@ export default function GroupDynamics({
       {overallTrends.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
               <TrendingUp size={16} /> Общая динамика здоровья групп
             </h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={overallTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis
-                    dataKey="week"
-                    tick={{ fontSize: 10 }}
-                    tickFormatter={(v: string) => v.slice(5)}
-                  />
+                  <XAxis dataKey="week" tick={{ fontSize: 10 }} tickFormatter={(v: string) => v.slice(5)} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Line

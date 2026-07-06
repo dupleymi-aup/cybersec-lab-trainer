@@ -1,30 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
-import { getCohortAnalysis, getAllGroups } from "@/lib/auth-store";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import KPICard from "./KPICard";
-import { motion } from "framer-motion";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import {
-  Users,
-  Calendar,
-  TrendingUp,
-  TrendingDown,
-  Target,
-  Loader2,
-  BarChart3,
-} from "lucide-react";
-import { logger } from "@/lib/logger";
+import { useState, useEffect, useMemo } from 'react';
+import { getCohortAnalysis, getAllGroups } from '@/lib/auth-store';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import KPICard from './KPICard';
+import { motion } from 'framer-motion';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Users, Calendar, TrendingUp, TrendingDown, Target, Loader2, BarChart3 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface CohortRetention {
   week1: number;
@@ -55,11 +39,11 @@ const RETENTION_WEEKS: Array<{
   label: string;
   daysLabel: string;
 }> = [
-  { key: "week1", label: "Неделя 1", daysLabel: "7 дней" },
-  { key: "week2", label: "Неделя 2", daysLabel: "14 дней" },
-  { key: "week4", label: "Неделя 4", daysLabel: "28 дней" },
-  { key: "week8", label: "Неделя 8", daysLabel: "56 дней" },
-  { key: "week12", label: "Неделя 12", daysLabel: "84 дня" },
+  { key: 'week1', label: 'Неделя 1', daysLabel: '7 дней' },
+  { key: 'week2', label: 'Неделя 2', daysLabel: '14 дней' },
+  { key: 'week4', label: 'Неделя 4', daysLabel: '28 дней' },
+  { key: 'week8', label: 'Неделя 8', daysLabel: '56 дней' },
+  { key: 'week12', label: 'Неделя 12', daysLabel: '84 дня' },
 ];
 
 /**
@@ -73,29 +57,29 @@ function getRetentionColor(percent: number): {
 } {
   if (percent >= 80)
     return {
-      bg: "bg-emerald-100",
-      text: "text-emerald-700",
-      border: "border-emerald-200",
+      bg: 'bg-emerald-100',
+      text: 'text-emerald-700',
+      border: 'border-emerald-200',
     };
   if (percent >= 60)
     return {
-      bg: "bg-emerald-50",
-      text: "text-emerald-600",
-      border: "border-emerald-100",
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-600',
+      border: 'border-emerald-100',
     };
   if (percent >= 40)
     return {
-      bg: "bg-amber-50",
-      text: "text-amber-600",
-      border: "border-amber-100",
+      bg: 'bg-amber-50',
+      text: 'text-amber-600',
+      border: 'border-amber-100',
     };
   if (percent >= 20)
     return {
-      bg: "bg-orange-50",
-      text: "text-orange-600",
-      border: "border-orange-100",
+      bg: 'bg-orange-50',
+      text: 'text-orange-600',
+      border: 'border-orange-100',
     };
-  return { bg: "bg-red-50", text: "text-red-500", border: "border-red-100" };
+  return { bg: 'bg-red-50', text: 'text-red-500', border: 'border-red-100' };
 }
 
 /**
@@ -103,10 +87,10 @@ function getRetentionColor(percent: number): {
  */
 function getHeatmapStyle(percent: number): React.CSSProperties {
   const opacity = Math.max(0.1, percent / 100);
-  const hue = percent >= 60 ? "152" : percent >= 40 ? "38" : "0";
+  const hue = percent >= 60 ? '152' : percent >= 40 ? '38' : '0';
   return {
     backgroundColor: `hsla(${hue}, 70%, 50%, ${opacity})`,
-    transition: "background-color 0.2s ease",
+    transition: 'background-color 0.2s ease',
   };
 }
 
@@ -115,7 +99,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [groups, setGroups] = useState<string[]>([]);
-  const [internalGroupId, setInternalGroupId] = useState("");
+  const [internalGroupId, setInternalGroupId] = useState('');
 
   const isControlled = groupId !== undefined;
   const effectiveGroupId = isControlled ? groupId : internalGroupId;
@@ -126,8 +110,8 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
     getAllGroups()
       .then((g) => setGroups(g))
       .catch((err) => {
-        if (process.env.NODE_ENV === "development")
-          logger.error("CohortAnalysis failed to load groups", { error: err });
+        if (process.env.NODE_ENV === 'development')
+          logger.error('CohortAnalysis failed to load groups', { error: err });
         setGroups([]);
       });
     return () => {
@@ -150,7 +134,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки данных");
+          setError(e.message || 'Ошибка загрузки данных');
           setLoading(false);
         }
       });
@@ -174,18 +158,9 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
     }, data.cohorts[0]);
 
     // Average week1 and week12 retention
-    const avgWeek1 =
-      Math.round(
-        (data.cohorts.reduce((sum, c) => sum + c.retention.week1, 0) /
-          totalCohorts) *
-          10,
-      ) / 10;
+    const avgWeek1 = Math.round((data.cohorts.reduce((sum, c) => sum + c.retention.week1, 0) / totalCohorts) * 10) / 10;
     const avgWeek12 =
-      Math.round(
-        (data.cohorts.reduce((sum, c) => sum + c.retention.week12, 0) /
-          totalCohorts) *
-          10,
-      ) / 10;
+      Math.round((data.cohorts.reduce((sum, c) => sum + c.retention.week12, 0) / totalCohorts) * 10) / 10;
 
     return { totalCohorts, bestCohort, avgWeek1, avgWeek12 };
   }, [data]);
@@ -203,13 +178,8 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <Loader2
-            size={32}
-            className="animate-spin text-indigo-500 mx-auto mb-3"
-          />
-          <p className="text-sm text-muted-foreground">
-            Загрузка когортного анализа...
-          </p>
+          <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
+          <p className="text-muted-foreground text-sm">Загрузка когортного анализа...</p>
         </div>
       </div>
     );
@@ -219,11 +189,9 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <BarChart3 size={32} className="text-red-400 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground font-medium">
-            Ошибка загрузки данных
-          </p>
-          <p className="text-xs text-slate-400 mt-1">{error || "Нет данных"}</p>
+          <BarChart3 size={32} className="mx-auto mb-3 text-red-400" />
+          <p className="text-muted-foreground text-sm font-medium">Ошибка загрузки данных</p>
+          <p className="mt-1 text-xs text-slate-400">{error || 'Нет данных'}</p>
         </div>
       </div>
     );
@@ -235,10 +203,8 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
         <CardContent className="flex flex-col items-center justify-center py-16 text-slate-400">
           <Calendar size={40} className="mb-3 opacity-50" />
           <p className="text-sm">Нет данных о когортах</p>
-          <p className="text-xs text-slate-300 mt-1">
-            {effectiveGroupId
-              ? "Нет студентов в выбранной группе"
-              : "В системе пока нет студентов"}
+          <p className="mt-1 text-xs text-slate-300">
+            {effectiveGroupId ? 'Нет студентов в выбранной группе' : 'В системе пока нет студентов'}
           </p>
         </CardContent>
       </Card>
@@ -248,8 +214,8 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
   return (
     <div className="space-y-6">
       {/* Header with group selector */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 className="text-lg font-bold flex items-center gap-2">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+        <h2 className="flex items-center gap-2 text-lg font-bold">
           <BarChart3 size={20} className="text-indigo-600" />
           Когортный анализ
         </h2>
@@ -261,7 +227,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
             <select
               value={internalGroupId}
               onChange={(e) => setInternalGroupId(e.target.value)}
-              className="px-3 py-1.5 border border-border rounded-md text-sm bg-card hover:border-border focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 outline-none transition-colors"
+              className="border-border bg-card hover:border-border rounded-md border px-3 py-1.5 text-sm transition-colors outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
             >
               <option value="">Все группы</option>
               {groups.map((g) => (
@@ -275,7 +241,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KPICard
           icon={<Calendar size={18} />}
           value={summary.totalCohorts}
@@ -285,13 +251,9 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
         />
         <KPICard
           icon={<Target size={18} />}
-          value={summary.bestCohort ? `${summary.bestCohort.month}` : "—"}
+          value={summary.bestCohort ? `${summary.bestCohort.month}` : '—'}
           label="Лучшая когорта"
-          delta={
-            summary.bestCohort
-              ? Math.round(summary.bestCohort.retention.week4 * 10) / 10
-              : undefined
-          }
+          delta={summary.bestCohort ? Math.round(summary.bestCohort.retention.week4 * 10) / 10 : undefined}
           deltaSuffix="% (нед. 4)"
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
@@ -315,7 +277,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       {/* Retention heatmap table */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
             <BarChart3 size={16} className="text-slate-400" />
             Тепловая карта удержания по когортам
           </h3>
@@ -323,23 +285,14 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-2 px-3 font-semibold text-muted-foreground min-w-[140px]">
-                    Когорта
-                  </th>
-                  <th className="text-center py-2 px-2 font-semibold text-muted-foreground">
-                    Студентов
-                  </th>
+                <tr className="border-border border-b">
+                  <th className="text-muted-foreground min-w-[140px] px-3 py-2 text-left font-semibold">Когорта</th>
+                  <th className="text-muted-foreground px-2 py-2 text-center font-semibold">Студентов</th>
                   {RETENTION_WEEKS.map((w) => (
-                    <th
-                      key={w.key}
-                      className="text-center py-2 px-2 font-semibold text-muted-foreground min-w-[90px]"
-                    >
+                    <th key={w.key} className="text-muted-foreground min-w-[90px] px-2 py-2 text-center font-semibold">
                       <div className="flex flex-col items-center">
                         <span>{w.label}</span>
-                        <span className="text-[10px] text-slate-400 font-normal">
-                          {w.daysLabel}
-                        </span>
+                        <span className="text-[10px] font-normal text-slate-400">{w.daysLabel}</span>
                       </div>
                     </th>
                   ))}
@@ -352,12 +305,10 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className="border-b border-slate-100 last:border-0 hover:bg-secondary/50"
+                    className="hover:bg-secondary/50 border-b border-slate-100 last:border-0"
                   >
-                    <td className="py-2.5 px-3 font-medium text-foreground/70">
-                      {cohort.month}
-                    </td>
-                    <td className="py-2.5 px-2 text-center">
+                    <td className="text-foreground/70 px-3 py-2.5 font-medium">{cohort.month}</td>
+                    <td className="px-2 py-2.5 text-center">
                       <Badge variant="secondary" className="text-xs">
                         {cohort.totalStudents}
                       </Badge>
@@ -366,12 +317,12 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
                       const value = cohort.retention[w.key];
                       const colors = getRetentionColor(value);
                       return (
-                        <td key={w.key} className="py-2.5 px-2 text-center">
+                        <td key={w.key} className="px-2 py-2.5 text-center">
                           <div
-                            className={`inline-flex items-center justify-center rounded-md px-2 py-1 font-semibold text-xs ${colors.text} ${colors.border}`}
+                            className={`inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-semibold ${colors.text} ${colors.border}`}
                             style={getHeatmapStyle(value)}
                           >
-                            {value > 0 ? `${value}%` : "—"}
+                            {value > 0 ? `${value}%` : '—'}
                           </div>
                         </td>
                       );
@@ -383,26 +334,26 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-3 mt-4 pt-3 border-t border-slate-100 text-xs text-muted-foreground">
+          <div className="text-muted-foreground mt-4 flex items-center gap-3 border-t border-slate-100 pt-3 text-xs">
             <span>Удержание:</span>
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-sm" style={getHeatmapStyle(90)} />
+              <div className="h-4 w-4 rounded-sm" style={getHeatmapStyle(90)} />
               <span>80%+</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-sm" style={getHeatmapStyle(70)} />
+              <div className="h-4 w-4 rounded-sm" style={getHeatmapStyle(70)} />
               <span>60-79%</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-sm" style={getHeatmapStyle(50)} />
+              <div className="h-4 w-4 rounded-sm" style={getHeatmapStyle(50)} />
               <span>40-59%</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-sm" style={getHeatmapStyle(30)} />
+              <div className="h-4 w-4 rounded-sm" style={getHeatmapStyle(30)} />
               <span>20-39%</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 rounded-sm" style={getHeatmapStyle(10)} />
+              <div className="h-4 w-4 rounded-sm" style={getHeatmapStyle(10)} />
               <span>&lt;20%</span>
             </div>
           </div>
@@ -412,7 +363,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       {/* Overall retention line chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
             <TrendingUp size={16} className="text-slate-400" />
             Общее удержание по неделям
           </h3>
@@ -421,25 +372,16 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={lineChartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis
-                  dataKey="week"
-                  tick={{ fontSize: 11 }}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11 }}
-                  tickFormatter={(v) => `${v}%`}
-                  domain={[0, 100]}
-                  allowDecimals={false}
-                />
+                <XAxis dataKey="week" tick={{ fontSize: 11 }} tickLine={false} />
+                <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} allowDecimals={false} />
                 <Tooltip
-                  formatter={(value) => [`${value ?? 0}%`, "Удержание"]}
+                  formatter={(value) => [`${value ?? 0}%`, 'Удержание']}
                   contentStyle={{
-                    backgroundColor: "#1e293b",
-                    border: "none",
-                    borderRadius: "8px",
-                    color: "#fff",
-                    fontSize: "12px",
+                    backgroundColor: '#1e293b',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '12px',
                   }}
                 />
                 <Line
@@ -448,15 +390,15 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
                   stroke="#6366f1"
                   strokeWidth={2.5}
                   dot={{
-                    fill: "#6366f1",
+                    fill: '#6366f1',
                     r: 4,
                     strokeWidth: 2,
-                    stroke: "#fff",
+                    stroke: '#fff',
                   }}
                   activeDot={{
                     r: 6,
-                    fill: "#6366f1",
-                    stroke: "#fff",
+                    fill: '#6366f1',
+                    stroke: '#fff',
                     strokeWidth: 2,
                   }}
                 />

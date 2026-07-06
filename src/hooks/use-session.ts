@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useAuthStore } from "@/lib/auth-store";
-import { useAppStore } from "@/lib/store";
-import { useCallback } from "react";
+import { useAuthStore } from '@/lib/auth-store';
+import { useAppStore } from '@/lib/store';
+import { useCallback } from 'react';
 
 /**
  * Hook providing session state and helpers.

@@ -1,26 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await authenticate(request);
     if (!auth) return unauthorized();
-    if (!requireRole(auth.role, "teacher")) return forbidden();
+    if (!requireRole(auth.role, 'teacher')) return forbidden();
 
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-    const dateRange = searchParams.get("dateRange") || "90d";
+    const userId = searchParams.get('userId');
+    const dateRange = searchParams.get('dateRange') || '90d';
 
     // Calculate date range
     const now = new Date();
-    const days = dateRange === "180d" ? 180 : dateRange === "365d" ? 365 : 90;
+    const days = dateRange === '180d' ? 180 : dateRange === '365d' ? 365 : 90;
     const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
     // Determine which students to query
@@ -30,18 +25,15 @@ export async function GET(request: NextRequest) {
         where: { id: userId },
       });
       if (!targetUser) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
-      if (targetUser.role !== "student" && auth.role !== "admin") {
-        return NextResponse.json(
-          { error: "Can only view student activity" },
-          { status: 403 },
-        );
+      if (targetUser.role !== 'student' && auth.role !== 'admin') {
+        return NextResponse.json({ error: 'Can only view student activity' }, { status: 403 });
       }
       studentIds = [userId];
     } else {
       const students = await prisma.user.findMany({
-        where: { role: "student" },
+        where: { role: 'student' },
         select: { id: true },
       });
       studentIds = students.map((s) => s.id);
@@ -92,7 +84,7 @@ export async function GET(request: NextRequest) {
     }[] = [];
 
     function getDateKey(date: Date): string {
-      return date.toISOString().split("T")[0];
+      return date.toISOString().split('T')[0];
     }
 
     for (const la of loginActivities) {
@@ -101,7 +93,7 @@ export async function GET(request: NextRequest) {
         date: getDateKey(ts),
         hour: ts.getHours(),
         dayOfWeek: (ts.getDay() + 6) % 7, // Convert Sun=0 to Mon=0
-        userId: la.userId || "",
+        userId: la.userId || '',
       });
     }
 
@@ -149,20 +141,12 @@ export async function GET(request: NextRequest) {
 
     // Most active day
     const mostActiveDayEntry =
-      dailyActivity.length > 0
-        ? dailyActivity.reduce((max, curr) =>
-            curr.count > max.count ? curr : max,
-          )
-        : null;
+      dailyActivity.length > 0 ? dailyActivity.reduce((max, curr) => (curr.count > max.count ? curr : max)) : null;
 
     // Most active hour — only if there's actual activity
     const maxHourCount = Math.max(...hourlyActivity.map((h) => h.count));
     const mostActiveHourEntry =
-      maxHourCount > 0
-        ? hourlyActivity.reduce((max, curr) =>
-            curr.count > max.count ? curr : max,
-          )
-        : null;
+      maxHourCount > 0 ? hourlyActivity.reduce((max, curr) => (curr.count > max.count ? curr : max)) : null;
 
     // Streak: count consecutive days with activity going back from today
     const activeDaysSet = new Set(dailyActivity.map((d) => d.date));
@@ -192,10 +176,7 @@ export async function GET(request: NextRequest) {
       streakDays,
     });
   } catch (error) {
-    logger.error("Activity heatmap failed", { error: String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    logger.error('Activity heatmap failed', { error: String(error) });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

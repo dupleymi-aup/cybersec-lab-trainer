@@ -1,40 +1,24 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useAppStore } from "@/lib/store";
-import { secureCodingChallenges } from "@/lib/data";
-import CodeBlock from "./CodeBlock";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChevronLeft,
-  Code,
-  CheckCircle2,
-  XCircle,
-  ArrowRight,
-  ArrowLeft,
-  RotateCcw,
-} from "lucide-react";
+import { useState } from 'react';
+import { useAppStore } from '@/lib/store';
+import { secureCodingChallenges } from '@/lib/data';
+import CodeBlock from './CodeBlock';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, Code, CheckCircle2, XCircle, ArrowRight, ArrowLeft, RotateCcw } from 'lucide-react';
 
 export default function SecureCodingLab() {
   const completeModule = useAppStore((s) => s.completeModule);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
-  const secureCodingAnsweredChallenges = useAppStore(
-    (s) => s.secureCodingAnsweredChallenges,
-  );
+  const secureCodingAnsweredChallenges = useAppStore((s) => s.secureCodingAnsweredChallenges);
   const addSecureCodingAnswer = useAppStore((s) => s.addSecureCodingAnswer);
-  const removeSecureCodingAnswer = useAppStore(
-    (s) => s.removeSecureCodingAnswer,
-  );
-  const secureCodingCorrectCount = useAppStore(
-    (s) => s.secureCodingCorrectCount,
-  );
-  const setSecureCodingCorrectCount = useAppStore(
-    (s) => s.setSecureCodingCorrectCount,
-  );
+  const removeSecureCodingAnswer = useAppStore((s) => s.removeSecureCodingAnswer);
+  const secureCodingCorrectCount = useAppStore((s) => s.secureCodingCorrectCount);
+  const setSecureCodingCorrectCount = useAppStore((s) => s.setSecureCodingCorrectCount);
   const [activeChallenge, setActiveChallenge] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -42,7 +26,7 @@ export default function SecureCodingLab() {
   const answeredSet = new Set(secureCodingAnsweredChallenges);
   const challenge = secureCodingChallenges[activeChallenge];
   const isAnswered = answeredSet.has(activeChallenge);
-  const isCompleted = completedModules.includes("secure-coding");
+  const isCompleted = completedModules.includes('secure-coding');
 
   const handleSelectOption = (index: number) => {
     if (isAnswered) return;
@@ -61,7 +45,7 @@ export default function SecureCodingLab() {
     // Check completion: count current answered (not yet in store) + store length
     const totalAnswered = answeredSet.size + 1;
     if (totalAnswered === secureCodingChallenges.length) {
-      completeModule("secure-coding");
+      completeModule('secure-coding');
     }
   };
 
@@ -91,43 +75,30 @@ export default function SecureCodingLab() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCurrentPage("dashboard")}
-        >
+        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
           <ChevronLeft size={20} />
         </Button>
-        <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
           <Code size={20} className="text-emerald-600" />
         </div>
         <div>
           <h1 className="text-xl font-bold">Безопасное кодирование</h1>
-          <p className="text-xs text-muted-foreground">
-            Найдите уязвимость и выберите правильное решение
-          </p>
+          <p className="text-muted-foreground text-xs">Найдите уязвимость и выберите правильное решение</p>
         </div>
       </div>
 
       {/* Progress */}
       <Card className="border-none shadow-sm">
         <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-medium">
               Задание {activeChallenge + 1} из {secureCodingChallenges.length}
             </span>
             <div className="flex items-center gap-2">
-              <Badge
-                variant="outline"
-                className="text-[10px] flex items-center gap-1"
-              >
+              <Badge variant="outline" className="flex items-center gap-1 text-[10px]">
                 <CheckCircle2 size={12} /> {secureCodingCorrectCount} правильных
               </Badge>
-              {isCompleted && (
-                <Badge className="bg-emerald-600 text-white">
-                  Модуль завершён!
-                </Badge>
-              )}
+              {isCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
             </div>
           </div>
           <div className="flex gap-2">
@@ -139,12 +110,8 @@ export default function SecureCodingLab() {
                   setSelectedOption(null);
                   setShowResult(false);
                 }}
-                className={`flex-1 h-2 rounded-full transition-all ${
-                  answeredSet.has(i)
-                    ? "bg-emerald-500"
-                    : i === activeChallenge
-                      ? "bg-emerald-300"
-                      : "bg-slate-200"
+                className={`h-2 flex-1 rounded-full transition-all ${
+                  answeredSet.has(i) ? 'bg-emerald-500' : i === activeChallenge ? 'bg-emerald-300' : 'bg-slate-200'
                 }`}
               />
             ))}
@@ -161,39 +128,32 @@ export default function SecureCodingLab() {
       >
         <Card className="border-border">
           <CardContent className="p-5">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="mb-3 flex items-center gap-2">
               <Badge variant="secondary" className="text-[10px]">
                 {challenge.category}
               </Badge>
               <span className="text-xs text-slate-400">Код-ревью</span>
             </div>
-            <h2 className="font-semibold mb-3">{challenge.title}</h2>
+            <h2 className="mb-3 font-semibold">{challenge.title}</h2>
 
             {/* Vulnerable code */}
-            <CodeBlock
-              code={challenge.code}
-              language="javascript"
-              title="vulnerable.js"
-            />
+            <CodeBlock code={challenge.code} language="javascript" title="vulnerable.js" />
 
             <div className="mt-4">
-              <h3 className="text-sm font-semibold mb-3">
-                Что нужно исправить?
-              </h3>
+              <h3 className="mb-3 text-sm font-semibold">Что нужно исправить?</h3>
               <div className="space-y-2">
                 {challenge.options.map((option, i) => {
-                  let optionStyle =
-                    "border-border hover:border-slate-400 hover:bg-secondary";
+                  let optionStyle = 'border-border hover:border-slate-400 hover:bg-secondary';
                   if (isAnswered) {
                     if (option.correct) {
-                      optionStyle = "border-emerald-400 bg-emerald-50";
+                      optionStyle = 'border-emerald-400 bg-emerald-50';
                     } else if (selectedOption === i && !option.correct) {
-                      optionStyle = "border-red-400 bg-red-50";
+                      optionStyle = 'border-red-400 bg-red-50';
                     } else {
-                      optionStyle = "border-slate-100 opacity-60";
+                      optionStyle = 'border-slate-100 opacity-60';
                     }
                   } else if (selectedOption === i) {
-                    optionStyle = "border-emerald-400 bg-emerald-50/50";
+                    optionStyle = 'border-emerald-400 bg-emerald-50/50';
                   }
 
                   return (
@@ -201,30 +161,24 @@ export default function SecureCodingLab() {
                       key={i}
                       onClick={() => handleSelectOption(i)}
                       disabled={isAnswered}
-                      className={`w-full text-left p-3 rounded-lg border-2 transition-all duration-200 ${optionStyle}`}
+                      className={`w-full rounded-lg border-2 p-3 text-left transition-all duration-200 ${optionStyle}`}
                     >
                       <div className="flex items-start gap-3">
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
+                          className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${
                             isAnswered && option.correct
-                              ? "border-emerald-500 bg-emerald-500"
-                              : isAnswered &&
-                                  selectedOption === i &&
-                                  !option.correct
-                                ? "border-red-500 bg-red-500"
+                              ? 'border-emerald-500 bg-emerald-500'
+                              : isAnswered && selectedOption === i && !option.correct
+                                ? 'border-red-500 bg-red-500'
                                 : selectedOption === i
-                                  ? "border-emerald-500 bg-emerald-100"
-                                  : "border-border"
+                                  ? 'border-emerald-500 bg-emerald-100'
+                                  : 'border-border'
                           }`}
                         >
-                          {isAnswered && option.correct && (
-                            <CheckCircle2 size={14} className="text-white" />
+                          {isAnswered && option.correct && <CheckCircle2 size={14} className="text-white" />}
+                          {isAnswered && selectedOption === i && !option.correct && (
+                            <XCircle size={14} className="text-white" />
                           )}
-                          {isAnswered &&
-                            selectedOption === i &&
-                            !option.correct && (
-                              <XCircle size={14} className="text-white" />
-                            )}
                         </div>
                         <span className="text-sm">{option.text}</span>
                       </div>
@@ -248,73 +202,47 @@ export default function SecureCodingLab() {
             {/* Explanation */}
             <AnimatePresence>
               {showResult && selectedOption !== null && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-4"
-                >
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4">
                   <div
                     className={`rounded-lg p-4 ${
                       challenge.options[selectedOption]?.correct
-                        ? "bg-emerald-50 border border-emerald-200"
-                        : "bg-red-50 border border-red-200"
+                        ? 'border border-emerald-200 bg-emerald-50'
+                        : 'border border-red-200 bg-red-50'
                     }`}
                   >
                     <h4
-                      className={`text-xs font-semibold mb-1 ${
-                        challenge.options[selectedOption]?.correct
-                          ? "text-emerald-700"
-                          : "text-red-700"
+                      className={`mb-1 text-xs font-semibold ${
+                        challenge.options[selectedOption]?.correct ? 'text-emerald-700' : 'text-red-700'
                       }`}
                     >
                       {challenge.options[selectedOption]?.correct ? (
                         <>
-                          <CheckCircle2 size={14} className="inline mr-1" />{" "}
-                          Правильно!
+                          <CheckCircle2 size={14} className="mr-1 inline" /> Правильно!
                         </>
                       ) : (
                         <>
-                          <XCircle size={14} className="inline mr-1" />{" "}
-                          Неправильно
+                          <XCircle size={14} className="mr-1 inline" /> Неправильно
                         </>
                       )}
                     </h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {challenge.explanation}
-                    </p>
+                    <p className="text-muted-foreground text-xs leading-relaxed">{challenge.explanation}</p>
                   </div>
 
                   {/* Retry button */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-3 w-full"
-                    onClick={retryChallenge}
-                  >
+                  <Button variant="outline" size="sm" className="mt-3 w-full" onClick={retryChallenge}>
                     <RotateCcw size={14} className="mr-1" /> Повторить
                   </Button>
 
-                  <div className="flex justify-between mt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={prevChallenge}
-                      disabled={activeChallenge === 0}
-                    >
+                  <div className="mt-4 flex justify-between">
+                    <Button variant="outline" size="sm" onClick={prevChallenge} disabled={activeChallenge === 0}>
                       <ArrowLeft size={14} className="mr-1" /> Назад
                     </Button>
                     {activeChallenge < secureCodingChallenges.length - 1 ? (
-                      <Button
-                        size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700"
-                        onClick={nextChallenge}
-                      >
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={nextChallenge}>
                         Следующее <ArrowRight size={14} className="ml-1" />
                       </Button>
                     ) : (
-                      <Badge className="bg-emerald-600 text-white py-1.5">
-                        Все задания завершены!
-                      </Badge>
+                      <Badge className="bg-emerald-600 py-1.5 text-white">Все задания завершены!</Badge>
                     )}
                   </div>
                 </motion.div>

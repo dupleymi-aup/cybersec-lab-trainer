@@ -1,26 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 const MONTH_NAMES = [
-  "Январь",
-  "Февраль",
-  "Март",
-  "Апрель",
-  "Май",
-  "Июнь",
-  "Июль",
-  "Август",
-  "Сентябрь",
-  "Октябрь",
-  "Ноябрь",
-  "Декабрь",
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
 ];
 
 interface RetentionWeeks {
@@ -36,11 +31,7 @@ interface RetentionWeeks {
  * A student is "active" in a retention week if they have any progress or quiz
  * activity within that week's window (measured from their registration date).
  */
-function calculateStudentRetention(
-  registrationDate: Date,
-  progressDates: Date[],
-  quizDates: Date[],
-): RetentionWeeks {
+function calculateStudentRetention(registrationDate: Date, progressDates: Date[], quizDates: Date[]): RetentionWeeks {
   const allActivityDates = [...progressDates, ...quizDates];
   const weeks = [1, 2, 4, 8, 12] as const;
   const results: RetentionWeeks = {
@@ -52,14 +43,10 @@ function calculateStudentRetention(
   };
 
   for (const weekNum of weeks) {
-    const weekStart = new Date(
-      registrationDate.getTime() + (weekNum - 1) * 7 * 24 * 60 * 60 * 1000,
-    );
+    const weekStart = new Date(registrationDate.getTime() + (weekNum - 1) * 7 * 24 * 60 * 60 * 1000);
     const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-    const isActive = allActivityDates.some(
-      (d) => d >= weekStart && d < weekEnd,
-    );
+    const isActive = allActivityDates.some((d) => d >= weekStart && d < weekEnd);
 
     const key = `week${weekNum}` as keyof RetentionWeeks;
     results[key] = isActive ? 1 : 0;
@@ -72,7 +59,7 @@ function calculateStudentRetention(
  * Format a year-month string like "2024-01" into a Russian label like "Январь 2024".
  */
 function formatMonthLabel(ym: string): string {
-  const [year, month] = ym.split("-").map(Number);
+  const [year, month] = ym.split('-').map(Number);
   return `${MONTH_NAMES[month - 1]} ${year}`;
 }
 
@@ -80,15 +67,15 @@ export async function GET(request: NextRequest) {
   try {
     const auth = await authenticate(request);
     if (!auth) return unauthorized();
-    if (!requireRole(auth.role, "teacher")) return forbidden();
+    if (!requireRole(auth.role, 'teacher')) return forbidden();
 
     const { searchParams } = new URL(request.url);
-    const groupId = searchParams.get("groupId") || "";
+    const groupId = searchParams.get('groupId') || '';
 
     // Fetch students filtered by group if specified
     const students = await prisma.user.findMany({
       where: {
-        role: "student",
+        role: 'student',
         ...(groupId ? { group: groupId } : {}),
       },
       select: { id: true, createdAt: true },
@@ -145,13 +132,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Group students by registration month (YYYY-MM)
-    const cohortMap = new Map<
-      string,
-      Array<{ id: string; registrationDate: Date }>
-    >();
+    const cohortMap = new Map<string, Array<{ id: string; registrationDate: Date }>>();
     for (const student of students) {
       const regDate = new Date(student.createdAt);
-      const ym = `${regDate.getFullYear()}-${String(regDate.getMonth() + 1).padStart(2, "0")}`;
+      const ym = `${regDate.getFullYear()}-${String(regDate.getMonth() + 1).padStart(2, '0')}`;
       const cohort = cohortMap.get(ym) || [];
       cohort.push({ id: student.id, registrationDate: regDate });
       cohortMap.set(ym, cohort);
@@ -178,16 +162,9 @@ export async function GET(request: NextRequest) {
 
         for (const student of cohortStudents) {
           const progressDates = progressByUser.get(student.id) || [];
-          const quizDates = [
-            ...(quizByUser.get(student.id) || []),
-            ...(attemptsByUser.get(student.id) || []),
-          ];
+          const quizDates = [...(quizByUser.get(student.id) || []), ...(attemptsByUser.get(student.id) || [])];
 
-          const retention = calculateStudentRetention(
-            student.registrationDate,
-            progressDates,
-            quizDates,
-          );
+          const retention = calculateStudentRetention(student.registrationDate, progressDates, quizDates);
 
           aggregateRetention.week1 += retention.week1;
           aggregateRetention.week2 += retention.week2;
@@ -198,32 +175,11 @@ export async function GET(request: NextRequest) {
 
         // Convert counts to percentages
         const retentionPercentages: RetentionWeeks = {
-          week1:
-            totalStudents > 0
-              ? Math.round((aggregateRetention.week1 / totalStudents) * 10000) /
-                100
-              : 0,
-          week2:
-            totalStudents > 0
-              ? Math.round((aggregateRetention.week2 / totalStudents) * 10000) /
-                100
-              : 0,
-          week4:
-            totalStudents > 0
-              ? Math.round((aggregateRetention.week4 / totalStudents) * 10000) /
-                100
-              : 0,
-          week8:
-            totalStudents > 0
-              ? Math.round((aggregateRetention.week8 / totalStudents) * 10000) /
-                100
-              : 0,
-          week12:
-            totalStudents > 0
-              ? Math.round(
-                  (aggregateRetention.week12 / totalStudents) * 10000,
-                ) / 100
-              : 0,
+          week1: totalStudents > 0 ? Math.round((aggregateRetention.week1 / totalStudents) * 10000) / 100 : 0,
+          week2: totalStudents > 0 ? Math.round((aggregateRetention.week2 / totalStudents) * 10000) / 100 : 0,
+          week4: totalStudents > 0 ? Math.round((aggregateRetention.week4 / totalStudents) * 10000) / 100 : 0,
+          week8: totalStudents > 0 ? Math.round((aggregateRetention.week8 / totalStudents) * 10000) / 100 : 0,
+          week12: totalStudents > 0 ? Math.round((aggregateRetention.week12 / totalStudents) * 10000) / 100 : 0,
         };
 
         return {
@@ -257,44 +213,18 @@ export async function GET(request: NextRequest) {
       overallAggregate.week12 += w12;
     }
 
-    const totalStudentsAll = cohorts.reduce(
-      (sum, c) => sum + c.totalStudents,
-      0,
-    );
+    const totalStudentsAll = cohorts.reduce((sum, c) => sum + c.totalStudents, 0);
     const overallRetention: RetentionWeeks = {
-      week1:
-        totalStudentsAll > 0
-          ? Math.round((overallAggregate.week1 / totalStudentsAll) * 10000) /
-            100
-          : 0,
-      week2:
-        totalStudentsAll > 0
-          ? Math.round((overallAggregate.week2 / totalStudentsAll) * 10000) /
-            100
-          : 0,
-      week4:
-        totalStudentsAll > 0
-          ? Math.round((overallAggregate.week4 / totalStudentsAll) * 10000) /
-            100
-          : 0,
-      week8:
-        totalStudentsAll > 0
-          ? Math.round((overallAggregate.week8 / totalStudentsAll) * 10000) /
-            100
-          : 0,
-      week12:
-        totalStudentsAll > 0
-          ? Math.round((overallAggregate.week12 / totalStudentsAll) * 10000) /
-            100
-          : 0,
+      week1: totalStudentsAll > 0 ? Math.round((overallAggregate.week1 / totalStudentsAll) * 10000) / 100 : 0,
+      week2: totalStudentsAll > 0 ? Math.round((overallAggregate.week2 / totalStudentsAll) * 10000) / 100 : 0,
+      week4: totalStudentsAll > 0 ? Math.round((overallAggregate.week4 / totalStudentsAll) * 10000) / 100 : 0,
+      week8: totalStudentsAll > 0 ? Math.round((overallAggregate.week8 / totalStudentsAll) * 10000) / 100 : 0,
+      week12: totalStudentsAll > 0 ? Math.round((overallAggregate.week12 / totalStudentsAll) * 10000) / 100 : 0,
     };
 
     return NextResponse.json({ cohorts, overallRetention });
   } catch (error) {
-    logger.error("analytics/cohort GET error", { error });
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    logger.error('analytics/cohort GET error', { error });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

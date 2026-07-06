@@ -1,23 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireCapability,
-} from "@/lib/api-middleware";
-import { generateGradebookCSV } from "@/lib/export-utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
+import { generateGradebookCSV } from '@/lib/export-utils';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireCapability(auth, "grades:export")) return forbidden();
+  if (!requireCapability(auth, 'grades:export')) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const groupId = searchParams.get("groupId") || undefined;
+  const groupId = searchParams.get('groupId') || undefined;
 
   const users = await prisma.user.findMany({
-    where: groupId ? { group: groupId, role: "student" } : { role: "student" },
+    where: groupId ? { group: groupId, role: 'student' } : { role: 'student' },
     select: {
       id: true,
       fullName: true,
@@ -59,21 +54,14 @@ export async function GET(request: NextRequest) {
     const modulesCompleted = userProgress.filter((p) => p.completed).length;
     const quizCount = userQuizzes.length;
     const avgScore =
-      userQuizzes.length > 0
-        ? userQuizzes.reduce((sum, q) => sum + q.percentage, 0) /
-          userQuizzes.length
-        : 0;
+      userQuizzes.length > 0 ? userQuizzes.reduce((sum, q) => sum + q.percentage, 0) / userQuizzes.length : 0;
 
     const lastProgressDate =
-      userProgress.length > 0
-        ? new Date(Math.max(...userProgress.map((p) => p.updatedAt.getTime())))
-        : null;
+      userProgress.length > 0 ? new Date(Math.max(...userProgress.map((p) => p.updatedAt.getTime()))) : null;
     const lastQuizDate =
-      userQuizzes.length > 0
-        ? new Date(Math.max(...userQuizzes.map((q) => q.updatedAt.getTime())))
-        : null;
+      userQuizzes.length > 0 ? new Date(Math.max(...userQuizzes.map((q) => q.updatedAt.getTime()))) : null;
 
-    let lastActive = "N/A";
+    let lastActive = 'N/A';
     if (lastProgressDate && lastQuizDate) {
       lastActive =
         lastProgressDate > lastQuizDate
@@ -101,8 +89,8 @@ export async function GET(request: NextRequest) {
 
   return new NextResponse(csv, {
     headers: {
-      "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="gradebook.csv"',
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': 'attachment; filename="gradebook.csv"',
     },
   });
 }

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   BarChart,
   Bar,
@@ -15,7 +15,7 @@ import {
   AreaChart,
   Area,
   Legend,
-} from "recharts";
+} from 'recharts';
 import {
   User,
   BookOpen,
@@ -34,29 +34,22 @@ import {
   Minus,
   Download,
   FileText,
-} from "lucide-react";
-import {
-  getStudentPerformance,
-  type StudentPerformanceData,
-} from "@/lib/auth-store";
-import { useDateFormatter, useDateTimeFormatter } from "@/lib/format";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  generateStudentReportPDF,
-  generateStudentReportCSV,
-  downloadCSV,
-} from "@/lib/export-utils";
-import KPICard from "./KPICard";
-import { logger } from "@/lib/logger";
+} from 'lucide-react';
+import { getStudentPerformance, type StudentPerformanceData } from '@/lib/auth-store';
+import { useDateFormatter, useDateTimeFormatter } from '@/lib/format';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { generateStudentReportPDF, generateStudentReportCSV, downloadCSV } from '@/lib/export-utils';
+import KPICard from './KPICard';
+import { logger } from '@/lib/logger';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: "7д" },
-  { key: 30, label: "30д" },
-  { key: 90, label: "90д" },
-  { key: 180, label: "180д" },
+  { key: 7, label: '7д' },
+  { key: 30, label: '30д' },
+  { key: 90, label: '90д' },
+  { key: 180, label: '180д' },
 ];
 
 interface Props {
@@ -65,20 +58,14 @@ interface Props {
   groupId?: string;
 }
 
-export default function StudentPerformanceReport({
-  userId,
-  initialDays = 30,
-  groupId: _groupId,
-}: Props) {
+export default function StudentPerformanceReport({ userId, initialDays = 30, groupId: _groupId }: Props) {
   const formatDate = useDateFormatter();
   const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [days, setDays] = useState(initialDays);
-  const [exportStatus, setExportStatus] = useState<
-    "idle" | "loading" | "success"
-  >("idle");
+  const [exportStatus, setExportStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
   useEffect(() => {
     if (!userId) return;
@@ -94,7 +81,7 @@ export default function StudentPerformanceReport({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || "Ошибка загрузки");
+          setError(e.message || 'Ошибка загрузки');
           setLoading(false);
         }
       });
@@ -106,9 +93,7 @@ export default function StudentPerformanceReport({
   if (!userId) {
     return (
       <div className="flex items-center justify-center py-16">
-        <p className="text-sm text-muted-foreground">
-          Выберите студента для просмотра отчёта
-        </p>
+        <p className="text-muted-foreground text-sm">Выберите студента для просмотра отчёта</p>
       </div>
     );
   }
@@ -117,7 +102,7 @@ export default function StudentPerformanceReport({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -126,9 +111,7 @@ export default function StudentPerformanceReport({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          Ошибка загрузки
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">Ошибка загрузки</p>
       </div>
     );
   }
@@ -149,28 +132,19 @@ export default function StudentPerformanceReport({
   } = data;
 
   const riskColor =
-    kpis.riskScore >= 70
-      ? "text-red-600"
-      : kpis.riskScore >= 30
-        ? "text-amber-600"
-        : "text-emerald-600";
-  const riskBg =
-    kpis.riskScore >= 70
-      ? "bg-red-50"
-      : kpis.riskScore >= 30
-        ? "bg-amber-50"
-        : "bg-emerald-50";
+    kpis.riskScore >= 70 ? 'text-red-600' : kpis.riskScore >= 30 ? 'text-amber-600' : 'text-emerald-600';
+  const riskBg = kpis.riskScore >= 70 ? 'bg-red-50' : kpis.riskScore >= 30 ? 'bg-amber-50' : 'bg-emerald-50';
 
   const handlePdfExport = async () => {
-    setExportStatus("loading");
+    setExportStatus('loading');
     try {
       await generateStudentReportPDF(
         {
           fullName: profile.fullName,
           email: profile.email,
           group: profile.group,
-          course: profile.course || "",
-          university: profile.university || "",
+          course: profile.course || '',
+          university: profile.university || '',
         },
         {
           modulesCompleted: kpis.modulesCompleted,
@@ -192,16 +166,13 @@ export default function StudentPerformanceReport({
         })),
         recommendations,
       );
-      setExportStatus("success");
+      setExportStatus('success');
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        logger.warn(
-          "StudentPerformanceReport handlePdfExport failed",
-          { error: e },
-        );
-      setExportStatus("idle");
+      if (process.env.NODE_ENV === 'development')
+        logger.warn('StudentPerformanceReport handlePdfExport failed', { error: e });
+      setExportStatus('idle');
     }
-    setTimeout(() => setExportStatus("idle"), 4000);
+    setTimeout(() => setExportStatus('idle'), 4000);
   };
 
   const handleCsvExport = () => {
@@ -210,8 +181,8 @@ export default function StudentPerformanceReport({
         fullName: profile.fullName,
         email: profile.email,
         group: profile.group,
-        course: profile.course || "",
-        university: profile.university || "",
+        course: profile.course || '',
+        university: profile.university || '',
       },
       moduleProgress.map((p) => ({
         moduleId: p.moduleName,
@@ -225,24 +196,24 @@ export default function StudentPerformanceReport({
         percentage: q.percentage,
       })),
     );
-    const date = new Date().toISOString().split("T")[0];
-    const safeName = profile.fullName.replace(/\s+/g, "-");
+    const date = new Date().toISOString().split('T')[0];
+    const safeName = profile.fullName.replace(/\s+/g, '-');
     downloadCSV(csv, `student-${safeName}-${date}.csv`);
   };
 
   return (
     <div className="space-y-6">
       {/* Toolbar: Period selector + Export buttons */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex gap-1 p-1 bg-muted rounded-lg">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="bg-muted flex gap-1 rounded-lg p-1">
           {PERIOD_OPTIONS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setDays(key)}
-              className={`px-3 py-1.5 text-xs rounded-md transition-all ${
+              className={`rounded-md px-3 py-1.5 text-xs transition-all ${
                 days === key
-                  ? "bg-background text-foreground shadow-sm font-medium"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? 'bg-background text-foreground font-medium shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {label}
@@ -254,17 +225,15 @@ export default function StudentPerformanceReport({
             variant="outline"
             size="sm"
             onClick={handlePdfExport}
-            disabled={exportStatus === "loading"}
+            disabled={exportStatus === 'loading'}
             className={
-              exportStatus === "success"
-                ? "bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600"
-                : ""
+              exportStatus === 'success' ? 'border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700' : ''
             }
           >
-            {exportStatus === "loading" ? (
-              "..."
-            ) : exportStatus === "success" ? (
-              "Готово"
+            {exportStatus === 'loading' ? (
+              '...'
+            ) : exportStatus === 'success' ? (
+              'Готово'
             ) : (
               <>
                 <FileText size={14} className="mr-1" /> PDF
@@ -281,36 +250,28 @@ export default function StudentPerformanceReport({
       <Card className="border-border">
         <CardContent className="p-5">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
               <User size={32} className="text-indigo-600" />
             </div>
             <div className="flex-1">
               <h2 className="text-lg font-bold">{profile.fullName}</h2>
-              <p className="text-sm text-muted-foreground">{profile.email}</p>
-              <div className="flex gap-2 mt-2 flex-wrap">
-                {profile.group && (
-                  <Badge variant="secondary">{profile.group}</Badge>
-                )}
-                {profile.course && (
-                  <Badge variant="outline">{profile.course}</Badge>
-                )}
-                {profile.university && (
-                  <Badge variant="outline">{profile.university}</Badge>
-                )}
+              <p className="text-muted-foreground text-sm">{profile.email}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {profile.group && <Badge variant="secondary">{profile.group}</Badge>}
+                {profile.course && <Badge variant="outline">{profile.course}</Badge>}
+                {profile.university && <Badge variant="outline">{profile.university}</Badge>}
               </div>
             </div>
-            <div className={`px-4 py-2 rounded-lg ${riskBg}`}>
-              <p className={`text-2xl font-bold ${riskColor}`}>
-                {kpis.riskScore}
-              </p>
-              <p className="text-xs text-muted-foreground">Риск</p>
+            <div className={`rounded-lg px-4 py-2 ${riskBg}`}>
+              <p className={`text-2xl font-bold ${riskColor}`}>{kpis.riskScore}</p>
+              <p className="text-muted-foreground text-xs">Риск</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KPICard
           icon={<BookOpen size={18} />}
           value={`${kpis.modulesCompleted}/${kpis.totalModules}`}
@@ -334,11 +295,7 @@ export default function StudentPerformanceReport({
         />
         <KPICard
           icon={<Clock size={18} />}
-          value={
-            kpis.lastActiveDays === 0
-              ? "Сегодня"
-              : `${kpis.lastActiveDays}д назад`
-          }
+          value={kpis.lastActiveDays === 0 ? 'Сегодня' : `${kpis.lastActiveDays}д назад`}
           label="Последняя активность"
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
@@ -376,9 +333,7 @@ export default function StudentPerformanceReport({
           {categoryBreakdown.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">
-                  Результаты по категориям квизов
-                </h3>
+                <h3 className="mb-4 text-sm font-semibold">Результаты по категориям квизов</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={categoryBreakdown}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -395,32 +350,26 @@ export default function StudentPerformanceReport({
           {activityTimeline.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">
-                  Последняя активность
-                </h3>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
+                <h3 className="mb-4 text-sm font-semibold">Последняя активность</h3>
+                <div className="max-h-64 space-y-2 overflow-y-auto">
                   {activityTimeline.slice(0, 15).map((activity, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.03 }}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary"
+                      className="hover:bg-secondary flex items-center gap-3 rounded-lg p-2"
                     >
-                      {activity.type === "login" ? (
+                      {activity.type === 'login' ? (
                         <CheckCircle size={16} className="text-emerald-500" />
-                      ) : activity.type === "module_completed" ? (
+                      ) : activity.type === 'module_completed' ? (
                         <Trophy size={16} className="text-amber-500" />
                       ) : (
                         <Activity size={16} className="text-sky-500" />
                       )}
                       <div className="flex-1">
-                        <p className="text-xs font-medium">
-                          {activity.details}
-                        </p>
-                        <p className="text-[10px] text-slate-400">
-                          {formatDateTime(activity.date)}
-                        </p>
+                        <p className="text-xs font-medium">{activity.details}</p>
+                        <p className="text-[10px] text-slate-400">{formatDateTime(activity.date)}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -433,29 +382,18 @@ export default function StudentPerformanceReport({
           {achievements.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">Достижения</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <h3 className="mb-4 text-sm font-semibold">Достижения</h3>
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                   {achievements.map((achievement) => (
                     <div
                       key={achievement.id}
-                      className={`p-3 rounded-lg border ${achievement.unlocked ? "border-amber-200 bg-amber-50/50" : "border-border opacity-60"}`}
+                      className={`rounded-lg border p-3 ${achievement.unlocked ? 'border-amber-200 bg-amber-50/50' : 'border-border opacity-60'}`}
                     >
                       <div className="flex items-center gap-2">
-                        <Award
-                          size={16}
-                          className={
-                            achievement.unlocked
-                              ? "text-amber-600"
-                              : "text-slate-400"
-                          }
-                        />
-                        <p className="text-xs font-semibold">
-                          {achievement.title}
-                        </p>
+                        <Award size={16} className={achievement.unlocked ? 'text-amber-600' : 'text-slate-400'} />
+                        <p className="text-xs font-semibold">{achievement.title}</p>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-1">
-                        {achievement.description}
-                      </p>
+                      <p className="text-muted-foreground mt-1 text-[10px]">{achievement.description}</p>
                     </div>
                   ))}
                 </div>
@@ -468,9 +406,7 @@ export default function StudentPerformanceReport({
         <TabsContent value="modules" className="mt-4 space-y-4">
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">
-                Прогресс по модулям
-              </h3>
+              <h3 className="mb-4 text-sm font-semibold">Прогресс по модулям</h3>
               <div className="space-y-2">
                 {moduleProgress.map((module, i) => (
                   <motion.div
@@ -478,7 +414,7 @@ export default function StudentPerformanceReport({
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.03 }}
-                    className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-border"
+                    className="hover:border-border flex items-center justify-between rounded-lg border border-slate-100 p-3"
                   >
                     <div className="flex items-center gap-3">
                       {module.completed ? (
@@ -487,23 +423,13 @@ export default function StudentPerformanceReport({
                         <XCircle size={18} className="text-slate-300" />
                       )}
                       <div>
-                        <p className="text-sm font-medium">
-                          {module.moduleName}
-                        </p>
-                        <p className="text-[10px] text-slate-400">
-                          {formatDate(module.updatedAt)}
-                        </p>
+                        <p className="text-sm font-medium">{module.moduleName}</p>
+                        <p className="text-[10px] text-slate-400">{formatDate(module.updatedAt)}</p>
                       </div>
                     </div>
                     {module.score !== null && (
                       <Badge
-                        variant={
-                          module.score >= 70
-                            ? "default"
-                            : module.score >= 50
-                              ? "secondary"
-                              : "destructive"
-                        }
+                        variant={module.score >= 70 ? 'default' : module.score >= 50 ? 'secondary' : 'destructive'}
                       >
                         {module.score}%
                       </Badge>
@@ -519,7 +445,7 @@ export default function StudentPerformanceReport({
         <TabsContent value="quizzes" className="mt-4 space-y-4">
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">Результаты квизов</h3>
+              <h3 className="mb-4 text-sm font-semibold">Результаты квизов</h3>
               {quizResults.length > 0 ? (
                 <div className="space-y-2">
                   {quizResults.map((quiz, i) => (
@@ -528,7 +454,7 @@ export default function StudentPerformanceReport({
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.03 }}
-                      className="flex items-center justify-between p-3 rounded-lg border border-slate-100"
+                      className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
                     >
                       <div>
                         <p className="text-sm font-medium">{quiz.quizId}</p>
@@ -538,11 +464,7 @@ export default function StudentPerformanceReport({
                       </div>
                       <Badge
                         variant={
-                          quiz.percentage >= 70
-                            ? "default"
-                            : quiz.percentage >= 50
-                              ? "secondary"
-                              : "destructive"
+                          quiz.percentage >= 70 ? 'default' : quiz.percentage >= 50 ? 'secondary' : 'destructive'
                         }
                       >
                         {quiz.percentage}%
@@ -551,9 +473,7 @@ export default function StudentPerformanceReport({
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Нет результатов квизов
-                </p>
+                <p className="text-muted-foreground py-8 text-center text-sm">Нет результатов квизов</p>
               )}
             </CardContent>
           </Card>
@@ -563,40 +483,33 @@ export default function StudentPerformanceReport({
         <TabsContent value="activity" className="mt-4 space-y-4">
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="font-semibold text-sm mb-4">
-                Хронология активности
-              </h3>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <h3 className="mb-4 text-sm font-semibold">Хронология активности</h3>
+              <div className="max-h-96 space-y-2 overflow-y-auto">
                 {activityTimeline.map((activity, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.02 }}
-                    className="flex items-start gap-3 p-3 rounded-lg border border-slate-100"
+                    className="flex items-start gap-3 rounded-lg border border-slate-100 p-3"
                   >
-                    {activity.type === "login" ? (
-                      <CheckCircle
-                        size={16}
-                        className="text-emerald-500 mt-0.5"
-                      />
-                    ) : activity.type === "module_completed" ? (
-                      <Trophy size={16} className="text-amber-500 mt-0.5" />
+                    {activity.type === 'login' ? (
+                      <CheckCircle size={16} className="mt-0.5 text-emerald-500" />
+                    ) : activity.type === 'module_completed' ? (
+                      <Trophy size={16} className="mt-0.5 text-amber-500" />
                     ) : (
-                      <Activity size={16} className="text-sky-500 mt-0.5" />
+                      <Activity size={16} className="mt-0.5 text-sky-500" />
                     )}
                     <div className="flex-1">
                       <p className="text-xs font-medium">{activity.details}</p>
-                      <p className="text-[10px] text-slate-400">
-                        {formatDateTime(activity.date)}
-                      </p>
+                      <p className="text-[10px] text-slate-400">{formatDateTime(activity.date)}</p>
                     </div>
                     <Badge variant="outline" className="text-[10px]">
-                      {activity.type === "login"
-                        ? "Вход"
-                        : activity.type === "module_completed"
-                          ? "Модуль"
-                          : "Прогресс"}
+                      {activity.type === 'login'
+                        ? 'Вход'
+                        : activity.type === 'module_completed'
+                          ? 'Модуль'
+                          : 'Прогресс'}
                     </Badge>
                   </motion.div>
                 ))}
@@ -611,7 +524,7 @@ export default function StudentPerformanceReport({
           {moduleCompletionTimeline.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <TrendingUp size={16} className="text-indigo-500" />
                   Прогресс по модулям
                 </h3>
@@ -621,9 +534,7 @@ export default function StudentPerformanceReport({
                     <XAxis
                       dataKey="date"
                       tick={{ fontSize: 10 }}
-                      tickFormatter={(v) =>
-                        formatDate(v, { month: "short", day: "numeric" })
-                      }
+                      tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis domain={[0, 100]} />
                     <Tooltip labelFormatter={(v) => formatDate(v)} />
@@ -646,7 +557,7 @@ export default function StudentPerformanceReport({
           {loginActivityTimeline.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <Activity size={16} className="text-emerald-500" />
                   Активность входов
                 </h3>
@@ -656,19 +567,13 @@ export default function StudentPerformanceReport({
                     <XAxis
                       dataKey="date"
                       tick={{ fontSize: 10 }}
-                      tickFormatter={(v) =>
-                        formatDate(v, { month: "short", day: "numeric" })
-                      }
+                      tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis />
                     <Tooltip labelFormatter={(v) => formatDate(v)} />
                     <Legend />
                     <Bar dataKey="count" fill="#6366f1" name="Входы" />
-                    <Bar
-                      dataKey="successCount"
-                      fill="#10b981"
-                      name="Успешные"
-                    />
+                    <Bar dataKey="successCount" fill="#10b981" name="Успешные" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -679,7 +584,7 @@ export default function StudentPerformanceReport({
           {quizCategoryTrajectory.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
+                <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <Target size={16} className="text-amber-500" />
                   Траектория квизов по категориям
                 </h3>
@@ -689,24 +594,13 @@ export default function StudentPerformanceReport({
                     <XAxis
                       dataKey="week"
                       tick={{ fontSize: 10 }}
-                      tickFormatter={(v) =>
-                        formatDate(v, { month: "short", day: "numeric" })
-                      }
+                      tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis domain={[0, 100]} />
                     <Tooltip labelFormatter={(v) => formatDate(v)} />
                     <Legend />
-                    {Array.from(
-                      new Set(quizCategoryTrajectory.map((p) => p.category)),
-                    ).map((category, i) => {
-                      const colors = [
-                        "#6366f1",
-                        "#10b981",
-                        "#f59e0b",
-                        "#ef4444",
-                        "#8b5cf6",
-                        "#ec4899",
-                      ];
+                    {Array.from(new Set(quizCategoryTrajectory.map((p) => p.category))).map((category, i) => {
+                      const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
                       return (
                         <Line
                           key={category}
@@ -715,9 +609,7 @@ export default function StudentPerformanceReport({
                           name={category}
                           stroke={colors[i % colors.length]}
                           dot={false}
-                          data={quizCategoryTrajectory.filter(
-                            (p) => p.category === category,
-                          )}
+                          data={quizCategoryTrajectory.filter((p) => p.category === category)}
                         />
                       );
                     })}
@@ -732,13 +624,8 @@ export default function StudentPerformanceReport({
             quizCategoryTrajectory.length === 0 && (
               <Card className="border-border">
                 <CardContent className="p-8 text-center">
-                  <Clock
-                    size={32}
-                    className="text-muted-foreground mx-auto mb-3"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Нет данных для отображения таймлайна
-                  </p>
+                  <Clock size={32} className="text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground text-sm">Нет данных для отображения таймлайна</p>
                 </CardContent>
               </Card>
             )}
@@ -752,23 +639,21 @@ export default function StudentPerformanceReport({
               <div className="grid grid-cols-3 gap-3">
                 <KPICard
                   icon={<AlertTriangle size={18} />}
-                  value={skillsGap.filter((g) => g.severity === "high").length}
+                  value={skillsGap.filter((g) => g.severity === 'high').length}
                   label="Критичные"
                   iconBg="bg-red-100"
                   iconColor="text-red-600"
                 />
                 <KPICard
                   icon={<AlertTriangle size={18} />}
-                  value={
-                    skillsGap.filter((g) => g.severity === "medium").length
-                  }
+                  value={skillsGap.filter((g) => g.severity === 'medium').length}
                   label="Средние"
                   iconBg="bg-amber-100"
                   iconColor="text-amber-600"
                 />
                 <KPICard
                   icon={<CheckCircle size={18} />}
-                  value={skillsGap.filter((g) => g.severity === "low").length}
+                  value={skillsGap.filter((g) => g.severity === 'low').length}
                   label="Норма"
                   iconBg="bg-emerald-100"
                   iconColor="text-emerald-600"
@@ -778,9 +663,7 @@ export default function StudentPerformanceReport({
               {/* Skills Gap Bar Chart */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-4">
-                    Сравнение с группой
-                  </h3>
+                  <h3 className="mb-4 text-sm font-semibold">Сравнение с группой</h3>
                   <ResponsiveContainer width="100%" height={350}>
                     <BarChart data={skillsGap}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -792,19 +675,13 @@ export default function StudentPerformanceReport({
                         textAnchor="end"
                         height={80}
                         tickFormatter={(v) =>
-                          v.startsWith("category:")
-                            ? v.replace("category:", "").substring(0, 8)
-                            : v.substring(0, 8)
+                          v.startsWith('category:') ? v.replace('category:', '').substring(0, 8) : v.substring(0, 8)
                         }
                       />
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
                       <Legend />
-                      <Bar
-                        dataKey="studentScore"
-                        fill="#6366f1"
-                        name="Студент"
-                      />
+                      <Bar dataKey="studentScore" fill="#6366f1" name="Студент" />
                       <Bar dataKey="cohortAvg" fill="#94a3b8" name="Группа" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -814,72 +691,49 @@ export default function StudentPerformanceReport({
               {/* Detailed Gap Table */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="font-semibold text-sm mb-4">
-                    Детальный анализ
-                  </h3>
+                  <h3 className="mb-4 text-sm font-semibold">Детальный анализ</h3>
                   <div className="space-y-2">
                     {skillsGap
                       .sort((a, b) => a.gap - b.gap)
                       .map((gap, i) => {
                         const severityColor =
-                          gap.severity === "high"
-                            ? "destructive"
-                            : gap.severity === "medium"
-                              ? "secondary"
-                              : "default";
-                        const TrendIcon =
-                          gap.gap > 0
-                            ? TrendingUp
-                            : gap.gap < 0
-                              ? TrendingDown
-                              : Minus;
+                          gap.severity === 'high' ? 'destructive' : gap.severity === 'medium' ? 'secondary' : 'default';
+                        const TrendIcon = gap.gap > 0 ? TrendingUp : gap.gap < 0 ? TrendingDown : Minus;
                         return (
                           <motion.div
                             key={gap.moduleId}
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.02 }}
-                            className="flex items-center justify-between p-3 rounded-lg border border-slate-100"
+                            className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
                           >
                             <div className="flex items-center gap-3">
                               <TrendIcon
                                 size={16}
                                 className={
-                                  gap.gap > 0
-                                    ? "text-emerald-500"
-                                    : gap.gap < 0
-                                      ? "text-red-500"
-                                      : "text-slate-400"
+                                  gap.gap > 0 ? 'text-emerald-500' : gap.gap < 0 ? 'text-red-500' : 'text-slate-400'
                                 }
                               />
                               <div>
                                 <p className="text-sm font-medium">
-                                  {gap.moduleId.startsWith("category:")
-                                    ? `Категория: ${gap.moduleId.replace("category:", "")}`
+                                  {gap.moduleId.startsWith('category:')
+                                    ? `Категория: ${gap.moduleId.replace('category:', '')}`
                                     : gap.moduleId}
                                 </p>
-                                <p className="text-[10px] text-muted-foreground">
-                                  Студент: {gap.studentScore}% | Группа:{" "}
-                                  {gap.cohortAvg}%
+                                <p className="text-muted-foreground text-[10px]">
+                                  Студент: {gap.studentScore}% | Группа: {gap.cohortAvg}%
                                 </p>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
                               <span
-                                className={`text-xs font-semibold ${gap.gap > 0 ? "text-emerald-600" : "text-red-600"}`}
+                                className={`text-xs font-semibold ${gap.gap > 0 ? 'text-emerald-600' : 'text-red-600'}`}
                               >
-                                {gap.gap > 0 ? "+" : ""}
+                                {gap.gap > 0 ? '+' : ''}
                                 {gap.gap}%
                               </span>
-                              <Badge
-                                variant={severityColor}
-                                className="text-[10px]"
-                              >
-                                {gap.severity === "high"
-                                  ? "Критично"
-                                  : gap.severity === "medium"
-                                    ? "Средне"
-                                    : "Норма"}
+                              <Badge variant={severityColor} className="text-[10px]">
+                                {gap.severity === 'high' ? 'Критично' : gap.severity === 'medium' ? 'Средне' : 'Норма'}
                               </Badge>
                             </div>
                           </motion.div>
@@ -894,13 +748,8 @@ export default function StudentPerformanceReport({
           {skillsGap.length === 0 && (
             <Card className="border-border">
               <CardContent className="p-8 text-center">
-                <Target
-                  size={32}
-                  className="text-muted-foreground mx-auto mb-3"
-                />
-                <p className="text-sm text-muted-foreground">
-                  Нет данных для анализа навыков
-                </p>
+                <Target size={32} className="text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground text-sm">Нет данных для анализа навыков</p>
               </CardContent>
             </Card>
           )}
@@ -912,23 +761,14 @@ export default function StudentPerformanceReport({
             <div className="space-y-3">
               {recommendations.map((rec, i) => {
                 const priorityColor =
-                  rec.priority === "high"
-                    ? "border-red-200 bg-red-50/50"
-                    : rec.priority === "medium"
-                      ? "border-amber-200 bg-amber-50/50"
-                      : "border-emerald-200 bg-emerald-50/50";
+                  rec.priority === 'high'
+                    ? 'border-red-200 bg-red-50/50'
+                    : rec.priority === 'medium'
+                      ? 'border-amber-200 bg-amber-50/50'
+                      : 'border-emerald-200 bg-emerald-50/50';
                 const priorityBadge =
-                  rec.priority === "high"
-                    ? "destructive"
-                    : rec.priority === "medium"
-                      ? "secondary"
-                      : "default";
-                const TypeIcon =
-                  rec.type === "module"
-                    ? BookOpen
-                    : rec.type === "quiz"
-                      ? Target
-                      : Lightbulb;
+                  rec.priority === 'high' ? 'destructive' : rec.priority === 'medium' ? 'secondary' : 'default';
+                const TypeIcon = rec.type === 'module' ? BookOpen : rec.type === 'quiz' ? Target : Lightbulb;
                 return (
                   <motion.div
                     key={i}
@@ -940,42 +780,33 @@ export default function StudentPerformanceReport({
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
                           <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                              rec.priority === "high"
-                                ? "bg-red-100"
-                                : rec.priority === "medium"
-                                  ? "bg-amber-100"
-                                  : "bg-emerald-100"
+                            className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                              rec.priority === 'high'
+                                ? 'bg-red-100'
+                                : rec.priority === 'medium'
+                                  ? 'bg-amber-100'
+                                  : 'bg-emerald-100'
                             }`}
                           >
                             <TypeIcon
                               size={18}
                               className={
-                                rec.priority === "high"
-                                  ? "text-red-600"
-                                  : rec.priority === "medium"
-                                    ? "text-amber-600"
-                                    : "text-emerald-600"
+                                rec.priority === 'high'
+                                  ? 'text-red-600'
+                                  : rec.priority === 'medium'
+                                    ? 'text-amber-600'
+                                    : 'text-emerald-600'
                               }
                             />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-bold">{rec.title}</p>
-                              <Badge
-                                variant={priorityBadge}
-                                className="text-[10px]"
-                              >
-                                {rec.priority === "high"
-                                  ? "Высокий"
-                                  : rec.priority === "medium"
-                                    ? "Средний"
-                                    : "Низкий"}
+                              <Badge variant={priorityBadge} className="text-[10px]">
+                                {rec.priority === 'high' ? 'Высокий' : rec.priority === 'medium' ? 'Средний' : 'Низкий'}
                               </Badge>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {rec.description}
-                            </p>
+                            <p className="text-muted-foreground mt-1 text-xs">{rec.description}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -987,13 +818,8 @@ export default function StudentPerformanceReport({
           ) : (
             <Card className="border-border">
               <CardContent className="p-8 text-center">
-                <Lightbulb
-                  size={32}
-                  className="text-muted-foreground mx-auto mb-3"
-                />
-                <p className="text-sm text-muted-foreground">
-                  Нет рекомендаций — отличная работа!
-                </p>
+                <Lightbulb size={32} className="text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground text-sm">Нет рекомендаций — отличная работа!</p>
               </CardContent>
             </Card>
           )}

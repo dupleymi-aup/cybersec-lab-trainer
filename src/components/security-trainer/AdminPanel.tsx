@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   useAuthStore,
   getAllUsers,
@@ -14,30 +14,27 @@ import {
   type UserRole,
   type User,
   type ComprehensiveSummary,
-} from "@/lib/auth-store";
-import { useAppStore } from "@/lib/store";
-import { useDateFormatter } from "@/lib/format";
-import {
-  AnalyticsProvider,
-  useAnalyticsFilters,
-} from "@/lib/analytics-context";
-import KPICard from "./KPICard";
-import AnalyticsFilterBar from "./AnalyticsFilterBar";
-import AchievementAnalytics from "./AchievementAnalytics";
-import LearningPathReport from "./LearningPathReport";
-import QuizTrajectoryReport from "./QuizTrajectoryReport";
-import CohortAnalysis from "./CohortAnalysis";
-import CompetencyRadar from "./CompetencyRadar";
-import WeaknessAnalyzer from "./WeaknessAnalyzer";
-import PredictiveInsights from "./PredictiveInsights";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AnimatePresence, motion } from "framer-motion";
+} from '@/lib/auth-store';
+import { useAppStore } from '@/lib/store';
+import { useDateFormatter } from '@/lib/format';
+import { AnalyticsProvider, useAnalyticsFilters } from '@/lib/analytics-context';
+import KPICard from './KPICard';
+import AnalyticsFilterBar from './AnalyticsFilterBar';
+import AchievementAnalytics from './AchievementAnalytics';
+import LearningPathReport from './LearningPathReport';
+import QuizTrajectoryReport from './QuizTrajectoryReport';
+import CohortAnalysis from './CohortAnalysis';
+import CompetencyRadar from './CompetencyRadar';
+import WeaknessAnalyzer from './WeaknessAnalyzer';
+import PredictiveInsights from './PredictiveInsights';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   ChevronLeft,
   Settings,
@@ -81,87 +78,82 @@ import {
   ShieldCheck,
   Loader2,
   ArrowLeftRight,
-} from "lucide-react";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
-import UserModal from "./UserModal";
-import BulkActionsBar from "./BulkActionsBar";
-import PasswordResetModal from "./PasswordResetModal";
-import UserActivityModal from "./UserActivityModal";
-import GroupManager from "./GroupManager";
-import AuditLogView from "./AuditLogView";
-import AdminSummaryReport from "./AdminSummaryReport";
-import ActivityHeatmap from "./ActivityHeatmap";
-import ComprehensiveDashboard from "./ComprehensiveDashboard";
-import ModulePerformanceReport from "./ModulePerformanceReport";
-import ProgressDynamicsChart from "./ProgressDynamicsChart";
-import AtRiskReport from "./AtRiskReport";
-import GroupComparisonReport from "./GroupComparisonReport";
-import QuizCategoryDeepDive from "./QuizCategoryDeepDive";
-import AnalyticsExportPanel from "./AnalyticsExportPanel";
-import ProgressTrendsChart from "./ProgressTrendsChart";
-import QuizQuestionAnalytics from "./QuizQuestionAnalytics";
-import StudentPerformanceReport from "./StudentPerformanceReport";
-import StudentComparisonView from "./StudentComparisonView";
-import GradebookView from "./GradebookView";
-import EngagementAnalytics from "./EngagementAnalytics";
-import ModuleManager from "./ModuleManager";
-import SystemAnnouncements from "./SystemAnnouncements";
-import ModuleDeepDive from "./ModuleDeepDive";
-import CertificationReadiness from "./CertificationReadiness";
-import LearningVelocity from "./LearningVelocity";
-import QuizSessionAnalytics from "./QuizSessionAnalytics";
-import GroupDynamics from "./GroupDynamics";
-import LoginPatterns from "./LoginPatterns";
-import AdvancedAnalytics from "./AdvancedAnalytics";
-import QuizDifficultyAnalysis from "./QuizDifficultyAnalysis";
-import QuizRetryAnalytics from "./QuizRetryAnalytics";
-import ErrorPatternsAnalytics from "./ErrorPatternsAnalytics";
-import ProgressSankey from "./ProgressSankey";
-import StudentHeatmapCalendar from "./StudentHeatmapCalendar";
-import PredictiveRiskDashboard from "./PredictiveRiskDashboard";
-import ReportScheduler from "./ReportScheduler";
-import NotificationBell from "./NotificationBell";
-import ExecutiveSummaryExport from "./ExecutiveSummaryExport";
-import DataQualityMonitor from "./DataQualityMonitor";
-import PeriodComparison from "./PeriodComparison";
-import LtiPlatformManager from "./LtiPlatformManager";
-import { Link } from "lucide-react";
-import { logger } from "@/lib/logger";
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import UserModal from './UserModal';
+import BulkActionsBar from './BulkActionsBar';
+import PasswordResetModal from './PasswordResetModal';
+import UserActivityModal from './UserActivityModal';
+import GroupManager from './GroupManager';
+import AuditLogView from './AuditLogView';
+import AdminSummaryReport from './AdminSummaryReport';
+import ActivityHeatmap from './ActivityHeatmap';
+import ComprehensiveDashboard from './ComprehensiveDashboard';
+import ModulePerformanceReport from './ModulePerformanceReport';
+import ProgressDynamicsChart from './ProgressDynamicsChart';
+import AtRiskReport from './AtRiskReport';
+import GroupComparisonReport from './GroupComparisonReport';
+import QuizCategoryDeepDive from './QuizCategoryDeepDive';
+import AnalyticsExportPanel from './AnalyticsExportPanel';
+import ProgressTrendsChart from './ProgressTrendsChart';
+import QuizQuestionAnalytics from './QuizQuestionAnalytics';
+import StudentPerformanceReport from './StudentPerformanceReport';
+import StudentComparisonView from './StudentComparisonView';
+import GradebookView from './GradebookView';
+import EngagementAnalytics from './EngagementAnalytics';
+import ModuleManager from './ModuleManager';
+import SystemAnnouncements from './SystemAnnouncements';
+import ModuleDeepDive from './ModuleDeepDive';
+import CertificationReadiness from './CertificationReadiness';
+import LearningVelocity from './LearningVelocity';
+import QuizSessionAnalytics from './QuizSessionAnalytics';
+import GroupDynamics from './GroupDynamics';
+import LoginPatterns from './LoginPatterns';
+import AdvancedAnalytics from './AdvancedAnalytics';
+import QuizDifficultyAnalysis from './QuizDifficultyAnalysis';
+import QuizRetryAnalytics from './QuizRetryAnalytics';
+import ErrorPatternsAnalytics from './ErrorPatternsAnalytics';
+import ProgressSankey from './ProgressSankey';
+import StudentHeatmapCalendar from './StudentHeatmapCalendar';
+import PredictiveRiskDashboard from './PredictiveRiskDashboard';
+import ReportScheduler from './ReportScheduler';
+import NotificationBell from './NotificationBell';
+import ExecutiveSummaryExport from './ExecutiveSummaryExport';
+import DataQualityMonitor from './DataQualityMonitor';
+import PeriodComparison from './PeriodComparison';
+import LtiPlatformManager from './LtiPlatformManager';
+import { Link } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 const roleColors: Record<UserRole, string> = {
-  student:
-    "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
-  teacher:
-    "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  admin: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
+  student: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+  teacher: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+  admin: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 };
 
 export default function AdminPanel() {
-  const t = useTranslations("admin");
+  const t = useTranslations('admin');
   const formatDate = useDateFormatter();
   const user = useAuthStore((s) => s.user);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
-  const { groupId: analyticsGroupId, days: analyticsDays } =
-    useAnalyticsFilters();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
+  const { groupId: analyticsGroupId, days: analyticsDays } = useAnalyticsFilters();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
   const [reportSubTab, setReportSubTab] = useState<
-    | "summary"
-    | "heatmap"
-    | "quiz-categories"
-    | "quiz-questions"
-    | "student-comparison"
-    | "at-risk"
-    | "group-compare"
-    | "export"
-  >("summary");
+    | 'summary'
+    | 'heatmap'
+    | 'quiz-categories'
+    | 'quiz-questions'
+    | 'student-comparison'
+    | 'at-risk'
+    | 'group-compare'
+    | 'export'
+  >('summary');
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(
-    new Set(),
-  );
-  const [selectedStudentId, setSelectedStudentId] = useState<string>("");
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalUser, setEditModalUser] = useState<User | null>(null);
   const [passwordResetUser, setPasswordResetUser] = useState<User | null>(null);
@@ -177,35 +169,34 @@ export default function AdminPanel() {
     getAllUsers()
       .then(setAllUsers)
       .catch((err) => {
-        if (process.env.NODE_ENV === "development")
-          logger.error("AdminPanel failed to load users", { error: err });
+        if (process.env.NODE_ENV === 'development') logger.error('AdminPanel failed to load users', { error: err });
       })
       .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
   const filteredUsers = allUsers.filter((u) => {
     const matchesSearch =
-      searchTerm === "" ||
+      searchTerm === '' ||
       u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === "" || u.role === roleFilter;
+    const matchesRole = roleFilter === '' || u.role === roleFilter;
     return matchesSearch && matchesRole;
   });
 
   // DB Stats
   const totalUsers = allUsers.length;
-  const studentCount = allUsers.filter((u) => u.role === "student").length;
-  const teacherCount = allUsers.filter((u) => u.role === "teacher").length;
-  const adminCount = allUsers.filter((u) => u.role === "admin").length;
+  const studentCount = allUsers.filter((u) => u.role === 'student').length;
+  const teacherCount = allUsers.filter((u) => u.role === 'teacher').length;
+  const adminCount = allUsers.filter((u) => u.role === 'admin').length;
   const blockedCount = allUsers.filter((u) => u.isBlocked).length;
 
   // LocalStorage usage
   let storageUsed = 0;
   let keysCount = 0;
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key) {
-        const value = localStorage.getItem(key) || "";
+        const value = localStorage.getItem(key) || '';
         storageUsed += key.length + value.length;
         keysCount++;
       }
@@ -216,7 +207,7 @@ export default function AdminPanel() {
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
     const result = await changeUserRole(userId, newRole);
     if (result.success) {
-      toast.success(t("actions.roleChanged", { role: getRoleLabel(newRole) }));
+      toast.success(t('actions.roleChanged', { role: getRoleLabel(newRole) }));
       refresh();
     } else {
       toast.error(result.error);
@@ -224,10 +215,10 @@ export default function AdminPanel() {
   };
 
   const handleDeleteUser = async (userId: string, fullName: string) => {
-    if (!confirm(t("actions.confirmDelete", { name: fullName }))) return;
+    if (!confirm(t('actions.confirmDelete', { name: fullName }))) return;
     const result = await deleteUser(userId);
     if (result.success) {
-      toast.success(t("actions.userDeleted"));
+      toast.success(t('actions.userDeleted'));
       refresh();
     } else {
       toast.error(result.error);
@@ -238,9 +229,7 @@ export default function AdminPanel() {
     const result = await toggleUserBlock(userId);
     if (result.success) {
       const isNowBlocked = allUsers.find((u) => u.id === userId)?.isBlocked;
-      toast.success(
-        isNowBlocked ? t("actions.userBlocked") : t("actions.userUnblocked"),
-      );
+      toast.success(isNowBlocked ? t('actions.userBlocked') : t('actions.userUnblocked'));
       refresh();
     } else {
       toast.error(result.error);
@@ -258,9 +247,7 @@ export default function AdminPanel() {
   };
 
   const handleSelectAll = () => {
-    const filteredIds = filteredUsers
-      .filter((u) => u.id !== user?.id)
-      .map((u) => u.id);
+    const filteredIds = filteredUsers.filter((u) => u.id !== user?.id).map((u) => u.id);
     if (selectedUserIds.size === filteredIds.length) {
       setSelectedUserIds(new Set());
     } else {
@@ -276,97 +263,78 @@ export default function AdminPanel() {
     reader.onload = async (event) => {
       try {
         const text = event.target?.result as string;
-        const lines = text.split("\n").filter((l) => l.trim());
+        const lines = text.split('\n').filter((l) => l.trim());
         if (lines.length < 2) {
-          toast.error(t("actions.csvEmpty"));
+          toast.error(t('actions.csvEmpty'));
           return;
         }
 
         // Parse header
-        const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
-        const nameIdx = headers.findIndex(
-          (h) => h.includes("name") || h.includes("имя"),
-        );
-        const emailIdx = headers.findIndex((h) => h.includes("email"));
-        const phoneIdx = headers.findIndex(
-          (h) => h.includes("phone") || h.includes("телефон"),
-        );
-        const roleIdx = headers.findIndex(
-          (h) => h.includes("role") || h.includes("роль"),
-        );
-        const groupIdx = headers.findIndex(
-          (h) => h.includes("group") || h.includes("группа"),
-        );
+        const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+        const nameIdx = headers.findIndex((h) => h.includes('name') || h.includes('имя'));
+        const emailIdx = headers.findIndex((h) => h.includes('email'));
+        const phoneIdx = headers.findIndex((h) => h.includes('phone') || h.includes('телефон'));
+        const roleIdx = headers.findIndex((h) => h.includes('role') || h.includes('роль'));
+        const groupIdx = headers.findIndex((h) => h.includes('group') || h.includes('группа'));
 
         if (nameIdx === -1 || emailIdx === -1) {
-          toast.error(t("actions.csvMissingColumns"));
+          toast.error(t('actions.csvMissingColumns'));
           return;
         }
 
         let created = 0;
         let skipped = 0;
         for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(",").map((c) => c.trim());
-          const fullName = cols[nameIdx] || "";
-          const email = cols[emailIdx] || "";
-          const phone = cols[phoneIdx] || "+7000000000";
-          const roleStr = (cols[roleIdx] || "student").toLowerCase();
-          const group = cols[groupIdx] || "";
-          const role: UserRole = ["student", "teacher", "admin"].includes(
-            roleStr,
-          )
-            ? (roleStr as UserRole)
-            : "student";
+          const cols = lines[i].split(',').map((c) => c.trim());
+          const fullName = cols[nameIdx] || '';
+          const email = cols[emailIdx] || '';
+          const phone = cols[phoneIdx] || '+7000000000';
+          const roleStr = (cols[roleIdx] || 'student').toLowerCase();
+          const group = cols[groupIdx] || '';
+          const role: UserRole = ['student', 'teacher', 'admin'].includes(roleStr) ? (roleStr as UserRole) : 'student';
 
           // Check duplicate
-          const existing = allUsers.find(
-            (u) => u.email.toLowerCase() === email.toLowerCase(),
-          );
+          const existing = allUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
           if (existing) {
             skipped++;
             continue;
           }
 
-          const chars =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
           const array = new Uint8Array(14);
           crypto.getRandomValues(array);
-          const defaultPassword = Array.from(
-            array,
-            (b) => chars[b % chars.length],
-          ).join("");
+          const defaultPassword = Array.from(array, (b) => chars[b % chars.length]).join('');
           const result = await createUser(
-            { email, phone, fullName, role, group, course: "", university: "" },
+            { email, phone, fullName, role, group, course: '', university: '' },
             defaultPassword,
           );
           if (result.success) created++;
           else skipped++;
         }
 
-        toast.success(t("actions.csvImported", { created, skipped }));
+        toast.success(t('actions.csvImported', { created, skipped }));
         refresh();
       } catch (e) {
-        if (process.env.NODE_ENV === "development")
-          logger.warn("AdminPanel handleCSVImport failed", { error: e });
-        toast.error(t("actions.csvParseError"));
+        if (process.env.NODE_ENV === 'development') logger.warn('AdminPanel handleCSVImport failed', { error: e });
+        toast.error(t('actions.csvParseError'));
       }
     };
     reader.readAsText(file);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleClearProgress = () => {
-    if (!confirm(t("actions.confirmClearProgress"))) return;
-    if (typeof window === "undefined") return;
+    if (!confirm(t('actions.confirmClearProgress'))) return;
+    if (typeof window === 'undefined') return;
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith("security-trainer-progress-")) {
+      if (key && key.startsWith('security-trainer-progress-')) {
         keysToRemove.push(key);
       }
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
-    toast.success(t("actions.progressCleared"));
+    toast.success(t('actions.progressCleared'));
   };
 
   const handleExportData = () => {
@@ -375,15 +343,15 @@ export default function AdminPanel() {
       exportedAt: new Date().toISOString(),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
+      type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `cybersec-lab-export-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `cybersec-lab-export-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(t("actions.dataExported"));
+    toast.success(t('actions.dataExported'));
   };
 
   return (
@@ -391,19 +359,15 @@ export default function AdminPanel() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCurrentPage("dashboard")}
-          >
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
             <ChevronLeft size={20} />
           </Button>
-          <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100">
             <Settings size={20} className="text-red-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">{t("title")}</h1>
-            <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
+            <h1 className="text-xl font-bold">{t('title')}</h1>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -413,30 +377,30 @@ export default function AdminPanel() {
       </div>
 
       {/* KPI Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
         <KPICard
-          label={t("kpi.totalUsers")}
+          label={t('kpi.totalUsers')}
           value={totalUsers}
           icon={<Users size={18} />}
           iconColor="text-sky-600"
           iconBg="bg-sky-50"
         />
         <KPICard
-          label={t("kpi.students")}
+          label={t('kpi.students')}
           value={studentCount}
           icon={<Users size={18} />}
           iconColor="text-violet-600"
           iconBg="bg-violet-50"
         />
         <KPICard
-          label={t("kpi.teachers")}
+          label={t('kpi.teachers')}
           value={teacherCount}
           icon={<Users size={18} />}
           iconColor="text-amber-600"
           iconBg="bg-amber-50"
         />
         <KPICard
-          label={t("kpi.blocked")}
+          label={t('kpi.blocked')}
           value={blockedCount}
           icon={<Shield size={18} />}
           iconColor="text-red-600"
@@ -446,75 +410,65 @@ export default function AdminPanel() {
 
       <AnalyticsProvider>
         <Tabs defaultValue="users">
-          <div className="overflow-x-auto pb-2 scrollbar-thin">
-            <TabsList className="grid w-full grid-cols-5 md:grid-cols-10 min-w-[700px] md:min-w-0">
+          <div className="scrollbar-thin overflow-x-auto pb-2">
+            <TabsList className="grid w-full min-w-[700px] grid-cols-5 md:min-w-0 md:grid-cols-10">
               <TabsTrigger value="users" className="text-xs">
-                <Users size={14} className="mr-1" /> {t("tabs.users")}
+                <Users size={14} className="mr-1" /> {t('tabs.users')}
               </TabsTrigger>
               <TabsTrigger value="groups" className="text-xs">
-                <Database size={14} className="mr-1" /> {t("tabs.groups")}
+                <Database size={14} className="mr-1" /> {t('tabs.groups')}
               </TabsTrigger>
-              <TabsTrigger value="database" className="text-xs hidden md:block">
-                <Database size={14} className="mr-1" /> {t("tabs.database")}
+              <TabsTrigger value="database" className="hidden text-xs md:block">
+                <Database size={14} className="mr-1" /> {t('tabs.database')}
               </TabsTrigger>
-              <TabsTrigger value="settings" className="text-xs hidden md:block">
-                <Settings size={14} className="mr-1" /> {t("tabs.settings")}
+              <TabsTrigger value="settings" className="hidden text-xs md:block">
+                <Settings size={14} className="mr-1" /> {t('tabs.settings')}
               </TabsTrigger>
-              <TabsTrigger value="modules" className="text-xs hidden lg:block">
-                <BookOpen size={14} className="mr-1" /> {t("tabs.modules")}
+              <TabsTrigger value="modules" className="hidden text-xs lg:block">
+                <BookOpen size={14} className="mr-1" /> {t('tabs.modules')}
               </TabsTrigger>
-              <TabsTrigger value="lms" className="text-xs hidden lg:block">
-                <Link size={14} className="mr-1" /> {t("tabs.lms")}
+              <TabsTrigger value="lms" className="hidden text-xs lg:block">
+                <Link size={14} className="mr-1" /> {t('tabs.lms')}
               </TabsTrigger>
-              <TabsTrigger
-                value="announcements"
-                className="text-xs hidden xl:block"
-              >
-                <Megaphone size={14} className="mr-1" />{" "}
-                {t("tabs.announcements")}
+              <TabsTrigger value="announcements" className="hidden text-xs xl:block">
+                <Megaphone size={14} className="mr-1" /> {t('tabs.announcements')}
               </TabsTrigger>
-              <TabsTrigger
-                value="analytics"
-                className="text-xs hidden xl:block"
-              >
-                <LineChart size={14} className="mr-1" /> {t("tabs.analytics")}
+              <TabsTrigger value="analytics" className="hidden text-xs xl:block">
+                <LineChart size={14} className="mr-1" /> {t('tabs.analytics')}
               </TabsTrigger>
-              <TabsTrigger value="audit" className="text-xs hidden xl:block">
-                <Activity size={14} className="mr-1" /> {t("tabs.audit")}
+              <TabsTrigger value="audit" className="hidden text-xs xl:block">
+                <Activity size={14} className="mr-1" /> {t('tabs.audit')}
               </TabsTrigger>
-              <TabsTrigger value="report" className="text-xs hidden xl:block">
-                <FileBarChart size={14} className="mr-1" /> {t("tabs.report")}
+              <TabsTrigger value="report" className="hidden text-xs xl:block">
+                <FileBarChart size={14} className="mr-1" /> {t('tabs.report')}
               </TabsTrigger>
             </TabsList>
           </div>
 
           {/* Users Tab */}
           <TabsContent value="users" className="mt-4 space-y-4">
-            <div className="flex gap-3 items-center">
+            <div className="flex items-center gap-3">
               <div className="relative flex-1">
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                />
+                <Search size={16} className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400" />
                 <Input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={t("search.placeholder")}
+                  placeholder={t('search.placeholder')}
                   className="pl-10"
                 />
               </div>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="px-3 py-2 border border-border rounded-md text-sm bg-card"
+                className="border-border bg-card rounded-md border px-3 py-2 text-sm"
               >
-                <option value="">{t("search.allRoles")}</option>
-                <option value="student">{t("search.student")}</option>
-                <option value="teacher">{t("search.teacher")}</option>
-                <option value="admin">{t("search.admin")}</option>
+                <option value="">{t('search.allRoles')}</option>
+                <option value="student">{t('search.student')}</option>
+                <option value="teacher">{t('search.teacher')}</option>
+                <option value="admin">{t('search.admin')}</option>
               </select>
               <Button onClick={() => setCreateModalOpen(true)}>
-                <UserPlus size={16} className="mr-1" /> {t("users.create")}
+                <UserPlus size={16} className="mr-1" /> {t('users.create')}
               </Button>
             </div>
 
@@ -523,26 +477,23 @@ export default function AdminPanel() {
               <Checkbox
                 checked={
                   filteredUsers.filter((u) => u.id !== user?.id).length > 0 &&
-                  selectedUserIds.size ===
-                    filteredUsers.filter((u) => u.id !== user?.id).length
+                  selectedUserIds.size === filteredUsers.filter((u) => u.id !== user?.id).length
                 }
                 onCheckedChange={handleSelectAll}
               />
-              <span className="text-xs text-muted-foreground">
-                {t("users.selectAll")}
-              </span>
+              <span className="text-muted-foreground text-xs">{t('users.selectAll')}</span>
               {selectedUserIds.size > 0 && (
                 <Badge variant="secondary" className="text-[10px]">
-                  {t("users.selected", { count: selectedUserIds.size })}
+                  {t('users.selected', { count: selectedUserIds.size })}
                 </Badge>
               )}
             </div>
 
             <div className="space-y-2">
               {loadingUsers ? (
-                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <div className="text-muted-foreground flex flex-col items-center justify-center py-12">
                   <Loader2 size={32} className="mb-3 animate-spin opacity-50" />
-                  <p className="text-sm">{t("users.loading")}</p>
+                  <p className="text-sm">{t('users.loading')}</p>
                 </div>
               ) : (
                 filteredUsers.map((u, i) => (
@@ -553,7 +504,7 @@ export default function AdminPanel() {
                     transition={{ delay: i * 0.03 }}
                   >
                     <Card
-                      className={`border-border hover:border-red-200 transition-colors ${u.isBlocked ? "opacity-60" : ""} ${u.id === user?.id ? "bg-secondary" : ""}`}
+                      className={`border-border transition-colors hover:border-red-200 ${u.isBlocked ? 'opacity-60' : ''} ${u.id === user?.id ? 'bg-secondary' : ''}`}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -563,45 +514,30 @@ export default function AdminPanel() {
                               onCheckedChange={() => handleToggleSelect(u.id)}
                               disabled={u.id === user?.id}
                             />
-                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100">
                               <Shield size={18} className="text-red-600" />
                             </div>
                             <div>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <p className="font-semibold text-sm">
-                                  {u.fullName}
-                                </p>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-sm font-semibold">{u.fullName}</p>
                                 {u.id === user?.id && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-[10px]"
-                                  >
-                                    {t("users.you")}
+                                  <Badge variant="outline" className="text-[10px]">
+                                    {t('users.you')}
                                   </Badge>
                                 )}
                                 {u.isBlocked && (
-                                  <Badge
-                                    variant="destructive"
-                                    className="text-[10px]"
-                                  >
-                                    {t("users.blocked")}
+                                  <Badge variant="destructive" className="text-[10px]">
+                                    {t('users.blocked')}
                                   </Badge>
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-muted-foreground text-xs">
                                 {u.email} • {u.phone}
                               </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge
-                                  className={`text-[10px] ${roleColors[u.role]}`}
-                                >
-                                  {getRoleLabel(u.role)}
-                                </Badge>
+                              <div className="mt-1 flex items-center gap-2">
+                                <Badge className={`text-[10px] ${roleColors[u.role]}`}>{getRoleLabel(u.role)}</Badge>
                                 {u.group && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-[10px]"
-                                  >
+                                  <Badge variant="secondary" className="text-[10px]">
                                     {u.group}
                                   </Badge>
                                 )}
@@ -609,53 +545,40 @@ export default function AdminPanel() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="text-right mr-2">
-                              <p className="text-xs text-muted-foreground">
-                                {t("users.logins", {
+                            <div className="mr-2 text-right">
+                              <p className="text-muted-foreground text-xs">
+                                {t('users.logins', {
                                   count: u.loginCount || 0,
                                 })}
                               </p>
                               <p className="text-[10px] text-slate-400">
-                                {u.lastLoginAt
-                                  ? formatDate(u.lastLoginAt)
-                                  : t("users.neverLoggedIn")}
+                                {u.lastLoginAt ? formatDate(u.lastLoginAt) : t('users.neverLoggedIn')}
                               </p>
                             </div>
                             {u.id !== user?.id && (
                               <>
                                 <select
                                   value={u.role}
-                                  onChange={(e) =>
-                                    handleRoleChange(
-                                      u.id,
-                                      e.target.value as UserRole,
-                                    )
-                                  }
-                                  className="px-2 py-1 border border-border rounded-md text-xs bg-card"
+                                  onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
+                                  className="border-border bg-card rounded-md border px-2 py-1 text-xs"
                                 >
-                                  <option value="student">
-                                    {t("search.student")}
-                                  </option>
-                                  <option value="teacher">
-                                    {t("search.teacher")}
-                                  </option>
-                                  <option value="admin">
-                                    {t("search.admin")}
-                                  </option>
+                                  <option value="student">{t('search.student')}</option>
+                                  <option value="teacher">{t('search.teacher')}</option>
+                                  <option value="admin">{t('search.admin')}</option>
                                 </select>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="text-muted-foreground hover:text-sky-700 hover:bg-sky-50"
+                                  className="text-muted-foreground hover:bg-sky-50 hover:text-sky-700"
                                   onClick={() => setActivityUser(u)}
-                                  title={t("users.activity")}
+                                  title={t('users.activity')}
                                 >
                                   <Activity size={16} />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="text-muted-foreground hover:text-emerald-700 hover:bg-emerald-50"
+                                  className="text-muted-foreground hover:bg-emerald-50 hover:text-emerald-700"
                                   onClick={() => setEditModalUser(u)}
                                 >
                                   <Pencil size={16} />
@@ -663,50 +586,43 @@ export default function AdminPanel() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="text-muted-foreground hover:text-amber-700 hover:bg-amber-50"
+                                  className="text-muted-foreground hover:bg-amber-50 hover:text-amber-700"
                                   onClick={() => setPasswordResetUser(u)}
-                                  title={t("users.resetPassword")}
+                                  title={t('users.resetPassword')}
                                 >
                                   <KeyRound size={16} />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="text-muted-foreground hover:text-purple-700 hover:bg-purple-50"
+                                  className="text-muted-foreground hover:bg-purple-50 hover:text-purple-700"
                                   onClick={async () => {
-                                    const result = await startImpersonation(
-                                      u.id,
-                                      user?.id || "",
-                                    );
+                                    const result = await startImpersonation(u.id, user?.id || '');
                                     if (result.success) {
                                       toast.success(
-                                        t("actions.loggedInAs", {
+                                        t('actions.loggedInAs', {
                                           name: u.fullName,
                                         }),
                                       );
-                                      setCurrentPage("dashboard");
+                                      setCurrentPage('dashboard');
                                     } else {
                                       toast.error(result.error);
                                     }
                                   }}
-                                  title={t("users.loginAs")}
+                                  title={t('users.loginAs')}
                                 >
                                   <LogIn size={16} />
                                 </Button>
                                 <Switch
                                   checked={u.isBlocked}
-                                  onCheckedChange={() =>
-                                    handleToggleBlock(u.id)
-                                  }
+                                  onCheckedChange={() => handleToggleBlock(u.id)}
                                   className="data-[state=checked]:bg-red-500"
                                 />
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                  onClick={() =>
-                                    handleDeleteUser(u.id, u.fullName)
-                                  }
+                                  className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                                  onClick={() => handleDeleteUser(u.id, u.fullName)}
                                 >
                                   <Trash2 size={16} />
                                 </Button>
@@ -726,33 +642,19 @@ export default function AdminPanel() {
           <TabsContent value="database" className="mt-4 space-y-4">
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">
-                  {t("database.usersByRole")}
-                </h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('database.usersByRole')}</h3>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-violet-50 rounded-lg">
-                    <p className="text-3xl font-bold text-violet-600">
-                      {studentCount}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("database.students")}
-                    </p>
+                  <div className="rounded-lg bg-violet-50 p-4 text-center">
+                    <p className="text-3xl font-bold text-violet-600">{studentCount}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('database.students')}</p>
                   </div>
-                  <div className="text-center p-4 bg-amber-50 rounded-lg">
-                    <p className="text-3xl font-bold text-amber-600">
-                      {teacherCount}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("database.teachers")}
-                    </p>
+                  <div className="rounded-lg bg-amber-50 p-4 text-center">
+                    <p className="text-3xl font-bold text-amber-600">{teacherCount}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('database.teachers')}</p>
                   </div>
-                  <div className="text-center p-4 bg-red-50 rounded-lg">
-                    <p className="text-3xl font-bold text-red-600">
-                      {adminCount}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("database.admins")}
-                    </p>
+                  <div className="rounded-lg bg-red-50 p-4 text-center">
+                    <p className="text-3xl font-bold text-red-600">{adminCount}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('database.admins')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -760,25 +662,15 @@ export default function AdminPanel() {
 
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">
-                  {t("database.localStorage")}
-                </h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('database.localStorage')}</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-sky-50 rounded-lg">
-                    <p className="text-3xl font-bold text-sky-600">
-                      {keysCount}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("kpi.keys")}
-                    </p>
+                  <div className="rounded-lg bg-sky-50 p-4 text-center">
+                    <p className="text-3xl font-bold text-sky-600">{keysCount}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('kpi.keys')}</p>
                   </div>
-                  <div className="text-center p-4 bg-emerald-50 rounded-lg">
-                    <p className="text-3xl font-bold text-emerald-600">
-                      {storageKB} KB
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("kpi.used")}
-                    </p>
+                  <div className="rounded-lg bg-emerald-50 p-4 text-center">
+                    <p className="text-3xl font-bold text-emerald-600">{storageKB} KB</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('kpi.used')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -788,57 +680,47 @@ export default function AdminPanel() {
           {/* Settings Tab */}
           <TabsContent value="settings" className="mt-4 space-y-4">
             <Card className="border-border">
-              <CardContent className="p-5 space-y-4">
-                <h3 className="font-semibold text-sm">
-                  {t("settings.systemActions")}
-                </h3>
+              <CardContent className="space-y-4 p-5">
+                <h3 className="text-sm font-semibold">{t('settings.systemActions')}</h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <Button
                     variant="outline"
-                    className="border-red-200 text-red-600 hover:bg-red-50 justify-start"
+                    className="justify-start border-red-200 text-red-600 hover:bg-red-50"
                     onClick={handleClearProgress}
                   >
                     <RotateCcw size={16} className="mr-2" />
-                    {t("settings.clearProgress")}
+                    {t('settings.clearProgress')}
                   </Button>
 
                   <Button
                     variant="outline"
-                    className="border-sky-200 text-sky-600 hover:bg-sky-50 justify-start"
+                    className="justify-start border-sky-200 text-sky-600 hover:bg-sky-50"
                     onClick={handleExportData}
                   >
                     <Download size={16} className="mr-2" />
-                    {t("settings.exportJson")}
+                    {t('settings.exportJson')}
                   </Button>
 
                   <div>
-                    <input
-                      type="file"
-                      accept=".csv"
-                      ref={fileInputRef}
-                      onChange={handleCSVImport}
-                      className="hidden"
-                    />
+                    <input type="file" accept=".csv" ref={fileInputRef} onChange={handleCSVImport} className="hidden" />
                     <Button
                       variant="outline"
-                      className="border-emerald-200 text-emerald-600 hover:bg-emerald-50 justify-start w-full"
+                      className="w-full justify-start border-emerald-200 text-emerald-600 hover:bg-emerald-50"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <Upload size={16} className="mr-2" />
-                      {t("settings.importCsv")}
+                      {t('settings.importCsv')}
                     </Button>
                   </div>
                 </div>
 
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
                   <p className="text-xs text-amber-700">
-                    <strong>{t("settings.warning")}</strong>{" "}
-                    {t("settings.warningText")}
+                    <strong>{t('settings.warning')}</strong> {t('settings.warningText')}
                   </p>
-                  <p className="text-xs text-amber-700 mt-1">
-                    <strong>{t("settings.csvInfo")}</strong>{" "}
-                    {t("settings.csvFormat")}
+                  <p className="mt-1 text-xs text-amber-700">
+                    <strong>{t('settings.csvInfo')}</strong> {t('settings.csvFormat')}
                   </p>
                 </div>
               </CardContent>
@@ -847,41 +729,23 @@ export default function AdminPanel() {
             {/* Stats */}
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="font-semibold text-sm mb-4">
-                  {t("settings.overallStats")}
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-3 bg-violet-50 rounded-lg">
-                    <p className="text-2xl font-bold text-violet-600">
-                      {totalUsers}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("kpi.total")}
-                    </p>
+                <h3 className="mb-4 text-sm font-semibold">{t('settings.overallStats')}</h3>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  <div className="rounded-lg bg-violet-50 p-3 text-center">
+                    <p className="text-2xl font-bold text-violet-600">{totalUsers}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('kpi.total')}</p>
                   </div>
-                  <div className="text-center p-3 bg-red-50 rounded-lg">
-                    <p className="text-2xl font-bold text-red-600">
-                      {blockedCount}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("kpi.blocked")}
-                    </p>
+                  <div className="rounded-lg bg-red-50 p-3 text-center">
+                    <p className="text-2xl font-bold text-red-600">{blockedCount}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('kpi.blocked')}</p>
                   </div>
-                  <div className="text-center p-3 bg-sky-50 rounded-lg">
-                    <p className="text-2xl font-bold text-sky-600">
-                      {keysCount}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("kpi.localStorageKeys")}
-                    </p>
+                  <div className="rounded-lg bg-sky-50 p-3 text-center">
+                    <p className="text-2xl font-bold text-sky-600">{keysCount}</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('kpi.localStorageKeys')}</p>
                   </div>
-                  <div className="text-center p-3 bg-emerald-50 rounded-lg">
-                    <p className="text-2xl font-bold text-emerald-600">
-                      {storageKB} KB
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("kpi.storage")}
-                    </p>
+                  <div className="rounded-lg bg-emerald-50 p-3 text-center">
+                    <p className="text-2xl font-bold text-emerald-600">{storageKB} KB</p>
+                    <p className="text-muted-foreground mt-1 text-xs">{t('kpi.storage')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -890,15 +754,13 @@ export default function AdminPanel() {
 
           {/* Groups Tab */}
           <TabsContent value="groups" className="mt-4 space-y-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center">
+            <div className="mb-2 flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-100">
                 <Users size={16} className="text-sky-600" />
               </div>
               <div>
-                <h2 className="text-sm font-bold">{t("groups.title")}</h2>
-                <p className="text-xs text-muted-foreground">
-                  {t("groups.subtitle")}
-                </p>
+                <h2 className="text-sm font-bold">{t('groups.title')}</h2>
+                <p className="text-muted-foreground text-xs">{t('groups.subtitle')}</p>
               </div>
             </div>
             <GroupManager onRefresh={refresh} />
@@ -916,9 +778,7 @@ export default function AdminPanel() {
 
           {/* Announcements Tab */}
           <TabsContent value="announcements" className="mt-4 space-y-4">
-            <SystemAnnouncements
-              currentUser={user?.fullName || t("search.admin")}
-            />
+            <SystemAnnouncements currentUser={user?.fullName || t('search.admin')} />
           </TabsContent>
 
           {/* Analytics Tab */}
@@ -933,15 +793,13 @@ export default function AdminPanel() {
 
           {/* Audit Log Tab */}
           <TabsContent value="audit" className="mt-4 space-y-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+            <div className="mb-2 flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100">
                 <Activity size={16} className="text-purple-600" />
               </div>
               <div>
-                <h2 className="text-sm font-bold">{t("audit.title")}</h2>
-                <p className="text-xs text-muted-foreground">
-                  {t("audit.subtitle")}
-                </p>
+                <h2 className="text-sm font-bold">{t('audit.title')}</h2>
+                <p className="text-muted-foreground text-xs">{t('audit.subtitle')}</p>
               </div>
             </div>
             <AuditLogView />
@@ -950,46 +808,46 @@ export default function AdminPanel() {
           {/* Report Tab */}
           <TabsContent value="report" className="mt-4 space-y-4">
             {/* Sub-tab selector */}
-            <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
+            <div className="bg-muted flex w-fit flex-wrap gap-1 rounded-lg p-1">
               {[
                 {
-                  key: "summary" as const,
-                  label: t("report.summary"),
+                  key: 'summary' as const,
+                  label: t('report.summary'),
                   icon: FileBarChart,
                 },
                 {
-                  key: "heatmap" as const,
-                  label: t("report.activity"),
+                  key: 'heatmap' as const,
+                  label: t('report.activity'),
                   icon: Calendar,
                 },
                 {
-                  key: "quiz-categories" as const,
-                  label: t("report.quizzes"),
+                  key: 'quiz-categories' as const,
+                  label: t('report.quizzes'),
                   icon: HelpCircle,
                 },
                 {
-                  key: "quiz-questions" as const,
-                  label: t("report.questions"),
+                  key: 'quiz-questions' as const,
+                  label: t('report.questions'),
                   icon: HelpCircle,
                 },
                 {
-                  key: "student-comparison" as const,
-                  label: t("report.students"),
+                  key: 'student-comparison' as const,
+                  label: t('report.students'),
                   icon: GitCompare,
                 },
                 {
-                  key: "export" as const,
-                  label: t("report.export"),
+                  key: 'export' as const,
+                  label: t('report.export'),
                   icon: Download,
                 },
               ].map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
                   onClick={() => setReportSubTab(key)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
                     reportSubTab === key
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Icon size={13} />
@@ -999,77 +857,44 @@ export default function AdminPanel() {
             </div>
 
             {/* Summary sub-tab */}
-            {reportSubTab === "summary" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
+            {reportSubTab === 'summary' && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
                 <AdminSummaryReport />
               </motion.div>
             )}
 
             {/* Heatmap sub-tab */}
-            {reportSubTab === "heatmap" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
+            {reportSubTab === 'heatmap' && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
                 <ActivityHeatmap />
               </motion.div>
             )}
 
             {/* Quiz Categories sub-tab */}
-            {reportSubTab === "quiz-categories" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <QuizCategoryDeepDive
-                  groupId={analyticsGroupId}
-                  days={analyticsDays}
-                />
+            {reportSubTab === 'quiz-categories' && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                <QuizCategoryDeepDive groupId={analyticsGroupId} days={analyticsDays} />
               </motion.div>
             )}
 
             {/* Quiz Questions sub-tab */}
-            {reportSubTab === "quiz-questions" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
+            {reportSubTab === 'quiz-questions' && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
                 <QuizQuestionAnalytics />
               </motion.div>
             )}
 
             {/* Student Comparison sub-tab */}
-            {reportSubTab === "student-comparison" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <StudentComparisonView
-                  groupId={analyticsGroupId}
-                  days={analyticsDays}
-                />
+            {reportSubTab === 'student-comparison' && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                <StudentComparisonView groupId={analyticsGroupId} days={analyticsDays} />
               </motion.div>
             )}
 
             {/* Export sub-tab */}
-            {reportSubTab === "export" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <AnalyticsExportPanel
-                  groupId={analyticsGroupId}
-                  days={analyticsDays}
-                />
+            {reportSubTab === 'export' && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                <AnalyticsExportPanel groupId={analyticsGroupId} days={analyticsDays} />
               </motion.div>
             )}
           </TabsContent>
@@ -1118,18 +943,13 @@ export default function AdminPanel() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {activityUser && (
-          <UserActivityModal
-            user={activityUser}
-            onClose={() => setActivityUser(null)}
-          />
-        )}
+        {activityUser && <UserActivityModal user={activityUser} onClose={() => setActivityUser(null)} />}
       </AnimatePresence>
 
       {/* Bulk Actions Bar */}
       <BulkActionsBar
         selectedIds={Array.from(selectedUserIds)}
-        currentUserId={user?.id || ""}
+        currentUserId={user?.id || ''}
         onDone={() => {
           setSelectedUserIds(new Set());
           refresh();
@@ -1148,44 +968,44 @@ function AnalyticsSubTabs({
   selectedStudentId: string;
   setSelectedStudentId: (id: string) => void;
 }) {
-  const t = useTranslations("admin");
+  const t = useTranslations('admin');
   const [analyticsSubTab, setAnalyticsSubTab] = useState<
-    | "dashboard"
-    | "modules"
-    | "dynamics"
-    | "trends"
-    | "at-risk"
-    | "comparison"
-    | "engagement"
-    | "student"
-    | "achievements"
-    | "gradebook"
-    | "learning-path"
-    | "quiz-trajectory"
-    | "cohort"
-    | "competency"
-    | "weaknesses"
-    | "predictive"
-    | "module-deep-dive"
-    | "certification"
-    | "velocity"
-    | "quiz-session"
-    | "group-dynamics"
-    | "login-patterns"
-    | "advanced"
-    | "difficulty"
-    | "heatmap"
-    | "questions"
-    | "summary"
-    | "retry"
-    | "errors"
-    | "sankey"
-    | "calendar"
-    | "predictive-risk"
-    | "scheduler"
-    | "data-quality"
-    | "period-comparison"
-  >("dashboard");
+    | 'dashboard'
+    | 'modules'
+    | 'dynamics'
+    | 'trends'
+    | 'at-risk'
+    | 'comparison'
+    | 'engagement'
+    | 'student'
+    | 'achievements'
+    | 'gradebook'
+    | 'learning-path'
+    | 'quiz-trajectory'
+    | 'cohort'
+    | 'competency'
+    | 'weaknesses'
+    | 'predictive'
+    | 'module-deep-dive'
+    | 'certification'
+    | 'velocity'
+    | 'quiz-session'
+    | 'group-dynamics'
+    | 'login-patterns'
+    | 'advanced'
+    | 'difficulty'
+    | 'heatmap'
+    | 'questions'
+    | 'summary'
+    | 'retry'
+    | 'errors'
+    | 'sankey'
+    | 'calendar'
+    | 'predictive-risk'
+    | 'scheduler'
+    | 'data-quality'
+    | 'period-comparison'
+  >('dashboard');
   const { groupId, days } = useAnalyticsFilters();
   const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
 
@@ -1197,216 +1017,216 @@ function AnalyticsSubTabs({
     <>
       {/* KPI Summary Row */}
       {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
           <KPICard
             icon={<Users size={18} />}
             value={summary.kpis.totalStudents ?? 0}
-            label={t("analytics.totalStudents")}
-            trend={summary.trends.students ?? "stable"}
+            label={t('analytics.totalStudents')}
+            trend={summary.trends.students ?? 'stable'}
           />
           <KPICard
             icon={<Activity size={18} />}
             value={`${summary.kpis.activePercentage ?? 0}%`}
-            label={t("analytics.activePercent")}
-            trend={summary.trends.activity ?? "stable"}
+            label={t('analytics.activePercent')}
+            trend={summary.trends.activity ?? 'stable'}
           />
           <KPICard
             icon={<BookOpen size={18} />}
             value={`${summary.kpis.avgCompletionRate ?? 0}%`}
-            label={t("analytics.avgCompletion")}
-            trend={summary.trends.completion ?? "stable"}
+            label={t('analytics.avgCompletion')}
+            trend={summary.trends.completion ?? 'stable'}
           />
           <KPICard
             icon={<HelpCircle size={18} />}
             value={`${summary.kpis.avgQuizScore ?? 0}%`}
-            label={t("analytics.avgQuizScore")}
-            trend={summary.trends.quizScore ?? "stable"}
+            label={t('analytics.avgQuizScore')}
+            trend={summary.trends.quizScore ?? 'stable'}
           />
         </div>
       )}
 
       {/* Sub-tab selector */}
-      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit flex-wrap">
+      <div className="bg-muted flex w-fit flex-wrap gap-1 rounded-lg p-1">
         {[
           {
-            key: "dashboard" as const,
-            label: t("analytics.dashboard"),
+            key: 'dashboard' as const,
+            label: t('analytics.dashboard'),
             icon: BarChart3,
           },
           {
-            key: "modules" as const,
-            label: t("analytics.modules"),
+            key: 'modules' as const,
+            label: t('analytics.modules'),
             icon: BookOpen,
           },
           {
-            key: "dynamics" as const,
-            label: t("analytics.dynamics"),
+            key: 'dynamics' as const,
+            label: t('analytics.dynamics'),
             icon: TrendingUp,
           },
           {
-            key: "trends" as const,
-            label: t("analytics.trends"),
+            key: 'trends' as const,
+            label: t('analytics.trends'),
             icon: LineChart,
           },
           {
-            key: "at-risk" as const,
-            label: t("analytics.atRisk"),
+            key: 'at-risk' as const,
+            label: t('analytics.atRisk'),
             icon: AlertTriangle,
           },
           {
-            key: "comparison" as const,
-            label: t("analytics.comparison"),
+            key: 'comparison' as const,
+            label: t('analytics.comparison'),
             icon: GitCompare,
           },
           {
-            key: "engagement" as const,
-            label: t("analytics.engagement"),
+            key: 'engagement' as const,
+            label: t('analytics.engagement'),
             icon: Flame,
           },
           {
-            key: "achievements" as const,
-            label: t("analytics.achievements"),
+            key: 'achievements' as const,
+            label: t('analytics.achievements'),
             icon: Award,
           },
           {
-            key: "gradebook" as const,
-            label: t("analytics.gradebook"),
+            key: 'gradebook' as const,
+            label: t('analytics.gradebook'),
             icon: Table,
           },
           {
-            key: "learning-path" as const,
-            label: t("analytics.learningPath"),
+            key: 'learning-path' as const,
+            label: t('analytics.learningPath'),
             icon: GitBranch,
           },
           {
-            key: "quiz-trajectory" as const,
-            label: t("analytics.quizTrajectory"),
+            key: 'quiz-trajectory' as const,
+            label: t('analytics.quizTrajectory'),
             icon: Target,
           },
           {
-            key: "cohort" as const,
-            label: t("analytics.cohort"),
+            key: 'cohort' as const,
+            label: t('analytics.cohort'),
             icon: Layers,
           },
           {
-            key: "competency" as const,
-            label: t("analytics.competency"),
+            key: 'competency' as const,
+            label: t('analytics.competency'),
             icon: Radar,
           },
           {
-            key: "weaknesses" as const,
-            label: t("analytics.weaknesses"),
+            key: 'weaknesses' as const,
+            label: t('analytics.weaknesses'),
             icon: AlertTriangle,
           },
           {
-            key: "predictive" as const,
-            label: t("analytics.predictive"),
+            key: 'predictive' as const,
+            label: t('analytics.predictive'),
             icon: TrendingUp,
           },
           {
-            key: "student" as const,
-            label: t("analytics.student"),
+            key: 'student' as const,
+            label: t('analytics.student'),
             icon: Users,
           },
           {
-            key: "module-deep-dive" as const,
-            label: t("analytics.moduleDeepDive"),
+            key: 'module-deep-dive' as const,
+            label: t('analytics.moduleDeepDive'),
             icon: ListChecks,
           },
           {
-            key: "certification" as const,
-            label: t("analytics.certification"),
+            key: 'certification' as const,
+            label: t('analytics.certification'),
             icon: Award,
           },
           {
-            key: "velocity" as const,
-            label: t("analytics.velocity"),
+            key: 'velocity' as const,
+            label: t('analytics.velocity'),
             icon: Zap,
           },
           {
-            key: "quiz-session" as const,
-            label: t("analytics.quizSession"),
+            key: 'quiz-session' as const,
+            label: t('analytics.quizSession'),
             icon: Clock,
           },
           {
-            key: "group-dynamics" as const,
-            label: t("analytics.groupDynamics"),
+            key: 'group-dynamics' as const,
+            label: t('analytics.groupDynamics'),
             icon: Heart,
           },
           {
-            key: "login-patterns" as const,
-            label: t("analytics.loginPatterns"),
+            key: 'login-patterns' as const,
+            label: t('analytics.loginPatterns'),
             icon: LogIn,
           },
           {
-            key: "advanced" as const,
-            label: t("analytics.advanced"),
+            key: 'advanced' as const,
+            label: t('analytics.advanced'),
             icon: Layers,
           },
           {
-            key: "difficulty" as const,
-            label: t("analytics.difficulty"),
+            key: 'difficulty' as const,
+            label: t('analytics.difficulty'),
             icon: Target,
           },
           {
-            key: "heatmap" as const,
-            label: t("analytics.heatmap"),
+            key: 'heatmap' as const,
+            label: t('analytics.heatmap'),
             icon: Grid,
           },
           {
-            key: "questions" as const,
-            label: t("analytics.questionsTab"),
+            key: 'questions' as const,
+            label: t('analytics.questionsTab'),
             icon: HelpCircle,
           },
           {
-            key: "summary" as const,
-            label: t("analytics.summaryTab"),
+            key: 'summary' as const,
+            label: t('analytics.summaryTab'),
             icon: FileBarChart,
           },
-          { key: "retry" as const, label: t("analytics.retry"), icon: Repeat },
+          { key: 'retry' as const, label: t('analytics.retry'), icon: Repeat },
           {
-            key: "errors" as const,
-            label: t("analytics.errors"),
+            key: 'errors' as const,
+            label: t('analytics.errors'),
             icon: AlertOctagon,
           },
           {
-            key: "sankey" as const,
-            label: t("analytics.sankey"),
+            key: 'sankey' as const,
+            label: t('analytics.sankey'),
             icon: GitBranch,
           },
           {
-            key: "calendar" as const,
-            label: t("analytics.calendar"),
+            key: 'calendar' as const,
+            label: t('analytics.calendar'),
             icon: Calendar,
           },
           {
-            key: "predictive-risk" as const,
-            label: t("analytics.predictiveRisk"),
+            key: 'predictive-risk' as const,
+            label: t('analytics.predictiveRisk'),
             icon: TrendingUp,
           },
           {
-            key: "scheduler" as const,
-            label: t("analytics.scheduler"),
+            key: 'scheduler' as const,
+            label: t('analytics.scheduler'),
             icon: Calendar,
           },
           {
-            key: "data-quality" as const,
-            label: t("analytics.dataQuality"),
+            key: 'data-quality' as const,
+            label: t('analytics.dataQuality'),
             icon: ShieldCheck,
           },
           {
-            key: "period-comparison" as const,
-            label: t("analytics.periodComparison"),
+            key: 'period-comparison' as const,
+            label: t('analytics.periodComparison'),
             icon: ArrowLeftRight,
           },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setAnalyticsSubTab(key)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
               analyticsSubTab === key
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Icon size={13} />
@@ -1415,160 +1235,96 @@ function AnalyticsSubTabs({
         ))}
       </div>
 
-      {analyticsSubTab === "dashboard" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center justify-end mb-3">
+      {analyticsSubTab === 'dashboard' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+          <div className="mb-3 flex items-center justify-end">
             <ExecutiveSummaryExport groupId={groupId} days={days} />
           </div>
           <ComprehensiveDashboard groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "modules" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'modules' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <ModulePerformanceReport groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "dynamics" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'dynamics' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <ProgressDynamicsChart groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "trends" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'trends' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <ProgressTrendsChart groupId={groupId} />
         </motion.div>
       )}
-      {analyticsSubTab === "at-risk" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'at-risk' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <AtRiskReport groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "comparison" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'comparison' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <GroupComparisonReport groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "engagement" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'engagement' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <EngagementAnalytics groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "achievements" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'achievements' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <AchievementAnalytics groupId={groupId} />
         </motion.div>
       )}
-      {analyticsSubTab === "gradebook" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'gradebook' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <GradebookView groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "learning-path" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'learning-path' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <LearningPathReport groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "quiz-trajectory" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'quiz-trajectory' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <QuizTrajectoryReport groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "cohort" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'cohort' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <CohortAnalysis groupId={groupId} />
         </motion.div>
       )}
-      {analyticsSubTab === "competency" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'competency' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <CompetencyRadar groupId={groupId} />
         </motion.div>
       )}
-      {analyticsSubTab === "weaknesses" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'weaknesses' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <WeaknessAnalyzer groupId={groupId} />
         </motion.div>
       )}
-      {analyticsSubTab === "predictive" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'predictive' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <PredictiveInsights groupId={groupId} />
         </motion.div>
       )}
-      {analyticsSubTab === "student" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'student' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <select
                 value={selectedStudentId}
                 onChange={(e) => setSelectedStudentId(e.target.value)}
-                className="px-3 py-2 border border-border rounded-md text-sm bg-card"
+                className="border-border bg-card rounded-md border px-3 py-2 text-sm"
               >
-                <option value="">{t("analytics.selectStudent")}</option>
+                <option value="">{t('analytics.selectStudent')}</option>
                 {allUsers
-                  .filter((u) => u.role === "student")
+                  .filter((u) => u.role === 'student')
                   .map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.fullName} ({u.email})
@@ -1580,174 +1336,98 @@ function AnalyticsSubTabs({
           </div>
         </motion.div>
       )}
-      {analyticsSubTab === "module-deep-dive" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'module-deep-dive' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <ModuleDeepDive groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "certification" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'certification' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <CertificationReadiness groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "velocity" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'velocity' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <LearningVelocity groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "quiz-session" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'quiz-session' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <QuizSessionAnalytics groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "group-dynamics" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'group-dynamics' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <GroupDynamics groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "login-patterns" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'login-patterns' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <LoginPatterns groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "advanced" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'advanced' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <AdvancedAnalytics groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "difficulty" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'difficulty' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <QuizDifficultyAnalysis groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "heatmap" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'heatmap' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <ActivityHeatmap />
         </motion.div>
       )}
-      {analyticsSubTab === "questions" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'questions' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <QuizQuestionAnalytics />
         </motion.div>
       )}
-      {analyticsSubTab === "summary" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'summary' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <AdminSummaryReport />
         </motion.div>
       )}
-      {analyticsSubTab === "retry" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'retry' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <QuizRetryAnalytics groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "errors" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'errors' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <ErrorPatternsAnalytics groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "sankey" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'sankey' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <ProgressSankey groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "calendar" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'calendar' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <StudentHeatmapCalendar groupId={groupId} />
         </motion.div>
       )}
-      {analyticsSubTab === "predictive-risk" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'predictive-risk' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <PredictiveRiskDashboard groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "scheduler" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'scheduler' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <ReportScheduler groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "data-quality" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'data-quality' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <DataQualityMonitor groupId={groupId} days={days} />
         </motion.div>
       )}
-      {analyticsSubTab === "period-comparison" && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      {analyticsSubTab === 'period-comparison' && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
           <PeriodComparison groupId={groupId} />
         </motion.div>
       )}

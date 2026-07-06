@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -14,40 +14,26 @@ import {
   ZAxis,
   LineChart,
   Line,
-} from "recharts";
-import {
-  Loader2,
-  AlertTriangle,
-  TrendingUp,
-  Zap,
-  Users,
-  Clock,
-} from "lucide-react";
-import {
-  getLearningVelocity,
-  type LearningVelocityData,
-} from "@/lib/auth-store";
-import { useAnalyticsFetcher } from "@/hooks/use-analytics-fetch";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from 'recharts';
+import { Loader2, AlertTriangle, TrendingUp, Zap, Users, Clock } from 'lucide-react';
+import { getLearningVelocity, type LearningVelocityData } from '@/lib/auth-store';
+import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export interface LearningVelocityProps {
   groupId?: string;
   days?: number;
 }
 
-export default function LearningVelocity({
-  groupId: propGroupId,
-  days: propDays,
-}: LearningVelocityProps = {}) {
+export default function LearningVelocity({ groupId: propGroupId, days: propDays }: LearningVelocityProps = {}) {
   const [internalDays, setInternalDays] = useState(90);
-  const [internalGroupId] = useState("");
+  const [internalGroupId] = useState('');
 
   const days = propDays ?? internalDays;
 
   const { data, loading, error } = useAnalyticsFetcher<LearningVelocityData>(
-    () =>
-      getLearningVelocity(days, propGroupId || internalGroupId || undefined),
+    () => getLearningVelocity(days, propGroupId || internalGroupId || undefined),
     [days, propGroupId, internalGroupId],
   );
 
@@ -55,7 +41,7 @@ export default function LearningVelocity({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-sm text-muted-foreground ml-3">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
       </div>
     );
   }
@@ -64,41 +50,27 @@ export default function LearningVelocity({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-sm text-muted-foreground font-medium ml-3">
-          {error || "Нет данных"}
-        </p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
       </div>
     );
   }
 
-  const {
-    studentVelocities,
-    velocityDistribution,
-    avgVelocityByGroup,
-    velocityOverTime,
-  } = data;
+  const { studentVelocities, velocityDistribution, avgVelocityByGroup, velocityOverTime } = data;
 
   const avgVelocity =
     studentVelocities.length > 0
-      ? Math.round(
-          studentVelocities.reduce((sum, v) => sum + v.velocityScore, 0) /
-            studentVelocities.length,
-        )
+      ? Math.round(studentVelocities.reduce((sum, v) => sum + v.velocityScore, 0) / studentVelocities.length)
       : 0;
   const avgDays =
     studentVelocities.length > 0
       ? Math.round(
-          (studentVelocities.reduce((sum, v) => sum + v.avgDaysPerModule, 0) /
-            studentVelocities.length) *
-            10,
+          (studentVelocities.reduce((sum, v) => sum + v.avgDaysPerModule, 0) / studentVelocities.length) * 10,
         ) / 10
       : 0;
   const avgImprovement =
     studentVelocities.length > 0
       ? Math.round(
-          (studentVelocities.reduce((sum, v) => sum + v.scoreImprovement, 0) /
-            studentVelocities.length) *
-            10,
+          (studentVelocities.reduce((sum, v) => sum + v.scoreImprovement, 0) / studentVelocities.length) * 10,
         ) / 10
       : 0;
 
@@ -113,7 +85,7 @@ export default function LearningVelocity({
           <select
             value={internalDays}
             onChange={(e) => setInternalDays(Number(e.target.value))}
-            className="px-3 py-1.5 border border-border rounded-md text-sm bg-card"
+            className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
             <option value={30}>30 дней</option>
             <option value={90}>90 дней</option>
@@ -123,38 +95,36 @@ export default function LearningVelocity({
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Users size={18} className="mx-auto mb-1 text-indigo-600" />
-            <p className="text-2xl font-bold text-indigo-600">
-              {studentVelocities.length}
-            </p>
-            <p className="text-xs text-muted-foreground">Студентов с данными</p>
+            <p className="text-2xl font-bold text-indigo-600">{studentVelocities.length}</p>
+            <p className="text-muted-foreground text-xs">Студентов с данными</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Clock size={18} className="mx-auto mb-1 text-amber-600" />
             <p className="text-2xl font-bold text-amber-600">{avgDays}</p>
-            <p className="text-xs text-muted-foreground">Ср. дней/модуль</p>
+            <p className="text-muted-foreground text-xs">Ср. дней/модуль</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <TrendingUp size={18} className="mx-auto mb-1 text-emerald-600" />
             <p className="text-2xl font-bold text-emerald-600">
-              {avgImprovement > 0 ? "+" : ""}
+              {avgImprovement > 0 ? '+' : ''}
               {avgImprovement}
             </p>
-            <p className="text-xs text-muted-foreground">Ср. улучшение балла</p>
+            <p className="text-muted-foreground text-xs">Ср. улучшение балла</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Zap size={18} className="mx-auto mb-1 text-violet-600" />
             <p className="text-2xl font-bold text-violet-600">{avgVelocity}</p>
-            <p className="text-xs text-muted-foreground">Ср. индекс скорости</p>
+            <p className="text-muted-foreground text-xs">Ср. индекс скорости</p>
           </CardContent>
         </Card>
       </div>
@@ -162,9 +132,7 @@ export default function LearningVelocity({
       {/* Scatter: velocity vs score improvement */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">
-            Скорость vs Улучшение балла
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold">Скорость vs Улучшение балла</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart>
@@ -175,8 +143,8 @@ export default function LearningVelocity({
                   type="number"
                   tick={{ fontSize: 10 }}
                   label={{
-                    value: "Дней на модуль",
-                    position: "insideBottom",
+                    value: 'Дней на модуль',
+                    position: 'insideBottom',
                     offset: -5,
                     fontSize: 11,
                   }}
@@ -187,18 +155,15 @@ export default function LearningVelocity({
                   type="number"
                   tick={{ fontSize: 10 }}
                   label={{
-                    value: "Улучшение балла",
+                    value: 'Улучшение балла',
                     angle: -90,
-                    position: "insideLeft",
+                    position: 'insideLeft',
                     offset: 5,
                     fontSize: 11,
                   }}
                 />
                 <ZAxis dataKey="velocityScore" range={[30, 100]} />
-                <Tooltip
-                  cursor={{ strokeDasharray: "3 3" }}
-                  formatter={(value, name) => [`${value}`, name ?? ""]}
-                />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value, name) => [`${value}`, name ?? '']} />
                 <Scatter
                   name="Студенты"
                   data={studentVelocities.map((v) => ({
@@ -216,7 +181,7 @@ export default function LearningVelocity({
       {/* Velocity distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-4">Распределение скорости</h3>
+          <h3 className="mb-4 text-sm font-semibold">Распределение скорости</h3>
           <div className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={velocityDistribution}>
@@ -224,12 +189,7 @@ export default function LearningVelocity({
                 <XAxis dataKey="range" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Bar
-                  dataKey="count"
-                  name="Студентов"
-                  fill="#10b981"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="count" name="Студентов" fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -240,9 +200,7 @@ export default function LearningVelocity({
       {velocityOverTime.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Динамика скорости по неделям
-            </h3>
+            <h3 className="mb-4 text-sm font-semibold">Динамика скорости по неделям</h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={velocityOverTime}>
@@ -275,7 +233,7 @@ export default function LearningVelocity({
       {avgVelocityByGroup.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">Скорость по группам</h3>
+            <h3 className="mb-4 text-sm font-semibold">Скорость по группам</h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={avgVelocityByGroup}>
@@ -283,18 +241,8 @@ export default function LearningVelocity({
                   <XAxis dataKey="group" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Bar
-                    dataKey="avgDaysPerModule"
-                    name="Дней/модуль"
-                    fill="#6366f1"
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="avgScoreImprovement"
-                    name="Улучшение"
-                    fill="#10b981"
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="avgDaysPerModule" name="Дней/модуль" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="avgScoreImprovement" name="Улучшение" fill="#10b981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -305,16 +253,13 @@ export default function LearningVelocity({
       {/* Top students ranking */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="font-semibold text-sm mb-3">Рейтинг скорости</h3>
+          <h3 className="mb-3 text-sm font-semibold">Рейтинг скорости</h3>
           <div className="space-y-2">
             {studentVelocities.slice(0, 15).map((v, i) => (
-              <div
-                key={v.userId}
-                className="flex items-center justify-between text-sm"
-              >
+              <div key={v.userId} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? "bg-amber-100 text-amber-700" : i === 1 ? "bg-slate-200 text-muted-foreground" : i === 2 ? "bg-orange-100 text-orange-700" : "bg-muted text-muted-foreground"}`}
+                    className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${i === 0 ? 'bg-amber-100 text-amber-700' : i === 1 ? 'text-muted-foreground bg-slate-200' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-muted text-muted-foreground'}`}
                   >
                     {i + 1}
                   </span>
@@ -325,23 +270,13 @@ export default function LearningVelocity({
                     </Badge>
                   )}
                 </div>
-                <div className="flex gap-4 text-xs items-center">
-                  <span className="text-muted-foreground">
-                    {v.avgDaysPerModule} дн/мод
-                  </span>
-                  <span
-                    className={
-                      v.scoreImprovement > 0
-                        ? "text-emerald-600"
-                        : "text-red-600"
-                    }
-                  >
-                    {v.scoreImprovement > 0 ? "+" : ""}
+                <div className="flex items-center gap-4 text-xs">
+                  <span className="text-muted-foreground">{v.avgDaysPerModule} дн/мод</span>
+                  <span className={v.scoreImprovement > 0 ? 'text-emerald-600' : 'text-red-600'}>
+                    {v.scoreImprovement > 0 ? '+' : ''}
                     {v.scoreImprovement}
                   </span>
-                  <Badge className="bg-violet-100 text-violet-700 text-[10px]">
-                    {v.velocityScore}
-                  </Badge>
+                  <Badge className="bg-violet-100 text-[10px] text-violet-700">{v.velocityScore}</Badge>
                 </div>
               </div>
             ))}

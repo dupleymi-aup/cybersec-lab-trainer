@@ -1,18 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import {
   Users,
   GraduationCap,
@@ -23,35 +13,26 @@ import {
   Minus,
   Loader2,
   AlertTriangle,
-} from "lucide-react";
-import { getAdminSummary, type AdminSummary } from "@/lib/auth-store";
-import { useAnalyticsFetcher } from "@/hooks/use-analytics-fetch";
-import { Card, CardContent } from "@/components/ui/card";
+} from 'lucide-react';
+import { getAdminSummary, type AdminSummary } from '@/lib/auth-store';
+import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
+import { Card, CardContent } from '@/components/ui/card';
 
-type GroupBy = "group" | "course" | "university";
+type GroupBy = 'group' | 'course' | 'university';
 
 const groupByLabels: Record<GroupBy, string> = {
-  group: "По группе",
-  course: "По курсу",
-  university: "По университету",
+  group: 'По группе',
+  course: 'По курсу',
+  university: 'По университету',
 };
 
-const COLORS = [
-  "#6366f1",
-  "#8b5cf6",
-  "#a78bfa",
-  "#c4b5fd",
-  "#818cf8",
-  "#7c3aed",
-  "#a855f7",
-  "#d8b4fe",
-];
+const COLORS = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#818cf8', '#7c3aed', '#a855f7', '#d8b4fe'];
 
 interface MetricCardProps {
   icon: React.ReactNode;
   value: string | number;
   label: string;
-  trend?: "up" | "down" | "stable";
+  trend?: 'up' | 'down' | 'stable';
   delta?: number;
   deltaSuffix?: string;
   delay?: number;
@@ -59,65 +40,39 @@ interface MetricCardProps {
   iconColor: string;
 }
 
-function MetricCard({
-  icon,
-  value,
-  label,
-  trend,
-  delta,
-  deltaSuffix,
-  delay = 0,
-  iconBg,
-  iconColor,
-}: MetricCardProps) {
+function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, iconBg, iconColor }: MetricCardProps) {
   const trendIcon =
-    trend === "up" ? (
+    trend === 'up' ? (
       <TrendingUp size={14} className="text-emerald-500" />
-    ) : trend === "down" ? (
+    ) : trend === 'down' ? (
       <TrendingDown size={14} className="text-red-500" />
     ) : (
       <Minus size={14} className="text-slate-400" />
     );
 
-  const trendColor =
-    trend === "up"
-      ? "text-emerald-600"
-      : trend === "down"
-        ? "text-red-600"
-        : "text-slate-400";
+  const trendColor = trend === 'up' ? 'text-emerald-600' : trend === 'down' ? 'text-red-600' : 'text-slate-400';
 
-  const deltaDisplay =
-    delta !== undefined
-      ? `${delta > 0 ? "+" : ""}${delta}${deltaSuffix || ""}`
-      : "";
+  const deltaDisplay = delta !== undefined ? `${delta > 0 ? '+' : ''}${delta}${deltaSuffix || ''}` : '';
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: delay * 0.08 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: delay * 0.08 }}>
       <Card className="border-border hover:border-border transition-colors">
         <CardContent className="p-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
-              <div
-                className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center`}
-              >
+              <div className={`h-8 w-8 rounded-lg ${iconBg} flex items-center justify-center`}>
                 <span className={iconColor}>{icon}</span>
               </div>
               <div>
                 <p className="text-2xl font-bold">{value}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+                <p className="text-muted-foreground mt-0.5 text-xs">{label}</p>
               </div>
             </div>
             {trend && (
               <div className="flex items-center gap-1">
                 {trendIcon}
                 {delta !== undefined && delta !== 0 && (
-                  <span className={`text-xs font-medium ${trendColor}`}>
-                    {deltaDisplay}
-                  </span>
+                  <span className={`text-xs font-medium ${trendColor}`}>{deltaDisplay}</span>
                 )}
               </div>
             )}
@@ -129,20 +84,15 @@ function MetricCard({
 }
 
 function chartData(summary: AdminSummary, groupBy: GroupBy) {
-  const source =
-    groupBy === "group"
-      ? summary.byGroup
-      : groupBy === "course"
-        ? summary.byCourse
-        : summary.byUniversity;
+  const source = groupBy === 'group' ? summary.byGroup : groupBy === 'course' ? summary.byCourse : summary.byUniversity;
 
   if (!source || source.length === 0) return [];
 
   return source.map((item, i) => ({
     name:
-      groupBy === "group"
+      groupBy === 'group'
         ? (item as { group: string }).group
-        : groupBy === "course"
+        : groupBy === 'course'
           ? (item as { course: string }).course
           : (item as { university: string }).university,
     students: item.students,
@@ -153,20 +103,15 @@ function chartData(summary: AdminSummary, groupBy: GroupBy) {
 }
 
 function tableData(summary: AdminSummary, groupBy: GroupBy) {
-  const source =
-    groupBy === "group"
-      ? summary.byGroup
-      : groupBy === "course"
-        ? summary.byCourse
-        : summary.byUniversity;
+  const source = groupBy === 'group' ? summary.byGroup : groupBy === 'course' ? summary.byCourse : summary.byUniversity;
 
   if (!source || source.length === 0) return [];
 
   return source.map((item) => ({
     name:
-      groupBy === "group"
+      groupBy === 'group'
         ? (item as { group: string }).group
-        : groupBy === "course"
+        : groupBy === 'course'
           ? (item as { course: string }).course
           : (item as { university: string }).university,
     students: item.students,
@@ -176,26 +121,20 @@ function tableData(summary: AdminSummary, groupBy: GroupBy) {
 }
 
 export default function AdminSummaryReport() {
-  const [groupBy, setGroupBy] = useState<GroupBy>("group");
+  const [groupBy, setGroupBy] = useState<GroupBy>('group');
 
   const {
     data: summary,
     loading,
     error,
-  } = useAnalyticsFetcher<AdminSummary>(
-    () => getAdminSummary(groupBy),
-    [groupBy],
-  );
+  } = useAnalyticsFetcher<AdminSummary>(() => getAdminSummary(groupBy), [groupBy]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <Loader2
-            size={32}
-            className="animate-spin text-indigo-500 mx-auto mb-3"
-          />
-          <p className="text-sm text-muted-foreground">Загрузка данных...</p>
+          <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
+          <p className="text-muted-foreground text-sm">Загрузка данных...</p>
         </div>
       </div>
     );
@@ -205,11 +144,9 @@ export default function AdminSummaryReport() {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <AlertTriangle size={32} className="text-red-500 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground font-medium">
-            Ошибка загрузки
-          </p>
-          <p className="text-xs text-slate-400 mt-1">{error || "Нет данных"}</p>
+          <AlertTriangle size={32} className="mx-auto mb-3 text-red-500" />
+          <p className="text-muted-foreground text-sm font-medium">Ошибка загрузки</p>
+          <p className="mt-1 text-xs text-slate-400">{error || 'Нет данных'}</p>
         </div>
       </div>
     );
@@ -224,7 +161,7 @@ export default function AdminSummaryReport() {
   return (
     <div className="space-y-6">
       {/* Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           icon={<Users size={18} />}
           value={current.totalStudents}
@@ -251,9 +188,7 @@ export default function AdminSummaryReport() {
           value={`${completionModules}/8 модулей`}
           label="Ср. завершение"
           trend={trends.completion}
-          delta={Math.round(
-            current.avgCompletionRate - previous.avgCompletionRate,
-          )}
+          delta={Math.round(current.avgCompletionRate - previous.avgCompletionRate)}
           delay={2}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
@@ -263,10 +198,7 @@ export default function AdminSummaryReport() {
           value={`${(Math.round(current.avgQuizScore * 100) / 100).toFixed(1)}%`}
           label="Ср. балл квизов"
           trend={trends.quizScore}
-          delta={
-            Math.round((current.avgQuizScore - previous.avgQuizScore) * 100) /
-            100
-          }
+          delta={Math.round((current.avgQuizScore - previous.avgQuizScore) * 100) / 100}
           deltaSuffix="%"
           delay={3}
           iconBg="bg-violet-100"
@@ -277,17 +209,17 @@ export default function AdminSummaryReport() {
       {/* Aggregation Chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h3 className="font-semibold text-sm">Агрегация по группам</h3>
-            <div className="flex gap-1 bg-muted rounded-lg p-0.5">
-              {(["group", "course", "university"] as GroupBy[]).map((key) => (
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold">Агрегация по группам</h3>
+            <div className="bg-muted flex gap-1 rounded-lg p-0.5">
+              {(['group', 'course', 'university'] as GroupBy[]).map((key) => (
                 <button
                   key={key}
                   onClick={() => setGroupBy(key)}
-                  className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                  className={`rounded-md px-3 py-1 text-xs transition-colors ${
                     groupBy === key
-                      ? "bg-background text-foreground shadow-sm font-medium"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? 'bg-background text-foreground font-medium shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {groupByLabels[key]}
@@ -298,29 +230,16 @@ export default function AdminSummaryReport() {
 
           {cData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={cData}
-                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-              >
+              <BarChart data={cData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e2e8f0" }}
-                />
-                <YAxis
-                  yAxisId="left"
-                  tick={{ fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e2e8f0" }}
-                />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
+                <YAxis yAxisId="left" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
                   tick={{ fontSize: 11 }}
                   tickLine={false}
-                  axisLine={{ stroke: "#e2e8f0" }}
+                  axisLine={{ stroke: '#e2e8f0' }}
                   domain={[0, 100]}
                   tickFormatter={(v) => `${v}%`}
                 />
@@ -328,32 +247,22 @@ export default function AdminSummaryReport() {
                   contentStyle={{
                     fontSize: 12,
                     borderRadius: 8,
-                    border: "1px solid #e2e8f0",
+                    border: '1px solid #e2e8f0',
                   }}
                   formatter={(value, name) => {
                     const v = value as number;
-                    if (name === "students") return [v, "Студенты"];
-                    if (name === "avgCompletion")
-                      return [`${v}%`, "Завершение"];
+                    if (name === 'students') return [v, 'Студенты'];
+                    if (name === 'avgCompletion') return [`${v}%`, 'Завершение'];
                     return value;
                   }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
                   formatter={(value) =>
-                    value === "students"
-                      ? "Студенты"
-                      : value === "avgCompletion"
-                        ? "Завершение (%)"
-                        : value
+                    value === 'students' ? 'Студенты' : value === 'avgCompletion' ? 'Завершение (%)' : value
                   }
                 />
-                <Bar
-                  yAxisId="left"
-                  dataKey="students"
-                  name="students"
-                  radius={[4, 4, 0, 0]}
-                >
+                <Bar yAxisId="left" dataKey="students" name="students" radius={[4, 4, 0, 0]}>
                   {cData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -369,9 +278,7 @@ export default function AdminSummaryReport() {
             </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center py-12">
-              <p className="text-sm text-slate-400">
-                Нет данных для отображения
-              </p>
+              <p className="text-sm text-slate-400">Нет данных для отображения</p>
             </div>
           )}
         </CardContent>
@@ -381,36 +288,26 @@ export default function AdminSummaryReport() {
       {tData.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="font-semibold text-sm mb-4">
-              Сводка{" "}
-              <span className="text-slate-400 font-normal">
-                (
-                {groupBy === "group"
-                  ? "по группам"
-                  : groupBy === "course"
-                    ? "по курсам"
-                    : "по университетам"}
-                )
+            <h3 className="mb-4 text-sm font-semibold">
+              Сводка{' '}
+              <span className="font-normal text-slate-400">
+                ({groupBy === 'group' ? 'по группам' : groupBy === 'course' ? 'по курсам' : 'по университетам'})
               </span>
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {groupBy === "group"
-                        ? "Группа"
-                        : groupBy === "course"
-                          ? "Курс"
-                          : "Университет"}
+                  <tr className="border-border border-b">
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium tracking-wider uppercase">
+                      {groupBy === 'group' ? 'Группа' : groupBy === 'course' ? 'Курс' : 'Университет'}
                     </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium tracking-wider uppercase">
                       Студенты
                     </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium tracking-wider uppercase">
                       Ср. завершение
                     </th>
-                    <th className="text-right py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium tracking-wider uppercase">
                       Ср. балл квизов
                     </th>
                   </tr>
@@ -422,26 +319,24 @@ export default function AdminSummaryReport() {
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.04 }}
-                      className="border-b border-slate-100 hover:bg-secondary transition-colors"
+                      className="hover:bg-secondary border-b border-slate-100 transition-colors"
                     >
-                      <td className="py-2.5 px-3 font-medium">{row.name}</td>
-                      <td className="py-2.5 px-3 text-right">{row.students}</td>
-                      <td className="py-2.5 px-3 text-right">
+                      <td className="px-3 py-2.5 font-medium">{row.name}</td>
+                      <td className="px-3 py-2.5 text-right">{row.students}</td>
+                      <td className="px-3 py-2.5 text-right">
                         <span
-                          className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+                          className={`inline-flex rounded px-2 py-0.5 text-xs font-medium ${
                             Number(row.avgCompletion) >= 70
-                              ? "bg-emerald-100 text-emerald-700"
+                              ? 'bg-emerald-100 text-emerald-700'
                               : Number(row.avgCompletion) >= 40
-                                ? "bg-amber-100 text-amber-700"
-                                : "bg-red-100 text-red-700"
+                                ? 'bg-amber-100 text-amber-700'
+                                : 'bg-red-100 text-red-700'
                           }`}
                         >
                           {row.avgCompletion}%
                         </span>
                       </td>
-                      <td className="py-2.5 px-3 text-right font-medium">
-                        {row.avgQuizScore}%
-                      </td>
+                      <td className="px-3 py-2.5 text-right font-medium">{row.avgQuizScore}%</td>
                     </motion.tr>
                   ))}
                 </tbody>

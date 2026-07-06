@@ -1,74 +1,50 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  generateToken,
-  getClientIp,
-} from "@/lib/api-middleware";
-import { setAuthCookie } from "@/lib/cookie-auth";
-import { validateUuid } from "@/lib/validate-uuid";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, generateToken, getClientIp } from '@/lib/api-middleware';
+import { setAuthCookie } from '@/lib/cookie-auth';
+import { validateUuid } from '@/lib/validate-uuid';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
     const admin = await authenticate(request);
     if (!admin) return unauthorized();
 
-    if (admin.role !== "admin") {
-      return forbidden("Только администраторы могут использовать имперсонацию");
+    if (admin.role !== 'admin') {
+      return forbidden('Только администраторы могут использовать имперсонацию');
     }
 
     const body = await request.json();
     const { targetUserId } = body;
 
     if (!targetUserId) {
-      return NextResponse.json(
-        { error: "targetUserId required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'targetUserId required' }, { status: 400 });
     }
 
     // Validate UUID format
     if (!validateUuid(targetUserId)) {
-      return NextResponse.json(
-        { error: "Invalid user ID format" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
     if (targetUserId === admin.id) {
-      return NextResponse.json(
-        { error: "Нельзя войти как себя" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Нельзя войти как себя' }, { status: 400 });
     }
 
     const targetUser = await prisma.user.findUnique({
       where: { id: targetUserId },
     });
     if (!targetUser) {
-      return NextResponse.json(
-        { error: "Пользователь не найден" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
     }
 
     // Prevent impersonating blocked users
     if (targetUser.isBlocked) {
-      return NextResponse.json(
-        { error: "Нельзя войти как заблокированный пользователь" },
-        { status: 403 },
-      );
+      return NextResponse.json({ error: 'Нельзя войти как заблокированный пользователь' }, { status: 403 });
     }
 
     // Prevent admin impersonating another admin (privilege escalation concern)
-    if (targetUser.role === "admin") {
-      return NextResponse.json(
-        { error: "Нельзя войти как другой администратор" },
-        { status: 403 },
-      );
+    if (targetUser.role === 'admin') {
+      return NextResponse.json({ error: 'Нельзя войти как другой администратор' }, { status: 403 });
     }
 
     const token = await generateToken(targetUser.id, targetUser.role, {
@@ -87,16 +63,16 @@ export async function POST(request: NextRequest) {
         data: {
           id: crypto.randomUUID(),
           adminId: admin.id,
-          adminName: adminUser?.fullName || adminUser?.email || "Unknown",
-          action: "impersonation_start",
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: 'impersonation_start',
           targetId: targetUserId,
           targetName: targetUser.fullName || targetUser.email,
           details: `Admin ${adminUser?.fullName || adminUser?.email || admin.id} started impersonating user ${targetUserId} [IP: ${ip}]`,
         },
       });
     } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        logger.warn("Audit logging failed", { error });
+      if (process.env.NODE_ENV === 'development') {
+        logger.warn('Audit logging failed', { error });
       }
     }
 
@@ -125,10 +101,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    logger.error("Impersonation failed", { error: String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    logger.error('Impersonation failed', { error: String(error) });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

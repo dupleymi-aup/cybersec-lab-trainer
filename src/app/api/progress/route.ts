@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { authenticate, unauthorized } from "@/lib/api-middleware";
-import { syncGradesToPlatform } from "@/lib/lti-utils";
-import { modules } from "@/lib/data";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { syncGradesToPlatform } from '@/lib/lti-utils';
+import { modules } from '@/lib/data';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -33,8 +33,7 @@ export async function GET(request: NextRequest) {
     try {
       return JSON.parse(val);
     } catch (e) {
-      if (process.env.NODE_ENV === "development")
-        logger.warn("progress parseJsonField failed", { error: e });
+      if (process.env.NODE_ENV === 'development') logger.warn('progress parseJsonField failed', { error: e });
       return val;
     }
   };
@@ -67,7 +66,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
   const {
     moduleId,
@@ -84,22 +83,19 @@ export async function POST(request: NextRequest) {
   } = body;
 
   if (!moduleId) {
-    return NextResponse.json({ error: "Module ID required" }, { status: 400 });
+    return NextResponse.json({ error: 'Module ID required' }, { status: 400 });
   }
 
   // Validate moduleId against known modules to prevent fake progress records
   const validModuleIds = modules.map((m) => m.id);
   if (!validModuleIds.includes(moduleId)) {
-    return NextResponse.json({ error: "Invalid module ID" }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid module ID' }, { status: 400 });
   }
 
   // Validate score if provided - must be between 0 and 100
   if (score !== undefined && score !== null) {
-    if (typeof score !== "number" || score < 0 || score > 100) {
-      return NextResponse.json(
-        { error: "Score must be between 0 and 100" },
-        { status: 400 },
-      );
+    if (typeof score !== 'number' || score < 0 || score > 100) {
+      return NextResponse.json({ error: 'Score must be between 0 and 100' }, { status: 400 });
     }
   }
 
@@ -111,28 +107,20 @@ export async function POST(request: NextRequest) {
       moduleId,
       completed: completed || false,
       ...(score !== undefined && { score }),
-      sqlLevels: Array.isArray(sqlLevels)
-        ? JSON.stringify(sqlLevels)
-        : sqlLevels || "",
-      xssLevels: Array.isArray(xssLevels)
-        ? JSON.stringify(xssLevels)
-        : xssLevels || "",
-      csrfSteps: Array.isArray(csrfSteps)
-        ? JSON.stringify(csrfSteps)
-        : csrfSteps || "",
+      sqlLevels: Array.isArray(sqlLevels) ? JSON.stringify(sqlLevels) : sqlLevels || '',
+      xssLevels: Array.isArray(xssLevels) ? JSON.stringify(xssLevels) : xssLevels || '',
+      csrfSteps: Array.isArray(csrfSteps) ? JSON.stringify(csrfSteps) : csrfSteps || '',
       csrfChallengeScores: Array.isArray(csrfChallengeScores)
         ? JSON.stringify(csrfChallengeScores)
-        : csrfChallengeScores || "",
+        : csrfChallengeScores || '',
       secureCodingAnswers: Array.isArray(secureCodingAnswers)
         ? JSON.stringify(secureCodingAnswers)
-        : secureCodingAnswers || "",
+        : secureCodingAnswers || '',
       secureCodingCorrectCount: secureCodingCorrectCount || 0,
-      studiedOwaspItems: Array.isArray(studiedOwaspItems)
-        ? JSON.stringify(studiedOwaspItems)
-        : studiedOwaspItems || "",
+      studiedOwaspItems: Array.isArray(studiedOwaspItems) ? JSON.stringify(studiedOwaspItems) : studiedOwaspItems || '',
       challengeScores:
         challengeScores !== undefined
-          ? typeof challengeScores === "object"
+          ? typeof challengeScores === 'object'
             ? JSON.stringify(challengeScores)
             : challengeScores
           : undefined,
@@ -141,19 +129,13 @@ export async function POST(request: NextRequest) {
       ...(completed !== undefined && { completed }),
       ...(score !== undefined && { score }),
       ...(sqlLevels && {
-        sqlLevels: Array.isArray(sqlLevels)
-          ? JSON.stringify(sqlLevels)
-          : sqlLevels,
+        sqlLevels: Array.isArray(sqlLevels) ? JSON.stringify(sqlLevels) : sqlLevels,
       }),
       ...(xssLevels && {
-        xssLevels: Array.isArray(xssLevels)
-          ? JSON.stringify(xssLevels)
-          : xssLevels,
+        xssLevels: Array.isArray(xssLevels) ? JSON.stringify(xssLevels) : xssLevels,
       }),
       ...(csrfSteps && {
-        csrfSteps: Array.isArray(csrfSteps)
-          ? JSON.stringify(csrfSteps)
-          : csrfSteps,
+        csrfSteps: Array.isArray(csrfSteps) ? JSON.stringify(csrfSteps) : csrfSteps,
       }),
       ...(csrfChallengeScores && {
         csrfChallengeScores: Array.isArray(csrfChallengeScores)
@@ -169,15 +151,10 @@ export async function POST(request: NextRequest) {
         secureCodingCorrectCount,
       }),
       ...(studiedOwaspItems && {
-        studiedOwaspItems: Array.isArray(studiedOwaspItems)
-          ? JSON.stringify(studiedOwaspItems)
-          : studiedOwaspItems,
+        studiedOwaspItems: Array.isArray(studiedOwaspItems) ? JSON.stringify(studiedOwaspItems) : studiedOwaspItems,
       }),
       ...(challengeScores !== undefined && {
-        challengeScores:
-          typeof challengeScores === "object"
-            ? JSON.stringify(challengeScores)
-            : challengeScores,
+        challengeScores: typeof challengeScores === 'object' ? JSON.stringify(challengeScores) : challengeScores,
       }),
     },
   });
@@ -198,14 +175,14 @@ export async function POST(request: NextRequest) {
       syncGradesToPlatform(platform.id, auth.id, moduleId, score, 100, label)
         .then((result) => {
           if (!result.success) {
-            logger.error("LTI grade sync failed", {
+            logger.error('LTI grade sync failed', {
               platformName: platform.name,
               error: result.error,
             });
           }
         })
         .catch((err) => {
-          logger.error("LTI grade sync error", {
+          logger.error('LTI grade sync error', {
             platformName: platform.name,
             error: String(err),
           });

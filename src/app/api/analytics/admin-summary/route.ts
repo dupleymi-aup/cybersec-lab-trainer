@@ -1,24 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-} from "@/lib/api-middleware";
-import {
-  MS_PER_DAY,
-  PERCENT_ROUNDING_FACTOR,
-  PERCENT_SCALE,
-} from "@/lib/constants";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { MS_PER_DAY, PERCENT_ROUNDING_FACTOR, PERCENT_SCALE } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "admin")) return forbidden();
+  if (!requireRole(auth.role, 'admin')) return forbidden();
 
   const { searchParams } = new URL(request.url);
-  const groupBy = searchParams.get("groupBy"); // 'group' | 'course' | 'university'
+  const groupBy = searchParams.get('groupBy'); // 'group' | 'course' | 'university'
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * MS_PER_DAY);
@@ -26,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   // Current period (last 30 days)
   const students = await prisma.user.findMany({
-    where: { role: "student" },
+    where: { role: 'student' },
     select: {
       id: true,
       group: true,
@@ -38,14 +29,9 @@ export async function GET(request: NextRequest) {
 
   const studentIds = students.map((s) => s.id);
   const totalStudents = students.length;
-  const activeStudents = students.filter(
-    (s) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo,
-  ).length;
+  const activeStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo).length;
   const activePercentage =
-    totalStudents > 0
-      ? Math.round((activeStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) /
-        PERCENT_SCALE
-      : 0;
+    totalStudents > 0 ? Math.round((activeStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
 
   // Progress data
   const progressRecords = await prisma.progress.findMany({
@@ -72,10 +58,7 @@ export async function GET(request: NextRequest) {
   const perStudentModules = new Map<string, number>();
   for (const p of progressRecords) {
     if (p.completed) {
-      perStudentModules.set(
-        p.userId,
-        (perStudentModules.get(p.userId) || 0) + 1,
-      );
+      perStudentModules.set(p.userId, (perStudentModules.get(p.userId) || 0) + 1);
     }
   }
   let totalCompletedModules = 0;
@@ -84,38 +67,24 @@ export async function GET(request: NextRequest) {
   }
   const avgCompletionRate =
     totalStudents > 0
-      ? Math.round(
-          (totalCompletedModules / (totalStudents * totalModules)) *
-            PERCENT_ROUNDING_FACTOR,
-        ) / PERCENT_SCALE
+      ? Math.round((totalCompletedModules / (totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
       : 0;
 
   // Avg quiz score
   const avgQuizScore =
     quizResults.length > 0
-      ? Math.round(
-          (quizResults.reduce((sum, q) => sum + q.percentage, 0) /
-            quizResults.length) *
-            100,
-        ) / 100
+      ? Math.round((quizResults.reduce((sum, q) => sum + q.percentage, 0) / quizResults.length) * 100) / 100
       : 0;
 
   const totalQuizAttempts = quizResults.length;
 
   // Previous period student count (total students active in 30-60 days ago period)
   const prevPeriodStudents = students.filter(
-    (s) =>
-      s.lastLoginAt &&
-      s.lastLoginAt >= sixtyDaysAgo &&
-      s.lastLoginAt < thirtyDaysAgo,
+    (s) => s.lastLoginAt && s.lastLoginAt >= sixtyDaysAgo && s.lastLoginAt < thirtyDaysAgo,
   );
   const prevActiveStudents = prevPeriodStudents.length;
   const prevActivePercentage =
-    totalStudents > 0
-      ? Math.round(
-          (prevActiveStudents / totalStudents) * PERCENT_ROUNDING_FACTOR,
-        ) / PERCENT_SCALE
-      : 0;
+    totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
 
   // Previous period progress
   const prevProgress = await prisma.progress.findMany({
@@ -147,10 +116,7 @@ export async function GET(request: NextRequest) {
   const prevPerStudentModules = new Map<string, number>();
   for (const p of prevProgress) {
     if (p.completed) {
-      prevPerStudentModules.set(
-        p.userId,
-        (prevPerStudentModules.get(p.userId) || 0) + 1,
-      );
+      prevPerStudentModules.set(p.userId, (prevPerStudentModules.get(p.userId) || 0) + 1);
     }
   }
   let prevTotalCompleted = 0;
@@ -159,29 +125,19 @@ export async function GET(request: NextRequest) {
   }
   const prevAvgCompletionRate =
     totalStudents > 0
-      ? Math.round(
-          (prevTotalCompleted / (totalStudents * totalModules)) *
-            PERCENT_ROUNDING_FACTOR,
-        ) / PERCENT_SCALE
+      ? Math.round((prevTotalCompleted / (totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
       : 0;
 
   const prevAvgQuizScore =
     prevQuizResults.length > 0
-      ? Math.round(
-          (prevQuizResults.reduce((sum, q) => sum + q.percentage, 0) /
-            prevQuizResults.length) *
-            100,
-        ) / 100
+      ? Math.round((prevQuizResults.reduce((sum, q) => sum + q.percentage, 0) / prevQuizResults.length) * 100) / 100
       : 0;
 
-  function trendIndicator(
-    current: number,
-    previous: number,
-  ): "up" | "down" | "stable" {
+  function trendIndicator(current: number, previous: number): 'up' | 'down' | 'stable' {
     const diff = current - previous;
-    if (diff > 2) return "up";
-    if (diff < -2) return "down";
-    return "stable";
+    if (diff > 2) return 'up';
+    if (diff < -2) return 'down';
+    return 'stable';
   }
 
   const current = {
@@ -205,7 +161,7 @@ export async function GET(request: NextRequest) {
   };
 
   const trends = {
-    students: "stable" as const,
+    students: 'stable' as const,
     activity: trendIndicator(activePercentage, prevActivePercentage),
     completion: trendIndicator(avgCompletionRate, prevAvgCompletionRate),
     quizScore: trendIndicator(avgQuizScore, prevAvgQuizScore),
@@ -214,8 +170,8 @@ export async function GET(request: NextRequest) {
   // Optional groupBy aggregation
   let groupedData: Record<string, unknown> = {};
 
-  if (groupBy === "group" || groupBy === "course" || groupBy === "university") {
-    const field = groupBy as "group" | "course" | "university";
+  if (groupBy === 'group' || groupBy === 'course' || groupBy === 'university') {
+    const field = groupBy as 'group' | 'course' | 'university';
     const groups = new Map<
       string,
       {
@@ -227,7 +183,7 @@ export async function GET(request: NextRequest) {
     >();
 
     for (const s of students) {
-      const key = s[field] || "(не указано)";
+      const key = s[field] || '(не указано)';
       let g = groups.get(key);
       if (!g) {
         g = {
@@ -247,7 +203,7 @@ export async function GET(request: NextRequest) {
     for (const p of progressRecords) {
       const student = students.find((s) => s.id === p.userId);
       if (student) {
-        const key = student[field] || "(не указано)";
+        const key = student[field] || '(не указано)';
         const g = groups.get(key);
         if (g) g.progressRecords.push(p);
       }
@@ -256,7 +212,7 @@ export async function GET(request: NextRequest) {
     for (const q of quizResults) {
       const student = students.find((s) => s.id === q.userId);
       if (student) {
-        const key = student[field] || "(не указано)";
+        const key = student[field] || '(не указано)';
         const g = groups.get(key);
         if (g) g.quizResults.push(q);
       }
@@ -264,23 +220,14 @@ export async function GET(request: NextRequest) {
 
     const byField: Record<string, unknown>[] = [];
     for (const [key, g] of groups.entries()) {
-      const completedCount = g.progressRecords.filter(
-        (p) => p.completed,
-      ).length;
+      const completedCount = g.progressRecords.filter((p) => p.completed).length;
       const groupAvgCompletion =
         g.totalStudents > 0
-          ? Math.round(
-              (completedCount / (g.totalStudents * totalModules)) *
-                PERCENT_ROUNDING_FACTOR,
-            ) / PERCENT_SCALE
+          ? Math.round((completedCount / (g.totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
           : 0;
       const groupAvgQuiz =
         g.quizResults.length > 0
-          ? Math.round(
-              (g.quizResults.reduce((sum, q) => sum + q.percentage, 0) /
-                g.quizResults.length) *
-                100,
-            ) / 100
+          ? Math.round((g.quizResults.reduce((sum, q) => sum + q.percentage, 0) / g.quizResults.length) * 100) / 100
           : 0;
       byField.push({
         name: key,

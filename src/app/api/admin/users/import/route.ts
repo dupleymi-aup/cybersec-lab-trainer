@@ -1,15 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import {
-  authenticate,
-  unauthorized,
-  forbidden,
-  requireRole,
-  checkRateLimit,
-  getClientIp,
-} from "@/lib/api-middleware";
-import { logger } from "@/lib/logger";
-import { hashPassword, validateEmail, validatePhone } from "@/lib/auth-utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
+import { hashPassword, validateEmail, validatePhone } from '@/lib/auth-utils';
 
 interface RequestBody {
   csv: string;
@@ -36,10 +29,10 @@ interface ImportError {
 }
 
 function generateRandomPassword(): string {
-  const lowercase = "abcdefghijklmnopqrstuvwxyz";
-  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const digits = "0123456789";
-  const specials = "!@#$%^&*";
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const digits = '0123456789';
+  const specials = '!@#$%^&*';
   const allChars = lowercase + uppercase + digits + specials;
 
   // Ensure at least one character from each category
@@ -63,31 +56,31 @@ function generateRandomPassword(): string {
     [password[i], password[j]] = [password[j], password[i]];
   }
 
-  return password.join("");
+  return password.join('');
 }
 
 function parseCSV(csv: string): ParsedRow[] {
   const lines = csv.trim().split(/\r?\n/);
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+  const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
 
   const rows: ParsedRow[] = [];
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(",").map((v) => v.trim());
+    const values = lines[i].split(',').map((v) => v.trim());
     const row: Record<string, string> = {};
     headers.forEach((header, idx) => {
-      row[header] = values[idx] || "";
+      row[header] = values[idx] || '';
     });
 
     rows.push({
-      email: row.email || "",
-      phone: row.phone || "",
-      fullName: row.fullname || "",
-      group: row.group || "",
-      course: row.course || "",
-      university: row.university || "",
-      bio: row.bio || "",
+      email: row.email || '',
+      phone: row.phone || '',
+      fullName: row.fullname || '',
+      group: row.group || '',
+      course: row.course || '',
+      university: row.university || '',
+      bio: row.bio || '',
     });
   }
 
@@ -98,54 +91,36 @@ function parseCSV(csv: string): ParsedRow[] {
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
-  if (!requireRole(auth.role, "admin")) return forbidden();
+  if (!requireRole(auth.role, 'admin')) return forbidden();
 
   // Rate limit: 5 imports per minute per admin
   const rateLimit = checkRateLimit(`import:${auth.id}`, 5, 60_000);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Too many requests", retryAfter: rateLimit.retryAfter },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
   let body: RequestBody;
   try {
     body = await request.json();
   } catch (e) {
-    logger.error("Invalid JSON in users import", { error: String(e) });
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    logger.error('Invalid JSON in users import', { error: String(e) });
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const {
-    csv,
-    role,
-    defaultGroup = "",
-    defaultCourse = "",
-    defaultUniversity = "",
-  } = body;
+  const { csv, role, defaultGroup = '', defaultCourse = '', defaultUniversity = '' } = body;
 
-  if (!csv || typeof csv !== "string" || csv.trim().length === 0) {
-    return NextResponse.json(
-      { error: "CSV content is required" },
-      { status: 400 },
-    );
+  if (!csv || typeof csv !== 'string' || csv.trim().length === 0) {
+    return NextResponse.json({ error: 'CSV content is required' }, { status: 400 });
   }
 
   // Validate role if provided
-  if (role && !["student", "teacher", "admin"].includes(role)) {
-    return NextResponse.json(
-      { error: "Invalid role. Must be: student, teacher, admin" },
-      { status: 400 },
-    );
+  if (role && !['student', 'teacher', 'admin'].includes(role)) {
+    return NextResponse.json({ error: 'Invalid role. Must be: student, teacher, admin' }, { status: 400 });
   }
 
   const rows = parseCSV(csv);
   if (rows.length === 0) {
-    return NextResponse.json(
-      { error: "No data rows found in CSV" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'No data rows found in CSV' }, { status: 400 });
   }
 
   const errors: ImportError[] = [];
@@ -163,7 +138,7 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!row.email) {
-      errors.push({ row: rowNum, error: "Email is required" });
+      errors.push({ row: rowNum, error: 'Email is required' });
       skipped++;
       continue;
     }
@@ -171,7 +146,7 @@ export async function POST(request: NextRequest) {
       errors.push({
         row: rowNum,
         email: row.email,
-        error: "Phone is required",
+        error: 'Phone is required',
       });
       skipped++;
       continue;
@@ -180,7 +155,7 @@ export async function POST(request: NextRequest) {
       errors.push({
         row: rowNum,
         email: row.email,
-        error: "Full name is required",
+        error: 'Full name is required',
       });
       skipped++;
       continue;
@@ -191,7 +166,7 @@ export async function POST(request: NextRequest) {
       errors.push({
         row: rowNum,
         email: row.email,
-        error: "Invalid email format",
+        error: 'Invalid email format',
       });
       skipped++;
       continue;
@@ -202,7 +177,7 @@ export async function POST(request: NextRequest) {
       errors.push({
         row: rowNum,
         email: row.email,
-        error: "Invalid phone format",
+        error: 'Invalid phone format',
       });
       skipped++;
       continue;
@@ -213,7 +188,7 @@ export async function POST(request: NextRequest) {
       errors.push({
         row: rowNum,
         email: row.email,
-        error: "Duplicate email in CSV",
+        error: 'Duplicate email in CSV',
       });
       skipped++;
       continue;
@@ -222,7 +197,7 @@ export async function POST(request: NextRequest) {
       errors.push({
         row: rowNum,
         email: row.email,
-        error: "Duplicate phone in CSV",
+        error: 'Duplicate phone in CSV',
       });
       skipped++;
       continue;
@@ -235,17 +210,12 @@ export async function POST(request: NextRequest) {
   // Check for existing users in database (emails and phones)
   const existingUsers = await prisma.user.findMany({
     where: {
-      OR: [
-        { email: { in: Array.from(seenEmails) } },
-        { phone: { in: Array.from(seenPhones) } },
-      ],
+      OR: [{ email: { in: Array.from(seenEmails) } }, { phone: { in: Array.from(seenPhones) } }],
     },
     select: { email: true, phone: true },
   });
 
-  const existingEmails = new Set(
-    existingUsers.map((u) => u.email.toLowerCase()),
-  );
+  const existingEmails = new Set(existingUsers.map((u) => u.email.toLowerCase()));
   const existingPhones = new Set(existingUsers.map((u) => u.phone));
 
   // Filter out rows that conflict with existing users
@@ -262,7 +232,7 @@ export async function POST(request: NextRequest) {
       errors.push({
         row: rowNum,
         email: row.email,
-        error: "Email already exists",
+        error: 'Email already exists',
       });
       skipped++;
       continue;
@@ -271,7 +241,7 @@ export async function POST(request: NextRequest) {
       errors.push({
         row: rowNum,
         email: row.email,
-        error: "Phone already exists",
+        error: 'Phone already exists',
       });
       skipped++;
       continue;
@@ -285,9 +255,7 @@ export async function POST(request: NextRequest) {
   for (let i = 0; i < rowsToImport.length; i += BATCH_SIZE) {
     const batchRows = rowsToImport.slice(i, i + BATCH_SIZE);
     const passwords = batchRows.map(() => generateRandomPassword());
-    const passwordHashes = await Promise.all(
-      passwords.map((p) => hashPassword(p)),
-    );
+    const passwordHashes = await Promise.all(passwords.map((p) => hashPassword(p)));
 
     batchRows.forEach((row, idx) => {
       tempPasswords.push({ email: row.email, password: passwords[idx] });
@@ -304,7 +272,7 @@ export async function POST(request: NextRequest) {
           course: row.course || defaultCourse,
           university: row.university || defaultUniversity,
           bio: row.bio,
-          role: (role || "student") as "student" | "teacher" | "admin",
+          role: (role || 'student') as 'student' | 'teacher' | 'admin',
           passwordHash: passwordHashes[idx],
         })),
       });
@@ -314,8 +282,7 @@ export async function POST(request: NextRequest) {
         errors.push({
           row: row.rowNum,
           email: row.email,
-          error:
-            error instanceof Error ? error.message : "Failed to create user",
+          error: error instanceof Error ? error.message : 'Failed to create user',
         });
         skipped++;
       }
@@ -330,16 +297,16 @@ export async function POST(request: NextRequest) {
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || "Unknown",
-        action: "users_import",
-        targetId: "csv_import",
+        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+        action: 'users_import',
+        targetId: 'csv_import',
         targetName: `${imported} users imported`,
         details: `Admin ${auth.id} imported ${imported} users from CSV, ${skipped} skipped [IP: ${ip}]`,
       },
     });
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      logger.warn("Audit logging failed", { error });
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn('Audit logging failed', { error });
     }
   }
 
@@ -349,6 +316,6 @@ export async function POST(request: NextRequest) {
     skipped,
     errors,
     passwordCount: tempPasswords.length,
-    note: "Temporary passwords generated for imported users. Distribute securely via out-of-band channel.",
+    note: 'Temporary passwords generated for imported users. Distribute securely via out-of-band channel.',
   });
 }

@@ -1,4 +1,4 @@
-export type UserRole = "student" | "teacher" | "admin";
+export type UserRole = 'student' | 'teacher' | 'admin';
 
 export const ROLE_HIERARCHY: Record<UserRole, number> = {
   student: 0,
@@ -7,77 +7,66 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
 };
 
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  student: [
-    "view_modules",
-    "take_quizzes",
-    "view_progress",
-    "view_leaderboard",
-  ],
+  student: ['view_modules', 'take_quizzes', 'view_progress', 'view_leaderboard'],
   teacher: [
-    "view_modules",
-    "take_quizzes",
-    "view_progress",
-    "view_leaderboard",
-    "create_assignments",
-    "grade_submissions",
-    "view_students_progress",
-    "manage_deadlines",
-    "view_analytics",
-    "export_grades",
+    'view_modules',
+    'take_quizzes',
+    'view_progress',
+    'view_leaderboard',
+    'create_assignments',
+    'grade_submissions',
+    'view_students_progress',
+    'manage_deadlines',
+    'view_analytics',
+    'export_grades',
   ],
   admin: [
-    "view_modules",
-    "take_quizzes",
-    "view_progress",
-    "view_leaderboard",
-    "create_assignments",
-    "grade_submissions",
-    "view_students_progress",
-    "manage_deadlines",
-    "view_analytics",
-    "export_grades",
-    "manage_users",
-    "change_roles",
-    "block_users",
-    "view_audit_logs",
-    "impersonate",
-    "manage_announcements",
-    "system_settings",
+    'view_modules',
+    'take_quizzes',
+    'view_progress',
+    'view_leaderboard',
+    'create_assignments',
+    'grade_submissions',
+    'view_students_progress',
+    'manage_deadlines',
+    'view_analytics',
+    'export_grades',
+    'manage_users',
+    'change_roles',
+    'block_users',
+    'view_audit_logs',
+    'impersonate',
+    'manage_announcements',
+    'system_settings',
   ],
 };
 
-export function hasRole(
-  userRole: UserRole | null | undefined,
-  requiredRole: UserRole,
-): boolean {
+export function hasRole(userRole: UserRole | null | undefined, requiredRole: UserRole): boolean {
   if (!userRole) return false;
   return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
 }
 
-export function hasPermission(
-  userRole: UserRole | null | undefined,
-  permission: string,
-): boolean {
+export function hasPermission(userRole: UserRole | null | undefined, permission: string): boolean {
   if (!userRole) return false;
   return ROLE_PERMISSIONS[userRole].includes(permission);
 }
 
 export function getRoleLabel(role: UserRole): string {
   const labels: Record<UserRole, string> = {
-    student: "Студент",
-    teacher: "Преподаватель",
-    admin: "Администратор",
+    student: 'Студент',
+    teacher: 'Преподаватель',
+    admin: 'Администратор',
   };
   return labels[role] || role;
 }
 
 export function getRoleDescription(role: UserRole): string {
   const descriptions: Record<UserRole, string> = {
-    student: "Доступ к учебным модулям, тестам и отслеживанию прогресса",
-    teacher: "Создание заданий, проверка работ, аналитика студентов",
-    admin: "Полный доступ: управление пользователями, настройки системы",
+    student: 'Доступ к учебным модулям, тестам и отслеживанию прогресса',
+    teacher: 'Создание заданий, проверка работ, аналитика студентов',
+    admin: 'Полный доступ: управление пользователями, настройки системы',
   };
-  return descriptions[role] || "";
+  return descriptions[role] || '';
 }
 
 export interface User {
@@ -107,21 +96,21 @@ export interface LoginActivityEntry {
 }
 
 export type AuditAction =
-  | "role_change"
-  | "user_created"
-  | "user_deleted"
-  | "user_blocked"
-  | "user_unblocked"
-  | "password_reset"
-  | "impersonation_start"
-  | "impersonation_end"
-  | "user_updated"
-  | "bulk_delete"
-  | "bulk_role_change"
-  | "bulk_block"
-  | "group_renamed"
-  | "group_deleted"
-  | "group_users_reassigned";
+  | 'role_change'
+  | 'user_created'
+  | 'user_deleted'
+  | 'user_blocked'
+  | 'user_unblocked'
+  | 'password_reset'
+  | 'impersonation_start'
+  | 'impersonation_end'
+  | 'user_updated'
+  | 'bulk_delete'
+  | 'bulk_role_change'
+  | 'bulk_block'
+  | 'group_renamed'
+  | 'group_deleted'
+  | 'group_users_reassigned';
 
 export interface AuditLogEntry {
   id: string;
@@ -158,7 +147,7 @@ export interface AchievementStat {
   unlockedCount: number;
   totalCount: number;
   unlockRate: number;
-  rarity: "common" | "uncommon" | "rare" | "epic";
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic';
 }
 
 export interface AdminSummary {
@@ -181,10 +170,10 @@ export interface AdminSummary {
     totalLoginAttempts: number;
   };
   trends: {
-    students: "up" | "down" | "stable";
-    activity: "up" | "down" | "stable";
-    completion: "up" | "down" | "stable";
-    quizScore: "up" | "down" | "stable";
+    students: 'up' | 'down' | 'stable';
+    activity: 'up' | 'down' | 'stable';
+    completion: 'up' | 'down' | 'stable';
+    quizScore: 'up' | 'down' | 'stable';
   };
   byGroup?: Array<{
     group: string;
@@ -250,7 +239,7 @@ export interface AtRiskStudent {
   modulesCompleted: number;
   avgQuizScore: number;
   quizAttempts: number;
-  trend: "improving" | "declining" | "stable";
+  trend: 'improving' | 'declining' | 'stable';
 }
 
 export interface GroupComparisonDimension {
@@ -295,10 +284,10 @@ export interface ComprehensiveSummary {
     engagementScore: number;
   };
   trends: {
-    students: "up" | "down" | "stable";
-    activity: "up" | "down" | "stable";
-    completion: "up" | "down" | "stable";
-    quizScore: "up" | "down" | "stable";
+    students: 'up' | 'down' | 'stable';
+    activity: 'up' | 'down' | 'stable';
+    completion: 'up' | 'down' | 'stable';
+    quizScore: 'up' | 'down' | 'stable';
   };
   previousKpis: {
     totalStudents: number;
@@ -412,13 +401,13 @@ export interface StudentPerformanceData {
     studentScore: number;
     cohortAvg: number;
     gap: number;
-    severity: "low" | "medium" | "high";
+    severity: 'low' | 'medium' | 'high';
   }>;
   recommendations: Array<{
     type: string;
     title: string;
     description: string;
-    priority: "high" | "medium" | "low";
+    priority: 'high' | 'medium' | 'low';
   }>;
 }
 
@@ -521,7 +510,7 @@ export interface WeaknessAnalysis {
     category: string;
     score: number;
     studentCount: number;
-    severity: "low" | "medium" | "high" | "critical";
+    severity: 'low' | 'medium' | 'high' | 'critical';
     recommendedActions: string[];
   }>;
   summary: {
@@ -537,7 +526,7 @@ export interface PredictiveInsight {
   metric: string;
   currentValue: number;
   predictedValue: number;
-  trend: "improving" | "declining" | "stable";
+  trend: 'improving' | 'declining' | 'stable';
   confidence: number;
   daysAhead: number;
 }
@@ -561,7 +550,7 @@ export interface Announcement {
   author: string;
   createdAt: string;
   expiresAt?: string;
-  priority: "low" | "normal" | "high";
+  priority: 'low' | 'normal' | 'high';
   active: boolean;
 }
 
@@ -612,7 +601,7 @@ export interface CertificationStudentData {
   email: string;
   group: string;
   readinessScore: number;
-  readinessTier: "ready" | "almost" | "needs-work" | "not-ready";
+  readinessTier: 'ready' | 'almost' | 'needs-work' | 'not-ready';
   categoryReadiness: CertificationCategoryReadiness[];
   modulesCompleted: number;
   totalModules: number;
@@ -691,7 +680,7 @@ export interface QuizSessionData {
     attemptCount: number;
   }[];
   weekdayVsWeekend: {
-    dayType: "weekday" | "weekend";
+    dayType: 'weekday' | 'weekend';
     avgPercentage: number;
     attemptCount: number;
     avgDuration: number;
@@ -715,7 +704,7 @@ export interface GroupDynamicsEntry {
   peerInfluenceScore: number;
   newMemberIntegrationDays: number;
   healthScore: number;
-  trend: "improving" | "stable" | "declining";
+  trend: 'improving' | 'stable' | 'declining';
 }
 
 export interface GroupDynamicsData {
@@ -864,7 +853,7 @@ export interface ScheduledReport {
   id: string;
   userId: string;
   reportType: string;
-  frequency: "daily" | "weekly" | "monthly";
+  frequency: 'daily' | 'weekly' | 'monthly';
   dayOfWeek: number | null;
   dayOfMonth: number | null;
   email: string;
@@ -877,7 +866,7 @@ export interface ScheduledReport {
 
 export interface DataQualityIssue {
   type: string;
-  severity: "critical" | "warning" | "info";
+  severity: 'critical' | 'warning' | 'info';
   title: string;
   description: string;
   count: number;
