@@ -36,6 +36,18 @@ export async function GET(
   }
 }
 
+interface ScheduledReportUpdateBody {
+  reportType?: string;
+  frequency?: string;
+  dayOfWeek?: number;
+  dayOfMonth?: number;
+  email?: string;
+  groupId?: string;
+  days?: number;
+  isActive?: boolean;
+  lastGenerated?: string;
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -54,11 +66,10 @@ export async function PATCH(
       return unauthorized();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const bodyResult = await parseBody<any>(request);
+    const bodyResult = await parseBody<ScheduledReportUpdateBody>(request);
     if (!bodyResult.ok) return bodyResult.response;
     const body = bodyResult.data;
-    const { isActive, lastGenerated, ...updates } = body;
+    const { isActive, lastGenerated, ...updates } = body ?? {};
 
     const report = await prisma.scheduledReport.update({
       where: { id },
