@@ -6,6 +6,7 @@ import {
   forbidden,
   requireRole,
 } from "@/lib/api-middleware";
+import { parseBody } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
@@ -53,8 +54,10 @@ export async function PATCH(
       return unauthorized();
     }
 
-    const body = await request.json();
-    const { isActive, lastGenerated, ...updates } = body;
+    const bodyResult = await parseBody(request);
+    if (!bodyResult.ok) return bodyResult.response;
+    const body = bodyResult.data as Record<string, unknown>;
+    const { isActive, lastGenerated, ...updates } = body as Record<string, any>;
 
     const report = await prisma.scheduledReport.update({
       where: { id },

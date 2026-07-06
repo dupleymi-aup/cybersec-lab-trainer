@@ -7,6 +7,7 @@ import {
 } from "@/lib/api-middleware";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
+import { parseBody } from "@/lib/utils";
 
 /**
  * GET /api/lti/platforms/[id]
@@ -100,7 +101,9 @@ export async function PUT(
   if (!requireRole(auth.role, "admin")) return forbidden();
 
   const { id } = await params;
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data as Record<string, unknown>;
 
   try {
     const platform = await prisma.ltiPlatform.update({

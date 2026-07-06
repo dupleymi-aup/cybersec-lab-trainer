@@ -7,6 +7,7 @@ import {
   requireCapability,
 } from "@/lib/api-middleware";
 import { updateAssignmentSchema } from "@/lib/validations/api";
+import { parseBody } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
@@ -67,7 +68,9 @@ export async function PUT(
     return forbidden();
   }
 
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data;
   const parsed = updateAssignmentSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

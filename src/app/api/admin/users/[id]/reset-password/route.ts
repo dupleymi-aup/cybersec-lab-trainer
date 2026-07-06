@@ -10,6 +10,7 @@ import {
 import { hashPassword, validatePassword } from "@/lib/auth-utils";
 import { validateUuid } from "@/lib/validate-uuid";
 import { logger } from "@/lib/logger";
+import { parseBody } from "@/lib/utils";
 
 // POST /api/admin/users/[id]/reset-password - admin resets another user's password
 export async function POST(
@@ -39,7 +40,9 @@ export async function POST(
     );
   }
 
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data as Record<string, unknown>;
   const { newPassword } = body;
 
   if (!newPassword) {

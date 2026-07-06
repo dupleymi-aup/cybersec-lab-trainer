@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { authenticate, unauthorized, forbidden } from "@/lib/api-middleware";
 import { gradeSubmissionSchema } from "@/lib/validations/api";
+import { parseBody } from "@/lib/utils";
 
 export async function POST(
   request: NextRequest,
@@ -40,7 +41,9 @@ export async function POST(
     );
   }
 
-  const body = await request.json();
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data;
   const parsed = gradeSubmissionSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

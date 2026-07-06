@@ -2,13 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { authenticate, unauthorized } from "@/lib/api-middleware";
 import { logger } from "@/lib/logger";
+import { parseBody } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  const body = await request.json();
-  const { moduleId, score, completed, userId } = body;
+  const bodyResult = await parseBody(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const body = bodyResult.data as Record<string, unknown>;
+  const { moduleId, score, completed, userId } = body as Record<string, any>;
 
   if (!moduleId || score === undefined || completed === undefined) {
     return NextResponse.json(
