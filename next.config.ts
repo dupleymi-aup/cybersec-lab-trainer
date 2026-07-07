@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n.ts");
 
 const baseConfig = {
   reactStrictMode: true,
+  output: "standalone",
   outputFileTracingRoot: process.cwd(),
   poweredByHeader: false,
   typescript: {

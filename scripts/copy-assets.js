@@ -25,6 +25,11 @@ function copyDir(src, dest) {
   }
 }
 
+if (!fs.existsSync(standalone)) {
+  console.warn('Standalone output not found — skipping asset copy');
+  process.exit(0);
+}
+
 copyDir(nextStatic, nextStandaloneStatic);
 copyDir(publicDir, standalonePublic);
 console.log('Assets copied to standalone');
