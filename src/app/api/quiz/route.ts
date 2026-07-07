@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, checkRateLimit } from '@/lib/api-middleware';
 import { quizCategories } from '@/lib/data';
 import { quizSubmissionSchema } from '@/lib/validations/api';
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
-    const result = await prisma.quizResult.upsert({
+    const result = await getPrisma().quizResult.upsert({
       where: { userId_quizId: { userId: auth.id, quizId } },
       create: {
         id: crypto.randomUUID(),
@@ -117,7 +117,7 @@ async function saveQuizAttempts(
 
   if (validAttempts.length === 0) return;
 
-  await prisma.quizAttempt.createMany({
+  await getPrisma().quizAttempt.createMany({
     data: validAttempts,
   });
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import type { Prisma } from '@prisma/client';
@@ -19,20 +19,20 @@ export async function GET(request: NextRequest) {
   const userFilter: Prisma.UserWhereInput = { role: 'student' };
   if (groupId) userFilter.group = groupId;
 
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: userFilter,
     select: { id: true, fullName: true, group: true, createdAt: true },
   });
 
   const studentIds = students.map((s) => s.id);
 
-  const progress = await prisma.progress.findMany({
+  const progress = await getPrisma().progress.findMany({
     where: { userId: { in: studentIds }, completed: true },
     select: { userId: true, moduleId: true, score: true, updatedAt: true },
     orderBy: { updatedAt: 'asc' },
   });
 
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId: { in: studentIds } },
     select: { userId: true, percentage: true, updatedAt: true },
   });

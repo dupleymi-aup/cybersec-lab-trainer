@@ -1,9 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+const mockPrisma = {
+  user: { findUnique: vi.fn(), findMany: vi.fn() },
+};
+
 vi.mock('@/lib/db', () => ({
-  prisma: {
-    user: { findUnique: vi.fn(), findMany: vi.fn() },
-  },
+  getPrisma: () => mockPrisma,
 }));
 
 import { checkRateLimit } from '@/lib/api-middleware';
@@ -38,39 +40,33 @@ describe('XP rate limiting', () => {
     expect(blocked.retryAfter).toBeGreaterThan(0);
   });
 
-  it('should allow again after window expires', () => {
-    const key = 'xp:test-expiry-1';
-    const maxAttempts = 2;
-    const windowMs = 100; // 100ms window for testing
-
-    // Use up attempts
-    checkRateLimit(key, maxAttempts, windowMs);
-    checkRateLimit(key, maxAttempts, windowMs);
-    const blocked = checkRateLimit(key, maxAttempts, windowMs);
-    expect(blocked.allowed).toBe(false);
-
-    // After a short wait, the window should expire
-    // Note: In a real scenario we'd wait, but here we verify the retryAfter is reasonable
-    expect(blocked.retryAfter).toBeLessThanOrEqual(Math.ceil(windowMs / 1000));
-  });
-
-  it('should provide retryAfter in seconds', () => {
-    const key = 'xp:test-retryafter-1';
-    const maxAttempts = 1;
-    const windowMs = 3600000; // 1 hour
-
-    checkRateLimit(key, maxAttempts, windowMs);
-    const blocked = checkRateLimit(key, maxAttempts, windowMs);
-
-    expect(blocked.allowed).toBe(false);
-    expect(blocked.retryAfter).toBeGreaterThan(0);
-    expect(blocked.retryAfter).toBeLessThanOrEqual(3600); // <= 1 hour in seconds
-  });
-
-  it('should isolate rate limits per user', () => {
-    const key1 = 'xp:isolate-user-1';
-    const key2 = 'xp:isolate-user-2';
+  it('should reset after window expires', async () => {
+    const key = 'xp:test-reset-1';
     const maxAttempts = 3;
+    const windowMs = 100; // 100ms window
+
+    // Exhaust attempts
+    for (let i = 0; i < maxAttempts; i++) {
+      const result = checkRateLimit(key, maxAttempts, windowMs);
+      expect(result.allowed).toBe(true);
+    }
+
+    // Should be blocked now
+    const blocked = checkRateLimit(key, maxAttempts, windowMs);
+    expect(blocked.allowed).toBe(false);
+
+    // Wait for window to expire
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    // Should be allowed again
+    const afterReset = checkRateLimit(key, maxAttempts, windowMs);
+    expect(afterReset.allowed).toBe(true);
+  });
+
+  it('should handle different keys independently', () => {
+    const key1 = 'xp:test-indep-1';
+    const key2 = 'xp:test-indep-2';
+    const maxAttempts = 5;
     const windowMs = 60 * 60 * 1000;
 
     // Exhaust key1
@@ -78,20 +74,23 @@ describe('XP rate limiting', () => {
       checkRateLimit(key1, maxAttempts, windowMs);
     }
 
+    // key1 should be blocked
+    expect(checkRateLimit(key1, maxAttempts, windowMs).allowed).toBe(false);
+
     // key2 should still be allowed
-    const result = checkRateLimit(key2, maxAttempts, windowMs);
-    expect(result.allowed).toBe(true);
+    expect(checkRateLimit(key2, maxAttempts, windowMs).allowed).toBe(true);
   });
-});
 
-describe('XP endpoint rate limit constants', () => {
-  it('should have sensible rate limit values', () => {
-    // These match the constants in the XP route
-    const XP_RATE_LIMIT_MAX = 20;
-    const XP_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+  it('should report correct retryAfter time', () => {
+    const key = 'xp:test-retry-1';
+    const maxAttempts = 1;
+    const windowMs = 60_000; // 1 minute
 
-    expect(XP_RATE_LIMIT_MAX).toBe(20);
-    expect(XP_RATE_LIMIT_WINDOW_MS).toBe(3600000); // 1 hour
-    expect(XP_RATE_LIMIT_WINDOW_MS / 1000 / 60).toBe(60); // 60 minutes
+    checkRateLimit(key, maxAttempts, windowMs);
+
+    const result = checkRateLimit(key, maxAttempts, windowMs);
+    expect(result.allowed).toBe(false);
+    expect(result.retryAfter).toBeGreaterThan(0);
+    expect(result.retryAfter).toBeLessThanOrEqual(60);
   });
 });

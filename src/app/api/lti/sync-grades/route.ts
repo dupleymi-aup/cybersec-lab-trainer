@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { syncGradesToPlatform } from '@/lib/lti-utils';
 import { logger } from '@/lib/logger';
 
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
   if (!platformId) {
     // Return all platforms with sync stats
-    const platforms = await prisma.ltiPlatform.findMany({
+    const platforms = await getPrisma().ltiPlatform.findMany({
       include: {
         _count: {
           select: { gradeSyncs: true },
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(platforms);
   }
 
-  const syncs = await prisma.ltiGradeSync.findMany({
+  const syncs = await getPrisma().ltiGradeSync.findMany({
     where: { platformId },
     orderBy: { createdAt: 'desc' },
     take: 50,

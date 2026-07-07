@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import {
   authenticate,
   unauthorized,
@@ -47,7 +47,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
   }
 
-  const user = await prisma.user.update({
+  const user = await getPrisma().user.update({
     where: { id },
     data: {
       role,
@@ -57,9 +57,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   // Audit log the role change
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

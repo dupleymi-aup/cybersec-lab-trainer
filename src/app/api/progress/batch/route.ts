@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseBody } from '@/lib/utils';
 
@@ -30,13 +30,13 @@ export async function GET(request: NextRequest) {
   // Verify scope: teachers can only fetch students in their group
   let allowedIds = userIds;
   if (auth.role !== 'admin' && auth.group) {
-    const targetUsers = await prisma.user.findMany({
+    const targetUsers = await getPrisma().user.findMany({
       where: { id: { in: userIds }, role: 'student' },
       select: { id: true, group: true },
     });
     allowedIds = targetUsers.filter((u) => u.group === auth.group).map((u) => u.id);
   } else if (auth.role === 'admin') {
-    const targetUsers = await prisma.user.findMany({
+    const targetUsers = await getPrisma().user.findMany({
       where: { id: { in: userIds }, role: 'student' },
       select: { id: true },
     });
@@ -49,10 +49,10 @@ export async function GET(request: NextRequest) {
 
   // Fetch all progress and quiz results in two PRISMA queries (not per-user)
   const [allProgress, allQuizResults] = await Promise.all([
-    prisma.progress.findMany({
+    getPrisma().progress.findMany({
       where: { userId: { in: allowedIds } },
     }),
-    prisma.quizResult.findMany({
+    getPrisma().quizResult.findMany({
       where: { userId: { in: allowedIds } },
     }),
   ]);
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Wrap all operations in a transaction for atomicity
-  const results = await prisma.$transaction(async (tx) => {
+  const results = await getPrisma().$transaction(async (tx) => {
     let progressSaved = 0;
     let quizSaved = 0;
 

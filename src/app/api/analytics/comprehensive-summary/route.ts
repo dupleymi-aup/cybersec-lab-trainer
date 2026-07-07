@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
   const prevSince = new Date(now.getTime() - days * 2 * 24 * 60 * 60 * 1000);
 
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: userWhere,
     select: { id: true, fullName: true, group: true, lastLoginAt: true },
   });
@@ -52,17 +52,17 @@ export async function GET(request: NextRequest) {
   const activeStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= since).length;
   const activePercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 10000) / 100 : 0;
 
-  const progressRecords = await prisma.progress.findMany({
+  const progressRecords = await getPrisma().progress.findMany({
     where: { userId: { in: studentIds } },
     select: { userId: true, moduleId: true, completed: true, score: true },
   });
 
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId: { in: studentIds } },
     select: { userId: true, percentage: true, score: true, total: true },
   });
 
-  const quizAttempts = await prisma.quizAttempt.findMany({
+  const quizAttempts = await getPrisma().quizAttempt.findMany({
     where: { userId: { in: studentIds }, attemptedAt: { gte: since } },
     select: { userId: true, correct: true },
   });
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
   ).length;
   const prevActivePercentage = totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * 10000) / 100 : 0;
 
-  const prevProgress = await prisma.progress.findMany({
+  const prevProgress = await getPrisma().progress.findMany({
     where: {
       userId: { in: studentIds },
       updatedAt: { gte: prevSince, lt: since },
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
     select: { completed: true },
   });
 
-  const prevQuizResults = await prisma.quizResult.findMany({
+  const prevQuizResults = await getPrisma().quizResult.findMany({
     where: {
       userId: { in: studentIds },
       updatedAt: { gte: prevSince, lt: since },
@@ -237,7 +237,7 @@ export async function GET(request: NextRequest) {
     details: string;
   }> = [];
 
-  const recentLogins = await prisma.loginActivity.findMany({
+  const recentLogins = await getPrisma().loginActivity.findMany({
     where: { userId: { in: studentIds }, timestamp: { gte: since } },
     orderBy: { timestamp: 'desc' },
     take: 10,

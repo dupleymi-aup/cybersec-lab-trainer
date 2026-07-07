@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { submitAssignmentSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   try {
     const { id } = await params;
 
-    const assignment = await prisma.assignment.findUnique({
+    const assignment = await getPrisma().assignment.findUnique({
       where: { id },
       include: {
         _count: {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const nextAttempt = currentAttempt + 1;
 
-    const submission = await prisma.assignmentSubmission.create({
+    const submission = await getPrisma().assignmentSubmission.create({
       data: {
         assignmentId: id,
         userId: auth.id,

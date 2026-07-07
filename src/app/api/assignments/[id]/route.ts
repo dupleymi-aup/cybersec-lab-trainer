@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { updateAssignmentSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params;
 
-  const assignment = await prisma.assignment.findUnique({
+  const assignment = await getPrisma().assignment.findUnique({
     where: { id },
     include: {
       creator: {
@@ -41,7 +41,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params;
 
-  const existing = await prisma.assignment.findUnique({ where: { id } });
+  const existing = await getPrisma().assignment.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
   }
@@ -61,7 +61,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const { dueAt, ...data } = parsed.data;
 
-  const assignment = await prisma.assignment.update({
+  const assignment = await getPrisma().assignment.update({
     where: { id },
     data: {
       ...data,
@@ -84,7 +84,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   const { id } = await params;
 
-  const existing = await prisma.assignment.findUnique({ where: { id } });
+  const existing = await getPrisma().assignment.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
   }
@@ -93,7 +93,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     return forbidden();
   }
 
-  await prisma.assignment.delete({ where: { id } });
+  await getPrisma().assignment.delete({ where: { id } });
 
   return NextResponse.json({ success: true });
 }

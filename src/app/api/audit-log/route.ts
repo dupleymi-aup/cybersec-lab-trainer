@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'admin')) return forbidden();
 
-  const logs = await prisma.auditLog.findMany({
+  const logs = await getPrisma().auditLog.findMany({
     orderBy: { timestamp: 'desc' },
     take: 500,
   });
@@ -44,8 +44,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'action and targetId required' }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { id: auth.id } });
-  const log = await prisma.auditLog.create({
+  const user = await getPrisma().user.findUnique({ where: { id: auth.id } });
+  const log = await getPrisma().auditLog.create({
     data: {
       id: crypto.randomUUID(),
       adminId: auth.id,

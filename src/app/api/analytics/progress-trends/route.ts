@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   let studentIds: string[];
   if (userId) {
     // Check that the target user exists and is a student (or user is admin viewing any user)
-    const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+    const targetUser = await getPrisma().user.findUnique({ where: { id: userId } });
     if (!targetUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
     studentIds = [userId];
   } else {
-    const students = await prisma.user.findMany({
+    const students = await getPrisma().user.findMany({
       where: userWhere,
       select: { id: true },
     });
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Fetch Progress records
-  const progressRecords = await prisma.progress.findMany({
+  const progressRecords = await getPrisma().progress.findMany({
     where: {
       userId: { in: studentIds },
       ...(cutoffDate && { updatedAt: { gte: cutoffDate } }),
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Fetch QuizResult records
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: {
       userId: { in: studentIds },
       ...(cutoffDate && { updatedAt: { gte: cutoffDate } }),

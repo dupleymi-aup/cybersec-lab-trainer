@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { createAssignmentSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const assignments = await prisma.assignment.findMany({
+    const assignments = await getPrisma().assignment.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       include: {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     const { dueAt, ...data } = parsed.data;
 
-    const assignment = await prisma.assignment.create({
+    const assignment = await getPrisma().assignment.create({
       data: {
         ...data,
         dueAt: dueAt ? new Date(dueAt) : null,

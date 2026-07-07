@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { CORE_MODULE_IDS } from '@/lib/module-constants';
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
   // Get all students
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: { role: 'student', ...(groupId && { group: groupId }) },
     select: { id: true, fullName: true, group: true },
   });
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   // 1. Students with 0 logins in last 30 days
   const activeLoginIds = new Set(
     (
-      await prisma.loginActivity.findMany({
+      await getPrisma().loginActivity.findMany({
         where: {
           userId: { in: Array.from(studentIds) },
           success: true,
@@ -41,14 +41,14 @@ export async function GET(request: NextRequest) {
   const inactiveStudents = students.filter((s) => !activeLoginIds.has(s.id));
 
   // 2. Students who started modules but have no quiz results
-  const progressWithStarts = await prisma.progress.findMany({
+  const progressWithStarts = await getPrisma().progress.findMany({
     where: { userId: { in: Array.from(studentIds) }, moduleId: { not: '' } },
     select: { userId: true },
     distinct: ['userId'],
   });
   const quizResultIds = new Set(
     (
-      await prisma.quizResult.findMany({
+      await getPrisma().quizResult.findMany({
         where: { userId: { in: Array.from(studentIds) } },
         select: { userId: true },
         distinct: ['userId'],
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
   const missingQuizStudents = students.filter((s) => startedIds.has(s.id) && !quizResultIds.has(s.id));
 
   // 3. Modules with 0 completions
-  const completedModules = await prisma.progress.findMany({
+  const completedModules = await getPrisma().progress.findMany({
     where: { userId: { in: Array.from(studentIds) }, completed: true },
     select: { moduleId: true },
     distinct: ['moduleId'],
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
   const zeroCompletionModules = CORE_MODULE_IDS.filter((m) => !completedModuleIds.has(m));
 
   // 4. Progress entries not updated in 60+ days
-  const staleProgress = await prisma.progress.findMany({
+  const staleProgress = await getPrisma().progress.findMany({
     where: {
       userId: { in: Array.from(studentIds) },
       updatedAt: { lt: sixtyDaysAgo },
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
   const staleStudents = students.filter((s) => staleStudentIds.has(s.id));
 
   // 5. Quiz results with 0% score
-  const failedQuizzes = await prisma.quizResult.count({
+  const failedQuizzes = await getPrisma().quizResult.count({
     where: { userId: { in: Array.from(studentIds) }, percentage: 0 },
   });
 
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
       activeStudents: students.length - inactiveStudents.length,
       totalModules: CORE_MODULE_IDS.length,
       completedModules: completedModuleIds.size,
-      totalQuizzes: await prisma.quizResult.count({
+      totalQuizzes: await getPrisma().quizResult.count({
         where: { userId: { in: Array.from(studentIds) } },
       }),
     },

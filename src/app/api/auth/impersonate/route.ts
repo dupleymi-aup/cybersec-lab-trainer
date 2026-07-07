@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, generateToken, getClientIp } from '@/lib/api-middleware';
 import { setAuthCookie } from '@/lib/cookie-auth';
 import { validateUuid } from '@/lib/validate-uuid';
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Нельзя войти как себя' }, { status: 400 });
     }
 
-    const targetUser = await prisma.user.findUnique({
+    const targetUser = await getPrisma().user.findUnique({
       where: { id: targetUserId },
     });
     if (!targetUser) {
@@ -55,11 +55,11 @@ export async function POST(request: NextRequest) {
 
     // Audit log the impersonation
     try {
-      const adminUser = await prisma.user.findUnique({
+      const adminUser = await getPrisma().user.findUnique({
         where: { id: admin.id },
       });
       const ip = getClientIp(request);
-      await prisma.auditLog.create({
+      await getPrisma().auditLog.create({
         data: {
           id: crypto.randomUUID(),
           adminId: admin.id,

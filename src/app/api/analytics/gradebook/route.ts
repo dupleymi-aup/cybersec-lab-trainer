@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { getModuleName } from '@/lib/module-names';
 import type { Prisma } from '@prisma/client';
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   if (university) userFilter.university = university;
 
   // Get students
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: userFilter,
     select: {
       id: true,
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
   const studentIds = students.map((s) => s.id);
 
   // Get progress for all students
-  const progressRecords = await prisma.progress.findMany({
+  const progressRecords = await getPrisma().progress.findMany({
     where: { userId: { in: studentIds } },
     select: {
       userId: true,
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Get quiz results
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId: { in: studentIds } },
     select: { userId: true, percentage: true, updatedAt: true },
   });

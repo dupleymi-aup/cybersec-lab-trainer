@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { verifyPassword } from '@/lib/auth-utils';
 import { loginSchema } from '@/lib/validations/api';
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       userAgent: string;
       success: boolean;
     }) => {
-      await prisma.loginActivity.create({
+      await getPrisma().loginActivity.create({
         data: { id: crypto.randomUUID(), ...data },
       });
     };
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || '';
 
     // Find user by email or phone
-    const user = await prisma.user.findFirst({
+    const user = await getPrisma().user.findFirst({
       where: {
         OR: [{ email: emailOrPhone }, { phone: emailOrPhone }],
       },
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Update login stats atomically to prevent race condition
     const now = new Date();
-    await prisma.user.update({
+    await getPrisma().user.update({
       where: { id: user.id },
       data: {
         lastLoginAt: now,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { quizQuestions } from '@/lib/data/quiz-data';
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   if (category) where.category = category;
   if (difficulty) where.difficulty = difficulty;
 
-  const attempts = await prisma.quizAttempt.findMany({
+  const attempts = await getPrisma().quizAttempt.findMany({
     where: where as Record<string, never>,
     select: {
       questionId: true,

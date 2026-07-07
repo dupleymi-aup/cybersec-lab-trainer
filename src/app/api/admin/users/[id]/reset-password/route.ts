@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { validateUuid } from '@/lib/validate-uuid';
@@ -41,22 +41,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: pwValidation.errors.join(', ') }, { status: 400 });
   }
 
-  const targetUser = await prisma.user.findUnique({ where: { id } });
+  const targetUser = await getPrisma().user.findUnique({ where: { id } });
   if (!targetUser) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
   const passwordHash = await hashPassword(newPassword);
-  await prisma.user.update({
+  await getPrisma().user.update({
     where: { id },
     data: { passwordHash, tokenVersion: { increment: 1 } },
   });
 
   // Audit log the password reset
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

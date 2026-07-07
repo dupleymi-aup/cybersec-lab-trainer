@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
 import { timingSafeEqual } from 'crypto';
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Find user to get the OTP store key
-  const user = await prisma.user.findFirst({
+  const user = await getPrisma().user.findFirst({
     where: { OR: [{ email: emailOrPhone }, { phone: emailOrPhone }] },
     select: { id: true },
   });

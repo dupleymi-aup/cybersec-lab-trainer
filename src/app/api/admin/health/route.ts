@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability, checkRateLimit } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   // 1. Database connectivity
   try {
     const start = Date.now();
-    await prisma.$queryRaw`SELECT 1`;
+    await getPrisma().$queryRaw`SELECT 1`;
     const latency = Date.now() - start;
     checks.database = {
       status: latency > 500 ? 'warn' : 'ok',
@@ -45,12 +45,12 @@ export async function GET(request: NextRequest) {
   // 2. Table record counts
   try {
     const [users, auditLogs, quizResults, progress, loginActivity, announcements] = await Promise.all([
-      prisma.user.count(),
-      prisma.auditLog.count(),
-      prisma.quizResult.count(),
-      prisma.progress.count(),
-      prisma.loginActivity.count(),
-      prisma.announcement.count(),
+      getPrisma().user.count(),
+      getPrisma().auditLog.count(),
+      getPrisma().quizResult.count(),
+      getPrisma().progress.count(),
+      getPrisma().loginActivity.count(),
+      getPrisma().announcement.count(),
     ]);
     checks.tables = {
       status: 'ok',
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
   // 6. Recent errors — check for failed login attempts in last hour
   try {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const failedLogins = await prisma.loginActivity.count({
+    const failedLogins = await getPrisma().loginActivity.count({
       where: { success: false, timestamp: { gte: oneHourAgo } },
     });
     checks.security = {

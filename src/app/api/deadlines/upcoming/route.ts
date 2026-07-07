@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id: auth.id },
     select: { group: true, role: true },
   });
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   // Find deadlines that apply to this user
   const applicableGroups = ['', user.group || ''].filter(Boolean);
-  const deadlines = await prisma.deadline.findMany({
+  const deadlines = await getPrisma().deadline.findMany({
     where: { group: { in: applicableGroups } },
     orderBy: { dueAt: 'asc' },
   });
@@ -23,13 +23,13 @@ export async function GET(request: NextRequest) {
   const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
   // Get user's progress to check completion
-  const progress = await prisma.progress.findMany({
+  const progress = await getPrisma().progress.findMany({
     where: { userId: auth.id },
     select: { moduleId: true, completed: true },
   });
   const completedModules = new Set(progress.filter((p) => p.completed).map((p) => p.moduleId));
 
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId: auth.id },
     select: { quizId: true },
   });

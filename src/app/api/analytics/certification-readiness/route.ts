@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { isAchievementUnlocked } from '@/lib/data/achievements-data';
@@ -34,14 +34,14 @@ export async function GET(request: NextRequest) {
   const userFilter: Prisma.UserWhereInput = { role: 'student' };
   if (groupId) userFilter.group = groupId;
 
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: userFilter,
     select: { id: true, fullName: true, email: true, group: true },
   });
 
   const studentIds = students.map((s) => s.id);
 
-  const progress = await prisma.progress.findMany({
+  const progress = await getPrisma().progress.findMany({
     where: { userId: { in: studentIds } },
     select: {
       userId: true,
@@ -56,12 +56,12 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId: { in: studentIds } },
     select: { userId: true, quizId: true, percentage: true },
   });
 
-  const quizAttempts = await prisma.quizAttempt.findMany({
+  const quizAttempts = await getPrisma().quizAttempt.findMany({
     where: { userId: { in: studentIds }, attemptedAt: { gte: since } },
     select: { userId: true, category: true, correct: true },
   });

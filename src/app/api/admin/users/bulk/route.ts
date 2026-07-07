@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { Role } from '@prisma/client';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { validateUuid } from '@/lib/validate-uuid';
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
 
   // Prevent last admin deletion
   if (action === 'delete') {
-    const adminCount = await prisma.user.count({ where: { role: 'admin' } });
-    const adminsToDelete = await prisma.user.count({
+    const adminCount = await getPrisma().user.count({ where: { role: 'admin' } });
+    const adminsToDelete = await getPrisma().user.count({
       where: { id: { in: userIds }, role: 'admin' },
     });
     if (adminCount - adminsToDelete < 1) {
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Fetch target users for audit logging
-  const targetUsers = await prisma.user.findMany({
+  const targetUsers = await getPrisma().user.findMany({
     where: { id: { in: userIds } },
     select: { id: true, email: true, fullName: true, role: true },
   });
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
   try {
     switch (action) {
       case 'block': {
-        const result = await prisma.user.updateMany({
+        const result = await getPrisma().user.updateMany({
           where: { id: { in: userIds } },
           data: { isBlocked: true, tokenVersion: { increment: 1 } },
         });
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'unblock': {
-        const result = await prisma.user.updateMany({
+        const result = await getPrisma().user.updateMany({
           where: { id: { in: userIds } },
           data: { isBlocked: false, tokenVersion: { increment: 1 } },
         });
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'delete': {
-        const deleteResult = await prisma.user.deleteMany({
+        const deleteResult = await getPrisma().user.deleteMany({
           where: { id: { in: userIds } },
         });
         resultCount = deleteResult.count;
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
       case 'role_change': {
         const targetRole = role as Role;
-        const result = await prisma.user.updateMany({
+        const result = await getPrisma().user.updateMany({
           where: { id: { in: userIds } },
           data: { role: targetRole, tokenVersion: { increment: 1 } },
         });
@@ -129,11 +129,11 @@ export async function POST(request: NextRequest) {
 
     // Audit log the bulk operation
     try {
-      const adminUser = await prisma.user.findUnique({
+      const adminUser = await getPrisma().user.findUnique({
         where: { id: auth.id },
       });
       const ip = getClientIp(request);
-      await prisma.auditLog.create({
+      await getPrisma().auditLog.create({
         data: {
           id: crypto.randomUUID(),
           adminId: auth.id,

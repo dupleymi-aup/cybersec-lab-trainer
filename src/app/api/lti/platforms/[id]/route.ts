@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { parseBody } from '@/lib/utils';
 
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params;
 
-  const platform = await prisma.ltiPlatform.findUnique({
+  const platform = await getPrisma().ltiPlatform.findUnique({
     where: { id },
     select: {
       id: true,
@@ -96,7 +96,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   const body = bodyResult.data;
 
   try {
-    const platform = await prisma.ltiPlatform.update({
+    const platform = await getPrisma().ltiPlatform.update({
       where: { id },
       data: {
         ...(body.name && { name: body.name }),
@@ -134,10 +134,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   const { id } = await params;
 
   try {
-    await prisma.ltiPlatform.delete({ where: { id } });
+    await getPrisma().ltiPlatform.delete({ where: { id } });
 
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
-    await prisma.auditLog.create({
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

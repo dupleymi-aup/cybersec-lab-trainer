@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
   // Get all incorrect quiz attempts
-  const incorrectAttempts = await prisma.quizAttempt.findMany({
+  const incorrectAttempts = await getPrisma().quizAttempt.findMany({
     where: { correct: false, attemptedAt: { gte: since } },
     select: {
       questionId: true,
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Get all attempts for context
-  const allAttempts = await prisma.quizAttempt.findMany({
+  const allAttempts = await getPrisma().quizAttempt.findMany({
     where: { attemptedAt: { gte: since } },
     select: {
       questionId: true,
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Get user info for group filtering
-  const users = await prisma.user.findMany({
+  const users = await getPrisma().user.findMany({
     select: { id: true, group: true },
   });
   const filteredUsers = new Set(users.filter((u) => !groupId || u.group === groupId).map((u) => u.id));

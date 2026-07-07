@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Fetch users
-  const users = await prisma.user.findMany({
+  const users = await getPrisma().user.findMany({
     where,
     select: {
       id: true,
@@ -123,9 +123,9 @@ export async function POST(request: NextRequest) {
 
   // Audit log the export action (best-effort)
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

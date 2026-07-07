@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { generateStudentReportCSV } from '@/lib/export-utils';
 
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return forbidden();
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id: userId },
     select: {
       fullName: true,
@@ -29,12 +29,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  const progress = await prisma.progress.findMany({
+  const progress = await getPrisma().progress.findMany({
     where: { userId },
     select: { moduleId: true, completed: true, score: true },
   });
 
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId },
     select: { quizId: true, score: true, total: true, percentage: true },
   });

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { logger } from '@/lib/logger';
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     if (groupId) userFilter.group = groupId;
 
     // Get students
-    const students = await prisma.user.findMany({
+    const students = await getPrisma().user.findMany({
       where: userFilter,
       select: { id: true, fullName: true },
     });
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const totalStudents = students.length;
 
     // Get login activity for hourly patterns
-    const loginActivity = await prisma.loginActivity.findMany({
+    const loginActivity = await getPrisma().loginActivity.findMany({
       where: {
         userId: { in: studentIds },
         timestamp: { gte: since },
@@ -42,25 +42,25 @@ export async function GET(request: NextRequest) {
     });
 
     // Get progress for activity calculation
-    const progressRecords = await prisma.progress.findMany({
+    const progressRecords = await getPrisma().progress.findMany({
       where: { userId: { in: studentIds }, updatedAt: { gte: since } },
       select: { userId: true, updatedAt: true },
     });
 
     // Get quiz attempts
-    const quizAttempts = await prisma.quizAttempt.findMany({
+    const quizAttempts = await getPrisma().quizAttempt.findMany({
       where: { userId: { in: studentIds }, attemptedAt: { gte: since } },
       select: { userId: true, attemptedAt: true },
     });
 
     // Calculate engagement scores for each student
     const totalModules = 12;
-    const allProgress = await prisma.progress.findMany({
+    const allProgress = await getPrisma().progress.findMany({
       where: { userId: { in: studentIds } },
       select: { userId: true, completed: true },
     });
 
-    const allQuizResults = await prisma.quizResult.findMany({
+    const allQuizResults = await getPrisma().quizResult.findMany({
       where: { userId: { in: studentIds } },
       select: { userId: true, percentage: true },
     });

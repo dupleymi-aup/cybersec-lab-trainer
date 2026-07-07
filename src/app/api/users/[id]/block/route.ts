@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 import { validateUuid } from '@/lib/validate-uuid';
@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'isBlocked must be boolean' }, { status: 400 });
   }
 
-  const user = await prisma.user.update({
+  const user = await getPrisma().user.update({
     where: { id },
     data: {
       isBlocked,
@@ -50,9 +50,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   // Audit log the block/unblock
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

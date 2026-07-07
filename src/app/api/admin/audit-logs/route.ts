@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit } from '@/lib/api-middleware';
 
 // GET /api/admin/audit-logs - view audit logs with filtering and pagination
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
   }
 
   const [logs, total] = await Promise.all([
-    prisma.auditLog.findMany({
+    getPrisma().auditLog.findMany({
       where,
       orderBy: { timestamp: 'desc' },
       skip,
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         },
       },
     }),
-    prisma.auditLog.count({ where }),
+    getPrisma().auditLog.count({ where }),
   ]);
 
   return NextResponse.json({

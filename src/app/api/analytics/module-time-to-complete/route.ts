@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
   // Get all progress records with timestamps
-  const allProgress = await prisma.progress.findMany({
+  const allProgress = await getPrisma().progress.findMany({
     where: { updatedAt: { gte: since } },
     select: {
       userId: true,
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Get user info for filtering and display
-  const users = await prisma.user.findMany({
+  const users = await getPrisma().user.findMany({
     select: { id: true, fullName: true, group: true },
   });
 
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Also get snapshots for more granular start dates
-  const snapshots = await prisma.progressSnapshot.findMany({
+  const snapshots = await getPrisma().progressSnapshot.findMany({
     where: {
       userId: { in: Array.from(filteredUsers) },
       recordedAt: { gte: since },

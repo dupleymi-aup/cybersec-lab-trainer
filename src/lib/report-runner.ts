@@ -7,7 +7,7 @@
  * Or from a Next.js API route that runs on a schedule.
  */
 
-import { prisma } from './db';
+import { getPrisma } from './db';
 import { logger } from './logger';
 import {
   generateGradebookPDF,
@@ -139,7 +139,7 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
   const results = { success: 0, skipped: 0, failed: 0 };
 
   // Get all active scheduled reports
-  const reports: ScheduledReportRecord[] = await prisma.scheduledReport.findMany({
+  const reports: ScheduledReportRecord[] = await getPrisma().scheduledReport.findMany({
     where: { isActive: true },
   });
 
@@ -179,7 +179,7 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
       await generator(report.days, report.groupId || undefined);
 
       // Update lastGenerated timestamp
-      await prisma.scheduledReport.update({
+      await getPrisma().scheduledReport.update({
         where: { id: report.id },
         data: { lastGenerated: now },
       });

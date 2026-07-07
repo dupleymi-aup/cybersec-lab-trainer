@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 // GET /api/announcements - get active announcements (public access)
 export async function GET(_request: NextRequest) {
   // Public endpoint - return active, non-expired announcements
   try {
-    const announcements = await prisma.announcement.findMany({
+    const announcements = await getPrisma().announcement.findMany({
       where: {
         active: true,
         OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }],

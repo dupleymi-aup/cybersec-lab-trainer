@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const where: Record<string, unknown> = { createdBy: auth.id };
   if (deadlineId) where.id = deadlineId;
 
-  const deadlines = await prisma.deadline.findMany({
+  const deadlines = await getPrisma().deadline.findMany({
     where,
     orderBy: { dueAt: 'asc' },
   });
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     if (deadline.group) studentWhere.group = deadline.group;
     if (group) studentWhere.group = group;
 
-    const students = await prisma.user.findMany({
+    const students = await getPrisma().user.findMany({
       where: studentWhere,
       select: { id: true, fullName: true, email: true, group: true },
     });
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       let progressDate: string | null = null;
 
       if (deadline.scope === 'module') {
-        const p = await prisma.progress.findUnique({
+        const p = await getPrisma().progress.findUnique({
           where: {
             userId_moduleId: { userId: student.id, moduleId: deadline.scopeId },
           },
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
         completed = !!p?.completed;
         progressDate = p?.updatedAt?.toISOString() || null;
       } else if (deadline.scope === 'quiz') {
-        const q = await prisma.quizResult.findUnique({
+        const q = await getPrisma().quizResult.findUnique({
           where: {
             userId_quizId: { userId: student.id, quizId: deadline.scopeId },
           },
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
         completed = !!q;
         progressDate = q?.updatedAt?.toISOString() || null;
       } else if (deadline.scope === 'course') {
-        const allProgress = await prisma.progress.findMany({
+        const allProgress = await getPrisma().progress.findMany({
           where: { userId: student.id, completed: true },
         });
         completed = allProgress.length > 0;

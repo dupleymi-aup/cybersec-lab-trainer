@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseBody } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   try {
     const { id } = await params;
-    const report = await prisma.scheduledReport.findUnique({
+    const report = await getPrisma().scheduledReport.findUnique({
       where: { id },
     });
 
@@ -44,7 +44,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   try {
     const { id } = await params;
-    const existing = await prisma.scheduledReport.findUnique({
+    const existing = await getPrisma().scheduledReport.findUnique({
       where: { id },
     });
 
@@ -57,7 +57,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = bodyResult.data;
     const { isActive, lastGenerated, ...updates } = body ?? {};
 
-    const report = await prisma.scheduledReport.update({
+    const report = await getPrisma().scheduledReport.update({
       where: { id },
       data: {
         ...(updates.reportType !== undefined && {
@@ -96,7 +96,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   try {
     const { id } = await params;
-    const existing = await prisma.scheduledReport.findUnique({
+    const existing = await getPrisma().scheduledReport.findUnique({
       where: { id },
     });
 
@@ -104,7 +104,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return unauthorized();
     }
 
-    await prisma.scheduledReport.delete({
+    await getPrisma().scheduledReport.delete({
       where: { id },
     });
 

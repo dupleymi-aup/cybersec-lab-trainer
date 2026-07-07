@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { generateOTP } from '@/lib/auth-utils';
 import { otpStore, ensureOtpCapacity } from '@/lib/otp-store';
 import { sendOTPRecoveryEmail } from '@/lib/email';
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const user = await prisma.user.findFirst({
+  const user = await getPrisma().user.findFirst({
     where: { OR: [{ email: emailOrPhone }, { phone: emailOrPhone }] },
   });
 

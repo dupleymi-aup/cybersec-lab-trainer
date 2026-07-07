@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 /**
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the platform by issuer
-    const platform = await prisma.ltiPlatform.findFirst({
+    const platform = await getPrisma().ltiPlatform.findFirst({
       where: { issuer: iss, isActive: true },
     });
 
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const platform = await prisma.ltiPlatform.findFirst({
+    const platform = await getPrisma().ltiPlatform.findFirst({
       where: { issuer: body.iss, isActive: true },
     });
 

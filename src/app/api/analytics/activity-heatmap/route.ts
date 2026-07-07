@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     // Determine which students to query
     let studentIds: string[];
     if (userId) {
-      const targetUser = await prisma.user.findUnique({
+      const targetUser = await getPrisma().user.findUnique({
         where: { id: userId },
       });
       if (!targetUser) {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       }
       studentIds = [userId];
     } else {
-      const students = await prisma.user.findMany({
+      const students = await getPrisma().user.findMany({
         where: { role: 'student' },
         select: { id: true },
       });
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch LoginActivity records
-    const loginActivities = await prisma.loginActivity.findMany({
+    const loginActivities = await getPrisma().loginActivity.findMany({
       where: {
         userId: { in: studentIds },
         timestamp: { gte: cutoffDate },
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Fetch Progress records
-    const progressRecords = await prisma.progress.findMany({
+    const progressRecords = await getPrisma().progress.findMany({
       where: {
         userId: { in: studentIds },
         updatedAt: { gte: cutoffDate },

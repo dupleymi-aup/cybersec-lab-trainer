@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
 import { gradeSubmissionSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
@@ -14,7 +14,7 @@ export async function POST(
 
   const { id, submissionId } = await params;
 
-  const assignment = await prisma.assignment.findUnique({
+  const assignment = await getPrisma().assignment.findUnique({
     where: { id },
     select: { id: true, createdBy: true, maxScore: true },
   });
@@ -27,7 +27,7 @@ export async function POST(
     return forbidden();
   }
 
-  const submission = await prisma.assignmentSubmission.findUnique({
+  const submission = await getPrisma().assignmentSubmission.findUnique({
     where: { id: submissionId },
   });
 
@@ -49,7 +49,7 @@ export async function POST(
 
   const percentage = Math.round((parsed.data.score / assignment.maxScore) * 100);
 
-  const updated = await prisma.assignmentSubmission.update({
+  const updated = await getPrisma().assignmentSubmission.update({
     where: { id: submissionId },
     data: {
       score: parsed.data.score,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { syncGradesToPlatform } from '@/lib/lti-utils';
 import { modules } from '@/lib/data';
@@ -9,11 +9,11 @@ export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  const progress = await prisma.progress.findMany({
+  const progress = await getPrisma().progress.findMany({
     where: { userId: auth.id },
   });
 
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId: auth.id },
   });
 
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const progress = await prisma.progress.upsert({
+  const progress = await getPrisma().progress.upsert({
     where: { userId_moduleId: { userId: auth.id, moduleId } },
     create: {
       id: crypto.randomUUID(),
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
 
   // Auto-sync grades to connected LTI platforms when module is completed with a score
   if (completed && score !== undefined && score !== null) {
-    const activePlatforms = await prisma.ltiPlatform.findMany({
+    const activePlatforms = await getPrisma().ltiPlatform.findMany({
       where: { isActive: true },
     });
 

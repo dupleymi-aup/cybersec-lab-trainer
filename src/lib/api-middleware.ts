@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateToken, getTokenPayload, type TokenPayload } from '@/lib/auth-server';
 import { ROLE_HIERARCHY, hasPermission, type UserRole } from './auth-types';
 import { hasCapability, hasAnyCapability, hasCapabilities, type Capability } from './capabilities';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 
 export type { TokenPayload };
 
@@ -28,7 +28,7 @@ export async function authenticate(request: NextRequest): Promise<AuthUser | nul
   if (!payload) return null;
   if (payload.exp < Date.now() / 1000) return null;
 
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id: payload.id },
     select: { tokenVersion: true, isBlocked: true, role: true },
   });

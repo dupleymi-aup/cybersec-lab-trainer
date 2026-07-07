@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 import { parseBody } from '@/lib/utils';
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
   // If userId is provided and differs from auth.id, verify the caller has permission
   if (userId && userId !== auth.id) {
-    const caller = await prisma.user.findUnique({
+    const caller = await getPrisma().user.findUnique({
       where: { id: auth.id },
       select: { role: true },
     });
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await prisma.progressSnapshot.create({
+    await getPrisma().progressSnapshot.create({
       data: {
         id: crypto.randomUUID(),
         userId: targetUserId,

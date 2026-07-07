@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, generateToken, getClientIp } from '@/lib/api-middleware';
 import { setAuthCookie } from '@/lib/cookie-auth';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Re-issue a proper JWT for the admin with current tokenVersion from DB
-    const admin = await prisma.user.findUnique({
+    const admin = await getPrisma().user.findUnique({
       where: { id: auth.id },
       select: {
         id: true,
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Audit log the end of impersonation
     try {
       const ip = getClientIp(request);
-      await prisma.auditLog.create({
+      await getPrisma().auditLog.create({
         data: {
           id: crypto.randomUUID(),
           adminId: admin.id,

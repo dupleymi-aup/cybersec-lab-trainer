@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   const studentWhere: Record<string, unknown> = { role: 'student' };
   if (groupId) studentWhere.group = groupId;
 
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: studentWhere,
     select: { id: true },
   });
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
   const studentIds = students.map((s) => s.id);
   const totalStudents = students.length;
 
-  const progressRecords = await prisma.progress.findMany({
+  const progressRecords = await getPrisma().progress.findMany({
     where: {
       userId: { in: studentIds },
       moduleId: { in: LEARNING_PATH.map((m) => m.id) },

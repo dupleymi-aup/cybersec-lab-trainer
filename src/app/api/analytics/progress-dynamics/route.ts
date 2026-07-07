@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   if (course) userWhere.course = course;
   if (university) userWhere.university = university;
 
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: userWhere,
     select: { id: true },
   });
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Get all progress records within the date range
-  const progressRecords = await prisma.progress.findMany({
+  const progressRecords = await getPrisma().progress.findMany({
     where: {
       userId: { in: studentIds },
       updatedAt: { gte: since },
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Get all quiz results within the date range
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: {
       userId: { in: studentIds },
       updatedAt: { gte: since },
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Get login activity
-  const loginActivity = await prisma.loginActivity.findMany({
+  const loginActivity = await getPrisma().loginActivity.findMany({
     where: {
       userId: { in: studentIds },
       timestamp: { gte: since },

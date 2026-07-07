@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Count how many records match
-  const count = await prisma.auditLog.count({ where });
+  const count = await getPrisma().auditLog.count({ where });
 
   // Dry run: just return the count without deleting
   if (dryRun) {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
   // Actually delete (capped at limit)
   // Prisma deleteMany doesn't support `take`, so find IDs first then delete
-  const recordsToDelete = await prisma.auditLog.findMany({
+  const recordsToDelete = await getPrisma().auditLog.findMany({
     where,
     select: { id: true },
     take: limit,
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
   let deletedCount = 0;
   if (recordsToDelete.length > 0) {
     const ids = recordsToDelete.map((r) => r.id);
-    const deleteResult = await prisma.auditLog.deleteMany({
+    const deleteResult = await getPrisma().auditLog.deleteMany({
       where: { id: { in: ids } },
     });
     deletedCount = deleteResult.count;
@@ -97,9 +97,9 @@ export async function POST(request: NextRequest) {
 
   // Audit log the deletion
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

@@ -31,27 +31,29 @@ vi.mock('jose', () => ({
   jwtVerify: vi.fn(),
 }));
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    ltiPlatform: {
-      findUnique: vi.fn(),
-      findFirst: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    },
-    ltiGradeSync: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-    },
-    ltiLaunchLog: {
-      create: vi.fn(),
-    },
-    user: {
-      findUnique: vi.fn(),
-    },
+const mockPrisma = {
+  ltiPlatform: {
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
   },
+  ltiGradeSync: {
+    create: vi.fn(),
+    findMany: vi.fn(),
+  },
+  ltiLaunchLog: {
+    create: vi.fn(),
+  },
+  user: {
+    findUnique: vi.fn(),
+  },
+};
+
+vi.mock('@/lib/db', () => ({
+  getPrisma: () => mockPrisma,
 }));
 
 describe('LTI Utilities', () => {
@@ -115,8 +117,7 @@ describe('LTI Utilities', () => {
 
   describe('syncGradesToPlatform', () => {
     it('should return error when platform not found', async () => {
-      const { prisma } = await import('@/lib/db');
-      vi.mocked(prisma.ltiPlatform.findUnique).mockResolvedValue(null);
+      mockPrisma.ltiPlatform.findUnique.mockResolvedValue(null);
 
       const { syncGradesToPlatform } = await import('@/lib/lti-utils');
       const result = await syncGradesToPlatform('nonexistent', 'user1', 'module1', 80, 100, 'Test');
@@ -126,8 +127,7 @@ describe('LTI Utilities', () => {
     });
 
     it('should return error when private key not configured', async () => {
-      const { prisma } = await import('@/lib/db');
-      vi.mocked(prisma.ltiPlatform.findUnique).mockResolvedValue({
+      mockPrisma.ltiPlatform.findUnique.mockResolvedValue({
         id: 'platform1',
         privateKey: null,
         publicKey: '',

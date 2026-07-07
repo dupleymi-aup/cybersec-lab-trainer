@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit } from '@/lib/api-middleware';
 import { RATE_WINDOW_1_MIN } from '@/lib/constants';
 
@@ -64,28 +64,28 @@ export async function GET(request: NextRequest) {
     launchesInPeriod,
   ] = await Promise.all([
     // User stats
-    prisma.user.count(),
-    prisma.user.groupBy({
+    getPrisma().user.count(),
+    getPrisma().user.groupBy({
       by: ['role'],
       _count: true,
     }),
-    prisma.user.count({ where: { isBlocked: true } }),
-    prisma.user.count({ where: { createdAt: { gte: dateFrom } } }),
-    prisma.user.count({ where: { lastLoginAt: { gte: dateFrom } } }),
+    getPrisma().user.count({ where: { isBlocked: true } }),
+    getPrisma().user.count({ where: { createdAt: { gte: dateFrom } } }),
+    getPrisma().user.count({ where: { lastLoginAt: { gte: dateFrom } } }),
 
     // Quiz stats
-    prisma.quizResult.count(),
-    prisma.quizResult.count({ where: { createdAt: { gte: dateFrom } } }),
-    prisma.quizResult.aggregate({
+    getPrisma().quizResult.count(),
+    getPrisma().quizResult.count({ where: { createdAt: { gte: dateFrom } } }),
+    getPrisma().quizResult.aggregate({
       _avg: { score: true },
     }),
-    prisma.quizAttempt.count(),
-    prisma.quizAttempt.count({ where: { attemptedAt: { gte: dateFrom } } }),
+    getPrisma().quizAttempt.count(),
+    getPrisma().quizAttempt.count({ where: { attemptedAt: { gte: dateFrom } } }),
 
     // Login stats
-    prisma.loginActivity.count(),
-    prisma.loginActivity.count({ where: { timestamp: { gte: dateFrom } } }),
-    prisma.loginActivity
+    getPrisma().loginActivity.count(),
+    getPrisma().loginActivity.count({ where: { timestamp: { gte: dateFrom } } }),
+    getPrisma().loginActivity
       .groupBy({
         by: ['userId'],
         where: { timestamp: { gte: dateFrom } },
@@ -94,9 +94,9 @@ export async function GET(request: NextRequest) {
       .then((results) => results.length),
 
     // Audit stats
-    prisma.auditLog.count(),
-    prisma.auditLog.count({ where: { timestamp: { gte: dateFrom } } }),
-    prisma.auditLog.groupBy({
+    getPrisma().auditLog.count(),
+    getPrisma().auditLog.count({ where: { timestamp: { gte: dateFrom } } }),
+    getPrisma().auditLog.groupBy({
       by: ['action'],
       where: { timestamp: { gte: dateFrom } },
       _count: true,
@@ -105,16 +105,16 @@ export async function GET(request: NextRequest) {
     }),
 
     // Reports
-    prisma.scheduledReport.count(),
-    prisma.scheduledReport.count({ where: { isActive: true } }),
+    getPrisma().scheduledReport.count(),
+    getPrisma().scheduledReport.count({ where: { isActive: true } }),
 
     // Progress
-    prisma.progressSnapshot.count(),
+    getPrisma().progressSnapshot.count(),
 
     // LTI stats
-    prisma.ltiPlatform.count(),
-    prisma.ltiLaunchLog.count(),
-    prisma.ltiLaunchLog.count({ where: { launchedAt: { gte: dateFrom } } }),
+    getPrisma().ltiPlatform.count(),
+    getPrisma().ltiLaunchLog.count(),
+    getPrisma().ltiLaunchLog.count({ where: { launchedAt: { gte: dateFrom } } }),
   ]);
 
   // Build role breakdown

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
   // Get all quiz attempts grouped by user+quiz to find retries
-  const attempts = await prisma.quizAttempt.findMany({
+  const attempts = await getPrisma().quizAttempt.findMany({
     where: { attemptedAt: { gte: since } },
     select: {
       userId: true,
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Get user info
-  const users = await prisma.user.findMany({
+  const users = await getPrisma().user.findMany({
     select: { id: true, fullName: true, group: true },
   });
   const userMap = new Map(users.map((u) => [u.id, u]));

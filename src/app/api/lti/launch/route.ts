@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { verifyLtiLaunch, type LtiClaims } from '@/lib/lti-utils';
 import { logger } from '@/lib/logger';
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the platform by issuer
-    const platform = await prisma.ltiPlatform.findFirst({
+    const platform = await getPrisma().ltiPlatform.findFirst({
       where: { issuer, isActive: true },
     });
 
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       const message = error instanceof Error ? error.message : 'Unknown error';
 
       // Log failed launch
-      await prisma.ltiLaunchLog.create({
+      await getPrisma().ltiLaunchLog.create({
         data: {
           platformId: platform.id,
           email: claims?.email || '',
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     const role = isTeacher ? 'teacher' : 'student';
 
     // Find or create user
-    let user = await prisma.user.findUnique({ where: { email } });
+    let user = await getPrisma().user.findUnique({ where: { email } });
 
     if (!user) {
       // Auto-provision user from LTI launch
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       const bcrypt = await import('bcryptjs');
       const passwordHash = await bcrypt.hash(randomPassword, 12);
 
-      user = await prisma.user.create({
+      user = await getPrisma().user.create({
         data: {
           id: userId,
           email,
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // Update user info
-      await prisma.user.update({
+      await getPrisma().user.update({
         where: { id: user.id },
         data: {
           fullName: name,
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
     const messageType = claims['https://purl.imsglobal.org/spec/lti/claim/message_type'];
 
     // Log successful launch
-    await prisma.ltiLaunchLog.create({
+    await getPrisma().ltiLaunchLog.create({
       data: {
         platformId: platform.id,
         userId: user.id,
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     // Return public keys for all active platforms
-    const platforms = await prisma.ltiPlatform.findMany({
+    const platforms = await getPrisma().ltiPlatform.findMany({
       where: { isActive: true },
       select: { id: true, publicKey: true },
     });

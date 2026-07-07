@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 import { validateUuid } from '@/lib/validate-uuid';
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const isAdmin = auth.role === 'admin';
   const { id } = await params;
 
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id },
     select: {
       id: true,
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // Check for duplicate email
-    const existing = await prisma.user.findFirst({
+    const existing = await getPrisma().user.findFirst({
       where: { email: body.email, id: { not: id } },
     });
     if (existing) {
@@ -95,7 +95,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
   }
 
-  const user = await prisma.user.update({
+  const user = await getPrisma().user.update({
     where: { id },
     data: {
       ...(fullName !== undefined && { fullName }),
@@ -113,7 +113,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   // Audit log the user update
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
     const appliedFields = [
       ...(fullName !== undefined ? ['fullName'] : []),
@@ -126,7 +126,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       ...(role !== undefined ? ['role'] : []),
       ...(body.email !== undefined ? ['email'] : []),
     ];
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
@@ -187,16 +187,16 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     return NextResponse.json({ error: 'Нельзя удалить свой аккаунт через этот endpoint' }, { status: 403 });
   }
 
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await getPrisma().user.findUnique({ where: { id } });
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-  await prisma.user.delete({ where: { id } });
+  await getPrisma().user.delete({ where: { id } });
 
   // Audit log the deletion
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

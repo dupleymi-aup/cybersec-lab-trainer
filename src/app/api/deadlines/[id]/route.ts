@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { updateDeadlineSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
@@ -10,7 +10,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { id } = await context.params;
-  const existing = await prisma.deadline.findUnique({ where: { id } });
+  const existing = await getPrisma().deadline.findUnique({ where: { id } });
   if (!existing) return NextResponse.json({ error: 'Deadline not found' }, { status: 404 });
   if (existing.createdBy !== auth.id && auth.role !== 'admin') return forbidden();
 
@@ -23,7 +23,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
   }
   const { dueAt, title, description, group } = parsed.data;
 
-  const deadline = await prisma.deadline.update({
+  const deadline = await getPrisma().deadline.update({
     where: { id },
     data: {
       ...(dueAt && { dueAt: new Date(dueAt) }),
@@ -45,10 +45,10 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const { id } = await context.params;
-  const existing = await prisma.deadline.findUnique({ where: { id } });
+  const existing = await getPrisma().deadline.findUnique({ where: { id } });
   if (!existing) return NextResponse.json({ error: 'Deadline not found' }, { status: 404 });
   if (existing.createdBy !== auth.id && auth.role !== 'admin') return forbidden();
 
-  await prisma.deadline.delete({ where: { id } });
+  await getPrisma().deadline.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

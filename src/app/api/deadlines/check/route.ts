@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { sendDeadlineReminderEmail } from '@/lib/email';
 import { authenticate } from '@/lib/api-middleware';
 import { timingSafeEqual } from 'crypto';
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const rangeEnd = new Date(now.getTime() + window.end * 24 * 60 * 60 * 1000);
     rangeEnd.setHours(23, 59, 59, 999);
 
-    const deadlines = await prisma.deadline.findMany({
+    const deadlines = await getPrisma().deadline.findMany({
       where: {
         dueAt: {
           gte: rangeEnd,
@@ -56,14 +56,14 @@ export async function POST(request: NextRequest) {
       const whereClause: Record<string, unknown> = { role: 'student' };
       if (deadline.group) whereClause.group = deadline.group;
 
-      const students = await prisma.user.findMany({
+      const students = await getPrisma().user.findMany({
         where: whereClause,
         select: { id: true, email: true, fullName: true },
       });
 
       for (const student of students) {
         // Check if already sent
-        const existing = await prisma.reminderLog.findUnique({
+        const existing = await getPrisma().reminderLog.findUnique({
           where: {
             deadlineId_userId_type: {
               deadlineId: deadline.id,
@@ -79,12 +79,12 @@ export async function POST(request: NextRequest) {
         let completed = false;
         if (deadline.scope === 'course') {
           // Simplified: check if student has any completed modules
-          const progress = await prisma.progress.findFirst({
+          const progress = await getPrisma().progress.findFirst({
             where: { userId: student.id, completed: true },
           });
           completed = !!progress;
         } else if (deadline.scope === 'module') {
-          const progress = await prisma.progress.findUnique({
+          const progress = await getPrisma().progress.findUnique({
             where: {
               userId_moduleId: {
                 userId: student.id,
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
           });
           completed = !!progress?.completed;
         } else if (deadline.scope === 'quiz') {
-          const quiz = await prisma.quizResult.findUnique({
+          const quiz = await getPrisma().quizResult.findUnique({
             where: {
               userId_quizId: { userId: student.id, quizId: deadline.scopeId },
             },
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
           });
         }
 
-        await prisma.reminderLog.create({
+        await getPrisma().reminderLog.create({
           data: {
             id: crypto.randomUUID(),
             deadlineId: deadline.id,

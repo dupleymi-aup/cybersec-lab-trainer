@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 // GET /api/progress/[userId] - Teacher view student progress (scoped to teacher's group)
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { userId } = await params;
 
   // Verify the target student exists and get their group
-  const targetUser = await prisma.user.findUnique({
+  const targetUser = await getPrisma().user.findUnique({
     where: { id: userId },
     select: { id: true, role: true, group: true },
   });
@@ -26,11 +26,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Access denied: student not in your group' }, { status: 403 });
   }
 
-  const progress = await prisma.progress.findMany({
+  const progress = await getPrisma().progress.findMany({
     where: { userId },
   });
 
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId },
   });
 

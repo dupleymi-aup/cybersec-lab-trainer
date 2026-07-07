@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { getLevel, getXpForNextLevel, getRank } from '@/lib/xp-utils';
 
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id: auth.id },
     select: { xp: true, level: true, streak: true, lastActivityAt: true },
   });

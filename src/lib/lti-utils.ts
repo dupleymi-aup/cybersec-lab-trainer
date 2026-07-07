@@ -1,5 +1,5 @@
 import { generateKeyPair, importPKCS8, SignJWT, jwtVerify, type JWK } from 'jose';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 export interface LtiClaims {
@@ -166,7 +166,7 @@ export async function syncGradesToPlatform(
   label: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const platform = await prisma.ltiPlatform.findUnique({
+    const platform = await getPrisma().ltiPlatform.findUnique({
       where: { id: platformId },
     });
 
@@ -180,7 +180,7 @@ export async function syncGradesToPlatform(
 
     const agsToken = await signAgsToken(platform.privateKey, platform.tokenUrl, platform.clientId);
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await getPrisma().user.findUnique({ where: { id: userId } });
     if (!user) {
       return { success: false, error: 'User not found' };
     }
@@ -234,7 +234,7 @@ export async function syncGradesToPlatform(
     }
 
     // Log the sync
-    await prisma.ltiGradeSync.create({
+    await getPrisma().ltiGradeSync.create({
       data: {
         platformId,
         userId,

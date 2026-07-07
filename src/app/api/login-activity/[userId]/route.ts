@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 // GET /api/login-activity/[userId]
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return forbidden();
   }
 
-  const activities = await prisma.loginActivity.findMany({
+  const activities = await getPrisma().loginActivity.findMany({
     where: { userId },
     orderBy: { timestamp: 'desc' },
     take: 50,

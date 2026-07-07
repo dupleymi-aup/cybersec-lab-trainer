@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     const groupId = searchParams.get('groupId') || '';
 
     // Fetch students filtered by group if specified
-    const students = await prisma.user.findMany({
+    const students = await getPrisma().user.findMany({
       where: {
         role: 'student',
         ...(groupId ? { group: groupId } : {}),
@@ -91,19 +91,19 @@ export async function GET(request: NextRequest) {
     const studentIds = students.map((s) => s.id);
 
     // Fetch all progress records for these students
-    const progressRecords = await prisma.progress.findMany({
+    const progressRecords = await getPrisma().progress.findMany({
       where: { userId: { in: studentIds } },
       select: { userId: true, updatedAt: true },
     });
 
     // Fetch all quiz results for these students
-    const quizResults = await prisma.quizResult.findMany({
+    const quizResults = await getPrisma().quizResult.findMany({
       where: { userId: { in: studentIds } },
       select: { userId: true, createdAt: true, updatedAt: true },
     });
 
     // Fetch quiz attempts for additional activity signals
-    const quizAttempts = await prisma.quizAttempt.findMany({
+    const quizAttempts = await getPrisma().quizAttempt.findMany({
       where: { userId: { in: studentIds } },
       select: { userId: true, attemptedAt: true },
     });

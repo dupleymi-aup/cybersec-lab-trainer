@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { getModuleName } from '@/lib/module-names';
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const userId = resolvedParams.userId;
 
   // Get user profile
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id: userId },
     select: {
       id: true,
@@ -40,13 +40,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   // Get module progress
-  const progressRecords = await prisma.progress.findMany({
+  const progressRecords = await getPrisma().progress.findMany({
     where: { userId },
     select: { moduleId: true, completed: true, score: true, updatedAt: true },
   });
 
   // Get quiz results
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId },
     select: {
       quizId: true,
@@ -59,13 +59,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   });
 
   // Get quiz attempts with category info
-  const quizAttempts = await prisma.quizAttempt.findMany({
+  const quizAttempts = await getPrisma().quizAttempt.findMany({
     where: { userId, attemptedAt: { gte: since } },
     select: { category: true, correct: true, attemptedAt: true },
   });
 
   // Get recent login activity
-  const loginActivity = await prisma.loginActivity.findMany({
+  const loginActivity = await getPrisma().loginActivity.findMany({
     where: { userId, timestamp: { gte: since } },
     select: { timestamp: true, success: true },
     orderBy: { timestamp: 'desc' },
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   });
 
   // Get progress snapshots for timeline
-  const snapshots = await prisma.progressSnapshot.findMany({
+  const snapshots = await getPrisma().progressSnapshot.findMany({
     where: { userId },
     select: { moduleId: true, score: true, completed: true, recordedAt: true },
     orderBy: { recordedAt: 'asc' },
@@ -178,7 +178,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   // ─── Quiz Category Trajectory (weekly buckets) ───
-  const allQuizAttempts = await prisma.quizAttempt.findMany({
+  const allQuizAttempts = await getPrisma().quizAttempt.findMany({
     where: { userId },
     select: { category: true, correct: true, attemptedAt: true },
     orderBy: { attemptedAt: 'asc' },
@@ -225,7 +225,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   quizCategoryTrajectory.sort((a, b) => a.week.localeCompare(b.week));
 
   // ─── Login Activity Timeline (daily aggregation) ───
-  const allLoginActivity = await prisma.loginActivity.findMany({
+  const allLoginActivity = await getPrisma().loginActivity.findMany({
     where: { userId },
     select: { timestamp: true, success: true },
     orderBy: { timestamp: 'asc' },
@@ -256,7 +256,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   // Get cohort averages for comparison (same group for meaningful comparison)
   const cohortUserIds = user.group
     ? (
-        await prisma.user.findMany({
+        await getPrisma().user.findMany({
           where: { group: user.group },
           select: { id: true },
         })
@@ -264,7 +264,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     : [];
   const allUserProgress =
     cohortUserIds.length > 0
-      ? await prisma.progress.findMany({
+      ? await getPrisma().progress.findMany({
           where: { userId: { in: cohortUserIds } },
           select: { moduleId: true, score: true, completed: true },
         })
@@ -317,7 +317,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   // Category-level gap analysis (same cohort scope)
   const allQuizAttemptsForCohort =
     cohortUserIds.length > 0
-      ? await prisma.quizAttempt.findMany({
+      ? await getPrisma().quizAttempt.findMany({
           where: { userId: { in: cohortUserIds } },
           select: { category: true, correct: true },
         })

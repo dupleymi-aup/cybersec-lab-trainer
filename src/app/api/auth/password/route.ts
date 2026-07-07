@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { hashPassword, verifyPassword, validatePassword } from '@/lib/auth-utils';
 import { passwordChangeSchema } from '@/lib/validations/api';
@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  const user = await prisma.user.findUnique({ where: { id: auth.id } });
+  const user = await getPrisma().user.findUnique({ where: { id: auth.id } });
   if (!user) return unauthorized();
 
   const isValid = await verifyPassword(currentPassword, user.passwordHash);
@@ -46,7 +46,7 @@ export async function PUT(request: NextRequest) {
   }
 
   const newHash = await hashPassword(newPassword);
-  await prisma.user.update({
+  await getPrisma().user.update({
     where: { id: auth.id },
     data: {
       passwordHash: newHash,

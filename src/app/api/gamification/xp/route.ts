@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma, PrismaTransactionClient } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, checkRateLimit } from '@/lib/api-middleware';
 import { getLevel, XP_REWARDS } from '@/lib/xp-utils';
 import { xpActionSchema } from '@/lib/validations/api';
@@ -30,8 +30,7 @@ export async function POST(request: NextRequest) {
   const { action } = parsed.data;
 
   // Use transaction to prevent race condition on XP + streak updates
-  const result = await prisma
-    .$transaction(async (tx) => {
+  const result = await getPrisma().$transaction(async (tx) => {
       const xpAmount =
         action === 'daily_login'
           ? await calculateDailyLoginXp(tx, auth.id)
@@ -111,7 +110,7 @@ export async function POST(request: NextRequest) {
     });
 
   if (result === null && action === 'daily_login') {
-    const recheck = await prisma.xpLog.aggregate({
+    const recheck = await getPrisma().xpLog.aggregate({
       where: {
         userId: auth.id,
         createdAt: {
@@ -147,7 +146,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function calculateDailyLoginXp(
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
+  tx: PrismaTransactionClient,
   userId: string,
 ): Promise<number> {
   const user = await tx.user.findUnique({

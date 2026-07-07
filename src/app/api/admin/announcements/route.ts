@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import {
   authenticate,
   unauthorized,
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     };
   }
 
-  const announcements = await prisma.announcement.findMany({
+  const announcements = await getPrisma().announcement.findMany({
     where,
     orderBy: { createdAt: 'desc' },
   });
@@ -83,11 +83,11 @@ export async function POST(request: NextRequest) {
 
   const parsedExpiresAt = expiresAt ? new Date(expiresAt) : null;
 
-  const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+  const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
   const ip = getClientIp(request);
   const announcementId = crypto.randomUUID();
 
-  const announcement = await prisma.announcement.create({
+  const announcement = await getPrisma().announcement.create({
     data: {
       id: announcementId,
       title,
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
   // Audit log
   try {
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
@@ -162,17 +162,17 @@ export async function PUT(request: NextRequest) {
 
   const { id, title, content, priority, active, expiresAt } = parsed.data;
 
-  const existing = await prisma.announcement.findUnique({ where: { id } });
+  const existing = await getPrisma().announcement.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: 'Announcement not found' }, { status: 404 });
   }
 
   const parsedExpiresAt = expiresAt === null ? null : expiresAt !== undefined ? new Date(expiresAt) : undefined;
 
-  const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+  const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
   const ip = getClientIp(request);
 
-  const announcement = await prisma.announcement.update({
+  const announcement = await getPrisma().announcement.update({
     where: { id },
     data: {
       ...(title !== undefined ? { title } : {}),
@@ -185,7 +185,7 @@ export async function PUT(request: NextRequest) {
 
   // Audit log
   try {
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,
@@ -250,19 +250,19 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Announcement ID is required' }, { status: 400 });
   }
 
-  const existing = await prisma.announcement.findUnique({ where: { id } });
+  const existing = await getPrisma().announcement.findUnique({ where: { id } });
   if (!existing) {
     return NextResponse.json({ error: 'Announcement not found' }, { status: 404 });
   }
 
-  const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+  const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
   const ip = getClientIp(request);
 
-  await prisma.announcement.delete({ where: { id } });
+  await getPrisma().announcement.delete({ where: { id } });
 
   // Audit log
   try {
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

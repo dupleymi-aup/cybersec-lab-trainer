@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params;
 
-    const assignment = await prisma.assignment.findUnique({
+    const assignment = await getPrisma().assignment.findUnique({
       where: { id },
       select: { id: true, createdBy: true, group: true },
     });
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     // Students can view only their own submissions
     if (auth.role === 'student') {
-      const submissions = await prisma.assignmentSubmission.findMany({
+      const submissions = await getPrisma().assignmentSubmission.findMany({
         where: { assignmentId: id, userId: auth.id },
         orderBy: { submittedAt: 'desc' },
       });
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (graded === 'true') where.submittedAt = { not: null };
     if (graded === 'false') where.submittedAt = null;
 
-    const submissions = await prisma.assignmentSubmission.findMany({
+    const submissions = await getPrisma().assignmentSubmission.findMany({
       where,
       include: {
         user: {

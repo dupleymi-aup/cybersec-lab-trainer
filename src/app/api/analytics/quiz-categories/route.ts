@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 
@@ -29,14 +29,14 @@ export async function GET(request: NextRequest) {
   const now = new Date();
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: userWhere,
     select: { id: true },
   });
 
   const studentIds = students.map((s) => s.id);
 
-  const quizAttempts = await prisma.quizAttempt.findMany({
+  const quizAttempts = await getPrisma().quizAttempt.findMany({
     where: {
       userId: { in: studentIds },
       attemptedAt: { gte: since },

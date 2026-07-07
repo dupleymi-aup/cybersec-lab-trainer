@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   try {
-    const reports = await prisma.scheduledReport.findMany({
+    const reports = await getPrisma().scheduledReport.findMany({
       where: { userId: auth.id },
       orderBy: { createdAt: 'desc' },
     });
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'dayOfMonth должен быть 1-31 для monthly' }, { status: 400 });
     }
 
-    const report = await prisma.scheduledReport.create({
+    const report = await getPrisma().scheduledReport.create({
       data: {
         userId: auth.id,
         reportType,

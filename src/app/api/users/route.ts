@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { createUserSchema } from '@/lib/validations/api';
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
   const order = sortOrder === 'asc' ? 'asc' : 'desc';
 
   const [users, total] = await Promise.all([
-    prisma.user.findMany({
+    getPrisma().user.findMany({
       where,
       select: {
         id: true,
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       skip,
       take: Math.min(limit, 100),
     }),
-    prisma.user.count({ where }),
+    getPrisma().user.count({ where }),
   ]);
 
   return NextResponse.json({
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Пароль недостаточно надёжный', details: pwValidation.errors }, { status: 400 });
   }
 
-  const existing = await prisma.user.findFirst({
+  const existing = await getPrisma().user.findFirst({
     where: { OR: [{ email }, { phone }] },
   });
   if (existing) {
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
   }
 
   const passwordHash = await hashPassword(password);
-  const user = await prisma.user.create({
+  const user = await getPrisma().user.create({
     data: {
       id: crypto.randomUUID(),
       email,
@@ -140,9 +140,9 @@ export async function POST(request: NextRequest) {
 
   // Audit log the user creation
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

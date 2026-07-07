@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { updateUserSchema } from '@/lib/validations/api';
 
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  const user = await prisma.user.findUnique({
+  const user = await getPrisma().user.findUnique({
     where: { id: auth.id },
     select: {
       id: true,
@@ -55,7 +55,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Необходимо указать хотя бы одно поле для обновления' }, { status: 400 });
   }
 
-  const user = await prisma.user.update({
+  const user = await getPrisma().user.update({
     where: { id: auth.id },
     data: parsed.data,
   });

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { getRank } from '@/lib/xp-utils';
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   // For timeframe filtering, we would use lastActivityAt but for simplicity show all-time
   const [users, total] = await Promise.all([
-    prisma.user.findMany({
+    getPrisma().user.findMany({
       where,
       orderBy: [{ xp: 'desc' }, { level: 'desc' }],
       take: Math.min(limit, 100),
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         lastActivityAt: true,
       },
     }),
-    prisma.user.count({ where }),
+    getPrisma().user.count({ where }),
   ]);
 
   const leaderboard = users.map((u, index) => ({
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
   // Get user's own rank if not in top list
   let userRank = leaderboard.find((u) => u.isCurrentUser);
   if (!userRank) {
-    const [ownUser] = await prisma.user.findMany({
+    const [ownUser] = await getPrisma().user.findMany({
       where: { id: auth.id, role: 'student', isBlocked: false },
       select: { xp: true, level: true, streak: true },
     });

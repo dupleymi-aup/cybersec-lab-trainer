@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 /**
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   if (!requireRole(auth.role, 'admin', 'teacher')) return forbidden();
 
-  const platforms = await prisma.ltiPlatform.findMany({
+  const platforms = await getPrisma().ltiPlatform.findMany({
     select: {
       id: true,
       name: true,
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const platform = await prisma.ltiPlatform.create({
+    const platform = await getPrisma().ltiPlatform.create({
       data: {
         name,
         issuer,
@@ -91,8 +91,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Log audit
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
-    await prisma.auditLog.create({
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { MS_PER_DAY, PERCENT_ROUNDING_FACTOR, PERCENT_SCALE } from '@/lib/constants';
 
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const sixtyDaysAgo = new Date(now.getTime() - 60 * MS_PER_DAY);
 
   // Current period (last 30 days)
-  const students = await prisma.user.findMany({
+  const students = await getPrisma().user.findMany({
     where: { role: 'student' },
     select: {
       id: true,
@@ -34,19 +34,19 @@ export async function GET(request: NextRequest) {
     totalStudents > 0 ? Math.round((activeStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
 
   // Progress data
-  const progressRecords = await prisma.progress.findMany({
+  const progressRecords = await getPrisma().progress.findMany({
     where: { userId: { in: studentIds } },
     select: { userId: true, moduleId: true, completed: true, score: true },
   });
 
   // Quiz results
-  const quizResults = await prisma.quizResult.findMany({
+  const quizResults = await getPrisma().quizResult.findMany({
     where: { userId: { in: studentIds } },
     select: { userId: true, percentage: true },
   });
 
   // Login activity in last 30 days
-  const loginActivity = await prisma.loginActivity.count({
+  const loginActivity = await getPrisma().loginActivity.count({
     where: {
       userId: { in: studentIds },
       timestamp: { gte: thirtyDaysAgo },
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
     totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
 
   // Previous period progress
-  const prevProgress = await prisma.progress.findMany({
+  const prevProgress = await getPrisma().progress.findMany({
     where: {
       userId: { in: studentIds },
       updatedAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Previous period quiz results
-  const prevQuizResults = await prisma.quizResult.findMany({
+  const prevQuizResults = await getPrisma().quizResult.findMany({
     where: {
       userId: { in: studentIds },
       updatedAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
   });
 
   // Previous period login activity
-  const prevLoginActivity = await prisma.loginActivity.count({
+  const prevLoginActivity = await getPrisma().loginActivity.count({
     where: {
       userId: { in: studentIds },
       timestamp: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { generateGradebookCSV } from '@/lib/export-utils';
 
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const groupId = searchParams.get('groupId') || undefined;
 
-  const users = await prisma.user.findMany({
+  const users = await getPrisma().user.findMany({
     where: groupId ? { group: groupId, role: 'student' } : { role: 'student' },
     select: {
       id: true,
@@ -23,12 +23,12 @@ export async function GET(request: NextRequest) {
 
   const userIds = users.map((u) => u.id);
 
-  const progressRecords = await prisma.progress.findMany({
+  const progressRecords = await getPrisma().progress.findMany({
     where: { userId: { in: userIds } },
     select: { userId: true, completed: true, updatedAt: true },
   });
 
-  const quizRecords = await prisma.quizResult.findMany({
+  const quizRecords = await getPrisma().quizResult.findMany({
     where: { userId: { in: userIds } },
     select: { userId: true, percentage: true, updatedAt: true },
   });

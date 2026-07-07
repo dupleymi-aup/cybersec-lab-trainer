@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { generateToken, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { getAdminInviteCode } from '@/lib/auth-server-secrets';
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user exists
-    const existing = await prisma.user.findFirst({
+    const existing = await getPrisma().user.findFirst({
       where: { OR: [{ email }, { phone }] },
     });
     if (existing) {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await hashPassword(password);
 
-    const user = await prisma.user.create({
+    const user = await getPrisma().user.create({
       data: {
         id: crypto.randomUUID(),
         email,

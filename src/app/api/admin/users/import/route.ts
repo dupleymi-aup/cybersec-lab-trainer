@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 import { hashPassword, validateEmail, validatePhone } from '@/lib/auth-utils';
@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Check for existing users in database (emails and phones)
-  const existingUsers = await prisma.user.findMany({
+  const existingUsers = await getPrisma().user.findMany({
     where: {
       OR: [{ email: { in: Array.from(seenEmails) } }, { phone: { in: Array.from(seenPhones) } }],
     },
@@ -262,7 +262,7 @@ export async function POST(request: NextRequest) {
     });
 
     try {
-      await prisma.user.createMany({
+      await getPrisma().user.createMany({
         data: batchRows.map((row, idx) => ({
           id: crypto.randomUUID(),
           email: row.email,
@@ -291,9 +291,9 @@ export async function POST(request: NextRequest) {
 
   // Audit log the import action
   try {
-    const adminUser = await prisma.user.findUnique({ where: { id: auth.id } });
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
     const ip = getClientIp(request);
-    await prisma.auditLog.create({
+    await getPrisma().auditLog.create({
       data: {
         id: crypto.randomUUID(),
         adminId: auth.id,

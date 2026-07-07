@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { createDeadlineSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   // Teachers/admins see deadlines they created; students see deadlines for their group or all
   let where: Record<string, unknown>;
   if (auth.role === 'student') {
-    const student = await prisma.user.findUnique({
+    const student = await getPrisma().user.findUnique({
       where: { id: auth.id },
       select: { group: true },
     });
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   if (scope) where.scope = scope;
   if (group) where.group = group;
 
-  const deadlines = await prisma.deadline.findMany({
+  const deadlines = await getPrisma().deadline.findMany({
     where,
     orderBy: { dueAt: 'asc' },
     include: {
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
   const scopeId = scopeIdRaw || '';
   const group = body.group || '';
 
-  const deadline = await prisma.deadline.create({
+  const deadline = await getPrisma().deadline.create({
     data: {
       id: crypto.randomUUID(),
       scope,

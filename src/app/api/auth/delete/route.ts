@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { verifyPassword } from '@/lib/auth-utils';
 
@@ -47,7 +47,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Требуется подтверждение пароля' }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { id: auth.id } });
+  const user = await getPrisma().user.findUnique({ where: { id: auth.id } });
   if (!user) return unauthorized();
 
   const isValid = await verifyPassword(currentPassword, user.passwordHash);
@@ -55,7 +55,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Неверный пароль' }, { status: 401 });
   }
 
-  await prisma.user.delete({ where: { id: auth.id } });
+  await getPrisma().user.delete({ where: { id: auth.id } });
 
   return NextResponse.json({ success: true });
 }
