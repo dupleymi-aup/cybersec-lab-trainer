@@ -427,22 +427,22 @@ export default function AuthSecurityLab() {
               )}
 
               <CodeBlock
-                code={`// Пример использования bcrypt в Node.js
+                code={`// bcrypt usage example in Node.js
 const bcrypt = require('bcrypt');
 const SALT_ROUNDS = 12;
 
-// Хеширование пароля
+// Hash a password
 async function hashPassword(password) {
   const salt = await bcrypt.genSalt(SALT_ROUNDS);
   const hash = await bcrypt.hash(password, salt);
   return hash;
-  // Результат: $2b$12$N9qo8uLOickgx2ZMRZoMy...
+  // Result: $2b$12$N9qo8uLOickgx2ZMRZoMy...
 }
 
-// Проверка пароля
+// Verify a password
 async function verify(password, hash) {
   const isMatch = await bcrypt.compare(password, hash);
-  return isMatch; // true или false
+  return isMatch; // true or false
 }`}
                 language="javascript"
                 title="bcrypt-usage.js"
@@ -565,24 +565,24 @@ async function verify(password, hash) {
               </div>
 
               <CodeBlock
-                code={`// TOTP на сервере (Node.js)
+                code={`// TOTP on server (Node.js)
 import { authenticator } from 'otplib';
 
-// 1. Генерация секрета при включении 2FA
+// 1. Generate secret when 2FA is enabled
 const secret = authenticator.generateSecret();
-// Сохранить secret в БД пользователя
+// Store secret in user's DB
 
-// 2. Генерация QR-кода для Google Authenticator
+// 2. Generate QR code for Google Authenticator
 const otpauth = authenticator.keyuri(user.email, 'MyApp', secret);
 // otpauth://totp/MyApp:user@email?secret=ABCD...
 
-// 3. Проверка кода при входе
+// 3. Verify code on login
 const isValid = authenticator.check(token, user.secret);
-// Возвращает true, если код совпадает (±1 шаг)
+// Returns true if code matches (±1 step)
 
-// Без 2FA — только пароль
-// С 2FA — пароль + TOTP-код из телефона
-// Даже при утечке пароля — аккаунт защищён`}
+// Without 2FA: password only
+// With 2FA: password + TOTP code from phone
+// Even if password leaks, account stays protected`}
                 language="javascript"
                 title="totp-auth.js"
               />
@@ -628,31 +628,30 @@ const isValid = authenticator.check(token, user.secret);
                   <p className="text-xs leading-relaxed text-sky-700">{t('sessions.jwtDescription')}</p>
                 </div>
 
-                <CodeBlock
-                  code={`// Генерация JWT
+              <CodeBlock
+                code={`// JWT generation
 const jwt = require('jsonwebtoken');
 
 function login(user) {
   const token = jwt.sign(
     { id: user.id, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: '1h' }  // Токен истекает через час
+    { expiresIn: '1h' }  // Token expires in 1 hour
   );
   return token;
 }
 
-// Проверка JWT (middleware)
+// JWT verification (middleware)
 function authenticate(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Нет токена' });
+  if (!token) return res.status(401).json({ error: 'No token' });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (e) {
-    if (process.env.NODE_ENV === "development") console.warn("[AuthSecurityLab.tsx] authenticate failed:", e);
-    return res.status(401).json({ error: 'Невалидный токен' });
+    return res.status(401).json({ error: 'Invalid token' });
   }
 }`}
                   language="javascript"

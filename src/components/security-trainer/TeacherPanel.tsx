@@ -1133,7 +1133,7 @@ export default function TeacherPanel() {
               {/* Category averages bar chart */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-4 text-sm font-semibold">Средний балл по категориям квизов</h3>
+                  <h3 className="mb-4 text-sm font-semibold">{t('analyticsTitle')}</h3>
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -1145,7 +1145,7 @@ export default function TeacherPanel() {
                             const avg =
                               scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
                             return {
-                              name: cat.name.replace(' квизы', ''),
+                              name: cat.name.replace(' квизы', '').replace(' quizzes', ''),
                               avg,
                               attempted: scores.length,
                             };
@@ -1175,7 +1175,7 @@ export default function TeacherPanel() {
                 {/* Score distribution pie chart */}
                 <Card className="border-border">
                   <CardContent className="p-5">
-                    <h3 className="mb-4 text-sm font-semibold">Распределение оценок</h3>
+                    <h3 className="mb-4 text-sm font-semibold">{t('analyticsSubtitle')}</h3>
                     {(() => {
                       const allScores = students.flatMap((s) => Object.values(getSp(s.id).quizScores));
                       const excellent = allScores.filter((s) => s >= 80).length;
@@ -1187,23 +1187,23 @@ export default function TeacherPanel() {
 
                       const data = [
                         {
-                          name: 'Отлично (80%+)',
+                          name: t('excellent'),
                           value: excellent,
                           color: '#10b981',
                         },
                         {
-                          name: 'Хорошо (60-79%)',
+                          name: t('good'),
                           value: good,
                           color: '#3b82f6',
                         },
                         {
-                          name: 'Средне (40-59%)',
+                          name: t('average'),
                           value: average,
                           color: '#f59e0b',
                         },
-                        { name: 'Плохо (<40%)', value: poor, color: '#ef4444' },
+                        { name: t('poor'), value: poor, color: '#ef4444' },
                         {
-                          name: 'Не сдано',
+                          name: t('notSubmitted'),
                           value: notAttempted,
                           color: '#e2e8f0',
                         },
@@ -1231,7 +1231,7 @@ export default function TeacherPanel() {
                           </PieChart>
                         </ResponsiveContainer>
                       ) : (
-                        <p className="py-8 text-center text-xs text-slate-400">Нет данных</p>
+                        <p className="py-8 text-center text-xs text-slate-400">{t('noData')}</p>
                       );
                     })()}
                   </CardContent>
@@ -1240,14 +1240,14 @@ export default function TeacherPanel() {
                 {/* Activity pie chart */}
                 <Card className="border-border">
                   <CardContent className="p-5">
-                    <h3 className="mb-4 text-sm font-semibold">Активность студентов</h3>
+                    <h3 className="mb-4 text-sm font-semibold">{t('activityTitle')}</h3>
                     {(() => {
                       const active = students.filter((s) => getSp(s.id).completedModules.length > 0).length;
                       const inactive = students.length - active;
                       const data = [
-                        { name: 'Активные', value: active, color: '#10b981' },
+                        { name: t('activeStudents'), value: active, color: '#10b981' },
                         {
-                          name: 'Неактивные',
+                          name: t('inactiveStudents'),
                           value: inactive,
                           color: '#e2e8f0',
                         },
@@ -1275,7 +1275,7 @@ export default function TeacherPanel() {
                           </PieChart>
                         </ResponsiveContainer>
                       ) : (
-                        <p className="py-8 text-center text-xs text-slate-400">Нет данных</p>
+                        <p className="py-8 text-center text-xs text-slate-400">{t('noData')}</p>
                       );
                     })()}
                   </CardContent>
@@ -1285,7 +1285,7 @@ export default function TeacherPanel() {
               {/* Top students ranking */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-4 text-sm font-semibold">Рейтинг студентов</h3>
+                  <h3 className="mb-4 text-sm font-semibold">{t('ranking')}</h3>
                   {(() => {
                     const studentRankings = students
                       .map((s) => {
@@ -1331,8 +1331,8 @@ export default function TeacherPanel() {
                               </div>
                             </div>
                             <div className="flex items-center gap-4 text-xs">
-                              <span className="text-muted-foreground">{s.mods} модулей</span>
-                              <span className="text-muted-foreground">квизы: {s.avgQ}%</span>
+                              <span className="text-muted-foreground">{s.mods} {t('modules')}</span>
+                              <span className="text-muted-foreground">{t('quizScoreShort', { score: s.avgQ })}</span>
                               <span className="flex items-center gap-0.5 text-slate-400">
                                 <Clock size={10} /> {s.lastActive}
                               </span>
@@ -1340,7 +1340,7 @@ export default function TeacherPanel() {
                           </div>
                         ))}
                         {studentRankings.length === 0 && (
-                          <p className="py-4 text-center text-xs text-slate-400">Нет данных</p>
+                          <p className="py-4 text-center text-xs text-slate-400">{t('noData')}</p>
                         )}
                       </div>
                     );
@@ -1427,7 +1427,7 @@ export default function TeacherPanel() {
             <>
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-4 text-sm font-semibold">Сравнение групп</h3>
+                  <h3 className="mb-4 text-sm font-semibold">{t('comparisonTitle')}</h3>
                   <div className="h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={groupComparisonData}>
@@ -1436,9 +1436,9 @@ export default function TeacherPanel() {
                         <YAxis tick={{ fontSize: 10 }} />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="avgModules" name="Ср. модулей" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="avgScore" name="Ср. балл (%)" fill="#10b981" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="activityRate" name="Активность (%)" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="avgModules" name={t('avgModules')} fill="#6366f1" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="avgScore" name={t('avgScore') + ' (%)'} fill="#10b981" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="activityRate" name={t('activityRate')} fill="#f59e0b" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -1458,24 +1458,24 @@ export default function TeacherPanel() {
                         <div className="mb-3 flex items-center justify-between">
                           <h3 className="text-sm font-semibold">{g.name}</h3>
                           {g.name === best.name && (
-                            <Badge className="border-0 bg-emerald-100 text-[10px] text-emerald-700">Лучшая</Badge>
+                            <Badge className="border-0 bg-emerald-100 text-[10px] text-emerald-700">{t('bestGroup')}</Badge>
                           )}
                           {g.name === worst.name && (
-                            <Badge className="border-0 bg-red-100 text-[10px] text-red-700">Требует внимания</Badge>
+                            <Badge className="border-0 bg-red-100 text-[10px] text-red-700">{t('needsAttention')}</Badge>
                           )}
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
                           <div>
                             <p className="text-foreground/70 text-lg font-bold">{g.students}</p>
-                            <p className="text-muted-foreground text-[10px]">Студентов</p>
+                            <p className="text-muted-foreground text-[10px]">{t('totalStudents')}</p>
                           </div>
                           <div>
                             <p className="text-foreground/70 text-lg font-bold">{g.avgModules}</p>
-                            <p className="text-muted-foreground text-[10px]">Ср. модулей</p>
+                            <p className="text-muted-foreground text-[10px]">{t('avgModules')}</p>
                           </div>
                           <div>
                             <p className="text-foreground/70 text-lg font-bold">{g.avgScore}%</p>
-                            <p className="text-muted-foreground text-[10px]">Ср. балл</p>
+                            <p className="text-muted-foreground text-[10px]">{t('avgScore')}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -1487,7 +1487,7 @@ export default function TeacherPanel() {
           ) : (
             <div className="py-12 text-center text-slate-400">
               <GitCompare size={40} className="mx-auto mb-3 opacity-50" />
-              <p className="text-sm">Нет данных для сравнения. Студенты должны быть распределены по группам.</p>
+              <p className="text-sm">{t('comparisonSubtitle')}</p>
             </div>
           )}
         </TabsContent>
@@ -1533,11 +1533,11 @@ export default function TeacherPanel() {
                         </div>
                         <div className="flex items-center gap-4 text-right">
                           <div>
-                            <p className="text-muted-foreground text-xs">Модули</p>
+                            <p className="text-muted-foreground text-xs">{t('modules')}</p>
                             <p className="text-sm font-bold">{progress ? progress.completedModules.length : 0}</p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground text-xs">Ср. балл</p>
+                            <p className="text-muted-foreground text-xs">{t('avgScore')}</p>
                             <p className="text-sm font-bold">
                               {progress && Object.values(progress.quizScores).length > 0
                                 ? `${Math.round(avgScore)}%`
@@ -1545,13 +1545,13 @@ export default function TeacherPanel() {
                             </p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground text-xs">Последняя активность</p>
+                            <p className="text-muted-foreground text-xs">{t('lastActive')}</p>
                             <p className="text-sm font-bold">
                               {progress
                                 ? progress.lastActive
-                                  ? `${daysSinceActive} дн. назад`
-                                  : 'Никогда'
-                                : 'Никогда'}
+                                  ? t('daysAgo', { days: daysSinceActive })
+                                  : t('never')
+                                : t('never')}
                             </p>
                           </div>
                         </div>
@@ -1571,7 +1571,7 @@ export default function TeacherPanel() {
           ) : (
             <div className="py-12 text-center text-slate-400">
               <AlertTriangle size={40} className="mx-auto mb-3 opacity-50" />
-              <p className="text-sm">Все студенты в порядке! Нет студентов с признаками риска.</p>
+              <p className="text-sm">{t('noAtRisk')}</p>
             </div>
           )}
         </TabsContent>
@@ -1588,7 +1588,7 @@ export default function TeacherPanel() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{totalStudents}</p>
-                    <p className="text-muted-foreground text-xs">Всего студентов</p>
+                    <p className="text-muted-foreground text-xs">{t('totalStudents')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -1601,7 +1601,7 @@ export default function TeacherPanel() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{activeStudents}</p>
-                    <p className="text-muted-foreground text-xs">Активных</p>
+                    <p className="text-muted-foreground text-xs">{t('activeStudents')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -1614,7 +1614,7 @@ export default function TeacherPanel() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{avgCompletion}</p>
-                    <p className="text-muted-foreground text-xs">Ср. модулей</p>
+                    <p className="text-muted-foreground text-xs">{t('avgModules')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -1627,7 +1627,7 @@ export default function TeacherPanel() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{avgQuizScore}%</p>
-                    <p className="text-muted-foreground text-xs">Ср. балл квизов</p>
+                    <p className="text-muted-foreground text-xs">{t('quizAvgScore')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -1638,7 +1638,7 @@ export default function TeacherPanel() {
           {groupComparisonData.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Завершение модулей по группам</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('moduleCompletionByGroup')}</h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={groupComparisonData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -1646,8 +1646,8 @@ export default function TeacherPanel() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="avgModules" fill="#6366f1" name="Ср. модулей" />
-                    <Bar dataKey="avgScore" fill="#10b981" name="Ср. балл" />
+                    <Bar dataKey="avgModules" fill="#6366f1" name={t('avgModules')} />
+                    <Bar dataKey="avgScore" fill="#10b981" name={t('avgScore')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -1657,7 +1657,7 @@ export default function TeacherPanel() {
           {/* Quiz Score Distribution */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Распределение баллов квизов</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('quizScoreDistribution')}</h3>
               {(() => {
                 const ranges = [
                   { label: '0-20%', min: 0, max: 20, color: '#ef4444' },
@@ -1707,7 +1707,7 @@ export default function TeacherPanel() {
             <CardContent className="p-5">
               <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                 <Trophy size={16} className="text-amber-500" />
-                Лидеры по вовлечённости
+                {t('engagementLeaders')}
               </h3>
               <div className="space-y-2">
                 {(() => {
@@ -1761,14 +1761,14 @@ export default function TeacherPanel() {
                         <div>
                           <p className="text-sm font-semibold">{student.fullName}</p>
                           <p className="text-muted-foreground text-[10px]">
-                            {student.group} • Модулей: {student.progress.completedModules.length}
+                            {student.group} • {t('modules')}: {student.progress.completedModules.length}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <p className="text-xs font-bold">{Math.round(student.avgScore)}%</p>
-                          <p className="text-muted-foreground text-[10px]">Квиз</p>
+                          <p className="text-muted-foreground text-[10px]">{t('quiz')}</p>
                         </div>
                         <Badge
                           variant={
@@ -1795,7 +1795,7 @@ export default function TeacherPanel() {
               <CardContent className="p-5">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <AlertTriangle size={16} className="text-red-500" />
-                  Студенты с признаками риска ({atRiskStudents.length})
+                  {t('atRiskStudents', { count: atRiskStudents.length })}
                 </h3>
                 <div className="space-y-2">
                   {atRiskStudents

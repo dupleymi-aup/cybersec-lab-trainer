@@ -314,7 +314,7 @@ export default function ToolsLab() {
       if (parts.length !== 3) {
         setJwtDecoded({
           valid: false,
-          error: 'JWT должен содержать 3 части, разделённые точкой',
+          error: t('jwtPartsError'),
         });
         return;
       }
@@ -326,12 +326,12 @@ export default function ToolsLab() {
         header,
         payload,
         valid: true,
-        error: isExpired ? '⚠️ Токен истёк' : undefined,
+        error: isExpired ? `⚠️ ${t('jwtExpired')}` : undefined,
       });
     } catch (e: unknown) {
       setJwtDecoded({
         valid: false,
-        error: `Неверный JWT: ${e instanceof Error ? e.message : 'ошибка парсинга'}`,
+        error: t('jwtInvalid', { error: e instanceof Error ? e.message : 'parse error' }),
       });
     }
   };

@@ -204,7 +204,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Минимум 8 символов"
+                  placeholder={t('passwordPlaceholder')}
                 />
                 <button
                   type="button"
@@ -244,7 +244,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Повторите пароль"
+                  placeholder={t('confirmPasswordPlaceholder')}
                 />
                 <button
                   type="button"
@@ -291,7 +291,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                   <Input
                     value={inviteCode}
                     onChange={(e) => setInviteCode(e.target.value)}
-                    placeholder="Введите код приглашения"
+                    placeholder={t('inviteCodePlaceholder')}
                   />
                 </motion.div>
               )}
@@ -327,7 +327,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
           <div className="space-y-4">
             {/* Full Name */}
             <div className="space-y-1.5">
-              <Label>Имя *</Label>
+              <Label>{t('nameLabel')}</Label>
               <Input value={editFullName} onChange={(e) => setEditFullName(e.target.value)} />
             </div>
 
@@ -338,7 +338,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                 <Input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Телефон *</Label>
+                <Label>{t('phoneLabel')}</Label>
                 <Input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
               </div>
             </div>
@@ -367,7 +367,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                 onChange={(e) => setEditBio(e.target.value)}
                 rows={3}
                 className="border-border w-full resize-none rounded-lg border px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                placeholder="Расскажите о себе..."
+                placeholder={t('bioPlaceholder')}
               />
             </div>
 

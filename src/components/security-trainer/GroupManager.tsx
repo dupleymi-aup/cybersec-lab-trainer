@@ -44,7 +44,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
     }
     const result = await renameGroup(oldName, editValue);
     if (result.success) {
-      toast.success(`Группа переименована, ${result.count} пользователей обновлено`);
+      toast.success(t('renamed', { count: result.count }));
       setEditingGroup(null);
       setEditValue('');
       loadData();
@@ -56,10 +56,10 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
 
   const handleDelete = async (name: string) => {
     const count = groupCounts[name] || 0;
-    if (!confirm(`Удалить группу "${name}"? ${count} пользователей потеряют привязку к группе.`)) return;
+    if (!confirm(t('confirmDelete', { name, count }))) return;
     const result = await deleteGroup(name);
     if (result.success) {
-      toast.success(`Группа удалена, ${result.count} пользователей отвязано`);
+      toast.success(t('deleted', { count: result.count }));
       loadData();
       onRefresh();
     } else {
@@ -76,7 +76,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
       toast.error(t('groupExists'));
       return;
     }
-    toast.success(`Группа "${newGroupName.trim()}" создана. Назначьте пользователей через массовые действия.`);
+    toast.success(t('created', { name: newGroupName.trim() }));
     setNewGroupName('');
     loadData();
     onRefresh();
@@ -108,13 +108,13 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
       <Card className="border-border">
         <CardContent className="p-4">
           <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-            <Users size={14} className="text-sky-500" /> Группы ({groups.length})
+            <Users size={14} className="text-sky-500" /> {t('groupsTitle', { count: groups.length })}
           </h3>
 
           {groups.length === 0 ? (
-            <p className="text-muted-foreground py-4 text-center text-sm">
-              Нет групп. Назначьте пользователям поле «Группа» или создайте группу выше.
-            </p>
+              <p className="text-muted-foreground py-4 text-center text-sm">
+                {t('empty')}
+              </p>
           ) : (
             <div className="space-y-2">
               {groups.map((name) => (
@@ -166,7 +166,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                         </div>
                         <div>
                           <p className="text-sm font-medium">{name}</p>
-                          <p className="text-muted-foreground text-xs">{groupCounts[name] || 0} пользователей</p>
+                          <p className="text-muted-foreground text-xs">{t('usersCount', { count: groupCounts[name] || 0 })}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -203,8 +203,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
 
       <div className="bg-secondary border-border rounded-lg border p-3">
         <p className="text-muted-foreground text-xs">
-          <strong>Совет:</strong> Для назначения пользователей в группу выберите их в списке пользователей и используйте
-          кнопку «Назначить группу» в панели массовых действий.
+          {t('tip')}
         </p>
       </div>
     </div>

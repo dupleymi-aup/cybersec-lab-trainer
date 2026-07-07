@@ -27,15 +27,17 @@ interface UserProgressData {
   secureCodingAnsweredChallenges: number[];
 }
 
-const moduleNames: Record<string, string> = {
-  owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL-инъекции',
-  xss: 'XSS атаки',
-  csrf: 'CSRF атаки',
-  auth: 'Аутентификация',
-  'secure-coding': 'Безопасное программирование',
-  tools: 'Инструменты',
-  'security-headers': 'HTTP заголовки',
+const MODULE_IDS = ['owasp', 'sql-injection', 'xss', 'csrf', 'auth', 'secure-coding', 'tools', 'security-headers'] as const;
+
+const NAV_KEY_MAP: Record<string, string> = {
+  owasp: 'owasp',
+  'sql-injection': 'sqlInjection',
+  xss: 'xss',
+  csrf: 'csrf',
+  auth: 'authSecurity',
+  'secure-coding': 'secureCoding',
+  tools: 'tools',
+  'security-headers': 'securityHeaders',
 };
 
 function getUserProgress(userId: string): UserProgressData {
@@ -68,20 +70,6 @@ function getLoginActivity(): LoginActivityEntry[] {
   }
 }
 
-function getQuizLabel(category: string): string {
-  const labels: Record<string, string> = {
-    owasp: 'OWASP Top 10',
-    'sql-injection': 'SQL-инъекции',
-    xss: 'XSS атаки',
-    csrf: 'CSRF атаки',
-    auth: 'Аутентификация',
-    'secure-coding': 'Безопасное программирование',
-    tools: 'Инструменты',
-    'security-headers': 'HTTP заголовки',
-  };
-  return labels[category] || category;
-}
-
 function getScoreColor(score: number): string {
   if (score >= 80) return 'bg-emerald-100 text-emerald-700 border-emerald-300';
   if (score >= 50) return 'bg-amber-100 text-amber-700 border-amber-300';
@@ -92,6 +80,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
   const formatDateTime = useDateTimeFormatter();
   const t = useTranslations('admin.userActivity');
   const tc = useTranslations('common');
+  const tNav = useTranslations('nav');
   const [progress, setProgress] = useState<UserProgressData>({
     completedModules: [],
     quizScores: {},
@@ -123,7 +112,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
   }, [handleEscape]);
 
   // Stats
-  const totalModules = Object.keys(moduleNames).length;
+  const totalModules = MODULE_IDS.length;
   const completedCount = progress.completedModules.length;
   const quizEntries = Object.entries(progress.quizScores);
   const avgScore =
@@ -221,8 +210,9 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
 
           {/* Modules tab */}
           <TabsContent value="modules" className="mt-4 space-y-2">
-            {Object.entries(moduleNames).map(([id, name]) => {
+            {MODULE_IDS.map((id) => {
               const done = progress.completedModules.includes(id);
+              const name = tNav(NAV_KEY_MAP[id] || id);
               return (
                 <div key={id} className="flex items-center justify-between rounded-lg border border-slate-100 p-3">
                   <div className="flex items-center gap-2">
@@ -249,7 +239,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
               quizEntries.map(([category, score]) => (
                 <div key={category} className="rounded-lg border border-slate-100 p-3">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm font-medium">{getQuizLabel(category)}</span>
+                    <span className="text-sm font-medium">{tNav(NAV_KEY_MAP[category] || category)}</span>
                     <Badge className={`border text-xs ${getScoreColor(score)}`}>{score}%</Badge>
                   </div>
                   <Progress
