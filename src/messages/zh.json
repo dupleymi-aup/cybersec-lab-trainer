@@ -358,7 +358,12 @@
     "warning": "警告",
     "info": "信息",
     "required": "必填",
-    "optional": "可选"
+    "optional": "可选",
+    "systemTheme": "系统",
+    "darkTheme": "深色",
+    "lightTheme": "浅色",
+    "switchTheme": "切换主题。当前：",
+    "currentTheme": "主题"
   },
   "nav": {
     "dashboard": "控制台",
@@ -658,6 +663,8 @@
     "moduleCompleted": "模块已完成！",
     "moduleCompletedSubtitle": "《{title}》—— 做得好！",
     "completed": "已完成",
+    "enterPassword": "请输入密码",
+    "notAuthorized": "未授权",
     "componentError": "{name} 中发生错误",
     "unexpectedError": "发生意外错误",
     "reloadPage": "重新加载页面",

@@ -358,7 +358,12 @@
     "warning": "Warning",
     "info": "Info",
     "required": "Required field",
-    "optional": "Optional"
+    "optional": "Optional",
+    "systemTheme": "System",
+    "darkTheme": "Dark",
+    "lightTheme": "Light",
+    "switchTheme": "Switch theme. Current:",
+    "currentTheme": "Theme"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -658,6 +663,8 @@
     "moduleCompleted": "Module Completed!",
     "moduleCompletedSubtitle": "«{title}» — Great job!",
     "completed": "Completed",
+    "enterPassword": "Enter password",
+    "notAuthorized": "Not authorized",
     "componentError": "Error in {name}",
     "unexpectedError": "An unexpected error occurred",
     "reloadPage": "Reload page",

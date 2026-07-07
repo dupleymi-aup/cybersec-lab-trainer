@@ -358,7 +358,12 @@
     "warning": "Предупреждение",
     "info": "Информация",
     "required": "Обязательное поле",
-    "optional": "Необязательно"
+    "optional": "Необязательно",
+    "systemTheme": "Системная",
+    "darkTheme": "Тёмная",
+    "lightTheme": "Светлая",
+    "switchTheme": "Сменить тему. Сейчас:",
+    "currentTheme": "Тема"
   },
   "nav": {
     "dashboard": "Главная",
@@ -658,6 +663,8 @@
     "moduleCompleted": "Модуль завершён!",
     "moduleCompletedSubtitle": "«{title}» — отличная работа!",
     "completed": "Пройдено",
+    "enterPassword": "Введите пароль",
+    "notAuthorized": "Не авторизован",
     "componentError": "Ошибка в {name}",
     "unexpectedError": "Произошла непредвиденная ошибка",
     "reloadPage": "Перезагрузить страницу",

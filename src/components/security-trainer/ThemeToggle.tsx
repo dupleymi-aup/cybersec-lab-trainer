@@ -4,9 +4,11 @@ import { memo } from 'react';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 
 export default memo(function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
+  const tc = useTranslations('common');
 
   const cycleTheme = () => {
     if (theme === 'system') setTheme('light');
@@ -15,7 +17,7 @@ export default memo(function ThemeToggle() {
   };
 
   const isDark = resolvedTheme === 'dark';
-  const label = theme === 'system' ? 'Системная' : isDark ? 'Тёмная' : 'Светлая';
+  const label = theme === 'system' ? tc('systemTheme') : isDark ? tc('darkTheme') : tc('lightTheme');
 
   return (
     <Button
@@ -23,8 +25,8 @@ export default memo(function ThemeToggle() {
       size="icon"
       className="relative h-9 w-9 shrink-0"
       onClick={cycleTheme}
-      aria-label={`Сменить тему. Сейчас: ${label}`}
-      title={`Тема: ${label}`}
+      aria-label={`${tc('switchTheme')} ${label}`}
+      title={`${tc('currentTheme')}: ${label}`}
     >
       {theme === 'system' ? <Monitor size={18} /> : isDark ? <Sun size={18} /> : <Moon size={18} />}
     </Button>

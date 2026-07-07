@@ -24,6 +24,7 @@ interface PasswordResetModalProps {
 export default function PasswordResetModal({ user, onClose, onSuccess }: PasswordResetModalProps) {
   const t = useTranslations('admin.passwordReset');
   const tc = useTranslations('common');
+  const te = useTranslations('errors');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -48,11 +49,11 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
 
   const handleReset = async () => {
     if (!password) {
-      toast.error('Введите пароль');
+      toast.error(te('enterPassword'));
       return;
     }
     if (password !== confirmPassword) {
-      toast.error('Пароли не совпадают');
+      toast.error(t('passwordsMismatch'));
       return;
     }
 
@@ -64,7 +65,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
 
     const { user: _currentUser } = useAuthStore.getState();
     if (!_currentUser) {
-      toast.error('Не авторизован');
+      toast.error(te('notAuthorized'));
       return;
     }
 
@@ -81,7 +82,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
   const handleCopy = () => {
     navigator.clipboard.writeText(newPassword);
     setCopied(true);
-    toast.success('Пароль скопирован');
+    toast.success(t('copied'));
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -172,31 +173,30 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
                 </button>
               </div>
               {confirmPassword && password !== confirmPassword && (
-                <p className="text-xs text-red-500">Пароли не совпадают</p>
+                <p className="text-xs text-red-500">{t('passwordsMismatch')}</p>
               )}
             </div>
 
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
               <p className="text-xs text-amber-700">
-                <strong>Внимание:</strong> Сообщите новый пароль пользователю. Рекомендуется сменить пароль при
-                следующем входе.
+                <strong>{t('warning')}</strong>
               </p>
             </div>
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
               <Button onClick={handleReset} className="flex-1">
-                Сбросить пароль
+                {t('resetButton')}
               </Button>
               <Button variant="outline" onClick={onClose}>
-                Отмена
+                {tc('cancel')}
               </Button>
             </div>
           </div>
         ) : (
           <div className="space-y-4">
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-              <p className="mb-2 text-sm font-medium text-emerald-700">Пароль успешно сброшен!</p>
+              <p className="mb-2 text-sm font-medium text-emerald-700">{t('success')}</p>
               <div className="bg-card flex items-center gap-2 rounded-lg border border-emerald-200 p-3">
                 <code className="flex-1 font-mono text-sm">{newPassword}</code>
                 <Button
@@ -204,7 +204,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
                   size="icon"
                   onClick={handleCopy}
                   className="shrink-0"
-                  aria-label="Копировать пароль"
+                  aria-label={t('copyAria')}
                 >
                   <Copy size={16} className={copied ? 'text-emerald-600' : 'text-slate-400'} />
                 </Button>
@@ -214,7 +214,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
             {/* Actions */}
             <div className="flex gap-3 pt-2">
               <Button onClick={onSuccess} className="flex-1">
-                Готово
+                {t('done')}
               </Button>
             </div>
           </div>
