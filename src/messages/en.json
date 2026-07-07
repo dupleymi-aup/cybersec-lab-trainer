@@ -363,7 +363,86 @@
     "darkTheme": "Dark",
     "lightTheme": "Light",
     "switchTheme": "Switch theme. Current:",
-    "currentTheme": "Theme"
+    "currentTheme": "Theme",
+    "riskScore": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "celebration": {
+      "moduleCompleted": "Module Completed!",
+      "greatJob": "great job!"
+    },
+    "filterBar": {
+      "group": "Group",
+      "allGroups": "All Groups",
+      "period": "Period",
+      "daysShort": "d",
+      "filter": "Filter",
+      "days": "days"
+    },
+    "keyboardShortcuts": {
+      "title": "Keyboard Shortcuts",
+      "buttonTitle": "Shortcuts (?)",
+      "selectAnswer": "Select answer in quiz",
+      "navigateOptions": "Navigate options",
+      "confirmAnswer": "Confirm answer / Next",
+      "exitQuiz": "Exit quiz",
+      "globalSearch": "Global search",
+      "showShortcuts": "Show shortcuts",
+      "pressQuestionMark": "Press ",
+      "toToggle": " to open/close"
+    },
+    "dateRange": {
+      "7d": "7d",
+      "30d": "30d",
+      "90d": "90d",
+      "180d": "180d",
+      "1y": "1y",
+      "allTime": "All Time",
+      "allTimeRange": "All time",
+      "lastNdays": "Last {n} days",
+      "nDays": "{n} days",
+      "customPeriod": "Custom Period",
+      "daysCount": "Number of days"
+    },
+    "progressTrends": {
+      "title": "Progress Trends",
+      "allStudents": "All Students",
+      "loading": "Loading...",
+      "noData": "No data",
+      "modulesLabel": "Modules",
+      "scoreLabel": "Score (%)",
+      "modulesCompleted": "Modules Completed",
+      "avgQuizScore": "Avg Quiz Score",
+      "7days": "7 days",
+      "30days": "30 days",
+      "90days": "90 days",
+      "allTime": "All Time"
+    },
+    "quizTrajectory": {
+      "loadError": "Load error",
+      "loading": "Loading data...",
+      "bestProgress": "Best Progress",
+      "bestAvgScore": "Best Avg Score",
+      "attempts": "Attempts",
+      "trajectoryTitle": "Quiz Trajectory by Category",
+      "attemptsLabel": "Attempts",
+      "noData": "No data"
+    },
+    "activityCalendar": {
+      "mon": "Mo",
+      "wed": "We",
+      "fri": "Fr",
+      "daysShort": "d",
+      "currentStreak": "current streak",
+      "longestStreak": "longest streak",
+      "activeDays": "active days",
+      "actions": "actions",
+      "less": "Less",
+      "more": "More"
+    }
   },
   "nav": {
     "dashboard": "Dashboard",

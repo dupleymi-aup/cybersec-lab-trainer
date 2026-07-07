@@ -7,6 +7,7 @@ import { Loader2, AlertTriangle, TrendingUp, Target, BarChart3 } from 'lucide-re
 import { getQuizTrajectory, type QuizTrajectoryPoint } from '@/lib/auth-store';
 import { CHART_COLORS } from '@/lib/constants';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTranslations } from 'next-intl';
 import KPICard from './KPICard';
 
 const PERIOD_OPTIONS = [
@@ -36,6 +37,7 @@ const DEFAULT_DAYS = 30;
 
 export default function QuizTrajectoryReport({ groupId, days: controlledDays }: QuizTrajectoryReportProps = {}) {
   const formatDateLocale = useDateFormatter();
+  const t = useTranslations('common.quizTrajectory');
   const [trajectories, setTrajectories] = useState<QuizTrajectoryPoint[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,14 +61,14 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, groupId]);
+  }, [days, groupId, t]);
 
   // Merge trajectories into chart data: one row per week, one column per category
   const chartData = useMemo(() => {
@@ -150,7 +152,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -191,7 +193,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
           <KPICard
             icon={<TrendingUp size={18} />}
             value={`+${summary.bestImproved.improvement}%`}
-            label={`Лучший прогресс: ${summary.bestImproved.category}`}
+            label={`${t('bestProgress')}: ${summary.bestImproved.category}`}
             trend="up"
             iconBg="bg-emerald-100"
             iconColor="text-emerald-600"
@@ -201,7 +203,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
           <KPICard
             icon={<Target size={18} />}
             value={`${summary.highestAvg.avgScore}%`}
-            label={`Лучший ср. балл: ${summary.highestAvg.category}`}
+            label={`${t('bestAvgScore')}: ${summary.highestAvg.category}`}
             iconBg="bg-violet-100"
             iconColor="text-violet-600"
           />
@@ -210,7 +212,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
           <KPICard
             icon={<BarChart3 size={18} />}
             value={summary.mostAttempts.attempts}
-            label={`Попыток: ${summary.mostAttempts.category}`}
+            label={`${t('attempts')}: ${summary.mostAttempts.category}`}
             iconBg="bg-blue-100"
             iconColor="text-blue-600"
           />
@@ -220,7 +222,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
       {/* Trajectory chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Траектория квизов по категориям</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('trajectoryTitle')}</h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={350}>
               <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
@@ -247,7 +249,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
                   }}
                   formatter={(value, name) => {
                     const nameStr = String(name || '');
-                    if (nameStr.endsWith('_attempts')) return [value, 'Попытки'];
+                    if (nameStr.endsWith('_attempts')) return [value, t('attemptsLabel')];
                     return [`${value}%`, name];
                   }}
                   labelFormatter={(label) => formatDate(String(label))}
@@ -268,7 +270,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+            <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
           )}
         </CardContent>
       </Card>

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Calendar, ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   days: number;
@@ -9,24 +10,25 @@ interface Props {
   customLabel?: string;
 }
 
-const PRESETS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-  { key: 365, label: '1г' },
-  { key: -1, label: 'Всё время' },
-];
-
-function daysToDateRange(days: number): string {
-  if (days === -1) return 'За всё время';
-  return `Последние ${days} дн.`;
-}
-
 export default function CustomDateRangePicker({ days, onChange, customLabel }: Props) {
+  const t = useTranslations('common.dateRange');
   const [customOpen, setCustomOpen] = useState(false);
   const [customDays, setCustomDays] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const PRESETS = [
+    { key: 7, label: t('7d') },
+    { key: 30, label: t('30d') },
+    { key: 90, label: t('90d') },
+    { key: 180, label: t('180d') },
+    { key: 365, label: t('1y') },
+    { key: -1, label: t('allTime') },
+  ];
+
+  const daysToDateRange = (d: number) => {
+    if (d === -1) return t('allTimeRange');
+    return t('lastNdays', { n: d });
+  };
 
   useEffect(() => {
     if (customOpen && inputRef.current) {
@@ -73,13 +75,13 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
           }`}
         >
           <Calendar size={13} />
-          <span>{customLabel || (isPreset ? daysToDateRange(days) : `${days} дн.`)}</span>
+          <span>{customLabel || (isPreset ? daysToDateRange(days) : t('nDays', { n: days }))}</span>
           <ChevronDown size={12} />
         </button>
 
         {customOpen && (
           <div className="bg-card border-border absolute top-full right-0 z-20 mt-1 min-w-[200px] rounded-lg border p-3 shadow-lg">
-            <p className="text-foreground/70 mb-2 text-xs font-medium">Свой период</p>
+            <p className="text-foreground/70 mb-2 text-xs font-medium">{t('customPeriod')}</p>
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -91,7 +93,7 @@ export default function CustomDateRangePicker({ days, onChange, customLabel }: P
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleCustomSubmit();
                 }}
-                placeholder="Кол-во дней"
+                placeholder={t('daysCount')}
                 className="border-border flex-1 rounded-md border px-3 py-1.5 text-xs"
               />
               <button

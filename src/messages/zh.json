@@ -363,7 +363,86 @@
     "darkTheme": "深色",
     "lightTheme": "浅色",
     "switchTheme": "切换主题。当前：",
-    "currentTheme": "主题"
+    "currentTheme": "主题",
+    "riskScore": {
+      "critical": "严重",
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "celebration": {
+      "moduleCompleted": "模块已完成！",
+      "greatJob": "做得好！"
+    },
+    "filterBar": {
+      "group": "组别",
+      "allGroups": "所有组",
+      "period": "时段",
+      "daysShort": "天",
+      "filter": "筛选",
+      "days": "天"
+    },
+    "keyboardShortcuts": {
+      "title": "键盘快捷键",
+      "buttonTitle": "快捷键 (?)",
+      "selectAnswer": "在测验中选择答案",
+      "navigateOptions": "导航选项",
+      "confirmAnswer": "确认答案 / 下一步",
+      "exitQuiz": "退出测验",
+      "globalSearch": "全局搜索",
+      "showShortcuts": "显示快捷键",
+      "pressQuestionMark": "按 ",
+      "toToggle": " 打开/关闭"
+    },
+    "dateRange": {
+      "7d": "7天",
+      "30d": "30天",
+      "90d": "90天",
+      "180d": "180天",
+      "1y": "1年",
+      "allTime": "全部时间",
+      "allTimeRange": "全部时间",
+      "lastNdays": "最近 {n} 天",
+      "nDays": "{n} 天",
+      "customPeriod": "自定义时段",
+      "daysCount": "天数"
+    },
+    "progressTrends": {
+      "title": "进度趋势",
+      "allStudents": "所有学生",
+      "loading": "加载中...",
+      "noData": "暂无数据",
+      "modulesLabel": "模块",
+      "scoreLabel": "分数 (%)",
+      "modulesCompleted": "已完成模块",
+      "avgQuizScore": "平均测验分数",
+      "7days": "7 天",
+      "30days": "30 天",
+      "90days": "90 天",
+      "allTime": "全部时间"
+    },
+    "quizTrajectory": {
+      "loadError": "加载错误",
+      "loading": "加载数据中...",
+      "bestProgress": "最佳进展",
+      "bestAvgScore": "最佳平均分",
+      "attempts": "尝试次数",
+      "trajectoryTitle": "按类别的测验轨迹",
+      "attemptsLabel": "尝试次数",
+      "noData": "暂无数据"
+    },
+    "activityCalendar": {
+      "mon": "一",
+      "wed": "三",
+      "fri": "五",
+      "daysShort": "天",
+      "currentStreak": "当前连续",
+      "longestStreak": "最长连续",
+      "activeDays": "活跃天数",
+      "actions": "次操作",
+      "less": "少",
+      "more": "多"
+    }
   },
   "nav": {
     "dashboard": "控制台",

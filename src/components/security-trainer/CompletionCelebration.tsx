@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Trophy, Star } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { modules } from '@/lib/data';
+import { useTranslations } from 'next-intl';
 
 interface CelebrationEvent {
   id: string;
@@ -38,6 +39,7 @@ function randomBetween(min: number, max: number) {
 }
 
 export default function CompletionCelebration() {
+  const t = useTranslations('common.celebration');
   const [event, setEvent] = useState<CelebrationEvent | null>(null);
   const [particles, setParticles] = useState<
     Array<{
@@ -62,15 +64,15 @@ export default function CompletionCelebration() {
           if (mod) {
             triggerCelebration({
               type: 'module',
-              title: `Модуль завершён!`,
-              subtitle: `«${mod.title}» — отличная работа!`,
+              title: t('moduleCompleted'),
+              subtitle: `«${mod.title}» — ${t('greatJob')}`,
             });
           }
         }
       }
     });
     return unsub;
-  }, []);
+  }, [t]);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

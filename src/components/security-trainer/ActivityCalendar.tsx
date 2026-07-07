@@ -4,8 +4,10 @@ import { useMemo } from 'react';
 import { useAppStore } from '@/lib/store';
 import { motion } from 'framer-motion';
 import { Flame, CalendarDays } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function ActivityCalendar() {
+  const t = useTranslations('common.activityCalendar');
   const moduleTimestamps = useAppStore((s) => s.moduleTimestamps);
   const quizTimestamps = useAppStore((s) => s.quizTimestamps);
 
@@ -90,7 +92,7 @@ export default function ActivityCalendar() {
 
   if (totalActiveDays === 0) return null;
 
-  const weekDays = ['Пн', '', 'Ср', '', 'Пт', '', ''];
+  const weekDays = [t('mon'), '', t('wed'), '', t('fri'), '', ''];
   const weeks: (typeof dailyData)[] = [];
   for (let i = 0; i < dailyData.length; i += 7) {
     weeks.push(dailyData.slice(i, i + 7));
@@ -105,20 +107,20 @@ export default function ActivityCalendar() {
         {currentStreak > 0 && (
           <div className="flex items-center gap-1.5">
             <Flame size={16} className="text-orange-500" />
-            <span className="text-foreground/70 font-semibold">{currentStreak} дн.</span>
-            <span className="text-slate-400">текущая серия</span>
+            <span className="text-foreground/70 font-semibold">{currentStreak} {t('daysShort')}</span>
+            <span className="text-slate-400">{t('currentStreak')}</span>
           </div>
         )}
         {longestStreak > 0 && (
           <div className="flex items-center gap-1.5">
             <CalendarDays size={14} className="text-violet-500" />
-            <span className="text-foreground/70 font-semibold">{longestStreak} дн.</span>
-            <span className="text-slate-400">макс. серия</span>
+            <span className="text-foreground/70 font-semibold">{longestStreak} {t('daysShort')}</span>
+            <span className="text-slate-400">{t('longestStreak')}</span>
           </div>
         )}
         <div className="flex items-center gap-1.5">
           <span className="text-foreground/70 font-semibold">{totalActiveDays}</span>
-          <span className="text-slate-400">активных дней</span>
+          <span className="text-slate-400">{t('activeDays')}</span>
         </div>
       </div>
 
@@ -141,7 +143,7 @@ export default function ActivityCalendar() {
                   <div
                     key={day.date}
                     className={`h-[14px] w-[14px] rounded-sm ${levelColors[day.level]} cursor-default`}
-                    title={`${day.date}: ${day.count} действий`}
+                    title={`${day.date}: ${day.count} ${t('actions')}`}
                   />
                 );
               })}
@@ -152,11 +154,11 @@ export default function ActivityCalendar() {
 
       {/* Legend */}
       <div className="flex items-center justify-end gap-1.5 text-[10px] text-slate-400">
-        <span>Меньше</span>
+        <span>{t('less')}</span>
         {levelColors.map((c, i) => (
           <div key={i} className={`h-3 w-3 rounded-sm ${c}`} />
         ))}
-        <span>Больше</span>
+        <span>{t('more')}</span>
       </div>
     </motion.div>
   );

@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import { getAllGroups } from '@/lib/auth-store';
 import { useAnalyticsFilters } from '@/lib/analytics-context';
 import { Calendar, Users } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const DAY_PRESETS = [7, 30, 90, 180];
 
 export default function AnalyticsFilterBar() {
+  const t = useTranslations('common.filterBar');
   const { groupId, days, setGroupId, setDays } = useAnalyticsFilters();
   const [groups, setGroups] = useState<string[]>([]);
 
@@ -20,13 +22,13 @@ export default function AnalyticsFilterBar() {
       {/* Group filter */}
       <div className="flex items-center gap-2">
         <Users size={15} className="text-muted-foreground" />
-        <span className="text-muted-foreground text-xs font-medium">Группа:</span>
+        <span className="text-muted-foreground text-xs font-medium">{t('group')}:</span>
         <select
           value={groupId}
           onChange={(e) => setGroupId(e.target.value)}
           className="border-border bg-card hover:border-border rounded-md border px-2.5 py-1.5 text-sm transition-colors outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
         >
-          <option value="">Все группы</option>
+          <option value="">{t('allGroups')}</option>
           {groups.map((g) => (
             <option key={g} value={g}>
               {g}
@@ -41,7 +43,7 @@ export default function AnalyticsFilterBar() {
       {/* Period presets */}
       <div className="flex items-center gap-2">
         <Calendar size={15} className="text-muted-foreground" />
-        <span className="text-muted-foreground text-xs font-medium">Период:</span>
+        <span className="text-muted-foreground text-xs font-medium">{t('period')}:</span>
         <div className="bg-muted flex gap-1 rounded-md p-0.5">
           {DAY_PRESETS.map((d) => (
             <button
@@ -51,7 +53,7 @@ export default function AnalyticsFilterBar() {
                 days === d ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {d}д
+              {d}{t('daysShort')}
             </button>
           ))}
         </div>
@@ -63,10 +65,10 @@ export default function AnalyticsFilterBar() {
           <div className="h-6 w-px bg-slate-200" />
           <div className="flex items-center gap-1.5 text-xs text-blue-600">
             <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />
-            Фильтр:
+            {t('filter')}:
             {groupId && <span className="font-medium">{groupId}</span>}
             {groupId && days !== 30 && <span>·</span>}
-            {days !== 30 && <span className="font-medium">{days} дней</span>}
+            {days !== 30 && <span className="font-medium">{days} {t('days')}</span>}
           </div>
         </>
       )}

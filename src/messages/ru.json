@@ -363,7 +363,86 @@
     "darkTheme": "Тёмная",
     "lightTheme": "Светлая",
     "switchTheme": "Сменить тему. Сейчас:",
-    "currentTheme": "Тема"
+    "currentTheme": "Тема",
+    "riskScore": {
+      "critical": "Критический",
+      "high": "Высокий",
+      "medium": "Средний",
+      "low": "Низкий"
+    },
+    "celebration": {
+      "moduleCompleted": "Модуль завершён!",
+      "greatJob": "отличная работа!"
+    },
+    "filterBar": {
+      "group": "Группа",
+      "allGroups": "Все группы",
+      "period": "Период",
+      "daysShort": "д",
+      "filter": "Фильтр",
+      "days": "дней"
+    },
+    "keyboardShortcuts": {
+      "title": "Клавиатурные шорткаты",
+      "buttonTitle": "Шорткаты (?)",
+      "selectAnswer": "Выбрать ответ в квизе",
+      "navigateOptions": "Навигация по вариантам",
+      "confirmAnswer": "Подтвердить ответ / Далее",
+      "exitQuiz": "Выйти из квиза",
+      "globalSearch": "Глобальный поиск",
+      "showShortcuts": "Показать шорткаты",
+      "pressQuestionMark": "Нажмите ",
+      "toToggle": " чтобы открыть/закрыть"
+    },
+    "dateRange": {
+      "7d": "7д",
+      "30d": "30д",
+      "90d": "90д",
+      "180d": "180д",
+      "1y": "1г",
+      "allTime": "Всё время",
+      "allTimeRange": "За всё время",
+      "lastNdays": "Последние {n} дн.",
+      "nDays": "{n} дн.",
+      "customPeriod": "Свой период",
+      "daysCount": "Кол-во дней"
+    },
+    "progressTrends": {
+      "title": "Динамика прогресса",
+      "allStudents": "Все студенты",
+      "loading": "Загрузка...",
+      "noData": "Нет данных",
+      "modulesLabel": "Модули",
+      "scoreLabel": "Балл (%)",
+      "modulesCompleted": "Модули пройдены",
+      "avgQuizScore": "Средний балл квизов",
+      "7days": "7 дней",
+      "30days": "30 дней",
+      "90days": "90 дней",
+      "allTime": "Всё время"
+    },
+    "quizTrajectory": {
+      "loadError": "Ошибка загрузки",
+      "loading": "Загрузка данных...",
+      "bestProgress": "Лучший прогресс",
+      "bestAvgScore": "Лучший ср. балл",
+      "attempts": "Попыток",
+      "trajectoryTitle": "Траектория квизов по категориям",
+      "attemptsLabel": "Попытки",
+      "noData": "Нет данных"
+    },
+    "activityCalendar": {
+      "mon": "Пн",
+      "wed": "Ср",
+      "fri": "Пт",
+      "daysShort": "дн.",
+      "currentStreak": "текущая серия",
+      "longestStreak": "макс. серия",
+      "activeDays": "активных дней",
+      "actions": "действий",
+      "less": "Меньше",
+      "more": "Больше"
+    }
   },
   "nav": {
     "dashboard": "Главная",

@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface RiskScoreBarProps {
   score: number; // 0-100
@@ -9,6 +10,7 @@ interface RiskScoreBarProps {
 }
 
 export default memo(function RiskScoreBar({ score, className = '', showLabel = true }: RiskScoreBarProps) {
+  const t = useTranslations('common.riskScore');
   const clampedScore = Math.max(0, Math.min(100, score));
 
   let colorClass = 'bg-emerald-500';
@@ -29,7 +31,7 @@ export default memo(function RiskScoreBar({ score, className = '', showLabel = t
   }
 
   const label =
-    clampedScore >= 80 ? 'Критический' : clampedScore >= 60 ? 'Высокий' : clampedScore >= 30 ? 'Средний' : 'Низкий';
+    clampedScore >= 80 ? t('critical') : clampedScore >= 60 ? t('high') : clampedScore >= 30 ? t('medium') : t('low');
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>

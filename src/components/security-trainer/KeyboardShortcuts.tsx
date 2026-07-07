@@ -3,18 +3,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard, X, Command } from 'lucide-react';
-
-const SHORTCUTS = [
-  { keys: ['1', '2', '3', '4'], desc: 'Выбрать ответ в квизе' },
-  { keys: ['↑', '↓'], desc: 'Навигация по вариантам' },
-  { keys: ['Enter'], desc: 'Подтвердить ответ / Далее' },
-  { keys: ['Esc'], desc: 'Выйти из квиза' },
-  { keys: ['Ctrl', 'K'], desc: 'Глобальный поиск' },
-  { keys: ['?'], desc: 'Показать шорткаты' },
-];
+import { useTranslations } from 'next-intl';
 
 export default function KeyboardShortcuts() {
+  const t = useTranslations('common.keyboardShortcuts');
   const [open, setOpen] = useState(false);
+
+  const SHORTCUTS = [
+    { keys: ['1', '2', '3', '4'], desc: t('selectAnswer') },
+    { keys: ['↑', '↓'], desc: t('navigateOptions') },
+    { keys: ['Enter'], desc: t('confirmAnswer') },
+    { keys: ['Esc'], desc: t('exitQuiz') },
+    { keys: ['Ctrl', 'K'], desc: t('globalSearch') },
+    { keys: ['?'], desc: t('showShortcuts') },
+  ];
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -42,7 +44,7 @@ export default function KeyboardShortcuts() {
       <button
         onClick={() => setOpen(true)}
         className="fixed right-4 bottom-4 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-white opacity-60 shadow-lg transition-colors hover:bg-slate-700 hover:opacity-100 dark:bg-slate-700"
-        title="Шорткаты (?)"
+        title={t('buttonTitle')}
       >
         <Keyboard size={16} />
       </button>
@@ -61,7 +63,7 @@ export default function KeyboardShortcuts() {
               <div className="flex items-center justify-between border-b p-4">
                 <div className="flex items-center gap-2">
                   <Keyboard size={18} className="text-muted-foreground" />
-                  <h2 className="font-semibold">Клавиатурные шорткаты</h2>
+                  <h2 className="font-semibold">{t('title')}</h2>
                 </div>
                 <button onClick={() => setOpen(false)} className="hover:bg-muted rounded p-1 transition-colors">
                   <X size={16} />
@@ -102,11 +104,11 @@ export default function KeyboardShortcuts() {
               </div>
 
               <div className="border-t p-3 text-center text-[11px] text-slate-400">
-                Нажмите{' '}
+                {t('pressQuestionMark')}
                 <kbd className="bg-muted border-border mx-1 inline-flex h-5 items-center justify-center rounded border px-1.5 font-mono text-[10px]">
                   ?
                 </kbd>{' '}
-                чтобы открыть/закрыть
+                {t('toToggle')}
               </div>
             </motion.div>
           </>
