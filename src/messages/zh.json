@@ -667,6 +667,13 @@
     "notAuthorized": "未授权",
     "syncSuccess": "进度已同步",
     "syncError": "同步失败",
+    "fillName": "请输入姓名",
+    "invalidEmail": "邮箱格式无效",
+    "invalidPhone": "电话号码无效",
+    "nameRequired": "姓名为必填项",
+    "fieldRequired": "请填写所有必填字段",
+    "loadError": "数据加载失败",
+    "networkError": "网络错误",
     "componentError": "{name} 中发生错误",
     "unexpectedError": "发生意外错误",
     "reloadPage": "重新加载页面",
@@ -1063,6 +1070,29 @@
       "xssAttacks": "XSS攻击",
       "csrfAttacks": "CSRF攻击",
       "secureCoding": "安全编码"
+    },
+    "userModal": {
+      "createTitle": "创建用户",
+      "editTitle": "编辑资料",
+      "nameLabel": "姓名 *",
+      "phoneLabel": "电话 *",
+      "passwordLabel": "密码 *",
+      "confirmPasswordLabel": "确认密码 *",
+      "roleLabel": "角色",
+      "inviteCodeLabel": "管理员邀请码 *",
+      "groupLabel": "组别",
+      "courseLabel": "课程",
+      "universityLabel": "大学",
+      "bioLabel": "关于",
+      "createButton": "创建",
+      "saveButton": "保存",
+      "userCreated": "用户已创建",
+      "profileUpdated": "资料已更新"
+    },
+    "groupManager": {
+      "emptyName": "名称不能为空",
+      "enterName": "请输入组名",
+      "groupExists": "组名已存在"
     },
     "actions": {
       "roleChanged": "角色已更改为 {role}",

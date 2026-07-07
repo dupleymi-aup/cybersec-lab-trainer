@@ -667,6 +667,13 @@
     "notAuthorized": "Not authorized",
     "syncSuccess": "Progress synced",
     "syncError": "Sync failed",
+    "fillName": "Enter a name",
+    "invalidEmail": "Invalid email",
+    "invalidPhone": "Invalid phone number",
+    "nameRequired": "Name is required",
+    "fieldRequired": "Fill in all required fields",
+    "loadError": "Failed to load data",
+    "networkError": "Network error",
     "componentError": "Error in {name}",
     "unexpectedError": "An unexpected error occurred",
     "reloadPage": "Reload page",
@@ -1064,6 +1071,29 @@
       "xssAttacks": "XSS Attacks",
       "csrfAttacks": "CSRF Attacks",
       "secureCoding": "Secure Coding"
+    },
+    "userModal": {
+      "createTitle": "Create User",
+      "editTitle": "Edit Profile",
+      "nameLabel": "Name *",
+      "phoneLabel": "Phone *",
+      "passwordLabel": "Password *",
+      "confirmPasswordLabel": "Confirm Password *",
+      "roleLabel": "Role",
+      "inviteCodeLabel": "Admin invite code *",
+      "groupLabel": "Group",
+      "courseLabel": "Course",
+      "universityLabel": "University",
+      "bioLabel": "About",
+      "createButton": "Create",
+      "saveButton": "Save",
+      "userCreated": "User created",
+      "profileUpdated": "Profile updated"
+    },
+    "groupManager": {
+      "emptyName": "Name cannot be empty",
+      "enterName": "Enter group name",
+      "groupExists": "Group already exists"
     },
     "actions": {
       "roleChanged": "Role changed to {role}",

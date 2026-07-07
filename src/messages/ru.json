@@ -667,6 +667,13 @@
     "notAuthorized": "Не авторизован",
     "syncSuccess": "Прогресс синхронизирован",
     "syncError": "Ошибка синхронизации",
+    "fillName": "Введите имя",
+    "invalidEmail": "Неверный email",
+    "invalidPhone": "Неверный телефон",
+    "nameRequired": "Имя обязательно",
+    "fieldRequired": "Заполните все обязательные поля",
+    "loadError": "Ошибка загрузки данных",
+    "networkError": "Ошибка сети",
     "componentError": "Ошибка в {name}",
     "unexpectedError": "Произошла непредвиденная ошибка",
     "reloadPage": "Перезагрузить страницу",
@@ -1063,6 +1070,29 @@
       "xssAttacks": "XSS атаки",
       "csrfAttacks": "CSRF атаки",
       "secureCoding": "Безопасное кодирование"
+    },
+    "userModal": {
+      "createTitle": "Создание пользователя",
+      "editTitle": "Редактирование профиля",
+      "nameLabel": "Имя *",
+      "phoneLabel": "Телефон *",
+      "passwordLabel": "Пароль *",
+      "confirmPasswordLabel": "Подтверждение пароля *",
+      "roleLabel": "Роль",
+      "inviteCodeLabel": "Код приглашения администратора *",
+      "groupLabel": "Группа",
+      "courseLabel": "Курс",
+      "universityLabel": "Университет",
+      "bioLabel": "О себе",
+      "createButton": "Создать",
+      "saveButton": "Сохранить",
+      "userCreated": "Пользователь создан",
+      "profileUpdated": "Профиль обновлён"
+    },
+    "groupManager": {
+      "emptyName": "Название не может быть пустым",
+      "enterName": "Введите название группы",
+      "groupExists": "Группа уже существует"
     },
     "actions": {
       "roleChanged": "Роль изменена на {role}",

@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Eye, EyeOff, GraduationCap, Briefcase, Shield, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 const roleIcons: Record<UserRole, React.ReactNode> = {
   student: <GraduationCap size={16} className="text-violet-500" />,
@@ -34,6 +35,9 @@ interface UserModalProps {
 }
 
 export default function UserModal({ mode, user, onClose, onSuccess }: UserModalProps) {
+  const t = useTranslations('admin.userModal');
+  const te = useTranslations('errors');
+  const tc = useTranslations('common');
   // Create fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -85,19 +89,19 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
 
   const handleCreate = async () => {
     if (!fullName.trim()) {
-      toast.error('Введите имя');
+      toast.error(te('fillName'));
       return;
     }
     if (!validateEmail(email)) {
-      toast.error('Неверный email');
+      toast.error(te('invalidEmail'));
       return;
     }
     if (!validatePhone(phone)) {
-      toast.error('Неверный телефон');
+      toast.error(te('invalidPhone'));
       return;
     }
     if (password !== confirmPassword) {
-      toast.error('Пароли не совпадают');
+      toast.error(t('passwordsMismatch'));
       return;
     }
 
@@ -109,7 +113,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
 
     const result = await createUser({ email, phone, fullName, role, group, course, university, inviteCode }, password);
     if (result.success) {
-      toast.success('Пользователь создан');
+      toast.success(t('userCreated'));
       onSuccess();
     } else {
       toast.error(result.error);
@@ -119,15 +123,15 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
   const handleEdit = async () => {
     if (!user) return;
     if (!editFullName.trim()) {
-      toast.error('Имя не может быть пустым');
+      toast.error(te('nameRequired'));
       return;
     }
     if (!validateEmail(editEmail)) {
-      toast.error('Неверный email');
+      toast.error(te('invalidEmail'));
       return;
     }
     if (!validatePhone(editPhone)) {
-      toast.error('Неверный телефон');
+      toast.error(te('invalidPhone'));
       return;
     }
 
@@ -141,7 +145,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
       bio: editBio,
     });
     if (result.success) {
-      toast.success('Профиль обновлён');
+      toast.success(t('profileUpdated'));
       onSuccess();
     } else {
       toast.error(result.error);
@@ -160,9 +164,9 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold">
-            {mode === 'create' ? 'Создание пользователя' : 'Редактирование профиля'}
+            {mode === 'create' ? t('createTitle') : t('editTitle')}
           </h2>
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Закрыть">
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label={tc('close')}>
             <X size={18} />
           </Button>
         </div>
@@ -171,8 +175,8 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
           <div className="space-y-4">
             {/* Full Name */}
             <div className="space-y-1.5">
-              <Label>Имя *</Label>
-              <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Иванов Иван" />
+              <Label>{t('nameLabel')}</Label>
+              <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ivanov Ivan" />
             </div>
 
             {/* Email + Phone */}
@@ -187,14 +191,14 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Телефон *</Label>
+                <Label>{t('phoneLabel')}</Label>
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+79001234567" />
               </div>
             </div>
 
             {/* Password */}
             <div className="space-y-1.5">
-              <Label>Пароль *</Label>
+              <Label>{t('passwordLabel')}</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
@@ -234,7 +238,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
 
             {/* Confirm Password */}
             <div className="space-y-1.5">
-              <Label>Подтверждение пароля *</Label>
+              <Label>{t('confirmPasswordLabel')}</Label>
               <div className="relative">
                 <Input
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -251,13 +255,13 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                 </button>
               </div>
               {confirmPassword && password !== confirmPassword && (
-                <p className="text-xs text-red-500">Пароли не совпадают</p>
+                <p className="text-xs text-red-500">{te('passwordsMismatch')}</p>
               )}
             </div>
 
             {/* Role Selection */}
             <div className="space-y-1.5">
-              <Label>Роль</Label>
+              <Label>{t('roleLabel')}</Label>
               <RadioGroup value={role} onValueChange={(v) => setRole(v as UserRole)} className="space-y-2">
                 {(['student', 'teacher', 'admin'] as UserRole[]).map((r) => (
                   <div
@@ -283,7 +287,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
                   exit={{ opacity: 0, height: 0 }}
                   className="space-y-1.5"
                 >
-                  <Label>Код приглашения администратора *</Label>
+                  <Label>{t('inviteCodeLabel')}</Label>
                   <Input
                     value={inviteCode}
                     onChange={(e) => setInviteCode(e.target.value)}
@@ -296,15 +300,15 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
             {/* Group, Course, University */}
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label>Группа</Label>
+                <Label>{t('groupLabel')}</Label>
                 <Input value={group} onChange={(e) => setGroup(e.target.value)} placeholder="ИС-101" />
               </div>
               <div className="space-y-1.5">
-                <Label>Курс</Label>
+                <Label>{t('courseLabel')}</Label>
                 <Input value={course} onChange={(e) => setCourse(e.target.value)} placeholder="2" />
               </div>
               <div className="space-y-1.5">
-                <Label>Университет</Label>
+                <Label>{t('universityLabel')}</Label>
                 <Input value={university} onChange={(e) => setUniversity(e.target.value)} placeholder="МГУ" />
               </div>
             </div>
@@ -312,10 +316,10 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
             {/* Actions */}
             <div className="flex gap-3 pt-2">
               <Button onClick={handleCreate} className="flex-1">
-                Создать
+                {t('createButton')}
               </Button>
               <Button variant="outline" onClick={onClose}>
-                Отмена
+                {tc('cancel')}
               </Button>
             </div>
           </div>
@@ -342,22 +346,22 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
             {/* Group, Course, University */}
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label>Группа</Label>
+                <Label>{t('groupLabel')}</Label>
                 <Input value={editGroup} onChange={(e) => setEditGroup(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Курс</Label>
+                <Label>{t('courseLabel')}</Label>
                 <Input value={editCourse} onChange={(e) => setEditCourse(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Университет</Label>
+                <Label>{t('universityLabel')}</Label>
                 <Input value={editUniversity} onChange={(e) => setEditUniversity(e.target.value)} />
               </div>
             </div>
 
             {/* Bio */}
             <div className="space-y-1.5">
-              <Label>О себе</Label>
+              <Label>{t('bioLabel')}</Label>
               <textarea
                 value={editBio}
                 onChange={(e) => setEditBio(e.target.value)}
@@ -370,10 +374,10 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
             {/* Actions */}
             <div className="flex gap-3 pt-2">
               <Button onClick={handleEdit} className="flex-1">
-                Сохранить
+                {t('saveButton')}
               </Button>
               <Button variant="outline" onClick={onClose}>
-                Отмена
+                {tc('cancel')}
               </Button>
             </div>
           </div>

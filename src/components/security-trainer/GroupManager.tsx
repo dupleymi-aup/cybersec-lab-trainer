@@ -7,12 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Users, Plus, Check, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface GroupManagerProps {
   onRefresh: () => void;
 }
 
 export default function GroupManager({ onRefresh }: GroupManagerProps) {
+  const t = useTranslations('admin.groupManager');
+  const tc = useTranslations('common');
   const [groups, setGroups] = useState<string[]>([]);
   const [groupCounts, setGroupCounts] = useState<Record<string, number>>({});
   const [editingGroup, setEditingGroup] = useState<string | null>(null);
@@ -36,7 +39,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
 
   const handleRename = async (oldName: string) => {
     if (!editValue.trim()) {
-      toast.error('Название не может быть пустым');
+      toast.error(t('emptyName'));
       return;
     }
     const result = await renameGroup(oldName, editValue);
@@ -66,11 +69,11 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
 
   const handleCreate = () => {
     if (!newGroupName.trim()) {
-      toast.error('Введите название группы');
+      toast.error(t('enterName'));
       return;
     }
     if (groups.includes(newGroupName.trim())) {
-      toast.error('Группа уже существует');
+      toast.error(t('groupExists'));
       return;
     }
     toast.success(`Группа "${newGroupName.trim()}" создана. Назначьте пользователей через массовые действия.`);
@@ -85,17 +88,17 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
       <Card className="border-border">
         <CardContent className="p-4">
           <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-            <Plus size={14} className="text-emerald-500" /> Создать группу
+            <Plus size={14} className="text-emerald-500" /> {tc('create')}
           </h3>
           <div className="flex gap-2">
             <Input
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
-              placeholder="Название группы (например, ИС-101)"
+              placeholder={t('enterName')}
               onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
             />
             <Button onClick={handleCreate} size="sm">
-              <Plus size={14} className="mr-1" /> Создать
+              <Plus size={14} className="mr-1" /> {tc('create')}
             </Button>
           </div>
         </CardContent>
