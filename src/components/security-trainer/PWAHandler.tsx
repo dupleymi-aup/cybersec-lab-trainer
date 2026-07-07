@@ -3,8 +3,11 @@
 import { useEffect, useState } from 'react';
 import { RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 
 export default function PWAHandler() {
+  const t = useTranslations('errors');
+  const tc = useTranslations('common');
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
   const [showReload, setShowReload] = useState(false);
 
@@ -67,8 +70,8 @@ export default function PWAHandler() {
   return (
     <div className="fixed right-4 bottom-4 z-50 flex max-w-sm items-center gap-3 rounded-lg bg-slate-900 p-4 text-white shadow-lg">
       <div className="flex-1">
-        <p className="text-sm font-medium">Доступно обновление</p>
-        <p className="text-xs text-slate-300">Обновите страницу для получения последней версии</p>
+        <p className="text-sm font-medium">{t('updateAvailable')}</p>
+        <p className="text-xs text-slate-300">{t('updateDescription')}</p>
       </div>
       <Button
         size="sm"
@@ -80,7 +83,7 @@ export default function PWAHandler() {
       </Button>
       <Button size="sm" onClick={handleReload} className="bg-emerald-600 hover:bg-emerald-700">
         <RefreshCw size={14} className="mr-1" />
-        Обновить
+        {t('updateRefresh') || tc('refresh')}
       </Button>
     </div>
   );

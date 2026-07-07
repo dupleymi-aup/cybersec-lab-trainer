@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface OTPModalProps {
   otp: string;
@@ -14,6 +15,9 @@ interface OTPModalProps {
 }
 
 export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalProps) {
+  const t = useTranslations('auth.recovery');
+  const te = useTranslations('errors');
+  const tc = useTranslations('common');
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [showOtp, setShowOtp] = useState(false);
   const [cooldown, setCooldown] = useState(30);
@@ -75,7 +79,7 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
   const handleSubmit = () => {
     const code = digits.join('');
     if (code.length !== 6) {
-      toast.error('Введите все 6 цифр');
+      toast.error(te('enterAllDigits'));
       return;
     }
     onSubmit(code);
@@ -92,9 +96,9 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-card w-full max-w-sm rounded-2xl p-6 shadow-xl">
-        <h3 className="mb-2 text-center text-xl font-bold text-slate-900">Введите код подтверждения</h3>
+        <h3 className="mb-2 text-center text-xl font-bold text-slate-900">{te('enterCode')}</h3>
         <p className="text-muted-foreground mb-4 text-center text-sm">
-          Мы отправили 6-значный код для восстановления доступа
+          {te('codeSentDescription')}
         </p>
 
         <div className="mb-4 flex justify-center gap-2" onPaste={handlePaste}>
@@ -125,19 +129,19 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
               <>
                 <EyeOff className="h-3 w-3" />
                 <span className="text-foreground/70 font-mono">{otp}</span>
-                <span className="text-muted-foreground">скрыть</span>
+                <span className="text-muted-foreground">{t('hideOtp')}</span>
               </>
             ) : (
               <>
                 <Eye className="h-3 w-3" />
-                Показать код
+                {t('showOtp')}
               </>
             )}
           </button>
         </div>
 
         <Button onClick={handleSubmit} className="mb-3 w-full">
-          Подтвердить
+          {tc('confirm')}
         </Button>
 
         <div className="flex items-center justify-between text-sm">
@@ -147,10 +151,10 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
             disabled={cooldown > 0}
             className={`text-violet-600 ${cooldown > 0 ? 'cursor-not-allowed opacity-50' : 'hover:underline'}`}
           >
-            Отправить снова {cooldown > 0 ? `(${cooldown}с)` : ''}
+            {cooldown > 0 ? t('resendCountdown', { seconds: cooldown }) : t('resendOtp')}
           </button>
           <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground/70">
-            Отмена
+            {tc('cancel')}
           </button>
         </div>
       </div>

@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
+import { useTranslations } from 'next-intl';
 
 interface RoleGuardProps {
   requiredRole: UserRole;
@@ -14,6 +15,7 @@ interface RoleGuardProps {
 }
 
 export default memo(function RoleGuard({ requiredRole, fallback, children }: RoleGuardProps) {
+  const t = useTranslations('errors');
   const user = useAuthStore((s) => s.user);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
 
@@ -23,9 +25,9 @@ export default memo(function RoleGuard({ requiredRole, fallback, children }: Rol
       <Card className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20">
         <CardContent className="p-8 text-center">
           <Shield size={48} className="mx-auto mb-4 text-amber-400" />
-          <h2 className="mb-2 text-xl font-bold text-amber-800 dark:text-amber-300">Доступ ограничен</h2>
+          <h2 className="mb-2 text-xl font-bold text-amber-800 dark:text-amber-300">{t('accessRestricted')}</h2>
           <p className="mb-4 text-sm text-amber-700 dark:text-amber-400">
-            Для доступа к этой странице требуется роль: <strong>{getRoleLabel(requiredRole)}</strong>
+            {t('accessRestrictedDescription')} <strong>{getRoleLabel(requiredRole)}</strong>
           </p>
           <Button
             onClick={() => setCurrentPage('dashboard')}
@@ -33,7 +35,7 @@ export default memo(function RoleGuard({ requiredRole, fallback, children }: Rol
             className="border-amber-300 text-amber-700 hover:bg-amber-100"
           >
             <ArrowLeft size={16} className="mr-2" />
-            На главную
+            {t('backToHome')}
           </Button>
         </CardContent>
       </Card>

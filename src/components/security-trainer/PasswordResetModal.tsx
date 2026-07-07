@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 import { X, Eye, EyeOff, Check, Copy, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/auth-store';
+import { useTranslations } from 'next-intl';
 
 interface PasswordResetModalProps {
   user: User;
@@ -21,6 +22,8 @@ interface PasswordResetModalProps {
 }
 
 export default function PasswordResetModal({ user, onClose, onSuccess }: PasswordResetModalProps) {
+  const t = useTranslations('admin.passwordReset');
+  const tc = useTranslations('common');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -69,7 +72,7 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
     if (result.success) {
       setNewPassword(password);
       setResetDone(true);
-      toast.success('Пароль сброшен');
+      toast.success(t('success'));
     } else {
       toast.error(result.error);
     }
@@ -95,9 +98,9 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <KeyRound size={20} className="text-sky-600" />
-            <h2 className="text-lg font-bold">Сброс пароля</h2>
+            <h2 className="text-lg font-bold">{t('title')}</h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Закрыть">
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label={tc('close')}>
             <X size={18} />
           </Button>
         </div>
@@ -112,13 +115,13 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
           <div className="space-y-4">
             {/* New Password */}
             <div className="space-y-1.5">
-              <Label>Новый пароль *</Label>
+              <Label>{t('newPassword')}</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Минимум 8 символов"
+                  placeholder={t('newPasswordPlaceholder')}
                 />
                 <button
                   type="button"
@@ -152,13 +155,13 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
 
             {/* Confirm Password */}
             <div className="space-y-1.5">
-              <Label>Подтверждение пароля *</Label>
+              <Label>{t('confirmPassword')}</Label>
               <div className="relative">
                 <Input
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Повторите пароль"
+                  placeholder={t('confirmPasswordPlaceholder')}
                 />
                 <button
                   type="button"

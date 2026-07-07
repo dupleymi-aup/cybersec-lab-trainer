@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WifiOff } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function OfflineBanner() {
+  const t = useTranslations('errors');
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function OfflineBanner() {
           className="flex items-center justify-center gap-2 bg-amber-500 px-4 py-2 text-sm font-medium text-white"
         >
           <WifiOff size={16} />
-          Нет подключения к интернету. Некоторые функции могут быть недоступны.
+          {t('offlineBanner')}
         </motion.div>
       )}
     </AnimatePresence>
