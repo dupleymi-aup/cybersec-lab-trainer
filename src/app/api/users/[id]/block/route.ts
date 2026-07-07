@@ -61,8 +61,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (error) {
-      logger.warn('Audit logging failed', { error });
-
+    logger.warn('Audit logging failed', { error });
   }
 
   return NextResponse.json({

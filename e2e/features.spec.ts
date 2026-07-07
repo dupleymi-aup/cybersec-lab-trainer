@@ -4,8 +4,14 @@ test.describe('Core Features', () => {
   test.beforeEach(async ({ page }) => {
     // Login before each test
     await page.goto('/');
-    await page.getByLabel(/почта|телефон|email/i).first().fill('admin@cybersec.lab');
-    await page.getByLabel(/пароль/i).first().fill('Admin@123');
+    await page
+      .getByLabel(/почта|телефон|email/i)
+      .first()
+      .fill('admin@cybersec.lab');
+    await page
+      .getByLabel(/пароль/i)
+      .first()
+      .fill('Admin@123');
     await page.getByRole('button', { name: /войти/i }).click();
     await expect(page.getByRole('heading', { name: /панель/i })).toBeVisible({ timeout: 10000 });
   });

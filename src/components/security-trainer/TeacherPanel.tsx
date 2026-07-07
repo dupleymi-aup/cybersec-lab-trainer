@@ -296,7 +296,7 @@ export default function TeacherPanel() {
           if (data.deadlines) setDeadlines(data.deadlines);
         }
       } catch (e) {
-logger.warn('TeacherPanel loadProgress failed', { error: e });
+        logger.warn('TeacherPanel loadProgress failed', { error: e });
       }
 
       try {
@@ -307,7 +307,7 @@ logger.warn('TeacherPanel loadProgress failed', { error: e });
           if (data.results) setDeadlineReminders(data.results);
         }
       } catch (e) {
-logger.warn('TeacherPanel loadReminders failed', { error: e });
+        logger.warn('TeacherPanel loadReminders failed', { error: e });
       }
     })();
   }, []);
@@ -344,7 +344,7 @@ logger.warn('TeacherPanel loadReminders failed', { error: e });
         }
       }
     } catch (err) {
-logger.error('Failed to create deadline', { error: err });
+      logger.error('Failed to create deadline', { error: err });
     }
   };
 
@@ -360,7 +360,7 @@ logger.error('Failed to create deadline', { error: err });
         setDeadlineReminders((prev) => prev.filter((r) => r.deadline.id !== id));
       }
     } catch (err) {
-logger.error('Failed to delete deadline', { error: err });
+      logger.error('Failed to delete deadline', { error: err });
     }
   };
 
@@ -666,13 +666,13 @@ logger.error('Failed to delete deadline', { error: err });
                         {t('student')}
                       </th>
                       {modules.map((m) => (
-                      <th
-                        key={m.id}
-                        className="text-muted-foreground min-w-[60px] p-2 text-center font-medium"
-                        title={t(`modules.${m.id}.title`)}
-                      >
-                        {t(`modules.${m.id}.title`).split(' ').slice(0, 2).join(' ')}
-                      </th>
+                        <th
+                          key={m.id}
+                          className="text-muted-foreground min-w-[60px] p-2 text-center font-medium"
+                          title={t(`modules.${m.id}.title`)}
+                        >
+                          {t(`modules.${m.id}.title`).split(' ').slice(0, 2).join(' ')}
+                        </th>
                       ))}
                       <th className="text-muted-foreground p-2 text-center font-medium">{t('avgScore')}</th>
                     </tr>

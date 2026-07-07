@@ -67,8 +67,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
   } catch (error) {
-      logger.warn('Audit logging failed', { error });
-
+    logger.warn('Audit logging failed', { error });
   }
 
   return NextResponse.json({ success: true });

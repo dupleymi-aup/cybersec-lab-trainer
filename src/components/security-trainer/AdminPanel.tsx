@@ -169,7 +169,7 @@ export default function AdminPanel() {
     getAllUsers()
       .then(setAllUsers)
       .catch((err) => {
-logger.error('AdminPanel failed to load users', { error: err });
+        logger.error('AdminPanel failed to load users', { error: err });
       })
       .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
@@ -315,7 +315,7 @@ logger.error('AdminPanel failed to load users', { error: err });
         toast.success(t('actions.csvImported', { created, skipped }));
         refresh();
       } catch (e) {
-logger.warn('AdminPanel handleCSVImport failed', { error: e });
+        logger.warn('AdminPanel handleCSVImport failed', { error: e });
         toast.error(t('actions.csvParseError'));
       }
     };
@@ -600,9 +600,7 @@ logger.warn('AdminPanel handleCSVImport failed', { error: e });
                                   onClick={async () => {
                                     const result = await startImpersonation(u.id, user?.id || '');
                                     if (result.success) {
-                                      toast.success(
-                                        t('users.impersonationStarted'),
-                                      );
+                                      toast.success(t('users.impersonationStarted'));
                                     }
                                   }}
                                   aria-label="Impersonate user"

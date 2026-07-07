@@ -228,7 +228,7 @@ export default function AssignmentBuilder() {
         toast.error(err.error || 'Ошибка сохранения');
       }
     } catch (e) {
-logger.warn('AssignmentBuilder handleSubmit failed', { error: e });
+      logger.warn('AssignmentBuilder handleSubmit failed', { error: e });
       toast.error('Ошибка сети');
     } finally {
       setSaving(false);
@@ -250,7 +250,7 @@ logger.warn('AssignmentBuilder handleSubmit failed', { error: e });
         toast.error('Не удалось удалить');
       }
     } catch (e) {
-logger.warn('AssignmentBuilder handleDelete failed', { error: e });
+      logger.warn('AssignmentBuilder handleDelete failed', { error: e });
       toast.error('Ошибка сети');
     }
   };
@@ -268,7 +268,7 @@ logger.warn('AssignmentBuilder handleDelete failed', { error: e });
         fetchAssignments();
       }
     } catch (e) {
-logger.warn('AssignmentBuilder togglePublished failed', { error: e });
+      logger.warn('AssignmentBuilder togglePublished failed', { error: e });
       toast.error('Ошибка');
     }
   };

@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     try {
       return JSON.parse(val);
     } catch (e) {
-logger.warn('progress parseJsonField failed', { error: e });
+      logger.warn('progress parseJsonField failed', { error: e });
       return val;
     }
   };

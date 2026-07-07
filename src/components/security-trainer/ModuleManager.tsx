@@ -30,7 +30,7 @@ function loadConfig(): StoredConfig {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw);
   } catch (e) {
-logger.warn('ModuleManager loadConfig failed', { error: e });
+    logger.warn('ModuleManager loadConfig failed', { error: e });
     // Intentionally silent — fallback to defaults if localStorage fails
   }
   return { modules: {}, order: [] };

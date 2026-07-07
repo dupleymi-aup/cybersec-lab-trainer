@@ -187,7 +187,7 @@ export default function ProfilePage() {
         year: 'numeric',
       });
     } catch (e) {
-logger.warn('ProfilePage formatDate failed', { error: e });
+      logger.warn('ProfilePage formatDate failed', { error: e });
       return iso;
     }
   };

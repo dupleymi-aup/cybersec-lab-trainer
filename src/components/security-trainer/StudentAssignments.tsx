@@ -117,7 +117,7 @@ export default function StudentAssignments() {
         setSubmissions(subMap);
       }
     } catch (e) {
-logger.warn('StudentAssignments fetchData failed', { error: e });
+      logger.warn('StudentAssignments fetchData failed', { error: e });
       toast.error('Ошибка загрузки заданий');
     } finally {
       setLoading(false);
@@ -186,7 +186,7 @@ logger.warn('StudentAssignments fetchData failed', { error: e });
         toast.error(err.error || 'Не удалось отправить');
       }
     } catch (e) {
-logger.warn('StudentAssignments handleSubmit failed', { error: e });
+      logger.warn('StudentAssignments handleSubmit failed', { error: e });
       toast.error('Ошибка сети');
     } finally {
       setSubmitting(false);

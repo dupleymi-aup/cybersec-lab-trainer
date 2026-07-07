@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -137,7 +137,7 @@
   /* Improve tap targets on mobile */
   button,
   a,
-  [role="button"] {
+  [role='button'] {
     min-height: 44px;
     min-width: 44px;
   }
@@ -197,7 +197,7 @@ button,
 a,
 input,
 select,
-[role="button"] {
+[role='button'] {
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,

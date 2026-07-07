@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
   const { action } = parsed.data;
 
   // Use transaction to prevent race condition on XP + streak updates
-  const result = await getPrisma().$transaction(async (tx) => {
+  const result = await getPrisma()
+    .$transaction(async (tx) => {
       const xpAmount =
         action === 'daily_login'
           ? await calculateDailyLoginXp(tx, auth.id)
@@ -145,10 +146,7 @@ export async function POST(request: NextRequest) {
   });
 }
 
-async function calculateDailyLoginXp(
-  tx: PrismaTransactionClient,
-  userId: string,
-): Promise<number> {
+async function calculateDailyLoginXp(tx: PrismaTransactionClient, userId: string): Promise<number> {
   const user = await tx.user.findUnique({
     where: { id: userId },
     select: { lastActivityAt: true, streak: true },

@@ -980,25 +980,25 @@ export default function Dashboard() {
                       </div>
                       <div className="flex-1 p-4">
                         <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h3 className="text-sm font-semibold transition-colors group-hover:text-emerald-700">
-                            {t(`modules.${mod.id}.title`)}
-                          </h3>
-                          <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">
-                            {t(`modules.${mod.id}.description`)}
-                          </p>
+                          <div>
+                            <h3 className="text-sm font-semibold transition-colors group-hover:text-emerald-700">
+                              {t(`modules.${mod.id}.title`)}
+                            </h3>
+                            <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">
+                              {t(`modules.${mod.id}.description`)}
+                            </p>
+                          </div>
+                          <ChevronRight
+                            size={16}
+                            className="mt-1 shrink-0 text-slate-300 transition-colors group-hover:text-emerald-500"
+                          />
                         </div>
-                        <ChevronRight
-                          size={16}
-                          className="mt-1 shrink-0 text-slate-300 transition-colors group-hover:text-emerald-500"
-                        />
-                      </div>
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary" className={`text-[10px] ${mod.difficultyColor}`}>
-                          {t(`modules.${mod.id}.difficulty`)}
-                        </Badge>
-                        <span className="text-[11px] text-slate-400">
-                          {mod.lessons} {t('module.lessons')}
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <Badge variant="secondary" className={`text-[10px] ${mod.difficultyColor}`}>
+                            {t(`modules.${mod.id}.difficulty`)}
+                          </Badge>
+                          <span className="text-[11px] text-slate-400">
+                            {mod.lessons} {t('module.lessons')}
                           </span>
                           {isCompleted && (
                             <Badge className="border-0 bg-emerald-100 text-[10px] text-emerald-700">

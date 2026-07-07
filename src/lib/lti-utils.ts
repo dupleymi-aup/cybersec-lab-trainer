@@ -101,7 +101,7 @@ export async function verifyLtiLaunch(
       verified = true;
       break;
     } catch (e) {
-logger.warn('verifyLtiLaunch failed', { error: e });
+      logger.warn('verifyLtiLaunch failed', { error: e });
       // Try next key
     }
   }

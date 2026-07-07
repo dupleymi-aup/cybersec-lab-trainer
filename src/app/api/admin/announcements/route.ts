@@ -112,8 +112,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-      logger.warn('Audit logging failed', { error });
-
+    logger.warn('Audit logging failed', { error });
   }
 
   return NextResponse.json(
@@ -197,8 +196,7 @@ export async function PUT(request: NextRequest) {
       },
     });
   } catch (error) {
-      logger.warn('Audit logging failed', { error });
-
+    logger.warn('Audit logging failed', { error });
   }
 
   return NextResponse.json({
@@ -274,8 +272,7 @@ export async function DELETE(request: NextRequest) {
       },
     });
   } catch (error) {
-      logger.warn('Audit logging failed', { error });
-
+    logger.warn('Audit logging failed', { error });
   }
 
   return NextResponse.json({ success: true });

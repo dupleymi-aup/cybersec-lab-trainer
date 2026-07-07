@@ -85,8 +85,8 @@ export async function GET(request: NextRequest) {
     // Login stats
     getPrisma().loginActivity.count(),
     getPrisma().loginActivity.count({ where: { timestamp: { gte: dateFrom } } }),
-    getPrisma().loginActivity
-      .groupBy({
+    getPrisma()
+      .loginActivity.groupBy({
         by: ['userId'],
         where: { timestamp: { gte: dateFrom } },
         _count: true,

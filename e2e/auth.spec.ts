@@ -11,8 +11,14 @@ test.describe('Authentication Flow', () => {
   test('should login with default admin credentials', async ({ page }) => {
     await page.goto('/');
     // Fill login form
-    await page.getByLabel(/почта|телефон|email/i).first().fill('admin@cybersec.lab');
-    await page.getByLabel(/пароль/i).first().fill('Admin@123');
+    await page
+      .getByLabel(/почта|телефон|email/i)
+      .first()
+      .fill('admin@cybersec.lab');
+    await page
+      .getByLabel(/пароль/i)
+      .first()
+      .fill('Admin@123');
     await page.getByRole('button', { name: /войти/i }).click();
 
     // Should navigate to dashboard
@@ -21,8 +27,14 @@ test.describe('Authentication Flow', () => {
 
   test('should show error for invalid credentials', async ({ page }) => {
     await page.goto('/');
-    await page.getByLabel(/почта|телефон|email/i).first().fill('wrong@test.com');
-    await page.getByLabel(/пароль/i).first().fill('wrongpassword');
+    await page
+      .getByLabel(/почта|телефон|email/i)
+      .first()
+      .fill('wrong@test.com');
+    await page
+      .getByLabel(/пароль/i)
+      .first()
+      .fill('wrongpassword');
     await page.getByRole('button', { name: /войти/i }).click();
 
     // Should show error toast

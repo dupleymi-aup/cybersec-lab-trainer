@@ -191,8 +191,7 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
       toast.success('Итоговый отчёт скачан');
     } catch (error) {
       toast.error('Ошибка генерации отчёта');
-        logger.error('ExecutiveSummaryExport PDF generation failed', { error });
-
+      logger.error('ExecutiveSummaryExport PDF generation failed', { error });
     } finally {
       setGenerating(false);
     }

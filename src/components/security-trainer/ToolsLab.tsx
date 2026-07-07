@@ -109,7 +109,7 @@ function xorDecrypt(hex: string, key: string): string {
       .map((h, i) => String.fromCharCode(parseInt(h, 16) ^ key.charCodeAt(i % key.length)))
       .join('');
   } catch (e) {
-logger.warn('ToolsLab xorDecrypt failed', { error: e });
+    logger.warn('ToolsLab xorDecrypt failed', { error: e });
     return 'Ошибка декодирования';
   }
 }
@@ -121,7 +121,7 @@ function base64Encode(text: string): string {
   try {
     return btoa(unescape(encodeURIComponent(text)));
   } catch (e) {
-logger.warn('ToolsLab base64Encode failed', { error: e });
+    logger.warn('ToolsLab base64Encode failed', { error: e });
     return 'Ошибка кодирования';
   }
 }
@@ -129,7 +129,7 @@ function base64Decode(text: string): string {
   try {
     return decodeURIComponent(escape(atob(text)));
   } catch (e) {
-logger.warn('ToolsLab base64Decode failed', { error: e });
+    logger.warn('ToolsLab base64Decode failed', { error: e });
     return 'Ошибка декодирования';
   }
 }
@@ -144,7 +144,7 @@ function urlDecode(text: string): string {
   try {
     return decodeURIComponent(text);
   } catch (e) {
-logger.warn('ToolsLab urlDecode failed', { error: e });
+    logger.warn('ToolsLab urlDecode failed', { error: e });
     return 'Ошибка декодирования';
   }
 }
@@ -299,7 +299,7 @@ export default function ToolsLab() {
       }
       return new TextDecoder().decode(result);
     } catch (e) {
-logger.warn('ToolsLab aesDecrypt failed', { error: e });
+      logger.warn('ToolsLab aesDecrypt failed', { error: e });
       return '❌ Ошибка: неверный ключ или повреждённые данные';
     }
   };
@@ -854,7 +854,7 @@ function vigenereEncrypt(text, key) {
                   size="icon"
                   className="text-slate-400 hover:text-white"
                   onClick={() => setShowPw(!showPw)}
-                  aria-label={showPw ? "Hide password" : "Show password"}
+                  aria-label={showPw ? 'Hide password' : 'Show password'}
                 >
                   {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                 </Button>

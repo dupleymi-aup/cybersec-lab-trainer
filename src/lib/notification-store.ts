@@ -168,6 +168,6 @@ export async function loadAnnouncementsIntoNotifications() {
       }
     }
   } catch (e) {
-logger.warn('loadAnnouncementsIntoNotifications failed', { error: e });
+    logger.warn('loadAnnouncementsIntoNotifications failed', { error: e });
   }
 }
