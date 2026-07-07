@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
-import { createDeadlineSchema } from '@/lib/validations/api';
+import { createDeadlineSchema, type CreateDeadlineInput } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
+
+interface DeadlineBody extends CreateDeadlineInput {
+  group?: string;
+}
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -44,8 +48,7 @@ export async function POST(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireCapability(auth, 'deadlines:create')) return forbidden();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const bodyResult = await parseBody<any>(request);
+  const bodyResult = await parseBody<DeadlineBody>(request);
   if (!bodyResult.ok) return bodyResult.response;
   const body = bodyResult.data;
   const parsed = createDeadlineSchema.safeParse(body);

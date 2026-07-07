@@ -12,10 +12,10 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
-- **API route type safety** — replaced `any` types with proper interfaces (`ProgressSnapshotBody`, `ScheduledReportUpdateBody`) in 2 API routes, removed eslint-disable comments
-- **Prettier format pass** — formatted 291 src files (zh.json formatting fixes, consistent line endings)
-- **`bb4ca11e`**: lazy PrismaClient init to fix build without DATABASE_URL (89 files)
+- **`bb4ca11e`**: lazy PrismaClient init to fix build without DATABASE_URL — `getPrisma()` replaces eager `new PrismaClient()`, 87 route/lib files updated, tests mocks fixed, `PrismaTransactionClient` type exported
+- **`84abb256`**: `find-port.js` async/await modernization; AGENTS.md updated
+- **`f52b7b36`**: `output: 'standalone'` in next.config.ts, start-server.js respects `PORT` env (Amvera)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
 - **239/239 tests passing** (19 files) — all unit tests green
-- **Remote sync** — `origin` and `gitverse` at `bb4ca11e`
-- **Full verification passed**: lint ✓, typecheck ✓, tests ✓, build ✓
+- **Remote sync** — `origin` and `gitverse` at `84abb256`
+- **Full verification passed**: lint ✓, typecheck ✓, tests ✓
