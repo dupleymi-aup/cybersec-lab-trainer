@@ -4,6 +4,12 @@ import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, get
 import { logger } from '@/lib/logger';
 import { validateUuid } from '@/lib/validate-uuid';
 import { parseBody } from '@/lib/utils';
+import { type UpdateUserInput } from '@/lib/validations/api';
+
+interface UserUpdateBody extends UpdateUserInput {
+  email?: string;
+  role?: 'student' | 'teacher' | 'admin';
+}
 
 // GET /api/users/[id] - get single user
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -55,11 +61,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const bodyResult = await parseBody<any>(request);
+  const bodyResult = await parseBody<UserUpdateBody>(request);
   if (!bodyResult.ok) return bodyResult.response;
-  const body = bodyResult.data;
-  const { fullName, phone, group, course, university, avatar, bio, role } = body;
+  const { fullName, phone, group, course, university, avatar, bio, role, email } = bodyResult.data;
 
   // Validate role if provided
   if (role !== undefined && !['student', 'teacher', 'admin'].includes(role)) {
@@ -80,15 +84,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   // Validate email format if provided
-  if (body.email !== undefined) {
+  if (email !== undefined) {
     const { validateEmail } = await import('@/lib/auth-utils');
-    if (!validateEmail(body.email)) {
+    if (!validateEmail(email)) {
       return NextResponse.json({ error: 'Неверный формат email' }, { status: 400 });
     }
 
     // Check for duplicate email
     const existing = await getPrisma().user.findFirst({
-      where: { email: body.email, id: { not: id } },
+      where: { email: email, id: { not: id } },
     });
     if (existing) {
       return NextResponse.json({ error: 'Email уже используется' }, { status: 409 });
@@ -106,7 +110,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       ...(avatar !== undefined && { avatar }),
       ...(bio !== undefined && { bio }),
       ...(role !== undefined && { role }),
-      ...(body.email !== undefined && { email: body.email }),
+      ...(email !== undefined && { email: email }),
       ...(role !== undefined && { tokenVersion: { increment: 1 } }), // Revoke tokens on role change
     },
   });
@@ -124,7 +128,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       ...(avatar !== undefined ? ['avatar'] : []),
       ...(bio !== undefined ? ['bio'] : []),
       ...(role !== undefined ? ['role'] : []),
-      ...(body.email !== undefined ? ['email'] : []),
+      ...(email !== undefined ? ['email'] : []),
     ];
     await getPrisma().auditLog.create({
       data: {

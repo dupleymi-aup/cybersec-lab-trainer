@@ -4,6 +4,19 @@ import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { parseBody } from '@/lib/utils';
 
+interface LtiPlatformUpdateBody {
+  name?: string;
+  issuer?: string;
+  clientId?: string;
+  authUrl?: string;
+  tokenUrl?: string;
+  keysetUrl?: string;
+  deploymentId?: string;
+  publicKey?: string;
+  privateKey?: string;
+  isActive?: boolean;
+}
+
 /**
  * GET /api/lti/platforms/[id]
  * Get a single LTI platform
@@ -90,8 +103,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   if (!requireRole(auth.role, 'admin')) return forbidden();
 
   const { id } = await params;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const bodyResult = await parseBody<any>(request);
+  const bodyResult = await parseBody<LtiPlatformUpdateBody>(request);
   if (!bodyResult.ok) return bodyResult.response;
   const body = bodyResult.data;
 

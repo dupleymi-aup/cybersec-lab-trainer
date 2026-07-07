@@ -4,16 +4,18 @@ import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
 import { timingSafeEqual } from 'crypto';
+import { parseBody } from '@/lib/utils';
+
+interface PasswordResetBody {
+  emailOrPhone: string;
+  newPassword: string;
+  otp: string;
+}
 
 export async function POST(request: NextRequest) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let body: any;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-  }
-  const { emailOrPhone, newPassword, otp } = body;
+  const bodyResult = await parseBody<PasswordResetBody>(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const { emailOrPhone, newPassword, otp } = bodyResult.data;
 
   if (!emailOrPhone || !newPassword || !otp) {
     return NextResponse.json({ error: 'Email/phone, OTP and new password required' }, { status: 400 });

@@ -5,6 +5,7 @@ import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { validateUuid } from '@/lib/validate-uuid';
 import { logger } from '@/lib/logger';
 import { parseBody } from '@/lib/utils';
+import { type AdminResetPasswordInput } from '@/lib/validations/api';
 
 // POST /api/admin/users/[id]/reset-password - admin resets another user's password
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -25,11 +26,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const bodyResult = await parseBody<any>(request);
+  const bodyResult = await parseBody<AdminResetPasswordInput>(request);
   if (!bodyResult.ok) return bodyResult.response;
-  const body = bodyResult.data;
-  const { newPassword } = body;
+  const { newPassword } = bodyResult.data;
 
   if (!newPassword) {
     return NextResponse.json({ error: 'New password is required' }, { status: 400 });

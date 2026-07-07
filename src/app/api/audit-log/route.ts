@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { parseBody } from '@/lib/utils';
+
+interface AuditLogBody {
+  action: string;
+  targetId: string;
+  targetName?: string;
+  details?: string;
+}
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -31,14 +39,9 @@ export async function POST(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'admin')) return forbidden();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let body: any;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-  }
-  const { action, targetId, targetName, details } = body;
+  const bodyResult = await parseBody<AuditLogBody>(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const { action, targetId, targetName, details } = bodyResult.data;
 
   if (!action || !targetId) {
     return NextResponse.json({ error: 'action and targetId required' }, { status: 400 });

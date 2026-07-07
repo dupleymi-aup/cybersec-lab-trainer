@@ -3,6 +3,8 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 import { validateUuid } from '@/lib/validate-uuid';
+import { parseBody } from '@/lib/utils';
+import { type BlockUserInput } from '@/lib/validations/api';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticate(request);
@@ -27,14 +29,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Нельзя заблокировать себя' }, { status: 403 });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let body: any;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-  }
-  const { isBlocked } = body;
+  const bodyResult = await parseBody<BlockUserInput>(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const { isBlocked } = bodyResult.data;
 
   if (typeof isBlocked !== 'boolean') {
     return NextResponse.json({ error: 'isBlocked must be boolean' }, { status: 400 });

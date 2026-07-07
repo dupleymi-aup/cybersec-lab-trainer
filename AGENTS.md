@@ -14,6 +14,8 @@ This project belongs to the work account — always use the `github-work` host a
 ### Done last
 - **API route type safety** — replaced `any` types with proper interfaces (`ProgressSnapshotBody`, `ScheduledReportUpdateBody`) in 2 API routes, removed eslint-disable comments
 - **Prettier format pass** — formatted 291 src files (zh.json formatting fixes, consistent line endings)
+- **`bb4ca11e`**: lazy PrismaClient init to fix build without DATABASE_URL (89 files)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **240/240 tests passing** — all unit tests green
-- **Remote sync** — `origin` and `gitverse` at `8d33ffa3`
+- **239/239 tests passing** (19 files) — all unit tests green
+- **Remote sync** — `origin` and `gitverse` at `bb4ca11e`
+- **Full verification passed**: lint ✓, typecheck ✓, tests ✓, build ✓

@@ -10,6 +10,8 @@ import {
 } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 import { validateUuid } from '@/lib/validate-uuid';
+import { parseBody } from '@/lib/utils';
+import { type RoleChangeInput } from '@/lib/validations/api';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticate(request);
@@ -34,14 +36,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Нельзя изменить свою роль' }, { status: 403 });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let body: any;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-  }
-  const { role } = body;
+  const bodyResult = await parseBody<RoleChangeInput>(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const { role } = bodyResult.data;
 
   if (!role || !['student', 'teacher', 'admin'].includes(role)) {
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 });

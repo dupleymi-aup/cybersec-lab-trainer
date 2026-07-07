@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { verifyPassword } from '@/lib/auth-utils';
+import { parseBody } from '@/lib/utils';
+
+interface DeleteAccountBody {
+  currentPassword: string;
+}
 
 export async function DELETE(request: NextRequest) {
   const auth = await authenticate(request);
@@ -34,14 +39,9 @@ export async function DELETE(request: NextRequest) {
   }
 
   // Require password confirmation to prevent deletion via stolen tokens
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let body: any;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-  }
-  const { currentPassword } = body;
+  const bodyResult = await parseBody<DeleteAccountBody>(request);
+  if (!bodyResult.ok) return bodyResult.response;
+  const { currentPassword } = bodyResult.data;
 
   if (!currentPassword) {
     return NextResponse.json({ error: 'Требуется подтверждение пароля' }, { status: 400 });

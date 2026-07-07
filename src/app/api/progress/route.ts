@@ -4,6 +4,21 @@ import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { syncGradesToPlatform } from '@/lib/lti-utils';
 import { modules } from '@/lib/data';
 import { logger } from '@/lib/logger';
+import { parseBody } from '@/lib/utils';
+
+interface ProgressBody {
+  moduleId: string;
+  completed?: boolean;
+  score?: number;
+  sqlLevels?: string[] | string;
+  xssLevels?: string[] | string;
+  csrfSteps?: number[] | string;
+  csrfChallengeScores?: number[] | string;
+  secureCodingAnswers?: number[] | string;
+  secureCodingCorrectCount?: number;
+  studiedOwaspItems?: string[] | string;
+  challengeScores?: Record<string, unknown> | string;
+}
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -61,13 +76,8 @@ export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let body: any;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-  }
+  const bodyResult = await parseBody<ProgressBody>(request);
+  if (!bodyResult.ok) return bodyResult.response;
   const {
     moduleId,
     completed,
@@ -80,7 +90,7 @@ export async function POST(request: NextRequest) {
     secureCodingCorrectCount,
     studiedOwaspItems,
     challengeScores,
-  } = body;
+  } = bodyResult.data;
 
   if (!moduleId) {
     return NextResponse.json({ error: 'Module ID required' }, { status: 400 });
