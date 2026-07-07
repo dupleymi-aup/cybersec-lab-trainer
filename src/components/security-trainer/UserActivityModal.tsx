@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import { X, BookOpen, Trophy, Activity, BarChart3, Database, Clock, ShieldCheck, Code } from 'lucide-react';
 import { useDateTimeFormatter } from '@/lib/format';
+import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
 
 interface UserActivityModalProps {
@@ -35,22 +36,6 @@ const moduleNames: Record<string, string> = {
   'secure-coding': 'Безопасное программирование',
   tools: 'Инструменты',
   'security-headers': 'HTTP заголовки',
-};
-
-const sqlLevelNames: Record<string, string> = {
-  '1': 'Уровень 1: Basic SELECT',
-  '2': 'Уровень 2: UNION attack',
-  '3': 'Уровень 3: Authentication bypass',
-  '4': 'Уровень 4: Blind SQLi',
-  '5': 'Уровень 5: Advanced injection',
-};
-
-const xssLevelNames: Record<string, string> = {
-  '1': 'Уровень 1: Reflected XSS',
-  '2': 'Уровень 2: Stored XSS',
-  '3': 'Уровень 3: DOM-based XSS',
-  '4': 'Уровень 4: XSS filter bypass',
-  '5': 'Уровень 5: Advanced XSS',
 };
 
 function getUserProgress(userId: string): UserProgressData {
@@ -105,6 +90,8 @@ function getScoreColor(score: number): string {
 
 export default function UserActivityModal({ user, onClose }: UserActivityModalProps) {
   const formatDateTime = useDateTimeFormatter();
+  const t = useTranslations('admin.userActivity');
+  const tc = useTranslations('common');
   const [progress, setProgress] = useState<UserProgressData>({
     completedModules: [],
     quizScores: {},
@@ -155,12 +142,12 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold">Активность пользователя</h2>
+            <h2 className="text-lg font-bold">{t('title')}</h2>
             <p className="text-muted-foreground text-xs">
               {user.fullName} • {user.email}
             </p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Закрыть">
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label={tc('close')}>
             <X size={18} />
           </Button>
         </div>
@@ -197,38 +184,38 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
             <p className="text-xl font-bold text-sky-600">
               {completedCount}/{totalModules}
             </p>
-            <p className="text-muted-foreground text-[10px]">Модули</p>
+            <p className="text-muted-foreground text-[10px]">{t('modules')}</p>
           </div>
           <div className="rounded-lg bg-emerald-50 p-3 text-center">
             <Trophy size={18} className="mx-auto mb-1 text-emerald-500" />
             <p className="text-xl font-bold text-emerald-600">{avgScore}%</p>
-            <p className="text-muted-foreground text-[10px]">Ср. балл</p>
+            <p className="text-muted-foreground text-[10px]">{t('avgScore')}</p>
           </div>
           <div className="rounded-lg bg-violet-50 p-3 text-center">
             <Activity size={18} className="mx-auto mb-1 text-violet-500" />
             <p className="text-xl font-bold text-violet-600">{totalLogins}</p>
-            <p className="text-muted-foreground text-[10px]">Входов</p>
+            <p className="text-muted-foreground text-[10px]">{t('totalLogins')}</p>
           </div>
           <div className="rounded-lg bg-amber-50 p-3 text-center">
             <Clock size={18} className="mx-auto mb-1 text-amber-500" />
             <p className="text-xl font-bold text-amber-600">{user.loginCount || 0}</p>
-            <p className="text-muted-foreground text-[10px]">Всего</p>
+            <p className="text-muted-foreground text-[10px]">{t('totalCount')}</p>
           </div>
         </div>
 
         <Tabs defaultValue="modules">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="modules" className="text-xs">
-              Модули
+              {t('modules')}
             </TabsTrigger>
             <TabsTrigger value="quizzes" className="text-xs">
-              Квизы
+              {t('quizzes')}
             </TabsTrigger>
             <TabsTrigger value="labs" className="text-xs">
-              Лабы
+              {t('labs')}
             </TabsTrigger>
             <TabsTrigger value="logins" className="text-xs">
-              Входы
+              {t('logins')}
             </TabsTrigger>
           </TabsList>
 
@@ -247,7 +234,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                     <span className="text-sm">{name}</span>
                   </div>
                   <Badge variant={done ? 'default' : 'secondary'} className="text-[10px]">
-                    {done ? 'Пройден' : 'Не пройден'}
+                    {done ? t('passed') : t('notPassed')}
                   </Badge>
                 </div>
               );
@@ -257,7 +244,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
           {/* Quizzes tab */}
           <TabsContent value="quizzes" className="mt-4 space-y-2">
             {quizEntries.length === 0 ? (
-              <p className="text-muted-foreground py-4 text-center text-sm">Квизы ещё не проходились</p>
+              <p className="text-muted-foreground py-4 text-center text-sm">{t('noQuizzes')}</p>
             ) : (
               quizEntries.map(([category, score]) => (
                 <div key={category} className="rounded-lg border border-slate-100 p-3">
@@ -284,15 +271,15 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
           <TabsContent value="labs" className="mt-4 space-y-4">
             <div>
               <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                <Database size={14} className="text-sky-500" /> SQL-инъекции
+                <Database size={14} className="text-sky-500" /> {t('sqlInjection')}
               </h4>
               {progress.sqlCompletedLevels.length === 0 ? (
-                <p className="text-muted-foreground text-xs">Уровни не пройдены</p>
+                <p className="text-muted-foreground text-xs">{t('noLevels')}</p>
               ) : (
                 <div className="space-y-1">
                   {progress.sqlCompletedLevels.map((level) => (
                     <Badge key={level} variant="secondary" className="mr-1 text-xs">
-                      {sqlLevelNames[level] || `Уровень ${level}`}
+                      {t('level', { n: level })}
                     </Badge>
                   ))}
                 </div>
@@ -301,15 +288,15 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
 
             <div>
               <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                <BookOpen size={14} className="text-amber-500" /> XSS атаки
+                <BookOpen size={14} className="text-amber-500" /> {t('xssAttacks')}
               </h4>
               {progress.xssCompletedLevels.length === 0 ? (
-                <p className="text-muted-foreground text-xs">Уровни не пройдены</p>
+                <p className="text-muted-foreground text-xs">{t('noLevels')}</p>
               ) : (
                 <div className="space-y-1">
                   {progress.xssCompletedLevels.map((level) => (
                     <Badge key={level} variant="secondary" className="mr-1 text-xs">
-                      {xssLevelNames[level] || `Уровень ${level}`}
+                      {t('level', { n: level })}
                     </Badge>
                   ))}
                 </div>
@@ -318,15 +305,15 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
 
             <div>
               <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                <ShieldCheck size={14} className="text-emerald-500" /> CSRF атаки
+                <ShieldCheck size={14} className="text-emerald-500" /> {t('csrfAttacks')}
               </h4>
               {progress.csrfCompletedSteps?.length === 0 ? (
-                <p className="text-muted-foreground text-xs">Шаги не пройдены</p>
+                <p className="text-muted-foreground text-xs">{t('noSteps')}</p>
               ) : (
                 <div className="space-y-1">
                   {progress.csrfCompletedSteps.map((step) => (
                     <Badge key={step} variant="secondary" className="mr-1 text-xs">
-                      Шаг {step + 1}
+                      {t('step', { n: step + 1 })}
                     </Badge>
                   ))}
                 </div>
@@ -335,15 +322,15 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
 
             <div>
               <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                <Code size={14} className="text-purple-500" /> Безопасное кодирование
+                <Code size={14} className="text-purple-500" /> {t('secureCoding')}
               </h4>
               {progress.secureCodingAnsweredChallenges?.length === 0 ? (
-                <p className="text-muted-foreground text-xs">Задания не пройдены</p>
+                <p className="text-muted-foreground text-xs">{t('noChallenges')}</p>
               ) : (
                 <div className="space-y-1">
                   {progress.secureCodingAnsweredChallenges.map((idx) => (
                     <Badge key={idx} variant="secondary" className="mr-1 text-xs">
-                      Задание {idx + 1}
+                      {t('challenge', { n: idx + 1 })}
                     </Badge>
                   ))}
                 </div>
@@ -355,8 +342,8 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
           <TabsContent value="logins" className="mt-4 space-y-2">
             {loginActivity.length === 0 ? (
               <div className="py-4 text-center">
-                <p className="text-muted-foreground text-sm">Нет записей о входах</p>
-                <p className="mt-1 text-xs text-slate-400">Записи появляются после каждого входа в систему</p>
+                <p className="text-muted-foreground text-sm">{t('noLoginRecords')}</p>
+                <p className="mt-1 text-xs text-slate-400">{t('loginRecordsAppear')}</p>
               </div>
             ) : (
               loginActivity.slice(0, 20).map((entry) => (
@@ -367,7 +354,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
                   <div className="flex items-center gap-2">
                     <div className={`h-2 w-2 rounded-full ${entry.success ? 'bg-emerald-500' : 'bg-red-500'}`} />
                     <div>
-                      <p className="text-xs font-medium">{entry.success ? 'Успешный вход' : 'Ошибка входа'}</p>
+                      <p className="text-xs font-medium">{entry.success ? t('loginSuccess') : t('loginFailed')}</p>
                       <p className="text-[10px] text-slate-400">{entry.ip}</p>
                     </div>
                   </div>
@@ -381,7 +368,7 @@ export default function UserActivityModal({ user, onClose }: UserActivityModalPr
         {/* Close */}
         <div className="mt-4 flex gap-3 border-t border-slate-100 pt-4">
           <Button onClick={onClose} className="flex-1">
-            Закрыть
+            {tc('close')}
           </Button>
         </div>
       </motion.div>
