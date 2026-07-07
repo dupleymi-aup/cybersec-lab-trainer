@@ -5,9 +5,16 @@ meta:
     version: 20
 
 build:
-  additionalCommands: npm run build
+  additionalCommands:
+    - npx prisma generate
+    - npm run build
 
 run:
   command: npm run start
   containerPort: 3000
   persistenceMount: /data
+
+# Required environment variables (set in Amvera Cloud dashboard):
+# DATABASE_URL      — MySQL connection string
+# TOKEN_SECRET     — JWT signing secret (min 32 chars)
+# NEXT_PUBLIC_APP_URL — Public URL (e.g. https://your-app.amvera.app)
