@@ -110,19 +110,18 @@ function xorDecrypt(hex: string, key: string): string {
       .join('');
   } catch (e) {
     logger.warn('ToolsLab xorDecrypt failed', { error: e });
-    return 'Ошибка декодирования';
+    return 'Decode error';
   }
 }
 
 // ============================================================
 // Base64
-// ============================================================
 function base64Encode(text: string): string {
   try {
     return btoa(unescape(encodeURIComponent(text)));
   } catch (e) {
     logger.warn('ToolsLab base64Encode failed', { error: e });
-    return 'Ошибка кодирования';
+    return 'Encode error';
   }
 }
 function base64Decode(text: string): string {
@@ -130,7 +129,7 @@ function base64Decode(text: string): string {
     return decodeURIComponent(escape(atob(text)));
   } catch (e) {
     logger.warn('ToolsLab base64Decode failed', { error: e });
-    return 'Ошибка декодирования';
+    return 'Decode error';
   }
 }
 
@@ -145,7 +144,7 @@ function urlDecode(text: string): string {
     return decodeURIComponent(text);
   } catch (e) {
     logger.warn('ToolsLab urlDecode failed', { error: e });
-    return 'Ошибка декодирования';
+    return 'Decode error';
   }
 }
 
@@ -300,7 +299,7 @@ export default function ToolsLab() {
       return new TextDecoder().decode(result);
     } catch (e) {
       logger.warn('ToolsLab aesDecrypt failed', { error: e });
-      return '❌ Ошибка: неверный ключ или повреждённые данные';
+      return '❌ Error: invalid key or corrupted data';
     }
   };
 

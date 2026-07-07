@@ -5,6 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { useSession } from '@/hooks/use-session';
 import { Cloud, CloudOff, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
 
 export default function SyncIndicator() {
@@ -13,6 +14,7 @@ export default function SyncIndicator() {
   const userId = useAppStore((s) => s.userId);
   const syncWithDatabase = useAppStore((s) => s.syncWithDatabase);
   const { isAuthenticated } = useSession();
+  const t = useTranslations('errors');
   const [isManualSyncing, setIsManualSyncing] = useState(false);
 
   if (!isAuthenticated || !userId) return null;
@@ -22,10 +24,10 @@ export default function SyncIndicator() {
     setIsManualSyncing(true);
     try {
       await syncWithDatabase();
-      toast.success('Прогресс синхронизирован');
+      toast.success(t('syncSuccess'));
     } catch (e) {
       logger.warn('SyncIndicator handleManualSync failed', { error: e });
-      toast.error('Ошибка синхронизации');
+      toast.error(t('syncError'));
     } finally {
       setIsManualSyncing(false);
     }

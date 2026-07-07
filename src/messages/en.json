@@ -665,6 +665,8 @@
     "completed": "Completed",
     "enterPassword": "Enter password",
     "notAuthorized": "Not authorized",
+    "syncSuccess": "Progress synced",
+    "syncError": "Sync failed",
     "componentError": "Error in {name}",
     "unexpectedError": "An unexpected error occurred",
     "reloadPage": "Reload page",

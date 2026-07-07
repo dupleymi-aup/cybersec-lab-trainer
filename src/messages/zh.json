@@ -665,6 +665,8 @@
     "completed": "已完成",
     "enterPassword": "请输入密码",
     "notAuthorized": "未授权",
+    "syncSuccess": "进度已同步",
+    "syncError": "同步失败",
     "componentError": "{name} 中发生错误",
     "unexpectedError": "发生意外错误",
     "reloadPage": "重新加载页面",

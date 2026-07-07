@@ -665,6 +665,8 @@
     "completed": "Пройдено",
     "enterPassword": "Введите пароль",
     "notAuthorized": "Не авторизован",
+    "syncSuccess": "Прогресс синхронизирован",
+    "syncError": "Ошибка синхронизации",
     "componentError": "Ошибка в {name}",
     "unexpectedError": "Произошла непредвиденная ошибка",
     "reloadPage": "Перезагрузить страницу",
