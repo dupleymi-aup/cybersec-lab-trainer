@@ -1,16 +1,8 @@
-meta:
-  environment: node
-  toolchain:
-    name: npm
-    version: 20
-
-build:
-  additionalCommands:
-    - npx prisma generate
-    - npm run build
+# Amvera deployment configuration
+# When a Dockerfile is present, Amvera uses Docker-based build.
+# This file provides runtime configuration only.
 
 run:
-  command: npm run start
   containerPort: 3000
   persistenceMount: /data
 

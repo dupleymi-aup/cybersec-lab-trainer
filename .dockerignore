@@ -11,7 +11,7 @@ docker-compose.yml
 .env.local
 .env.development
 .env.production
-amvera.yml
+amvera.yaml
 playwright-report
 test-results
 e2e

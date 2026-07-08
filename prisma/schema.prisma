@@ -1,5 +1,5 @@
 // CyberSec Lab Trainer — Prisma Schema
-// PostgreSQL database for user management, progress tracking, and audit logging
+// MySQL database for user management, progress tracking, and audit logging
 
 generator client {
   provider = "prisma-client-js"
