@@ -3,125 +3,130 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const { searchParams } = new URL(request.url);
-  const deadlineId = searchParams.get('deadlineId');
-  const group = searchParams.get('group');
+    const { searchParams } = new URL(request.url);
+    const deadlineId = searchParams.get('deadlineId');
+    const group = searchParams.get('group');
 
-  const where: Record<string, unknown> = { createdBy: auth.id };
-  if (deadlineId) where.id = deadlineId;
+    const where: Record<string, unknown> = { createdBy: auth.id };
+    if (deadlineId) where.id = deadlineId;
 
-  const deadlines = await getPrisma().deadline.findMany({
-    where,
-    orderBy: { dueAt: 'asc' },
-  });
-
-  const results: Array<{
-    deadline: {
-      id: string;
-      scope: string;
-      scopeId: string;
-      dueAt: Date;
-      title: string;
-      group: string;
-    };
-    totalStudents: number;
-    completedCount: number;
-    completionRate: number;
-    studentStatus: Array<{
-      id: string;
-      fullName: string;
-      email: string;
-      group: string;
-      completed: boolean;
-      progressDate: string | null;
-      isOverdue: boolean;
-    }>;
-  }> = [];
-
-  for (const deadline of deadlines) {
-    // Find target students
-    const studentWhere: Record<string, unknown> = { role: 'student' };
-    if (deadline.group) studentWhere.group = deadline.group;
-    if (group) studentWhere.group = group;
-
-    const students = await getPrisma().user.findMany({
-      where: studentWhere,
-      select: { id: true, fullName: true, email: true, group: true },
+    const deadlines = await getPrisma().deadline.findMany({
+      where,
+      orderBy: { dueAt: 'asc' },
     });
 
-    const studentStatus: Array<{
-      id: string;
-      fullName: string;
-      email: string;
-      group: string;
-      completed: boolean;
-      progressDate: string | null;
-      isOverdue: boolean;
+    const results: Array<{
+      deadline: {
+        id: string;
+        scope: string;
+        scopeId: string;
+        dueAt: Date;
+        title: string;
+        group: string;
+      };
+      totalStudents: number;
+      completedCount: number;
+      completionRate: number;
+      studentStatus: Array<{
+        id: string;
+        fullName: string;
+        email: string;
+        group: string;
+        completed: boolean;
+        progressDate: string | null;
+        isOverdue: boolean;
+      }>;
     }> = [];
 
-    for (const student of students) {
-      let completed = false;
-      let progressDate: string | null = null;
+    for (const deadline of deadlines) {
+      // Find target students
+      const studentWhere: Record<string, unknown> = { role: 'student' };
+      if (deadline.group) studentWhere.group = deadline.group;
+      if (group) studentWhere.group = group;
 
-      if (deadline.scope === 'module') {
-        const p = await getPrisma().progress.findUnique({
-          where: {
-            userId_moduleId: { userId: student.id, moduleId: deadline.scopeId },
-          },
+      const students = await getPrisma().user.findMany({
+        where: studentWhere,
+        select: { id: true, fullName: true, email: true, group: true },
+      });
+
+      const studentStatus: Array<{
+        id: string;
+        fullName: string;
+        email: string;
+        group: string;
+        completed: boolean;
+        progressDate: string | null;
+        isOverdue: boolean;
+      }> = [];
+
+      for (const student of students) {
+        let completed = false;
+        let progressDate: string | null = null;
+
+        if (deadline.scope === 'module') {
+          const p = await getPrisma().progress.findUnique({
+            where: {
+              userId_moduleId: { userId: student.id, moduleId: deadline.scopeId },
+            },
+          });
+          completed = !!p?.completed;
+          progressDate = p?.updatedAt?.toISOString() || null;
+        } else if (deadline.scope === 'quiz') {
+          const q = await getPrisma().quizResult.findUnique({
+            where: {
+              userId_quizId: { userId: student.id, quizId: deadline.scopeId },
+            },
+          });
+          completed = !!q;
+          progressDate = q?.updatedAt?.toISOString() || null;
+        } else if (deadline.scope === 'course') {
+          const allProgress = await getPrisma().progress.findMany({
+            where: { userId: student.id, completed: true },
+          });
+          completed = allProgress.length > 0;
+          progressDate = allProgress.length > 0 ? allProgress[allProgress.length - 1].updatedAt.toISOString() : null;
+        }
+
+        const isOverdue = new Date(deadline.dueAt) < new Date() && !completed;
+
+        studentStatus.push({
+          id: student.id,
+          fullName: student.fullName,
+          email: student.email,
+          group: student.group,
+          completed,
+          progressDate,
+          isOverdue,
         });
-        completed = !!p?.completed;
-        progressDate = p?.updatedAt?.toISOString() || null;
-      } else if (deadline.scope === 'quiz') {
-        const q = await getPrisma().quizResult.findUnique({
-          where: {
-            userId_quizId: { userId: student.id, quizId: deadline.scopeId },
-          },
-        });
-        completed = !!q;
-        progressDate = q?.updatedAt?.toISOString() || null;
-      } else if (deadline.scope === 'course') {
-        const allProgress = await getPrisma().progress.findMany({
-          where: { userId: student.id, completed: true },
-        });
-        completed = allProgress.length > 0;
-        progressDate = allProgress.length > 0 ? allProgress[allProgress.length - 1].updatedAt.toISOString() : null;
       }
 
-      const isOverdue = new Date(deadline.dueAt) < new Date() && !completed;
+      const completedCount = studentStatus.filter((s) => s.completed).length;
+      const completionRate = students.length > 0 ? Math.round((completedCount / students.length) * 100) : 0;
 
-      studentStatus.push({
-        id: student.id,
-        fullName: student.fullName,
-        email: student.email,
-        group: student.group,
-        completed,
-        progressDate,
-        isOverdue,
+      results.push({
+        deadline: {
+          id: deadline.id,
+          scope: deadline.scope,
+          scopeId: deadline.scopeId,
+          dueAt: deadline.dueAt,
+          title: deadline.title,
+          group: deadline.group,
+        },
+        totalStudents: students.length,
+        completedCount,
+        completionRate,
+        studentStatus,
       });
     }
 
-    const completedCount = studentStatus.filter((s) => s.completed).length;
-    const completionRate = students.length > 0 ? Math.round((completedCount / students.length) * 100) : 0;
-
-    results.push({
-      deadline: {
-        id: deadline.id,
-        scope: deadline.scope,
-        scopeId: deadline.scopeId,
-        dueAt: deadline.dueAt,
-        title: deadline.title,
-        group: deadline.group,
-      },
-      totalStudents: students.length,
-      completedCount,
-      completionRate,
-      studentStatus,
-    });
+    return NextResponse.json({ results });
+  } catch (error) {
+    console.error('Teacher reminders error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  return NextResponse.json({ results });
 }
