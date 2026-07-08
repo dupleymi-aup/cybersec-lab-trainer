@@ -12,10 +12,11 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`cd946d8`**: fix Amvera deployment — renamed `amvera.yml` → `amvera.yaml`, simplified for Docker-based deployment, fixed Prisma schema comment, updated `.dockerignore`
 - **`bb4ca11e`**: lazy PrismaClient init to fix build without DATABASE_URL — `getPrisma()` replaces eager `new PrismaClient()`, 87 route/lib files updated, tests mocks fixed, `PrismaTransactionClient` type exported
 - **`84abb256`**: `find-port.js` async/await modernization; AGENTS.md updated
 - **`f52b7b36`**: `output: 'standalone'` in next.config.ts, start-server.js respects `PORT` env (Amvera)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
 - **239/239 tests passing** (19 files) — all unit tests green
-- **Remote sync** — `origin` and `gitverse` at `84abb256`
+- **Remote sync** — `origin` and `gitverse` at `cd946d8`
 - **Full verification passed**: lint ✓, typecheck ✓, tests ✓
