@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { careerPaths, skillLevels, industryDemand, modules } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -40,6 +41,7 @@ const demandColors: Record<string, string> = {
 };
 
 export default function CareerPaths() {
+  const t = useTranslations('careerPaths');
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
 
@@ -66,8 +68,8 @@ export default function CareerPaths() {
           <Target size={20} className="text-indigo-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Карьерные пути в кибербезопасности</h1>
-          <p className="text-muted-foreground text-xs">Выберите специализацию и отслеживайте прогресс</p>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -76,7 +78,7 @@ export default function CareerPaths() {
         <CardContent className="p-5">
           <div className="mb-3 flex items-center gap-3">
             <BarChart3 size={20} className="text-indigo-600" />
-            <h2 className="font-semibold text-indigo-900">Ваш текущий уровень</h2>
+            <h2 className="font-semibold text-indigo-900">{t('currentLevel')}</h2>
           </div>
           {(() => {
             const level = getSkillLevel(completedModules.length);
@@ -85,7 +87,7 @@ export default function CareerPaths() {
                 <div className="mb-2 flex items-center gap-2">
                   <span className={`text-lg font-bold ${level.color}`}>{level.level}</span>
                   <span className="text-muted-foreground text-sm">
-                    — {completedModules.length}/{modules.length} модулей пройдено
+                    — {t('modulesCompleted', { count: completedModules.length, total: modules.length })}
                   </span>
                 </div>
                 <Progress value={(completedModules.length / modules.length) * 100} className="mb-2 h-2" />
@@ -99,7 +101,7 @@ export default function CareerPaths() {
       {/* Career paths */}
       <div>
         <h2 className="mb-4 flex items-center gap-2 text-lg font-bold">
-          <Briefcase size={18} className="text-foreground/70" /> Направления специализации
+          <Briefcase size={18} className="text-foreground/70" /> {t('specializations')}
         </h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {careerPaths.map((path, i) => {
@@ -128,20 +130,20 @@ export default function CareerPaths() {
 
                     <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
                       <div>
-                        <span className="text-muted-foreground">Зарплата:</span>
+                        <span className="text-muted-foreground">{t('salary')}</span>
                         <p className="font-semibold">{path.salaryRange}</p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Спрос:</span>
+                        <span className="text-muted-foreground">{t('demand')}</span>
                         <Badge className={`ml-1 text-[10px] ${demandColors[path.demandLevel]}`}>
-                          {path.demandLevel === 'very-high' ? 'Очень высокий' : 'Высокий'}
+                          {path.demandLevel === 'very-high' ? t('veryHigh') : t('high')}
                         </Badge>
                       </div>
                     </div>
 
                     {/* Skills */}
                     <div className="mt-3">
-                      <span className="text-muted-foreground text-xs">Ключевые навыки:</span>
+                      <span className="text-muted-foreground text-xs">{t('keySkills')}</span>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {path.skills.map((s) => (
                           <Badge key={s} variant="secondary" className="text-[10px]">
@@ -157,7 +159,7 @@ export default function CareerPaths() {
                     {/* Learning path progress */}
                     <div className="mt-4">
                       <div className="mb-1 flex items-center justify-between">
-                        <span className="text-xs font-medium">Прогресс обучения</span>
+                        <span className="text-xs font-medium">{t('learningProgress')}</span>
                         <span className="text-xs font-semibold">{progress}%</span>
                       </div>
                       <Progress value={progress} className="h-1.5" />
@@ -165,7 +167,7 @@ export default function CareerPaths() {
 
                     {/* Recommended modules */}
                     <div className="mt-3">
-                      <span className="text-muted-foreground text-xs">Рекомендуемые модули:</span>
+                      <span className="text-muted-foreground text-xs">{t('recommendedModules')}</span>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {path.learningPath.map((modId, idx) => {
                           const mod = modules.find((m) => m.id === modId);
@@ -188,7 +190,7 @@ export default function CareerPaths() {
                     <div className="bg-secondary mt-3 rounded-lg p-3">
                       <div className="mb-1 flex items-center gap-1.5">
                         <GraduationCap size={14} className="text-amber-500" />
-                        <span className="text-xs font-semibold">Сертификации:</span>
+                        <span className="text-xs font-semibold">{t('certifications')}</span>
                       </div>
                       <div className="space-y-0.5">
                         {path.certifications.slice(0, 2).map((cert) => (
@@ -201,7 +203,7 @@ export default function CareerPaths() {
 
                     {/* Roles */}
                     <div className="mt-3">
-                      <span className="text-muted-foreground text-xs">Должности:</span>
+                      <span className="text-muted-foreground text-xs">{t('positions')}</span>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {path.roles.slice(0, 2).map((role) => (
                           <span
@@ -224,7 +226,7 @@ export default function CareerPaths() {
       {/* Industry demand */}
       <div>
         <h2 className="mb-4 flex items-center gap-2 text-lg font-bold">
-          <Building2 size={18} className="text-foreground/70" /> Спрос по отраслям
+          <Building2 size={18} className="text-foreground/70" /> {t('industryDemand')}
         </h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
           {industryDemand.map((sector, i) => (
@@ -242,7 +244,7 @@ export default function CareerPaths() {
                     <span className="font-medium">{sector.demand}</span>
                   </div>
                   <p className="mt-1 text-xs text-emerald-600">{sector.growth}</p>
-                  <p className="text-muted-foreground mt-1 text-[11px]">Ключевые: {sector.key}</p>
+                  <p className="text-muted-foreground mt-1 text-[11px]">{t('keyAreas')} {sector.key}</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -253,7 +255,7 @@ export default function CareerPaths() {
       {/* Skill progression */}
       <div>
         <h2 className="mb-4 flex items-center gap-2 text-lg font-bold">
-          <Target size={18} className="text-foreground/70" /> Уровни компетенций
+          <Target size={18} className="text-foreground/70" /> {t('competencyLevels')}
         </h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
           {skillLevels.map((level, i) => {
@@ -285,10 +287,10 @@ export default function CareerPaths() {
                       </div>
                       <span className={`text-sm font-semibold ${level.color}`}>{level.level}</span>
                     </div>
-                    <p className="text-muted-foreground mb-2 text-xs">Модулей: {level.modules}+</p>
+                    <p className="text-muted-foreground mb-2 text-xs">{t('modulesLabel')} {level.modules}+</p>
                     <p className="text-muted-foreground text-[11px]">{level.description}</p>
                     {isCurrentLevel && (
-                      <Badge className="mt-2 border-0 bg-indigo-100 text-[10px] text-indigo-700">Ваш уровень</Badge>
+                      <Badge className="mt-2 border-0 bg-indigo-100 text-[10px] text-indigo-700">{t('yourLevel')}</Badge>
                     )}
                   </CardContent>
                 </Card>
@@ -301,12 +303,12 @@ export default function CareerPaths() {
       {/* CTA */}
       <Card className="bg-gradient-to-r from-indigo-600 to-blue-700 text-white">
         <CardContent className="p-6">
-          <h3 className="mb-2 text-lg font-bold">Готовы начать обучение?</h3>
+          <h3 className="mb-2 text-lg font-bold">{t('readyToStart')}</h3>
           <p className="mb-4 text-sm text-indigo-100">
-            Выберите модуль из рекомендованного пути и начните изучение. Каждый модуль приближает вас к цели!
+            {t('readyToStartDesc')}
           </p>
           <Button className="bg-card text-indigo-700 hover:bg-indigo-50" onClick={() => setCurrentPage('dashboard')}>
-            Вернуться на дашборд <ArrowRight size={16} className="ml-2" />
+            {t('backToDashboard')} <ArrowRight size={16} className="ml-2" />
           </Button>
         </CardContent>
       </Card>

@@ -22,67 +22,67 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-  const category = searchParams.get('category');
-  const difficulty = searchParams.get('difficulty');
+    const category = searchParams.get('category');
+    const difficulty = searchParams.get('difficulty');
 
-  // Build filter for QuizAttempt
-  const where: Record<string, unknown> = {};
-  if (category) where.category = category;
-  if (difficulty) where.difficulty = difficulty;
+    // Build filter for QuizAttempt
+    const where: Record<string, unknown> = {};
+    if (category) where.category = category;
+    if (difficulty) where.difficulty = difficulty;
 
-  const attempts = await getPrisma().quizAttempt.findMany({
-    where: where as Record<string, never>,
-    select: {
-      questionId: true,
-      correct: true,
-      category: true,
-      difficulty: true,
-    },
-  });
+    const attempts = await getPrisma().quizAttempt.findMany({
+      where: where as Record<string, never>,
+      select: {
+        questionId: true,
+        correct: true,
+        category: true,
+        difficulty: true,
+      },
+    });
 
-  // Group by questionId
-  const questionStats = new Map<
-    string,
-    {
-      totalAttempts: number;
-      correctCount: number;
-      category: string;
-      difficulty: string;
+    // Group by questionId
+    const questionStats = new Map<
+      string,
+      {
+        totalAttempts: number;
+        correctCount: number;
+        category: string;
+        difficulty: string;
+      }
+    >();
+
+    for (const a of attempts) {
+      const key = a.questionId;
+      if (!questionStats.has(key)) {
+        questionStats.set(key, {
+          totalAttempts: 0,
+          correctCount: 0,
+          category: a.category,
+          difficulty: a.difficulty,
+        });
+      }
+      const stat = questionStats.get(key);
+      if (stat) {
+        stat.totalAttempts++;
+        if (a.correct) stat.correctCount++;
+      }
     }
-  >();
 
-  for (const a of attempts) {
-    const key = a.questionId;
-    if (!questionStats.has(key)) {
-      questionStats.set(key, {
-        totalAttempts: 0,
-        correctCount: 0,
-        category: a.category,
-        difficulty: a.difficulty,
-      });
-    }
-    const stat = questionStats.get(key);
-    if (stat) {
-      stat.totalAttempts++;
-      if (a.correct) stat.correctCount++;
-    }
-  }
-
-  // Build result with question text from quiz-data.ts
-  const questions = Array.from(questionStats.entries())
-    .map(([questionId, stat]) => {
-      const qData = questionMap.get(questionId);
-      return {
-        questionId,
-        questionText: qData?.questionText || questionId,
-        category: qData?.category || stat.category,
-        difficulty: qData?.difficulty || stat.difficulty,
-        totalAttempts: stat.totalAttempts,
-        correctCount: stat.correctCount,
-        correctRate: stat.totalAttempts > 0 ? Math.round((stat.correctCount / stat.totalAttempts) * 10000) / 100 : 0,
-      };
-    })
-    .sort((a, b) => a.correctRate - b.correctRate); // hardest first
+    // Build result with question text from quiz-data.ts
+    const questions = Array.from(questionStats.entries())
+      .map(([questionId, stat]) => {
+        const qData = questionMap.get(questionId);
+        return {
+          questionId,
+          questionText: qData?.questionText || questionId,
+          category: qData?.category || stat.category,
+          difficulty: qData?.difficulty || stat.difficulty,
+          totalAttempts: stat.totalAttempts,
+          correctCount: stat.correctCount,
+          correctRate: stat.totalAttempts > 0 ? Math.round((stat.correctCount / stat.totalAttempts) * 10000) / 100 : 0,
+        };
+      })
+      .sort((a, b) => a.correctRate - b.correctRate); // hardest first
 
     return NextResponse.json({ questions });
   } catch (error) {

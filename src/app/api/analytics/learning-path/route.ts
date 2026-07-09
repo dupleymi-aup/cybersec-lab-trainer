@@ -15,60 +15,65 @@ const LEARNING_PATH: Array<{ id: string; name: string }> = [
 ];
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const { searchParams } = new URL(request.url);
-  const days = parseDays(searchParams);
-  const groupId = searchParams.get('groupId') || undefined;
+    const { searchParams } = new URL(request.url);
+    const days = parseDays(searchParams);
+    const groupId = searchParams.get('groupId') || undefined;
 
-  const now = new Date();
-  const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    const now = new Date();
+    const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-  const studentWhere: Record<string, unknown> = { role: 'student' };
-  if (groupId) studentWhere.group = groupId;
+    const studentWhere: Record<string, unknown> = { role: 'student' };
+    if (groupId) studentWhere.group = groupId;
 
-  const students = await getPrisma().user.findMany({
-    where: studentWhere,
-    select: { id: true },
-  });
+    const students = await getPrisma().user.findMany({
+      where: studentWhere,
+      select: { id: true },
+    });
 
-  const studentIds = students.map((s) => s.id);
-  const totalStudents = students.length;
+    const studentIds = students.map((s) => s.id);
+    const totalStudents = students.length;
 
-  const progressRecords = await getPrisma().progress.findMany({
-    where: {
-      userId: { in: studentIds },
-      moduleId: { in: LEARNING_PATH.map((m) => m.id) },
-      completed: true,
-      updatedAt: { gte: since },
-    },
-    select: { userId: true, moduleId: true },
-  });
+    const progressRecords = await getPrisma().progress.findMany({
+      where: {
+        userId: { in: studentIds },
+        moduleId: { in: LEARNING_PATH.map((m) => m.id) },
+        completed: true,
+        updatedAt: { gte: since },
+      },
+      select: { userId: true, moduleId: true },
+    });
 
-  const completedByModule = new Map<string, Set<string>>();
-  for (const m of LEARNING_PATH) {
-    completedByModule.set(m.id, new Set());
-  }
-
-  for (const record of progressRecords) {
-    const moduleSet = completedByModule.get(record.moduleId);
-    if (moduleSet) {
-      moduleSet.add(record.userId);
+    const completedByModule = new Map<string, Set<string>>();
+    for (const m of LEARNING_PATH) {
+      completedByModule.set(m.id, new Set());
     }
+
+    for (const record of progressRecords) {
+      const moduleSet = completedByModule.get(record.moduleId);
+      if (moduleSet) {
+        moduleSet.add(record.userId);
+      }
+    }
+
+    const path = LEARNING_PATH.map((module) => {
+      const completedCount = completedByModule.get(module.id)?.size || 0;
+      const percentage = totalStudents > 0 ? Math.round((completedCount / totalStudents) * 10000) / 100 : 0;
+      return {
+        moduleId: module.id,
+        moduleName: module.name,
+        completedCount,
+        percentage,
+      };
+    });
+
+    return NextResponse.json({ path, totalStudents });
+  } catch (error) {
+    console.error('Learning path error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const path = LEARNING_PATH.map((module) => {
-    const completedCount = completedByModule.get(module.id)?.size || 0;
-    const percentage = totalStudents > 0 ? Math.round((completedCount / totalStudents) * 10000) / 100 : 0;
-    return {
-      moduleId: module.id,
-      moduleName: module.name,
-      completedCount,
-      percentage,
-    };
-  });
-
-  return NextResponse.json({ path, totalStudents });
 }

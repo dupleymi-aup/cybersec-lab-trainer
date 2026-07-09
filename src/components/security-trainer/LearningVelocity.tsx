@@ -18,6 +18,7 @@ import {
 import { Loader2, AlertTriangle, TrendingUp, Zap, Users, Clock } from 'lucide-react';
 import { getLearningVelocity, type LearningVelocityData } from '@/lib/auth-store';
 import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -27,6 +28,7 @@ export interface LearningVelocityProps {
 }
 
 export default function LearningVelocity({ groupId: propGroupId, days: propDays }: LearningVelocityProps = {}) {
+  const t = useTranslations('learningVelocity');
   const [internalDays, setInternalDays] = useState(90);
   const [internalGroupId] = useState('');
 
@@ -41,7 +43,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -50,7 +52,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -79,7 +81,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Zap size={20} className="text-amber-600" />
-          <h2 className="text-lg font-bold">Скорость обучения</h2>
+          <h2 className="text-lg font-bold">{t('title')}</h2>
         </div>
         {propDays === undefined && (
           <select
@@ -87,9 +89,9 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
             onChange={(e) => setInternalDays(Number(e.target.value))}
             className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
-            <option value={30}>30 дней</option>
-            <option value={90}>90 дней</option>
-            <option value={180}>180 дней</option>
+            <option value={30}>{t('days30')}</option>
+            <option value={90}>{t('days90')}</option>
+            <option value={180}>{t('days180')}</option>
           </select>
         )}
       </div>
@@ -100,14 +102,14 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
           <CardContent className="p-4 text-center">
             <Users size={18} className="mx-auto mb-1 text-indigo-600" />
             <p className="text-2xl font-bold text-indigo-600">{studentVelocities.length}</p>
-            <p className="text-muted-foreground text-xs">Студентов с данными</p>
+            <p className="text-muted-foreground text-xs">{t('studentsWithData')}</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Clock size={18} className="mx-auto mb-1 text-amber-600" />
             <p className="text-2xl font-bold text-amber-600">{avgDays}</p>
-            <p className="text-muted-foreground text-xs">Ср. дней/модуль</p>
+            <p className="text-muted-foreground text-xs">{t('avgDaysPerModule')}</p>
           </CardContent>
         </Card>
         <Card className="border-border">
@@ -117,14 +119,14 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
               {avgImprovement > 0 ? '+' : ''}
               {avgImprovement}
             </p>
-            <p className="text-muted-foreground text-xs">Ср. улучшение балла</p>
+            <p className="text-muted-foreground text-xs">{t('avgScoreImprovement')}</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Zap size={18} className="mx-auto mb-1 text-violet-600" />
             <p className="text-2xl font-bold text-violet-600">{avgVelocity}</p>
-            <p className="text-muted-foreground text-xs">Ср. индекс скорости</p>
+            <p className="text-muted-foreground text-xs">{t('avgVelocityIndex')}</p>
           </CardContent>
         </Card>
       </div>
@@ -132,18 +134,18 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
       {/* Scatter: velocity vs score improvement */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Скорость vs Улучшение балла</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('velocityVsImprovement')}</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis
                   dataKey="avgDaysPerModule"
-                  name="Дней/модуль"
+                  name={t('daysPerModule')}
                   type="number"
                   tick={{ fontSize: 10 }}
                   label={{
-                    value: 'Дней на модуль',
+                    value: t('daysPerModule'),
                     position: 'insideBottom',
                     offset: -5,
                     fontSize: 11,
@@ -151,11 +153,11 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                 />
                 <YAxis
                   dataKey="scoreImprovement"
-                  name="Улучшение"
+                  name={t('scoreImprovement')}
                   type="number"
                   tick={{ fontSize: 10 }}
                   label={{
-                    value: 'Улучшение балла',
+                    value: t('scoreImprovement'),
                     angle: -90,
                     position: 'insideLeft',
                     offset: 5,
@@ -165,7 +167,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                 <ZAxis dataKey="velocityScore" range={[30, 100]} />
                 <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value, name) => [`${value}`, name ?? '']} />
                 <Scatter
-                  name="Студенты"
+                  name={t('students')}
                   data={studentVelocities.map((v) => ({
                     ...v,
                     name: v.fullName,
@@ -181,7 +183,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
       {/* Velocity distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Распределение скорости</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('velocityDistribution')}</h3>
           <div className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={velocityDistribution}>
@@ -189,7 +191,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                 <XAxis dataKey="range" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Bar dataKey="count" name="Студентов" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" name={t('students')} fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -200,7 +202,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
       {velocityOverTime.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Динамика скорости по неделям</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('velocityOverTime')}</h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={velocityOverTime}>
@@ -211,14 +213,14 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                   <Line
                     type="monotone"
                     dataKey="avgDaysPerModule"
-                    name="Дней/модуль"
+                    name={t('daysPerModule')}
                     stroke="#f59e0b"
                     strokeWidth={2}
                   />
                   <Line
                     type="monotone"
                     dataKey="avgScoreImprovement"
-                    name="Улучшение"
+                    name={t('scoreImprovement')}
                     stroke="#10b981"
                     strokeWidth={2}
                   />
@@ -233,7 +235,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
       {avgVelocityByGroup.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Скорость по группам</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('velocityByGroup')}</h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={avgVelocityByGroup}>
@@ -241,8 +243,8 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                   <XAxis dataKey="group" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Bar dataKey="avgDaysPerModule" name="Дней/модуль" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="avgScoreImprovement" name="Улучшение" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="avgDaysPerModule" name={t('daysPerModule')} fill="#6366f1" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="avgScoreImprovement" name={t('scoreImprovement')} fill="#10b981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -253,7 +255,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
       {/* Top students ranking */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-3 text-sm font-semibold">Рейтинг скорости</h3>
+          <h3 className="mb-3 text-sm font-semibold">{t('velocityRating')}</h3>
           <div className="space-y-2">
             {studentVelocities.slice(0, 15).map((v, i) => (
               <div key={v.userId} className="flex items-center justify-between text-sm">
@@ -271,7 +273,7 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                   )}
                 </div>
                 <div className="flex items-center gap-4 text-xs">
-                  <span className="text-muted-foreground">{v.avgDaysPerModule} дн/мод</span>
+                  <span className="text-muted-foreground">{v.avgDaysPerModule} {t('daysModuleShort')}</span>
                   <span className={v.scoreImprovement > 0 ? 'text-emerald-600' : 'text-red-600'}>
                     {v.scoreImprovement > 0 ? '+' : ''}
                     {v.scoreImprovement}

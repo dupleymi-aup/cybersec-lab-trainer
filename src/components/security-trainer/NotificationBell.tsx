@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { useNotificationStore, type Notification as NotifType } from '@/lib/notification-store';
 import {
   Bell,
@@ -27,30 +28,31 @@ const ICON_MAP: Record<NotifType['type'], { icon: typeof Trophy; className: stri
   deadline: { icon: Clock, className: 'text-orange-500' },
 };
 
-function formatTime(ts: number): string {
+function formatTime(ts: number, t: (key: string) => string): string {
   const diff = Date.now() - ts;
   const m = Math.floor(diff / 60000);
   const h = Math.floor(diff / 3600000);
   const d = Math.floor(diff / 86400000);
-  if (m < 1) return 'Только что';
-  if (m < 60) return `${m} мин. назад`;
-  if (h < 24) return `${h} ч. назад`;
-  return `${d} дн. назад`;
+  if (m < 1) return t('justNow');
+  if (m < 60) return `${m} ${t('minutesAgo')}`;
+  if (h < 24) return `${h} ${t('hoursAgo')}`;
+  return `${d} ${t('daysAgo')}`;
 }
 
-const FILTERS = [
-  { key: 'all', label: 'Все' },
-  { key: 'unread', label: 'Новые' },
-  { key: 'announcement', label: 'Объявления' },
-] as const;
-
-type FilterKey = (typeof FILTERS)[number]['key'];
+type FilterKey = 'all' | 'unread' | 'announcement';
 
 export default function NotificationBell() {
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications, removeNotification } =
     useNotificationStore();
+  const t = useTranslations('notificationBell');
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<FilterKey>('all');
+
+  const FILTERS = useMemo(() => [
+    { key: 'all', label: t('filterAll') },
+    { key: 'unread', label: t('filterUnread') },
+    { key: 'announcement', label: t('filterAnnouncements') },
+  ], [t]);
 
   const filtered = useMemo(() => {
     if (filter === 'unread') return notifications.filter((n) => !n.read);
@@ -63,7 +65,7 @@ export default function NotificationBell() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="hover:bg-muted relative rounded-lg p-2 transition-colors"
-        aria-label="Уведомления"
+        aria-label={t('title')}
       >
         <Bell className="text-foreground h-5 w-5" />
         {unreadCount > 0 && (
@@ -86,13 +88,13 @@ export default function NotificationBell() {
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b p-4">
-                <h3 className="text-lg font-semibold">Уведомления</h3>
+                <h3 className="text-lg font-semibold">{t('title')}</h3>
                 <div className="flex gap-1">
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllAsRead}
                       className="hover:bg-muted rounded p-1.5 transition-colors"
-                      title="Отметить все"
+                      title={t('markAllRead')}
                     >
                       <Check className="h-4 w-4" />
                     </button>
@@ -101,7 +103,7 @@ export default function NotificationBell() {
                     <button
                       onClick={clearNotifications}
                       className="hover:bg-muted rounded p-1.5 text-red-500 transition-colors"
-                      title="Очистить"
+                      title={t('clear')}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -117,7 +119,7 @@ export default function NotificationBell() {
                 {FILTERS.map((f) => (
                   <button
                     key={f.key}
-                    onClick={() => setFilter(f.key)}
+                    onClick={() => setFilter(f.key as FilterKey)}
                     className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                       filter === f.key ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted'
                     }`}
@@ -137,10 +139,10 @@ export default function NotificationBell() {
                     <BellOff className="mb-2 h-12 w-12 opacity-50" />
                     <p className="text-sm">
                       {filter === 'unread'
-                        ? 'Нет непрочитанных'
+                        ? t('noUnread')
                         : filter === 'announcement'
-                          ? 'Нет объявлений'
-                          : 'Нет уведомлений'}
+                          ? t('noAnnouncements')
+                          : t('noNotifications')}
                     </p>
                   </div>
                 ) : (
@@ -174,7 +176,7 @@ export default function NotificationBell() {
                                 </button>
                               </div>
                               <p className="text-muted-foreground mt-0.5 text-xs">{notif.message}</p>
-                              <p className="text-muted-foreground/60 mt-1 text-xs">{formatTime(notif.timestamp)}</p>
+                              <p className="text-muted-foreground/60 mt-1 text-xs">{formatTime(notif.timestamp, t)}</p>
                             </div>
                           </div>
                         </div>
