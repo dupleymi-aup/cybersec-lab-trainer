@@ -83,7 +83,7 @@ export default function PWAHandler() {
       </Button>
       <Button size="sm" onClick={handleReload} className="bg-emerald-600 hover:bg-emerald-700">
         <RefreshCw size={14} className="mr-1" />
-        {t('updateRefresh') || tc('refresh')}
+        {tc('refresh')}
       </Button>
     </div>
   );
