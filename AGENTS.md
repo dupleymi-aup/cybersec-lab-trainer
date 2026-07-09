@@ -12,11 +12,11 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
-- **`39e16b4c`**: i18n localization of 7 components (OfflineBanner, PWAHandler, RoleGuard, ModuleNavigation, OTPModal, PasswordResetModal, CompletionCelebration) + advanced localization for 6 more (TeacherMessaging, ModuleManager, StudentAssignments, GroupManager, UserModal, UserActivityModal); added 13 new keys + teacher.messaging + moduleManager + admin.userModal + admin.groupManager sections to en/ru/zh.json; fixed unused import in AssignmentBuilder; `.mimocode/` in `.gitignore`; PWAHandler fixed to use `common.refresh`
-- **`84abb256`**: `find-port.js` async/await modernization; AGENTS.md updated
-- **`f52b7b36`**: `output: 'standalone'` in next.config.ts, start-server.js respects `PORT` env (Amvera)
-- **`bb4ca11e`**: lazy PrismaClient init to fix build without DATABASE_URL (87 files)
+- **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in all 7 root-level redirect pages → dynamic locale from `NEXT_LOCALE` cookie; fixed missing `catch` block and misindentation in `audit-logs/route.ts`; added try/catch to 7 analytics routes (predictive-risk, progress-dynamics, progress-trends, quiz-categories, quiz-difficulty, quiz-questions, quiz-retry)
+- **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
+- **`04260ced`**: AGENTS.md update, PWAHandler refresh key fix, @vitest/coverage-v8 install
+- **`39e16b4c`**: i18n localization of 7+6 components
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
 - **239/239 tests passing** (19 files) — all unit tests green
-- **Remote sync** — `origin` and `gitverse` at `39e16b4c`
+- **Remote sync** — both remotes at `e8f83058`
 - **Full verification passed**: lint ✓, typecheck ✓, tests ✓
