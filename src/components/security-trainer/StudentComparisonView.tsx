@@ -20,13 +20,7 @@ import { GitCompare, Loader2, AlertTriangle } from 'lucide-react';
 import { getStudentComparison, getAllUsers, type StudentComparisonData, type User as UserType } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
+import { useTranslations } from 'next-intl';
 
 const STUDENT_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444'];
 
@@ -38,12 +32,20 @@ interface Props {
 const isControlled = (props: Props): props is Props & { days: number } => props.days !== undefined;
 
 export default function StudentComparisonView(props: Props = {}) {
+  const t = useTranslations('studentComparison');
   const [data, setData] = useState<StudentComparisonData | null>(null);
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
+
+  const PERIOD_OPTIONS = [
+    { key: 7, label: t('period7d') },
+    { key: 30, label: t('period30d') },
+    { key: 90, label: t('period90d') },
+    { key: 180, label: t('period180d') },
+  ];
 
   const effectiveDays = isControlled(props) ? props.days : internalDays;
   const controlled = isControlled(props);
@@ -69,7 +71,7 @@ export default function StudentComparisonView(props: Props = {}) {
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadError'));
           setLoading(false);
         }
       });
@@ -94,7 +96,7 @@ export default function StudentComparisonView(props: Props = {}) {
   // Prepare radar chart data
   const radarData =
     data?.students.map((student) => ({
-      metric: studentNames[student.id] || 'Студент',
+      metric: studentNames[student.id] || t('student'),
       completion: Math.round((student.modulesCompleted / 12) * 100),
       quizScore: student.avgQuizScore,
       activity: Math.max(0, 100 - student.lastActiveDays * 3),
@@ -107,7 +109,7 @@ export default function StudentComparisonView(props: Props = {}) {
   const moduleComparison = Array.from(allModuleIds).map((moduleId) => {
     const entry: Record<string, string | number> = { module: moduleId };
     data?.students.forEach((student) => {
-      entry[studentNames[student.id] || 'Студент'] = student.moduleScores[moduleId] ?? 0;
+      entry[studentNames[student.id] || t('student')] = student.moduleScores[moduleId] ?? 0;
     });
     return entry;
   });
@@ -136,7 +138,7 @@ export default function StudentComparisonView(props: Props = {}) {
       {/* Student selector */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-3 text-sm font-semibold">Выберите студентов для сравнения (2-4)</h3>
+          <h3 className="mb-3 text-sm font-semibold">{t('selectStudents')}</h3>
           <div className="flex max-h-32 flex-wrap gap-2 overflow-y-auto">
             {allUsers.map((user) => {
               const isSelected = selectedStudents.includes(user.id);
@@ -155,7 +157,7 @@ export default function StudentComparisonView(props: Props = {}) {
             })}
           </div>
           {selectedStudents.length > 0 && (
-            <p className="text-muted-foreground mt-2 text-xs">Выбрано: {selectedStudents.length} студент(ов)</p>
+            <p className="text-muted-foreground mt-2 text-xs">{t('selectedCount', { count: selectedStudents.length })}</p>
           )}
         </CardContent>
       </Card>
@@ -163,7 +165,7 @@ export default function StudentComparisonView(props: Props = {}) {
       {loading && (
         <div className="flex items-center justify-center py-16">
           <Loader2 size={32} className="animate-spin text-indigo-500" />
-          <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+          <p className="text-muted-foreground ml-3 text-sm">{t('loading')}</p>
         </div>
       )}
 
@@ -179,7 +181,7 @@ export default function StudentComparisonView(props: Props = {}) {
           {/* Radar Chart */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Сравнение метрик</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('metricsComparison')}</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <RadarChart data={radarData}>
                   <PolarGrid />
@@ -188,7 +190,7 @@ export default function StudentComparisonView(props: Props = {}) {
                   {data.students.map((_, i) => (
                     <Radar
                       key={i}
-                      name={radarData[i]?.metric || `Студент ${i + 1}`}
+                      name={radarData[i]?.metric || t('studentN', { n: i + 1 })}
                       dataKey={['completion', 'quizScore', 'activity', 'engagement'][i % 4]}
                       stroke={STUDENT_COLORS[i]}
                       fill={STUDENT_COLORS[i]}
@@ -200,7 +202,7 @@ export default function StudentComparisonView(props: Props = {}) {
                 </RadarChart>
               </ResponsiveContainer>
               <p className="mt-2 text-center text-xs text-slate-400">
-                Примечание: RadarChart показывает разные метрики для каждого студента
+                {t('radarNote')}
               </p>
             </CardContent>
           </Card>
@@ -208,12 +210,12 @@ export default function StudentComparisonView(props: Props = {}) {
           {/* Side-by-side metrics */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Метрики студентов</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('studentMetrics')}</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-border border-b">
-                      <th className="p-2 text-left">Метрика</th>
+                      <th className="p-2 text-left">{t('metric')}</th>
                       {data.students.map((student, i) => (
                         <th key={student.id} className="p-2 text-center" style={{ color: STUDENT_COLORS[i] }}>
                           {studentNames[student.id]}
@@ -224,27 +226,27 @@ export default function StudentComparisonView(props: Props = {}) {
                   <tbody>
                     {[
                       {
-                        label: 'Модули завершено',
+                        label: t('modulesCompleted'),
                         getValue: (s: (typeof data.students)[0]) => s.modulesCompleted,
                       },
                       {
-                        label: 'Ср. балл квизов',
+                        label: t('avgQuizScore'),
                         getValue: (s: (typeof data.students)[0]) => `${s.avgQuizScore}%`,
                       },
                       {
-                        label: 'Попыток квизов',
+                        label: t('quizAttempts'),
                         getValue: (s: (typeof data.students)[0]) => s.totalQuizAttempts,
                       },
                       {
-                        label: 'Дней без активности',
+                        label: t('daysInactive'),
                         getValue: (s: (typeof data.students)[0]) => s.lastActiveDays,
                       },
                       {
-                        label: 'Вовлечённость',
+                        label: t('engagement'),
                         getValue: (s: (typeof data.students)[0]) => s.engagementScore,
                       },
                       {
-                        label: 'Риск',
+                        label: t('risk'),
                         getValue: (s: (typeof data.students)[0]) => s.riskScore,
                       },
                     ].map((row, i) => (
@@ -267,7 +269,7 @@ export default function StudentComparisonView(props: Props = {}) {
           {moduleComparison.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Сравнение по модулям</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('moduleComparison')}</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={moduleComparison}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -276,7 +278,7 @@ export default function StudentComparisonView(props: Props = {}) {
                     <Tooltip />
                     <Legend />
                     {data.students.map((student, i) => (
-                      <Bar key={student.id} dataKey={studentNames[student.id] || 'Студент'} fill={STUDENT_COLORS[i]} />
+                      <Bar key={student.id} dataKey={studentNames[student.id] || t('student')} fill={STUDENT_COLORS[i]} />
                     ))}
                   </BarChart>
                 </ResponsiveContainer>
@@ -289,7 +291,7 @@ export default function StudentComparisonView(props: Props = {}) {
       {!data && selectedStudents.length < 2 && !loading && (
         <div className="flex flex-col items-center justify-center py-16 text-slate-400">
           <GitCompare size={48} className="mb-4" />
-          <p className="text-sm">Выберите минимум 2 студентов для сравнения</p>
+          <p className="text-sm">{t('selectMinimum')}</p>
         </div>
       )}
     </div>

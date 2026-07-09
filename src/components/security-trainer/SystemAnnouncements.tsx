@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Megaphone, Plus, Trash2, X, AlertTriangle, Info, AlertCircle, Calendar, CheckCircle2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -92,6 +93,7 @@ async function deleteAnnouncement(id: string): Promise<{ success: boolean; error
 }
 
 export default function SystemAnnouncements({ currentUser: _currentUser }: { currentUser: string }) {
+  const t = useTranslations('systemAnnouncements');
   const formatDate = useDateFormatter();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,13 +118,13 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
 
   const handleCreate = async () => {
     if (!formTitle.trim() || !formContent.trim()) {
-      toast.error('Заполните заголовок и содержание');
+      toast.error(t('fillTitleAndContent'));
       return;
     }
 
     const result = await createAnnouncement(formTitle.trim(), formContent.trim(), formPriority, formExpiry);
     if (!result.success) {
-      toast.error(result.error || 'Ошибка создания');
+      toast.error(result.error || t('creationError'));
       return;
     }
 
@@ -131,24 +133,24 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
     setFormContent('');
     setFormPriority('normal');
     setFormExpiry('');
-    toast.success('Объявление создано');
+    toast.success(t('announcementCreated'));
     loadData();
   };
 
   const handleDelete = async (id: string) => {
     const result = await deleteAnnouncement(id);
     if (!result.success) {
-      toast.error(result.error || 'Ошибка удаления');
+      toast.error(result.error || t('deletionError'));
       return;
     }
-    toast.success('Объявление удалено');
+    toast.success(t('announcementDeleted'));
     loadData();
   };
 
   const handleClearExpired = async () => {
     // Reload from server — server already filters expired
     loadData();
-    toast.info('Список обновлён');
+    toast.info(t('listRefreshed'));
   };
 
   const sorted = [...announcements].sort((a, b) => {
@@ -166,18 +168,18 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
             <Megaphone size={16} className="text-red-600" />
           </div>
           <div>
-            <h2 className="text-sm font-bold">Системные объявления</h2>
-            <p className="text-muted-foreground text-xs">Создание и управление объявлениями для всех пользователей</p>
+            <h2 className="text-sm font-bold">{t('title')}</h2>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {announcements.length > 0 && (
             <Button variant="outline" size="sm" onClick={handleClearExpired}>
-              <X size={14} className="mr-1" /> Обновить
+              <X size={14} className="mr-1" /> {t('refresh')}
             </Button>
           )}
           <Button size="sm" onClick={() => setShowForm(!showForm)}>
-            <Plus size={14} className="mr-1" /> Создать
+            <Plus size={14} className="mr-1" /> {t('create')}
           </Button>
         </div>
       </div>
@@ -192,32 +194,32 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
           >
             <Card className="border-indigo-200 bg-indigo-50/50">
               <CardContent className="space-y-3 p-4">
-                <h3 className="text-sm font-semibold">Новое объявление</h3>
+                <h3 className="text-sm font-semibold">{t('newAnnouncement')}</h3>
                 <input
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
-                  placeholder="Заголовок объявления"
+                  placeholder={t('titlePlaceholder')}
                   className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm"
                   maxLength={100}
                 />
                 <textarea
                   value={formContent}
                   onChange={(e) => setFormContent(e.target.value)}
-                  placeholder="Содержание объявления..."
+                  placeholder={t('contentPlaceholder')}
                   className="border-border bg-card min-h-[80px] w-full resize-y rounded-md border px-3 py-2 text-sm"
                   maxLength={500}
                 />
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-xs">Приоритет:</span>
+                    <span className="text-muted-foreground text-xs">{t('priority')}:</span>
                     <select
                       value={formPriority}
                       onChange={(e) => setFormPriority(e.target.value as 'low' | 'normal' | 'high')}
                       className="border-border bg-card rounded-md border px-2 py-1.5 text-xs"
                     >
-                      <option value="low">Низкий</option>
-                      <option value="normal">Обычный</option>
-                      <option value="high">Высокий</option>
+                      <option value="low">{t('priorityLow')}</option>
+                      <option value="normal">{t('priorityNormal')}</option>
+                      <option value="high">{t('priorityHigh')}</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2">
@@ -228,15 +230,15 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
                       onChange={(e) => setFormExpiry(e.target.value)}
                       className="border-border bg-card rounded-md border px-2 py-1.5 text-xs"
                     />
-                    <span className="text-[10px] text-slate-400">(дата истечения)</span>
+                    <span className="text-[10px] text-slate-400">({t('expiryDate')})</span>
                   </div>
                 </div>
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>
-                    Отмена
+                    {t('cancel')}
                   </Button>
                   <Button size="sm" onClick={handleCreate}>
-                    <CheckCircle2 size={14} className="mr-1" /> Опубликовать
+                    <CheckCircle2 size={14} className="mr-1" /> {t('publish')}
                   </Button>
                 </div>
               </CardContent>
@@ -246,14 +248,14 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
       </AnimatePresence>
 
       {/* Loading state */}
-      {loading && <div className="text-muted-foreground py-8 text-center text-sm">Загрузка...</div>}
+      {loading && <div className="text-muted-foreground py-8 text-center text-sm">{t('loading')}</div>}
 
       {/* Announcements list */}
       {!loading && sorted.length === 0 ? (
         <div className="py-12 text-center">
           <Megaphone size={40} className="mx-auto mb-3 text-slate-300" />
-          <p className="text-muted-foreground text-sm">Нет активных объявлений</p>
-          <p className="mt-1 text-xs text-slate-400">Создайте первое объявление для всех пользователей</p>
+          <p className="text-muted-foreground text-sm">{t('noAnnouncements')}</p>
+          <p className="mt-1 text-xs text-slate-400">{t('createFirstAnnouncement')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -280,19 +282,19 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="text-sm font-semibold">{ann.title}</h3>
                           <Badge className={`text-[10px] ${pConfig.badge}`}>
-                            {ann.priority === 'high' ? 'Важно' : ann.priority === 'normal' ? 'Обычное' : 'Инфо'}
+                            {ann.priority === 'high' ? t('priorityHighBadge') : ann.priority === 'normal' ? t('priorityNormalBadge') : t('priorityLowBadge')}
                           </Badge>
                           {isExpiring && (
                             <Badge variant="outline" className="border-amber-200 text-[10px] text-amber-600">
-                              Скоро истекает
+                              {t('expiringSoon')}
                             </Badge>
                           )}
                         </div>
                         <p className="text-muted-foreground mt-1 text-xs whitespace-pre-wrap">{ann.content}</p>
                         <div className="mt-2 flex items-center gap-3 text-[10px] text-slate-400">
                           <span>{formatDate(ann.createdAt)}</span>
-                          <span>Автор: {ann.author}</span>
-                          {ann.expiresAt && <span>Действ. до: {formatDate(ann.expiresAt)}</span>}
+                          <span>{t('author')}: {ann.author}</span>
+                          {ann.expiresAt && <span>{t('validUntil')}: {formatDate(ann.expiresAt)}</span>}
                         </div>
                       </div>
                     </div>

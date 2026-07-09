@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import {
   XAxis,
   YAxis,
@@ -95,6 +96,7 @@ export default function StudentProgressView({
   const [trends, setTrends] = useState<TrendPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const t = useTranslations('studentProgress');
 
   const selectedStudent = useMemo(
     () => studentList.find((s) => s.id === selectedId) || null,
@@ -179,7 +181,7 @@ export default function StudentProgressView({
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={student.avatar}
-                            alt={`Аватар: ${student.fullName}`}
+                            alt={`${t('avatar')}: ${student.fullName}`}
                             className="h-full w-full object-cover"
                           />
                         ) : (
@@ -198,15 +200,15 @@ export default function StudentProgressView({
                     </div>
                     <div className="flex items-center gap-3 text-right">
                       <div>
-                        <p className="text-[10px] text-slate-400">Модули</p>
+                        <p className="text-[10px] text-slate-400">{t('modules')}</p>
                         <p className="text-xs font-bold">{moduleCount}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-slate-400">Квизы</p>
+                        <p className="text-[10px] text-slate-400">{t('quizzes')}</p>
                         <p className="text-xs font-bold">{quizCount}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-slate-400">Ср. балл</p>
+                        <p className="text-[10px] text-slate-400">{t('avgScore')}</p>
                         <p className="text-xs font-bold">{avgScore}%</p>
                       </div>
                       <Zap size={14} className="text-slate-300" />
@@ -220,7 +222,7 @@ export default function StudentProgressView({
         {studentList.length === 0 && (
           <div className="py-12 text-center text-slate-400">
             <Users size={40} className="mx-auto mb-3 opacity-50" />
-            <p className="text-sm">Студенты не найдены</p>
+            <p className="text-sm">{t('noStudents')}</p>
           </div>
         )}
       </div>
@@ -247,7 +249,7 @@ export default function StudentProgressView({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={selectedStudent.avatar}
-                alt={`Аватар: ${selectedStudent.fullName}`}
+                alt={`${t('avatar')}: ${selectedStudent.fullName}`}
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -269,7 +271,7 @@ export default function StudentProgressView({
                   : 'bg-emerald-100 text-emerald-700'
             }
           >
-            Риск: {data.kpis.riskScore}%
+            {t('risk')}: {data.kpis.riskScore}%
           </Badge>
         )}
       </div>
@@ -286,7 +288,7 @@ export default function StudentProgressView({
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <BookOpen size={14} className="text-blue-500" />
-                  <span className="text-muted-foreground text-xs">Модули</span>
+                  <span className="text-muted-foreground text-xs">{t('modules')}</span>
                 </div>
                 <p className="mt-1 text-xl font-bold">
                   {data.kpis.modulesCompleted}/{data.kpis.totalModules}
@@ -305,20 +307,20 @@ export default function StudentProgressView({
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <Brain size={14} className="text-emerald-500" />
-                  <span className="text-muted-foreground text-xs">Ср. балл</span>
+                  <span className="text-muted-foreground text-xs">{t('avgScore')}</span>
                 </div>
                 <p className="mt-1 text-xl font-bold">{data.kpis.avgQuizScore}%</p>
-                <p className="mt-1 text-xs text-slate-400">{data.kpis.totalQuizAttempts} попыток</p>
+                <p className="mt-1 text-xs text-slate-400">{data.kpis.totalQuizAttempts} {t('attempts')}</p>
               </CardContent>
             </Card>
             <Card className="border-border">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2">
                   <Activity size={14} className="text-violet-500" />
-                  <span className="text-muted-foreground text-xs">Вовлечённость</span>
+                  <span className="text-muted-foreground text-xs">{t('engagement')}</span>
                 </div>
                 <p className="mt-1 text-xl font-bold">{data.kpis.engagementScore}%</p>
-                <p className="mt-1 text-xs text-slate-400">Не активен {data.kpis.lastActiveDays} дн.</p>
+                <p className="mt-1 text-xs text-slate-400">{t('inactiveFor')} {data.kpis.lastActiveDays} {t('days')}</p>
               </CardContent>
             </Card>
             <Card className="border-border">
@@ -334,11 +336,11 @@ export default function StudentProgressView({
                           : 'text-emerald-500'
                     }
                   />
-                  <span className="text-muted-foreground text-xs">Риск</span>
+                  <span className="text-muted-foreground text-xs">{t('riskLabel')}</span>
                 </div>
                 <p className="mt-1 text-xl font-bold">{data.kpis.riskScore}%</p>
                 <p className="mt-1 text-xs text-slate-400">
-                  {data.kpis.riskScore > 60 ? 'Требует внимания' : data.kpis.riskScore > 30 ? 'Средний' : 'Низкий'}
+                  {data.kpis.riskScore > 60 ? t('needsAttention') : data.kpis.riskScore > 30 ? t('medium') : t('low')}
                 </p>
               </CardContent>
             </Card>
@@ -348,16 +350,16 @@ export default function StudentProgressView({
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview" className="text-xs">
-                Обзор
+                {t('tabOverview')}
               </TabsTrigger>
               <TabsTrigger value="modules" className="text-xs">
-                Модули
+                {t('tabModules')}
               </TabsTrigger>
               <TabsTrigger value="trends" className="text-xs">
-                Тренды
+                {t('tabTrends')}
               </TabsTrigger>
               <TabsTrigger value="activity" className="text-xs">
-                Активность
+                {t('tabActivity')}
               </TabsTrigger>
             </TabsList>
 
@@ -367,7 +369,7 @@ export default function StudentProgressView({
                 {/* Radar Chart */}
                 <Card className="border-border">
                   <CardContent className="p-3">
-                    <h4 className="mb-2 text-xs font-semibold">Компетенции</h4>
+                    <h4 className="mb-2 text-xs font-semibold">{t('competencies')}</h4>
                     <div className="h-56">
                       <ResponsiveContainer width="100%" height="100%">
                         <RadarChart data={radarData}>
@@ -382,7 +384,7 @@ export default function StudentProgressView({
                             fillOpacity={0.2}
                           />
                           <Radar
-                            name="Среднее по группе"
+                            name={t('groupAvg')}
                             dataKey="group"
                             stroke="#94a3b8"
                             fill="#94a3b8"
@@ -398,7 +400,7 @@ export default function StudentProgressView({
                 {/* Category Breakdown */}
                 <Card className="border-border">
                   <CardContent className="p-3">
-                    <h4 className="mb-2 text-xs font-semibold">Результаты по категориям</h4>
+                    <h4 className="mb-2 text-xs font-semibold">{t('categoryResults')}</h4>
                     <div className="space-y-2">
                       {radarData.map((cat) => (
                         <div key={cat.category} className="flex items-center gap-2">
@@ -425,7 +427,7 @@ export default function StudentProgressView({
               {data.activityTimeline.length > 0 && (
                 <Card className="border-border">
                   <CardContent className="p-3">
-                    <h4 className="mb-2 text-xs font-semibold">Последние действия</h4>
+                    <h4 className="mb-2 text-xs font-semibold">{t('recentActivity')}</h4>
                     <div className="space-y-1.5">
                       {data.activityTimeline.slice(0, 5).map((event, i) => (
                         <div key={i} className="flex items-center gap-2 text-xs">
@@ -452,7 +454,7 @@ export default function StudentProgressView({
             <TabsContent value="modules" className="mt-3">
               <Card className="border-border">
                 <CardContent className="p-3">
-                  <h4 className="mb-3 text-xs font-semibold">Прогресс по модулям</h4>
+                  <h4 className="mb-3 text-xs font-semibold">{t('moduleProgress')}</h4>
                   <div className="space-y-1.5">
                     {data.moduleProgress.map((mod) => {
                       const modInfo = modules.find((m) => m.id === mod.moduleId);
@@ -468,7 +470,7 @@ export default function StudentProgressView({
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-xs font-medium">{modInfo?.title || mod.moduleId}</p>
                             <p className="text-[10px] text-slate-400">
-                              {mod.completed ? `Оценка: ${mod.score ?? '—'}%` : 'Не пройден'}
+                              {mod.completed ? `${t('score')}: ${mod.score ?? '—'}%` : t('notCompleted')}
                             </p>
                           </div>
                           <div className="text-right">
@@ -486,7 +488,7 @@ export default function StudentProgressView({
             <TabsContent value="trends" className="mt-3">
               <Card className="border-border">
                 <CardContent className="p-3">
-                  <h4 className="mb-3 text-xs font-semibold">Динамика успеваемости</h4>
+                  <h4 className="mb-3 text-xs font-semibold">{t('performanceTrends')}</h4>
                   {trends.length > 0 ? (
                     <div className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
@@ -501,7 +503,7 @@ export default function StudentProgressView({
                             yAxisId="left"
                             type="monotone"
                             dataKey="avgQuizScore"
-                            name="Ср. балл"
+                            name={t('avgScore')}
                             stroke="#8b5cf6"
                             strokeWidth={2}
                             dot={false}
@@ -510,7 +512,7 @@ export default function StudentProgressView({
                             yAxisId="right"
                             type="monotone"
                             dataKey="modulesCompleted"
-                            name="Модули"
+                            name={t('modules')}
                             stroke="#10b981"
                             strokeWidth={2}
                             dot={false}
@@ -521,7 +523,7 @@ export default function StudentProgressView({
                   ) : (
                     <div className="flex h-48 items-center justify-center text-slate-400">
                       <TrendingUp size={24} className="mr-2 opacity-50" />
-                      <span className="text-sm">Недостаточно данных для тренда</span>
+                      <span className="text-sm">{t('insufficientData')}</span>
                     </div>
                   )}
                 </CardContent>
@@ -532,7 +534,7 @@ export default function StudentProgressView({
             <TabsContent value="activity" className="mt-3">
               <Card className="border-border">
                 <CardContent className="p-3">
-                  <h4 className="mb-3 text-xs font-semibold">Хронология активности</h4>
+                  <h4 className="mb-3 text-xs font-semibold">{t('activityTimeline')}</h4>
                   {data.activityTimeline.length > 0 ? (
                     <div className="max-h-96 space-y-1.5 overflow-y-auto">
                       {data.activityTimeline.map((event, i) => (
@@ -561,7 +563,7 @@ export default function StudentProgressView({
                   ) : (
                     <div className="flex h-48 items-center justify-center text-slate-400">
                       <Clock size={24} className="mr-2 opacity-50" />
-                      <span className="text-sm">Активность не найдена</span>
+                      <span className="text-sm">{t('noActivity')}</span>
                     </div>
                   )}
                 </CardContent>
@@ -572,7 +574,7 @@ export default function StudentProgressView({
       ) : (
         <div className="flex items-center justify-center py-16 text-slate-400">
           <AlertTriangle size={24} className="mr-2" />
-          <span className="text-sm">Не удалось загрузить данные</span>
+          <span className="text-sm">{t('loadFailed')}</span>
         </div>
       )}
     </div>

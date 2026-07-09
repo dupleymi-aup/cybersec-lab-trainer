@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -39,16 +40,17 @@ const rarityBgColors: Record<string, string> = {
   common: 'bg-green-100 text-green-700',
 };
 
-const rarityLabels: Record<string, string> = {
-  epic: 'Эпическое',
-  rare: 'Редкое',
-  uncommon: 'Необычное',
-  common: 'Обычное',
-};
-
 export default function AchievementAnalytics({ groupId, students }: AchievementAnalyticsProps) {
+  const t = useTranslations('achievementAnalytics');
   const [data, setData] = useState<AchievementStat[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const rarityLabels: Record<string, string> = useMemo(() => ({
+    epic: t('rarityEpic'),
+    rare: t('rarityRare'),
+    uncommon: t('rarityUncommon'),
+    common: t('rarityCommon'),
+  }), [t]);
 
   useEffect(() => {
     setLoading(true);
@@ -103,7 +105,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
     return (
       <div className="flex flex-col items-center justify-center py-16 text-slate-400">
         <Loader2 size={32} className="mb-3 animate-spin" />
-        <p className="text-sm">Загрузка аналитики достижений...</p>
+        <p className="text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -112,7 +114,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
     return (
       <div className="py-12 text-center text-slate-400">
         <Award size={40} className="mx-auto mb-3 opacity-50" />
-        <p className="text-sm">Нет данных о достижениях</p>
+        <p className="text-sm">{t('noData')}</p>
       </div>
     );
   }
@@ -124,7 +126,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
         {/* Achievement unlock rates - horizontal bar chart */}
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Частота разблокировки достижений</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('unlockRates')}</h3>
             <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart layout="vertical" data={barData} margin={{ left: 80 }}>
@@ -137,7 +139,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
                         unlocked?: number;
                         total?: number;
                       };
-                      return [`${value}%`, `${p.unlocked ?? 0} из ${p.total ?? 0}`];
+                      return [`${value}%`, `${p.unlocked ?? 0} / ${p.total ?? 0}`];
                     }}
                   />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
@@ -154,7 +156,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
         {/* Rarity distribution pie chart */}
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Распределение по редкости</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('rarityDistribution')}</h3>
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
                 <PieChart>
@@ -173,11 +175,11 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: unknown) => `${value} достижений`} />
+                  <Tooltip formatter={(value: unknown) => `${value} ${t('achievements')}`} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="py-8 text-center text-xs text-slate-400">Нет данных</p>
+              <p className="py-8 text-center text-xs text-slate-400">{t('noData')}</p>
             )}
           </CardContent>
         </Card>
@@ -185,7 +187,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
 
       {/* Achievement cards grid */}
       <div>
-        <h3 className="mb-4 text-sm font-semibold">Все достижения</h3>
+        <h3 className="mb-4 text-sm font-semibold">{t('allAchievements')}</h3>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {data.map((item, i) => {
             const achievementInfo = achievementMap.get(item.id);
@@ -221,7 +223,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
                         <p className="text-muted-foreground mb-2 line-clamp-2 text-xs">{description}</p>
                         <div className="text-muted-foreground mb-1.5 flex items-center gap-2 text-xs">
                           <span>
-                            {item.unlockedCount} из {totalStudents} студентов разблокировали
+                            {item.unlockedCount} / {totalStudents} {t('unlockedBy')}
                           </span>
                         </div>
                         <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
