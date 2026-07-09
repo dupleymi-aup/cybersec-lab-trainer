@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { AlertTriangle, Loader2, Lightbulb, Target, TrendingUp } from 'lucide-react';
@@ -8,33 +9,6 @@ import { getModulePerformance, getQuizCategoryAnalytics } from '@/lib/auth-store
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import CustomDateRangePicker from './CustomDateRangePicker';
-
-const SEVERITY_CONFIG = {
-  critical: {
-    color: '#ef4444',
-    bg: 'bg-red-50',
-    text: 'text-red-700',
-    label: 'Критично',
-  },
-  high: {
-    color: '#f97316',
-    bg: 'bg-orange-50',
-    text: 'text-orange-700',
-    label: 'Высокий',
-  },
-  medium: {
-    color: '#f59e0b',
-    bg: 'bg-amber-50',
-    text: 'text-amber-700',
-    label: 'Средний',
-  },
-  low: {
-    color: '#84cc16',
-    bg: 'bg-lime-50',
-    text: 'text-lime-700',
-    label: 'Низкий',
-  },
-};
 
 interface WeaknessItem {
   topic: string;
@@ -46,6 +20,35 @@ interface WeaknessItem {
 }
 
 export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
+  const t = useTranslations('weaknessAnalyzer');
+
+  const SEVERITY_CONFIG = useMemo(() => ({
+    critical: {
+      color: '#ef4444',
+      bg: 'bg-red-50',
+      text: 'text-red-700',
+      label: t('severityCritical'),
+    },
+    high: {
+      color: '#f97316',
+      bg: 'bg-orange-50',
+      text: 'text-orange-700',
+      label: t('severityHigh'),
+    },
+    medium: {
+      color: '#f59e0b',
+      bg: 'bg-amber-50',
+      text: 'text-amber-700',
+      label: t('severityMedium'),
+    },
+    low: {
+      color: '#84cc16',
+      bg: 'bg-lime-50',
+      text: 'text-lime-700',
+      label: t('severityLow'),
+    },
+  }), [t]);
+
   const [days, setDays] = useState(90);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,16 +78,16 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
 
             const recommendations: string[] = [];
             if (mod.completionRate < 40) {
-              recommendations.push(`Повысить видимость модуля "${mod.moduleName}" в учебной программе`);
+              recommendations.push(t('recModuleIncreaseVisibility', { name: mod.moduleName }));
             }
             if (mod.avgScore < 50) {
-              recommendations.push(`Добавить дополнительные материалы и практику по "${mod.moduleName}"`);
+              recommendations.push(t('recModuleAddMaterials', { name: mod.moduleName }));
             }
             if (mod.difficultyIndex > 0.7) {
-              recommendations.push(`Упростить или разбить на подуровни модуль "${mod.moduleName}"`);
+              recommendations.push(t('recModuleSimplify', { name: mod.moduleName }));
             }
             if (recommendations.length === 0) {
-              recommendations.push(`Увеличить количество практических заданий в "${mod.moduleName}"`);
+              recommendations.push(t('recModuleMorePractice', { name: mod.moduleName }));
             }
 
             items.push({
@@ -92,7 +95,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
               score: Math.round(avgMetric),
               severity,
               type: 'module',
-              details: `${mod.completedCount}/${mod.totalStudents} завершили, средний балл ${mod.avgScore}%`,
+              details: t('moduleDetails', { completed: mod.completedCount, total: mod.totalStudents, score: mod.avgScore }),
               recommendations,
             });
           }
@@ -108,13 +111,13 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
 
             const recommendations: string[] = [];
             if (cat.avgScore < 40) {
-              recommendations.push(`Провести дополнительное занятие по "${cat.categoryName}"`);
+              recommendations.push(t('recQuizExtraSession', { name: cat.categoryName }));
             }
             if (cat.questionStats.some((q) => q.correctRate < 0.3)) {
-              recommendations.push(`Пересмотреть сложные вопросы в категории "${cat.categoryName}"`);
+              recommendations.push(t('recQuizReviewQuestions', { name: cat.categoryName }));
             }
             if (recommendations.length === 0) {
-              recommendations.push(`Добавить больше практики по "${cat.categoryName}"`);
+              recommendations.push(t('recQuizMorePractice', { name: cat.categoryName }));
             }
 
             items.push({
@@ -122,7 +125,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
               score: Math.round(cat.avgScore),
               severity,
               type: 'quiz',
-              details: `${cat.uniqueStudents} студентов, ${cat.totalAttempts} попыток`,
+              details: t('quizDetails', { students: cat.uniqueStudents, attempts: cat.totalAttempts }),
               recommendations,
             });
           }
@@ -134,7 +137,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
@@ -142,7 +145,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
     return () => {
       cancelled = true;
     };
-  }, [days, groupId]);
+  }, [days, groupId, t]);
 
   const severityCounts = useMemo(() => {
     const counts: Record<string, number> = {
@@ -175,7 +178,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Анализ слабых мест...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loadingMessage')}</p>
       </div>
     );
   }
@@ -197,8 +200,8 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
             <Target size={20} className="text-amber-600" />
           </div>
           <div>
-            <h2 className="text-lg font-bold">Анализ слабых мест</h2>
-            <p className="text-muted-foreground text-xs">Выявление проблемных тем и рекомендации по улучшению</p>
+            <h2 className="text-lg font-bold">{t('title')}</h2>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
         <CustomDateRangePicker days={days} onChange={setDays} />
@@ -219,7 +222,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                 }`}
               >
                 <p className="text-xl font-bold">{count}</p>
-                <p className="mt-0.5 text-xs">Все проблемы</p>
+                <p className="mt-0.5 text-xs">{t('allProblems')}</p>
               </button>
             );
           }
@@ -245,7 +248,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
           <CardContent className="p-5">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
               <TrendingUp size={16} className="text-muted-foreground" />
-              Топ проблемных тем
+              {t('topProblemTopics')}
             </h3>
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
@@ -253,7 +256,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} />
                   <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={90} />
-                  <Tooltip formatter={(value) => [`${value}%`, 'Средний балл']} />
+                  <Tooltip formatter={(value) => [`${value}%`, t('avgScoreLabel')]} />
                   <Bar dataKey="score" radius={[0, 4, 4, 0]}>
                     {chartData.map((entry, i) => (
                       <Cell key={i} fill={SEVERITY_CONFIG[entry.severity].color} />
@@ -262,7 +265,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="py-12 text-center text-sm text-slate-400">Проблемные темы не обнаружены</p>
+              <p className="py-12 text-center text-sm text-slate-400">{t('noProblemTopics')}</p>
             )}
           </CardContent>
         </Card>
@@ -272,7 +275,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
           <CardContent className="p-5">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
               <Lightbulb size={16} className="text-amber-500" />
-              Рекомендации
+              {t('recommendations')}
             </h3>
             {filteredWeaknesses.length > 0 ? (
               <div className="max-h-[300px] space-y-3 overflow-y-auto">
@@ -310,7 +313,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                 ))}
               </div>
             ) : (
-              <p className="py-12 text-center text-sm text-slate-400">Проблем не найдено</p>
+              <p className="py-12 text-center text-sm text-slate-400">{t('noProblems')}</p>
             )}
           </CardContent>
         </Card>
@@ -324,11 +327,11 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-secondary border-border border-b">
-                    <th className="p-3 text-left text-xs font-semibold">Тема</th>
-                    <th className="p-3 text-left text-xs font-semibold">Тип</th>
-                    <th className="p-3 text-center text-xs font-semibold">Балл</th>
-                    <th className="p-3 text-center text-xs font-semibold">Статус</th>
-                    <th className="p-3 text-left text-xs font-semibold">Детали</th>
+                    <th className="p-3 text-left text-xs font-semibold">{t('topic')}</th>
+                    <th className="p-3 text-left text-xs font-semibold">{t('type')}</th>
+                    <th className="p-3 text-center text-xs font-semibold">{t('score')}</th>
+                    <th className="p-3 text-center text-xs font-semibold">{t('status')}</th>
+                    <th className="p-3 text-left text-xs font-semibold">{t('details')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -343,7 +346,7 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
                       <td className="p-3 text-xs font-medium">{w.topic}</td>
                       <td className="p-3">
                         <Badge variant="outline" className="text-[10px]">
-                          {w.type === 'module' ? 'Модуль' : 'Квиз'}
+                          {w.type === 'module' ? t('module') : t('quiz')}
                         </Badge>
                       </td>
                       <td className="p-3 text-center">

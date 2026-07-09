@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Loader2, AlertTriangle, Users, TrendingUp } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { getAllUsers, type User } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
 import { logger } from '@/lib/logger';
-
-const DAY_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
 const ACTIVITY_COLORS = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
 
@@ -19,6 +18,8 @@ function getIntensityColor(count: number, maxCount: number): string {
 }
 
 export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: { groupId?: string } = {}) {
+  const t = useTranslations('studentHeatmap');
+  const locale = useLocale();
   const [students, setStudents] = useState<Array<{ id: string; fullName: string; group: string }>>([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [activityData, setActivityData] = useState<Record<string, number>>({});
@@ -117,6 +118,8 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
     setLoading(false);
   }, [selectedStudentId]);
 
+  const DAY_LABELS = [t('dayMon'), t('dayTue'), t('dayWed'), t('dayThu'), t('dayFri'), t('daySat'), t('daySun')];
+
   // Generate 90-day grid (13 weeks x 7 days)
   const weeks: Array<Array<{ date: string; dayOfWeek: number; count: number }>> = [];
   const now = new Date();
@@ -150,10 +153,10 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
           onChange={(e) => setSelectedStudentId(e.target.value)}
           className="border-border bg-card min-w-[250px] rounded-md border px-3 py-2 text-sm"
         >
-          <option value="">Выберите студента...</option>
+          <option value="">{t('selectStudent')}</option>
           {students.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.fullName} ({s.group || 'без группы'})
+              {s.fullName} ({s.group || t('noGroup')})
             </option>
           ))}
         </select>
@@ -162,7 +165,7 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
       {loading && (
         <div className="flex items-center justify-center py-16">
           <Loader2 size={32} className="animate-spin text-indigo-500" />
-          <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+          <p className="text-muted-foreground ml-3 text-sm">{t('loadingData')}</p>
         </div>
       )}
 
@@ -180,28 +183,28 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
             <KPICard
               icon={<Calendar size={18} />}
               value={totalActivity}
-              label="Всего действий"
+              label={t('totalActions')}
               iconBg="bg-indigo-100"
               iconColor="text-indigo-600"
             />
             <KPICard
               icon={<TrendingUp size={18} />}
-              value={`${streak}д`}
-              label="Текущая серия"
+              value={`${streak}${t('streakUnit')}`}
+              label={t('currentStreak')}
               iconBg="bg-emerald-100"
               iconColor="text-emerald-600"
             />
             <KPICard
               icon={<Users size={18} />}
               value={Object.values(activityData).filter((v) => v > 0).length}
-              label="Активных дней"
+              label={t('activeDays')}
               iconBg="bg-sky-100"
               iconColor="text-sky-600"
             />
             <KPICard
               icon={<Calendar size={18} />}
               value={maxCount}
-              label="Макс. за день"
+              label={t('maxPerDay')}
               iconBg="bg-amber-100"
               iconColor="text-amber-600"
             />
@@ -210,7 +213,7 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
           {/* Heatmap */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Активность за 90 дней</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('activity90Days')}</h3>
 
               {/* Day labels */}
               <div className="mb-1 ml-8 flex gap-1">
@@ -243,7 +246,7 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
                           style={{
                             backgroundColor: getIntensityColor(day.count, maxCount),
                           }}
-                          title={`${day.date}: ${day.count} действий`}
+                          title={t('tooltip', { date: day.date, count: day.count })}
                         />
                       ))}
                     </div>
@@ -253,11 +256,11 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
 
               {/* Legend */}
               <div className="text-muted-foreground mt-4 flex items-center justify-end gap-1 text-xs">
-                <span>Меньше</span>
+                <span>{t('less')}</span>
                 {ACTIVITY_COLORS.map((color, i) => (
                   <div key={i} className="h-3 w-3 rounded-sm" style={{ backgroundColor: color }} />
                 ))}
-                <span>Больше</span>
+                <span>{t('more')}</span>
               </div>
             </CardContent>
           </Card>
@@ -265,13 +268,13 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
           {/* Recent Activity Detail */}
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Детали активности (последние 7 дней)</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('activityDetails')}</h3>
               <div className="grid grid-cols-7 gap-2">
                 {Array.from({ length: 7 }).map((_, i) => {
                   const date = new Date(now.getTime() - (6 - i) * 24 * 60 * 60 * 1000);
                   const dateKey = date.toISOString().split('T')[0];
                   const count = activityData[dateKey] || 0;
-                  const dayName = date.toLocaleDateString('ru-RU', {
+                  const dayName = date.toLocaleDateString(locale, {
                     weekday: 'short',
                   });
                   const dayNum = date.getDate();
@@ -297,7 +300,7 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
       {!selectedStudentId && !loading && (
         <div className="flex items-center justify-center py-16">
           <Calendar size={48} className="text-muted-foreground mb-3" />
-          <p className="text-muted-foreground ml-3 text-sm">Выберите студента для просмотра календаря активности</p>
+          <p className="text-muted-foreground ml-3 text-sm">{t('emptyState')}</p>
         </div>
       )}
     </div>

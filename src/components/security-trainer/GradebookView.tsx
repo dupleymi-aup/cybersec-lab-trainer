@@ -8,14 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useTranslations } from 'next-intl';
 import StudentDrillDown from './StudentDrillDown';
-
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
 
 function getScoreColor(score: number | null): string {
   if (score === null) return 'bg-muted text-slate-400';
@@ -28,6 +22,13 @@ export default function GradebookView({
   groupId: controlledGroupId,
   days: controlledDays,
 }: { groupId?: string; days?: number } = {}) {
+  const t = useTranslations('gradebook');
+  const PERIOD_OPTIONS = [
+    { key: 7, label: t('period7d') },
+    { key: 30, label: t('period30d') },
+    { key: 90, label: t('period90d') },
+    { key: 180, label: t('period180d') },
+  ];
   const [internalGroupId, setInternalGroupId] = useState('');
   const [internalDays, setInternalDays] = useState(30);
   const groupId = controlledGroupId !== undefined ? controlledGroupId : internalGroupId;
@@ -56,7 +57,7 @@ export default function GradebookView({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
@@ -77,7 +78,7 @@ export default function GradebookView({
 
   const handleExportCSV = () => {
     if (!data) return;
-    const headers = ['Студент', 'Email', 'Группа', 'Ср. балл', ...data.modules.map((m) => m.moduleId)];
+    const headers = [t('csvStudent'), 'Email', t('csvGroup'), t('csvAvgScore'), ...data.modules.map((m) => m.moduleId)];
     const rows = data.students.map((s) => [
       s.fullName,
       s.email,
@@ -99,7 +100,7 @@ export default function GradebookView({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -108,7 +109,7 @@ export default function GradebookView({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -143,7 +144,7 @@ export default function GradebookView({
               onChange={(e) => setInternalGroupId(e.target.value)}
               className="border-border bg-card rounded-md border px-3 py-2 text-sm"
             >
-              <option value="">Все группы</option>
+              <option value="">{t('allGroups')}</option>
               {groups.map((g) => (
                 <option key={g} value={g}>
                   {g}
@@ -157,14 +158,14 @@ export default function GradebookView({
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Поиск студента..."
+            placeholder={t('searchStudent')}
             className="pl-3"
           />
         </div>
 
         <Button onClick={handleExportCSV} variant="outline" size="sm">
           <Download size={16} className="mr-2" />
-          Экспорт CSV
+          {t('exportCsv')}
         </Button>
       </div>
 
@@ -175,21 +176,21 @@ export default function GradebookView({
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-secondary border-border border-b">
-                  <th className="bg-secondary sticky left-0 z-10 min-w-[200px] p-3 text-left font-semibold">Студент</th>
-                  <th className="min-w-[100px] p-3 text-left font-semibold">Группа</th>
+                  <th className="bg-secondary sticky left-0 z-10 min-w-[200px] p-3 text-left font-semibold">{t('student')}</th>
+                  <th className="min-w-[100px] p-3 text-left font-semibold">{t('group')}</th>
                   {data.modules.map((module) => (
                     <th key={module.moduleId} className="min-w-[80px] p-3 text-center font-semibold">
                       <span className="text-xs">{module.moduleName}</span>
                     </th>
                   ))}
-                  <th className="min-w-[100px] p-3 text-center font-semibold">Ср. балл</th>
+                  <th className="min-w-[100px] p-3 text-center font-semibold">{t('avgScore')}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStudents.length === 0 ? (
                   <tr>
                     <td colSpan={data.modules.length + 3} className="p-8 text-center text-slate-400">
-                      Нет студентов
+                      {t('noStudents')}
                     </td>
                   </tr>
                 ) : (
@@ -241,7 +242,7 @@ export default function GradebookView({
               {filteredStudents.length > 0 && (
                 <tfoot>
                   <tr className="bg-secondary border-border border-t-2 font-semibold">
-                    <td className="bg-secondary sticky left-0 z-10 p-3">Средние значения</td>
+                    <td className="bg-secondary sticky left-0 z-10 p-3">{t('avgValues')}</td>
                     <td className="p-3"></td>
                     {data.modules.map((module) => {
                       const scores = filteredStudents
@@ -290,7 +291,7 @@ export default function GradebookView({
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-3xl font-bold text-indigo-600">{filteredStudents.length}</p>
-            <p className="text-muted-foreground mt-1 text-xs">Студентов</p>
+            <p className="text-muted-foreground mt-1 text-xs">{t('studentsCount')}</p>
           </CardContent>
         </Card>
         <Card className="border-border">
@@ -298,7 +299,7 @@ export default function GradebookView({
             <p className="text-3xl font-bold text-emerald-600">
               {filteredStudents.filter((s) => s.avgQuizScore >= 70).length}
             </p>
-            <p className="text-muted-foreground mt-1 text-xs">Средний балл ≥ 70%</p>
+            <p className="text-muted-foreground mt-1 text-xs">{t('avgScoreGte70')}</p>
           </CardContent>
         </Card>
         <Card className="border-border">
@@ -306,7 +307,7 @@ export default function GradebookView({
             <p className="text-3xl font-bold text-amber-600">
               {filteredStudents.filter((s) => s.avgQuizScore < 50 && s.avgQuizScore > 0).length}
             </p>
-            <p className="text-muted-foreground mt-1 text-xs">Средний балл {'<'} 50%</p>
+            <p className="text-muted-foreground mt-1 text-xs">{t('avgScoreLt50')}</p>
           </CardContent>
         </Card>
       </div>

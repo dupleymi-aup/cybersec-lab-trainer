@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import {
@@ -25,20 +26,21 @@ import KPICard from './KPICard';
 import StudentDrillDown from './StudentDrillDown';
 import { logger } from '@/lib/logger';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
-
 const RISK_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981'];
 
 export default function AtRiskReport({
   groupId: controlledGroupId,
   days: controlledDays,
 }: { groupId?: string; days?: number } = {}) {
+  const t = useTranslations('atRiskReport');
   const [internalDays, setInternalDays] = useState(30);
+
+  const PERIOD_OPTIONS = [
+    { key: 7, label: t('period7d') },
+    { key: 30, label: t('period30d') },
+    { key: 90, label: t('period90d') },
+    { key: 180, label: t('period180d') },
+  ];
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [sortField, setSortField] = useState<'riskScore' | 'fullName' | 'lastActiveDays' | 'avgQuizScore'>('riskScore');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
@@ -135,7 +137,7 @@ export default function AtRiskReport({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -183,7 +185,7 @@ export default function AtRiskReport({
             {exportStatus === 'loading' ? (
               '...'
             ) : exportStatus === 'success' ? (
-              'Готово'
+              t('done')
             ) : (
               <>
                 <FileText size={14} className="mr-1" /> PDF
@@ -201,14 +203,14 @@ export default function AtRiskReport({
         <KPICard
           icon={<Users size={18} />}
           value={summary.totalStudents}
-          label="Всего студентов"
+          label={t('totalStudents')}
           iconBg="bg-indigo-100"
           iconColor="text-indigo-600"
         />
         <KPICard
           icon={<AlertTriangle size={18} />}
           value={summary.atRiskCount}
-          label="В зоне риска"
+          label={t('atRisk')}
           trend={summary.atRiskPercentage > 20 ? 'down' : summary.atRiskPercentage > 10 ? 'stable' : 'up'}
           delta={summary.atRiskPercentage}
           deltaSuffix="%"
@@ -218,14 +220,14 @@ export default function AtRiskReport({
         <KPICard
           icon={<AlertTriangle size={18} />}
           value={summary.criticalCount}
-          label="Критических"
+          label={t('critical')}
           iconBg="bg-red-100"
           iconColor="text-red-600"
         />
         <KPICard
           icon={<Award size={18} />}
           value={summary.totalStudents - summary.atRiskCount}
-          label="В норме"
+          label={t('normal')}
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
         />
@@ -234,14 +236,14 @@ export default function AtRiskReport({
       {/* Risk distribution chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Распределение риска</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('riskDistribution')}</h3>
           {riskBuckets.some((b) => b.count > 0) ? (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={riskBuckets}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="label" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                <Tooltip formatter={(value) => [`${value ?? 0} студ.`, 'Количество']} />
+                <Tooltip formatter={(value) => [`${value ?? 0} ${t('studentsLabel')}`, t('countLabel')]} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                   {riskBuckets.map((_, i) => (
                     <Cell key={`cell-${i}`} fill={RISK_COLORS[i]} />
@@ -250,7 +252,7 @@ export default function AtRiskReport({
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-8 text-center text-sm text-slate-400">Нет данных</p>
+            <p className="py-8 text-center text-sm text-slate-400">{t('noData')}</p>
           )}
         </CardContent>
       </Card>
@@ -258,7 +260,7 @@ export default function AtRiskReport({
       {/* At-risk table */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Студенты в зоне риска</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('studentsAtRisk')}</h3>
           {sortedStudents.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -268,27 +270,27 @@ export default function AtRiskReport({
                       className="text-muted-foreground cursor-pointer px-3 py-2 text-left text-xs font-medium"
                       onClick={() => handleSort('fullName')}
                     >
-                      ФИО {sortField === 'fullName' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                      {t('fullName')} {sortField === 'fullName' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                     </th>
-                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Группа</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('group')}</th>
                     <th className="text-muted-foreground min-w-[180px] px-3 py-2 text-left text-xs font-medium">
-                      Риск
+                      {t('risk')}
                     </th>
-                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Причины</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('reasons')}</th>
                     <th
                       className="text-muted-foreground cursor-pointer px-3 py-2 text-right text-xs font-medium"
                       onClick={() => handleSort('lastActiveDays')}
                     >
-                      Неактивен {sortField === 'lastActiveDays' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                      {t('inactive')} {sortField === 'lastActiveDays' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                     </th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Модули</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('modules')}</th>
                     <th
                       className="text-muted-foreground cursor-pointer px-3 py-2 text-right text-xs font-medium"
                       onClick={() => handleSort('avgQuizScore')}
                     >
-                      Ср. балл {sortField === 'avgQuizScore' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                      {t('avgScore')} {sortField === 'avgQuizScore' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                     </th>
-                    <th className="text-muted-foreground px-3 py-2 text-center text-xs font-medium">Тренд</th>
+                    <th className="text-muted-foreground px-3 py-2 text-center text-xs font-medium">{t('trend')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -321,7 +323,7 @@ export default function AtRiskReport({
                           ))}
                         </div>
                       </td>
-                      <td className="px-3 py-2.5 text-right text-xs">{student.lastActiveDays} дн.</td>
+                      <td className="px-3 py-2.5 text-right text-xs">{student.lastActiveDays} {t('days')}</td>
                       <td className="px-3 py-2.5 text-right text-xs">{student.modulesCompleted}</td>
                       <td className="px-3 py-2.5 text-right font-medium">{student.avgQuizScore}%</td>
                       <td className="px-3 py-2.5 text-center">
@@ -339,7 +341,7 @@ export default function AtRiskReport({
               </table>
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-slate-400">Нет студентов в зоне риска</p>
+            <p className="py-8 text-center text-sm text-slate-400">{t('noAtRiskStudents')}</p>
           )}
         </CardContent>
       </Card>

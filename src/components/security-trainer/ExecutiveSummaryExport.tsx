@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FileDown, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { getComprehensiveSummary } from '@/lib/auth-store';
@@ -19,6 +20,7 @@ async function downloadPDF(pdfBlob: Blob, filename: string): Promise<void> {
 }
 
 export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: string; days?: number }) {
+  const t = useTranslations('executiveSummary');
   const formatDate = useDateFormatter();
   const [generating, setGenerating] = useState(false);
 
@@ -38,55 +40,55 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
       doc.text('CyberSec Lab Trainer', 105, 60, { align: 'center' });
       doc.setFontSize(18);
       doc.setTextColor(0);
-      doc.text('Итоговый отчёт', 105, 80, { align: 'center' });
+      doc.text(t('finalReport'), 105, 80, { align: 'center' });
       doc.setFontSize(12);
       doc.setTextColor(150);
-      doc.text(`Период: ${days || 30} дней`, 105, 100, { align: 'center' });
+      doc.text(t('period', { days: days || 30 }), 105, 100, { align: 'center' });
       doc.text(
-        `Дата генерации: ${new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' })}`,
+        t('generationDate', { date: new Date().toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' }) }),
         105,
         110,
         { align: 'center' },
       );
       if (groupId) {
-        doc.text(`Группа: ${groupId}`, 105, 120, { align: 'center' });
+        doc.text(t('group', { groupId }), 105, 120, { align: 'center' });
       }
 
       // Page 2: KPIs
       doc.addPage();
       doc.setFontSize(16);
       doc.setTextColor(0);
-      doc.text('Ключевые показатели', 14, 20);
+      doc.text(t('keyMetrics'), 14, 20);
 
       const kpiData = [
         [
-          'Всего студентов',
+          t('totalStudents'),
           String(kpis.totalStudents),
           trends.students === 'up' ? '+' : trends.students === 'down' ? '-' : '',
         ],
         [
-          'Активных',
+          t('active'),
           `${kpis.activePercentage}%`,
           trends.activity === 'up' ? '+' : trends.activity === 'down' ? '-' : '',
         ],
         [
-          'Ср. завершение',
+          t('avgCompletion'),
           `${kpis.avgCompletionRate}%`,
           trends.completion === 'up' ? '+' : trends.completion === 'down' ? '-' : '',
         ],
         [
-          'Ср. балл квизов',
+          t('avgQuizScore'),
           `${kpis.avgQuizScore}%`,
           trends.quizScore === 'up' ? '+' : trends.quizScore === 'down' ? '-' : '',
         ],
-        ['Модулей завершено', String(kpis.totalModulesCompleted), ''],
-        ['Попыток квизов', String(kpis.totalQuizAttempts), ''],
-        ['Вовлечённость', String(kpis.engagementScore), ''],
+        [t('modulesCompleted'), String(kpis.totalModulesCompleted), ''],
+        [t('quizAttempts'), String(kpis.totalQuizAttempts), ''],
+        [t('engagement'), String(kpis.engagementScore), ''],
       ];
 
       autoTable(doc, {
         startY: 30,
-        head: [['Показатель', 'Значение', 'Тренд']],
+        head: [[t('metric'), t('value'), t('trend')]],
         body: kpiData,
         theme: 'striped',
         headStyles: { fillColor: [99, 102, 241] },
@@ -97,19 +99,19 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
       // Page 3: Score Distribution
       doc.addPage();
       doc.setFontSize(16);
-      doc.text('Распределение баллов', 14, 20);
+      doc.text(t('scoreDistribution'), 14, 20);
 
       const scoreData = [
-        ['Отлично (90%+)', String(scoreDistribution.excellent)],
-        ['Хорошо (70-89%)', String(scoreDistribution.good)],
-        ['Средне (50-69%)', String(scoreDistribution.average)],
-        ['Плохо (<50%)', String(scoreDistribution.poor)],
-        ['Не attempted', String(scoreDistribution.notAttempted)],
+        [t('excellent'), String(scoreDistribution.excellent)],
+        [t('good'), String(scoreDistribution.good)],
+        [t('average'), String(scoreDistribution.average)],
+        [t('poor'), String(scoreDistribution.poor)],
+        [t('notAttempted'), String(scoreDistribution.notAttempted)],
       ].filter(([, v]) => parseInt(v) > 0);
 
       autoTable(doc, {
         startY: 30,
-        head: [['Категория', 'Количество студентов']],
+        head: [[t('category'), t('studentCount')]],
         body: scoreData,
         theme: 'striped',
         headStyles: { fillColor: [99, 102, 241] },
@@ -119,7 +121,7 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
       // Page 4: Module Performance
       doc.addPage();
       doc.setFontSize(16);
-      doc.text('Прогресс по модулям', 14, 20);
+      doc.text(t('moduleProgress'), 14, 20);
 
       const moduleTable = moduleDistribution.map((m) => {
         const mod = modules.find((mod) => mod.id === m.moduleId);
@@ -128,7 +130,7 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
 
       autoTable(doc, {
         startY: 30,
-        head: [['Модуль', 'Завершение', 'Ср. балл']],
+        head: [[t('module'), t('completion'), t('avgScore')]],
         body: moduleTable,
         theme: 'striped',
         headStyles: { fillColor: [99, 102, 241] },
@@ -140,7 +142,7 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
       if (topPerformers.length > 0) {
         doc.addPage();
         doc.setFontSize(16);
-        doc.text('Топ студентов', 14, 20);
+        doc.text(t('topStudents'), 14, 20);
 
         const topTable = topPerformers
           .slice(0, 10)
@@ -148,7 +150,7 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
 
         autoTable(doc, {
           startY: 30,
-          head: [['#', 'ФИО', 'Группа', 'Балл']],
+          head: [[t('number'), t('fullName'), t('groupHeader'), t('score')]],
           body: topTable,
           theme: 'striped',
           headStyles: { fillColor: [99, 102, 241] },
@@ -161,13 +163,13 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
       if (recentActivity.length > 0) {
         doc.addPage();
         doc.setFontSize(16);
-        doc.text('Последняя активность', 14, 20);
+        doc.text(t('recentActivity'), 14, 20);
 
         const activityTable = recentActivity.slice(0, 15).map((a) => [a.fullName, a.details, formatDate(a.timestamp)]);
 
         autoTable(doc, {
           startY: 30,
-          head: [['Студент', 'Действие', 'Дата']],
+          head: [[t('student'), t('action'), t('date')]],
           body: activityTable,
           theme: 'striped',
           headStyles: { fillColor: [99, 102, 241] },
@@ -182,15 +184,15 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor(150);
-        doc.text(`CyberSec Lab Trainer — Стр. ${i}/${pageCount}`, 14, 290);
+        doc.text(t('footer', { current: i, total: pageCount }), 14, 290);
       }
 
       const pdfBlob = doc.output('blob');
       const date = new Date().toISOString().split('T')[0];
       await downloadPDF(pdfBlob, `executive-summary-${date}.pdf`);
-      toast.success('Итоговый отчёт скачан');
+      toast.success(t('reportDownloaded'));
     } catch (error) {
-      toast.error('Ошибка генерации отчёта');
+      toast.error(t('generationError'));
       logger.error('ExecutiveSummaryExport PDF generation failed', { error });
     } finally {
       setGenerating(false);
@@ -200,7 +202,7 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
   return (
     <Button onClick={handleGenerate} disabled={generating} variant="outline" size="sm" className="gap-2">
       {generating ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} />}
-      {generating ? 'Генерация...' : 'Экспорт PDF'}
+      {generating ? t('generating') : t('exportPdf')}
     </Button>
   );
 }
