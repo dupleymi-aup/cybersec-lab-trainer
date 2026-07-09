@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -86,13 +87,7 @@ const emptyForm: AssignmentForm = {
   published: false,
 };
 
-const typeLabels: Record<Assignment['type'], string> = {
-  quiz: 'Квиз',
-  'code-review': 'Code Review',
-  attack: 'Атака',
-  writeup: 'Write-up',
-  custom: 'Своё',
-};
+
 
 const typeIcons: Record<Assignment['type'], typeof FileText> = {
   quiz: FileText,
@@ -127,6 +122,14 @@ function useGroups() {
 }
 
 export default function AssignmentBuilder() {
+  const t = useTranslations('assignmentBuilder');
+  const typeLabels: Record<Assignment['type'], string> = {
+    quiz: t('typeQuiz'),
+    'code-review': 'Code Review',
+    attack: t('typeAttack'),
+    writeup: 'Write-up',
+    custom: t('typeCustom'),
+  };
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -145,12 +148,12 @@ export default function AssignmentBuilder() {
         const data = await res.json();
         setAssignments(data);
       } else {
-        toast.error('Не удалось загрузить задания');
+        toast.error(t('loadError'));
       }
     } catch (e) {
       if (process.env.NODE_ENV === 'development')
         logger.warn('AssignmentBuilder fetchAssignments failed', { error: e });
-      toast.error('Ошибка сети при загрузке заданий');
+      toast.error(t('networkLoadError'));
     } finally {
       setLoading(false);
     }
@@ -188,11 +191,11 @@ export default function AssignmentBuilder() {
 
   const handleSubmit = async () => {
     if (!form.title.trim()) {
-      toast.error('Введите название задания');
+      toast.error(t('enterTitle'));
       return;
     }
     if (form.passScore > form.maxScore) {
-      toast.error('Проходной балл не может быть больше максимального');
+      toast.error(t('passScoreExceedsMax'));
       return;
     }
 
@@ -219,24 +222,24 @@ export default function AssignmentBuilder() {
       });
 
       if (res.ok) {
-        toast.success(editingId ? 'Задание обновлено' : 'Задание создано');
+        toast.success(editingId ? t('assignmentUpdated') : t('assignmentCreated'));
         setShowForm(false);
         setEditingId(null);
         fetchAssignments();
       } else {
         const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-        toast.error(err.error || 'Ошибка сохранения');
+        toast.error(err.error || t('saveError'));
       }
     } catch (e) {
       logger.warn('AssignmentBuilder handleSubmit failed', { error: e });
-      toast.error('Ошибка сети');
+      toast.error(t('networkError'));
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Удалить это задание? Все submissions тоже будут удалены.')) return;
+    if (!confirm(t('confirmDelete'))) return;
     try {
       const headers = await getAuthHeaders();
       const res = await fetch(`/api/assignments/${id}`, {
@@ -244,14 +247,14 @@ export default function AssignmentBuilder() {
         headers,
       });
       if (res.ok) {
-        toast.success('Задание удалено');
+        toast.success(t('assignmentDeleted'));
         fetchAssignments();
       } else {
-        toast.error('Не удалось удалить');
+        toast.error(t('deleteError'));
       }
     } catch (e) {
       logger.warn('AssignmentBuilder handleDelete failed', { error: e });
-      toast.error('Ошибка сети');
+      toast.error(t('networkError'));
     }
   };
 
@@ -264,12 +267,12 @@ export default function AssignmentBuilder() {
         body: JSON.stringify({ published: !a.published }),
       });
       if (res.ok) {
-        toast.success(a.published ? 'Скрыто из публикации' : 'Опубликовано');
+        toast.success(a.published ? t('unpublished') : t('published'));
         fetchAssignments();
       }
     } catch (e) {
       logger.warn('AssignmentBuilder togglePublished failed', { error: e });
-      toast.error('Ошибка');
+      toast.error(t('error'));
     }
   };
 
@@ -298,7 +301,7 @@ export default function AssignmentBuilder() {
                   <h2 className="text-lg font-bold">{a.title}</h2>
                   <div className="mt-1 flex items-center gap-2">
                     <Badge variant={a.published ? 'default' : 'secondary'} className="text-[10px]">
-                      {a.published ? 'Опубликовано' : 'Черновик'}
+                      {a.published ? t('published') : t('draft')}
                     </Badge>
                     <Badge variant="outline" className="text-[10px]">
                       {typeLabels[a.type]}
@@ -312,7 +315,7 @@ export default function AssignmentBuilder() {
                 </div>
               </div>
               <Button size="sm" variant="ghost" onClick={() => setViewingId(null)}>
-                <X size={16} /> Назад
+                <X size={16} /> {t('back')}
               </Button>
             </div>
 
@@ -320,35 +323,35 @@ export default function AssignmentBuilder() {
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-muted-foreground text-xs">Макс. балл</p>
+                <p className="text-muted-foreground text-xs">{t('maxScore')}</p>
                 <p className="text-lg font-bold text-violet-600">{a.maxScore}</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-muted-foreground text-xs">Проходной</p>
+                <p className="text-muted-foreground text-xs">{t('passScore')}</p>
                 <p className="text-lg font-bold text-emerald-600">{a.passScore}%</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-muted-foreground text-xs">Попытки</p>
+                <p className="text-muted-foreground text-xs">{t('attempts')}</p>
                 <p className="text-lg font-bold">{a.attempts === 0 ? '∞' : a.attempts}</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-muted-foreground text-xs">Submission'ы</p>
+                <p className="text-muted-foreground text-xs">{t('submissions')}</p>
                 <p className="text-lg font-bold">{a._count?.submissions ?? 0}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-muted-foreground">Таймер</p>
-                <p className="font-medium">{a.timeLimit ? `${a.timeLimit} мин` : 'Без лимита'}</p>
+                <p className="text-muted-foreground">{t('timer')}</p>
+                <p className="font-medium">{a.timeLimit ? `${a.timeLimit} ${t('minutes')}` : t('noLimit')}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Автопроверка</p>
-                <p className="font-medium">{a.autoGrade ? 'Да' : 'Нет'}</p>
+                <p className="text-muted-foreground">{t('autoGrade')}</p>
+                <p className="font-medium">{a.autoGrade ? t('yes') : t('no')}</p>
               </div>
               {a.dueAt && (
                 <div>
-                  <p className="text-muted-foreground">Дедлайн</p>
+                  <p className="text-muted-foreground">{t('deadline')}</p>
                   <p className="font-medium">
                     {new Date(a.dueAt).toLocaleDateString('ru-RU', {
                       day: 'numeric',
@@ -361,7 +364,7 @@ export default function AssignmentBuilder() {
               )}
               {a.group && (
                 <div>
-                  <p className="text-muted-foreground">Группа</p>
+                  <p className="text-muted-foreground">{t('group')}</p>
                   <p className="font-medium">{a.group}</p>
                 </div>
               )}
@@ -369,7 +372,7 @@ export default function AssignmentBuilder() {
 
             {a.content && (
               <div>
-                <p className="mb-2 text-sm font-medium">Содержимое</p>
+                <p className="mb-2 text-sm font-medium">{t('content')}</p>
                 <pre className="bg-muted max-h-40 overflow-auto rounded-lg p-3 text-xs whitespace-pre-wrap">
                   {a.content}
                 </pre>
@@ -384,21 +387,21 @@ export default function AssignmentBuilder() {
                   setViewingId(null);
                 }}
               >
-                <Edit2 size={14} className="mr-1" /> Редактировать
+                <Edit2 size={14} className="mr-1" /> {t('edit')}
               </Button>
               <Button size="sm" variant={a.published ? 'outline' : 'default'} onClick={() => togglePublished(a)}>
                 {a.published ? (
                   <>
-                    <EyeOff size={14} className="mr-1" /> Скрыть
+                    <EyeOff size={14} className="mr-1" /> {t('hide')}
                   </>
                 ) : (
                   <>
-                    <Eye size={14} className="mr-1" /> Опубликовать
+                    <Eye size={14} className="mr-1" /> {t('publish')}
                   </>
                 )}
               </Button>
               <Button size="sm" variant="destructive" onClick={() => handleDelete(a.id)}>
-                <Trash2 size={14} className="mr-1" /> Удалить
+                <Trash2 size={14} className="mr-1" /> {t('delete')}
               </Button>
             </div>
           </CardContent>
@@ -417,11 +420,11 @@ export default function AssignmentBuilder() {
               <h2 className="flex items-center gap-2 text-lg font-bold">
                 {editingId ? (
                   <>
-                    <Edit2 size={20} /> Редактирование задания
+                    <Edit2 size={20} /> {t('editAssignment')}
                   </>
                 ) : (
                   <>
-                    <Plus size={20} /> Новое задание
+                    <Plus size={20} /> {t('newAssignment')}
                   </>
                 )}
               </h2>
@@ -433,17 +436,17 @@ export default function AssignmentBuilder() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Title */}
               <div className="md:col-span-2">
-                <Label className="mb-1 block text-sm font-medium">Название *</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('titleLabel')}</Label>
                 <Input
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="Например: SQL Injection — основы"
+                  placeholder={t('titlePlaceholder')}
                 />
               </div>
 
               {/* Type */}
               <div>
-                <Label className="mb-1 block text-sm font-medium">Тип задания</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('typeLabel')}</Label>
                 <Tabs value={form.type} onValueChange={(v) => setForm({ ...form, type: v as AssignmentForm['type'] })}>
                   <TabsList className="grid w-full grid-cols-5">
                     {(Object.keys(typeLabels) as Assignment['type'][]).map((t) => (
@@ -457,13 +460,13 @@ export default function AssignmentBuilder() {
 
               {/* Module */}
               <div>
-                <Label className="mb-1 block text-sm font-medium">Привязка к модулю</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('moduleLabel')}</Label>
                 <select
                   value={form.moduleId}
                   onChange={(e) => setForm({ ...form, moduleId: e.target.value })}
                   className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm"
                 >
-                  <option value="">Без привязки</option>
+                  <option value="">{t('noModule')}</option>
                   {modules.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.title}
@@ -474,17 +477,17 @@ export default function AssignmentBuilder() {
 
               {/* Description */}
               <div className="md:col-span-2">
-                <Label className="mb-1 block text-sm font-medium">Описание</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('descriptionLabel')}</Label>
                 <Input
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Краткое описание задания"
+                  placeholder={t('descriptionPlaceholder')}
                 />
               </div>
 
               {/* Content */}
               <div className="md:col-span-2">
-                <Label className="mb-1 block text-sm font-medium">Содержимое (JSON или текст)</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('contentLabel')}</Label>
                 <textarea
                   value={form.content}
                   onChange={(e) => setForm({ ...form, content: e.target.value })}
@@ -495,7 +498,7 @@ export default function AssignmentBuilder() {
 
               {/* Max Score */}
               <div>
-                <Label className="mb-1 block text-sm font-medium">Макс. балл</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('maxScore')}</Label>
                 <Input
                   type="number"
                   value={form.maxScore}
@@ -507,7 +510,7 @@ export default function AssignmentBuilder() {
 
               {/* Pass Score */}
               <div>
-                <Label className="mb-1 block text-sm font-medium">Проходной балл (%)</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('passScorePercent')}</Label>
                 <Input
                   type="number"
                   value={form.passScore}
@@ -519,7 +522,7 @@ export default function AssignmentBuilder() {
 
               {/* Time Limit */}
               <div>
-                <Label className="mb-1 block text-sm font-medium">Таймер (минуты, пусто = без лимита)</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('timerHint')}</Label>
                 <Input
                   type="number"
                   value={form.timeLimit}
@@ -531,7 +534,7 @@ export default function AssignmentBuilder() {
 
               {/* Attempts */}
               <div>
-                <Label className="mb-1 block text-sm font-medium">Попытки (0 = безлимит)</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('attemptsHint')}</Label>
                 <Input
                   type="number"
                   value={form.attempts}
@@ -543,7 +546,7 @@ export default function AssignmentBuilder() {
 
               {/* Due Date */}
               <div>
-                <Label className="mb-1 block text-sm font-medium">Дедлайн</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('deadline')}</Label>
                 <Input
                   type="datetime-local"
                   value={form.dueAt}
@@ -553,13 +556,13 @@ export default function AssignmentBuilder() {
 
               {/* Group */}
               <div>
-                <Label className="mb-1 block text-sm font-medium">Группа (пусто = все)</Label>
+                <Label className="mb-1 block text-sm font-medium">{t('groupHint')}</Label>
                 <select
                   value={form.group}
                   onChange={(e) => setForm({ ...form, group: e.target.value })}
                   className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm"
                 >
-                  <option value="">Все студенты</option>
+                  <option value="">{t('allStudents')}</option>
                   {groups.map((g) => (
                     <option key={g} value={g}>
                       {g}
@@ -576,7 +579,7 @@ export default function AssignmentBuilder() {
                   id="autoGrade"
                 />
                 <Label htmlFor="autoGrade" className="text-sm">
-                  Автопроверка
+                  {t('autoGrade')}
                 </Label>
               </div>
 
@@ -587,18 +590,18 @@ export default function AssignmentBuilder() {
                   id="published"
                 />
                 <Label htmlFor="published" className="text-sm">
-                  Опубликовать сразу
+                  {t('publishImmediately')}
                 </Label>
               </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
               <Button size="sm" variant="outline" onClick={() => setShowForm(false)} disabled={saving}>
-                Отмена
+                {t('cancel')}
               </Button>
               <Button size="sm" onClick={handleSubmit} disabled={saving}>
                 {saving ? <Loader2 size={14} className="mr-1 animate-spin" /> : <Save size={14} className="mr-1" />}
-                {editingId ? 'Сохранить' : 'Создать'}
+                {editingId ? t('save') : t('create')}
               </Button>
             </div>
           </CardContent>
@@ -614,19 +617,19 @@ export default function AssignmentBuilder() {
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-lg font-bold">
           <FileText size={20} className="text-violet-500" />
-          Задания
+          {t('assignments')}
         </h2>
         <Button size="sm" onClick={openCreateForm}>
-          <Plus size={14} className="mr-1" /> Создать
+          <Plus size={14} className="mr-1" /> {t('create')}
         </Button>
       </div>
 
       {/* Filters */}
       <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
         <TabsList className="grid w-fit grid-cols-3">
-          <TabsTrigger value="all">Все</TabsTrigger>
-          <TabsTrigger value="published">Опубликованные</TabsTrigger>
-          <TabsTrigger value="draft">Черновики</TabsTrigger>
+          <TabsTrigger value="all">{t('all')}</TabsTrigger>
+          <TabsTrigger value="published">{t('publishedFilter')}</TabsTrigger>
+          <TabsTrigger value="draft">{t('drafts')}</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -634,7 +637,7 @@ export default function AssignmentBuilder() {
       {loading ? (
         <div className="py-12 text-center text-slate-400">
           <Loader2 size={32} className="mx-auto mb-3 animate-spin opacity-50" />
-          <p className="text-sm">Загрузка заданий...</p>
+          <p className="text-sm">{t('loading')}</p>
         </div>
       ) : filtered.length === 0 ? (
         <Card className="border-border">
@@ -642,10 +645,10 @@ export default function AssignmentBuilder() {
             <FileText size={40} className="mx-auto mb-3 opacity-50" />
             <p className="text-sm">
               {filter === 'all'
-                ? 'Нет заданий. Создайте первое!'
+                ? t('noAssignments')
                 : filter === 'published'
-                  ? 'Нет опубликованных заданий'
-                  : 'Нет черновиков'}
+                  ? t('noPublished')
+                  : t('noDrafts')}
             </p>
           </CardContent>
         </Card>
@@ -677,7 +680,7 @@ export default function AssignmentBuilder() {
                           {a.title}
                         </button>
                         <Badge variant={a.published ? 'default' : 'secondary'} className="text-[10px]">
-                          {a.published ? 'Опубликовано' : 'Черновик'}
+                          {a.published ? t('published') : t('draft')}
                         </Badge>
                         <Badge variant="outline" className="text-[10px]">
                           {typeLabels[a.type]}
@@ -689,22 +692,22 @@ export default function AssignmentBuilder() {
                         )}
                         {a.autoGrade && (
                           <Badge className="border-0 bg-emerald-100 text-[10px] text-emerald-700">
-                            <CheckCircle size={10} className="mr-0.5" /> Авто
+                            <CheckCircle size={10} className="mr-0.5" /> {t('auto')}
                           </Badge>
                         )}
                       </div>
 
                       <div className="text-muted-foreground mt-1.5 flex items-center gap-4 text-xs">
                         <span className="flex items-center gap-1">
-                          <Award size={12} /> {a.maxScore} баллов
+                          <Award size={12} /> {a.maxScore} {t('points')}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Users size={12} /> {a._count?.submissions ?? 0} submission'ов
+                          <Users size={12} /> {a._count?.submissions ?? 0} {t('submissionsCount')}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Clock size={12} /> {a.timeLimit ? `${a.timeLimit} мин` : 'Без лимита'}
+                          <Clock size={12} /> {a.timeLimit ? `${a.timeLimit} ${t('minutes')}` : t('noLimit')}
                         </span>
-                        {a.attempts > 0 && <span>Попытки: {a.attempts}</span>}
+                        {a.attempts > 0 && <span>{t('attemptsLabel')} {a.attempts}</span>}
                         {a.group && (
                           <span className="flex items-center gap-1">
                             <Users size={12} /> {a.group}
@@ -716,12 +719,12 @@ export default function AssignmentBuilder() {
                           >
                             <Calendar size={12} />
                             {isOverdue
-                              ? `Просрочен (${Math.abs(daysLeft)} дн.)`
+                              ? `${t('overdue')} (${Math.abs(daysLeft)} ${t('days')})`
                               : daysLeft === 0
-                                ? 'Сегодня'
+                                ? t('today')
                                 : daysLeft === 1
-                                  ? 'Завтра'
-                                  : `${daysLeft} дн.`}
+                                  ? t('tomorrow')
+                                  : `${daysLeft} ${t('days')}`}
                           </span>
                         )}
                       </div>
@@ -732,21 +735,21 @@ export default function AssignmentBuilder() {
                       <button
                         onClick={() => togglePublished(a)}
                         className="text-muted-foreground hover:text-foreground rounded p-1.5 transition-colors"
-                        title={a.published ? 'Скрыть' : 'Опубликовать'}
+                        title={a.published ? t('hide') : t('publish')}
                       >
                         {a.published ? <EyeOff size={14} /> : <Eye size={14} />}
                       </button>
                       <button
                         onClick={() => openEditForm(a)}
                         className="text-muted-foreground rounded p-1.5 transition-colors hover:text-blue-600"
-                        title="Редактировать"
+                        title={t('edit')}
                       >
                         <Edit2 size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(a.id)}
                         className="text-muted-foreground rounded p-1.5 transition-colors hover:text-red-600"
-                        title="Удалить"
+                        title={t('delete')}
                       >
                         <Trash2 size={14} />
                       </button>

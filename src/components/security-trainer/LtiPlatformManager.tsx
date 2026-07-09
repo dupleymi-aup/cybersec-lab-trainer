@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -59,6 +60,7 @@ interface GradeSync {
 }
 
 export default function LtiPlatformManager() {
+  const t = useTranslations('ltiPlatform');
   const [platforms, setPlatforms] = useState<LtiPlatform[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -89,11 +91,11 @@ export default function LtiPlatformManager() {
         const data = await res.json();
         setPlatforms(data);
       } else {
-        toast.error('Failed to load platforms');
+        toast.error(t('loadError'));
       }
     } catch (e) {
       logger.warn('LtiPlatformManager loadPlatforms failed', { error: e });
-      toast.error('Network error');
+      toast.error(t('networkError'));
     } finally {
       setLoading(false);
     }
@@ -125,7 +127,7 @@ export default function LtiPlatformManager() {
   const handleSubmit = async () => {
     const { name, issuer, clientId, authUrl, tokenUrl, keysetUrl, deploymentId } = formData;
     if (!name || !issuer || !clientId || !authUrl || !tokenUrl || !keysetUrl || !deploymentId) {
-      toast.error('Заполните все обязательные поля');
+      toast.error(t('fillRequired'));
       return;
     }
 
@@ -141,23 +143,23 @@ export default function LtiPlatformManager() {
       });
 
       if (res.ok) {
-        toast.success(editingPlatform ? 'Платформа обновлена' : 'Платформа создана');
+        toast.success(editingPlatform ? t('platformUpdated') : t('platformCreated'));
         setShowForm(false);
         setEditingPlatform(null);
         resetForm();
         loadPlatforms();
       } else {
         const error = await res.json();
-        toast.error(error.error || 'Ошибка сохранения');
+        toast.error(error.error || t('saveError'));
       }
     } catch (e) {
       logger.warn('LtiPlatformManager handleSubmit failed', { error: e });
-      toast.error('Network error');
+      toast.error(t('networkError'));
     }
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Удалить LTI платформу "${name}"?`)) return;
+    if (!confirm(t('confirmDelete', { name }))) return;
     try {
       const headers = await getAuthHeaders();
       const res = await fetch(`/api/lti/platforms/${id}`, {
@@ -165,18 +167,18 @@ export default function LtiPlatformManager() {
         headers,
       });
       if (res.ok) {
-        toast.success('Платформа удалена');
+        toast.success(t('platformDeleted'));
         if (selectedPlatformId === id) {
           setSelectedPlatformId(null);
           setGradeSyncs([]);
         }
         loadPlatforms();
       } else {
-        toast.error('Ошибка удаления');
+        toast.error(t('deleteError'));
       }
     } catch (e) {
       logger.warn('LtiPlatformManager handleDelete failed', { error: e });
-      toast.error('Network error');
+      toast.error(t('networkError'));
     }
   };
 
@@ -189,13 +191,13 @@ export default function LtiPlatformManager() {
         body: JSON.stringify({ isActive: !platform.isActive }),
       });
       if (res.ok) {
-        toast.success(platform.isActive ? 'Платформа отключена' : 'Платформа активирована');
+        toast.success(platform.isActive ? t('platformDeactivated') : t('platformActivated'));
         loadPlatforms();
       }
     } catch (e) {
       if (process.env.NODE_ENV === 'development')
         logger.warn('LtiPlatformManager handleToggleActive failed', { error: e });
-      toast.error('Network error');
+      toast.error(t('networkError'));
     }
   };
 
@@ -231,7 +233,7 @@ export default function LtiPlatformManager() {
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} скопирован`);
+    toast.success(t('copied', { label }));
   };
 
   const statusIcon = (status: string) => {
@@ -257,12 +259,12 @@ export default function LtiPlatformManager() {
           </div>
           <div>
             <h2 className="text-sm font-bold">LMS Integration (LTI 1.3)</h2>
-            <p className="text-muted-foreground text-xs">Подключение к Moodle и другим LMS через LTI 1.3</p>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={loadPlatforms}>
-            <RefreshCw size={14} className="mr-1" /> Обновить
+            <RefreshCw size={14} className="mr-1" /> {t('refresh')}
           </Button>
           <Button
             size="sm"
@@ -272,7 +274,7 @@ export default function LtiPlatformManager() {
               setEditingPlatform(null);
             }}
           >
-            <Plus size={14} className="mr-1" /> Добавить платформу
+            <Plus size={14} className="mr-1" /> {t('addPlatform')}
           </Button>
         </div>
       </div>
@@ -280,26 +282,26 @@ export default function LtiPlatformManager() {
       {/* Setup Instructions */}
       <Card className="border-border">
         <CardContent className="p-4">
-          <h3 className="mb-2 text-sm font-semibold">Инструкция по подключению Moodle</h3>
+          <h3 className="mb-2 text-sm font-semibold">{t('moodleInstructions')}</h3>
           <ol className="text-muted-foreground list-inside list-decimal space-y-1 text-xs">
             <li>
-              В Moodle перейдите: <strong>Site administration → Plugins → Activity modules → External tool</strong>
+              {t('moodleStep1')} <strong>Site administration → Plugins → Activity modules → External tool</strong>
             </li>
             <li>
-              Нажмите <strong>Configure a preconfigured tool</strong>
+              {t('moodleStep2Prefix')} <strong>Configure a preconfigured tool</strong>
             </li>
             <li>
-              Укажите <strong>Tool URL</strong>:{' '}
+              {t('moodleStep3Prefix')} <strong>Tool URL</strong>:{' '}
               <code className="bg-muted rounded px-1">{appUrl}/api/lti/oidc-login</code>
             </li>
             <li>
-              Скопируйте <strong>Issuer, Client ID, Deployment ID</strong> из Moodle и вставьте в форму ниже
+              {t('moodleStep4Prefix')} <strong>Issuer, Client ID, Deployment ID</strong> из Moodle {t('moodleStep4Suffix')}
             </li>
             <li>
-              Укажите <strong>Keyset URL</strong>:{' '}
+              {t('moodleStep3Prefix')} <strong>Keyset URL</strong>:{' '}
               <code className="bg-muted rounded px-1">https://your-moodle.com/mod/lti/certs.php</code>
             </li>
-            <li>Сохраните платформу и активируйте</li>
+            <li>{t('moodleStep6')}</li>
           </ol>
           <div className="mt-3 rounded-lg bg-blue-50 p-2 dark:bg-blue-900/20">
             <p className="text-xs text-blue-700 dark:text-blue-300">
@@ -321,12 +323,12 @@ export default function LtiPlatformManager() {
             <Card className="border-blue-200 dark:border-blue-800">
               <CardContent className="space-y-3 p-4">
                 <h3 className="text-sm font-semibold">
-                  {editingPlatform ? 'Редактировать платформу' : 'Новая LTI платформа'}
+                  {editingPlatform ? t('editPlatform') : t('newPlatform')}
                 </h3>
 
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div>
-                    <label className="text-xs font-medium">Название *</label>
+                    <label className="text-xs font-medium">{t('nameLabel')}</label>
                     <Input
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -335,7 +337,7 @@ export default function LtiPlatformManager() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Issuer (URL) *</label>
+                    <label className="text-xs font-medium">{t('issuerLabel')}</label>
                     <Input
                       value={formData.issuer}
                       onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
@@ -344,16 +346,16 @@ export default function LtiPlatformManager() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Client ID *</label>
+                    <label className="text-xs font-medium">{t('clientIdLabel')}</label>
                     <Input
                       value={formData.clientId}
                       onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                      placeholder="Client ID из Moodle"
+                      placeholder={t('clientIdPlaceholder')}
                       className="text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Deployment ID *</label>
+                    <label className="text-xs font-medium">{t('deploymentIdLabel')}</label>
                     <Input
                       value={formData.deploymentId}
                       onChange={(e) =>
@@ -362,12 +364,12 @@ export default function LtiPlatformManager() {
                           deploymentId: e.target.value,
                         })
                       }
-                      placeholder="Deployment ID из Moodle"
+                      placeholder={t('deploymentIdPlaceholder')}
                       className="text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Auth URL *</label>
+                    <label className="text-xs font-medium">{t('authUrlLabel')}</label>
                     <Input
                       value={formData.authUrl}
                       onChange={(e) => setFormData({ ...formData, authUrl: e.target.value })}
@@ -376,7 +378,7 @@ export default function LtiPlatformManager() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Token URL *</label>
+                    <label className="text-xs font-medium">{t('tokenUrlLabel')}</label>
                     <Input
                       value={formData.tokenUrl}
                       onChange={(e) => setFormData({ ...formData, tokenUrl: e.target.value })}
@@ -385,7 +387,7 @@ export default function LtiPlatformManager() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Keyset URL *</label>
+                    <label className="text-xs font-medium">{t('keysetLabel')}</label>
                     <Input
                       value={formData.keysetUrl}
                       onChange={(e) => setFormData({ ...formData, keysetUrl: e.target.value })}
@@ -394,7 +396,7 @@ export default function LtiPlatformManager() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Public Key (PEM)</label>
+                    <label className="text-xs font-medium">{t('publicKeyLabel')}</label>
                     <Input
                       value={formData.publicKey}
                       onChange={(e) => setFormData({ ...formData, publicKey: e.target.value })}
@@ -403,7 +405,7 @@ export default function LtiPlatformManager() {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="text-xs font-medium">Private Key (PEM) — для AGS grade passback</label>
+                    <label className="text-xs font-medium">{t('privateKeyLabel')}</label>
                     <div className="relative">
                       <Input
                         type={showPrivateKey ? 'text' : 'password'}
@@ -430,7 +432,7 @@ export default function LtiPlatformManager() {
 
                 <div className="flex gap-2 pt-2">
                   <Button onClick={handleSubmit} size="sm">
-                    {editingPlatform ? 'Сохранить' : 'Создать'}
+                    {editingPlatform ? t('save') : t('create')}
                   </Button>
                   <Button
                     variant="outline"
@@ -441,7 +443,7 @@ export default function LtiPlatformManager() {
                     }}
                     size="sm"
                   >
-                    Отмена
+                    {t('cancel')}
                   </Button>
                 </div>
               </CardContent>
@@ -452,13 +454,13 @@ export default function LtiPlatformManager() {
 
       {/* Platform List */}
       {loading ? (
-        <div className="text-muted-foreground py-8 text-center">Загрузка...</div>
+        <div className="text-muted-foreground py-8 text-center">{t('loading')}</div>
       ) : platforms.length === 0 ? (
         <Card className="border-border">
           <CardContent className="text-muted-foreground p-8 text-center">
             <ExternalLink size={32} className="mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Нет подключённых LMS платформ</p>
-            <p className="mt-1 text-xs">Добавьте первую платформу для начала интеграции</p>
+            <p className="text-sm">{t('noPlatforms')}</p>
+            <p className="mt-1 text-xs">{t('addFirstPlatform')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -498,7 +500,7 @@ export default function LtiPlatformManager() {
                         if (selectedPlatformId !== p.id) loadGradeSyncs(p.id);
                       }}
                     >
-                      <TrendingUp size={14} className="mr-1" /> Синхронизация
+                      <TrendingUp size={14} className="mr-1" /> {t('sync')}
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => startEdit(p)} aria-label="Edit platform">
                       <Pencil size={14} />
@@ -547,17 +549,17 @@ export default function LtiPlatformManager() {
             <CardContent className="p-4">
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
-                  <Upload size={14} /> Синхронизация оценок
+                  <Upload size={14} /> {t('gradeSync')}
                 </h3>
                 <Button variant="outline" size="sm" onClick={() => loadGradeSyncs(selectedPlatformId)}>
-                  <RefreshCw size={12} className="mr-1" /> Обновить
+                  <RefreshCw size={12} className="mr-1" /> {t('refresh')}
                 </Button>
               </div>
 
               {loadingSyncs ? (
-                <div className="text-muted-foreground py-4 text-center">Загрузка...</div>
+                <div className="text-muted-foreground py-4 text-center">{t('loading')}</div>
               ) : gradeSyncs.length === 0 ? (
-                <p className="text-muted-foreground py-4 text-center text-xs">Нет записей синхронизации</p>
+                <p className="text-muted-foreground py-4 text-center text-xs">{t('noSyncRecords')}</p>
               ) : (
                 <div className="space-y-1">
                   {gradeSyncs.slice(0, 10).map((sync) => (
