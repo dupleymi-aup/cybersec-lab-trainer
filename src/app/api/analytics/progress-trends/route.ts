@@ -7,7 +7,8 @@ export async function GET(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const { searchParams } = new URL(request.url);
+  try {
+    const { searchParams } = new URL(request.url);
   const userId = searchParams.get('userId');
   const dateRange = searchParams.get('dateRange') || '30d';
   const groupId = searchParams.get('groupId');
@@ -135,5 +136,9 @@ export async function GET(request: NextRequest) {
     })
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  return NextResponse.json({ trends });
+    return NextResponse.json({ trends });
+  } catch (error) {
+    console.error('Progress trends error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

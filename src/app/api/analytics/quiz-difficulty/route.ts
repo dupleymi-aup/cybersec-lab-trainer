@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const { searchParams } = new URL(request.url);
+  try {
+    const { searchParams } = new URL(request.url);
   const groupId = searchParams.get('groupId') || '';
   const days = parseDays(searchParams);
   const now = new Date();
@@ -159,10 +160,14 @@ export async function GET(request: NextRequest) {
     }))
     .sort((a, b) => a.week.localeCompare(b.week));
 
-  return NextResponse.json({
-    difficultyBreakdown,
-    categoryByDifficulty,
-    studentPerformanceByDifficulty,
-    trendByDifficulty,
-  });
+    return NextResponse.json({
+      difficultyBreakdown,
+      categoryByDifficulty,
+      studentPerformanceByDifficulty,
+      trendByDifficulty,
+    });
+  } catch (error) {
+    console.error('Quiz difficulty error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

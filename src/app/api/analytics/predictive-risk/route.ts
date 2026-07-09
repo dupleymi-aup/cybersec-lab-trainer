@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const { searchParams } = new URL(request.url);
+  try {
+    const { searchParams } = new URL(request.url);
   const groupId = searchParams.get('groupId') || '';
   const days = parseDays(searchParams);
   const now = new Date();
@@ -179,14 +180,18 @@ export async function GET(request: NextRequest) {
   const avgRisk =
     studentRisks.length > 0 ? Math.round(studentRisks.reduce((s, r) => s + r.riskScore, 0) / studentRisks.length) : 0;
 
-  return NextResponse.json({
-    students: studentRisks,
-    summary: {
-      totalStudents: students.length,
-      highRisk,
-      mediumRisk,
-      lowRisk,
-      avgRisk,
-    },
-  });
+    return NextResponse.json({
+      students: studentRisks,
+      summary: {
+        totalStudents: students.length,
+        highRisk,
+        mediumRisk,
+        lowRisk,
+        avgRisk,
+      },
+    });
+  } catch (error) {
+    console.error('Predictive risk error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const { searchParams } = new URL(request.url);
+  try {
+    const { searchParams } = new URL(request.url);
   const days = parseDays(searchParams);
   const groupId = searchParams.get('groupId');
   const course = searchParams.get('course');
@@ -156,13 +157,17 @@ export async function GET(request: NextRequest) {
   const trendDiff = last7Avg - prev7Avg;
   const trend = trendDiff > 2 ? 'up' : trendDiff < -2 ? 'down' : 'stable';
 
-  return NextResponse.json({
-    daily,
-    summary: {
-      totalModulesCompleted,
-      totalQuizAttempts,
-      avgDailyActive,
-      trend,
-    },
-  });
+    return NextResponse.json({
+      daily,
+      summary: {
+        totalModulesCompleted,
+        totalQuizAttempts,
+        avgDailyActive,
+        trend,
+      },
+    });
+  } catch (error) {
+    console.error('Progress dynamics error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const { searchParams } = new URL(request.url);
+  try {
+    const { searchParams } = new URL(request.url);
   const groupId = searchParams.get('groupId') || '';
   const days = parseDays(searchParams);
   const now = new Date();
@@ -191,12 +192,16 @@ export async function GET(request: NextRequest) {
     item.avgScore = item.count > 0 ? Math.round(item.avgScore / item.count) : 0;
   }
 
-  return NextResponse.json({
-    categoryRetryStats,
-    retryDistribution,
-    topRetryers,
-    improvementByRetries,
-    totalRetries: retryData.filter((r) => r.attempts > 1).length,
-    totalUniqueQuizzes: retryData.length,
-  });
+    return NextResponse.json({
+      categoryRetryStats,
+      retryDistribution,
+      topRetryers,
+      improvementByRetries,
+      totalRetries: retryData.filter((r) => r.attempts > 1).length,
+      totalUniqueQuizzes: retryData.length,
+    });
+  } catch (error) {
+    console.error('Quiz retry error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

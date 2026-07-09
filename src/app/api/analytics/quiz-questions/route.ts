@@ -20,7 +20,8 @@ export async function GET(request: NextRequest) {
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const { searchParams } = new URL(request.url);
+  try {
+    const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
   const difficulty = searchParams.get('difficulty');
 
@@ -83,5 +84,9 @@ export async function GET(request: NextRequest) {
     })
     .sort((a, b) => a.correctRate - b.correctRate); // hardest first
 
-  return NextResponse.json({ questions });
+    return NextResponse.json({ questions });
+  } catch (error) {
+    console.error('Quiz questions error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
