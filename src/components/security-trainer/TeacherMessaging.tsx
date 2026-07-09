@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { useDateFormatter } from '@/lib/format';
 import type { Announcement } from '@/lib/auth-types';
 import { logger } from '@/lib/logger';
@@ -29,6 +30,7 @@ function saveAll(items: Announcement[]) {
 
 export default function TeacherMessaging({ currentUser, groups = [] }: { currentUser: string; groups: string[] }) {
   const formatDate = useDateFormatter();
+  const t = useTranslations('teacher.messaging');
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -43,14 +45,14 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
 
   const handleSend = () => {
     if (!title.trim() || !content.trim()) {
-      toast.error('Заполните заголовок и сообщение');
+      toast.error(t('fillRequired'));
       return;
     }
 
     const msg: Announcement = {
       id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
       title: title.trim(),
-      content: content.trim() + (targetGroup ? `\n\nГруппа: ${targetGroup}` : ''),
+      content: content.trim() + (targetGroup ? `\n\nGroup: ${targetGroup}` : ''),
       author: currentUser,
       createdAt: new Date().toISOString(),
       priority,
@@ -66,7 +68,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
     setContent('');
     setPriority('normal');
     setTargetGroup('');
-    toast.success('Сообщение отправлено студентам');
+    toast.success(t('sent'));
   };
 
   const handleDelete = (id: string) => {
@@ -83,12 +85,12 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
             <MessageSquare size={16} className="text-amber-600" />
           </div>
           <div>
-            <h2 className="text-sm font-bold">Сообщения студентам</h2>
-            <p className="text-muted-foreground text-xs">Отправка уведомлений и объявлений</p>
+            <h2 className="text-sm font-bold">{t('title')}</h2>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
         <Button size="sm" onClick={() => setShowForm(!showForm)}>
-          <Send size={14} className="mr-1" /> {showForm ? 'Отмена' : 'Новое'}
+          <Send size={14} className="mr-1" /> {showForm ? t('cancel') : t('newMessage')}
         </Button>
       </div>
 
@@ -101,32 +103,32 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
           >
             <Card className="border-amber-200 bg-amber-50/50">
               <CardContent className="space-y-3 p-4">
-                <h3 className="text-sm font-semibold">Новое сообщение</h3>
+                <h3 className="text-sm font-semibold">{t('formTitle')}</h3>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Тема сообщения"
+                  placeholder={t('subjectPlaceholder')}
                   className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm"
                   maxLength={100}
                 />
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  placeholder="Текст сообщения..."
+                  placeholder={t('contentPlaceholder')}
                   className="border-border bg-card min-h-[80px] w-full resize-y rounded-md border px-3 py-2 text-sm"
                   maxLength={1000}
                 />
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-xs">Приоритет:</span>
+                    <span className="text-muted-foreground text-xs">{t('priority')}</span>
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value as 'low' | 'normal' | 'high')}
                       className="border-border bg-card rounded-md border px-2 py-1.5 text-xs"
                     >
-                      <option value="low">Низкий</option>
-                      <option value="normal">Обычный</option>
-                      <option value="high">Высокий</option>
+                      <option value="low">{t('priorityLow')}</option>
+                      <option value="normal">{t('priorityNormal')}</option>
+                      <option value="high">{t('priorityHigh')}</option>
                     </select>
                   </div>
                   {groups.length > 0 && (
@@ -137,10 +139,10 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                         onChange={(e) => setTargetGroup(e.target.value)}
                         className="border-border bg-card rounded-md border px-2 py-1.5 text-xs"
                       >
-                        <option value="">Всем студентам</option>
+                        <option value="">{t('allStudents')}</option>
                         {groups.map((g) => (
                           <option key={g} value={g}>
-                            Группа: {g}
+                            {t('groupLabel', { name: g })}
                           </option>
                         ))}
                       </select>
@@ -149,7 +151,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                 </div>
                 <div className="flex justify-end">
                   <Button size="sm" onClick={handleSend}>
-                    <Send size={14} className="mr-1" /> Отправить
+                    <Send size={14} className="mr-1" /> {t('send')}
                   </Button>
                 </div>
               </CardContent>
@@ -187,11 +189,11 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                               : 'bg-muted text-foreground/70'
                         }`}
                       >
-                        {msg.priority === 'high' ? 'Важно' : msg.priority === 'normal' ? 'Обычное' : 'Инфо'}
+                        {msg.priority === 'high' ? t('important') : msg.priority === 'normal' ? t('normal') : t('info')}
                       </Badge>
-                      {msg.content.includes('Группа:') && (
+                      {msg.content.includes('Group: ') && (
                         <Badge variant="secondary" className="text-[10px]">
-                          {msg.content.split('Группа: ')[1]?.split('\n')[0]}
+                          {msg.content.split('Group: ')[1]?.split('\n')[0]}
                         </Badge>
                       )}
                     </div>
@@ -213,7 +215,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
       {!showForm && recentMessages.length === 0 && (
         <div className="py-8 text-center">
           <MessageSquare size={32} className="mx-auto mb-2 text-slate-300" />
-          <p className="text-xs text-slate-400">Нет отправленных сообщений</p>
+          <p className="text-xs text-slate-400">{t('noMessages')}</p>
         </div>
       )}
     </div>

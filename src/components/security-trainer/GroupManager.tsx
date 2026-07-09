@@ -112,9 +112,9 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
           </h3>
 
           {groups.length === 0 ? (
-              <p className="text-muted-foreground py-4 text-center text-sm">
-                {t('empty')}
-              </p>
+            <p className="text-muted-foreground py-4 text-center text-sm">
+              {t('noGroups')}
+            </p>
           ) : (
             <div className="space-y-2">
               {groups.map((name) => (
@@ -203,7 +203,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
 
       <div className="bg-secondary border-border rounded-lg border p-3">
         <p className="text-muted-foreground text-xs">
-          {t('tip')}
+          <strong>{t('tip')}</strong> {t('tipText')}
         </p>
       </div>
     </div>

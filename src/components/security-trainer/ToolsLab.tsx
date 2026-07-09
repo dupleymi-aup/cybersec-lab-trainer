@@ -326,12 +326,12 @@ export default function ToolsLab() {
         header,
         payload,
         valid: true,
-        error: isExpired ? `⚠️ ${t('jwtExpired')}` : undefined,
+        error: isExpired ? t('jwtExpired') : undefined,
       });
     } catch (e: unknown) {
       setJwtDecoded({
         valid: false,
-        error: t('jwtInvalid', { error: e instanceof Error ? e.message : 'parse error' }),
+        error: t('jwtInvalid', { error: e instanceof Error ? e.message : 'parsing error' }),
       });
     }
   };
@@ -517,7 +517,7 @@ export default function ToolsLab() {
               </div>
 
               <CodeBlock
-                code={`// Шифр Виженера — JavaScript
+                code={`// Vigenere Cipher — JavaScript
 function vigenereEncrypt(text, key) {
   const k = key.toLowerCase().replace(/[^a-z]/g, '');
   let ki = 0;

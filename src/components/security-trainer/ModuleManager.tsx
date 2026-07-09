@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Reorder } from 'framer-motion';
 import { GripVertical, Eye, EyeOff, Star, BookOpen, Save, RotateCcw } from 'lucide-react';
 import { modules } from '@/lib/data';
@@ -41,6 +42,8 @@ function saveConfig(config: StoredConfig) {
 }
 
 export default function ModuleManager() {
+  const t = useTranslations('moduleManager');
+
   const [moduleOrder, setModuleOrder] = useState(() => {
     const saved = loadConfig();
     const savedOrder: string[] = saved.order || [];
@@ -92,7 +95,7 @@ export default function ModuleManager() {
     };
     saveConfig(stored);
     setHasChanges(false);
-    toast.success('Конфигурация модулей сохранена');
+    toast.success(t('saveSuccess'));
   };
 
   const handleReset = () => {
@@ -106,7 +109,7 @@ export default function ModuleManager() {
       })),
     );
     setHasChanges(false);
-    toast.success('Конфигурация сброшена');
+    toast.success(t('resetSuccess'));
   };
 
   const enabledCount = moduleOrder.filter((m) => m.enabled).length;
@@ -126,25 +129,25 @@ export default function ModuleManager() {
               <BookOpen size={16} className="text-indigo-600" />
             </div>
             <div>
-              <h2 className="text-sm font-bold">Управление модулями</h2>
-              <p className="text-muted-foreground text-xs">Включение, порядок и обязательность модулей</p>
+              <h2 className="text-sm font-bold">{t('title')}</h2>
+              <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary" className="text-xs">
-            {enabledCount}/{modules.length} активных
+            {t('activeCount', { count: enabledCount, total: modules.length })}
           </Badge>
           <Badge variant="secondary" className="text-xs">
-            {requiredCount} обязательных
+            {t('requiredCount', { count: requiredCount })}
           </Badge>
           {hasChanges && (
             <>
               <Button size="sm" variant="outline" onClick={handleReset}>
-                <RotateCcw size={14} className="mr-1" /> Сброс
+                <RotateCcw size={14} className="mr-1" /> {t('reset')}
               </Button>
               <Button size="sm" onClick={handleSave}>
-                <Save size={14} className="mr-1" /> Сохранить
+                <Save size={14} className="mr-1" /> {t('save')}
               </Button>
             </>
           )}
@@ -180,13 +183,13 @@ export default function ModuleManager() {
                     <p className="truncate text-xs text-slate-400">{mod.description}</p>
                     <div className="mt-1 flex items-center gap-2">
                       <Badge className={`text-[10px] ${mod.difficultyColor}`}>{mod.difficulty}</Badge>
-                      <span className="text-[10px] text-slate-400">{mod.lessons} уроков</span>
+                      <span className="text-[10px] text-slate-400">{t('lessons', { count: mod.lessons })}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <label className="text-muted-foreground flex items-center gap-2 text-xs">
-                      <span>Обязат.</span>
+                      <span>{t('required')}</span>
                       <Switch
                         checked={mod.required && mod.enabled}
                         onCheckedChange={() => handleToggleRequired(mod.id)}
@@ -218,9 +221,7 @@ export default function ModuleManager() {
       {!hasChanges && (
         <div className="rounded-lg border border-sky-100 bg-sky-50 p-4">
           <p className="text-xs text-sky-700">
-            <strong>Как это работает:</strong> Перетаскивайте модули для изменения порядка. Отключенные модули
-            скрываются из навигации студентов. Обязательные модули отмечаются звездочкой и требуют прохождения.
-            Изменения сохраняются локально и применяются ко всем пользователям после перезагрузки.
+            <strong>{t('howItWorks')}</strong> {t('howItWorksDescription')}
           </p>
         </div>
       )}

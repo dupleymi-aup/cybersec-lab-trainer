@@ -39,7 +39,7 @@ function randomBetween(min: number, max: number) {
 }
 
 export default function CompletionCelebration() {
-  const t = useTranslations('common.celebration');
+  const t = useTranslations('errors');
   const [event, setEvent] = useState<CelebrationEvent | null>(null);
   const [particles, setParticles] = useState<
     Array<{
@@ -65,7 +65,7 @@ export default function CompletionCelebration() {
             triggerCelebration({
               type: 'module',
               title: t('moduleCompleted'),
-              subtitle: `«${mod.title}» — ${t('greatJob')}`,
+              subtitle: t('moduleCompletedSubtitle', { title: mod.title }),
             });
           }
         }

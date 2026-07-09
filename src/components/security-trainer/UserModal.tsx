@@ -176,13 +176,13 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
             {/* Full Name */}
             <div className="space-y-1.5">
               <Label>{t('nameLabel')}</Label>
-              <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ivanov Ivan" />
+              <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={t('namePlaceholder')} />
             </div>
 
             {/* Email + Phone */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Email *</Label>
+                <Label>{t('emailLabel')}</Label>
                 <Input
                   type="email"
                   value={email}
@@ -301,7 +301,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label>{t('groupLabel')}</Label>
-                <Input value={group} onChange={(e) => setGroup(e.target.value)} placeholder="ИС-101" />
+                <Input value={group} onChange={(e) => setGroup(e.target.value)} placeholder={t('groupPlaceholder')} />
               </div>
               <div className="space-y-1.5">
                 <Label>{t('courseLabel')}</Label>
@@ -309,7 +309,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
               </div>
               <div className="space-y-1.5">
                 <Label>{t('universityLabel')}</Label>
-                <Input value={university} onChange={(e) => setUniversity(e.target.value)} placeholder="МГУ" />
+                <Input value={university} onChange={(e) => setUniversity(e.target.value)} placeholder={t('universityPlaceholder')} />
               </div>
             </div>
 
@@ -334,7 +334,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
             {/* Email + Phone */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Email *</Label>
+                <Label>{t('emailLabel')}</Label>
                 <Input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
               </div>
               <div className="space-y-1.5">

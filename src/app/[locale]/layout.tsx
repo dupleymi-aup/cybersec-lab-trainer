@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/routing';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -11,19 +11,11 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  const isRu = locale === 'ru';
-  const isZh = locale === 'zh';
+  const t = await getTranslations({ locale, namespace: 'landing.header' });
+  const tHero = await getTranslations({ locale, namespace: 'landing.hero' });
   return {
-    title: isRu
-      ? 'CyberSec Lab -- Тренажёр по ИБ'
-      : isZh
-        ? 'CyberSec Lab -- 网络安全培训'
-        : 'CyberSec Lab -- Cybersecurity Training',
-    description: isRu
-      ? 'Интерактивная платформа для изучения уязвимостей'
-      : isZh
-        ? '学习Web应用程序漏洞的交互平台'
-        : 'Interactive platform for learning web vulnerabilities',
+    title: `${t('logo')} -- ${tHero('title')} ${tHero('titleHighlight')}`,
+    description: tHero('subtitle'),
   };
 }
 

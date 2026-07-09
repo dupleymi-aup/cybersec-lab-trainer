@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -62,15 +63,16 @@ interface Submission {
   gradedBy: string | null;
 }
 
-const typeLabels: Record<Assignment['type'], string> = {
-  quiz: 'Квиз',
-  'code-review': 'Code Review',
-  attack: 'Атака',
-  writeup: 'Write-up',
-  custom: 'Своё',
+const typeKeyMap: Record<Assignment['type'], string> = {
+  quiz: 'typeQuiz',
+  'code-review': 'typeCodeReview',
+  attack: 'typeAttack',
+  writeup: 'typeWriteup',
+  custom: 'typeCustom',
 };
 
 export default function StudentAssignments() {
+  const t = useTranslations('teacher.assignments');
   const formatDate = useDateFormatter();
   const user = useAuthStore((s) => s.user);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -118,11 +120,11 @@ export default function StudentAssignments() {
       }
     } catch (e) {
       logger.warn('StudentAssignments fetchData failed', { error: e });
-      toast.error('Ошибка загрузки заданий');
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, t]);
 
   useEffect(() => {
     fetchData();
@@ -132,17 +134,17 @@ export default function StudentAssignments() {
   useEffect(() => {
     if (!timerRunning || timer <= 0) return;
     const interval = setInterval(() => {
-      setTimer((t) => {
-        if (t <= 1) {
+      setTimer((prev) => {
+        if (prev <= 1) {
           setTimerRunning(false);
-          toast.warning('Время вышло! Отправьте ваше решение.');
+          toast.warning(t('timerExpired'));
           return 0;
         }
-        return t - 1;
+        return prev - 1;
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [timerRunning, timer]);
+  }, [timerRunning, timer, t]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -162,7 +164,7 @@ export default function StudentAssignments() {
 
   const handleSubmit = async (a: Assignment) => {
     if (!submissionText.trim()) {
-      toast.error('Введите ваше решение');
+      toast.error(t('enterSolution'));
       return;
     }
 
@@ -176,18 +178,18 @@ export default function StudentAssignments() {
       });
 
       if (res.ok) {
-        toast.success('Решение отправлено!');
+        toast.success(t('solutionSent'));
         setViewingId(null);
         setSubmissionText('');
         setTimerRunning(false);
         fetchData();
       } else {
-        const err = await res.json().catch(() => ({ error: 'Ошибка' }));
-        toast.error(err.error || 'Не удалось отправить');
+        const err = await res.json().catch(() => ({ error: t('error') }));
+        toast.error(err.error || t('sendFailed'));
       }
     } catch (e) {
       logger.warn('StudentAssignments handleSubmit failed', { error: e });
-      toast.error('Ошибка сети');
+      toast.error(t('networkError'));
     } finally {
       setSubmitting(false);
     }
@@ -228,7 +230,7 @@ export default function StudentAssignments() {
                     setTimerRunning(false);
                   }}
                 >
-                  <ChevronLeft size={16} /> Назад
+                  <ChevronLeft size={16} /> {t('back')}
                 </Button>
                 <h2 className="text-lg font-bold">{a.title}</h2>
               </div>
@@ -246,23 +248,23 @@ export default function StudentAssignments() {
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-muted-foreground text-xs">Тип</p>
-                <p className="text-sm font-semibold">{typeLabels[a.type]}</p>
+                <p className="text-muted-foreground text-xs">{t('type')}</p>
+                <p className="text-sm font-semibold">{t(typeKeyMap[a.type])}</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-muted-foreground text-xs">Баллы</p>
+                <p className="text-muted-foreground text-xs">{t('score')}</p>
                 <p className="text-sm font-semibold">
                   {a.passScore}% / {a.maxScore}
                 </p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-muted-foreground text-xs">Попытки</p>
+                <p className="text-muted-foreground text-xs">{t('attempts')}</p>
                 <p className="text-sm font-semibold">
                   {attemptCount}/{a.attempts === 0 ? '∞' : a.attempts}
                 </p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-muted-foreground text-xs">Лучший результат</p>
+                <p className="text-muted-foreground text-xs">{t('bestScore')}</p>
                 <p className="text-sm font-semibold">
                   {(() => {
                     const best = getMyBestSubmission(a);
@@ -274,7 +276,7 @@ export default function StudentAssignments() {
 
             {a.moduleId && (
               <Badge variant="outline" className="text-xs">
-                Модуль: {modules.find((m) => m.id === a.moduleId)?.title || a.moduleId}
+                {t('module', { name: modules.find((m) => m.id === a.moduleId)?.title || a.moduleId })}
               </Badge>
             )}
 
@@ -282,12 +284,13 @@ export default function StudentAssignments() {
               <div className="flex items-center gap-2 text-sm">
                 <Calendar size={14} className="text-orange-500" />
                 <span>
-                  Дедлайн:{' '}
-                  {new Date(a.dueAt).toLocaleDateString('ru-RU', {
-                    day: 'numeric',
-                    month: 'long',
-                    hour: '2-digit',
-                    minute: '2-digit',
+                  {t('deadline', {
+                    date: new Date(a.dueAt).toLocaleDateString(undefined, {
+                      day: 'numeric',
+                      month: 'long',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    }),
                   })}
                 </span>
               </div>
@@ -295,7 +298,7 @@ export default function StudentAssignments() {
 
             {a.content && (
               <div>
-                <p className="mb-2 text-sm font-medium">Задание</p>
+                <p className="mb-2 text-sm font-medium">{t('assignment')}</p>
                 <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap">{a.content}</div>
               </div>
             )}
@@ -303,16 +306,16 @@ export default function StudentAssignments() {
             {/* Submission area */}
             {canSubmit ? (
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold">Ваше решение</h3>
+                <h3 className="text-sm font-semibold">{t('yourSolution')}</h3>
                 <textarea
                   value={submissionText}
                   onChange={(e) => setSubmissionText(e.target.value)}
                   placeholder={
                     a.type === 'code-review'
-                      ? '// Вставьте ваш код'
+                      ? t('placeholderCodeReview')
                       : a.type === 'attack'
-                        ? 'Опишите ваш подход к атаке...'
-                        : 'Введите ваше решение...'
+                        ? t('placeholderAttack')
+                        : t('placeholderDefault')
                   }
                   className="border-border bg-card min-h-[150px] w-full rounded-lg border px-3 py-3 font-mono text-sm"
                 />
@@ -323,7 +326,7 @@ export default function StudentAssignments() {
                     ) : (
                       <Send size={16} className="mr-1" />
                     )}
-                    Отправить
+                    {t('submit')}
                   </Button>
                 </div>
               </div>
@@ -331,7 +334,7 @@ export default function StudentAssignments() {
               <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <AlertCircle size={20} className="shrink-0 text-amber-500" />
                 <p className="text-sm text-amber-700">
-                  Вы использовали все {a.attempts} попыток. Обратитесь к преподавателю для дополнительной попытки.
+                  {t('allAttemptsUsed', { count: a.attempts })}
                 </p>
               </div>
             )}
@@ -339,11 +342,11 @@ export default function StudentAssignments() {
             {/* Previous submissions */}
             {mySubs.length > 0 && (
               <div className="space-y-2">
-                <h3 className="text-sm font-semibold">Ваши попытки</h3>
+                <h3 className="text-sm font-semibold">{t('yourAttempts')}</h3>
                 {mySubs.map((sub) => (
                   <div key={sub.id} className="border-border flex items-center justify-between rounded-lg border p-3">
                     <div className="flex items-center gap-3 text-sm">
-                      <span className="text-muted-foreground">Попытка #{sub.attempt}</span>
+                      <span className="text-muted-foreground">{t('attempt', { num: sub.attempt })}</span>
                       <span className="text-muted-foreground">{formatDate(sub.startedAt)}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -353,11 +356,11 @@ export default function StudentAssignments() {
                         </Badge>
                       ) : sub.submittedAt ? (
                         <Badge variant="secondary" className="text-xs">
-                          <Clock size={12} className="mr-1" /> Ожидает проверки
+                          <Clock size={12} className="mr-1" /> {t('awaitingReview')}
                         </Badge>
                       ) : (
                         <Badge variant="outline" className="text-xs">
-                          Незавершённая
+                          {t('incomplete')}
                         </Badge>
                       )}
                       {sub.passed === true && <CheckCircle size={14} className="text-emerald-500" />}
@@ -378,21 +381,21 @@ export default function StudentAssignments() {
       <div className="mb-6">
         <h1 className="flex items-center gap-2 text-xl font-bold">
           <FileText size={22} className="text-violet-500" />
-          Мои задания
+          {t('myAssignments')}
         </h1>
-        <p className="text-muted-foreground mt-1 text-sm">Выполняйте задания преподавателя и отслеживайте прогресс</p>
+        <p className="text-muted-foreground mt-1 text-sm">{t('myAssignmentsSubtitle')}</p>
       </div>
 
       {loading ? (
         <div className="py-12 text-center text-slate-400">
           <Loader2 size={32} className="mx-auto mb-3 animate-spin opacity-50" />
-          <p className="text-sm">Загрузка заданий...</p>
+          <p className="text-sm">{t('loadingAssignments')}</p>
         </div>
       ) : assignments.length === 0 ? (
         <Card className="border-border">
           <CardContent className="p-12 text-center text-slate-400">
             <FileText size={40} className="mx-auto mb-3 opacity-50" />
-            <p className="text-sm">Нет доступных заданий</p>
+            <p className="text-sm">{t('noAssignments')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -437,16 +440,16 @@ export default function StudentAssignments() {
                           {a.title}
                         </button>
                         <Badge variant="outline" className="text-[10px]">
-                          {typeLabels[a.type]}
+                          {t(typeKeyMap[a.type])}
                         </Badge>
                         {isCompleted && (
                           <Badge className="border-0 bg-emerald-100 text-[10px] text-emerald-700">
-                            <CheckCircle size={10} className="mr-0.5" /> Выполнено
+                            <CheckCircle size={10} className="mr-0.5" /> {t('completed')}
                           </Badge>
                         )}
                         {isPending && (
                           <Badge variant="secondary" className="text-[10px]">
-                            <Clock size={10} className="mr-0.5" /> Ожидает
+                            <Clock size={10} className="mr-0.5" /> {t('pending')}
                           </Badge>
                         )}
                       </div>
@@ -455,28 +458,31 @@ export default function StudentAssignments() {
 
                       <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-4 text-xs">
                         <span className="flex items-center gap-1">
-                          <Award size={12} /> {a.maxScore} баллов
+                          <Award size={12} /> {t('points', { count: a.maxScore })}
                         </span>
                         {a.timeLimit && (
                           <span className="flex items-center gap-1">
-                            <Clock size={12} /> {a.timeLimit} мин
+                            <Clock size={12} /> {t('minutes', { count: a.timeLimit })}
                           </span>
                         )}
                         <span>
-                          Попытки: {attemptCount}/{a.attempts === 0 ? '∞' : a.attempts}
+                          {t('attemptsCount', {
+                            used: attemptCount,
+                            total: a.attempts === 0 ? '∞' : a.attempts,
+                          })}
                         </span>
-                        {a.autoGrade && <span>Автопроверка</span>}
+                        {a.autoGrade && <span>{t('autoGrade')}</span>}
                         {dueDate && daysLeft !== null && (
                           <span
                             className={isOverdue ? 'font-medium text-red-500' : daysLeft <= 3 ? 'text-orange-500' : ''}
                           >
                             {isOverdue
-                              ? `Просрочен (${Math.abs(daysLeft)} дн.)`
+                              ? t('overdueWithDays', { days: Math.abs(daysLeft) })
                               : daysLeft === 0
-                                ? 'Сегодня'
+                                ? t('today')
                                 : daysLeft === 1
-                                  ? 'Завтра'
-                                  : `Дедлайн: ${daysLeft} дн.`}
+                                  ? t('tomorrow')
+                                  : t('deadlineDays', { days: daysLeft })}
                           </span>
                         )}
                       </div>

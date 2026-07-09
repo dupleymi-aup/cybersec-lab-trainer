@@ -1133,7 +1133,7 @@ export default function TeacherPanel() {
               {/* Category averages bar chart */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-4 text-sm font-semibold">{t('analyticsTitle')}</h3>
+                  <h3 className="mb-4 text-sm font-semibold">{t('quizAvgScore')}</h3>
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -1145,7 +1145,7 @@ export default function TeacherPanel() {
                             const avg =
                               scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
                             return {
-                              name: cat.name.replace(' квизы', '').replace(' quizzes', ''),
+                              name: cat.name.replace(` ${t('quiz')}`, ''),
                               avg,
                               attempted: scores.length,
                             };
@@ -1175,7 +1175,7 @@ export default function TeacherPanel() {
                 {/* Score distribution pie chart */}
                 <Card className="border-border">
                   <CardContent className="p-5">
-                    <h3 className="mb-4 text-sm font-semibold">{t('analyticsSubtitle')}</h3>
+                    <h3 className="mb-4 text-sm font-semibold">{t('quizScoreDistribution')}</h3>
                     {(() => {
                       const allScores = students.flatMap((s) => Object.values(getSp(s.id).quizScores));
                       const excellent = allScores.filter((s) => s >= 80).length;
@@ -1245,7 +1245,7 @@ export default function TeacherPanel() {
                       const active = students.filter((s) => getSp(s.id).completedModules.length > 0).length;
                       const inactive = students.length - active;
                       const data = [
-                        { name: t('activeStudents'), value: active, color: '#10b981' },
+                        { name: t('active'), value: active, color: '#10b981' },
                         {
                           name: t('inactiveStudents'),
                           value: inactive,
@@ -1285,7 +1285,7 @@ export default function TeacherPanel() {
               {/* Top students ranking */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-4 text-sm font-semibold">{t('ranking')}</h3>
+                    <h3 className="mb-4 text-sm font-semibold">{t('ranking')}</h3>
                   {(() => {
                     const studentRankings = students
                       .map((s) => {
@@ -1332,7 +1332,7 @@ export default function TeacherPanel() {
                             </div>
                             <div className="flex items-center gap-4 text-xs">
                               <span className="text-muted-foreground">{s.mods} {t('modules')}</span>
-                              <span className="text-muted-foreground">{t('quizScoreShort', { score: s.avgQ })}</span>
+                              <span className="text-muted-foreground">{t('quiz')}: {s.avgQ}%</span>
                               <span className="flex items-center gap-0.5 text-slate-400">
                                 <Clock size={10} /> {s.lastActive}
                               </span>
@@ -1437,7 +1437,7 @@ export default function TeacherPanel() {
                         <Tooltip />
                         <Legend />
                         <Bar dataKey="avgModules" name={t('avgModules')} fill="#6366f1" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="avgScore" name={t('avgScore') + ' (%)'} fill="#10b981" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="avgScore" name={t('avgScore')} fill="#10b981" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="activityRate" name={t('activityRate')} fill="#f59e0b" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -1487,7 +1487,7 @@ export default function TeacherPanel() {
           ) : (
             <div className="py-12 text-center text-slate-400">
               <GitCompare size={40} className="mx-auto mb-3 opacity-50" />
-              <p className="text-sm">{t('comparisonSubtitle')}</p>
+              <p className="text-sm">{t('noData')}</p>
             </div>
           )}
         </TabsContent>
@@ -1549,7 +1549,7 @@ export default function TeacherPanel() {
                             <p className="text-sm font-bold">
                               {progress
                                 ? progress.lastActive
-                                  ? t('daysAgo', { days: daysSinceActive })
+                                  ? `${daysSinceActive} ${t('daysAgo')}`
                                   : t('never')
                                 : t('never')}
                             </p>
@@ -1601,7 +1601,7 @@ export default function TeacherPanel() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{activeStudents}</p>
-                    <p className="text-muted-foreground text-xs">{t('activeStudents')}</p>
+                    <p className="text-muted-foreground text-xs">{t('active')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -1795,7 +1795,7 @@ export default function TeacherPanel() {
               <CardContent className="p-5">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <AlertTriangle size={16} className="text-red-500" />
-                  {t('atRiskStudents', { count: atRiskStudents.length })}
+                  {t('atRiskStudents')} ({atRiskStudents.length})
                 </h3>
                 <div className="space-y-2">
                   {atRiskStudents

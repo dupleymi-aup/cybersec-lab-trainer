@@ -30,3 +30,6 @@ e2e-results.json/
 
 # Local environment overrides
 .dev.vars
+
+# AI assistant artifacts
+.mimocode/
