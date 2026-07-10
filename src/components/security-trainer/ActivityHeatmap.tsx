@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { getActivityHeatmap, getAllUsers, type HeatmapData, type User } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -40,6 +40,7 @@ interface TooltipState {
 
 export default function ActivityHeatmap() {
   const t = useTranslations('activityHeatmap');
+  const locale = useLocale();
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [dateRange, setDateRange] = useState<DateRange>('90d');
   const [heatmapData, setHeatmapData] = useState<HeatmapData | null>(null);
@@ -255,7 +256,7 @@ export default function ActivityHeatmap() {
 
                 {tooltip.visible && (
                   <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded bg-slate-800 px-3 py-2 text-xs text-white shadow-lg dark:bg-slate-700" style={{ left: tooltip.x, top: tooltip.y - 8 }}>
-                    <p className="font-medium">{formatDate(tooltip.date, 'en-US')}</p>
+                    <p className="font-medium">{formatDate(tooltip.date, locale)}</p>
                     <p>{tooltip.count} {t('activities')}</p>
                   </div>
                 )}
@@ -283,7 +284,7 @@ export default function ActivityHeatmap() {
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
                   <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-sky-100"><Calendar size={16} className="text-sky-600" /></div>
-                  <p className="text-2xl font-bold text-sky-600">{heatmapData.mostActiveDay ? formatDate(heatmapData.mostActiveDay, 'en-US') : '—'}</p>
+                  <p className="text-2xl font-bold text-sky-600">{heatmapData.mostActiveDay ? formatDate(heatmapData.mostActiveDay, locale) : '—'}</p>
                   <p className="text-muted-foreground mt-1 text-xs">{t('mostActiveDay')}</p>
                 </CardContent>
               </Card>
