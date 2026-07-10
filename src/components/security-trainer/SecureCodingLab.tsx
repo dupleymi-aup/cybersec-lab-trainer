@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { secureCodingChallenges } from '@/lib/data';
 import CodeBlock from './CodeBlock';
@@ -11,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Code, CheckCircle2, XCircle, ArrowRight, ArrowLeft, RotateCcw } from 'lucide-react';
 
 export default function SecureCodingLab() {
+  const t = useTranslations('labs.secureCoding');
   const completeModule = useAppStore((s) => s.completeModule);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
@@ -82,8 +84,8 @@ export default function SecureCodingLab() {
           <Code size={20} className="text-emerald-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Безопасное кодирование</h1>
-          <p className="text-muted-foreground text-xs">Найдите уязвимость и выберите правильное решение</p>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -92,13 +94,13 @@ export default function SecureCodingLab() {
         <CardContent className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-medium">
-              Задание {activeChallenge + 1} из {secureCodingChallenges.length}
+              {t('challengeNumber', { current: activeChallenge + 1, total: secureCodingChallenges.length })}
             </span>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="flex items-center gap-1 text-[10px]">
-                <CheckCircle2 size={12} /> {secureCodingCorrectCount} правильных
+                <CheckCircle2 size={12} /> {t('correctCount', { count: secureCodingCorrectCount })}
               </Badge>
-              {isCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
+              {isCompleted && <Badge className="bg-emerald-600 text-white">{t('moduleCompleted')}</Badge>}
             </div>
           </div>
           <div className="flex gap-2">
@@ -132,7 +134,7 @@ export default function SecureCodingLab() {
               <Badge variant="secondary" className="text-[10px]">
                 {challenge.category}
               </Badge>
-              <span className="text-xs text-slate-400">Код-ревью</span>
+              <span className="text-xs text-slate-400">{t('codeReview')}</span>
             </div>
             <h2 className="mb-3 font-semibold">{challenge.title}</h2>
 
@@ -140,7 +142,7 @@ export default function SecureCodingLab() {
             <CodeBlock code={challenge.code} language="javascript" title="vulnerable.js" />
 
             <div className="mt-4">
-              <h3 className="mb-3 text-sm font-semibold">Что нужно исправить?</h3>
+              <h3 className="mb-3 text-sm font-semibold">{t('whatToFix')}</h3>
               <div className="space-y-2">
                 {challenge.options.map((option, i) => {
                   let optionStyle = 'border-border hover:border-slate-400 hover:bg-secondary';
@@ -195,7 +197,7 @@ export default function SecureCodingLab() {
                 onClick={handleCheckAnswer}
                 disabled={selectedOption === null}
               >
-                Проверить ответ
+                {t('checkAnswer')}
               </Button>
             )}
 
@@ -217,11 +219,11 @@ export default function SecureCodingLab() {
                     >
                       {challenge.options[selectedOption]?.correct ? (
                         <>
-                          <CheckCircle2 size={14} className="mr-1 inline" /> Правильно!
+                          <CheckCircle2 size={14} className="mr-1 inline" /> {t('correct')}
                         </>
                       ) : (
                         <>
-                          <XCircle size={14} className="mr-1 inline" /> Неправильно
+                          <XCircle size={14} className="mr-1 inline" /> {t('incorrect')}
                         </>
                       )}
                     </h4>
@@ -230,19 +232,19 @@ export default function SecureCodingLab() {
 
                   {/* Retry button */}
                   <Button variant="outline" size="sm" className="mt-3 w-full" onClick={retryChallenge}>
-                    <RotateCcw size={14} className="mr-1" /> Повторить
+                    <RotateCcw size={14} className="mr-1" /> {t('retry')}
                   </Button>
 
                   <div className="mt-4 flex justify-between">
                     <Button variant="outline" size="sm" onClick={prevChallenge} disabled={activeChallenge === 0}>
-                      <ArrowLeft size={14} className="mr-1" /> Назад
+                      <ArrowLeft size={14} className="mr-1" /> {t('back')}
                     </Button>
                     {activeChallenge < secureCodingChallenges.length - 1 ? (
                       <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={nextChallenge}>
-                        Следующее <ArrowRight size={14} className="ml-1" />
+                        {t('next')} <ArrowRight size={14} className="ml-1" />
                       </Button>
                     ) : (
-                      <Badge className="bg-emerald-600 py-1.5 text-white">Все задания завершены!</Badge>
+                      <Badge className="bg-emerald-600 py-1.5 text-white">{t('allDone')}</Badge>
                     )}
                   </div>
                 </motion.div>

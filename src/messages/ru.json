@@ -2118,6 +2118,13 @@
     "stepAttack": "Атака",
     "stepVulnerable": "Уязвимый код",
     "stepSecure": "Защита",
-    "stepQuiz": "Квиз"
+    "stepQuiz": "Квиз",
+    "correct": "Правильно!",
+    "incorrect": "Неверно.",
+    "previous": "← Пред. шаг",
+    "previousHeader": "← Пред. заголовок",
+    "nextHeader": "Следующий заголовок →",
+    "next": "Далее →",
+    "markComplete": "Отметить модуль как изученный"
   }
 }

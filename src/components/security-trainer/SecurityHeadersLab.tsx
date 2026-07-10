@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { securityHeaders } from '@/lib/data';
 import CodeBlock from './CodeBlock';
@@ -21,14 +22,6 @@ import {
 
 type HeaderStep = 'description' | 'attack' | 'vulnerable' | 'secure' | 'quiz';
 
-const stepLabels: { key: HeaderStep; label: string }[] = [
-  { key: 'description', label: 'Описание' },
-  { key: 'attack', label: 'Атака' },
-  { key: 'vulnerable', label: 'Уязвимый код' },
-  { key: 'secure', label: 'Защита' },
-  { key: 'quiz', label: 'Квиз' },
-];
-
 const categoryColors: Record<string, string> = {
   'Защита от XSS': 'bg-red-100 text-red-700',
   'Защита соединения': 'bg-blue-100 text-blue-700',
@@ -45,9 +38,18 @@ const categoryColors: Record<string, string> = {
 };
 
 export default function SecurityHeadersLab() {
+  const t = useTranslations('labs.securityHeaders');
   const completedModules = useAppStore((s) => s.completedModules);
   const completeModule = useAppStore((s) => s.completeModule);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
+
+  const stepLabels: { key: HeaderStep; label: string }[] = [
+    { key: 'description', label: t('stepDescription') },
+    { key: 'attack', label: t('stepAttack') },
+    { key: 'vulnerable', label: t('stepVulnerable') },
+    { key: 'secure', label: t('stepSecure') },
+    { key: 'quiz', label: t('stepQuiz') },
+  ];
   const [currentHeader, setCurrentHeader] = useState(0);
   const [step, setStep] = useState<HeaderStep>('description');
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
@@ -122,7 +124,7 @@ export default function SecurityHeadersLab() {
         </div>
         <div>
           <h1 className="text-xl font-bold">Security Headers</h1>
-          <p className="text-muted-foreground text-xs">Интерактивный гид по HTTP-заголовкам безопасности</p>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -131,9 +133,9 @@ export default function SecurityHeadersLab() {
         <CardContent className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-medium">
-              Заголовки: {correctHeaders.size}/{securityHeaders.length} правильных
+              {correctHeaders.size}/{securityHeaders.length}
             </span>
-            {isCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
+            {isCompleted && <Badge className="bg-emerald-600 text-white">{t('moduleCompleted')}</Badge>}
           </div>
           <div className="flex gap-1.5">
             {securityHeaders.map((h, i) => (
@@ -205,7 +207,7 @@ export default function SecurityHeadersLab() {
             <Card className="border-sky-200 bg-sky-50">
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-sky-800">
-                  <Lightbulb size={16} /> Общее описание
+                  <Lightbulb size={16} /> {t('stepDescription')}
                 </h3>
                 <p className="text-sm leading-relaxed text-sky-700">{header.description}</p>
               </CardContent>
@@ -217,7 +219,7 @@ export default function SecurityHeadersLab() {
             <Card className="border-red-200 bg-red-50">
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-red-800">
-                  <AlertTriangle size={16} /> Сценарий атаки
+                  <AlertTriangle size={16} /> {t('stepAttack')}
                 </h3>
                 <p className="text-sm leading-relaxed text-red-700">{header.attackDemo}</p>
               </CardContent>
@@ -229,7 +231,7 @@ export default function SecurityHeadersLab() {
             <Card className="border-amber-200">
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-amber-800">
-                  <AlertTriangle size={16} /> Уязвимая конфигурация
+                  <AlertTriangle size={16} /> {t('stepVulnerable')}
                 </h3>
                 <CodeBlock code={header.vulnerableConfig} language="javascript" title="vulnerable.js" />
               </CardContent>
@@ -241,7 +243,7 @@ export default function SecurityHeadersLab() {
             <Card className="border-emerald-200 bg-emerald-50">
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
-                  <ShieldCheck size={16} /> Безопасная конфигурация
+                  <ShieldCheck size={16} /> {t('stepSecure')}
                 </h3>
                 <CodeBlock code={header.secureConfig} language="javascript" title="secure.js" />
               </CardContent>
@@ -253,7 +255,7 @@ export default function SecurityHeadersLab() {
             <Card className="border-violet-200">
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold text-violet-800">
-                  <Trophy size={16} /> Проверьте знания
+                  <Trophy size={16} /> {t('stepQuiz')}
                 </h3>
                 <p className="text-sm font-medium">{header.quiz.question}</p>
                 <div className="space-y-2">
@@ -292,7 +294,7 @@ export default function SecurityHeadersLab() {
                       isQuizCorrect ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
                     }`}
                   >
-                    <p className="mb-1 font-medium">{isQuizCorrect ? 'Правильно!' : 'Неверно.'}</p>
+                    <p className="mb-1 font-medium">{isQuizCorrect ? t('correct') : t('incorrect')}</p>
                     <p className="text-xs leading-relaxed">{header.quiz.explanation}</p>
                   </motion.div>
                 )}
@@ -306,35 +308,35 @@ export default function SecurityHeadersLab() {
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={prevStep} disabled={stepIndex === 0}>
-            <ArrowLeft size={14} className="mr-1" /> Пред. шаг
+            <ArrowLeft size={14} className="mr-1" /> {t('previous')}
           </Button>
           <Button variant="outline" size="sm" onClick={prevHeader} disabled={currentHeader === 0}>
-            <ArrowLeft size={14} className="mr-1" /> Пред. заголовок
+            <ArrowLeft size={14} className="mr-1" /> {t('previousHeader')}
           </Button>
         </div>
         <div className="flex gap-2">
           {step === 'quiz' && quizSubmitted && isQuizCorrect ? (
             currentHeader < securityHeaders.length - 1 ? (
               <Button size="sm" className="bg-sky-600 hover:bg-sky-700" onClick={nextHeader}>
-                Следующий заголовок <ArrowRight size={14} className="ml-1" />
+                {t('nextHeader')} <ArrowRight size={14} className="ml-1" />
               </Button>
             ) : !isCompleted ? (
               <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleComplete}>
-                <CheckCircle2 size={16} className="mr-1" /> Отметить модуль как изученный
+                <CheckCircle2 size={16} className="mr-1" /> {t('markComplete')}
               </Button>
             ) : null
           ) : stepIndex < stepLabels.length - 1 ? (
             <Button size="sm" className="bg-sky-600 hover:bg-sky-700" onClick={nextStep}>
-              Далее <ArrowRight size={14} className="ml-1" />
+              {t('next')} <ArrowRight size={14} className="ml-1" />
             </Button>
           ) : (
             <Button size="sm" className="bg-sky-600 hover:bg-sky-700" onClick={nextHeader}>
-              Следующий заголовок <ArrowRight size={14} className="ml-1" />
+              {t('nextHeader')} <ArrowRight size={14} className="ml-1" />
             </Button>
           )}
           {isCompleted && (
             <div className="ml-2 flex items-center gap-1 text-sm font-medium text-emerald-600">
-              <CheckCircle2 size={16} /> Модуль завершён!
+              <CheckCircle2 size={16} /> {t('moduleCompleted')}
             </div>
           )}
         </div>

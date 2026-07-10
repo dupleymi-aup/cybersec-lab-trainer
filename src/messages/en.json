@@ -2119,6 +2119,13 @@
     "stepAttack": "Attack",
     "stepVulnerable": "Vulnerable Code",
     "stepSecure": "Protection",
-    "stepQuiz": "Quiz"
+    "stepQuiz": "Quiz",
+    "correct": "Correct!",
+    "incorrect": "Incorrect.",
+    "previous": "← Prev Step",
+    "previousHeader": "← Prev Header",
+    "nextHeader": "Next Header →",
+    "next": "Next →",
+    "markComplete": "Mark Module as Completed"
   }
 }
