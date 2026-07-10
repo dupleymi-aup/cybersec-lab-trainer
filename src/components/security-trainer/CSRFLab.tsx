@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { quizQuestions, attackSteps, defenseMechanisms, csrfChallenges, realWorldExamples } from '@/lib/data';
 import CodeBlock from './CodeBlock';
@@ -38,6 +39,7 @@ const mappedAttackSteps = attackSteps.map((step) => ({
 }));
 
 export default function CSRFLab() {
+  const t = useTranslations('labs.csrf');
   const completedModules = useAppStore((s) => s.completedModules);
   const completeModule = useAppStore((s) => s.completeModule);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
@@ -134,21 +136,17 @@ export default function CSRFLab() {
           <Lock size={20} className="text-emerald-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">CSRF-атаки</h1>
-          <p className="text-muted-foreground text-xs">Cross-Site Request Forgery — подделка межсайтовых запросов</p>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
       </div>
 
       {/* What is CSRF */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h2 className="mb-2 font-semibold">Что такое CSRF?</h2>
+          <h2 className="mb-2 font-semibold">{t('whatIsCsrf')}</h2>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            CSRF — это атака, при которой злоумышленник заставляет браузер аутентифицированного пользователя выполнить
-            нежелательное действие на сайте, на котором пользователь уже авторизован. Атака эксплуатирует то, что
-            браузер автоматически прикрепляет куки аутентификации к каждому запросу к домену, для которого они
-            установлены. Злоумышленник создаёт вредоносную страницу с скрытой HTML-формой, которая автоматически
-            отправляет запрос к целевому сайту.
+            {t('csrfDescription')}
           </p>
         </CardContent>
       </Card>
@@ -157,9 +155,9 @@ export default function CSRFLab() {
       <Card className="border-border">
         <CardContent className="p-5">
           <h3 className="mb-1 flex items-center gap-2 text-sm font-semibold">
-            <Target size={16} className="text-emerald-600" /> Симуляция атаки — пошаговая демонстрация
+            <Target size={16} className="text-emerald-600" /> {t('attackSimulation')}
           </h3>
-          <p className="text-muted-foreground mb-4 text-xs">Нажимайте «Далее», чтобы увидеть каждый этап CSRF-атаки</p>
+          <p className="text-muted-foreground mb-4 text-xs">{t('clickNext')}</p>
 
           {/* Steps */}
           <div className="space-y-3">
@@ -207,7 +205,7 @@ export default function CSRFLab() {
           {/* Navigation */}
           <div className="mt-4 flex justify-between">
             <Button variant="outline" size="sm" onClick={goPrev} disabled={currentStep === 0}>
-              <ArrowLeft size={14} className="mr-1" /> Назад
+              <ArrowLeft size={14} className="mr-1" /> {t('back')}
             </Button>
             <div className="flex gap-1">
               {mappedAttackSteps.map((_, i) => (
@@ -222,11 +220,11 @@ export default function CSRFLab() {
             </div>
             {currentStep < mappedAttackSteps.length - 1 ? (
               <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={goNext}>
-                Далее <ArrowRight size={14} className="ml-1" />
+                {t('next')} <ArrowRight size={14} className="ml-1" />
               </Button>
             ) : (
               <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => setShowDefense(true)}>
-                К защите <ShieldCheck size={14} className="ml-1" />
+                {t('toDefense')} <ShieldCheck size={14} className="ml-1" />
               </Button>
             )}
           </div>
@@ -240,9 +238,9 @@ export default function CSRFLab() {
             <CardContent className="p-5">
               <h3 className="mb-1 flex items-center gap-2 text-sm font-semibold text-emerald-800">
                 <ShieldCheck size={16} />
-                Механизмы защиты от CSRF
+                {t('csrfDefense')}
               </h3>
-              <p className="text-xs text-emerald-700">Нажимайте на каждый механизм, чтобы увидеть пример кода</p>
+              <p className="text-xs text-emerald-700">{t('clickToSeeCode')}</p>
             </CardContent>
           </Card>
 
@@ -257,7 +255,7 @@ export default function CSRFLab() {
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm font-semibold">{def.title}</h4>
                     <Badge variant="outline" className="text-[10px]">
-                      {activeDefense === i ? 'Скрыть' : 'Показать код'}
+                      {activeDefense === i ? t('hideCode') : t('showCode')}
                     </Badge>
                   </div>
                   <p className="text-muted-foreground mt-2 text-xs leading-relaxed">{def.description}</p>
@@ -285,7 +283,7 @@ export default function CSRFLab() {
             <div className="mt-6 space-y-3">
               <Button variant="outline" className="w-full" onClick={() => setShowRealWorld(!showRealWorld)}>
                 <History size={16} className="mr-2" />
-                {showRealWorld ? 'Скрыть' : 'Показать'} реальные примеры CSRF-атак
+                {showRealWorld ? t('hideRealExamples') : t('showRealExamples')}
               </Button>
 
               <AnimatePresence>
@@ -309,7 +307,7 @@ export default function CSRFLab() {
                               <span className="text-sm font-semibold">{ex.company}</span>
                             </div>
                             <Badge variant="outline" className="text-[10px]">
-                              {expandedExample === i ? 'Скрыть' : 'Подробнее'}
+                              {expandedExample === i ? t('hideCode') : t('showCode')}
                             </Badge>
                           </div>
                           <AnimatePresence>
@@ -323,11 +321,11 @@ export default function CSRFLab() {
                                 <p className="text-muted-foreground text-xs leading-relaxed">{ex.description}</p>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                   <div className="rounded bg-red-50 p-2">
-                                    <p className="font-semibold text-red-700">Влияние:</p>
+                                    <p className="font-semibold text-red-700">{t('impact')}</p>
                                     <p className="text-red-600">{ex.impact}</p>
                                   </div>
                                   <div className="rounded bg-emerald-50 p-2">
-                                    <p className="font-semibold text-emerald-700">Исправление:</p>
+                                    <p className="font-semibold text-emerald-700">{t('fix')}</p>
                                     <p className="text-emerald-600">{ex.fix}</p>
                                   </div>
                                 </div>
@@ -351,7 +349,7 @@ export default function CSRFLab() {
                 onClick={() => setShowChallenges(!showChallenges)}
               >
                 <Lightbulb size={16} className="mr-2" />
-                {showChallenges ? 'Скрыть' : 'Пройти'} интерактивные задания ({csrfChallenges.length} шт.)
+                {showChallenges ? t('hideCode') : t('interactiveChallenges')} ({csrfChallenges.length})
               </Button>
 
               <AnimatePresence>
@@ -361,7 +359,7 @@ export default function CSRFLab() {
                       <CardContent className="space-y-4 p-5">
                         <div className="flex items-center justify-between">
                           <h3 className="flex items-center gap-2 text-sm font-semibold text-amber-800">
-                            <BookOpen size={16} /> Задание {currentChallenge + 1}/{csrfChallenges.length}
+                            <BookOpen size={16} /> {t('challengeNumber', { current: currentChallenge + 1, total: csrfChallenges.length })}
                           </h3>
                           {csrfChallengeScores.total > 0 && (
                             <Badge className="border-0 bg-amber-100 text-amber-700">
@@ -419,7 +417,7 @@ export default function CSRFLab() {
                                   }`}
                                 >
                                   <p className="mb-1 font-medium">
-                                    {challengeAnswer === ch.correctIndex ? 'Правильно!' : 'Неверно.'}
+                                    {challengeAnswer === ch.correctIndex ? t('correct') : t('incorrect')}
                                   </p>
                                   <p className="text-xs leading-relaxed">{ch.explanation}</p>
                                 </motion.div>
@@ -431,7 +429,7 @@ export default function CSRFLab() {
                                   className="w-full bg-amber-600 hover:bg-amber-700"
                                   onClick={nextChallenge}
                                 >
-                                  Следующее задание <ArrowRight size={14} className="ml-1" />
+                                  {t('nextChallenge')} <ArrowRight size={14} className="ml-1" />
                                 </Button>
                               )}
 
@@ -441,16 +439,16 @@ export default function CSRFLab() {
                                   animate={{ opacity: 1, y: 0 }}
                                   className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-center"
                                 >
-                                  <p className="mb-1 text-sm font-semibold text-amber-800">Все задания пройдены!</p>
+                                  <p className="mb-1 text-sm font-semibold text-amber-800">{t('allChallengesDone')}</p>
                                   <p className="text-2xl font-bold text-amber-600">
                                     {challengeCorrect}/{csrfChallenges.length}
                                   </p>
                                   <p className="mb-3 text-xs text-amber-500">
                                     {challengeCorrect === csrfChallenges.length
-                                      ? 'Отлично! Все ответы правильные!'
+                                      ? t('perfectScore')
                                       : challengeCorrect >= csrfChallenges.length * 0.7
-                                        ? 'Хороший результат!'
-                                        : 'Стоит повторить материал.'}
+                                        ? t('goodScore')
+                                        : t('reviewNeeded')}
                                   </p>
                                   <Button
                                     size="sm"
@@ -462,7 +460,7 @@ export default function CSRFLab() {
                                       setChallengeAnswer(null);
                                     }}
                                   >
-                                    <RotateCcw size={14} className="mr-1" /> Пройти заново
+                                    <RotateCcw size={14} className="mr-1" /> {t('retake')}
                                   </Button>
                                 </motion.div>
                               )}
@@ -480,23 +478,23 @@ export default function CSRFLab() {
           {/* Quiz button */}
           {!showQuiz && !showChallenges ? (
             <Button className="mt-4 w-full bg-violet-600 hover:bg-violet-700" onClick={() => setShowQuiz(true)}>
-              <Trophy size={16} className="mr-2" /> Проверить знания
+              <Trophy size={16} className="mr-2" /> {t('checkKnowledge')}
             </Button>
           ) : !showQuiz && showChallenges ? (
             <Button className="mt-4 w-full bg-violet-600 hover:bg-violet-700" onClick={() => setShowQuiz(true)}>
-              <Trophy size={16} className="mr-2" /> Или проверьте знания квизом
+              <Trophy size={16} className="mr-2" /> {t('orTestKnowledge')}
             </Button>
           ) : (
             <div className="mt-4 space-y-4">
               <Card className="border-violet-200">
                 <CardContent className="space-y-4 p-5">
                   {!currentQuiz ? (
-                    <p className="text-muted-foreground text-center text-sm">Вопросы для CSRF пока не добавлены</p>
+                    <p className="text-muted-foreground text-center text-sm">{t('noQuizQuestions')}</p>
                   ) : (
                     <>
                       <h3 className="flex items-center gap-2 text-sm font-semibold text-violet-800">
-                        <Trophy size={16} /> Вопрос {quizIndex + 1}/{csrfQuizzes.length}
-                        <span className="ml-auto text-xs font-normal">Правильно: {correctCount}</span>
+                        <Trophy size={16} /> {t('quizQuestion', { current: quizIndex + 1, total: csrfQuizzes.length })}
+                        <span className="ml-auto text-xs font-normal">{t('correctCount', { count: correctCount })}</span>
                       </h3>
                       <p className="text-sm font-medium">{currentQuiz.question}</p>
                       <div className="space-y-2">
@@ -538,14 +536,14 @@ export default function CSRFLab() {
                           }`}
                         >
                           <p className="mb-1 font-medium">
-                            {quizAnswer === currentQuiz.correctIndex ? 'Правильно!' : 'Неверно.'}
+                            {quizAnswer === currentQuiz.correctIndex ? t('correct') : t('incorrect')}
                           </p>
                           <p className="text-xs leading-relaxed">{currentQuiz.explanation}</p>
                         </motion.div>
                       )}
                       {quizSubmitted && quizIndex < csrfQuizzes.length - 1 && (
                         <Button size="sm" className="w-full bg-violet-600 hover:bg-violet-700" onClick={nextQuiz}>
-                          Следующий вопрос <ArrowRight size={14} className="ml-1" />
+                          {t('nextQuestion')} <ArrowRight size={14} className="ml-1" />
                         </Button>
                       )}
                       {quizSubmitted && quizIndex >= csrfQuizzes.length - 1 && (
@@ -554,16 +552,16 @@ export default function CSRFLab() {
                           animate={{ opacity: 1, y: 0 }}
                           className="mt-3 rounded-lg border border-violet-200 bg-violet-50 p-4 text-center"
                         >
-                          <p className="mb-1 text-sm font-semibold text-violet-800">Квиз завершён!</p>
+                          <p className="mb-1 text-sm font-semibold text-violet-800">{t('quizCompleted')}</p>
                           <p className="text-2xl font-bold text-violet-600">
                             {correctCount}/{csrfQuizzes.length}
                           </p>
                           <p className="mb-3 text-xs text-violet-500">
                             {correctCount === csrfQuizzes.length
-                              ? 'Отлично! Все ответы правильные!'
+                              ? t('perfectScore')
                               : correctCount >= csrfQuizzes.length * 0.7
-                                ? 'Хороший результат!'
-                                : 'Стоит повторить материал.'}
+                                ? t('goodScore')
+                                : t('reviewNeeded')}
                           </p>
                           <Button
                             size="sm"
@@ -575,7 +573,7 @@ export default function CSRFLab() {
                               setQuizAnswer(null);
                             }}
                           >
-                            <RotateCcw size={14} className="mr-1" /> Пройти заново
+                            <RotateCcw size={14} className="mr-1" /> {t('retake')}
                           </Button>
                         </motion.div>
                       )}
@@ -587,11 +585,11 @@ export default function CSRFLab() {
               {/* Complete */}
               {!isCompleted ? (
                 <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={handleComplete}>
-                  Отметить модуль как изученный
+                  {t('markComplete')}
                 </Button>
               ) : (
                 <div className="flex items-center justify-center gap-2 text-center text-sm font-medium text-emerald-600">
-                  <CheckCircle2 size={16} /> Модуль завершён!
+                  <CheckCircle2 size={16} /> {t('moduleCompleted')}
                 </div>
               )}
             </div>
