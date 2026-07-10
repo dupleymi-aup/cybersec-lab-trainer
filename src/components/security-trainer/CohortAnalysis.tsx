@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { getCohortAnalysis, getAllGroups } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -39,11 +40,11 @@ const RETENTION_WEEKS: Array<{
   label: string;
   daysLabel: string;
 }> = [
-  { key: 'week1', label: 'Неделя 1', daysLabel: '7 дней' },
-  { key: 'week2', label: 'Неделя 2', daysLabel: '14 дней' },
-  { key: 'week4', label: 'Неделя 4', daysLabel: '28 дней' },
-  { key: 'week8', label: 'Неделя 8', daysLabel: '56 дней' },
-  { key: 'week12', label: 'Неделя 12', daysLabel: '84 дня' },
+  { key: 'week1', label: 'week1', daysLabel: 'days7' },
+  { key: 'week2', label: 'week2', daysLabel: 'days14' },
+  { key: 'week4', label: 'week4', daysLabel: 'days28' },
+  { key: 'week8', label: 'week8', daysLabel: 'days56' },
+  { key: 'week12', label: 'week12', daysLabel: 'days84' },
 ];
 
 /**
@@ -95,6 +96,7 @@ function getHeatmapStyle(percent: number): React.CSSProperties {
 }
 
 export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
+  const t = useTranslations('cohortAnalysis');
   const [data, setData] = useState<CohortAnalysisResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,7 +136,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки данных');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
@@ -179,7 +181,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-          <p className="text-muted-foreground text-sm">Загрузка когортного анализа...</p>
+          <p className="text-muted-foreground text-sm">{t('loading')}</p>
         </div>
       </div>
     );
@@ -190,8 +192,8 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <BarChart3 size={32} className="mx-auto mb-3 text-red-400" />
-          <p className="text-muted-foreground text-sm font-medium">Ошибка загрузки данных</p>
-          <p className="mt-1 text-xs text-slate-400">{error || 'Нет данных'}</p>
+          <p className="text-muted-foreground text-sm font-medium">{t('loadingError')}</p>
+          <p className="mt-1 text-xs text-slate-400">{error || t('noData')}</p>
         </div>
       </div>
     );
@@ -202,9 +204,9 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       <Card className="border-border">
         <CardContent className="flex flex-col items-center justify-center py-16 text-slate-400">
           <Calendar size={40} className="mb-3 opacity-50" />
-          <p className="text-sm">Нет данных о когортах</p>
+          <p className="text-sm">{t('noData')}</p>
           <p className="mt-1 text-xs text-slate-300">
-            {effectiveGroupId ? 'Нет студентов в выбранной группе' : 'В системе пока нет студентов'}
+            {effectiveGroupId ? t('noStudentsInGroup') : t('noStudentsYet')}
           </p>
         </CardContent>
       </Card>
@@ -217,7 +219,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <h2 className="flex items-center gap-2 text-lg font-bold">
           <BarChart3 size={20} className="text-indigo-600" />
-          Когортный анализ
+          {t('title')}
         </h2>
 
         {/* Group selector — hidden when controlled externally */}
@@ -229,7 +231,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
               onChange={(e) => setInternalGroupId(e.target.value)}
               className="border-border bg-card hover:border-border rounded-md border px-3 py-1.5 text-sm transition-colors outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
             >
-              <option value="">Все группы</option>
+              <option value="">{t('allGroups')}</option>
               {groups.map((g) => (
                 <option key={g} value={g}>
                   {g}
@@ -245,14 +247,14 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
         <KPICard
           icon={<Calendar size={18} />}
           value={summary.totalCohorts}
-          label="Всего когорт"
+          label={t('totalCohorts')}
           iconBg="bg-indigo-100"
           iconColor="text-indigo-600"
         />
         <KPICard
           icon={<Target size={18} />}
           value={summary.bestCohort ? `${summary.bestCohort.month}` : '—'}
-          label="Лучшая когорта"
+          label={t('bestCohort')}
           delta={summary.bestCohort ? Math.round(summary.bestCohort.retention.week4 * 10) / 10 : undefined}
           deltaSuffix="% (нед. 4)"
           iconBg="bg-emerald-100"
@@ -261,14 +263,14 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
         <KPICard
           icon={<TrendingUp size={18} />}
           value={`${summary.avgWeek1}%`}
-          label="Ср. удержание (нед. 1)"
+          label={t('avgRetentionWeek1')}
           iconBg="bg-blue-100"
           iconColor="text-blue-600"
         />
         <KPICard
           icon={<TrendingDown size={18} />}
           value={`${summary.avgWeek12}%`}
-          label="Ср. удержание (нед. 12)"
+          label={t('avgRetentionWeek12')}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
         />
@@ -279,15 +281,15 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
         <CardContent className="p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
             <BarChart3 size={16} className="text-slate-400" />
-            Тепловая карта удержания по когортам
+            {t('retentionHeatmap')}
           </h3>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-border border-b">
-                  <th className="text-muted-foreground min-w-[140px] px-3 py-2 text-left font-semibold">Когорта</th>
-                  <th className="text-muted-foreground px-2 py-2 text-center font-semibold">Студентов</th>
+                  <th className="text-muted-foreground min-w-[140px] px-3 py-2 text-left font-semibold">{t('cohort')}</th>
+                  <th className="text-muted-foreground px-2 py-2 text-center font-semibold">{t('students')}</th>
                   {RETENTION_WEEKS.map((w) => (
                     <th key={w.key} className="text-muted-foreground min-w-[90px] px-2 py-2 text-center font-semibold">
                       <div className="flex flex-col items-center">
@@ -335,7 +337,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
 
           {/* Legend */}
           <div className="text-muted-foreground mt-4 flex items-center gap-3 border-t border-slate-100 pt-3 text-xs">
-            <span>Удержание:</span>
+            <span>{t('retention')}:</span>
             <div className="flex items-center gap-1">
               <div className="h-4 w-4 rounded-sm" style={getHeatmapStyle(90)} />
               <span>80%+</span>
@@ -365,7 +367,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
         <CardContent className="p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
             <TrendingUp size={16} className="text-slate-400" />
-            Общее удержание по неделям
+            {t('overallRetentionByWeek')}
           </h3>
 
           <div className="h-[280px]">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -36,6 +37,7 @@ interface ComprehensiveDashboardProps {
 }
 
 export default function ComprehensiveDashboard({ groupId, days: daysProp }: ComprehensiveDashboardProps) {
+  const t = useTranslations('comprehensiveDashboard');
   const formatDate = useDateFormatter();
   const [data, setData] = useState<ComprehensiveSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,20 +61,20 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, groupId]);
+  }, [days, groupId, t]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -81,8 +83,8 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="mx-auto mb-3 text-red-500" />
-        <p className="text-muted-foreground text-sm font-medium">Ошибка загрузки</p>
-        <p className="mt-1 text-xs text-slate-400">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground text-sm font-medium">{t('loadingError')}</p>
+        <p className="mt-1 text-xs text-slate-400">{error || t('noData')}</p>
       </div>
     );
   }
@@ -91,23 +93,23 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
 
   const scorePieData = [
     {
-      name: 'Отлично (90%+)',
+      name: t('excellent'),
       value: scoreDistribution.excellent,
       color: '#10b981',
     },
     {
-      name: 'Хорошо (70-89%)',
+      name: t('good'),
       value: scoreDistribution.good,
       color: '#6366f1',
     },
     {
-      name: 'Средне (50-69%)',
+      name: t('average'),
       value: scoreDistribution.average,
       color: '#f59e0b',
     },
-    { name: 'Плохо (<50%)', value: scoreDistribution.poor, color: '#ef4444' },
+    { name: t('poor'), value: scoreDistribution.poor, color: '#ef4444' },
     {
-      name: 'Не attempted',
+      name: t('notAttempted'),
       value: scoreDistribution.notAttempted,
       color: '#94a3b8',
     },
@@ -139,7 +141,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
         <KPICard
           icon={<Users size={18} />}
           value={kpis.totalStudents}
-          label="Всего студентов"
+          label={t('totalStudents')}
           trend={trends.students}
           delta={kpis.totalStudents - previousKpis.totalStudents}
           delay={0}
@@ -149,7 +151,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
         <KPICard
           icon={<Activity size={18} />}
           value={`${kpis.activePercentage}%`}
-          label="Активных"
+          label={t('active')}
           trend={trends.activity}
           delta={kpis.activePercentage - previousKpis.activePercentage}
           deltaSuffix="%"
@@ -160,7 +162,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
         <KPICard
           icon={<BookOpen size={18} />}
           value={kpis.totalModulesCompleted}
-          label="Модулей завершено"
+          label={t('modulesCompleted')}
           trend={trends.completion}
           delta={kpis.totalModulesCompleted - previousKpis.totalModulesCompleted}
           delay={2}
@@ -170,7 +172,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
         <KPICard
           icon={<Trophy size={18} />}
           value={`${kpis.avgQuizScore}%`}
-          label="Ср. балл квизов"
+          label={t('avgQuizScore')}
           trend={trends.quizScore}
           delta={Math.round((kpis.avgQuizScore - previousKpis.avgQuizScore) * 10) / 10}
           deltaSuffix="%"
@@ -181,7 +183,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
         <KPICard
           icon={<Target size={18} />}
           value={kpis.totalQuizAttempts}
-          label="Попыток квизов"
+          label={t('quizAttempts')}
           trend={trends.quizScore}
           delta={kpis.totalQuizAttempts - previousKpis.totalQuizAttempts}
           delay={4}
@@ -191,7 +193,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
         <KPICard
           icon={<GraduationCap size={18} />}
           value={kpis.engagementScore}
-          label="Индекс вовлечённости"
+          label={t('engagementIndex')}
           trend={
             kpis.engagementScore > previousKpis.engagementScore
               ? 'up'
@@ -210,7 +212,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Распределение баллов</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('scoreDistribution')}</h3>
             {scorePieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
@@ -228,25 +230,25 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value, name) => [`${value} студ.`, name]} />
+                  <Tooltip formatter={(value, name) => [`${value} ${t('totalStudents').split(' ').pop()}`, name]} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+              <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
             )}
           </CardContent>
         </Card>
 
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Завершение модулей</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('moduleCompletion')}</h3>
             {moduleDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={moduleDistribution} layout="vertical" margin={{ left: 100 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis type="number" tick={{ fontSize: 11 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                   <YAxis dataKey="moduleName" type="category" tick={{ fontSize: 10 }} width={100} />
-                  <Tooltip formatter={(value) => [`${value}%`, 'Завершение']} />
+                  <Tooltip formatter={(value) => [`${value}%`, t('moduleCompletion')]} />
                   <Bar dataKey="completionRate" radius={[0, 4, 4, 0]}>
                     {moduleDistribution.map((_, i) => (
                       <Cell key={`cell-${i}`} fill={MODULE_COLORS[i % MODULE_COLORS.length]} />
@@ -255,7 +257,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+              <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
             )}
           </CardContent>
         </Card>
@@ -265,7 +267,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Топ студентов</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('topStudents')}</h3>
             {topPerformers.length > 0 ? (
               <div className="space-y-2">
                 {topPerformers.map((student, i) => (
@@ -305,14 +307,14 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
                 ))}
               </div>
             ) : (
-              <p className="py-8 text-center text-sm text-slate-400">Нет данных</p>
+              <p className="py-8 text-center text-sm text-slate-400">{t('noData')}</p>
             )}
           </CardContent>
         </Card>
 
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Последняя активность</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('recentActivity')}</h3>
             {recentActivity.length > 0 ? (
               <div className="max-h-80 space-y-2 overflow-y-auto">
                 {recentActivity.slice(0, 10).map((activity, i) => (
@@ -333,7 +335,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
                 ))}
               </div>
             ) : (
-              <p className="py-8 text-center text-sm text-slate-400">Нет данных</p>
+              <p className="py-8 text-center text-sm text-slate-400">{t('noData')}</p>
             )}
           </CardContent>
         </Card>

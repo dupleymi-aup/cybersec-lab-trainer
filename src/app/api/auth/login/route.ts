@@ -16,13 +16,27 @@ export async function POST(request: NextRequest) {
     const { emailOrPhone, password, rememberMe } = parsed.data;
 
     // Rate limiting: 5 attempts per 30 seconds per identifier
-    const rateKey = `login-${emailOrPhone}`;
-    const rateResult = checkRateLimit(rateKey, 5, 30_000);
-    if (!rateResult.allowed) {
+    const idRateKey = `login-${emailOrPhone}`;
+    const idRateResult = checkRateLimit(idRateKey, 5, 30_000);
+    if (!idRateResult.allowed) {
       return NextResponse.json(
         {
           error: 'Слишком много попыток. Подождите',
-          retryAfter: rateResult.retryAfter,
+          retryAfter: idRateResult.retryAfter,
+        },
+        { status: 429 },
+      );
+    }
+
+    // IP-based rate limiting: 20 attempts per 60 seconds per IP
+    const ip = getClientIp(request);
+    const ipRateKey = `login-ip-${ip}`;
+    const ipRateResult = checkRateLimit(ipRateKey, 20, 60_000);
+    if (!ipRateResult.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Слишком много попыток с этого IP. Подождите',
+          retryAfter: ipRateResult.retryAfter,
         },
         { status: 429 },
       );
@@ -40,7 +54,6 @@ export async function POST(request: NextRequest) {
       });
     };
 
-    const ip = getClientIp(request);
     const userAgent = request.headers.get('user-agent') || '';
 
     // Find user by email or phone
