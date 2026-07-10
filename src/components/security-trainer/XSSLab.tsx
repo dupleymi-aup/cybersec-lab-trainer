@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { xssTypes } from '@/lib/data';
 import CodeBlock from './CodeBlock';
@@ -24,6 +25,7 @@ import {
 } from 'lucide-react';
 
 export default function XSSLab() {
+  const t = useTranslations('labs.xss');
   const xssCompletedLevels = useAppStore((s) => s.xssCompletedLevels);
   const addXssLevel = useAppStore((s) => s.addXssLevel);
   const completeModule = useAppStore((s) => s.completeModule);
@@ -79,36 +81,36 @@ export default function XSSLab() {
         .replace(/'/g, '&#039;');
       return (
         <div className="bg-card rounded-lg border border-emerald-200 p-4">
-          <p className="text-muted-foreground mb-2 text-xs">Безопасный вывод (textContent / экранирование):</p>
+          <p className="text-muted-foreground mb-2 text-xs">{t('safeOutput')}</p>
           <code className="bg-muted block rounded px-2 py-1 font-mono text-xs break-all whitespace-pre-wrap">
             {escaped}
           </code>
           <p className="mt-2 flex items-center gap-1.5 text-xs text-emerald-600">
-            <CheckCircle2 size={14} /> Код не выполнен — все спецсимволы закодированы
+            <CheckCircle2 size={14} /> {t('codeNotExecuted')}
           </p>
         </div>
       );
     }
     return (
       <div className="bg-card rounded-lg border border-red-200 p-4">
-        <p className="text-muted-foreground mb-2 text-xs">Небезопасный вывод (innerHTML):</p>
+        <p className="text-muted-foreground mb-2 text-xs">{t('unsafeOutput')}</p>
         <div className="rounded-lg border border-red-200 bg-red-50 p-3">
           <code className="font-mono text-xs break-all whitespace-pre-wrap text-red-700">{text}</code>
         </div>
         <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-600">
-          <AlertTriangle size={14} /> В реальном приложении этот скрипт БЫ ВЫПОЛНЕН в браузере жертвы!
+          <AlertTriangle size={14} /> {t('wouldExecute')}
         </p>
       </div>
     );
   };
 
   const badgeTexts: Record<string, string> = {
-    reflected: 'Самый распространённый',
-    stored: 'Самый опасный',
-    dom: 'Невидимый для сервера',
-    svg: 'Через изображения',
-    markdown: 'Через парсеры MD',
-    pdf: 'Через документы',
+    reflected: t('reflected'),
+    stored: t('stored'),
+    dom: t('dom'),
+    svg: t('svg'),
+    markdown: t('markdown'),
+    pdf: t('pdf'),
   };
 
   return (
@@ -122,8 +124,8 @@ export default function XSSLab() {
           <FileText size={20} className="text-emerald-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Лаборатория XSS-атак</h1>
-          <p className="text-muted-foreground text-xs">6 типов Cross-Site Scripting уязвимостей</p>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -132,9 +134,9 @@ export default function XSSLab() {
         <CardContent className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-medium">
-              Изучено: {xssCompletedLevels.length}/{xssTypes.length}
+              {t('studied')} {xssCompletedLevels.length}/{xssTypes.length}
             </span>
-            {allCompleted && <Badge className="bg-emerald-600 text-white">Модуль завершён!</Badge>}
+            {allCompleted && <Badge className="bg-emerald-600 text-white">{t('moduleCompleted')}</Badge>}
           </div>
           <div className="flex gap-2">
             {xssTypes.map((x, i) => (
@@ -202,15 +204,15 @@ export default function XSSLab() {
             <div>
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <ShieldAlert size={16} className="text-amber-500" />
-                Переключатель санитизации
+                {t('sanitizationToggle')}
               </h3>
               <p className="text-muted-foreground mt-1 text-xs">
-                Включите, чтобы увидеть разницу между безопасным и опасным выводом
+                {t('sanitizationDesc')}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <Badge variant={sanitized ? 'default' : 'destructive'} className="text-[10px]">
-                {sanitized ? 'Защищённый' : 'Уязвимый'}
+                {sanitized ? t('protected') : t('vulnerable')}
               </Badge>
               <button
                 onClick={() => setSanitized(!sanitized)}
@@ -256,7 +258,7 @@ export default function XSSLab() {
           <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-red-600">
-                <XCircle size={14} /> Уязвимый код
+                <XCircle size={14} /> {t('vulnerableCode')}
               </h3>
               <CodeBlock code={currentXss.vulnerableCode} language="html" title="vulnerable.html" />
             </CardContent>
@@ -266,7 +268,7 @@ export default function XSSLab() {
           <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-                <CheckCircle2 size={14} /> Безопасный код
+                <CheckCircle2 size={14} /> {t('secureCode')}
               </h3>
               <CodeBlock code={currentXss.secureCode} language="html" title="secure.html" />
             </CardContent>
@@ -278,10 +280,10 @@ export default function XSSLab() {
               <div className="flex items-center justify-between">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <Lightbulb size={16} className="text-amber-500" />
-                  Интерактивная демонстрация
+                  {t('interactiveDemo')}
                 </h3>
                 <Button variant="outline" size="sm" onClick={() => setShowAttack(!showAttack)}>
-                  {showAttack ? 'Скрыть демо' : 'Показать атаку'}
+                  {showAttack ? t('hideDemo') : t('showDemo')}
                 </Button>
               </div>
 
@@ -294,7 +296,7 @@ export default function XSSLab() {
                     className="space-y-4"
                   >
                     <div>
-                      <p className="text-muted-foreground mb-1 text-xs">Payload атаки:</p>
+                      <p className="text-muted-foreground mb-1 text-xs">{t('attackPayload')}</p>
                       <div className="bg-secondary rounded-lg p-3">
                         <code className="font-mono text-xs break-all whitespace-pre-wrap text-red-600">
                           {currentXss.attackDemo}
@@ -302,12 +304,12 @@ export default function XSSLab() {
                       </div>
                     </div>
 
-                    <p className="text-muted-foreground text-xs">Результат вывода:</p>
+                    <p className="text-muted-foreground text-xs">{t('outputResult')}</p>
                     {renderSimulatedPreview()}
 
                     {/* Custom payload input */}
                     <div className="space-y-2 border-t pt-2">
-                      <h4 className="text-xs font-semibold">Попробуйте свой payload:</h4>
+                      <h4 className="text-xs font-semibold">{t('tryPayload')}</h4>
                       <div className="flex gap-2">
                         <Input
                           value={userPayload}
@@ -343,7 +345,7 @@ export default function XSSLab() {
 
                     <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
                       <h4 className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-blue-700">
-                        <Lightbulb size={14} /> Защита
+                        <Lightbulb size={14} /> {t('defense')}
                       </h4>
                       <p className="text-xs text-blue-600">{currentXss.mitigation}</p>
                     </div>
@@ -359,11 +361,11 @@ export default function XSSLab() {
               className="w-full bg-emerald-600 hover:bg-emerald-700"
               onClick={() => handleMarkComplete(currentXss.id)}
             >
-              Отметить как изученное
+              {t('markAsStudied')}
             </Button>
           ) : (
             <div className="flex items-center justify-center gap-2 text-center text-sm font-medium text-emerald-600">
-              <CheckCircle2 size={16} /> Изучено!
+              <CheckCircle2 size={16} /> {t('studiedBadge')}
             </div>
           )}
         </motion.div>
@@ -372,14 +374,14 @@ export default function XSSLab() {
       {/* Navigation */}
       <div className="flex justify-between">
         <Button variant="outline" size="sm" onClick={prevType} disabled={currentIndex === 0}>
-          <ArrowLeft size={14} className="mr-1" /> Предыдущий тип
+          <ArrowLeft size={14} className="mr-1" /> {t('previousType')}
         </Button>
         {currentIndex < xssTypes.length - 1 ? (
           <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={nextType}>
-            Следующий тип <ArrowRight size={14} className="ml-1" />
+            {t('nextType')} <ArrowRight size={14} className="ml-1" />
           </Button>
         ) : (
-          allCompleted && <Badge className="bg-emerald-600 text-white">Все типы изучены!</Badge>
+          allCompleted && <Badge className="bg-emerald-600 text-white">{t('allTypesStudied')}</Badge>
         )}
       </div>
     </div>

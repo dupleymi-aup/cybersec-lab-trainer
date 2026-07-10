@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { sqlChallenges } from '@/lib/data';
 import CodeBlock from './CodeBlock';
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export default function SQLInjectionLab() {
+  const t = useTranslations('labs.sqlInjection');
   const sqlCompletedLevels = useAppStore((s) => s.sqlCompletedLevels);
   const addSqlLevel = useAppStore((s) => s.addSqlLevel);
   const completeModule = useAppStore((s) => s.completeModule);
@@ -110,14 +112,14 @@ export default function SQLInjectionLab() {
             <Zap size={20} className="text-emerald-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">Лаборатория SQL-инъекций</h1>
-            <p className="text-muted-foreground text-xs">Интерактивная среда для изучения уязвимостей SQL</p>
+            <h1 className="text-xl font-bold">{t('title')}</h1>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
         {allCompleted && (
           <Badge className="shrink-0 bg-emerald-600 text-white">
             <CheckCircle2 size={14} className="mr-1" />
-            Модуль завершён!
+            {t('moduleCompleted')}
           </Badge>
         )}
       </div>
@@ -127,7 +129,7 @@ export default function SQLInjectionLab() {
         <CardContent className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-medium">
-              Прогресс: {sqlCompletedLevels.length}/{sqlChallenges.length}
+              {t('progress')} {sqlCompletedLevels.length}/{sqlChallenges.length}
             </span>
           </div>
           <div className="flex gap-1.5">
@@ -145,7 +147,7 @@ export default function SQLInjectionLab() {
                       ? 'bg-emerald-300'
                       : 'bg-slate-200'
                 }`}
-                title={`Задание ${i + 1}: ${c.title}`}
+                title={`${t('challengeNumber', { current: i + 1, total: sqlChallenges.length })}: ${c.title}`}
               />
             ))}
           </div>
@@ -162,7 +164,7 @@ export default function SQLInjectionLab() {
               <div className="mb-2 flex items-center justify-between">
                 <Badge className={`text-[11px] ${levelColors[challenge.level]}`}>{challenge.level}</Badge>
                 <span className="text-xs text-slate-400">
-                  Задание {activeChallenge + 1} из {sqlChallenges.length}
+                  {t('challengeNumber', { current: activeChallenge + 1, total: sqlChallenges.length })}
                 </span>
               </div>
               <CardTitle className="text-lg">{challenge.title}</CardTitle>
@@ -171,7 +173,7 @@ export default function SQLInjectionLab() {
               <p className="text-muted-foreground text-sm leading-relaxed">{challenge.description}</p>
               {isCompleted && (
                 <div className="mt-3 flex items-center gap-1 text-xs font-medium text-emerald-600">
-                  <CheckCircle2 size={14} /> Пройдено
+                  <CheckCircle2 size={14} /> {t('completed')}
                 </div>
               )}
             </CardContent>
@@ -182,12 +184,12 @@ export default function SQLInjectionLab() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-sm">
                 <Play size={16} className="text-emerald-600" />
-                Симуляция — введите payload
+                {t('simulation')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-muted-foreground mb-1 block text-xs">SQL-инъекция:</label>
+                <label className="text-muted-foreground mb-1 block text-xs">{t('sqlInjection')}</label>
                 <div className="flex gap-2">
                   <Input
                     value={userInput}
@@ -195,7 +197,7 @@ export default function SQLInjectionLab() {
                       setUserInput(e.target.value);
                       setShowResult(false);
                     }}
-                    placeholder="Введите вредоносный код..."
+                    placeholder={t('placeholder')}
                     className="font-mono text-sm"
                     onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
                   />
@@ -207,7 +209,7 @@ export default function SQLInjectionLab() {
 
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" onClick={tryExample}>
-                  <Lightbulb size={14} className="mr-1" /> Пример
+                  <Lightbulb size={14} className="mr-1" /> {t('example')}
                 </Button>
                 <Button
                   variant="outline"
@@ -218,7 +220,7 @@ export default function SQLInjectionLab() {
                   }}
                 >
                   <Lightbulb size={14} className="mr-1" />
-                  {showHint ? (hintLevel < 3 ? `Подсказка ${hintLevel + 1}/3` : 'Все показаны') : 'Подсказка'}
+                  {showHint ? (hintLevel < 3 ? t('showHint', { level: hintLevel }) : t('allShown')) : t('hint')}
                 </Button>
               </div>
 
@@ -240,13 +242,13 @@ export default function SQLInjectionLab() {
                             hintLevel === 1 ? 'text-amber-700' : hintLevel === 2 ? 'text-orange-700' : 'text-red-700'
                           }`}
                         >
-                          {hintLevel === 1 ? 'Общая идея:' : hintLevel === 2 ? 'Конкретнее:' : 'Подсказка:'}
+                          {hintLevel === 1 ? t('hint1Label') : hintLevel === 2 ? t('hint2Label') : t('hint3Label')}
                         </p>
                         <p className="text-xs text-amber-800">
                           {hintLevel === 1
-                            ? 'Попробуйте понять структуру SQL-запроса и найдите точку внедрения.'
+                            ? t('hint1Text')
                             : hintLevel === 2
-                              ? 'Обратите внимание на синтаксис кавычек, комментарии и операторы объединения запросов.'
+                              ? t('hint2Text')
                               : challenge.hint}
                         </p>
                       </div>
@@ -257,7 +259,7 @@ export default function SQLInjectionLab() {
                           className="h-auto px-2 py-1 text-xs text-amber-700 hover:text-amber-800"
                           onClick={() => setHintLevel(hintLevel + 1)}
                         >
-                          Показать следующую подсказку ({hintLevel + 1}/3) →
+                          {t('showHint', { level: hintLevel + 1 })} →
                         </Button>
                       )}
                     </div>
@@ -274,7 +276,7 @@ export default function SQLInjectionLab() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-sm">
                 <Eye size={16} className="text-emerald-600" />
-                Визуализация запроса
+                {t('visualization')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -294,21 +296,21 @@ export default function SQLInjectionLab() {
                   {isSuccess ? (
                     <>
                       <AlertTriangle size={18} className="text-red-500" />
-                      <h3 className="text-sm font-semibold text-red-700">Атака успешна! Запрос модифицирован</h3>
+                      <h3 className="text-sm font-semibold text-red-700">{t('attackSuccess')}</h3>
                     </>
                   ) : (
                     <>
                       <CheckCircle2 size={18} className="text-amber-500" />
-                      <h3 className="text-sm font-semibold text-amber-700">Это не похоже на SQL-инъекцию</h3>
+                      <h3 className="text-sm font-semibold text-amber-700">{t('notSqlInjection')}</h3>
                     </>
                   )}
                 </div>
                 {isSuccess ? (
-                  <CodeBlock code={challenge.successQuery} language="sql" title="Модифицированный запрос" />
+                  <CodeBlock code={challenge.successQuery} language="sql" title={t('modifiedQuery')} />
                 ) : (
                   <div className="dark:bg-card rounded-lg bg-white p-3">
                     <p className="text-muted-foreground mb-2 text-xs">
-                      Ваш ввод: <code className="font-mono text-red-600">{userInput}</code>
+                      {t('yourInput')} <code className="font-mono text-red-600">{userInput}</code>
                     </p>
                     <p className="text-muted-foreground text-xs">
                       Для SQL-инъекции попробуйте использовать: одинарные кавычки (<code className="font-mono">'</code>
@@ -321,7 +323,7 @@ export default function SQLInjectionLab() {
 
                 <div>
                   <Button variant="outline" size="sm" onClick={() => setShowExplanation(!showExplanation)}>
-                    {showExplanation ? 'Скрыть объяснение' : 'Показать объяснение'}
+                    {showExplanation ? t('hideExplanation') : t('showExplanation')}
                   </Button>
                 </div>
 
@@ -334,12 +336,12 @@ export default function SQLInjectionLab() {
                     >
                       <div className="dark:bg-card mt-2 space-y-3 rounded-lg bg-white p-4">
                         <h4 className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
-                          <BookOpen size={14} /> Объяснение
+                          <BookOpen size={14} /> {t('explanation')}
                         </h4>
                         <p className="text-muted-foreground text-xs leading-relaxed">{challenge.explanation}</p>
                         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
                           <h4 className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
-                            <ShieldCheck size={14} /> Как защититься?
+                            <ShieldCheck size={14} /> {t('howToProtect')}
                           </h4>
                           <p className="text-xs text-emerald-600">
                             Используйте параметризованные запросы (prepared statements) или ORM-библиотеки (Prisma,
@@ -355,11 +357,11 @@ export default function SQLInjectionLab() {
                 {/* Navigation */}
                 <div className="flex justify-between pt-2">
                   <Button variant="outline" size="sm" onClick={prevChallenge} disabled={activeChallenge === 0}>
-                    ← Предыдущее
+                    {t('previous')}
                   </Button>
                   {activeChallenge < sqlChallenges.length - 1 && (
                     <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={nextChallenge}>
-                      Следующее →
+                      {t('next')}
                     </Button>
                   )}
                 </div>
