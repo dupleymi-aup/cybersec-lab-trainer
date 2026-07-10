@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Loader2, AlertTriangle, Clock, AlertCircle } from 'lucide-react';
 import { getQuizSessionAnalytics, type QuizSessionData } from '@/lib/auth-store';
@@ -13,6 +14,7 @@ export interface QuizSessionAnalyticsProps {
 }
 
 export default function QuizSessionAnalytics({ groupId: propGroupId, days: propDays }: QuizSessionAnalyticsProps = {}) {
+  const t = useTranslations('quizSessionAnalytics');
   const [data, setData] = useState<QuizSessionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +49,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -68,7 +70,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Clock size={20} className="text-sky-600" />
-          <h2 className="text-lg font-bold">Аналитика квиз-сессий</h2>
+          <h2 className="text-lg font-bold">{t('title')}</h2>
         </div>
         {propDays === undefined && (
           <select
@@ -87,7 +89,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
       {categoryTiming.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Среднее время по категориям (сек)</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('avgTimeByCategory')}</h3>
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={categoryTiming}>
@@ -115,7 +117,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
       {timeVsPerformance.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Время vs Результат</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('timeVsResult')}</h3>
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={timeVsPerformance}>
@@ -135,7 +137,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
       {hourlyPerformance.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Результат по часам дня</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('resultByHour')}</h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={hourlyPerformance}>
@@ -164,7 +166,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
                 </div>
                 <div>
                   <p className="text-xl font-bold text-amber-600">{d.attemptCount}</p>
-                  <p className="text-muted-foreground text-xs">Попыток</p>
+                  <p className="text-muted-foreground text-xs">{t('attempts')}</p>
                 </div>
               </div>
             </CardContent>
@@ -186,11 +188,11 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
               <table className="w-full text-xs">
                 <thead className="bg-secondary border-border border-b">
                   <tr>
-                    <th className="text-muted-foreground p-2 text-left font-medium">Студент</th>
-                    <th className="text-muted-foreground p-2 font-medium">Категория</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Время (сек)</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Вопросов</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Результат</th>
+                    <th className="text-muted-foreground p-2 text-left font-medium">{t('student')}</th>
+                    <th className="text-muted-foreground p-2 font-medium">{t('category')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('timeSec')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('questions')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('result')}</th>
                   </tr>
                 </thead>
                 <tbody>
