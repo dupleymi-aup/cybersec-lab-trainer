@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`4704a593`**: i18n: localize CSRFLab with en/ru/zh keys
 - **`71d7b34f`**: i18n: localize SSRFLab, SecureCodingLab, SecurityHeadersLab with en/ru/zh keys
 - **`70a06b20`**: i18n: localize SQLInjectionLab and XSSLab with en/ru/zh keys + add lab i18n keys for CSRF/SSRF/SecureCoding/SecurityHeaders
 - **`c3d0be2b`**: fix: resolve 5 ESLint warnings (missing deps in hooks) + i18n: localize OWASPTop10 (~50 strings) and SecurityCheatSheets (~15 strings) with en/ru/zh keys
@@ -23,5 +24,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
 - **239/239 tests passing** (19 files) — all unit tests green
-- **Remote sync** — both remotes at `71d7b34f`
+- **Remote sync** — both remotes at `4704a593`
 - **Full verification passed**: lint ✓, typecheck ✓, tests ✓
