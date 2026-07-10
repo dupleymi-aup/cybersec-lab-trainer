@@ -12,6 +12,8 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`c3d0be2b`**: fix: resolve 5 ESLint warnings (missing deps in hooks) + i18n: localize OWASPTop10 (~50 strings) and SecurityCheatSheets (~15 strings) with en/ru/zh keys
+- **`fbebeb16`**: i18n: localize 6 more components (WeaknessAnalyzer, StudentDrillDown, GradebookView, AtRiskReport, ExecutiveSummaryExport, StudentHeatmapCalendar) with en/ru/zh keys
 - **`68ffccc3`**: i18n: localize 4 components (SystemAnnouncements, StudentProgressView, StudentComparisonView, AchievementAnalytics) with en/ru/zh keys
 - **`2412bc4b`**: i18n: localize AssignmentBuilder (~60 strings) and LtiPlatformManager (~40 strings) with en/ru/zh keys
 - **`7ee918eb`**: Added try/catch error handling to 25 API routes (all analytics + gamification/xp); i18n localization of 4 components (CareerPaths, LearningVelocity, LoginPatterns, NotificationBell) with en/ru/zh keys
