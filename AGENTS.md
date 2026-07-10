@@ -12,6 +12,10 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`e9a4f6c9`**: feat: proper password recovery page with full 3-step OTP flow (contact → OTP → reset), replacing redirect stub; added IP-based rate limiting to login route (20 req/60s) alongside identifier-based limit
+- **`1f8a8197`**: docs: update AGENTS.md
+- **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
+- **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **`90d58021`**: i18n: localize ActivityHeatmap, GlobalSearch, Leaderboard, PasswordStrengthChecker, IDORLab with en/ru/zh keys
 - **`8c8c6ab3`**: fix: resolve LandingFooter {year} FORMATTING_ERROR + add lab i18n keys (en/ru/zh)
 - **`dda4d24e`**: i18n: localize QuizSessionAnalytics with en/ru/zh keys
