@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -387,6 +388,7 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default function SecurityCheatSheets() {
+  const t = useTranslations('securityCheatSheets');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -425,13 +427,12 @@ export default function SecurityCheatSheets() {
             <BookOpen className="text-white" size={22} />
           </div>
           <div>
-            <h1 className="text-foreground text-xl font-bold">Шпаргалки по безопасности</h1>
-            <p className="text-muted-foreground text-sm">Quick Reference для разработчиков</p>
+            <h1 className="text-foreground text-xl font-bold">{t('title')}</h1>
+            <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
-          Быстрый справочник по основным практикам безопасности: OWASP Top 10, security headers, защита от инъекций,
-          криптография, сетевая безопасность.
+          {t('description')}
         </p>
       </div>
 
@@ -439,7 +440,7 @@ export default function SecurityCheatSheets() {
       <div className="relative mb-4">
         <Search className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2" size={18} />
         <Input
-          placeholder="Поиск по шпаргалкам..."
+          placeholder={t('searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
@@ -456,7 +457,7 @@ export default function SecurityCheatSheets() {
               activeCategory === cat ? 'bg-emerald-600 text-white' : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
-            {cat === 'all' ? 'Все' : cat}
+            {cat === 'all' ? t('allCategories') : cat}
           </button>
         ))}
       </div>
@@ -473,7 +474,7 @@ export default function SecurityCheatSheets() {
                 <h2 className="text-foreground text-lg font-semibold">{sheet.title}</h2>
                 <Badge className={categoryColors[sheet.category]}>{sheet.category}</Badge>
                 <Badge variant="secondary" className="text-xs">
-                  {sheet.items.length} пунктов
+                  {t('itemsCount', { count: sheet.items.length })}
                 </Badge>
               </div>
 
@@ -493,7 +494,7 @@ export default function SecurityCheatSheets() {
                         <button
                           onClick={() => item.code && handleCopy(item.code, `${sheet.id}-${idx}`)}
                           className="absolute top-1.5 right-1.5 rounded bg-slate-800 p-1 text-slate-400 transition hover:bg-slate-700 hover:text-white dark:bg-slate-700"
-                          title="Копировать"
+                          title={t('copyTitle')}
                         >
                           {copiedId === `${sheet.id}-${idx}` ? (
                             <Check size={14} className="text-emerald-400" />
@@ -513,7 +514,7 @@ export default function SecurityCheatSheets() {
         {filteredSheets.length === 0 && (
           <div className="py-12 text-center">
             <Search size={48} className="text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground">Ничего не найдено по запросу «{searchQuery}»</p>
+            <p className="text-muted-foreground">{t('nothingFound', { query: searchQuery })}</p>
           </div>
         )}
       </div>

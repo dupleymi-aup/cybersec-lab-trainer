@@ -78,7 +78,7 @@ export default function StudentComparisonView(props: Props = {}) {
     return () => {
       cancelled = true;
     };
-  }, [selectedStudents, effectiveDays]);
+  }, [selectedStudents, effectiveDays, t]);
 
   const toggleStudent = (userId: string) => {
     if (selectedStudents.includes(userId)) {

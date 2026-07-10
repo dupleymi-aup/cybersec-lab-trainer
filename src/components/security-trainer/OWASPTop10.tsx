@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { owaspItems } from '@/lib/data';
 import CodeBlock from './CodeBlock';
@@ -27,6 +28,7 @@ import {
 type LessonView = 'overview' | 'lesson' | 'complete';
 
 export default function OWASPTop10() {
+  const t = useTranslations('owaspTop10');
   const studiedOwaspItems = useAppStore((s) => s.studiedOwaspItems);
   const addStudiedOwasp = useAppStore((s) => s.addStudiedOwasp);
   const completeModule = useAppStore((s) => s.completeModule);
@@ -85,12 +87,12 @@ export default function OWASPTop10() {
   };
 
   const steps = [
-    { key: 'description' as const, label: 'Описание', icon: BookOpen },
-    { key: 'example' as const, label: 'Реальный пример', icon: Globe },
-    { key: 'vulnerable' as const, label: 'Уязвимый код', icon: Code },
-    { key: 'secure' as const, label: 'Безопасный код', icon: FileCode },
-    { key: 'mitigations' as const, label: 'Способы защиты', icon: Lightbulb },
-    { key: 'resources' as const, label: 'Ресурсы', icon: ShieldCheck },
+    { key: 'description' as const, label: t('stepDescription'), icon: BookOpen },
+    { key: 'example' as const, label: t('stepExample'), icon: Globe },
+    { key: 'vulnerable' as const, label: t('stepVulnerable'), icon: Code },
+    { key: 'secure' as const, label: t('stepSecure'), icon: FileCode },
+    { key: 'mitigations' as const, label: t('stepMitigations'), icon: Lightbulb },
+    { key: 'resources' as const, label: t('stepResources'), icon: ShieldCheck },
   ];
 
   const currentStepIndex = steps.findIndex((s) => s.key === lessonStep);
@@ -108,7 +110,7 @@ export default function OWASPTop10() {
           </div>
           <div>
             <h1 className="text-xl font-bold">OWASP Top 10 (2021)</h1>
-            <p className="text-muted-foreground text-xs">10 критических угроз безопасности веб-приложений</p>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
 
@@ -123,11 +125,11 @@ export default function OWASPTop10() {
                   <AlertTriangle size={18} className="text-amber-500" />
                 )}
                 <span className="text-sm font-medium">
-                  Изучено: {studiedCount} из {totalCount}
+                  {t('studiedLabel')} {studiedCount} {t('studiedOf')} {totalCount}
                 </span>
               </div>
               <Badge variant={allStudied ? 'default' : 'secondary'} className={allStudied ? 'bg-emerald-600' : ''}>
-                {allStudied ? 'Модуль завершён!' : `${Math.round((studiedCount / totalCount) * 100)}%`}
+                {allStudied ? t('moduleCompleted') : `${Math.round((studiedCount / totalCount) * 100)}%`}
               </Badge>
             </div>
             <Progress value={(studiedCount / totalCount) * 100} className="h-2" />
@@ -139,7 +141,7 @@ export default function OWASPTop10() {
           <CardContent className="p-5">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
               <ShieldCheck size={16} className="text-red-500" />
-              Матрица рисков
+              {t('riskMatrix')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {owaspItems.map((owaspItem) => (
@@ -156,13 +158,13 @@ export default function OWASPTop10() {
             </div>
             <div className="text-muted-foreground mt-3 flex gap-4 text-[11px]">
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded bg-red-500" /> Критический
+                <span className="h-2.5 w-2.5 rounded bg-red-500" /> {t('severityCritical')}
               </span>
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded bg-orange-500" /> Высокий
+                <span className="h-2.5 w-2.5 rounded bg-orange-500" /> {t('severityHigh')}
               </span>
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded bg-yellow-500" /> Средний
+                <span className="h-2.5 w-2.5 rounded bg-yellow-500" /> {t('severityMedium')}
               </span>
             </div>
           </CardContent>
@@ -170,7 +172,7 @@ export default function OWASPTop10() {
 
         {/* Lesson cards */}
         <div>
-          <h2 className="mb-4 text-lg font-bold">Уроки</h2>
+          <h2 className="mb-4 text-lg font-bold">{t('lessons')}</h2>
           <div className="space-y-3">
             {owaspItems.map((owaspItem, index) => {
               const isItemStudied = studiedOwaspItems.includes(owaspItem.id);
@@ -239,7 +241,7 @@ export default function OWASPTop10() {
             <Shield size={20} className="text-emerald-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">OWASP Top 10 — Завершение</h1>
+            <h1 className="text-xl font-bold">{t('completionTitle')}</h1>
           </div>
         </div>
 
@@ -249,12 +251,12 @@ export default function OWASPTop10() {
               <CheckCircle2 size={40} className="text-white" />
             </div>
             <h2 className="mb-2 text-2xl font-bold">
-              {allStudied ? 'Все уроки пройдены!' : `${studiedCount} из ${totalCount} изучено`}
+              {allStudied ? t('allLessonsComplete') : t('studiedCount', { count: studiedCount, total: totalCount })}
             </h2>
             <p className="mb-6 text-emerald-100">
               {allStudied
-                ? 'Поздравляем! Вы изучили все 10 критических угроз OWASP Top 10.'
-                : 'Продолжайте изучать оставшиеся темы для полного прохождения.'}
+                ? t('congratsAll')
+                : t('congratsPartial')}
             </p>
             <div className="flex justify-center gap-3">
               <Button
@@ -262,11 +264,11 @@ export default function OWASPTop10() {
                 className="hover:bg-card/10 border-white/20 text-white"
                 onClick={() => setView('overview')}
               >
-                К списку уроков
+                {t('backToLessons')}
               </Button>
               {!isStudied && (
                 <Button className="bg-card text-emerald-700 hover:bg-emerald-50" onClick={handleMarkStudied}>
-                  Отметить последний как изученный
+                  {t('markLastStudied')}
                 </Button>
               )}
             </div>
@@ -276,7 +278,7 @@ export default function OWASPTop10() {
         {/* Summary */}
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-3 text-sm font-semibold">Прогресс по темам</h3>
+            <h3 className="mb-3 text-sm font-semibold">{t('progressByTopics')}</h3>
             <div className="space-y-2">
               {owaspItems.map((owaspItem) => {
                 const done = studiedOwaspItems.includes(owaspItem.id);
@@ -331,10 +333,10 @@ export default function OWASPTop10() {
         <CardContent className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-medium">
-              Урок {currentLesson + 1} из {totalCount}
+              {t('lessonNumber', { current: currentLesson + 1, total: totalCount })}
             </span>
             <span className="text-muted-foreground text-xs">
-              Шаг {currentStepIndex + 1} из {steps.length}
+              {t('stepNumber', { current: currentStepIndex + 1, total: steps.length })}
             </span>
           </div>
           <Progress
@@ -390,14 +392,12 @@ export default function OWASPTop10() {
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <BookOpen size={16} className="text-emerald-600" />
-                  Описание уязвимости
+                  {t('vulnDescription')}
                 </h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
                 <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
                   <p className="text-xs text-emerald-700">
-                    <strong>Почему это важно:</strong> Эта уязвимость входит в OWASP Top 10 — список наиболее
-                    критических угроз для веб-приложений. Знание и понимание этой категории необходимо каждому
-                    разработчику.
+                    <strong>{t('whyImportant')}</strong> {t('whyImportantText')}
                   </p>
                 </div>
               </CardContent>
@@ -409,16 +409,14 @@ export default function OWASPTop10() {
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <Globe size={16} className="text-amber-600" />
-                  Реальный пример из практики
+                  {t('realExample')}
                 </h3>
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
                   <p className="text-sm leading-relaxed text-amber-800">{item.realExample}</p>
                 </div>
                 <div className="bg-secondary rounded-lg p-3">
                   <p className="text-muted-foreground text-xs">
-                    <strong>Вывод:</strong> Реальные инциденты показывают, что даже крупные компании с большими
-                    бюджетами на безопасность подвержены этим уязвимостям. Понимание механизмов атак — первый шаг к
-                    защите.
+                    <strong>{t('realExampleConclusion')}</strong> {t('realExampleConclusionText')}
                   </p>
                 </div>
               </CardContent>
@@ -430,13 +428,12 @@ export default function OWASPTop10() {
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <Code size={16} className="text-red-600" />
-                  Уязвимый код — что НЕЛЬЗЯ делать
+                  {t('vulnerableCodeTitle')}
                 </h3>
                 <CodeBlock code={item.vulnerableCode} language="javascript" title="vulnerable.js" />
                 <div className="rounded-lg border border-red-200 bg-red-50 p-3">
                   <p className="text-xs text-red-700">
-                    <strong>Внимание:</strong> Приведённый код содержит уязвимости. Не используйте подобные паттерны в
-                    продакшене. Каждая строка с комментарием «УЯЗВИМЫЙ КОД» демонстрирует типичную ошибку разработчика.
+                    <strong>{t('vulnerableWarning')}</strong> {t('vulnerableWarningText')}
                   </p>
                 </div>
               </CardContent>
@@ -448,14 +445,12 @@ export default function OWASPTop10() {
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <FileCode size={16} className="text-emerald-600" />
-                  Безопасный код — как ПРАВИЛЬНО
+                  {t('secureCodeTitle')}
                 </h3>
                 <CodeBlock code={item.secureCode} language="javascript" title="secure.js" />
                 <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
                   <p className="text-xs text-emerald-700">
-                    <strong>Обратите внимание:</strong> Безопасный код всегда включает валидацию входных данных,
-                    проверку прав доступа и обработку ошибок. Разница между уязвимым и безопасным кодом часто
-                    заключается в нескольких строках проверок.
+                    <strong>{t('secureNote')}</strong> {t('secureNoteText')}
                   </p>
                 </div>
               </CardContent>
@@ -467,7 +462,7 @@ export default function OWASPTop10() {
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <Lightbulb size={16} className="text-sky-600" />
-                  Способы защиты
+                  {t('mitigationsTitle')}
                 </h3>
                 <div className="space-y-3">
                   {item.mitigations.map((m, i) => (
@@ -481,8 +476,7 @@ export default function OWASPTop10() {
                 </div>
                 <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
                   <p className="text-xs text-sky-700">
-                    <strong>Совет:</strong> Применяйте эти рекомендации комплексно. Один метод защиты редко бывает
-                    достаточен — используйте «глубокую защиту» (Defense in Depth).
+                    <strong>{t('mitigationsTip')}</strong> {t('mitigationsTipText')}
                   </p>
                 </div>
               </CardContent>
@@ -494,11 +488,11 @@ export default function OWASPTop10() {
               <CardContent className="space-y-4 p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <ShieldCheck size={16} className="text-violet-600" />
-                  Дополнительные ресурсы
+                  {t('additionalResources')}
                 </h3>
                 {'cvssExample' in item && item.cvssExample && (
                   <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-                    <p className="mb-1 text-xs font-medium text-red-800">Пример CVSS-вектора:</p>
+                    <p className="mb-1 text-xs font-medium text-red-800">{t('cvssExample')}</p>
                     <code className="rounded bg-red-100 px-2 py-1 font-mono text-xs break-all text-red-700">
                       {item.cvssExample}
                     </code>
@@ -506,20 +500,19 @@ export default function OWASPTop10() {
                 )}
                 {'toolsForTesting' in item && item.toolsForTesting && (
                   <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                    <p className="mb-1 text-xs font-medium text-amber-800">Инструменты для тестирования:</p>
+                    <p className="mb-1 text-xs font-medium text-amber-800">{t('testingTools')}</p>
                     <p className="text-sm text-amber-700">{item.toolsForTesting}</p>
                   </div>
                 )}
                 {'furtherReading' in item && item.furtherReading && (
                   <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                    <p className="mb-1 text-xs font-medium text-blue-800">Рекомендуемая литература:</p>
+                    <p className="mb-1 text-xs font-medium text-blue-800">{t('recommendedReading')}</p>
                     <p className="text-sm text-blue-700">{item.furtherReading}</p>
                   </div>
                 )}
                 <div className="rounded-lg border border-violet-200 bg-violet-50 p-3">
                   <p className="text-xs text-violet-700">
-                    <strong>Совет:</strong> Используйте эти ресурсы для углублённого изучения темы и практического
-                    тестирования на лабораторных стендах.
+                    <strong>{t('resourcesTip')}</strong> {t('resourcesTipText')}
                   </p>
                 </div>
               </CardContent>
@@ -531,7 +524,7 @@ export default function OWASPTop10() {
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <Button variant="outline" onClick={prevStep} disabled={currentLesson === 0 && lessonStep === 'description'}>
-          <ArrowLeft size={14} className="mr-1" /> Назад
+          <ArrowLeft size={14} className="mr-1" /> {t('back')}
         </Button>
 
         <Button
@@ -543,15 +536,15 @@ export default function OWASPTop10() {
         >
           {isStudied ? (
             <>
-              <CheckCircle2 size={14} className="mr-1" /> Изучено
+              <CheckCircle2 size={14} className="mr-1" /> {t('studied')}
             </>
           ) : (
-            'Отметить как изученное'
+            t('markAsStudied')
           )}
         </Button>
 
         <Button onClick={nextStep} className="bg-emerald-600 hover:bg-emerald-700">
-          {lessonStep === 'mitigations' && currentLesson === owaspItems.length - 1 ? 'Завершить модуль' : 'Далее'}{' '}
+          {lessonStep === 'mitigations' && currentLesson === owaspItems.length - 1 ? t('completeModule') : t('next')}{' '}
           <ArrowRight size={14} className="ml-1" />
         </Button>
       </div>

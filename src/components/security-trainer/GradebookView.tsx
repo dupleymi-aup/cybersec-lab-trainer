@@ -64,7 +64,7 @@ export default function GradebookView({
     return () => {
       cancelled = true;
     };
-  }, [days, groupId]);
+  }, [days, groupId, t]);
 
   const groups = Array.from(new Set(allUsers.filter((u) => u.group).map((u) => u.group)));
 

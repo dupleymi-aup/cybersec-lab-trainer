@@ -99,7 +99,7 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
         value,
         color: rarityColors[name],
       }));
-  }, [data]);
+  }, [data, rarityLabels]);
 
   if (loading) {
     return (

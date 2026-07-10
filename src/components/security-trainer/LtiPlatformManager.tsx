@@ -103,6 +103,7 @@ export default function LtiPlatformManager() {
 
   useEffect(() => {
     loadPlatforms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadGradeSyncs = async (platformId: string) => {
