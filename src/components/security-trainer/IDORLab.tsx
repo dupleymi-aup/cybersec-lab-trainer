@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { idorScenarios, idorDefenseMechanisms } from '@/lib/data';
 import CodeBlock from './CodeBlock';
@@ -26,6 +27,7 @@ import {
 } from 'lucide-react';
 
 export default function IDORLab() {
+  const t = useTranslations('idorLab');
   const completedModules = useAppStore((s) => s.completedModules);
   const completeModule = useAppStore((s) => s.completeModule);
   const [currentScenario, setCurrentScenario] = useState(0);
@@ -94,14 +96,14 @@ export default function IDORLab() {
         </div>
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-bold">IDOR-атаки</h1>
+            <h1 className="text-xl font-bold">{t('title')}</h1>
             <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-              Средний
+              {t('difficulty')}
             </Badge>
-            {isCompleted && <Badge className="border-0 bg-emerald-100 text-emerald-700">Пройден</Badge>}
+            {isCompleted && <Badge className="border-0 bg-emerald-100 text-emerald-700">{t('completed')}</Badge>}
           </div>
           <p className="text-muted-foreground mt-0.5 text-sm">
-            Insecure Direct Object Reference — небезопасная прямая ссылка на объект
+            {t('description')}
           </p>
         </div>
       </div>
@@ -110,16 +112,16 @@ export default function IDORLab() {
       <Card className="bg-card border-none shadow-sm">
         <CardContent className="p-4">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Прогресс лаборатории</span>
+            <span className="text-muted-foreground">{t('labProgress')}</span>
             <span className="text-foreground/70 font-medium">
-              {currentScenario + 1} / {idorScenarios.length} — Сценарий {currentScenario + 1} из {idorScenarios.length}
+              {currentScenario + 1} / {idorScenarios.length} — {t('scenarioOf', { current: currentScenario + 1, total: idorScenarios.length })}
             </span>
           </div>
           <Progress value={progressPct} className="h-2" />
           {correctCount > 0 && (
             <p className="mt-2 text-xs text-emerald-600">
               <CheckCircle2 size={12} className="mr-1 inline" />
-              Правильных ответов: {correctCount}/{currentScenario + (optionSubmitted ? 1 : 0)}
+              {t('correctAnswers')} {correctCount}/{currentScenario + (optionSubmitted ? 1 : 0)}
             </p>
           )}
         </CardContent>
@@ -171,7 +173,7 @@ export default function IDORLab() {
               {/* Vulnerable code */}
               <div>
                 <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-red-600">
-                  <Code size={16} /> Уязвимый код
+                  <Code size={16} /> {t('vulnerableCode')}
                 </h3>
                 <CodeBlock code={scenario.code} language="javascript" />
               </div>
@@ -180,7 +182,7 @@ export default function IDORLab() {
               <Card className="border-amber-200 bg-amber-50">
                 <CardContent className="p-4">
                   <h3 className="flex items-center gap-2 text-sm font-semibold text-amber-800">
-                    <Lightbulb size={16} /> Анализ уязвимости
+                    <Lightbulb size={16} /> {t('vulnerabilityAnalysis')}
                   </h3>
                   <p className="mt-1 text-sm text-amber-700">{scenario.explanation}</p>
                 </CardContent>
@@ -189,7 +191,7 @@ export default function IDORLab() {
               {/* Quiz */}
               <div>
                 <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                  <BookOpen size={16} /> Как исправить эту уязвимость?
+                  <BookOpen size={16} /> {t('howToFix')}
                 </h3>
                 <div className="space-y-2">
                   {scenario.options.map((opt, i) => {
@@ -238,16 +240,16 @@ export default function IDORLab() {
                     onClick={handleSubmitOption}
                     disabled={selectedOption === null}
                   >
-                    Проверить ответ
+                    {t('checkAnswer')}
                   </Button>
                 ) : (
                   <Card className="bg-secondary mt-3 border-none">
                     <CardContent className="p-3">
                       <p className="text-sm font-medium">
                         {selectedOption != null && scenario.options[selectedOption]?.correct ? (
-                          <span className="text-emerald-600">Правильно! {scenario.fixExplanation}</span>
+                          <span className="text-emerald-600">{t('correct')} {scenario.fixExplanation}</span>
                         ) : (
-                          <span className="text-red-600">Неверно. {scenario.fixExplanation}</span>
+                          <span className="text-red-600">{t('incorrect')} {scenario.fixExplanation}</span>
                         )}
                       </p>
                     </CardContent>
@@ -259,7 +261,7 @@ export default function IDORLab() {
               {optionSubmitted && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                   <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-600">
-                    <ShieldCheck size={16} /> Исправленный код
+                    <ShieldCheck size={16} /> {t('fixedCode')}
                   </h3>
                   <CodeBlock code={scenario.fix} language="javascript" />
                   <p className="text-muted-foreground mt-2 text-xs">{scenario.fixExplanation}</p>
@@ -275,7 +277,7 @@ export default function IDORLab() {
         <CardContent className="p-5">
           <button onClick={() => setShowAllDefenses(!showAllDefenses)} className="flex w-full items-center gap-2">
             <Shield size={20} className="text-emerald-600" />
-            <h3 className="font-semibold text-emerald-800">Механизмы защиты от IDOR</h3>
+            <h3 className="font-semibold text-emerald-800">{t('idorDefense')}</h3>
             <ChevronLeft
               size={18}
               className={`ml-auto transition-transform ${showAllDefenses ? 'rotate-90' : '-rotate-90'}`}
@@ -310,23 +312,23 @@ export default function IDORLab() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={handlePrevScenario} disabled={currentScenario === 0}>
             <ArrowLeft size={16} className="mr-1" />
-            Назад
+            {t('back')}
           </Button>
           <Button variant="outline" onClick={handleReset}>
             <RotateCcw size={16} className="mr-1" />
-            Сбросить
+            {t('reset')}
           </Button>
         </div>
         <div className="flex gap-2">
           {optionSubmitted && (
             <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleComplete}>
               <Lock size={16} className="mr-1" />
-              Завершить модуль
+              {t('completeModule')}
             </Button>
           )}
           {currentScenario < idorScenarios.length - 1 && (
             <Button onClick={handleNextScenario}>
-              Далее
+              {t('next')}
               <ArrowRight size={16} className="ml-1" />
             </Button>
           )}

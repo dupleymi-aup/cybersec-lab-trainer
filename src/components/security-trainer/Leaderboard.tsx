@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { useAuthStore } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
@@ -156,6 +157,7 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
 const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
 
 export default function Leaderboard() {
+  const t = useTranslations('leaderboard');
   const completedModules = useAppStore((s) => s.completedModules);
   const quizScores = useAppStore((s) => s.quizScores);
   const user = useAuthStore((s) => s.user);
@@ -218,8 +220,8 @@ export default function Leaderboard() {
             <Trophy className="text-white" size={22} />
           </div>
           <div>
-            <h1 className="text-foreground text-xl font-bold">Таблица лидеров</h1>
-            <p className="text-muted-foreground text-sm">Рейтинг студентов по прогрессу обучения</p>
+            <h1 className="text-foreground text-xl font-bold">{t('title')}</h1>
+            <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
           </div>
         </div>
       </div>
@@ -231,22 +233,22 @@ export default function Leaderboard() {
             <div className="flex items-center gap-4">
               <div className="text-center">
                 <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">#{currentUserRank}</div>
-                <div className="text-muted-foreground text-xs">Ваш ранг</div>
+                <div className="text-muted-foreground text-xs">{t('yourRank')}</div>
               </div>
               <div className="flex-1">
-                <h3 className="text-foreground font-semibold">Ваша статистика</h3>
+                <h3 className="text-foreground font-semibold">{t('yourStats')}</h3>
                 <div className="mt-2 flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
                     <Target size={14} className="text-emerald-500" />
-                    <span className="text-sm">{completedModules.length} модулей</span>
+                    <span className="text-sm">{completedModules.length} {t('modulesLabel')}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Star size={14} className="text-amber-500" />
-                    <span className="text-sm">{currentUserStats.quizAvg}% квизы</span>
+                    <span className="text-sm">{currentUserStats.quizAvg}% {t('quizzesLabel')}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Flame size={14} className="text-orange-500" />
-                    <span className="text-sm">{currentUserStats.streak} дней</span>
+                    <span className="text-sm">{currentUserStats.streak} {t('daysLabel')}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Zap size={14} className="text-violet-500" />
@@ -265,20 +267,20 @@ export default function Leaderboard() {
 
       {/* Sort Tabs */}
       <div className="mb-4 flex items-center gap-3">
-        <span className="text-muted-foreground text-sm">Сортировка:</span>
+        <span className="text-muted-foreground text-sm">{t('sortBy')}</span>
         <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
           <TabsList className="grid grid-cols-4">
             <TabsTrigger value="xp" className="flex items-center gap-1.5">
-              <Zap size={14} /> XP
+              <Zap size={14} /> {t('sortXP')}
             </TabsTrigger>
             <TabsTrigger value="modules" className="flex items-center gap-1.5">
-              <Target size={14} /> Модули
+              <Target size={14} /> {t('sortModules')}
             </TabsTrigger>
             <TabsTrigger value="quiz" className="flex items-center gap-1.5">
-              <Star size={14} /> Квизы
+              <Star size={14} /> {t('sortQuizzes')}
             </TabsTrigger>
             <TabsTrigger value="streak" className="flex items-center gap-1.5">
-              <Flame size={14} /> Стрик
+              <Flame size={14} /> {t('sortStreak')}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -323,10 +325,10 @@ export default function Leaderboard() {
                       >
                         {student.name}
                       </p>
-                      {isCurrentUser && <Badge className="bg-violet-600 text-xs">Вы</Badge>}
+                      {isCurrentUser && <Badge className="bg-violet-600 text-xs">{t('you')}</Badge>}
                     </div>
                     <p className="text-muted-foreground text-xs">
-                      {student.group} • Активность: {student.lastActive}
+                      {student.group} · {t('activity')}: {student.lastActive}
                     </p>
                   </div>
 
@@ -334,22 +336,22 @@ export default function Leaderboard() {
                   <div className="hidden items-center gap-4 text-sm md:flex">
                     <div className="text-center">
                       <div className="text-foreground font-semibold">{student.modulesCompleted}</div>
-                      <div className="text-muted-foreground text-xs">модулей</div>
+                      <div className="text-muted-foreground text-xs">{t('modules')}</div>
                     </div>
                     <div className="text-center">
                       <div className="text-foreground font-semibold">{student.quizAvg}%</div>
-                      <div className="text-muted-foreground text-xs">квизы</div>
+                      <div className="text-muted-foreground text-xs">{t('quizzes')}</div>
                     </div>
                     <div className="text-center">
                       <div className="text-foreground font-semibold">{student.achievements}</div>
-                      <div className="text-muted-foreground text-xs">достижения</div>
+                      <div className="text-muted-foreground text-xs">{t('achievements')}</div>
                     </div>
                     <div className="text-center">
                       <div className="flex items-center gap-1 font-semibold text-orange-500">
                         <Flame size={14} />
                         {student.streak}
                       </div>
-                      <div className="text-muted-foreground text-xs">дней</div>
+                      <div className="text-muted-foreground text-xs">{t('days')}</div>
                     </div>
                   </div>
 
@@ -375,26 +377,14 @@ export default function Leaderboard() {
         <CardContent className="p-5">
           <h3 className="text-foreground mb-3 flex items-center gap-2 text-sm font-semibold">
             <Award size={16} className="text-amber-500" />
-            Как начисляется XP?
+            {t('howXP')}
           </h3>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
-              {
-                label: 'Модуль',
-                value: '+100 XP',
-                desc: 'За каждый пройденный модуль',
-              },
-              { label: 'Квиз', value: '+5 XP', desc: 'За 1% результата квиза' },
-              {
-                label: 'Достижение',
-                value: '+50 XP',
-                desc: 'За каждое достижение',
-              },
-              {
-                label: 'Стрик',
-                value: '+10 XP',
-                desc: 'За каждый день стрика',
-              },
+              { label: t('xpModule'), value: '+100 XP', desc: t('xpModuleDesc') },
+              { label: t('xpQuiz'), value: '+5 XP', desc: t('xpQuizDesc') },
+              { label: t('xpAchievement'), value: '+50 XP', desc: t('xpAchievementDesc') },
+              { label: t('xpStreak'), value: '+10 XP', desc: t('xpStreakDesc') },
             ].map((item, i) => (
               <div key={i} className="bg-muted/50 rounded-lg p-3 text-center">
                 <div className="font-bold text-violet-600 dark:text-violet-400">{item.value}</div>
