@@ -12,6 +12,8 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`dda4d24e`**: i18n: localize QuizSessionAnalytics with en/ru/zh keys
+- **`d463f6fa`**: i18n: add quiz analytics, report scheduler, progressSankey i18n keys (en/ru/zh) + fix broken JSON in all 3 locale files
 - **`4704a593`**: i18n: localize CSRFLab with en/ru/zh keys
 - **`71d7b34f`**: i18n: localize SSRFLab, SecureCodingLab, SecurityHeadersLab with en/ru/zh keys
 - **`70a06b20`**: i18n: localize SQLInjectionLab and XSSLab with en/ru/zh keys + add lab i18n keys for CSRF/SSRF/SecureCoding/SecurityHeaders
@@ -24,5 +26,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
 - **239/239 tests passing** (19 files) — all unit tests green
-- **Remote sync** — both remotes at `4704a593`
+- **Remote sync** — both remotes at `dda4d24e`
 - **Full verification passed**: lint ✓, typecheck ✓, tests ✓
