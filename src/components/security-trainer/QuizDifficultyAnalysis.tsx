@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { Loader2, Target } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTranslations } from 'next-intl';
 import KPICard from './KPICard';
 import { logger } from '@/lib/logger';
 
@@ -54,11 +55,6 @@ interface QuizDifficultyData {
   }>;
 }
 
-const DIFFICULTY_LABELS: Record<string, string> = {
-  easy: 'Лёгкие',
-  medium: 'Средние',
-  hard: 'Сложные',
-};
 const DIFFICULTY_COLORS: Record<string, string> = {
   easy: '#10b981',
   medium: '#f59e0b',
@@ -68,6 +64,12 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: string; days?: number }) {
   const [data, setData] = useState<QuizDifficultyData | null>(null);
   const [loading, setLoading] = useState(false);
+  const t = useTranslations('quizDifficultyAnalysis');
+  const DIFFICULTY_LABELS: Record<string, string> = {
+    easy: t('easy'),
+    medium: t('medium'),
+    hard: t('hard'),
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -97,7 +99,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
       <Card className="border-border">
         <CardContent className="text-muted-foreground p-8 text-center">
           <Target size={40} className="mx-auto mb-3 opacity-50" />
-          <p>Нет данных о квизах за выбранный период</p>
+          <p>{t('noData')}</p>
         </CardContent>
       </Card>
     );
@@ -149,10 +151,10 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
     <div className="space-y-4">
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <KPICard icon={<Target size={18} />} value={totalAttempts} label="Всего попыток" />
-        <KPICard icon={<Target size={18} />} value={`${avgCorrectRate}%`} label="Средний балл" />
-        <KPICard icon={<Target size={18} />} value={totalStudents} label="Студентов" />
-        <KPICard icon={<Target size={18} />} value={data.difficultyBreakdown.length} label="Уровней сложности" />
+        <KPICard icon={<Target size={18} />} value={totalAttempts} label={t('totalAttempts')} />
+        <KPICard icon={<Target size={18} />} value={`${avgCorrectRate}%`} label={t('avgScore')} />
+        <KPICard icon={<Target size={18} />} value={totalStudents} label={t('students')} />
+        <KPICard icon={<Target size={18} />} value={data.difficultyBreakdown.length} label={t('difficultyLevels')} />
       </div>
 
       {/* Difficulty Summary Cards */}
@@ -166,15 +168,15 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
               </div>
               <div className="text-muted-foreground space-y-1 text-xs">
                 <div className="flex justify-between">
-                  <span>Попыток:</span>
+                  <span>{t('attempts')}</span>
                   <span className="text-foreground font-medium">{d.totalAttempts}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Правильных:</span>
+                  <span>{t('correct')}</span>
                   <span className="text-foreground font-medium">{d.correctRate}%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Студентов:</span>
+                  <span>{t('students')}</span>
                   <span className="text-foreground font-medium">{d.uniqueStudents}</span>
                 </div>
               </div>
@@ -186,14 +188,14 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
       {/* Bar Chart: Correct Rate by Difficulty */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Процент правильных по сложности</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('correctRateByDifficulty')}</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={barChartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="difficulty" tick={{ fontSize: 12 }} />
               <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
               <Tooltip formatter={(value) => `${value ?? 0}%`} />
-              <Bar dataKey="correctRate" fill="#6366f1" name="Правильных (%)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="correctRate" fill="#6366f1" name={t('correctPercent')} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -203,7 +205,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
       {heatmapData.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Категории по сложности</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('categoriesByDifficulty')}</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={heatmapData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -224,7 +226,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
       {trendData.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Тренд по сложности (еженедельно)</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('trendByDifficulty')}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -238,7 +240,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
                   stroke={DIFFICULTY_COLORS.easy}
                   strokeWidth={2}
                   dot={false}
-                  name="Лёгкие"
+                  name={t('easy')}
                 />
                 <Line
                   type="monotone"
@@ -246,7 +248,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
                   stroke={DIFFICULTY_COLORS.medium}
                   strokeWidth={2}
                   dot={false}
-                  name="Средние"
+                  name={t('medium')}
                 />
                 <Line
                   type="monotone"
@@ -254,7 +256,7 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
                   stroke={DIFFICULTY_COLORS.hard}
                   strokeWidth={2}
                   dot={false}
-                  name="Сложные"
+                  name={t('hard')}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -266,16 +268,16 @@ export default function QuizDifficultyAnalysis({ groupId, days }: { groupId?: st
       {topStudents.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Лучшие по сложным вопросам (мин. 5 попыток)</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('topByHardQuestions')}</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-border border-b">
-                    <th className="text-muted-foreground px-3 py-2 text-left font-semibold">Студент</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">Лёгкие</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">Средние</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">Сложные</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">Всего</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left font-semibold">{t('students')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">{t('easy')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">{t('medium')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">{t('hard')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right font-semibold">{t('total')}</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -30,56 +30,25 @@ import {
 } from '@/lib/analytics-api';
 import type { ScheduledReport } from '@/lib/auth-types';
 import { getAllUsers } from '@/lib/auth-store';
-
-const REPORT_TYPES = [
-  {
-    value: 'gradebook',
-    label: 'Ведомость',
-    icon: FileText,
-    color: 'bg-blue-100 text-blue-700',
-  },
-  {
-    value: 'at-risk',
-    label: 'Студенты в риске',
-    icon: AlertTriangle,
-    color: 'bg-red-100 text-red-700',
-  },
-  {
-    value: 'analytics',
-    label: 'Общая аналитика',
-    icon: BarChart3,
-    color: 'bg-indigo-100 text-indigo-700',
-  },
-  {
-    value: 'module-performance',
-    label: 'Производительность модулей',
-    icon: BookOpen,
-    color: 'bg-emerald-100 text-emerald-700',
-  },
-  {
-    value: 'group-comparison',
-    label: 'Сравнение групп',
-    icon: GitCompare,
-    color: 'bg-violet-100 text-violet-700',
-  },
-  {
-    value: 'quiz-retry',
-    label: 'Повторы квизов',
-    icon: Calendar,
-    color: 'bg-amber-100 text-amber-700',
-  },
-];
-
-const FREQUENCY_OPTIONS = [
-  { value: 'daily', label: 'Ежедневно' },
-  { value: 'weekly', label: 'Еженедельно' },
-  { value: 'monthly', label: 'Ежемесячно' },
-];
-
-const WEEKDAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+import { useTranslations } from 'next-intl';
 
 export default function ReportScheduler({ groupId, days: _days }: { groupId?: string; days?: number }) {
   const [reports, setReports] = useState<ScheduledReport[]>([]);
+  const t = useTranslations('reportScheduler');
+  const REPORT_TYPES = [
+    { value: 'gradebook', label: t('gradebook'), icon: FileText, color: 'bg-blue-100 text-blue-700' },
+    { value: 'at-risk', label: t('atRisk'), icon: AlertTriangle, color: 'bg-red-100 text-red-700' },
+    { value: 'analytics', label: t('analytics'), icon: BarChart3, color: 'bg-indigo-100 text-indigo-700' },
+    { value: 'module-performance', label: t('modulePerformance'), icon: BookOpen, color: 'bg-emerald-100 text-emerald-700' },
+    { value: 'group-comparison', label: t('groupComparison'), icon: GitCompare, color: 'bg-violet-100 text-violet-700' },
+    { value: 'quiz-retry', label: t('quizRetries'), icon: Calendar, color: 'bg-amber-100 text-amber-700' },
+  ];
+  const FREQUENCY_OPTIONS = [
+    { value: 'daily', label: t('daily') },
+    { value: 'weekly', label: t('weekly') },
+    { value: 'monthly', label: t('monthly') },
+  ];
+  const WEEKDAYS = [t('sunday'), t('monday'), t('tuesday'), t('wednesday'), t('thursday'), t('friday'), t('saturday')];
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [groups, setGroups] = useState<string[]>([]);
@@ -110,7 +79,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
 
   const handleCreate = async () => {
     if (!reportType || !frequency) {
-      toast.error('Заполните все обязательные поля');
+      toast.error(t('fillRequired'));
       return;
     }
 
@@ -135,12 +104,12 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
 
     const result = await createScheduledReport(data);
     if (result.success) {
-      toast.success('Отчёт создан');
+      toast.success(t('reportCreated'));
       setShowForm(false);
       resetForm();
       loadReports();
     } else {
-      toast.error(result.error || 'Ошибка создания');
+      toast.error(result.error || t('creationError'));
     }
   };
 
@@ -149,21 +118,21 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
       isActive: !currentActive,
     });
     if (result.success) {
-      toast.success(currentActive ? 'Отчёт отключён' : 'Отчёт включён');
+      toast.success(currentActive ? t('reportDisabled') : t('reportEnabled'));
       loadReports();
     } else {
-      toast.error(result.error || 'Ошибка обновления');
+      toast.error(result.error || t('updateError'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Удалить этот отчёт?')) return;
+    if (!confirm(t('confirmDelete'))) return;
     const result = await deleteScheduledReport(id);
     if (result.success) {
-      toast.success('Отчёт удалён');
+      toast.success(t('reportDeleted'));
       loadReports();
     } else {
-      toast.error(result.error || 'Ошибка удаления');
+      toast.error(result.error || t('deleteError'));
     }
   };
 
@@ -178,7 +147,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
   };
 
   const formatLastGenerated = (dateStr: string | null) => {
-    if (!dateStr) return 'Не генерировался';
+    if (!dateStr) return t('notGenerated');
     return new Date(dateStr).toLocaleString('ru-RU', {
       day: '2-digit',
       month: '2-digit',
@@ -191,11 +160,11 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
   const formatSchedule = (report: ScheduledReport) => {
     switch (report.frequency) {
       case 'daily':
-        return 'Каждый день';
+        return t('everyDay');
       case 'weekly':
-        return `Каждый ${WEEKDAYS[report.dayOfWeek ?? 1] || 'Понедельник'}`;
+        return t('everyWeekday', { weekday: WEEKDAYS[report.dayOfWeek ?? 1] || t('monday') });
       case 'monthly':
-        return `${report.dayOfMonth || 1}-го числа каждого месяца`;
+        return t('dayOfMonth', { day: String(report.dayOfMonth || 1) });
       default:
         return report.frequency;
     }
@@ -220,7 +189,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-        <p className="text-muted-foreground text-sm">Загрузка расписания...</p>
+        <p className="text-muted-foreground text-sm">{t('loadingSchedule')}</p>
       </div>
     );
   }
@@ -230,12 +199,12 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold">Расписание отчётов</h3>
-          <p className="text-muted-foreground mt-0.5 text-xs">Автоматическая генерация отчётов по расписанию</p>
+          <h3 className="text-sm font-semibold">{t('scheduleTitle')}</h3>
+          <p className="text-muted-foreground mt-0.5 text-xs">{t('scheduleSubtitle')}</p>
         </div>
         <Button onClick={() => setShowForm(!showForm)} size="sm">
           {showForm ? <X size={16} className="mr-1" /> : <Plus size={16} className="mr-1" />}
-          {showForm ? 'Отмена' : 'Новое расписание'}
+          {showForm ? t('cancel') : t('newSchedule')}
         </Button>
       </div>
 
@@ -247,7 +216,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* Report Type */}
                 <div>
-                  <label className="mb-1 block text-xs font-medium">Тип отчёта *</label>
+                  <label className="mb-1 block text-xs font-medium">{t('reportType')}</label>
                   <select
                     value={reportType}
                     onChange={(e) => setReportType(e.target.value)}
@@ -263,7 +232,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
 
                 {/* Frequency */}
                 <div>
-                  <label className="mb-1 block text-xs font-medium">Частота *</label>
+                  <label className="mb-1 block text-xs font-medium">{t('frequency')}</label>
                   <select
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value as 'daily' | 'weekly' | 'monthly')}
@@ -280,7 +249,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
                 {/* Day of Week (for weekly) */}
                 {frequency === 'weekly' && (
                   <div>
-                    <label className="mb-1 block text-xs font-medium">День недели</label>
+                    <label className="mb-1 block text-xs font-medium">{t('dayOfWeek')}</label>
                     <select
                       value={dayOfWeek}
                       onChange={(e) => setDayOfWeek(Number(e.target.value))}
@@ -298,7 +267,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
                 {/* Day of Month (for monthly) */}
                 {frequency === 'monthly' && (
                   <div>
-                    <label className="mb-1 block text-xs font-medium">Число месяца</label>
+                    <label className="mb-1 block text-xs font-medium">{t('dayOfMonthLabel')}</label>
                     <Input
                       type="number"
                       min={1}
@@ -312,7 +281,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
 
                 {/* Email */}
                 <div>
-                  <label className="mb-1 block text-xs font-medium">Email для уведомлений</label>
+                  <label className="mb-1 block text-xs font-medium">{t('emailNotifications')}</label>
                   <Input
                     type="email"
                     value={email}
@@ -324,13 +293,13 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
 
                 {/* Group */}
                 <div>
-                  <label className="mb-1 block text-xs font-medium">Группа</label>
+                  <label className="mb-1 block text-xs font-medium">{t('group')}</label>
                   <select
                     value={selectedGroup}
                     onChange={(e) => setSelectedGroup(e.target.value)}
                     className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm"
                   >
-                    <option value="">Все группы</option>
+                    <option value="">{t('allGroups')}</option>
                     {groups.map((g) => (
                       <option key={g} value={g}>
                         {g}
@@ -341,22 +310,22 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
 
                 {/* Lookback Days */}
                 <div>
-                  <label className="mb-1 block text-xs font-medium">Период данных (дней)</label>
+                  <label className="mb-1 block text-xs font-medium">{t('dataPeriod')}</label>
                   <select
                     value={lookbackDays}
                     onChange={(e) => setLookbackDays(Number(e.target.value))}
                     className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm"
                   >
-                    <option value={7}>7 дней</option>
-                    <option value={30}>30 дней</option>
-                    <option value={90}>90 дней</option>
-                    <option value={180}>180 дней</option>
+                    <option value={7}>{t('days7')}</option>
+                    <option value={30}>{t('days30')}</option>
+                    <option value={90}>{t('days90')}</option>
+                    <option value={180}>{t('days180')}</option>
                   </select>
                 </div>
               </div>
 
               <Button onClick={handleCreate} className="w-full">
-                Создать расписание
+                {t('createSchedule')}
               </Button>
             </CardContent>
           </Card>
@@ -368,9 +337,9 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
         <Card className="border-border">
           <CardContent className="p-8 text-center">
             <Calendar size={40} className="text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm font-medium">Нет расписаний</p>
+            <p className="text-sm font-medium">{t('noSchedules')}</p>
             <p className="text-muted-foreground mt-1 text-xs">
-              Создайте первое расписание для автоматической генерации отчётов
+              {t('createFirst')}
             </p>
           </CardContent>
         </Card>
@@ -400,7 +369,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-semibold">{getReportTypeLabel(report.reportType)}</p>
                             <Badge variant={report.isActive ? 'default' : 'secondary'} className="text-[10px]">
-                              {report.isActive ? 'Активен' : 'Отключён'}
+                              {report.isActive ? t('active') : t('disabled')}
                             </Badge>
                           </div>
                           <div className="text-muted-foreground mt-0.5 flex items-center gap-3 text-xs">
@@ -408,11 +377,11 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
                               <Clock size={12} />
                               {formatSchedule(report)}
                             </span>
-                            {report.groupId && <span>Группа: {report.groupId}</span>}
-                            <span>{report.days}д данных</span>
+                            {report.groupId && <span>{t('groupId')} {report.groupId}</span>}
+                            <span>{report.days} {t('daysData')}</span>
                           </div>
                           <p className="text-muted-foreground mt-0.5 text-xs">
-                            Последняя генерация: {formatLastGenerated(report.lastGenerated)}
+                            {t('lastGenerated')} {formatLastGenerated(report.lastGenerated)}
                           </p>
                         </div>
                       </div>
@@ -421,7 +390,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
                         <button
                           onClick={() => handleToggleActive(report.id, report.isActive)}
                           className="text-muted-foreground transition-colors hover:text-indigo-600"
-                          title={report.isActive ? 'Отключить' : 'Включить'}
+                          title={report.isActive ? t('disable') : t('enable')}
                         >
                           {report.isActive ? (
                             <ToggleRight size={24} className="text-indigo-600" />
@@ -432,7 +401,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
                         <button
                           onClick={() => handleDelete(report.id)}
                           className="text-muted-foreground transition-colors hover:text-red-600"
-                          title="Удалить"
+                          title={t('delete')}
                         >
                           <Trash2 size={18} />
                         </button>

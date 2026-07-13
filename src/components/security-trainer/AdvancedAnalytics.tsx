@@ -21,6 +21,7 @@ import { Loader2, AlertTriangle, Clock, RefreshCw, Target, TrendingUp } from 'lu
 import { useDateFormatter } from '@/lib/format';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from 'next-intl';
 import KPICard from './KPICard';
 import { logger } from '@/lib/logger';
 
@@ -107,6 +108,7 @@ interface Props {
 
 export default function AdvancedAnalytics({ groupId, days: controlledDays }: Props) {
   const formatDate = useDateFormatter();
+  const t = useTranslations('advancedAnalytics');
   const [internalDays, setInternalDays] = useState(30);
   const [subTab, setSubTab] = useState<'time' | 'errors' | 'retry'>('time');
   const [timeData, setTimeData] = useState<TimeAnalyticsData | null>(null);
@@ -150,7 +152,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -176,9 +178,9 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
         </div>
         <div className="bg-muted flex gap-1 rounded-lg p-1">
           {[
-            { key: 'time' as const, label: 'Время модулей', icon: Clock },
-            { key: 'errors' as const, label: 'Ошибки', icon: AlertTriangle },
-            { key: 'retry' as const, label: 'Повторы квизов', icon: RefreshCw },
+            { key: 'time' as const, label: t('moduleTime'), icon: Clock },
+            { key: 'errors' as const, label: t('errors'), icon: AlertTriangle },
+            { key: 'retry' as const, label: t('quizRetries'), icon: RefreshCw },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -203,28 +205,28 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
             <KPICard
               icon={<Clock size={18} />}
               value={timeData.moduleTimes?.length ?? 0}
-              label="Модулей с данными"
+              label={t('modulesWithData')}
               iconBg="bg-indigo-100"
               iconColor="text-indigo-600"
             />
             <KPICard
               icon={<TrendingUp size={18} />}
               value={`${timeData.moduleTimes?.[0]?.avg ?? 0}ч`}
-              label="Ср. время (быстрый)"
+              label={t('avgTimeFastest')}
               iconBg="bg-emerald-100"
               iconColor="text-emerald-600"
             />
             <KPICard
               icon={<Clock size={18} />}
               value={`${timeData.moduleTimes?.[timeData.moduleTimes.length - 1]?.avg ?? 0}ч`}
-              label="Ср. время (медленный)"
+              label={t('avgTimeSlowest')}
               iconBg="bg-amber-100"
               iconColor="text-amber-600"
             />
             <KPICard
               icon={<Target size={18} />}
               value={timeData.studentSpeeds?.length ?? 0}
-              label="Студентов tracked"
+              label={t('trackedStudents')}
               iconBg="bg-sky-100"
               iconColor="text-sky-600"
             />
@@ -232,7 +234,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
 
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Среднее время прохождения модулей</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('avgModuleTime')}</h3>
               {timeData.moduleTimes && timeData.moduleTimes.length > 0 && (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={timeData.moduleTimes}>
@@ -240,7 +242,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                     <XAxis dataKey="moduleId" tick={{ fontSize: 10 }} angle={-30} textAnchor="end" height={60} />
                     <YAxis
                       label={{
-                        value: 'Часы',
+                        value: t('hours'),
                         angle: -90,
                         position: 'insideLeft',
                         fontSize: 10,
@@ -248,8 +250,8 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                     />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="avg" fill="#6366f1" name="Среднее" />
-                    <Bar dataKey="median" fill="#10b981" name="Медиана" />
+                    <Bar dataKey="avg" fill="#6366f1" name={t('avg')} />
+                    <Bar dataKey="median" fill="#10b981" name={t('median')} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -262,7 +264,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
               <CardContent className="p-5">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <TrendingUp size={16} className="text-emerald-500" />
-                  Быстрые студенты
+                  {t('fastStudents')}
                 </h3>
                 <div className="space-y-2">
                   {timeData.studentSpeeds.slice(0, 10).map((s: StudentSpeedEntry, i: number) => (
@@ -283,7 +285,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                         )}
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-muted-foreground text-xs">{s.modulesCompleted} мод.</span>
+                        <span className="text-muted-foreground text-xs">{s.modulesCompleted} {t('modules')}</span>
                         <Badge
                           variant={
                             s.avgHoursPerModule < 6 ? 'default' : s.avgHoursPerModule < 12 ? 'secondary' : 'destructive'
@@ -308,14 +310,14 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
           {errorData.categoryErrorRates && errorData.categoryErrorRates.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Ошибки по категориям</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('errorsByCategory')}</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={errorData.categoryErrorRates}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="category" tick={{ fontSize: 10 }} angle={-30} textAnchor="end" height={60} />
                     <YAxis domain={[0, 100]} />
                     <Tooltip />
-                    <Bar dataKey="errorRate" fill="#ef4444" name="Ошибка %" />
+                    <Bar dataKey="errorRate" fill="#ef4444" name={t('errorPercent')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -326,7 +328,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
           {errorData.mostMissedQuestions && errorData.mostMissedQuestions.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Самые сложные вопросы</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('hardestQuestions')}</h3>
                 <div className="space-y-2">
                   {errorData.mostMissedQuestions.slice(0, 15).map((q: MissedQuestionEntry, i: number) => (
                     <motion.div
@@ -346,9 +348,9 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs">{q.totalAttempts} попыток</span>
+                        <span className="text-muted-foreground text-xs">{q.totalAttempts} {t('attempts')}</span>
                         <Badge variant={q.errorRate > 70 ? 'destructive' : q.errorRate > 50 ? 'secondary' : 'default'}>
-                          {q.errorRate}% ошибок
+                          {q.errorRate}% {t('errorRate')}
                         </Badge>
                       </div>
                     </motion.div>
@@ -362,7 +364,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
           {errorData.errorTrends && errorData.errorTrends.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Динамика ошибок</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('errorDynamics')}</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={errorData.errorTrends}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -374,7 +376,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                     <YAxis domain={[0, 100]} />
                     <Tooltip labelFormatter={(v) => formatDate(v)} />
                     <Legend />
-                    <Line type="monotone" dataKey="errorRate" stroke="#ef4444" name="Ошибка %" dot={false} />
+                    <Line type="monotone" dataKey="errorRate" stroke="#ef4444" name={t('errorPercent')} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -390,28 +392,28 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
             <KPICard
               icon={<RefreshCw size={18} />}
               value={retryData.totalRetries ?? 0}
-              label="Квизов с повторами"
+              label={t('quizzesWithRetries')}
               iconBg="bg-indigo-100"
               iconColor="text-indigo-600"
             />
             <KPICard
               icon={<Target size={18} />}
               value={retryData.totalUniqueQuizzes ?? 0}
-              label="Всего квизов"
+              label={t('totalQuizzes')}
               iconBg="bg-sky-100"
               iconColor="text-sky-600"
             />
             <KPICard
               icon={<TrendingUp size={18} />}
               value={`${retryData.improvementByRetries?.[2]?.avgScore ?? 0}%`}
-              label="Ср. балл (3+ попыток)"
+              label={t('avgScoreWithRetries')}
               iconBg="bg-emerald-100"
               iconColor="text-emerald-600"
             />
             <KPICard
               icon={<Clock size={18} />}
               value={retryData.topRetryers?.length ?? 0}
-              label="Активных retry-еров"
+              label={t('activeRetryers')}
               iconBg="bg-amber-100"
               iconColor="text-amber-600"
             />
@@ -421,7 +423,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
           {retryData.retryDistribution && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Распределение повторов</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('retryDistribution')}</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
@@ -449,14 +451,14 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
           {retryData.improvementByRetries && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Балл по количеству попыток</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('scoreByAttempts')}</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={retryData.improvementByRetries}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="attempts" tick={{ fontSize: 10 }} />
                     <YAxis domain={[0, 100]} />
                     <Tooltip />
-                    <Bar dataKey="avgScore" fill="#6366f1" name="Ср. балл" />
+                    <Bar dataKey="avgScore" fill="#6366f1" name={t('avgScore')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -469,7 +471,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
               <CardContent className="p-5">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <RefreshCw size={16} className="text-indigo-500" />
-                  Студенты с наибольшим количеством повторов
+                  {t('topRetryers')}
                 </h3>
                 <div className="space-y-2">
                   {retryData.topRetryers.slice(0, 10).map((s: RetryerEntry, i: number) => (
@@ -490,7 +492,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                         )}
                       </div>
                       <Badge variant={s.retryCount > 5 ? 'destructive' : s.retryCount > 2 ? 'secondary' : 'default'}>
-                        {s.retryCount} повторов
+                        {s.retryCount} {t('retries')}
                       </Badge>
                     </motion.div>
                   ))}

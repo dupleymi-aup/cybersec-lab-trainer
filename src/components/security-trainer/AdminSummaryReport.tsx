@@ -17,14 +17,9 @@ import {
 import { getAdminSummary, type AdminSummary } from '@/lib/auth-store';
 import { useAnalyticsFetcher } from '@/hooks/use-analytics-fetch';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTranslations } from 'next-intl';
 
 type GroupBy = 'group' | 'course' | 'university';
-
-const groupByLabels: Record<GroupBy, string> = {
-  group: 'По группе',
-  course: 'По курсу',
-  university: 'По университету',
-};
 
 const COLORS = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#818cf8', '#7c3aed', '#a855f7', '#d8b4fe'];
 
@@ -122,6 +117,12 @@ function tableData(summary: AdminSummary, groupBy: GroupBy) {
 
 export default function AdminSummaryReport() {
   const [groupBy, setGroupBy] = useState<GroupBy>('group');
+  const t = useTranslations('adminSummary');
+  const groupByLabels: Record<GroupBy, string> = {
+    group: t('byGroup'),
+    course: t('byCourse'),
+    university: t('byUniversity'),
+  };
 
   const {
     data: summary,
@@ -134,7 +135,7 @@ export default function AdminSummaryReport() {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-          <p className="text-muted-foreground text-sm">Загрузка данных...</p>
+          <p className="text-muted-foreground text-sm">{t('loadingData')}</p>
         </div>
       </div>
     );
@@ -145,8 +146,8 @@ export default function AdminSummaryReport() {
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <AlertTriangle size={32} className="mx-auto mb-3 text-red-500" />
-          <p className="text-muted-foreground text-sm font-medium">Ошибка загрузки</p>
-          <p className="mt-1 text-xs text-slate-400">{error || 'Нет данных'}</p>
+          <p className="text-muted-foreground text-sm font-medium">{t('loadingError')}</p>
+          <p className="mt-1 text-xs text-slate-400">{error || t('noData')}</p>
         </div>
       </div>
     );
@@ -165,7 +166,7 @@ export default function AdminSummaryReport() {
         <MetricCard
           icon={<Users size={18} />}
           value={current.totalStudents}
-          label="Всего студентов"
+          label={t('totalStudents')}
           trend={trends.students}
           delta={current.totalStudents - previous.totalStudents}
           delay={0}
@@ -175,7 +176,7 @@ export default function AdminSummaryReport() {
         <MetricCard
           icon={<GraduationCap size={18} />}
           value={current.activeStudents}
-          label="Активных"
+          label={t('active')}
           trend={trends.activity}
           delta={current.activePercentage}
           deltaSuffix="%"
@@ -185,8 +186,8 @@ export default function AdminSummaryReport() {
         />
         <MetricCard
           icon={<BookOpen size={18} />}
-          value={`${completionModules}/8 модулей`}
-          label="Ср. завершение"
+          value={`${completionModules}/8 ${t('modulesOf8')}`}
+          label={t('avgCompletion')}
           trend={trends.completion}
           delta={Math.round(current.avgCompletionRate - previous.avgCompletionRate)}
           delay={2}
@@ -196,7 +197,7 @@ export default function AdminSummaryReport() {
         <MetricCard
           icon={<Trophy size={18} />}
           value={`${(Math.round(current.avgQuizScore * 100) / 100).toFixed(1)}%`}
-          label="Ср. балл квизов"
+          label={t('avgQuizScore')}
           trend={trends.quizScore}
           delta={Math.round((current.avgQuizScore - previous.avgQuizScore) * 100) / 100}
           deltaSuffix="%"
@@ -210,7 +211,7 @@ export default function AdminSummaryReport() {
       <Card className="border-border">
         <CardContent className="p-5">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold">Агрегация по группам</h3>
+            <h3 className="text-sm font-semibold">{t('aggregationByGroup')}</h3>
             <div className="bg-muted flex gap-1 rounded-lg p-0.5">
               {(['group', 'course', 'university'] as GroupBy[]).map((key) => (
                 <button
@@ -251,15 +252,15 @@ export default function AdminSummaryReport() {
                   }}
                   formatter={(value, name) => {
                     const v = value as number;
-                    if (name === 'students') return [v, 'Студенты'];
-                    if (name === 'avgCompletion') return [`${v}%`, 'Завершение'];
+                    if (name === 'students') return [v, t('studentsLabel')];
+                    if (name === 'avgCompletion') return [`${v}%`, t('completion')];
                     return value;
                   }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
                   formatter={(value) =>
-                    value === 'students' ? 'Студенты' : value === 'avgCompletion' ? 'Завершение (%)' : value
+                    value === 'students' ? t('studentsLabel') : value === 'avgCompletion' ? `${t('completion')} (%)` : value
                   }
                 />
                 <Bar yAxisId="left" dataKey="students" name="students" radius={[4, 4, 0, 0]}>
@@ -278,7 +279,7 @@ export default function AdminSummaryReport() {
             </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center py-12">
-              <p className="text-sm text-slate-400">Нет данных для отображения</p>
+              <p className="text-sm text-slate-400">{t('noData')}</p>
             </div>
           )}
         </CardContent>
@@ -289,9 +290,9 @@ export default function AdminSummaryReport() {
         <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="mb-4 text-sm font-semibold">
-              Сводка{' '}
+              {t('summary')}{' '}
               <span className="font-normal text-slate-400">
-                ({groupBy === 'group' ? 'по группам' : groupBy === 'course' ? 'по курсам' : 'по университетам'})
+                ({groupBy === 'group' ? t('summaryByGroup') : groupBy === 'course' ? t('summaryByCourse') : t('summaryByUniversity')})
               </span>
             </h3>
             <div className="overflow-x-auto">
@@ -299,16 +300,16 @@ export default function AdminSummaryReport() {
                 <thead>
                   <tr className="border-border border-b">
                     <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium tracking-wider uppercase">
-                      {groupBy === 'group' ? 'Группа' : groupBy === 'course' ? 'Курс' : 'Университет'}
+                      {groupBy === 'group' ? t('byGroup') : groupBy === 'course' ? t('byCourse') : t('byUniversity')}
                     </th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium tracking-wider uppercase">
-                      Студенты
+                      {t('studentsLabel')}
                     </th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium tracking-wider uppercase">
-                      Ср. завершение
+                      {t('avgCompletion')}
                     </th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium tracking-wider uppercase">
-                      Ср. балл квизов
+                      {t('avgQuizScore')}
                     </th>
                   </tr>
                 </thead>
