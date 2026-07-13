@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`65481de7`**: i18n: localize 3 more components (QuizQuestionAnalytics, ProgressSankey, CohortAnalysis) with en/ru/zh keys
 - **`802d7674`**: i18n: localize 5 more analytics components (QuizRetryAnalytics, QuizDifficultyAnalysis, AdminSummaryReport, AdvancedAnalytics, ReportScheduler) with en/ru/zh keys
 - **`d9af0309`**: i18n: localize 7 analytics components (QuizSessionAnalytics, StudentDrillDown, ProgressDynamicsChart, PredictiveRiskDashboard, EngagementAnalytics, ErrorPatternsAnalytics, ModulePerformanceReport) with en/ru/zh keys
 - **`c2e782d6`**: i18n: localize aria-labels, module names, and fix lint warnings (16 components aria-label, app/page.tsx module names, CohortAnalysis dep fix, tsconfig cleanup)
@@ -37,5 +38,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **Remote sync** — both remotes at `802d7674`
+- **Remote sync** — both remotes at `65481de7`
 - **Full verification passed**: lint ✓, build ✓
