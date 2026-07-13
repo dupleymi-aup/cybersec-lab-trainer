@@ -171,7 +171,7 @@ export default function Dashboard() {
     if (announcementsError) {
       toast.error(t('dashboard.failedToLoadAnnouncements'));
     }
-  }, [announcementsError]);
+  }, [announcementsError, t]);
 
   const dismissAnnouncement = (id: string) => {
     setDismissedAnnouncements((prev) => new Set([...prev, id]));
@@ -266,7 +266,7 @@ export default function Dashboard() {
     }
     events.sort((a, b) => b.date.getTime() - a.date.getTime());
     return events;
-  }, [moduleTimestamps, quizTimestamps]);
+  }, [moduleTimestamps, quizTimestamps, t]);
 
   const streakData = useMemo(() => {
     const allDates = new Set<string>();

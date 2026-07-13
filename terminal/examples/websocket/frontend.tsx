@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,9 +25,8 @@ export default function SocketDemo() {
   const [inputMessage, setInputMessage] = useState('');
   const [username, setUsername] = useState('');
   const [isUsernameSet, setIsUsernameSet] = useState(false);
-  const [socket, setSocket] = useState<any>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     // Connect to websocket server
@@ -58,21 +57,10 @@ export default function SocketDemo() {
 
     socketInstance.on('user-joined', (data: { user: User; message: Message }) => {
       setMessages(prev => [...prev, data.message]);
-      setUsers(prev => {
-        if (!prev.find(u => u.id === data.user.id)) {
-          return [...prev, data.user];
-        }
-        return prev;
-      });
     });
 
     socketInstance.on('user-left', (data: { user: User; message: Message }) => {
       setMessages(prev => [...prev, data.message]);
-      setUsers(prev => prev.filter(u => u.id !== data.user.id));
-    });
-
-    socketInstance.on('users-list', (data: { users: User[] }) => {
-      setUsers(data.users);
     });
 
     return () => {
