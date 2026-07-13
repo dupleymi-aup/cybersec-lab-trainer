@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`f675e180`**: fix: dev-mode OTP logging in recovery API, clean up sendRecoveryOTP store return type (removed unused `otp` field); added `logger` usage to recovery route
 - **`e9a4f6c9`**: feat: proper password recovery page with full 3-step OTP flow (contact → OTP → reset), replacing redirect stub; added IP-based rate limiting to login route (20 req/60s) alongside identifier-based limit
 - **`1f8a8197`**: docs: update AGENTS.md
 - **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
