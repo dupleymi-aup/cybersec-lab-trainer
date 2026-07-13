@@ -24,6 +24,7 @@ import {
 
 export default function SQLInjectionLab() {
   const t = useTranslations('labs.sqlInjection');
+  const tc = useTranslations('common');
   const sqlCompletedLevels = useAppStore((s) => s.sqlCompletedLevels);
   const addSqlLevel = useAppStore((s) => s.addSqlLevel);
   const completeModule = useAppStore((s) => s.completeModule);
@@ -105,7 +106,7 @@ export default function SQLInjectionLab() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label={tc('back')}>
             <ChevronLeft size={20} />
           </Button>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { X, Download, Loader2, AlertTriangle, Users, BookOpen, HelpCircle, Award, Activity } from 'lucide-react';
 import { getStudentPerformance, type StudentPerformanceData } from '@/lib/auth-store';
 import { useDateFormatter, useDateTimeFormatter } from '@/lib/format';
@@ -19,6 +20,7 @@ export default function StudentDrillDown({
   days?: number;
   onClose: () => void;
 }) {
+  const tc = useTranslations('common');
   const formatDate = useDateFormatter();
   const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);
@@ -97,7 +99,7 @@ export default function StudentDrillDown({
               <Button onClick={handleExport} variant="outline" size="sm" disabled={!data}>
                 <Download size={14} className="mr-1" /> Экспорт
               </Button>
-              <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
+              <Button variant="ghost" size="icon" onClick={onClose} aria-label={tc('close')}>
                 <X size={18} />
               </Button>
             </div>

@@ -97,6 +97,7 @@ const EMPTY_PROGRESS: StudentProgress = {
 export default function TeacherPanel() {
   const formatDate = useDateFormatter();
   const t = useTranslations('teacher');
+  const tc = useTranslations('common');
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const user = useAuthStore((s) => s.user);
   const [searchTerm, setSearchTerm] = useState('');
@@ -498,7 +499,7 @@ export default function TeacherPanel() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label={tc('back')}>
             <ChevronLeft size={20} />
           </Button>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100">

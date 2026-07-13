@@ -13,6 +13,7 @@ import { ChevronLeft, Code, CheckCircle2, XCircle, ArrowRight, ArrowLeft, Rotate
 
 export default function SecureCodingLab() {
   const t = useTranslations('labs.secureCoding');
+  const tc = useTranslations('common');
   const completeModule = useAppStore((s) => s.completeModule);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
@@ -77,7 +78,7 @@ export default function SecureCodingLab() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
+        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label={tc('back')}>
           <ChevronLeft size={20} />
         </Button>
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">

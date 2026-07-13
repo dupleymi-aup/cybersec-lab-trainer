@@ -207,6 +207,7 @@ function CopyButton({ text }: { text: string }) {
 
 export default function ToolsLab() {
   const t = useTranslations('labs.tools');
+  const tc = useTranslations('common');
   const formatDateTime = useDateTimeFormatter();
   const completeModule = useAppStore((s) => s.completeModule);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
@@ -367,7 +368,7 @@ export default function ToolsLab() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
+        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label={tc('back')}>
           <ChevronLeft size={20} />
         </Button>
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100">

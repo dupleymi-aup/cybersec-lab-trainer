@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { achievements as achievementDefs } from '@/lib/data';
 import { getAchievementStatus, countUnlockedAchievements } from '@/lib/achievement-utils';
@@ -669,6 +670,7 @@ const achievementIcons: Record<string, React.ReactNode> = {
 };
 
 export default function AchievementsAndGlossary() {
+  const tc = useTranslations('common');
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
   const quizScores = useAppStore((s) => s.quizScores);
@@ -700,7 +702,7 @@ export default function AchievementsAndGlossary() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
+        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label={tc('back')}>
           <ChevronLeft size={20} />
         </Button>
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100">

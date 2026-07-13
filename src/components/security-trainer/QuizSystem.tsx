@@ -67,6 +67,7 @@ export default function QuizSystem() {
   const setQuizScore = useAppStore((s) => s.setQuizScore);
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const t = useTranslations('quiz');
+  const tc = useTranslations('common');
   const [quizState, setQuizState] = useState<QuizState>('select');
   const [activeCategory, setActiveCategory] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
@@ -370,7 +371,7 @@ export default function QuizSystem() {
             resetQuiz();
             setCurrentPage('dashboard');
           }}
-          aria-label="Back"
+          aria-label={tc('back')}
         >
           <ChevronLeft size={20} />
         </Button>

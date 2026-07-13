@@ -29,6 +29,7 @@ type LessonView = 'overview' | 'lesson' | 'complete';
 
 export default function OWASPTop10() {
   const t = useTranslations('owaspTop10');
+  const tc = useTranslations('common');
   const studiedOwaspItems = useAppStore((s) => s.studiedOwaspItems);
   const addStudiedOwasp = useAppStore((s) => s.addStudiedOwasp);
   const completeModule = useAppStore((s) => s.completeModule);
@@ -102,7 +103,7 @@ export default function OWASPTop10() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label="Back">
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} aria-label={tc('back')}>
             <ChevronLeft size={20} />
           </Button>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
@@ -233,7 +234,7 @@ export default function OWASPTop10() {
             onClick={() => {
               setView('overview');
             }}
-            aria-label="Back"
+            aria-label={tc('back')}
           >
             <ChevronLeft size={20} />
           </Button>
@@ -310,7 +311,7 @@ export default function OWASPTop10() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setView('overview')} aria-label="Back">
+        <Button variant="ghost" size="icon" onClick={() => setView('overview')} aria-label={tc('back')}>
           <ChevronLeft size={20} />
         </Button>
         <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${item.severityColor} text-white`}>
