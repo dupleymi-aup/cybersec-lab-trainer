@@ -36,14 +36,14 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, propGroupId, internalGroupId]);
+  }, [days, propGroupId, internalGroupId, t]);
 
   if (loading) {
     return (
@@ -58,7 +58,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -78,9 +78,9 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
             onChange={(e) => setInternalDays(Number(e.target.value))}
             className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
-            <option value={7}>7 дней</option>
-            <option value={30}>30 дней</option>
-            <option value={90}>90 дней</option>
+            <option value={7}>{t('days7')}</option>
+            <option value={30}>{t('days30')}</option>
+            <option value={90}>{t('days90')}</option>
           </select>
         )}
       </div>
@@ -104,8 +104,8 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
                   />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Bar dataKey="avgDuration" name="Ср. время (сек)" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="medianDuration" name="Медиана (сек)" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="avgDuration" name={t('avgTimeSec')} fill="#6366f1" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="medianDuration" name={t('medianSec')} fill="#10b981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -125,7 +125,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
                   <XAxis dataKey="durationBucket" tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={50} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Bar dataKey="avgPercentage" name="Ср. результат (%)" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="avgPercentage" name={t('avgResultPercent')} fill="#f59e0b" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -145,7 +145,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
                   <XAxis dataKey="hour" tick={{ fontSize: 10 }} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
                   <Tooltip formatter={(value: unknown) => `${value}%`} />
-                  <Bar dataKey="avgPercentage" name="Ср. результат" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="avgPercentage" name={t('avgResult')} fill="#10b981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -158,11 +158,11 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
         {weekdayVsWeekend.map((d) => (
           <Card key={d.dayType} className="border-border">
             <CardContent className="p-4">
-              <h3 className="mb-3 text-sm font-semibold">{d.dayType === 'weekday' ? 'Будни' : 'Выходные'}</h3>
+              <h3 className="mb-3 text-sm font-semibold">{d.dayType === 'weekday' ? t('weekday') : t('weekend')}</h3>
               <div className="grid grid-cols-2 gap-3 text-center">
                 <div>
                   <p className="text-xl font-bold text-indigo-600">{d.avgPercentage}%</p>
-                  <p className="text-muted-foreground text-xs">Ср. балл</p>
+                  <p className="text-muted-foreground text-xs">{t('avgScore')}</p>
                 </div>
                 <div>
                   <p className="text-xl font-bold text-amber-600">{d.attemptCount}</p>
@@ -179,10 +179,10 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
         <Card className="border-border border-l-4 border-l-red-400">
           <CardContent className="p-5">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-red-600">
-              <AlertCircle size={16} /> Обнаружены rushed-квизы ({rushedQuizzes.length})
+              <AlertCircle size={16} /> {t('rushedQuizzesDetected', { count: rushedQuizzes.length })}
             </h3>
             <p className="text-muted-foreground mb-3 text-xs">
-              Студенты, завершившие квиз менее чем за 30 секунд (возможно, угадывание)
+              {t('rushedDescription')}
             </p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">

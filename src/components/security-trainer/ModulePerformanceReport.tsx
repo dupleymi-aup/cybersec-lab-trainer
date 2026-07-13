@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { BookOpen, Loader2, AlertTriangle } from 'lucide-react';
@@ -24,9 +25,9 @@ function getDifficultyColor(difficultyIndex: number): string {
 }
 
 function getDifficultyLabel(difficultyIndex: number): string {
-  if (difficultyIndex >= 60) return 'Сложный';
-  if (difficultyIndex >= 40) return 'Средний';
-  return 'Лёгкий';
+  if (difficultyIndex >= 60) return 'hard';
+  if (difficultyIndex >= 40) return 'medium';
+  return 'easy';
 }
 
 export interface ModulePerformanceReportProps {
@@ -38,6 +39,7 @@ const isControlled = (props: ModulePerformanceReportProps): props is ModulePerfo
   props.days !== undefined;
 
 export default function ModulePerformanceReport(props: ModulePerformanceReportProps = {}) {
+  const t = useTranslations('modulePerformance');
   const [modules, setModules] = useState<ModulePerformance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,20 +61,20 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [effectiveDays, props.groupId]);
+  }, [effectiveDays, props.groupId, t]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -133,21 +135,21 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Завершение</span>
+                    <span className="text-muted-foreground">{t('completion')}</span>
                     <span className="font-semibold">{m.completionRate}%</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Ср. балл</span>
+                    <span className="text-muted-foreground">{t('avgScore')}</span>
                     <span className="font-semibold">{m.avgScore}%</span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Сложность</span>
+                    <span className="text-muted-foreground">{t('difficulty')}</span>
                     <Badge className={`text-[10px] ${getDifficultyColor(m.difficultyIndex)}`}>
-                      {getDifficultyLabel(m.difficultyIndex)}
+                      {t(getDifficultyLabel(m.difficultyIndex))}
                     </Badge>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Завершили</span>
+                    <span className="text-muted-foreground">{t('completed')}</span>
                     <span className="font-semibold">
                       {m.completedCount}/{m.totalStudents}
                     </span>
@@ -162,7 +164,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
       {/* Completion rate bar chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Завершение модулей (%)</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('moduleCompletion')}</h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={chartData}>
@@ -176,7 +178,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
                   tickFormatter={(v) => `${v}%`}
                 />
                 <Tooltip
-                  formatter={(value, name) => [`${value}%`, name === 'completionRate' ? 'Завершение' : 'Ср. балл']}
+                  formatter={(value, name) => [`${value}%`, name === 'completionRate' ? t('completion') : t('avgScore')]}
                 />
                 <Bar dataKey="completionRate" name="completionRate" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry, index) => (
@@ -186,7 +188,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+            <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
           )}
         </CardContent>
       </Card>
@@ -194,17 +196,17 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
       {/* Module detail table */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Детализация по модулям</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('moduleDetails')}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-border border-b">
-                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Модуль</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Студенты</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершили</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершение</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Ср. балл</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Сложность</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('module')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('students')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completed')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completion')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('avgScore')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('difficulty')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -235,7 +237,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
                     <td className="px-3 py-2.5 text-right font-medium">{m.avgScore}%</td>
                     <td className="px-3 py-2.5 text-right">
                       <Badge className={`text-[10px] ${getDifficultyColor(m.difficultyIndex)}`}>
-                        {getDifficultyLabel(m.difficultyIndex)}
+                        {t(getDifficultyLabel(m.difficultyIndex))}
                       </Badge>
                     </td>
                   </motion.tr>

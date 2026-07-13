@@ -21,6 +21,7 @@ export default function StudentDrillDown({
   onClose: () => void;
 }) {
   const tc = useTranslations('common');
+  const t = useTranslations('studentDrillDown');
   const formatDate = useDateFormatter();
   const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);
@@ -41,14 +42,14 @@ export default function StudentDrillDown({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [userId, days]);
+  }, [userId, days, t]);
 
   const handleExport = () => {
     if (!data) return;
@@ -89,7 +90,7 @@ export default function StudentDrillDown({
                 <Users size={20} className="text-blue-600" />
               </div>
               <div>
-                <h2 className="font-bold text-slate-900">{data?.profile?.fullName || 'Загрузка...'}</h2>
+                <h2 className="font-bold text-slate-900">{data?.profile?.fullName || t('loadingStudent')}</h2>
                 <p className="text-muted-foreground text-xs">
                   {data?.profile?.email} {data?.profile?.group && `• ${data.profile.group}`}
                 </p>
@@ -97,7 +98,7 @@ export default function StudentDrillDown({
             </div>
             <div className="flex items-center gap-2">
               <Button onClick={handleExport} variant="outline" size="sm" disabled={!data}>
-                <Download size={14} className="mr-1" /> Экспорт
+                <Download size={14} className="mr-1" /> {t('export')}
               </Button>
               <Button variant="ghost" size="icon" onClick={onClose} aria-label={tc('close')}>
                 <X size={18} />
@@ -110,7 +111,7 @@ export default function StudentDrillDown({
             {loading && (
               <div className="flex items-center justify-center py-16">
                 <Loader2 size={32} className="animate-spin text-blue-500" />
-                <p className="text-muted-foreground ml-3 text-sm">Загрузка данных студента...</p>
+                <p className="text-muted-foreground ml-3 text-sm">{t('loadingStudent')}</p>
               </div>
             )}
 
@@ -128,19 +129,19 @@ export default function StudentDrillDown({
                   <Card className="border-border">
                     <CardContent className="p-3 text-center">
                       <p className="text-2xl font-bold text-blue-600">{data.kpis?.modulesCompleted ?? 0}</p>
-                      <p className="text-muted-foreground text-xs">Модулей пройдено</p>
+                      <p className="text-muted-foreground text-xs">{t('modulesCompleted')}</p>
                     </CardContent>
                   </Card>
                   <Card className="border-border">
                     <CardContent className="p-3 text-center">
                       <p className="text-2xl font-bold text-emerald-600">{data.kpis?.avgQuizScore ?? 0}%</p>
-                      <p className="text-muted-foreground text-xs">Средний балл</p>
+                      <p className="text-muted-foreground text-xs">{t('avgScore')}</p>
                     </CardContent>
                   </Card>
                   <Card className="border-border">
                     <CardContent className="p-3 text-center">
                       <p className="text-2xl font-bold text-amber-600">{data.kpis?.totalQuizAttempts ?? 0}</p>
-                      <p className="text-muted-foreground text-xs">Попыток quiz</p>
+                      <p className="text-muted-foreground text-xs">{t('quizAttempts')}</p>
                     </CardContent>
                   </Card>
                   <Card className="border-border">
@@ -148,7 +149,7 @@ export default function StudentDrillDown({
                       <p className="text-2xl font-bold text-purple-600">
                         {data.achievements?.filter((a: { unlocked?: boolean }) => a.unlocked).length ?? 0}
                       </p>
-                      <p className="text-muted-foreground text-xs">Достижений</p>
+                      <p className="text-muted-foreground text-xs">{t('achievements')}</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -158,7 +159,7 @@ export default function StudentDrillDown({
                   <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                        <BookOpen size={16} className="text-blue-500" /> Прогресс по модулям
+                        <BookOpen size={16} className="text-blue-500" /> {t('moduleProgress')}
                       </h3>
                       <ResponsiveContainer width="100%" height={200}>
                         <BarChart data={data.moduleProgress}>
@@ -178,7 +179,7 @@ export default function StudentDrillDown({
                   <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                        <HelpCircle size={16} className="text-amber-500" /> Результаты по категориям quiz
+                        <HelpCircle size={16} className="text-amber-500" /> {t('quizCategoryResults')}
                       </h3>
                       <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
                         {data.categoryBreakdown.map((cat) => (
@@ -210,7 +211,7 @@ export default function StudentDrillDown({
                   <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                        <Activity size={16} className="text-purple-500" /> Последняя активность
+                        <Activity size={16} className="text-purple-500" /> {t('recentActivity')}
                       </h3>
                       <div className="max-h-48 space-y-2 overflow-y-auto">
                         {data.activityTimeline.slice(0, 10).map((item, i) => (
@@ -232,7 +233,7 @@ export default function StudentDrillDown({
                   <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                        <Award size={16} className="text-amber-500" /> Достижения ({data.achievements.length})
+                        <Award size={16} className="text-amber-500" /> {t('achievementsTitle', { count: data.achievements.length })}
                       </h3>
                       <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
                         {data.achievements.map((ach) => (
@@ -241,7 +242,7 @@ export default function StudentDrillDown({
                             <div className="min-w-0">
                               <p className="truncate text-xs font-medium">{ach.title}</p>
                               <p className="text-[10px] text-slate-400">
-                                {ach.unlockedAt ? formatDate(ach.unlockedAt) : 'Не разблокировано'}
+                                {ach.unlockedAt ? formatDate(ach.unlockedAt) : t('notUnlocked')}
                               </p>
                             </div>
                           </div>

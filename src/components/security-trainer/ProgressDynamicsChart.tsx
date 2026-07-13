@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Loader2, AlertTriangle, TrendingUp, BookOpen, Users, Target } from 'lucide-react';
 import { getProgressDynamics, type ProgressDynamicsDay } from '@/lib/auth-store';
@@ -24,6 +25,7 @@ export interface ProgressDynamicsChartProps {
 const DEFAULT_DAYS = 30;
 
 export default function ProgressDynamicsChart({ groupId, days: controlledDays }: ProgressDynamicsChartProps = {}) {
+  const t = useTranslations('progressDynamics');
   const formatDate = useDateFormatter();
   const [daily, setDaily] = useState<ProgressDynamicsDay[]>([]);
   const [summary, setSummary] = useState<{
@@ -58,20 +60,20 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, groupId]);
+  }, [days, groupId, t]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -116,28 +118,28 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
         <KPICard
           icon={<BookOpen size={18} />}
           value={summary.totalModulesCompleted}
-          label="Модулей завершено"
+          label={t('modulesCompleted')}
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
         />
         <KPICard
           icon={<Target size={18} />}
           value={summary.totalQuizAttempts}
-          label="Попыток квизов"
+          label={t('quizAttempts')}
           iconBg="bg-violet-100"
           iconColor="text-violet-600"
         />
         <KPICard
           icon={<Users size={18} />}
           value={summary.avgDailyActive}
-          label="Ср. активных/день"
+          label={t('avgDailyActive')}
           iconBg="bg-blue-100"
           iconColor="text-blue-600"
         />
         <KPICard
           icon={<TrendingUp size={18} />}
-          value={summary.trend === 'up' ? 'Рост' : summary.trend === 'down' ? 'Спад' : 'Стабильно'}
-          label="Тренд активности"
+          value={summary.trend === 'up' ? t('trendUp') : summary.trend === 'down' ? t('trendDown') : t('trendStable')}
+          label={t('activityTrend')}
           trend={summary.trend}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
@@ -147,7 +149,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
       {/* Main composed chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Динамика прогресса</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('progressDynamics')}</h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
@@ -180,9 +182,9 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
                     border: `1px solid ${CHART_COLORS.grid}`,
                   }}
                   formatter={(value, name) => {
-                    if (name === 'modulesCompleted') return [value, 'Модулей завершено'];
-                    if (name === 'avgQuizScore') return [`${value}%`, 'Ср. балл квизов'];
-                    if (name === 'activeStudents') return [value, 'Активных студентов'];
+                    if (name === 'modulesCompleted') return [value, t('modulesCompleted')];
+                    if (name === 'avgQuizScore') return [`${value}%`, t('avgScore')];
+                    if (name === 'activeStudents') return [value, t('avgDailyActive')];
                     return [value, name];
                   }}
                 />
@@ -218,7 +220,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
               </ComposedChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+            <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
           )}
         </CardContent>
       </Card>
@@ -226,7 +228,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
       {/* Secondary chart: new completions */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Новые завершения по дням</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('newCompletionsByDay')}</h3>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
               <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
@@ -241,7 +243,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
                 <Tooltip
                   formatter={(value, name) => [
                     value,
-                    name === 'newCompletions' ? 'Новые завершения' : 'Попытки квизов',
+                    name === 'newCompletions' ? t('newCompletions') : t('quizAttempts'),
                   ]}
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -266,7 +268,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
               </ComposedChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+            <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
           )}
         </CardContent>
       </Card>

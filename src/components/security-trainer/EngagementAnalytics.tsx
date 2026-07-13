@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { TrendingUp, Users, Loader2, AlertTriangle, Flame, Clock } from 'lucide-react';
@@ -25,6 +26,7 @@ export interface EngagementAnalyticsProps {
 }
 
 export default function EngagementAnalytics({ groupId: propGroupId, days: propDays }: EngagementAnalyticsProps = {}) {
+  const t = useTranslations('engagementAnalytics');
   const [data, setData] = useState<EngagementData | null>(null);
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,14 +60,14 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, propGroupId, internalGroupId]);
+  }, [days, propGroupId, internalGroupId, t]);
 
   const groups = Array.from(new Set(allUsers.filter((u) => u.group).map((u) => u.group)));
 
@@ -73,7 +75,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -82,7 +84,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -131,7 +133,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
             onChange={(e) => setInternalGroupId(e.target.value)}
             className="border-border bg-card rounded-md border px-3 py-2 text-sm"
           >
-            <option value="">Все группы</option>
+            <option value="">{t('allGroups')}</option>
             {groups.map((g) => (
               <option key={g} value={g}>
                 {g}
@@ -146,28 +148,28 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
         <KPICard
           icon={<Users size={18} />}
           value={totalStudents}
-          label="Всего студентов"
+          label={t('totalStudents')}
           iconBg="bg-indigo-100"
           iconColor="text-indigo-600"
         />
         <KPICard
           icon={<Flame size={18} />}
           value={`${avgStreak}д`}
-          label="Средняя серия"
+          label={t('avgStreak')}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
         />
         <KPICard
           icon={<Clock size={18} />}
           value={`${peakHour.hour}:00`}
-          label="Пиковый час"
+          label={t('peakHour')}
           iconBg="bg-sky-100"
           iconColor="text-sky-600"
         />
         <KPICard
           icon={<TrendingUp size={18} />}
           value={DAY_NAMES[peakDay.day]}
-          label="Пиковый день"
+          label={t('peakDay')}
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
         />
@@ -176,7 +178,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       {/* Score Distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Распределение вовлечённости</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('engagementDistribution')}</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={scoreDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -192,7 +194,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       {/* Hourly Activity */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Активность по часам</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('hourlyActivity')}</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={hourlyActivity}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -208,7 +210,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       {/* Weekly Pattern */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Активность по дням недели</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('weeklyPattern')}</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={weeklyPattern}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -225,7 +227,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       {engagementTrend.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Тренд вовлечённости</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('engagementTrend')}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={engagementTrend}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -245,7 +247,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
           <CardContent className="p-5">
             <h3 className="mb-4 text-sm font-semibold">
               <Flame size={16} className="mr-2 inline text-amber-500" />
-              Топ серии активности
+              {t('topStreaks')}
             </h3>
             <div className="space-y-2">
               {streakLeaderboard.map((student, i) => (

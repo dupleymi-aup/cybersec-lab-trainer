@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -29,9 +30,9 @@ const PERIOD_OPTIONS = [
 ];
 
 const DIFFICULTY_LABELS: Record<string, string> = {
-  easy: 'Лёгкий',
-  medium: 'Средний',
-  hard: 'Сложный',
+  easy: 'easy',
+  medium: 'medium',
+  hard: 'hard',
 };
 const DIFFICULTY_COLORS: Record<string, string> = {
   easy: '#10b981',
@@ -43,6 +44,7 @@ export default function ErrorPatternsAnalytics({
   groupId: controlledGroupId,
   days: controlledDays,
 }: { groupId?: string; days?: number } = {}) {
+  const t = useTranslations('errorPatterns');
   const formatDate = useDateFormatter();
   const [internalDays, setInternalDays] = useState(30);
   const days = controlledDays !== undefined ? controlledDays : internalDays;
@@ -63,20 +65,20 @@ export default function ErrorPatternsAnalytics({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, controlledGroupId]);
+  }, [days, controlledGroupId, t]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -85,7 +87,7 @@ export default function ErrorPatternsAnalytics({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -120,28 +122,28 @@ export default function ErrorPatternsAnalytics({
         <KPICard
           icon={<AlertOctagon size={18} />}
           value={totalErrors}
-          label="Всего ошибок"
+          label={t('totalErrors')}
           iconBg="bg-red-100"
           iconColor="text-red-600"
         />
         <KPICard
           icon={<AlertOctagon size={18} />}
           value={`${overallErrorRate}%`}
-          label="Общий % ошибок"
+          label={t('overallErrorRate')}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
         />
         <KPICard
           icon={<AlertOctagon size={18} />}
           value={topCategory}
-          label="Проблемная категория"
+          label={t('problemCategory')}
           iconBg="bg-orange-100"
           iconColor="text-orange-600"
         />
         <KPICard
           icon={<AlertOctagon size={18} />}
           value={mostMissedQuestions.length}
-          label="Вопросов с ошибками"
+          label={t('questionsWithErrors')}
           iconBg="bg-sky-100"
           iconColor="text-sky-600"
         />
@@ -151,13 +153,13 @@ export default function ErrorPatternsAnalytics({
       {categoryErrorRates.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">% ошибок по категориям</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('errorRateByCategory')}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={categoryErrorRates.slice(0, 10)}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="category" tick={{ fontSize: 11 }} angle={-30} textAnchor="end" height={60} />
                 <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(v) => [`${v ?? 0}%`, 'Ошибка']} />
+                <Tooltip formatter={(v) => [`${v ?? 0}%`, t('error')]} />
                 <Bar dataKey="errorRate" fill="#ef4444" name="%" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -169,13 +171,13 @@ export default function ErrorPatternsAnalytics({
       {difficultyErrorRates.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">% ошибок по сложности</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('errorRateByDifficulty')}</h3>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={difficultyErrorRates}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="difficulty" tick={{ fontSize: 12 }} tickFormatter={(v) => DIFFICULTY_LABELS[v] || v} />
+                <XAxis dataKey="difficulty" tick={{ fontSize: 12 }} tickFormatter={(v) => t(DIFFICULTY_LABELS[v] || v)} />
                 <YAxis domain={[0, 100]} />
-                <Tooltip formatter={(v) => [`${v ?? 0}%`, 'Ошибка']} />
+                <Tooltip formatter={(v) => [`${v ?? 0}%`, t('error')]} />
                 <Bar dataKey="errorRate" name="%" radius={[4, 4, 0, 0]}>
                   {difficultyErrorRates.map((entry, i) => (
                     <Bar key={i} dataKey="errorRate" fill={DIFFICULTY_COLORS[entry.difficulty] || '#6366f1'} />
@@ -191,7 +193,7 @@ export default function ErrorPatternsAnalytics({
       {errorTrends.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Тренд ошибок (по неделям)</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('errorTrend')}</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={errorTrends}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -203,8 +205,8 @@ export default function ErrorPatternsAnalytics({
                 <YAxis />
                 <Tooltip labelFormatter={(v) => formatDate(v)} />
                 <Legend />
-                <Line type="monotone" dataKey="errorRate" stroke="#ef4444" name="% ошибок" dot={false} />
-                <Line type="monotone" dataKey="incorrectCount" stroke="#f59e0b" name="Кол-во ошибок" dot={false} />
+                <Line type="monotone" dataKey="errorRate" stroke="#ef4444" name={t('errorRate')} dot={false} />
+                <Line type="monotone" dataKey="incorrectCount" stroke="#f59e0b" name={t('errorCount')} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -215,18 +217,18 @@ export default function ErrorPatternsAnalytics({
       {mostMissedQuestions.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Топ вопросов с ошибками</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('topMissedQuestions')}</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-border border-b">
                     <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">#</th>
-                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Вопрос</th>
-                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Категория</th>
-                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Сложность</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Попытки</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Ошибки</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">% ошибок</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('question')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('category')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('difficulty')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('attempts')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('errors')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('errorRate')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -252,7 +254,7 @@ export default function ErrorPatternsAnalytics({
                           }
                           className="text-[10px]"
                         >
-                          {DIFFICULTY_LABELS[q.difficulty] || q.difficulty}
+                          {t(DIFFICULTY_LABELS[q.difficulty] || q.difficulty)}
                         </Badge>
                       </td>
                       <td className="px-3 py-2.5 text-right">{q.totalAttempts}</td>

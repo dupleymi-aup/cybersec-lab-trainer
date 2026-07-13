@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -31,6 +32,7 @@ export default function PredictiveRiskDashboard({
   groupId: controlledGroupId,
   days: controlledDays,
 }: { groupId?: string; days?: number } = {}) {
+  const t = useTranslations('predictiveRisk');
   const [internalDays, setInternalDays] = useState(30);
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [data, setData] = useState<PredictiveRiskData | null>(null);
@@ -50,20 +52,20 @@ export default function PredictiveRiskDashboard({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, controlledGroupId]);
+  }, [days, controlledGroupId, t]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -72,7 +74,7 @@ export default function PredictiveRiskDashboard({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -89,9 +91,9 @@ export default function PredictiveRiskDashboard({
 
   // Risk distribution
   const riskDistribution = [
-    { name: 'Высокий риск', value: summary.highRisk, color: '#ef4444' },
-    { name: 'Средний риск', value: summary.mediumRisk, color: '#f59e0b' },
-    { name: 'Низкий риск', value: summary.lowRisk, color: '#10b981' },
+    { name: t('highRisk'), value: summary.highRisk, color: '#ef4444' },
+    { name: t('mediumRisk'), value: summary.mediumRisk, color: '#f59e0b' },
+    { name: t('lowRisk'), value: summary.lowRisk, color: '#10b981' },
   ];
 
   return (
@@ -117,35 +119,35 @@ export default function PredictiveRiskDashboard({
         <KPICard
           icon={<TrendingUp size={18} />}
           value={summary.totalStudents}
-          label="Всего студентов"
+          label={t('totalStudents')}
           iconBg="bg-indigo-100"
           iconColor="text-indigo-600"
         />
         <KPICard
           icon={<AlertTriangle size={18} />}
           value={summary.highRisk}
-          label="Высокий риск"
+          label={t('highRisk')}
           iconBg="bg-red-100"
           iconColor="text-red-600"
         />
         <KPICard
           icon={<AlertCircle size={18} />}
           value={summary.mediumRisk}
-          label="Средний риск"
+          label={t('mediumRisk')}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
         />
         <KPICard
           icon={<CheckCircle size={18} />}
           value={summary.lowRisk}
-          label="Низкий риск"
+          label={t('lowRisk')}
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
         />
         <KPICard
           icon={<Target size={18} />}
           value={summary.avgRisk}
-          label="Ср. риск"
+          label={t('avgRisk')}
           iconBg="bg-sky-100"
           iconColor="text-sky-600"
         />
@@ -154,7 +156,7 @@ export default function PredictiveRiskDashboard({
       {/* Risk Distribution */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Распределение рисков</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('riskDistribution')}</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={riskDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -174,35 +176,35 @@ export default function PredictiveRiskDashboard({
       {/* Dropout Probability Scatter Plot */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Вероятность отсева vs Риск-скор</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('dropoutVsRisk')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <ScatterChart>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="riskScore"
-                name="Риск"
+                name={t('riskScore')}
                 domain={[0, 100]}
                 tick={{ fontSize: 11 }}
                 label={{
-                  value: 'Риск-скор',
+                  value: t('riskScore'),
                   position: 'insideBottom',
                   offset: -5,
                 }}
               />
               <YAxis
                 dataKey="dropoutProbability"
-                name="Отсев"
+                name={t('dropoutProbability')}
                 domain={[0, 100]}
                 tick={{ fontSize: 11 }}
                 label={{
-                  value: 'Вероятность отсева (%)',
+                  value: t('dropoutProbability'),
                   angle: -90,
                   position: 'insideLeft',
                 }}
               />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(v) => [`${v ?? 0}%`]} />
               <Legend />
-              <Scatter name="Студенты" data={scatterData} fill="#6366f1" />
+              <Scatter name={t('students')} data={scatterData} fill="#6366f1" />
             </ScatterChart>
           </ResponsiveContainer>
         </CardContent>
@@ -214,7 +216,7 @@ export default function PredictiveRiskDashboard({
           <CardContent className="p-5">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-red-600">
               <AlertTriangle size={16} />
-              Студенты с высоким риском ({students.filter((s) => s.riskScore >= 70).length})
+              {t('highRiskStudents', { count: students.filter((s) => s.riskScore >= 70).length })}
             </h3>
             <div className="space-y-4">
               {students
@@ -231,14 +233,14 @@ export default function PredictiveRiskDashboard({
                     <div className="mb-2 flex items-center justify-between">
                       <div>
                         <p className="font-semibold">{student.fullName}</p>
-                        <p className="text-muted-foreground text-xs">{student.group || 'без группы'}</p>
+                        <p className="text-muted-foreground text-xs">{student.group || t('noGroup')}</p>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="text-right">
                           <p className="text-2xl font-bold text-red-600">{student.riskScore}</p>
-                          <p className="text-muted-foreground text-xs">Риск</p>
+                          <p className="text-muted-foreground text-xs">{t('risk')}</p>
                         </div>
-                        <Badge variant="destructive">{Math.round(student.dropoutProbability * 100)}% отсев</Badge>
+                        <Badge variant="destructive">{Math.round(student.dropoutProbability * 100)}% {t('dropout')}</Badge>
                       </div>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1">
@@ -258,17 +260,17 @@ export default function PredictiveRiskDashboard({
       {/* All Students Risk Table */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Все студенты</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('allStudents')}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-border border-b">
-                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">ФИО</th>
-                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Группа</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Риск</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Отсев</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Неделя отсева</th>
-                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Рекомендации</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('name')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('group')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('risk')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('dropout')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('dropoutWeek')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('recommendations')}</th>
                 </tr>
               </thead>
               <tbody>
