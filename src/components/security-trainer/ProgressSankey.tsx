@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { GitBranch, Loader2, AlertTriangle, Users, BookOpen, Trophy, CheckCircle } from 'lucide-react';
 import { getComprehensiveSummary, type ComprehensiveSummary } from '@/lib/auth-store';
@@ -25,6 +26,7 @@ export default function ProgressSankey({
   const [data, setData] = useState<ComprehensiveSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations('progressSankey');
 
   useEffect(() => {
     let cancelled = false;
@@ -39,20 +41,20 @@ export default function ProgressSankey({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, controlledGroupId]);
+  }, [days, controlledGroupId, t]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loadingData')}</p>
       </div>
     );
   }
@@ -61,7 +63,7 @@ export default function ProgressSankey({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -77,31 +79,31 @@ export default function ProgressSankey({
 
   const stages = [
     {
-      label: 'Зарегистрированы',
+      label: t('registered'),
       value: totalStudents,
       icon: Users,
       color: '#6366f1',
     },
     {
-      label: 'Активные',
+      label: t('active'),
       value: activeStudents,
       icon: Loader2,
       color: '#8b5cf6',
     },
     {
-      label: 'Начали модули',
+      label: t('startedModules'),
       value: completedAtLeastOne,
       icon: BookOpen,
       color: '#10b981',
     },
     {
-      label: 'Сдали квизы',
+      label: t('passedQuizzes'),
       value: passedAtLeastOne,
       icon: Trophy,
       color: '#f59e0b',
     },
     {
-      label: 'Завершили курс',
+      label: t('completedCourse'),
       value: fullyCompleted,
       icon: CheckCircle,
       color: '#ef4444',
@@ -165,7 +167,7 @@ export default function ProgressSankey({
         <CardContent className="p-5">
           <h3 className="mb-6 flex items-center gap-2 text-sm font-semibold">
             <GitBranch size={16} className="text-indigo-500" />
-            Воронка прогресса студентов
+            {t('funnelTitle')}
           </h3>
           <div className="space-y-3">
             {stages.map((stage, idx) => {
@@ -180,7 +182,7 @@ export default function ProgressSankey({
                 >
                   <div className="w-40 flex-shrink-0 text-right">
                     <p className="text-sm font-medium">{stage.label}</p>
-                    <p className="text-muted-foreground text-xs">{stage.value} студ.</p>
+                    <p className="text-muted-foreground text-xs">{stage.value} {t('students')}</p>
                   </div>
                   <div className="relative flex-1">
                     <div
@@ -213,7 +215,7 @@ export default function ProgressSankey({
       {/* Conversion Details */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Конверсия между этапами</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('conversionBetweenStages')}</h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {conversions.map((conv, i) => (
               <motion.div
@@ -231,7 +233,7 @@ export default function ProgressSankey({
                 >
                   {conv.rate}%
                 </p>
-                <p className="text-muted-foreground mt-1 text-xs">Отток: {conv.dropoff} студ.</p>
+                <p className="text-muted-foreground mt-1 text-xs">{t('churn')}: {conv.dropoff} {t('students')}</p>
               </motion.div>
             ))}
           </div>
@@ -241,16 +243,16 @@ export default function ProgressSankey({
       {/* Module Progress Flow */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Прогресс по модулям</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('moduleProgress')}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-border border-b">
-                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Модуль</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Начали</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершили</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Сдали</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Конверсия</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('module')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('started')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completed')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('passed')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('conversion')}</th>
                 </tr>
               </thead>
               <tbody>

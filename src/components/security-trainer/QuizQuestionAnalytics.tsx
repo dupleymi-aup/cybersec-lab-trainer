@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { getQuizQuestionAnalytics, type QuizQuestionStat } from '@/lib/auth-store';
@@ -12,13 +13,6 @@ import { BarChart3, Filter, Loader2, AlertCircle } from 'lucide-react';
 
 const ALL_CATEGORIES = 'all';
 const ALL_DIFFICULTIES = 'all';
-
-const DIFFICULTY_OPTIONS = [
-  { value: ALL_DIFFICULTIES, label: 'Все' },
-  { value: 'easy', label: 'Easy' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'hard', label: 'Hard' },
-];
 
 function getCorrectRateColor(rate: number): string {
   if (rate < 30) return '#ef4444';
@@ -46,8 +40,16 @@ function getDifficultyBadgeClasses(difficulty: string): string {
 }
 
 export default function QuizQuestionAnalytics() {
+  const t = useTranslations('quizQuestionAnalytics');
   const [category, setCategory] = useState(ALL_CATEGORIES);
   const [difficulty, setDifficulty] = useState(ALL_DIFFICULTIES);
+
+  const DIFFICULTY_OPTIONS = [
+    { value: ALL_DIFFICULTIES, label: t('all') },
+    { value: 'easy', label: 'Easy' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'hard', label: 'Hard' },
+  ];
   const [stats, setStats] = useState<QuizQuestionStat[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -83,7 +85,7 @@ export default function QuizQuestionAnalytics() {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-slate-400" />
-        <span className="ml-3 text-sm text-slate-400">Загрузка аналитики...</span>
+        <span className="ml-3 text-sm text-slate-400">{t('loadingData')}</span>
       </div>
     );
   }
@@ -92,8 +94,8 @@ export default function QuizQuestionAnalytics() {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-slate-400">
         <AlertCircle size={40} className="mb-3 opacity-50" />
-        <p className="text-sm">Нет данных</p>
-        <p className="mt-1 text-xs">Студенты ещё не отвечали на вопросы квизов</p>
+        <p className="text-sm">{t('noData')}</p>
+        <p className="mt-1 text-xs">{t('noDataDescription')}</p>
       </div>
     );
   }
@@ -106,8 +108,8 @@ export default function QuizQuestionAnalytics() {
           <BarChart3 size={20} className="text-indigo-600" />
         </div>
         <div>
-          <h2 className="text-lg font-bold">Аналитика вопросов квизов</h2>
-          <p className="text-muted-foreground text-xs">Самые сложные вопросы и статистика ответов</p>
+          <h2 className="text-lg font-bold">{t('title')}</h2>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -115,14 +117,14 @@ export default function QuizQuestionAnalytics() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <Filter size={14} className="text-slate-400" />
-          <span className="text-muted-foreground text-xs">Категория:</span>
+          <span className="text-muted-foreground text-xs">{t('category')}</span>
         </div>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
         >
-          <option value={ALL_CATEGORIES}>Все категории</option>
+          <option value={ALL_CATEGORIES}>{t('allCategories')}</option>
           {quizCategories.map((cat) => (
             <option key={cat.id} value={cat.name}>
               {cat.name}
@@ -131,7 +133,7 @@ export default function QuizQuestionAnalytics() {
         </select>
 
         <div className="ml-2 flex items-center gap-1.5">
-          <span className="text-muted-foreground text-xs">Сложность:</span>
+          <span className="text-muted-foreground text-xs">{t('difficulty')}</span>
         </div>
         <div className="flex gap-1">
           {DIFFICULTY_OPTIONS.map((opt) => (
@@ -156,8 +158,8 @@ export default function QuizQuestionAnalytics() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-1 text-sm font-semibold">Топ 10 самых сложных вопросов</h3>
-            <p className="mb-4 text-xs text-slate-400">Вопросы с наименьшим процентом правильных ответов</p>
+            <h3 className="mb-1 text-sm font-semibold">{t('top10Hardest')}</h3>
+            <p className="mb-4 text-xs text-slate-400">{t('top10Description')}</p>
             {barChartData.length > 0 ? (
               <div className="h-[320px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -171,11 +173,11 @@ export default function QuizQuestionAnalytics() {
                           id?: string;
                           correctRate?: number;
                         };
-                        return [`${p.correctRate ?? 0}%`, 'Правильных ответов'];
+                        return [`${p.correctRate ?? 0}%`, t('correctAnswers')];
                       }}
-                      labelFormatter={(label) => `Вопрос: ${label}`}
+                      labelFormatter={(label) => `${t('questionLabel')} ${label}`}
                     />
-                    <Bar dataKey="correctRate" radius={[4, 4, 0, 0]} name="Правильных ответов (%)">
+                    <Bar dataKey="correctRate" radius={[4, 4, 0, 0]} name={t('correctRate')}>
                       {barChartData.map((entry, i) => (
                         <Cell key={`cell-${i}`} fill={entry.color} />
                       ))}
@@ -184,7 +186,7 @@ export default function QuizQuestionAnalytics() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <p className="py-8 text-center text-xs text-slate-400">Нет данных для выбранных фильтров</p>
+              <p className="py-8 text-center text-xs text-slate-400">{t('noDataForFilters')}</p>
             )}
           </CardContent>
         </Card>
@@ -194,17 +196,17 @@ export default function QuizQuestionAnalytics() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Таблица вопросов</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('questionTable')}</h3>
             <div className="border-border overflow-x-auto rounded-lg border">
               <table className="w-full text-xs">
                 <thead className="bg-secondary border-border border-b">
                   <tr>
                     <th className="text-muted-foreground p-2 text-left font-medium">#</th>
-                    <th className="text-muted-foreground min-w-[200px] p-2 text-left font-medium">Вопрос</th>
-                    <th className="text-muted-foreground p-2 text-left font-medium">Категория</th>
-                    <th className="text-muted-foreground p-2 text-left font-medium">Сложность</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Попытки</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Правильно</th>
+                    <th className="text-muted-foreground min-w-[200px] p-2 text-left font-medium">{t('question')}</th>
+                    <th className="text-muted-foreground p-2 text-left font-medium">{t('category')}</th>
+                    <th className="text-muted-foreground p-2 text-left font-medium">{t('difficultyLabel')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('attempts')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('correct')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -243,7 +245,7 @@ export default function QuizQuestionAnalytics() {
               </table>
               {stats.filter((s) => s.totalAttempts > 0).length === 0 && (
                 <div className="py-8 text-center text-slate-400">
-                  <p className="text-sm">Нет данных для выбранных фильтров</p>
+                  <p className="text-sm">{t('noDataForFilters')}</p>
                 </div>
               )}
             </div>

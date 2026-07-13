@@ -3016,5 +3016,49 @@
     "thursday": "Четверг",
     "friday": "Пятница",
     "saturday": "Суббота"
+  },
+  "quizQuestionAnalytics": {
+    "loadingData": "Загрузка аналитики...",
+    "noData": "Нет данных",
+    "noDataDescription": "Студенты ещё не отвечали на вопросы квизов",
+    "title": "Аналитика вопросов квизов",
+    "subtitle": "Самые сложные вопросы и статистика ответов",
+    "category": "Категория:",
+    "allCategories": "Все категории",
+    "difficulty": "Сложность:",
+    "all": "Все",
+    "top10Hardest": "Топ 10 самых сложных вопросов",
+    "top10Description": "Вопросы с наименьшим процентом правильных ответов",
+    "correctAnswers": "Правильных ответов",
+    "correctRate": "Правильных ответов (%)",
+    "questionLabel": "Вопрос:",
+    "noDataForFilters": "Нет данных для выбранных фильтров",
+    "questionTable": "Таблица вопросов",
+    "question": "Вопрос",
+    "attempts": "Попытки",
+    "correct": "Правильно"
+  },
+  "progressSankey": {
+    "loadingData": "Загрузка данных...",
+    "loadingError": "Ошибка загрузки",
+    "noData": "Нет данных",
+    "registered": "Зарегистрированы",
+    "active": "Активные",
+    "startedModules": "Начали модули",
+    "passedQuizzes": "Сдали квизы",
+    "completedCourse": "Завершили курс",
+    "students": "студ.",
+    "funnelTitle": "Воронка прогресса студентов",
+    "conversionBetweenStages": "Конверсия между этапами",
+    "churn": "Отток",
+    "moduleProgress": "Прогресс по модулям",
+    "module": "Модуль",
+    "started": "Начали",
+    "completed": "Завершили",
+    "passed": "Сдали",
+    "conversion": "Конверсия"
+  },
+  "cohortAnalysisExtra": {
+    "retention": "Удержание"
   }
 }

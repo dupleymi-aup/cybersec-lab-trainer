@@ -377,7 +377,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
                 <XAxis dataKey="week" tick={{ fontSize: 11 }} tickLine={false} />
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} allowDecimals={false} />
                 <Tooltip
-                  formatter={(value) => [`${value ?? 0}%`, 'Удержание']}
+                  formatter={(value) => [`${value ?? 0}%`, t('retention')]}
                   contentStyle={{
                     backgroundColor: '#1e293b',
                     border: 'none',

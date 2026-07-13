@@ -3016,5 +3016,49 @@
     "thursday": "星期四",
     "friday": "星期五",
     "saturday": "星期六"
+  },
+  "quizQuestionAnalytics": {
+    "loadingData": "加载分析数据...",
+    "noData": "暂无数据",
+    "noDataDescription": "学生尚未回答测验问题",
+    "title": "测验问题分析",
+    "subtitle": "最难的问题和答题统计",
+    "category": "分类：",
+    "allCategories": "所有分类",
+    "difficulty": "难度：",
+    "all": "全部",
+    "top10Hardest": "最难的10个问题",
+    "top10Description": "正确率最低的问题",
+    "correctAnswers": "正确答案数",
+    "correctRate": "正确率 (%)",
+    "questionLabel": "问题：",
+    "noDataForFilters": "所选筛选条件无数据",
+    "questionTable": "问题表格",
+    "question": "问题",
+    "attempts": "尝试次数",
+    "correct": "正确"
+  },
+  "progressSankey": {
+    "loadingData": "加载数据...",
+    "loadingError": "加载错误",
+    "noData": "暂无数据",
+    "registered": "已注册",
+    "active": "活跃",
+    "startedModules": "已开始模块",
+    "passedQuizzes": "已通过测验",
+    "completedCourse": "已完成课程",
+    "students": "学生",
+    "funnelTitle": "学生进度漏斗",
+    "conversionBetweenStages": "阶段间转化",
+    "churn": "流失",
+    "moduleProgress": "模块进度",
+    "module": "模块",
+    "started": "已开始",
+    "completed": "已完成",
+    "passed": "已通过",
+    "conversion": "转化率"
+  },
+  "cohortAnalysisExtra": {
+    "retention": "留存率"
   }
 }

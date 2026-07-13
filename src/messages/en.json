@@ -3016,5 +3016,49 @@
     "thursday": "Thursday",
     "friday": "Friday",
     "saturday": "Saturday"
+  },
+  "quizQuestionAnalytics": {
+    "loadingData": "Loading analytics...",
+    "noData": "No data",
+    "noDataDescription": "Students haven't answered quiz questions yet",
+    "title": "Quiz Question Analytics",
+    "subtitle": "Hardest questions and answer statistics",
+    "category": "Category:",
+    "allCategories": "All categories",
+    "difficulty": "Difficulty:",
+    "all": "All",
+    "top10Hardest": "Top 10 hardest questions",
+    "top10Description": "Questions with the lowest correct answer rate",
+    "correctAnswers": "Correct answers",
+    "correctRate": "Correct answers (%)",
+    "questionLabel": "Question:",
+    "noDataForFilters": "No data for selected filters",
+    "questionTable": "Question table",
+    "question": "Question",
+    "attempts": "Attempts",
+    "correct": "Correct"
+  },
+  "progressSankey": {
+    "loadingData": "Loading data...",
+    "loadingError": "Loading error",
+    "noData": "No data",
+    "registered": "Registered",
+    "active": "Active",
+    "startedModules": "Started modules",
+    "passedQuizzes": "Passed quizzes",
+    "completedCourse": "Completed course",
+    "students": "students",
+    "funnelTitle": "Student progress funnel",
+    "conversionBetweenStages": "Conversion between stages",
+    "churn": "Churn",
+    "moduleProgress": "Module progress",
+    "module": "Module",
+    "started": "Started",
+    "completed": "Completed",
+    "passed": "Passed",
+    "conversion": "Conversion"
+  },
+  "cohortAnalysisExtra": {
+    "retention": "Retention"
   }
 }
