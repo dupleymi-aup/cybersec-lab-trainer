@@ -693,7 +693,7 @@ interface AuthState {
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
   updatePassword: (oldPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
-  sendRecoveryOTP: (emailOrPhone: string) => Promise<{ success: boolean; error?: string; otp?: string }>;
+  sendRecoveryOTP: (emailOrPhone: string) => Promise<{ success: boolean; error?: string }>;
   verifyRecoveryOTP: (otp: string) => Promise<boolean>;
   resetPassword: (otp: string, newPassword: string) => Promise<{ success: boolean; error?: string }>;
   deleteAccount: (currentPassword: string) => Promise<{ success: boolean; error?: string }>;
@@ -879,7 +879,7 @@ export const useAuthStore = create<AuthState>()(
               expiresAt: Date.now() + 10 * 60 * 1000,
             },
           });
-          return { success: true, otp: data.otp };
+          return { success: true };
         } catch (e) {
           logger.warn('sendRecoveryOTP failed', { error: e });
           return { success: false, error: 'Network error' };

@@ -144,7 +144,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
     return () => {
       cancelled = true;
     };
-  }, [effectiveGroupId]);
+  }, [effectiveGroupId, t]);
 
   // Compute summary statistics
   const summary = useMemo(() => {

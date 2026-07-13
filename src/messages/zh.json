@@ -2609,5 +2609,143 @@
     "reminderSent": "已向学生 {name} 发送提醒",
     "remindersSent": "已向 {count} 名学生发送提醒",
     "modulesWithoutCompletion": "未完成的模块:"
+  },
+  "onboardingTour": {
+    "startTour": "开始导览",
+    "skip": "跳过",
+    "skipTour": "跳过导览",
+    "previous": "上一步",
+    "next": "下一步",
+    "getStarted": "开始使用",
+    "studentWelcome": {
+      "title": "欢迎来到 CyberSec Lab！",
+      "description": "一个学习信息安全基础知识的互动平台。作为学生，您将探索互动模块、参加测验、完成作业，并跟踪您的网络安全技能进步。"
+    },
+    "studentModules": {
+      "title": "模块",
+      "description": "探索涵盖 OWASP Top 10、SQL 注入、XSS、CSRF、身份验证、安全编码、安全头和加密工具等主题的互动安全培训模块。",
+      "action": "从侧边栏菜单访问任何模块"
+    },
+    "studentQuizzes": {
+      "title": "测验",
+      "description": "通过 9 个安全类别中的 136+ 个问题测试您的知识。参加带时间限制和难度筛选的测验。您的分数将影响成就和整体进度。",
+      "action": "导航到侧边栏中的「测验」"
+    },
+    "studentAssignments": {
+      "title": "作业",
+      "description": "完成教师创建的作业。提交您的作品并获得详细反馈的评分，帮助您提高网络安全技能。",
+      "action": "导航到侧边栏中的「作业」"
+    },
+    "studentAchievements": {
+      "title": "成就",
+      "description": "在完成模块和测验的过程中获得 16 个成就徽章。通过完成模块和在测验中取得高分解锁新徽章。",
+      "action": "在「成就」部分跟踪您的进度"
+    },
+    "studentTips": {
+      "title": "学习建议",
+      "description": "从 OWASP Top 10 开始——它是 Web 安全的基础。在学习模块后立即参加测验，趁概念还新鲜。复习错误以加强学习。"
+    },
+    "teacherWelcome": {
+      "title": "欢迎来到 CyberSec Lab！",
+      "description": "一个用于教授信息安全的互动平台。作为教师，您可以创建作业、批改学生提交、管理截止日期，并查看分析以跟踪学生进度。"
+    },
+    "teacherModules": {
+      "title": "模块概览",
+      "description": "浏览所有可用的培训模块。为班级分配特定模块并跟踪学生的完成情况。",
+      "action": "导航到侧边栏中的「模块」"
+    },
+    "teacherCreateAssignments": {
+      "title": "创建作业",
+      "description": "通过选择模块、定义问题和设置评分标准来设计自定义作业。作业可以针对特定班级或学生。",
+      "action": "点击作业部分中的「创建作业」"
+    },
+    "teacherGradeSubmissions": {
+      "title": "批改作业",
+      "description": "高效地审查和批改学生提交。提供详细反馈和基于标准的评分，帮助学生了解自己的表现。",
+      "action": "导航到「作业」>「待批改」"
+    },
+    "teacherViewAnalytics": {
+      "title": "查看分析",
+      "description": "访问班级和个别学生表现的详细分析。识别知识差距并跟踪随时间的改进。",
+      "action": "导航到侧边栏中的「分析」"
+    },
+    "teacherManageDeadlines": {
+      "title": "管理截止日期",
+      "description": "设置和调整作业和模块的截止日期。向学生发送提醒并监控完成率。",
+      "action": "在每个作业设置中配置截止日期"
+    },
+    "teacherTips": {
+      "title": "教学建议",
+      "description": "使用分析尽早识别有困难的学生。创建建立在先前知识基础上的分层作业。提供及时、可操作的反馈以最大化学生参与度。"
+    },
+    "adminWelcome": {
+      "title": "欢迎来到 CyberSec Lab！",
+      "description": "一个用于教授信息安全的互动平台。作为管理员，您拥有管理用户、配置系统设置、审查审计日志和监控平台分析的完全权限。"
+    },
+    "adminFullAccess": {
+      "title": "完全访问权限",
+      "description": "您拥有平台上所有功能的访问权限。导航到任何部分管理内容、用户和系统配置。"
+    },
+    "adminUserManagement": {
+      "title": "用户管理",
+      "description": "创建、更新和停用用户帐户。分配角色（学生、教师、管理员）并管理班级注册和教师分配。",
+      "action": "导航到管理面板中的「用户」"
+    },
+    "adminAuditLogs": {
+      "title": "审计日志",
+      "description": "审查跟踪所有系统活动、用户操作和安全事件的综合审计日志。导出日志用于合规和报告。",
+      "action": "导航到管理面板中的「审计」"
+    },
+    "adminSystemSettings": {
+      "title": "系统设置",
+      "description": "配置平台范围的设置，包括身份验证方法、通知偏好、模块可用性和外部系统集成。",
+      "action": "导航到管理面板中的「设置」"
+    },
+    "adminAdvancedAnalytics": {
+      "title": "高级分析",
+      "description": "访问显示所有班级和部门采用率、完成指标和性能趋势的平台分析仪表板。",
+      "action": "导航到管理面板中的「分析」"
+    },
+    "adminAnnouncements": {
+      "title": "公告",
+      "description": "创建并向特定用户组或整个平台广播公告。安排公告并跟踪阅读回执。",
+      "action": "导航到管理面板中的「公告」"
+    },
+    "adminTips": {
+      "title": "管理建议",
+      "description": "定期审查审计日志以确保安全合规。使用分析识别使用不足的模块并推动采用。记录系统设置并主动向用户传达变更。"
+    },
+    "roleStudent": "学生",
+    "roleTeacher": "教师",
+    "roleAdmin": "管理员"
+  },
+  "commonAria": {
+    "back": "返回",
+    "close": "关闭"
+  },
+  "appModules": {
+    "dashboard": "仪表板",
+    "owaspTop10": "OWASP Top 10",
+    "sqlInjectionLab": "SQL 注入实验室",
+    "xssLab": "XSS 实验室",
+    "csrfLab": "CSRF 实验室",
+    "authLab": "身份验证实验室",
+    "secureCodingLab": "安全编码",
+    "toolsLab": "工具",
+    "securityHeadersLab": "安全头",
+    "idorLab": "IDOR 实验室",
+    "ssrfLab": "SSRF 实验室",
+    "apiSecurityLab": "API 安全",
+    "phishingAnalyzer": "钓鱼分析器",
+    "careerPaths": "职业路径",
+    "quizSystem": "测验系统",
+    "achievements": "成就",
+    "cheatSheets": "速查表",
+    "passwordChecker": "密码检查器",
+    "profile": "个人资料",
+    "teacherPanel": "教师面板",
+    "adminPanel": "管理面板",
+    "leaderboard": "排行榜",
+    "assignments": "作业"
   }
 }

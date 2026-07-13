@@ -5,6 +5,7 @@ import { otpStore, ensureOtpCapacity } from '@/lib/otp-store';
 import { sendOTPRecoveryEmail } from '@/lib/email';
 import { checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { recoveryRequestEmailPhoneSchema } from '@/lib/validations/api';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -33,7 +34,8 @@ export async function POST(request: NextRequest) {
   }
 
   // Also rate limit by IP to prevent distributed attacks
-  const ipRateKey = `otp-request-ip-${getClientIp(request)}`;
+  const ip = getClientIp(request);
+  const ipRateKey = `otp-request-ip-${ip}`;
   const ipRateResult = checkRateLimit(ipRateKey, 10, 10 * 60 * 1000);
   if (!ipRateResult.allowed) {
     return NextResponse.json(
@@ -49,14 +51,14 @@ export async function POST(request: NextRequest) {
     where: { OR: [{ email: emailOrPhone }, { phone: emailOrPhone }] },
   });
 
-  // Always return same message to prevent user enumeration
-  const response = {
+  // Always return same generic response to prevent user enumeration
+  const genericResponse = {
     success: true,
     message: 'Если пользователь найден, OTP отправлен на email',
   };
 
   if (!user) {
-    return NextResponse.json(response);
+    return NextResponse.json(genericResponse);
   }
 
   const otp = generateOTP();
@@ -66,9 +68,22 @@ export async function POST(request: NextRequest) {
 
   const emailSent = await sendOTPRecoveryEmail(user.email, user.fullName || user.email, otp);
   if (!emailSent) {
-    // In development, check console for email delivery issues
-    // OTP is still stored in memory for verification
+    logger.warn('OTP email delivery failed', {
+      userId: user.id,
+      email: user.email,
+      ip,
+    });
   }
 
-  return NextResponse.json(response);
+  // In development, log OTP so developers can test without email delivery
+  if (process.env.NODE_ENV === 'development') {
+    logger.info('Development OTP', {
+      userId: user.id,
+      email: user.email,
+      otp,
+      expiresAt: new Date(expiresAt).toISOString(),
+    });
+  }
+
+  return NextResponse.json(genericResponse);
 }

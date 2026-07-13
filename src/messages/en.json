@@ -2609,5 +2609,143 @@
     "reminderSent": "Reminder sent to student {name}",
     "remindersSent": "Reminders sent to {count} students",
     "modulesWithoutCompletion": "Modules without completions:"
+  },
+  "onboardingTour": {
+    "startTour": "Start onboarding tour",
+    "skip": "Skip",
+    "skipTour": "Skip tour",
+    "previous": "Previous",
+    "next": "Next",
+    "getStarted": "Get Started",
+    "studentWelcome": {
+      "title": "Welcome to CyberSec Lab!",
+      "description": "An interactive platform for learning information security fundamentals. As a student, you will explore interactive modules, take quizzes, complete assignments, and track your progress as you build cybersecurity skills."
+    },
+    "studentModules": {
+      "title": "Modules",
+      "description": "Explore interactive security training modules covering topics like OWASP Top 10, SQL injection, XSS, CSRF, authentication, secure coding, security headers, and cryptographic tools.",
+      "action": "Access any module from the sidebar menu"
+    },
+    "studentQuizzes": {
+      "title": "Quizzes",
+      "description": "Test your knowledge with 136+ questions across 9 security categories. Take timed quizzes with difficulty filtering. Your scores contribute to your achievements and overall progress.",
+      "action": "Navigate to \"Quizzes\" in the sidebar"
+    },
+    "studentAssignments": {
+      "title": "Assignments",
+      "description": "Complete assignments created by your teachers. Submit your work and receive grades with detailed feedback to help you improve your cybersecurity skills.",
+      "action": "Navigate to \"Assignments\" in the sidebar"
+    },
+    "studentAchievements": {
+      "title": "Achievements",
+      "description": "Earn 16 achievement badges as you progress through modules and quizzes. Unlock new badges by completing modules and scoring high on quizzes.",
+      "action": "Track your progress in the \"Achievements\" section"
+    },
+    "studentTips": {
+      "title": "Tips for Learning",
+      "description": "Start with OWASP Top 10 - it is the foundation of web security. Take quizzes immediately after studying modules while concepts are fresh. Review your mistakes to reinforce learning."
+    },
+    "teacherWelcome": {
+      "title": "Welcome to CyberSec Lab!",
+      "description": "An interactive platform for teaching information security. As a teacher, you can create assignments, grade student submissions, manage deadlines, and view analytics to track your students progress."
+    },
+    "teacherModules": {
+      "title": "Modules Overview",
+      "description": "Browse all available training modules. Assign specific modules to your classes and track which students have completed them.",
+      "action": "Navigate to \"Modules\" in the sidebar"
+    },
+    "teacherCreateAssignments": {
+      "title": "Create Assignments",
+      "description": "Design custom assignments by selecting modules, defining questions, and setting grading criteria. Assignments can target individual classes or specific students.",
+      "action": "Click \"Create Assignment\" in the Assignments section"
+    },
+    "teacherGradeSubmissions": {
+      "title": "Grade Submissions",
+      "description": "Review and grade student submissions efficiently. Provide detailed feedback and rubric-based scoring to help students understand their performance.",
+      "action": "Navigate to \"Assignments\" > \"Pending Review\""
+    },
+    "teacherViewAnalytics": {
+      "title": "View Analytics",
+      "description": "Access detailed analytics on class and individual student performance. Identify knowledge gaps and track improvement over time with visual dashboards.",
+      "action": "Navigate to \"Analytics\" in the sidebar"
+    },
+    "teacherManageDeadlines": {
+      "title": "Manage Deadlines",
+      "description": "Set and adjust deadlines for assignments and modules. Send reminders to students and monitor completion rates before due dates.",
+      "action": "Configure deadlines in each assignment settings"
+    },
+    "teacherTips": {
+      "title": "Tips for Teaching",
+      "description": "Use analytics to identify struggling students early. Create scaffolded assignments that build on previous knowledge. Provide timely, actionable feedback to maximize student engagement."
+    },
+    "adminWelcome": {
+      "title": "Welcome to CyberSec Lab!",
+      "description": "An interactive platform for teaching information security. As an administrator, you have full access to manage users, configure system settings, review audit logs, and monitor platform-wide analytics."
+    },
+    "adminFullAccess": {
+      "title": "Full Access",
+      "description": "You have access to all features across the platform. Navigate to any section to manage content, users, and system configurations."
+    },
+    "adminUserManagement": {
+      "title": "User Management",
+      "description": "Create, update, and deactivate user accounts. Assign roles (student, teacher, admin) and manage class enrollments and teacher assignments.",
+      "action": "Navigate to \"Users\" in the admin panel"
+    },
+    "adminAuditLogs": {
+      "title": "Audit Logs",
+      "description": "Review comprehensive audit logs tracking all system activities, user actions, and security events. Export logs for compliance and reporting purposes.",
+      "action": "Navigate to \"Audit\" in the admin panel"
+    },
+    "adminSystemSettings": {
+      "title": "System Settings",
+      "description": "Configure platform-wide settings including authentication methods, notification preferences, module availability, and integration with external systems.",
+      "action": "Navigate to \"Settings\" in the admin panel"
+    },
+    "adminAdvancedAnalytics": {
+      "title": "Advanced Analytics",
+      "description": "Access platform-wide analytics dashboards showing adoption rates, completion metrics, and performance trends across all classes and departments.",
+      "action": "Navigate to \"Analytics\" in the admin panel"
+    },
+    "adminAnnouncements": {
+      "title": "Announcements",
+      "description": "Create and broadcast announcements to specific user groups or the entire platform. Schedule announcements and track read receipts.",
+      "action": "Navigate to \"Announcements\" in the admin panel"
+    },
+    "adminTips": {
+      "title": "Tips for Administration",
+      "description": "Regularly review audit logs for security compliance. Use analytics to identify underutilized modules and drive adoption. Keep system settings documented and communicate changes to users proactively."
+    },
+    "roleStudent": "Student",
+    "roleTeacher": "Teacher",
+    "roleAdmin": "Admin"
+  },
+  "commonAria": {
+    "back": "Back",
+    "close": "Close"
+  },
+  "appModules": {
+    "dashboard": "Dashboard",
+    "owaspTop10": "OWASP Top 10",
+    "sqlInjectionLab": "SQL Injection Lab",
+    "xssLab": "XSS Lab",
+    "csrfLab": "CSRF Lab",
+    "authLab": "Auth Lab",
+    "secureCodingLab": "Secure Coding Lab",
+    "toolsLab": "Tools Lab",
+    "securityHeadersLab": "Security Headers Lab",
+    "idorLab": "IDOR Lab",
+    "ssrfLab": "SSRF Lab",
+    "apiSecurityLab": "API Security Lab",
+    "phishingAnalyzer": "Phishing Analyzer",
+    "careerPaths": "Career Paths",
+    "quizSystem": "Quiz System",
+    "achievements": "Achievements",
+    "cheatSheets": "Cheat Sheets",
+    "passwordChecker": "Password Checker",
+    "profile": "Profile",
+    "teacherPanel": "Teacher Panel",
+    "adminPanel": "Admin Panel",
+    "leaderboard": "Leaderboard",
+    "assignments": "Assignments"
   }
 }
