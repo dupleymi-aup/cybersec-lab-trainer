@@ -20,9 +20,12 @@ function findAvailablePort(startPort = 3000) {
 }
 
 async function main() {
-  const port = await findAvailablePort(parseInt(process.argv[2]) || 3000);
+  const arg = process.argv[2];
+  const startPort = arg === '--port' ? parseInt(process.argv[3]) : parseInt(arg) || 3000;
+  const port = await findAvailablePort(startPort);
   console.log(`\n Starting Next.js on port ${port}...\n`);
-  const child = spawn('next', ['dev', '-p', String(port)], { stdio: 'inherit', shell: true });
+const nextBin = require('path').join(__dirname, '..', 'node_modules', '.bin', 'next.cmd');
+const child = spawn(nextBin, ['dev', '-p', String(port)], { stdio: 'inherit', shell: true });
   child.on('close', (code) => process.exit(code));
 }
 
