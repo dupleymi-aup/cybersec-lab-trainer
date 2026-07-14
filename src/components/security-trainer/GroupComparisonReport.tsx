@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -22,16 +23,16 @@ import { getGroupComparison, type GroupComparisonDimension } from '@/lib/auth-st
 import { Card, CardContent } from '@/components/ui/card';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
+  { key: 7, labelKey: '7d' },
+  { key: 30, labelKey: '30d' },
+  { key: 90, labelKey: '90d' },
+  { key: 180, labelKey: '180d' },
 ];
 
 const DIMENSION_OPTIONS = [
-  { key: 'group' as const, label: 'По группе' },
-  { key: 'course' as const, label: 'По курсу' },
-  { key: 'university' as const, label: 'По университету' },
+  { key: 'group' as const, labelKey: 'byGroup' },
+  { key: 'course' as const, labelKey: 'byCourse' },
+  { key: 'university' as const, labelKey: 'byUniversity' },
 ];
 
 const COLORS = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#818cf8', '#7c3aed', '#a855f7', '#d8b4fe'];
@@ -42,6 +43,7 @@ export interface GroupComparisonReportProps {
 }
 
 export default function GroupComparisonReport({ groupId, days: controlledDays }: GroupComparisonReportProps = {}) {
+  const t = useTranslations('groupComparison');
   const [dimensions, setDimensions] = useState<GroupComparisonDimension[]>([]);
   const [_rankings, setRankings] = useState({
     byCompletion: [] as Array<{ name: string; value: number }>,
@@ -83,7 +85,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -127,7 +129,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       <div className="flex flex-wrap items-center gap-3">
         {!isControlled && (
           <div className="bg-muted flex gap-1 rounded-lg p-1">
-            {PERIOD_OPTIONS.map(({ key, label }) => (
+            {PERIOD_OPTIONS.map(({ key, labelKey }) => (
               <button
                 key={key}
                 onClick={() => setInternalDays(key)}
@@ -137,13 +139,13 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {label}
+                {t(labelKey)}
               </button>
             ))}
           </div>
         )}
         <div className="bg-muted flex gap-1 rounded-lg p-1">
-          {DIMENSION_OPTIONS.map(({ key, label }) => (
+          {DIMENSION_OPTIONS.map(({ key, labelKey }) => (
             <button
               key={key}
               onClick={() => setDimension(key)}
@@ -153,7 +155,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {label}
+              {t(labelKey)}
             </button>
           ))}
         </div>
@@ -167,7 +169,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
               <div className="flex items-center gap-2">
                 <TrendingUp size={18} className="text-emerald-600" />
                 <div>
-                  <p className="text-xs font-medium text-emerald-600">Лучший</p>
+                  <p className="text-xs font-medium text-emerald-600">{t('best')}</p>
                   <p className="text-sm font-bold text-emerald-700">{bestGroup.name}</p>
                   <p className="text-xs text-emerald-600">
                     Завершение: {bestGroup.avgCompletionRate}%, Балл: {bestGroup.avgQuizScore}%
@@ -181,7 +183,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
               <div className="flex items-center gap-2">
                 <TrendingDown size={18} className="text-red-600" />
                 <div>
-                  <p className="text-xs font-medium text-red-600">Требует внимания</p>
+                  <p className="text-xs font-medium text-red-600">{t('needsAttention')}</p>
                   <p className="text-sm font-bold text-red-700">{worstGroup.name}</p>
                   <p className="text-xs text-red-600">
                     Завершение: {worstGroup.avgCompletionRate}%, Балл: {worstGroup.avgQuizScore}%
@@ -196,7 +198,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       {/* Grouped bar chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Сравнительная диаграмма</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('chartTitle')}</h3>
           {barData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={barData}>
@@ -212,9 +214,9 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                 <Tooltip
                   formatter={(value, name) => {
                     const labels: Record<string, string> = {
-                      avgCompletionRate: 'Завершение',
-                      avgQuizScore: 'Ср. балл',
-                      activeRate: 'Активность',
+                      avgCompletionRate: t('completion'),
+                      avgQuizScore: t('avgScore'),
+                      activeRate: t('activity'),
                     };
                     return [`${value}%`, name ? labels[name] || name : ''];
                   }}
@@ -223,9 +225,9 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                   wrapperStyle={{ fontSize: 12 }}
                   formatter={(value) => {
                     const labels: Record<string, string> = {
-                      avgCompletionRate: 'Завершение',
-                      avgQuizScore: 'Ср. балл',
-                      activeRate: 'Активность',
+                      avgCompletionRate: t('completion'),
+                      avgQuizScore: t('avgScore'),
+                      activeRate: t('activity'),
                     };
                     return labels[value] || value;
                   }}
@@ -236,7 +238,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+            <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
           )}
         </CardContent>
       </Card>
@@ -245,7 +247,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       {radarData.length >= 2 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Радар сравнения (топ 5)</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('radarTitle')}</h3>
             <ResponsiveContainer width="100%" height={300}>
               <RadarChart data={radarData}>
                 <PolarGrid />
@@ -272,7 +274,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       {/* Ranking table */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Рейтинг</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('ranking')}</h3>
           {dimensions.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -280,14 +282,14 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                   <tr className="border-border border-b">
                     <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">#</th>
                     <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">
-                      {dimension === 'group' ? 'Группа' : dimension === 'course' ? 'Курс' : 'Университет'}
+                      t(dimension)
                     </th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Студенты</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('students')}</th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершение</th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Ср. балл</th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Активность</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Лучший модуль</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Слабый модуль</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('bestModule')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('weakestModule')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -341,7 +343,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
               </table>
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-slate-400">Нет данных</p>
+            <p className="py-8 text-center text-sm text-slate-400">{t('noData')}</p>
           )}
         </CardContent>
       </Card>

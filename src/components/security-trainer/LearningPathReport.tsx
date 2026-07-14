@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { BookOpen, Loader2, AlertTriangle, TrendingDown, Users } from 'lucide-react';
@@ -8,13 +9,6 @@ import { getLearningPathAnalytics, type LearningPathEntry } from '@/lib/auth-sto
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import KPICard from '@/components/security-trainer/KPICard';
-
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
 
 const FUNNEL_COLORS = ['#6366f1', '#7c3aed', '#8b5cf6', '#a78bfa', '#818cf8', '#a855f7', '#c4b5fd', '#d8b4fe'];
 
@@ -34,11 +28,19 @@ const isControlled = (props: LearningPathReportProps): props is LearningPathRepo
   props.days !== undefined;
 
 export default function LearningPathReport(props: LearningPathReportProps = {}) {
+  const t = useTranslations('learningPath');
   const [path, setPath] = useState<LearningPathEntry[]>([]);
   const [totalStudents, setTotalStudents] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
+
+  const PERIOD_OPTIONS = [
+    { key: 7, label: t('days7') },
+    { key: 30, label: t('days30') },
+    { key: 90, label: t('days90') },
+    { key: 180, label: t('days180') },
+  ];
 
   const effectiveDays = isControlled(props) ? props.days : internalDays;
   const controlled = isControlled(props);
@@ -70,7 +72,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="mx-auto mb-3 animate-spin text-indigo-500" />
-        <p className="text-muted-foreground text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -123,21 +125,21 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
         <KPICard
           icon={<Users size={16} />}
           value={totalStudents}
-          label="Всего студентов"
+          label={t('totalStudents')}
           iconBg="bg-indigo-100"
           iconColor="text-indigo-600"
         />
         <KPICard
           icon={<BookOpen size={16} />}
           value={path.length}
-          label="Модулей в пути обучения"
+          label={t('modulesInPath')}
           iconBg="bg-violet-100"
           iconColor="text-violet-600"
         />
         <KPICard
           icon={<TrendingDown size={16} />}
           value={path.length > 0 ? `${path[path.length - 1].percentage}%` : '0%'}
-          label="Завершение пути"
+          label={t('pathCompletion')}
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
         />
@@ -146,7 +148,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
       {/* Learning Path Funnel - Bar Chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Воронка пути обучения</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('funnelTitle')}</h3>
           {funnelData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={funnelData} layout="vertical">
@@ -181,7 +183,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+            <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
           )}
         </CardContent>
       </Card>
@@ -189,7 +191,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
       {/* Module Path Cards */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Путь завершения модулей</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('modulePath')}</h3>
           <div className="space-y-3">
             {path.map((entry, i) => (
               <motion.div
@@ -251,17 +253,17 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
       {/* Detail Table */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Детальная статистика</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('detailStats')}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-border border-b">
                   <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">#</th>
-                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">Модуль</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершено</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Всего студентов</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершение %</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Отток</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('module')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completed')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('totalStudents')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completionPercent')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('dropoff')}</th>
                 </tr>
               </thead>
               <tbody>

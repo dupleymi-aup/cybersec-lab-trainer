@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   PieChart,
@@ -24,33 +25,34 @@ export interface CertificationReadinessProps {
   days?: number;
 }
 
-const TIER_CONFIG = {
-  ready: {
-    label: 'Готов',
-    color: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    icon: CheckCircle,
-  },
-  almost: {
-    label: 'Почти готов',
-    color: 'bg-blue-100 text-blue-700 border-blue-200',
-    icon: TrendingUp,
-  },
-  'needs-work': {
-    label: 'Нужна работа',
-    color: 'bg-amber-100 text-amber-700 border-amber-200',
-    icon: AlertTriangle,
-  },
-  'not-ready': {
-    label: 'Не готов',
-    color: 'bg-red-100 text-red-700 border-red-200',
-    icon: XCircle,
-  },
-};
-
 export default function CertificationReadiness({
   groupId: propGroupId,
   days: propDays,
 }: CertificationReadinessProps = {}) {
+  const t = useTranslations('certificationReadiness');
+
+  const TIER_CONFIG = {
+    ready: {
+      label: t('ready'),
+      color: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+      icon: CheckCircle,
+    },
+    almost: {
+      label: t('almost'),
+      color: 'bg-blue-100 text-blue-700 border-blue-200',
+      icon: TrendingUp,
+    },
+    'needs-work': {
+      label: t('needsWork'),
+      color: 'bg-amber-100 text-amber-700 border-amber-200',
+      icon: AlertTriangle,
+    },
+    'not-ready': {
+      label: t('notReady'),
+      color: 'bg-red-100 text-red-700 border-red-200',
+      icon: XCircle,
+    },
+  };
   const [data, setData] = useState<CertificationReadinessData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +88,7 @@ export default function CertificationReadiness({
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -95,7 +97,7 @@ export default function CertificationReadiness({
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -122,7 +124,7 @@ export default function CertificationReadiness({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Award size={20} className="text-indigo-600" />
-          <h2 className="text-lg font-bold">Готовность к сертификации</h2>
+          <h2 className="text-lg font-bold">{t('title')}</h2>
         </div>
         {propDays === undefined && (
           <select
@@ -130,9 +132,9 @@ export default function CertificationReadiness({
             onChange={(e) => setInternalDays(Number(e.target.value))}
             className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
-            <option value={7}>7 дней</option>
-            <option value={30}>30 дней</option>
-            <option value={90}>90 дней</option>
+            <option value={7}>{t('days7')}</option>
+            <option value={30}>{t('days30')}</option>
+            <option value={90}>{t('days90')}</option>
           </select>
         )}
       </div>
@@ -142,7 +144,7 @@ export default function CertificationReadiness({
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-2xl font-bold text-indigo-600">{summary.avgReadinessScore}</p>
-            <p className="text-muted-foreground text-xs">Ср. балл готовности</p>
+            <p className="text-muted-foreground text-xs">{t('avgScore')}</p>
           </CardContent>
         </Card>
         {Object.entries(TIER_CONFIG).map(([key, config]) => {
@@ -171,7 +173,7 @@ export default function CertificationReadiness({
       {tierData.length > 0 && (
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Распределение по уровням готовности</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('distribution')}</h3>
             <div className="h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -205,12 +207,12 @@ export default function CertificationReadiness({
             <table className="w-full text-xs">
               <thead className="bg-secondary border-border border-b">
                 <tr>
-                  <th className="text-muted-foreground p-2 text-left font-medium">Студент</th>
-                  <th className="text-muted-foreground p-2 text-center font-medium">Группа</th>
-                  <th className="text-muted-foreground p-2 text-center font-medium">Балл</th>
-                  <th className="text-muted-foreground p-2 text-center font-medium">Уровень</th>
-                  <th className="text-muted-foreground p-2 text-center font-medium">Модули</th>
-                  <th className="text-muted-foreground p-2 text-center font-medium">Достижения</th>
+                  <th className="text-muted-foreground p-2 text-left font-medium">{t('student')}</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">{t('group')}</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">{t('score')}</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">{t('level')}</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">{t('modules')}</th>
+                  <th className="text-muted-foreground p-2 text-center font-medium">{t('achievements')}</th>
                   <th className="text-muted-foreground p-2 font-medium"></th>
                 </tr>
               </thead>
@@ -273,7 +275,7 @@ export default function CertificationReadiness({
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {/* Radar chart */}
                     <div>
-                      <h4 className="mb-2 text-sm font-semibold">Готовность по категориям</h4>
+                      <h4 className="mb-2 text-sm font-semibold">{t('categoryReadiness')}</h4>
                       <div className="h-[250px]">
                         <ResponsiveContainer width="100%" height="100%">
                           <RadarChart
@@ -286,7 +288,7 @@ export default function CertificationReadiness({
                             <PolarGrid />
                             <PolarAngleAxis dataKey="name" tick={{ fontSize: 9 }} />
                             <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8 }} />
-                            <Radar name="Балл" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.4} />
+                            <Radar name={t('score')} dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.4} />
                           </RadarChart>
                         </ResponsiveContainer>
                       </div>
@@ -296,7 +298,7 @@ export default function CertificationReadiness({
                     <div className="space-y-3">
                       {s.strengths.length > 0 && (
                         <div>
-                          <h4 className="mb-1 text-sm font-semibold text-emerald-700">Сильные стороны</h4>
+                          <h4 className="mb-1 text-sm font-semibold text-emerald-700">{t('strengths')}</h4>
                           <div className="flex flex-wrap gap-1">
                             {s.strengths.map((w) => (
                               <Badge key={w} className="bg-emerald-100 text-[10px] text-emerald-700">
@@ -308,7 +310,7 @@ export default function CertificationReadiness({
                       )}
                       {s.weaknesses.length > 0 && (
                         <div>
-                          <h4 className="mb-1 text-sm font-semibold text-amber-700">Зоны роста</h4>
+                          <h4 className="mb-1 text-sm font-semibold text-amber-700">{t('growthAreas')}</h4>
                           <div className="flex flex-wrap gap-1">
                             {s.weaknesses.map((w) => (
                               <Badge key={w} className="bg-amber-100 text-[10px] text-amber-700">
@@ -320,7 +322,7 @@ export default function CertificationReadiness({
                       )}
                       {s.recommendations.length > 0 && (
                         <div>
-                          <h4 className="mb-1 text-sm font-semibold text-indigo-700">Рекомендации</h4>
+                          <h4 className="mb-1 text-sm font-semibold text-indigo-700">{t('recommendations')}</h4>
                           <ul className="space-y-1">
                             {s.recommendations.map((r, _i) => (
                               <li

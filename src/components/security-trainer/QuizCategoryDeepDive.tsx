@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { getQuizCategoryAnalytics, type QuizCategoryStat } from '@/lib/auth-store';
@@ -14,6 +15,7 @@ interface QuizCategoryDeepDiveProps {
 }
 
 export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategoryDeepDiveProps) {
+  const t = useTranslations('quizCategoryDeepDive');
   const [categories, setCategories] = useState<QuizCategoryStat[]>([]);
   const [hardestQuestions, setHardestQuestions] = useState<
     Array<{
@@ -41,7 +43,7 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-slate-400" />
-        <span className="ml-3 text-sm text-slate-400">Загрузка категорий...</span>
+        <span className="ml-3 text-sm text-slate-400">{t('loading')}</span>
       </div>
     );
   }
@@ -70,8 +72,8 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
           <BarChart3 size={20} className="text-indigo-600" />
         </div>
         <div>
-          <h2 className="text-lg font-bold">Детализация категорий квизов</h2>
-          <p className="text-muted-foreground text-xs">Статистика по каждой категории</p>
+          <h2 className="text-lg font-bold">{t('title')}</h2>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -85,8 +87,8 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} tickFormatter={(v: number) => `${v}%`} />
                   <Tooltip />
-                  <Bar dataKey="avgScore" fill="#6366f1" radius={[4, 4, 0, 0]} name="Средний балл" />
-                  <Bar dataKey="passRate" fill="#10b981" radius={[4, 4, 0, 0]} name="Проходной %" />
+                  <Bar dataKey="avgScore" fill="#6366f1" radius={[4, 4, 0, 0]} name={t('avgScore')} />
+                  <Bar dataKey="passRate" fill="#10b981" radius={[4, 4, 0, 0]} name={t('passRate')} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -98,7 +100,7 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Самые сложные вопросы</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('hardestQuestions')}</h3>
               <div className="space-y-2">
                 {hardestQuestions.slice(0, 10).map((q, i) => (
                   <div key={q.questionId} className="hover:bg-secondary flex items-center gap-3 rounded-lg p-2">
@@ -123,16 +125,16 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Card className="border-border">
           <CardContent className="p-5">
-            <h3 className="mb-4 text-sm font-semibold">Таблица категорий</h3>
+            <h3 className="mb-4 text-sm font-semibold">{t('categoryTable')}</h3>
             <div className="border-border overflow-x-auto rounded-lg border">
               <table className="w-full text-xs">
                 <thead className="bg-secondary border-border border-b">
                   <tr>
-                    <th className="text-muted-foreground p-2 text-left font-medium">Категория</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Попытки</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Студентов</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Средний балл</th>
-                    <th className="text-muted-foreground p-2 text-center font-medium">Проходной %</th>
+                    <th className="text-muted-foreground p-2 text-left font-medium">{t('category')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('attempts')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('students')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('avgScoreCol')}</th>
+                    <th className="text-muted-foreground p-2 text-center font-medium">{t('passRateCol')}</th>
                   </tr>
                 </thead>
                 <tbody>

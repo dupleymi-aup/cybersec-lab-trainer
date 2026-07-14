@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Trash2, Shield, Ban, CheckCircle, X, Users } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
@@ -24,6 +25,7 @@ interface BulkActionsBarProps {
 }
 
 export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: BulkActionsBarProps) {
+  const t = useTranslations('bulkActionsBar');
   const [showRolePicker, setShowRolePicker] = useState(false);
   const [showGroupPicker, setShowGroupPicker] = useState(false);
   const [newGroupInput, setNewGroupInput] = useState('');
@@ -45,10 +47,10 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
   }, []);
 
   const handleBulkDelete = async () => {
-    if (!confirm(`Удалить ${selectedIds.length} пользователей?`)) return;
+    if (!confirm(t('deleteConfirm', { count: selectedIds.length }))) return;
     const result = await bulkDeleteUsers(selectedIds, currentUserId);
     if (result.success) {
-      toast.success(`Удалено: ${result.count}`);
+      toast.success(t('deleted', { count: result.count }));
       onDone();
     } else {
       toast.error(result.error);
@@ -58,7 +60,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
   const handleBulkRoleChange = async (role: UserRole) => {
     const result = await bulkChangeRole(selectedIds, role);
     if (result.success) {
-      toast.success(`Роль изменена у ${result.count} пользователей`);
+      toast.success(t('roleChanged', { count: result.count }));
       setShowRolePicker(false);
       onDone();
     }
@@ -67,7 +69,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
   const handleBulkBlock = async (blocked: boolean) => {
     const result = await bulkToggleBlock(selectedIds, currentUserId, blocked);
     if (result.success) {
-      toast.success(blocked ? `Заблокировано: ${result.count}` : `Разблокировано: ${result.count}`);
+      toast.success(blocked ? t('blocked', { count: result.count }) : t('unblocked', { count: result.count }));
       onDone();
     } else {
       toast.error(result.error);
@@ -76,12 +78,12 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
 
   const handleGroupAssign = async (groupName: string) => {
     if (!groupName.trim()) {
-      toast.error('Введите название группы');
+      toast.error(t('enterGroupName'));
       return;
     }
     const result = await assignUsersToGroup(selectedIds, groupName);
     if (result.success) {
-      toast.success(`Группа "${groupName.trim()}" назначена ${result.count} пользователям`);
+      toast.success(t('groupAssigned', { name: groupName.trim(), count: result.count }));
       setShowGroupPicker(false);
       setNewGroupInput('');
       onDone();
@@ -104,7 +106,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
                 {selectedIds.length}
               </span>
-              <span className="text-sm">выбрано</span>
+              <span className="text-sm">{t('selected')}</span>
             </div>
 
             <div className="h-6 w-px bg-slate-700" />
@@ -180,7 +182,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
                       <Input
                         value={newGroupInput}
                         onChange={(e) => setNewGroupInput(e.target.value)}
-                        placeholder="Новая группа..."
+                        placeholder={t('newGroup')}
                         className="h-7 text-xs"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') handleGroupAssign(newGroupInput);

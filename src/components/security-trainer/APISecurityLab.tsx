@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { apiSecurityTopics } from '@/lib/data/api-security-data';
 import CodeBlock from './CodeBlock';
@@ -149,6 +150,7 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default function APISecurityLab() {
+  const t = useTranslations('labs.apiSecurity');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
   const completeModule = useAppStore((s) => s.completeModule);
@@ -244,7 +246,7 @@ export default function APISecurityLab() {
             <Shield className="text-white" size={22} />
           </div>
           <div>
-            <h1 className="text-foreground text-xl font-bold">Безопасность API</h1>
+            <h1 className="text-foreground text-xl font-bold">{t('title')}</h1>
             <p className="text-muted-foreground text-sm">OWASP API Security Top 10 (2023)</p>
           </div>
         </div>
@@ -260,7 +262,7 @@ export default function APISecurityLab() {
           </Badge>
           <div className="flex-1" />
           <span className="text-muted-foreground text-xs">
-            {completedTopics.size} / {apiSecurityTopics.length} изучено
+            {completedTopics.size} / {apiSecurityTopics.length} {t('studied')}
           </span>
         </div>
         <div className="bg-muted mt-2 h-1.5 w-full rounded-full">
@@ -386,7 +388,7 @@ export default function APISecurityLab() {
                   <CheckCircle2 size={16} /> Изучено
                 </>
               ) : (
-                <>Отметить как изученное</>
+                <>{t('markStudied')}</>
               )}
             </Button>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   RadarChart,
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export default function CompetencyRadar({ groupId }: Props) {
+  const t = useTranslations('competencyRadar');
   const [days, setDays] = useState(90);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +67,7 @@ export default function CompetencyRadar({ groupId }: Props) {
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loading'));
           setLoading(false);
         }
       });
@@ -73,7 +75,7 @@ export default function CompetencyRadar({ groupId }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [days, groupId]);
+  }, [days, groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
@@ -104,8 +106,8 @@ export default function CompetencyRadar({ groupId }: Props) {
             <Shield size={20} className="text-indigo-600" />
           </div>
           <div>
-            <h2 className="text-lg font-bold">Карта компетенций</h2>
-            <p className="text-muted-foreground text-xs">Радар навыков безопасности по модулям</p>
+            <h2 className="text-lg font-bold">{t('title')}</h2>
+            <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
           </div>
         </div>
         <CustomDateRangePicker days={days} onChange={setDays} />
@@ -117,7 +119,7 @@ export default function CompetencyRadar({ groupId }: Props) {
           onChange={(e) => setSelectedStudentId(e.target.value)}
           className="border-border bg-card rounded-md border px-3 py-2 text-sm"
         >
-          <option value="">Среднее по всем студентам</option>
+          <option value="">{t('allStudents')}</option>
           {students.map((s) => (
             <option key={s.id} value={s.id}>
               {s.fullName}
@@ -130,7 +132,7 @@ export default function CompetencyRadar({ groupId }: Props) {
         <Card className="border-border lg:col-span-2">
           <CardContent className="p-5">
             <h3 className="mb-4 text-sm font-semibold">
-              {selectedStudent ? `Компетенции: ${selectedStudent.fullName}` : 'Средние компетенции группы'}
+              {selectedStudent ? t('competencies', { name: selectedStudent.fullName }) : 'Средние компетенции группы'}
             </h3>
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
@@ -144,13 +146,13 @@ export default function CompetencyRadar({ groupId }: Props) {
                     tickFormatter={(v) => `${v}%`}
                   />
                   <Radar
-                    name="Завершение модулей"
+                    name={t('moduleCompletion')}
                     dataKey="completion"
                     stroke="#6366f1"
                     fill="#6366f1"
                     fillOpacity={0.15}
                   />
-                  <Radar name="Средний балл" dataKey="score" stroke="#10b981" fill="#10b981" fillOpacity={0.15} />
+                  <Radar name={t('avgScore')} dataKey="score" stroke="#10b981" fill="#10b981" fillOpacity={0.15} />
                   <Tooltip formatter={(value, name) => [`${value}%`, name]} />
                   <Legend
                     wrapperStyle={{ fontSize: 12 }}
@@ -159,7 +161,7 @@ export default function CompetencyRadar({ groupId }: Props) {
                 </RadarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="py-12 text-center text-sm text-slate-400">Нет данных</p>
+              <p className="py-12 text-center text-sm text-slate-400">{t('noData')}</p>
             )}
           </CardContent>
         </Card>
@@ -167,7 +169,7 @@ export default function CompetencyRadar({ groupId }: Props) {
         <div className="space-y-4">
           <Card className="border-border">
             <CardContent className="p-4">
-              <h3 className="mb-3 text-sm font-semibold">Легенда</h3>
+              <h3 className="mb-3 text-sm font-semibold">{t('legend')}</h3>
               {chartData.map((item) => (
                 <motion.div
                   key={item.category}
@@ -190,7 +192,7 @@ export default function CompetencyRadar({ groupId }: Props) {
 
           <Card className="border-border">
             <CardContent className="p-4">
-              <h3 className="mb-2 text-sm font-semibold">Сильные стороны</h3>
+              <h3 className="mb-2 text-sm font-semibold">{t('strengths')}</h3>
               {chartData.filter((d) => d.score >= 70).length > 0 ? (
                 <ul className="space-y-1">
                   {chartData
@@ -205,14 +207,14 @@ export default function CompetencyRadar({ groupId }: Props) {
                     ))}
                 </ul>
               ) : (
-                <p className="text-xs text-slate-400">Нет сильных сторон</p>
+                <p className="text-xs text-slate-400">{t('noStrengths')}</p>
               )}
             </CardContent>
           </Card>
 
           <Card className="border-border">
             <CardContent className="p-4">
-              <h3 className="mb-2 text-sm font-semibold">Зоны роста</h3>
+              <h3 className="mb-2 text-sm font-semibold">{t('growthAreas')}</h3>
               {chartData.filter((d) => d.score < 50).length > 0 ? (
                 <ul className="space-y-1">
                   {chartData
@@ -227,7 +229,7 @@ export default function CompetencyRadar({ groupId }: Props) {
                     ))}
                 </ul>
               ) : (
-                <p className="text-xs text-slate-400">Все модули на хорошем уровне</p>
+                <p className="text-xs text-slate-400">{t('allModulesGood')}</p>
               )}
             </CardContent>
           </Card>

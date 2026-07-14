@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   Download,
@@ -89,6 +90,7 @@ const isControlled = (props: AnalyticsExportPanelProps): props is AnalyticsExpor
   props.days !== undefined;
 
 export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = {}) {
+  const t = useTranslations('analyticsExport');
   const formatDate = useDateFormatter();
   const { students: propStudents, groupId } = props;
   const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
@@ -235,7 +237,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       setStatus('gradebook', 'success', `Экспортировано ${studentData.length} студентов`);
     } catch (error) {
       logger.error('Gradebook export failed', { error });
-      setStatus('gradebook', 'error', 'Ошибка экспорта');
+      setStatus('gradebook', 'error', t('exportError'));
     } finally {
       endExport('gradebook');
     }
@@ -247,7 +249,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
   // Export student report CSV
   const handleStudentReportExport = async () => {
     if (!selectedStudentId) {
-      setStatus('studentReport', 'error', 'Выберите студента');
+      setStatus('studentReport', 'error', t('selectStudent'));
       scheduleReset('studentReport', 3000);
       return;
     }
@@ -270,7 +272,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
 
       // Build quiz results
       const quizData = quizResults.map((q, i) => ({
-        quizId: `Квиз ${i + 1}`,
+        quizId: t('quizLabel', { n: i + 1 }),
         score: q.score ?? 0,
         total: q.total ?? 100,
         percentage: q.score ?? 0,
@@ -278,7 +280,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
 
       const student = students.find((s) => s.id === selectedStudentId);
       if (!student) {
-        setStatus('studentReport', 'error', 'Студент не найден');
+        setStatus('studentReport', 'error', t('studentNotFound'));
         return;
       }
 
@@ -298,10 +300,10 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const safeName = student.fullName.replace(/\s+/g, '-');
       downloadCSV(csv, `student-${safeName}-${date}.csv`);
 
-      setStatus('studentReport', 'success', 'Отчёт студента экспортирован');
+      setStatus('studentReport', 'success', t('studentReportExported'));
     } catch (error) {
       logger.error('Student report export failed', { error });
-      setStatus('studentReport', 'error', 'Ошибка экспорта');
+      setStatus('studentReport', 'error', t('exportError'));
     }
 
     scheduleReset('studentReport', 4000);
@@ -310,7 +312,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
   // Print report
   const handlePrint = () => {
     setPrintPreview(true);
-    setStatus('print', 'success', 'Подготовка к печати...');
+    setStatus('print', 'success', t('preparingPrint'));
     setTimeout(() => {
       window.print();
       setPrintPreview(false);
@@ -327,10 +329,10 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const csv = generateAnalyticsCSV(summary, summary.moduleDistribution);
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `analytics-${effectiveDays}d-${date}.csv`);
-      setStatus('analytics', 'success', 'Аналитика экспортирована');
+      setStatus('analytics', 'success', t('analyticsExported'));
     } catch (e) {
       logger.warn('Analytics export failed', { error: e });
-      setStatus('analytics', 'error', 'Ошибка при экспорте аналитики');
+      setStatus('analytics', 'error', t('analyticsError'));
     }
     scheduleReset('analytics', 4000);
   };
@@ -514,7 +516,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
   // Export student report PDF
   const handleStudentReportPdfExport = async () => {
     if (!selectedStudentId) {
-      setStatus('studentReportPdf', 'error', 'Выберите студента');
+      setStatus('studentReportPdf', 'error', t('selectStudent'));
       scheduleReset('studentReportPdf', 3000);
       return;
     }
@@ -531,14 +533,14 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
         };
       });
       const quizData = quizResults.map((q, i) => ({
-        quizId: `Квиз ${i + 1}`,
+        quizId: t('quizLabel', { n: i + 1 }),
         score: q.score ?? 0,
         total: q.total ?? 100,
         percentage: q.score ?? 0,
       }));
       const student = students.find((s) => s.id === selectedStudentId);
       if (!student) {
-        setStatus('studentReportPdf', 'error', 'Студент не найден');
+        setStatus('studentReportPdf', 'error', t('studentNotFound'));
         return;
       }
       await generateStudentReportPDF(
@@ -594,7 +596,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'gradebook' as keyof ExportState,
       icon: FileText,
-      title: 'Журнал оценок (CSV)',
+      title: t('gradebookCsv'),
       description: 'Экспорт полного журнала оценок всех студентов с прогрессом по модулям и средними баллами',
       onClick: handleGradebookExport,
       color: 'text-emerald-600',
@@ -604,8 +606,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'studentReport' as keyof ExportState,
       icon: Download,
-      title: 'Отчёт по студенту (CSV)',
-      description: 'Выберите студента из списка для экспорта детального отчёта по модулям и квизам',
+      title: t('studentReportCsv'),
+      description: t('studentReportCsvDesc'),
       onClick: handleStudentReportExport,
       color: 'text-violet-600',
       bgColor: 'bg-violet-50',
@@ -614,7 +616,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'analytics' as keyof ExportState,
       icon: BarChart3,
-      title: 'Аналитика (CSV)',
+      title: t('analyticsCsv'),
       description: 'Экспорт комплексной аналитики с KPI, распределением баллов и прогрессом по модулям',
       onClick: handleAnalyticsExport,
       color: 'text-indigo-600',
@@ -624,7 +626,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'atRisk' as keyof ExportState,
       icon: AlertTriangle,
-      title: 'Студенты риска (CSV)',
+      title: t('atRiskCsv'),
       description: 'Экспорт списка студентов в зоне риска с оценками риска, причинами и трендами',
       onClick: handleAtRiskExport,
       color: 'text-red-600',
@@ -634,7 +636,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'groupComparison' as keyof ExportState,
       icon: GitCompare,
-      title: 'Сравнение групп (CSV)',
+      title: t('groupComparisonCsv'),
       description: 'Экспорт сравнительной аналитики групп/курсов/университетов по метрикам',
       onClick: handleGroupComparisonExport,
       color: 'text-blue-600',
@@ -644,7 +646,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'modulePerformance' as keyof ExportState,
       icon: BookOpen,
-      title: 'Модули (CSV)',
+      title: t('modulesCsv'),
       description: 'Экспорт статистики по каждому модулю: завершение, баллы, сложность',
       onClick: handleModulePerformanceExport,
       color: 'text-amber-600',
@@ -654,7 +656,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'gradebookPdf' as keyof ExportState,
       icon: FileText,
-      title: 'Журнал (PDF)',
+      title: t('gradebookPdf'),
       description: 'Скачать журнал успеваемости в формате PDF для печати или отправки',
       onClick: handleGradebookPdfExport,
       color: 'text-emerald-700',
@@ -664,7 +666,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'atRiskPdf' as keyof ExportState,
       icon: AlertTriangle,
-      title: 'Студенты риска (PDF)',
+      title: t('atRiskPdf'),
       description: 'Скачать отчёт по студентам в зоне риска в формате PDF',
       onClick: handleAtRiskPdfExport,
       color: 'text-red-700',
@@ -674,7 +676,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'analyticsPdf' as keyof ExportState,
       icon: BarChart3,
-      title: 'Аналитика (PDF)',
+      title: t('analyticsPdf'),
       description: 'Скачать комплексный аналитический отчёт с KPI и метриками в формате PDF',
       onClick: handleAnalyticsPdfExport,
       color: 'text-indigo-700',
@@ -684,7 +686,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'modulePerformancePdf' as keyof ExportState,
       icon: BookOpen,
-      title: 'Модули (PDF)',
+      title: t('modulesPdf'),
       description: 'Скачать статистику по модулям в формате PDF',
       onClick: handleModulePerformancePdfExport,
       color: 'text-amber-700',
@@ -694,7 +696,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'groupComparisonPdf' as keyof ExportState,
       icon: GitCompare,
-      title: 'Сравнение групп (PDF)',
+      title: t('groupComparisonPdf'),
       description: 'Скачать сравнительную аналитику групп в формате PDF',
       onClick: handleGroupComparisonPdfExport,
       color: 'text-blue-700',
@@ -704,8 +706,8 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'studentReportPdf' as keyof ExportState,
       icon: FileText,
-      title: 'Отчёт студента (PDF)',
-      description: 'Выберите студента для экспорта детального отчёта в PDF',
+      title: t('studentReportPdf'),
+      description: t('studentReportPdfDesc'),
       onClick: handleStudentReportPdfExport,
       color: 'text-violet-700',
       bgColor: 'bg-violet-50',
@@ -714,7 +716,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'quizRetryPdf' as keyof ExportState,
       icon: Download,
-      title: 'Повторы квизов (PDF)',
+      title: t('quizRetryPdf'),
       description: 'Скачать аналитику по повторам квизов в формате PDF',
       onClick: handleQuizRetryPdfExport,
       color: 'text-teal-700',
@@ -724,7 +726,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     {
       key: 'print' as keyof ExportState,
       icon: Printer,
-      title: 'Печать отчёта',
+      title: t('printReport'),
       description: 'Открыть оптимизированную версию страницы для печати текущего состояния прогресса',
       onClick: handlePrint,
       color: 'text-muted-foreground',
@@ -738,7 +740,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       {/* Section header */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold">Экспорт отчётов</h2>
+          <h2 className="text-xl font-bold">{t('title')}</h2>
           <p className="text-muted-foreground mt-1 text-sm">
             Экспортируйте данные о прогрессе студентов в различных форматах
           </p>
@@ -798,7 +800,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                         className="border-border bg-card hover:border-border flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors"
                       >
                         <span className="text-foreground/70 truncate">
-                          {selectedStudent ? selectedStudent.fullName : 'Выберите студента...'}
+                          {selectedStudent ? selectedStudent.fullName : `${t('selectStudent')}...`}
                         </span>
                         <ChevronDown size={14} className="ml-2 flex-shrink-0 text-slate-400" />
                       </button>
@@ -806,7 +808,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                       {showDropdown && (
                         <div className="bg-card border-border absolute z-20 mt-1 max-h-48 w-full overflow-y-auto rounded-md border shadow-lg">
                           {students.length === 0 ? (
-                            <div className="px-3 py-3 text-center text-xs text-slate-400">Нет доступных студентов</div>
+                            <div className="px-3 py-3 text-center text-xs text-slate-400">{t('noStudents')}</div>
                           ) : (
                             students.map((s) => (
                               <button
@@ -905,13 +907,13 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
             onClick={(e) => e.stopPropagation()}
           >
             <div className="border-border border-b p-6">
-              <h3 className="text-lg font-bold">Предпросмотр печати</h3>
+              <h3 className="text-lg font-bold">{t('printPreview')}</h3>
               <p className="text-muted-foreground mt-1 text-sm">Текущий прогресс студентов будет распечатан</p>
             </div>
 
             <div className="p-6">
               <div className="mb-6 text-center">
-                <h2 className="text-xl font-bold">Отчёт по прогрессу студентов</h2>
+                <h2 className="text-xl font-bold">{t('studentProgressReport')}</h2>
                 <p className="text-muted-foreground text-sm">
                   {new Date().toLocaleDateString('ru-RU', {
                     year: 'numeric',
@@ -953,11 +955,11 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                         <div className="flex gap-6 text-sm">
                           <div className="text-center">
                             <p className="font-bold">{moduleCount}</p>
-                            <p className="text-muted-foreground text-xs">Модулей</p>
+                            <p className="text-muted-foreground text-xs">{t('modules')}</p>
                           </div>
                           <div className="text-center">
                             <p className="font-bold">{quizCount}</p>
-                            <p className="text-muted-foreground text-xs">Квизов</p>
+                            <p className="text-muted-foreground text-xs">{t('quizzes')}</p>
                           </div>
                         </div>
                       </div>
@@ -965,7 +967,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                   );
                 })}
 
-                {students.length === 0 && <p className="py-4 text-center text-slate-400">Нет данных для печати</p>}
+                {students.length === 0 && <p className="py-4 text-center text-slate-400">{t('noPrintData')}</p>}
               </div>
             </div>
 

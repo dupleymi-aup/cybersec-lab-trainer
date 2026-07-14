@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, Minus, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
@@ -10,15 +11,16 @@ import { getComprehensiveSummary, type ComprehensiveSummary } from '@/lib/auth-s
 import { modules } from '@/lib/data';
 
 const PRESETS = [
-  { key: '7', label: 'Эта неделя' },
-  { key: '14', label: 'Прошлая неделя' },
-  { key: '30', label: 'Этот месяц' },
-  { key: '60', label: 'Прошлый месяц' },
-  { key: '90', label: 'Этот квартал' },
-  { key: '180', label: 'Прошлый квартал' },
+  { key: '7', labelKey: 'thisWeek' },
+  { key: '14', labelKey: 'lastWeek' },
+  { key: '30', labelKey: 'thisMonth' },
+  { key: '60', labelKey: 'lastMonth' },
+  { key: '90', labelKey: 'thisQuarter' },
+  { key: '180', labelKey: 'lastQuarter' },
 ];
 
 export default function PeriodComparison({ groupId }: { groupId?: string }) {
+  const t = useTranslations('periodComparison');
   const [periodA, setPeriodA] = useState(30);
   const [periodB, setPeriodB] = useState(60);
   const [dataA, setDataA] = useState<ComprehensiveSummary | null>(null);
@@ -40,7 +42,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -125,7 +127,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
       {/* Period Selectors */}
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2">
-          <Badge className="bg-indigo-100 text-indigo-700">Период A</Badge>
+          <Badge className="bg-indigo-100 text-indigo-700">{t('periodA')}</Badge>
           <select
             value={periodA}
             onChange={(e) => setPeriodA(Number(e.target.value))}
@@ -133,13 +135,13 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
           >
             {PRESETS.map((p) => (
               <option key={`a-${p.key}`} value={p.key}>
-                {p.label} ({p.key}д)
+                {t(p.labelKey)} ({p.key}d)
               </option>
             ))}
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className="bg-violet-100 text-violet-700">Период B</Badge>
+          <Badge className="bg-violet-100 text-violet-700">{t('periodB')}</Badge>
           <select
             value={periodB}
             onChange={(e) => setPeriodB(Number(e.target.value))}
@@ -147,7 +149,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
           >
             {PRESETS.map((p) => (
               <option key={`b-${p.key}`} value={p.key}>
-                {p.label} ({p.key}д)
+                {t(p.labelKey)} ({p.key}d)
               </option>
             ))}
           </select>
@@ -172,7 +174,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
                       {kpi.a}
                       {kpi.delta.suffix}
                     </p>
-                    <p className="text-muted-foreground text-[10px]">Период A</p>
+                    <p className="text-muted-foreground text-[10px]">{t('periodA')}</p>
                   </div>
                   <div className="flex items-center gap-1 px-2">
                     <DeltaIcon direction={kpi.delta.direction} />
@@ -195,7 +197,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
                       {kpi.b}
                       {kpi.delta.suffix}
                     </p>
-                    <p className="text-muted-foreground text-[10px]">Период B</p>
+                    <p className="text-muted-foreground text-[10px]">{t('periodB')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -207,7 +209,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
       {/* Module Comparison Chart */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-4 text-sm font-semibold">Завершение модулей: сравнение</h3>
+          <h3 className="mb-4 text-sm font-semibold">{t('moduleComparison')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={moduleComparison}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -215,8 +217,8 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
               <YAxis tick={{ fontSize: 11 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
               <Tooltip formatter={(value) => [`${value ?? 0}%`, '']} />
               <Legend />
-              <Bar dataKey="periodA" name="Период A" fill="#6366f1" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="periodB" name="Период B" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="periodA" name={t('periodA')} fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="periodB" name={t('periodB')} fill="#8b5cf6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -229,7 +231,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
             <CardContent className="p-5">
               <div className="mb-3 flex items-center gap-2">
                 <TrendingUp size={16} className="text-emerald-600" />
-                <h3 className="text-sm font-semibold text-emerald-700">Наибольший рост</h3>
+                <h3 className="text-sm font-semibold text-emerald-700">{t('biggestGains')}</h3>
               </div>
               <div className="space-y-2">
                 {biggestGains.map((m) => (
@@ -247,7 +249,7 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
             <CardContent className="p-5">
               <div className="mb-3 flex items-center gap-2">
                 <TrendingDown size={16} className="text-red-600" />
-                <h3 className="text-sm font-semibold text-red-700">Наибольшее снижение</h3>
+                <h3 className="text-sm font-semibold text-red-700">{t('biggestLosses')}</h3>
               </div>
               <div className="space-y-2">
                 {biggestLosses.map((m) => (
@@ -265,14 +267,14 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
       {/* Summary */}
       <Card className="border-border">
         <CardContent className="p-5">
-          <h3 className="mb-2 text-sm font-semibold">Итог</h3>
+          <h3 className="mb-2 text-sm font-semibold">{t('summary')}</h3>
           {(() => {
             const positiveDeltas = kpiComparisons.filter((k) => k.delta.direction === 'up').length;
             const negativeDeltas = kpiComparisons.filter((k) => k.delta.direction === 'down').length;
             const stableDeltas = kpiComparisons.filter((k) => k.delta.direction === 'stable').length;
             const trend =
               positiveDeltas > negativeDeltas ? 'improving' : negativeDeltas > positiveDeltas ? 'declining' : 'stable';
-            const trendLabel = trend === 'improving' ? 'улучшается' : trend === 'declining' ? 'снижается' : 'стабильно';
+            const trendLabel = trend === 'improving' ? t('improving') : trend === 'declining' ? t('declining') : t('stable');
             const trendColor =
               trend === 'improving'
                 ? 'text-emerald-600'

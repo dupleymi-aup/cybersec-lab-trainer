@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -59,6 +60,7 @@ interface Props {
 }
 
 export default function StudentPerformanceReport({ userId, initialDays = 30, groupId: _groupId }: Props) {
+  const t = useTranslations('studentPerformance');
   const formatDate = useDateFormatter();
   const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);
@@ -93,7 +95,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
   if (!userId) {
     return (
       <div className="flex items-center justify-center py-16">
-        <p className="text-muted-foreground text-sm">Выберите студента для просмотра отчёта</p>
+        <p className="text-muted-foreground text-sm">{t('selectStudent')}</p>
       </div>
     );
   }
@@ -102,7 +104,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -111,7 +113,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">Ошибка загрузки</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{t('loadError')}</p>
       </div>
     );
   }
@@ -264,7 +266,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
             </div>
             <div className={`rounded-lg px-4 py-2 ${riskBg}`}>
               <p className={`text-2xl font-bold ${riskColor}`}>{kpis.riskScore}</p>
-              <p className="text-muted-foreground text-xs">Риск</p>
+              <p className="text-muted-foreground text-xs">{t('risk')}</p>
             </div>
           </div>
         </CardContent>
@@ -333,7 +335,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
           {categoryBreakdown.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Результаты по категориям квизов</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('quizCategoryResults')}</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={categoryBreakdown}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -350,7 +352,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
           {activityTimeline.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Последняя активность</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('lastActivity')}</h3>
                 <div className="max-h-64 space-y-2 overflow-y-auto">
                   {activityTimeline.slice(0, 15).map((activity, i) => (
                     <motion.div
@@ -382,7 +384,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
           {achievements.length > 0 && (
             <Card className="border-border">
               <CardContent className="p-5">
-                <h3 className="mb-4 text-sm font-semibold">Достижения</h3>
+                <h3 className="mb-4 text-sm font-semibold">{t('achievements')}</h3>
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                   {achievements.map((achievement) => (
                     <div
@@ -406,7 +408,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
         <TabsContent value="modules" className="mt-4 space-y-4">
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Прогресс по модулям</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('moduleProgress')}</h3>
               <div className="space-y-2">
                 {moduleProgress.map((module, i) => (
                   <motion.div
@@ -445,7 +447,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
         <TabsContent value="quizzes" className="mt-4 space-y-4">
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Результаты квизов</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('quizResults')}</h3>
               {quizResults.length > 0 ? (
                 <div className="space-y-2">
                   {quizResults.map((quiz, i) => (
@@ -473,7 +475,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                   ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground py-8 text-center text-sm">Нет результатов квизов</p>
+                <p className="text-muted-foreground py-8 text-center text-sm">{t('noQuizResults')}</p>
               )}
             </CardContent>
           </Card>
@@ -483,7 +485,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
         <TabsContent value="activity" className="mt-4 space-y-4">
           <Card className="border-border">
             <CardContent className="p-5">
-              <h3 className="mb-4 text-sm font-semibold">Хронология активности</h3>
+              <h3 className="mb-4 text-sm font-semibold">{t('activityTimeline')}</h3>
               <div className="max-h-96 space-y-2 overflow-y-auto">
                 {activityTimeline.map((activity, i) => (
                   <motion.div
@@ -625,7 +627,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
               <Card className="border-border">
                 <CardContent className="p-8 text-center">
                   <Clock size={32} className="text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground text-sm">Нет данных для отображения таймлайна</p>
+                  <p className="text-muted-foreground text-sm">{t('noTimelineData')}</p>
                 </CardContent>
               </Card>
             )}
@@ -663,7 +665,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
               {/* Skills Gap Bar Chart */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-4 text-sm font-semibold">Сравнение с группой</h3>
+                  <h3 className="mb-4 text-sm font-semibold">{t('groupComparison')}</h3>
                   <ResponsiveContainer width="100%" height={350}>
                     <BarChart data={skillsGap}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -681,8 +683,8 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="studentScore" fill="#6366f1" name="Студент" />
-                      <Bar dataKey="cohortAvg" fill="#94a3b8" name="Группа" />
+                      <Bar dataKey="studentScore" fill="#6366f1" name={t('student')} />
+                      <Bar dataKey="cohortAvg" fill="#94a3b8" name={t('group')} />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -691,7 +693,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
               {/* Detailed Gap Table */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-4 text-sm font-semibold">Детальный анализ</h3>
+                  <h3 className="mb-4 text-sm font-semibold">{t('detailedAnalysis')}</h3>
                   <div className="space-y-2">
                     {skillsGap
                       .sort((a, b) => a.gap - b.gap)
@@ -749,7 +751,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
             <Card className="border-border">
               <CardContent className="p-8 text-center">
                 <Target size={32} className="text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground text-sm">Нет данных для анализа навыков</p>
+                <p className="text-muted-foreground text-sm">{t('noSkillData')}</p>
               </CardContent>
             </Card>
           )}

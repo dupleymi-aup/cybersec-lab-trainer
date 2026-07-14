@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts';
 import { Loader2, AlertTriangle, Users, TrendingUp, Heart, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { getGroupDynamics, type GroupDynamicsData } from '@/lib/auth-store';
@@ -25,6 +26,7 @@ const TREND_COLORS = {
 };
 
 export default function GroupDynamics({ groupId: propGroupId, days: propDays }: GroupDynamicsProps = {}) {
+  const t = useTranslations('groupDynamics');
   const [data, setData] = useState<GroupDynamicsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +61,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -68,7 +70,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
     return (
       <div className="flex items-center justify-center py-16">
         <AlertTriangle size={32} className="text-red-500" />
-        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || 'Нет данных'}</p>
+        <p className="text-muted-foreground ml-3 text-sm font-medium">{error || t('noData')}</p>
       </div>
     );
   }
@@ -79,7 +81,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
     return (
       <div className="py-12 text-center text-slate-400">
         <Users size={40} className="mx-auto mb-3 opacity-50" />
-        <p className="text-sm">Нет данных о группах. Студенты должны быть распределены по группам.</p>
+        <p className="text-sm">{t('noGroups')}</p>
       </div>
     );
   }
@@ -89,7 +91,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Heart size={20} className="text-rose-600" />
-          <h2 className="text-lg font-bold">Динамика групп</h2>
+          <h2 className="text-lg font-bold">{t('title')}</h2>
         </div>
         {propDays === undefined && (
           <select
@@ -129,19 +131,19 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
                 <div className="mb-3 grid grid-cols-4 gap-2 text-center">
                   <div>
                     <p className="text-lg font-bold text-indigo-600">{g.studentCount}</p>
-                    <p className="text-muted-foreground text-[10px]">Студентов</p>
+                    <p className="text-muted-foreground text-[10px]">{t('students')}</p>
                   </div>
                   <div>
                     <p className="text-lg font-bold text-violet-600">{g.healthScore}</p>
-                    <p className="text-muted-foreground text-[10px]">Здоровье</p>
+                    <p className="text-muted-foreground text-[10px]">{t('health')}</p>
                   </div>
                   <div>
                     <p className="text-lg font-bold text-amber-600">{g.performanceVariance}</p>
-                    <p className="text-muted-foreground text-[10px]">Вариация</p>
+                    <p className="text-muted-foreground text-[10px]">{t('variance')}</p>
                   </div>
                   <div>
                     <p className="text-lg font-bold text-emerald-600">{g.peerInfluenceScore}%</p>
-                    <p className="text-muted-foreground text-[10px]">Влияние</p>
+                    <p className="text-muted-foreground text-[10px]">{t('influence')}</p>
                   </div>
                 </div>
 
@@ -157,7 +159,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
                         <Area
                           type="monotone"
                           dataKey="activeStudents"
-                          name="Активные"
+                          name={t('active')}
                           stroke="#6366f1"
                           fill="#6366f1"
                           fillOpacity={0.2}
@@ -166,7 +168,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
                         <Area
                           type="monotone"
                           dataKey="quizAttempts"
-                          name="Квизы"
+                          name={t('quizzes')}
                           stroke="#10b981"
                           fill="#10b981"
                           fillOpacity={0.2}
@@ -199,7 +201,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
                   <Line
                     type="monotone"
                     dataKey="avgHealthScore"
-                    name="Ср. здоровье"
+                    name={t('avgHealth')}
                     stroke="#f43f5e"
                     strokeWidth={2}
                     dot={false}
@@ -207,7 +209,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
                   <Line
                     type="monotone"
                     dataKey="totalActive"
-                    name="Активных"
+                    name={t('activeCount')}
                     stroke="#6366f1"
                     strokeWidth={2}
                     dot={false}
