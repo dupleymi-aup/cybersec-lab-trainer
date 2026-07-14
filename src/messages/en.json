@@ -308,9 +308,9 @@
       "roleTeacherDesc": "Track student progress, manage groups, and view analytics",
       "roleAdmin": "Administrator",
       "roleAdminDesc": "Full access: user management, database, system settings",
-      "inviteCode": "Admin invitation code",
+      "inviteCode": "Invitation code",
       "inviteCodePlaceholder": "Enter invitation code",
-      "inviteCodeHint": "An invitation code is required for the administrator role",
+      "inviteCodeHint": "An invitation code is required for administrator and teacher roles",
       "password": "Password",
       "passwordPlaceholder": "Min 8 characters",
       "passwordStrength": "Password strength",
@@ -3310,6 +3310,12 @@
     "phishingIndicators": "Phishing indicators",
     "critical": "Critical",
     "high": "High",
-    "scoreMedium": "Medium"
+    "scoreMedium": "Medium",
+    "next": "Next email",
+    "reset": "Start over",
+    "resetScore": "Reset score",
+    "markComplete": "Mark module as completed",
+    "moduleComplete": "Module completed!",
+    "noEmails": "No emails with this difficulty. Select All."
   }
 }

@@ -174,16 +174,16 @@ export default function RegisterPage() {
                 </RadioGroup>
               </div>
               <AnimatePresence>
-                {selectedRole === 'admin' && (
+                {selectedRole !== 'student' && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     className="space-y-2"
                   >
-                    <Label htmlFor="admin-invite-code">{t('register.inviteCode')}</Label>
+                    <Label htmlFor="invite-code">{t('register.inviteCode')}</Label>
                     <Input
-                      id="admin-invite-code"
+                      id="invite-code"
                       value={adminInviteCode}
                       onChange={(e) => setAdminInviteCode(e.target.value)}
                       placeholder={t('register.inviteCodePlaceholder')}

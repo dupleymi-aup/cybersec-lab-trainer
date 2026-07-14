@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import DOMPurify from 'dompurify';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { phishingEmails, phishingEducationContent } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -49,6 +49,8 @@ type PageType = import('@/lib/store').PageType;
 
 export default function PhishingAnalyzer() {
   const tc = useTranslations('common');
+  const t = useTranslations('phishingAnalyzer');
+  const locale = useLocale();
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
   const completeModule = useAppStore((s) => s.completeModule);
@@ -172,7 +174,7 @@ export default function PhishingAnalyzer() {
           <Shield size={20} className="text-red-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Анализатор фишинговых писем</h1>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground text-xs">
             Научитесь распознавать фишинг по заголовкам, содержимому и ссылкам
           </p>
@@ -217,7 +219,7 @@ export default function PhishingAnalyzer() {
           </Card>
 
           <div>
-            <h3 className="mb-3 font-semibold">Типы фишинговых атак</h3>
+            <h3 className="mb-3 font-semibold">{t('phishingTypes')}</h3>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {phishingEducationContent.commonTypes.map((t, i) => (
                 <Card key={i} className="border-border">
@@ -245,7 +247,7 @@ export default function PhishingAnalyzer() {
           </div>
 
           <div>
-            <h3 className="mb-3 font-semibold">Что делать, если вы обнаружили фишинг</h3>
+            <h3 className="mb-3 font-semibold">{t('whatToDo')}</h3>
             <div className="space-y-2">
               {phishingEducationContent.whatToDo.map((action, i) => (
                 <div key={i} className="bg-card flex items-start gap-3 rounded border border-slate-100 p-3">
@@ -282,7 +284,7 @@ export default function PhishingAnalyzer() {
                 }}
                 className={filterDifficulty === d ? 'bg-slate-800 dark:bg-slate-700' : ''}
               >
-                {d === 'all' ? 'Все' : d === 'easy' ? 'Лёгкие' : d === 'medium' ? 'Средние' : 'Сложные'}
+                {t(d)}
               </Button>
             ))}
           </div>
@@ -293,11 +295,7 @@ export default function PhishingAnalyzer() {
               {/* Email metadata */}
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge className={difficultyColors[currentEmail.difficulty]}>
-                  {currentEmail.difficulty === 'easy'
-                    ? 'Лёгкий'
-                    : currentEmail.difficulty === 'medium'
-                      ? 'Средний'
-                      : 'Сложный'}
+                  {t(currentEmail.difficulty)}
                 </Badge>
                 <span className="text-xs text-slate-400">
                   Письмо {currentEmailIndex + 1} из {filteredEmails.length}
@@ -306,19 +304,19 @@ export default function PhishingAnalyzer() {
 
               <div className="bg-secondary mb-4 space-y-2 rounded-lg p-4">
                 <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">Тема:</span>
+                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('subject')}</span>
                   <span className="text-sm font-medium">{currentEmail.subject}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">От:</span>
+                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('to')}<</span>
                   <span className="text-sm">{currentEmail.from}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">Кому:</span>
+                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('to')}<</span>
                   <span className="text-sm">{currentEmail.to}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">Дата:</span>
+                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('date')}<</span>
                   <span className="text-sm">{currentEmail.date}</span>
                 </div>
               </div>
@@ -326,7 +324,7 @@ export default function PhishingAnalyzer() {
               {/* Email body preview */}
               <div className="border-border mb-4 overflow-hidden rounded-lg border">
                 <div className="bg-muted flex items-center justify-between border-b p-2">
-                  <span className="text-muted-foreground text-xs font-semibold">Тело письма</span>
+                  <span className="text-muted-foreground text-xs font-semibold">{t('body')}</span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -357,7 +355,7 @@ export default function PhishingAnalyzer() {
 
               {/* Headers toggle */}
               <Button variant="outline" size="sm" className="w-full" onClick={() => setShowHeaders(!showHeaders)}>
-                {showHeaders ? 'Скрыть' : 'Показать'} заголовки письма
+                {showHeaders ? tc('hide') : tc('show')} {t('showHeaders').toLowerCase()}
               </Button>
               <AnimatePresence>
                 {showHeaders && (
@@ -403,11 +401,11 @@ export default function PhishingAnalyzer() {
                         <XCircle size={20} className="text-red-600" />
                       )}
                       <span className="font-semibold">
-                        {currentEmail.isPhishing === (userVerdict === 'phishing') ? 'Правильно!' : 'Неверно.'}
+                        {currentEmail.isPhishing === (userVerdict === 'phishing') ? t('correct') : t('incorrect')}
                       </span>
                     </div>
                     <p className="text-foreground/70 mb-3 text-sm">
-                      Это письмо <b>{currentEmail.isPhishing ? 'фишинговое' : 'легитимное'}</b>.
+                      {t('email')} <b>{currentEmail.isPhishing ? t('phishingWord') : t('legitimateWord')}</b>.
                       {currentEmail.isPhishing && ` Найдено ${currentEmail.indicators.length} индикаторов.`}
                     </p>
                     <p className="text-muted-foreground text-xs leading-relaxed">{currentEmail.explanation}</p>
@@ -430,13 +428,7 @@ export default function PhishingAnalyzer() {
                           <div className="flex items-center gap-2">
                             <span className="text-slate-400">{indicatorIcons[ind.type]}</span>
                             <Badge variant="outline" className={`text-[10px] ${severityColors[ind.severity]}`}>
-                              {ind.severity === 'critical'
-                                ? 'Критичный'
-                                : ind.severity === 'high'
-                                  ? 'Высокий'
-                                  : ind.severity === 'medium'
-                                    ? 'Средний'
-                                    : 'Низкий'}
+                              {{t(ind.severity)}}
                             </Badge>
                             <span className="flex-1 text-xs font-medium">{ind.title}</span>
                           </div>
@@ -460,7 +452,7 @@ export default function PhishingAnalyzer() {
                 {/* Navigation */}
                 <div className="mt-4 flex gap-2">
                   <Button variant="outline" onClick={nextEmail}>
-                    {currentEmailIndex < filteredEmails.length - 1 ? 'Следующее письмо' : 'Начать заново'}{' '}
+                    {currentEmailIndex < filteredEmails.length - 1 ? t('next') : t('reset')}{' '}
                     <ArrowRight size={14} className="ml-1" />
                   </Button>
                   {score.total === filteredEmails.length && (
