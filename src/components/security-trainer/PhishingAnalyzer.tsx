@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import DOMPurify from 'dompurify';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { phishingEmails, phishingEducationContent } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
@@ -50,7 +50,6 @@ type PageType = import('@/lib/store').PageType;
 export default function PhishingAnalyzer() {
   const tc = useTranslations('common');
   const t = useTranslations('phishingAnalyzer');
-  const locale = useLocale();
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
   const completeModule = useAppStore((s) => s.completeModule);
@@ -308,15 +307,15 @@ export default function PhishingAnalyzer() {
                   <span className="text-sm font-medium">{currentEmail.subject}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('to')}<</span>
+                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('to')}</span>
                   <span className="text-sm">{currentEmail.from}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('to')}<</span>
+                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('to')}</span>
                   <span className="text-sm">{currentEmail.to}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('date')}<</span>
+                  <span className="text-muted-foreground w-12 shrink-0 text-xs font-semibold">{t('date')}</span>
                   <span className="text-sm">{currentEmail.date}</span>
                 </div>
               </div>
@@ -428,7 +427,7 @@ export default function PhishingAnalyzer() {
                           <div className="flex items-center gap-2">
                             <span className="text-slate-400">{indicatorIcons[ind.type]}</span>
                             <Badge variant="outline" className={`text-[10px] ${severityColors[ind.severity]}`}>
-                              {{t(ind.severity)}}
+                              {t(ind.severity)}
                             </Badge>
                             <span className="flex-1 text-xs font-medium">{ind.title}</span>
                           </div>
