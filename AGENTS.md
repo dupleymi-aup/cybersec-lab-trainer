@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`331b0c4c`**: fix: show invite code input for teacher role on register page, update i18n keys en/ru/zh
 - **`65481de7`**: i18n: localize 3 more components (QuizQuestionAnalytics, ProgressSankey, CohortAnalysis) with en/ru/zh keys
 - **`802d7674`**: i18n: localize 5 more analytics components (QuizRetryAnalytics, QuizDifficultyAnalysis, AdminSummaryReport, AdvancedAnalytics, ReportScheduler) with en/ru/zh keys
 - **`d9af0309`**: i18n: localize 7 analytics components (QuizSessionAnalytics, StudentDrillDown, ProgressDynamicsChart, PredictiveRiskDashboard, EngagementAnalytics, ErrorPatternsAnalytics, ModulePerformanceReport) with en/ru/zh keys
