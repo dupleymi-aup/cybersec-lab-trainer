@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -123,6 +123,7 @@ function useGroups() {
 
 export default function AssignmentBuilder() {
   const t = useTranslations('assignmentBuilder');
+  const locale = useLocale();
   const typeLabels: Record<Assignment['type'], string> = {
     quiz: t('typeQuiz'),
     'code-review': 'Code Review',
@@ -353,7 +354,7 @@ export default function AssignmentBuilder() {
                 <div>
                   <p className="text-muted-foreground">{t('deadline')}</p>
                   <p className="font-medium">
-                    {new Date(a.dueAt).toLocaleDateString('ru-RU', {
+                    {new Date(a.dueAt).toLocaleDateString(locale, {
                       day: 'numeric',
                       month: 'long',
                       hour: '2-digit',

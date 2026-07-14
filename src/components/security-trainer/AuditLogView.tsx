@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { getAuditLogEntries, clearAuditLog, type AuditAction, type AuditLogEntry } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -49,6 +49,7 @@ const ACTION_LABEL_KEYS: Record<AuditAction, string> = {
 
 export default function AuditLogView() {
   const t = useTranslations('auditLog');
+  const locale = useLocale();
   const [entries, setEntries] = useState<AuditLogEntry[]>([]);
   const [filterAction, setFilterAction] = useState('');
   const [filterAdmin, setFilterAdmin] = useState('');
@@ -161,7 +162,7 @@ export default function AuditLogView() {
                       <p className="text-muted-foreground text-xs">{entry.details}</p>
                     </div>
                     <span className="text-[10px] whitespace-nowrap text-slate-400">
-                      {new Date(entry.timestamp).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                      {new Date(entry.timestamp).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 </CardContent>

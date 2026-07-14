@@ -30,11 +30,12 @@ import {
 } from '@/lib/analytics-api';
 import type { ScheduledReport } from '@/lib/auth-types';
 import { getAllUsers } from '@/lib/auth-store';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function ReportScheduler({ groupId, days: _days }: { groupId?: string; days?: number }) {
   const [reports, setReports] = useState<ScheduledReport[]>([]);
   const t = useTranslations('reportScheduler');
+  const locale = useLocale();
   const REPORT_TYPES = [
     { value: 'gradebook', label: t('gradebook'), icon: FileText, color: 'bg-blue-100 text-blue-700' },
     { value: 'at-risk', label: t('atRisk'), icon: AlertTriangle, color: 'bg-red-100 text-red-700' },
@@ -148,7 +149,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
 
   const formatLastGenerated = (dateStr: string | null) => {
     if (!dateStr) return t('notGenerated');
-    return new Date(dateStr).toLocaleString('ru-RU', {
+    return new Date(dateStr).toLocaleString(locale, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

@@ -23,7 +23,7 @@ import { Progress } from '@/components/ui/progress';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { toast } from 'sonner';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   Shield,
   ShieldCheck,
@@ -165,6 +165,7 @@ async function fetchActiveAnnouncements(): Promise<Announcement[]> {
 
 export default function Dashboard() {
   const t = useTranslations('dashboard');
+  const locale = useLocale();
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
   const quizScores = useAppStore((s) => s.quizScores);
@@ -907,7 +908,7 @@ export default function Dashboard() {
                         ? modules.find((m) => m.id === deadline.scopeId)?.title || deadline.scopeId
                         : t('deadline.scopeQuiz', { id: deadline.scopeId });
 
-                  const dueDate = new Date(deadline.dueAt).toLocaleDateString('ru-RU', {
+                  const dueDate = new Date(deadline.dueAt).toLocaleDateString(locale, {
                     day: 'numeric',
                     month: 'long',
                     hour: '2-digit',
@@ -1167,7 +1168,7 @@ export default function Dashboard() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-medium">{event.label}</p>
                         <p className="text-[10px] text-slate-400">
-                          {event.date.toLocaleDateString('ru-RU', {
+                          {event.date.toLocaleDateString(locale, {
                             day: 'numeric',
                             month: 'short',
                             hour: '2-digit',

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   Download,
@@ -91,6 +91,7 @@ const isControlled = (props: AnalyticsExportPanelProps): props is AnalyticsExpor
 
 export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = {}) {
   const t = useTranslations('analyticsExport');
+  const locale = useLocale();
   const formatDate = useDateFormatter();
   const { students: propStudents, groupId } = props;
   const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
@@ -915,7 +916,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
               <div className="mb-6 text-center">
                 <h2 className="text-xl font-bold">{t('studentProgressReport')}</h2>
                 <p className="text-muted-foreground text-sm">
-                  {new Date().toLocaleDateString('ru-RU', {
+                  {new Date().toLocaleDateString(locale, {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
