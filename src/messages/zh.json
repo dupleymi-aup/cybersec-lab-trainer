@@ -3103,7 +3103,9 @@
     "noData": "无数据",
     "byGroup": "按组",
     "byCourse": "按课程",
-    "byUniversity": "按大学"
+    "byUniversity": "按大学",
+    "completionLabel": "完成度: {rate}%, 分数: {score}%",
+    "activityLabel": "活跃度"
   },
   "periodComparison": {
     "loading": "加载数据中...",
@@ -3151,7 +3153,8 @@
     "days7": "7天",
     "days30": "30天",
     "days90": "90天",
-    "days180": "180天"
+    "days180": "180天",
+    "completionLabel": "完成度"
   },
   "predictiveInsights": {
     "loading": "预测中...",

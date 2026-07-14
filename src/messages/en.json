@@ -3103,7 +3103,9 @@
     "noData": "No data",
     "byGroup": "By group",
     "byCourse": "By course",
-    "byUniversity": "By university"
+    "byUniversity": "By university",
+    "completionLabel": "Completion: {rate}%, Score: {score}%",
+    "activityLabel": "Activity"
   },
   "periodComparison": {
     "loading": "Loading data...",
@@ -3151,7 +3153,8 @@
     "days7": "7 days",
     "days30": "30 days",
     "days90": "90 days",
-    "days180": "180 days"
+    "days180": "180 days",
+    "completionLabel": "Completion"
   },
   "predictiveInsights": {
     "loading": "Forecasting...",

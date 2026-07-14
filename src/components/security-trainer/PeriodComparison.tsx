@@ -63,37 +63,37 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
 
   const kpiComparisons = [
     {
-      label: 'Всего студентов',
+      label: t('totalStudents'),
       a: kpisA.totalStudents,
       b: kpisB.totalStudents,
       delta: computeDelta(kpisA.totalStudents, kpisB.totalStudents),
     },
     {
-      label: 'Активных (%)',
+      label: t('activePercent'),
       a: kpisA.activePercentage,
       b: kpisB.activePercentage,
       delta: computeDelta(kpisA.activePercentage, kpisB.activePercentage, '%'),
     },
     {
-      label: 'Ср. завершение (%)',
+      label: t('avgCompletion'),
       a: kpisA.avgCompletionRate,
       b: kpisB.avgCompletionRate,
       delta: computeDelta(kpisA.avgCompletionRate, kpisB.avgCompletionRate, '%'),
     },
     {
-      label: 'Ср. балл квизов (%)',
+      label: t('avgQuizScore'),
       a: kpisA.avgQuizScore,
       b: kpisB.avgQuizScore,
       delta: computeDelta(kpisA.avgQuizScore, kpisB.avgQuizScore, '%'),
     },
     {
-      label: 'Модулей завершено',
+      label: t('modulesCompleted'),
       a: kpisA.totalModulesCompleted,
       b: kpisB.totalModulesCompleted,
       delta: computeDelta(kpisA.totalModulesCompleted, kpisB.totalModulesCompleted),
     },
     {
-      label: 'Вовлечённость',
+      label: t('engagement'),
       a: kpisA.engagementScore,
       b: kpisB.engagementScore,
       delta: computeDelta(kpisA.engagementScore, kpisB.engagementScore),
@@ -285,10 +285,10 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
             return (
               <div>
                 <p className="text-sm">
-                  Общая динамика: <span className={`font-semibold ${trendColor}`}>{trendLabel}</span>
+                  {t('overallTrend')} <span className={`font-semibold ${trendColor}`}>{trendLabel}</span>
                 </p>
                 <p className="text-muted-foreground mt-1 text-xs">
-                  {positiveDeltas} показателей улучшилось, {negativeDeltas} снизилось, {stableDeltas} без изменений
+                  {positiveDeltas} {t('improved')}, {negativeDeltas} {t('decreased')}, {stableDeltas} {t('unchanged')}
                 </p>
               </div>
             );

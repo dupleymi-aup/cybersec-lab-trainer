@@ -171,7 +171,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
                 />
                 <Tooltip
                   formatter={(value, name) => {
-                    if (name === 'value') return [`${value}%`, 'Завершение'];
+                    if (name === 'value') return [`${value}%`, t('completionLabel')];
                     return [value, name];
                   }}
                 />

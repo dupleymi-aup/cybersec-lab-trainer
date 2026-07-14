@@ -172,7 +172,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                   <p className="text-xs font-medium text-emerald-600">{t('best')}</p>
                   <p className="text-sm font-bold text-emerald-700">{bestGroup.name}</p>
                   <p className="text-xs text-emerald-600">
-                    Завершение: {bestGroup.avgCompletionRate}%, Балл: {bestGroup.avgQuizScore}%
+                    {t('completionLabel', { rate: bestGroup.avgCompletionRate, score: bestGroup.avgQuizScore })}
                   </p>
                 </div>
               </div>
@@ -186,7 +186,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                   <p className="text-xs font-medium text-red-600">{t('needsAttention')}</p>
                   <p className="text-sm font-bold text-red-700">{worstGroup.name}</p>
                   <p className="text-xs text-red-600">
-                    Завершение: {worstGroup.avgCompletionRate}%, Балл: {worstGroup.avgQuizScore}%
+                    {t('completionLabel', { rate: worstGroup.avgCompletionRate, score: worstGroup.avgQuizScore })}
                   </p>
                 </div>
               </div>
@@ -282,12 +282,12 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                   <tr className="border-border border-b">
                     <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">#</th>
                     <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">
-                      t(dimension)
+                      {t(dimension)}
                     </th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('students')}</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Завершение</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Ср. балл</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">Активность</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completion')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('avgScore')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('activity')}</th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('bestModule')}</th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('weakestModule')}</th>
                   </tr>

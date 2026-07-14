@@ -3103,7 +3103,9 @@
     "noData": "Нет данных",
     "byGroup": "По группе",
     "byCourse": "По курсу",
-    "byUniversity": "По университету"
+    "byUniversity": "По университету",
+    "completionLabel": "Завершение: {rate}%, Балл: {score}%",
+    "activityLabel": "Активность"
   },
   "periodComparison": {
     "loading": "Загрузка данных...",
@@ -3151,7 +3153,8 @@
     "days7": "7 дней",
     "days30": "30 дней",
     "days90": "90 дней",
-    "days180": "180 дней"
+    "days180": "180 дней",
+    "completionLabel": "Завершение"
   },
   "predictiveInsights": {
     "loading": "Прогнозирование...",
