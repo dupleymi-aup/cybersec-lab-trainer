@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { getRank } from '@/lib/xp-utils';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
       total,
     });
   } catch (error) {
-    console.error('Leaderboard error:', error);
+    logger.error('Leaderboard error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

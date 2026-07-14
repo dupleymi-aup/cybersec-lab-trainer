@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 // GET /api/progress/[userId] - Teacher view student progress (scoped to teacher's group)
 export async function GET(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       })),
     });
   } catch (error) {
-    console.error('Get student progress error:', error);
+    logger.error('Get student progress error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

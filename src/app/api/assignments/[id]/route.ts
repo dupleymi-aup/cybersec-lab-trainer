@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { updateAssignmentSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json(assignment);
   } catch (error) {
-    console.error('Get assignment error:', error);
+    logger.error('Get assignment error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -82,7 +83,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json(assignment);
   } catch (error) {
-    console.error('Update assignment error:', error);
+    logger.error('Update assignment error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -108,7 +109,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete assignment error:', error);
+    logger.error('Delete assignment error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

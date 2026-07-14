@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -138,7 +139,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ trends });
   } catch (error) {
-    console.error('Progress trends error:', error);
+    logger.error('Progress trends error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

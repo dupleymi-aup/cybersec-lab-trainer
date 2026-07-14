@@ -4,6 +4,7 @@ import { authenticate, unauthorized, forbidden, checkRateLimit } from '@/lib/api
 import { getLevel, XP_REWARDS } from '@/lib/xp-utils';
 import { xpActionSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 const XP_RATE_LIMIT_MAX = 20; // max XP awards per window
 const XP_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -146,7 +147,7 @@ export async function POST(request: NextRequest) {
       ...result,
     });
   } catch (error) {
-    console.error('XP award error:', error);
+    logger.error('XP award error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { updateDeadlineSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
@@ -39,7 +40,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     return NextResponse.json({ success: true, deadline });
   } catch (error) {
-    console.error('Update deadline error:', error);
+    logger.error('Update deadline error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -58,7 +59,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     await getPrisma().deadline.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete deadline error:', error);
+    logger.error('Delete deadline error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

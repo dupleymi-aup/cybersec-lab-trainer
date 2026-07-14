@@ -4,6 +4,7 @@ import { authenticate, unauthorized, checkRateLimit } from '@/lib/api-middleware
 import { quizCategories } from '@/lib/data';
 import { quizSubmissionSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   } catch (error) {
-    console.error('Quiz submission error:', error);
+    logger.error('Quiz submission error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

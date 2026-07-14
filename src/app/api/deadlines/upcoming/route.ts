@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ upcoming });
   } catch (error) {
-    console.error('Upcoming deadlines error:', error);
+    logger.error('Upcoming deadlines error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

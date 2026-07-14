@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { generateGradebookCSV } from '@/lib/export-utils';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -95,7 +96,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Gradebook export error:', error);
+    logger.error('Gradebook export error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

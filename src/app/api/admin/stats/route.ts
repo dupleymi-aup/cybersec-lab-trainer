@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit } from '@/lib/api-middleware';
 import { RATE_WINDOW_1_MIN } from '@/lib/constants';
+import { logger } from '@/lib/logger';
 
 // GET /api/admin/stats - dashboard KPIs
 export async function GET(request: NextRequest) {
@@ -172,7 +173,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Admin stats error:', error);
+    logger.error('Admin stats error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

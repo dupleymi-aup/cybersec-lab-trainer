@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 // GET /api/login-activity/[userId]
 export async function GET(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       })),
     });
   } catch (error) {
-    console.error('Login activity error:', error);
+    logger.error('Login activity error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

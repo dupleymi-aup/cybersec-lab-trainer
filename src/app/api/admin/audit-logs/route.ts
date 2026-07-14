@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 // GET /api/admin/audit-logs - view audit logs with filtering and pagination
 export async function GET(request: NextRequest) {
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Audit logs error:', error);
+    logger.error('Audit logs error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

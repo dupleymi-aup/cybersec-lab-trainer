@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import type { Prisma } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -231,7 +232,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ groups: groupsData, overallTrends });
   } catch (error) {
-    console.error('Group dynamics error:', error);
+    logger.error('Group dynamics error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

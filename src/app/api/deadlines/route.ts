@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireCapability } from '@/lib/api-middleware';
 import { createDeadlineSchema, type CreateDeadlineInput } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface DeadlineBody extends CreateDeadlineInput {
   group?: string;
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ deadlines });
   } catch (error) {
-    console.error('Get deadlines error:', error);
+    logger.error('Get deadlines error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, deadline });
   } catch (error) {
-    console.error('Create deadline error:', error);
+    logger.error('Create deadline error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

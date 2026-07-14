@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { getModuleName } from '@/lib/module-names';
 import type { Prisma } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -108,7 +109,7 @@ export async function GET(request: NextRequest) {
       modules,
     });
   } catch (error) {
-    console.error('Gradebook error:', error);
+    logger.error('Gradebook error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

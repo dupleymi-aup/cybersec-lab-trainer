@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // GET /api/progress/batch?userIds=id1,id2,id3
 // Fetch progress for multiple students at once (teacher/admin only)
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Batch progress GET error:', error);
+    logger.error('Batch progress GET error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -246,7 +247,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, ...results });
   } catch (error) {
-    console.error('Batch progress POST error:', error);
+    logger.error('Batch progress POST error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

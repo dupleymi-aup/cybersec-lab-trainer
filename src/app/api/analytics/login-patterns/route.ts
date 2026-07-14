@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import type { Prisma } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 const _DAY_NAMES = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
@@ -137,7 +138,7 @@ export async function GET(request: NextRequest) {
       dailyDistribution,
     });
   } catch (error) {
-    console.error('Login patterns error:', error);
+    logger.error('Login patterns error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

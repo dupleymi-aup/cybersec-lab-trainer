@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden } from '@/lib/api-middleware';
 import { gradeSubmissionSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export async function POST(
   request: NextRequest,
@@ -71,7 +72,7 @@ export async function POST(
       percentage,
     });
   } catch (error) {
-    console.error('Grade submission error:', error);
+    logger.error('Grade submission error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

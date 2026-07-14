@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -109,7 +110,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ trajectories, categories });
   } catch (error) {
-    console.error('Quiz trajectory error:', error);
+    logger.error('Quiz trajectory error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

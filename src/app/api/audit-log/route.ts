@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface AuditLogBody {
   action: string;
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error('Get audit logs error:', error);
+    logger.error('Get audit logs error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, log });
   } catch (error) {
-    console.error('Create audit log error:', error);
+    logger.error('Create audit log error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

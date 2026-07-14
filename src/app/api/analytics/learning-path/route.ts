@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 const LEARNING_PATH: Array<{ id: string; name: string }> = [
   { id: 'owasp-top-10', name: 'OWASP Top 10' },
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ path, totalStudents });
   } catch (error) {
-    console.error('Learning path error:', error);
+    logger.error('Learning path error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

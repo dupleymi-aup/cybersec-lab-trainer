@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 const MODULE_NAMES: Record<string, string> = {
   owasp: 'OWASP Top 10',
@@ -177,7 +178,7 @@ export async function GET(request: NextRequest) {
       rankings: { byCompletion, byQuizScore, byActivity },
     });
   } catch (error) {
-    console.error('Group comparison error:', error);
+    logger.error('Group comparison error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

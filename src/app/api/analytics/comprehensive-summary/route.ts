@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // In-memory response cache with 30s TTL
 const cache = new Map<string, { data: unknown; expiresAt: number }>();
@@ -281,7 +282,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Comprehensive summary error:', error);
+    logger.error('Comprehensive summary error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

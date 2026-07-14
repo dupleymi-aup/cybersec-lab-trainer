@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -167,7 +168,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Progress dynamics error:', error);
+    logger.error('Progress dynamics error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

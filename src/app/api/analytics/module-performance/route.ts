@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 const MODULE_NAMES: Record<string, string> = {
   owasp: 'OWASP Top 10',
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
       byGroup,
     });
   } catch (error) {
-    console.error('Module performance error:', error);
+    logger.error('Module performance error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

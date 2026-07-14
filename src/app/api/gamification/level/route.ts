@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { getLevel, getXpForNextLevel, getRank } from '@/lib/xp-utils';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Level info error:', error);
+    logger.error('Level info error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

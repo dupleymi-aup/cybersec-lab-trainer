@@ -5,6 +5,7 @@ import { parseDays } from '@/lib/utils';
 import { isAchievementUnlocked } from '@/lib/data/achievements-data';
 import type { Prisma } from '@prisma/client';
 import { TOTAL_MODULES } from '@/lib/module-constants';
+import { logger } from '@/lib/logger';
 
 const ALL_QUIZ_CATEGORIES = ['sql', 'xss', 'csrf', 'auth', 'general', 'owasp', 'coding', 'network', 'social'];
 const CATEGORY_NAMES: Record<string, string> = {
@@ -235,7 +236,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ students: studentsData, summary });
   } catch (error) {
-    console.error('Certification readiness error:', error);
+    logger.error('Certification readiness error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

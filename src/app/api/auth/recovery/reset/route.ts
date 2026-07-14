@@ -5,6 +5,7 @@ import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
 import { timingSafeEqual } from 'crypto';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface PasswordResetBody {
   emailOrPhone: string;
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Password reset error:', error);
+    logger.error('Password reset error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

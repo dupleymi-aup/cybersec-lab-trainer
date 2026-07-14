@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { verifyPassword } from '@/lib/auth-utils';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface DeleteAccountBody {
   currentPassword: string;
@@ -60,7 +61,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Account deletion error:', error);
+    logger.error('Account deletion error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

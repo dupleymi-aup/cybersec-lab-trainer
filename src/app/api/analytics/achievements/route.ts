@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { achievements, isAchievementUnlocked } from '@/lib/data/achievements-data';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -144,7 +145,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ achievements: result });
   } catch (error) {
-    console.error('Achievements analytics error:', error);
+    logger.error('Achievements analytics error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

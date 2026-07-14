@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { quizQuestions } from '@/lib/data/quiz-data';
+import { logger } from '@/lib/logger';
 
 // Build a lookup map for question data
 const questionMap = new Map(
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ questions });
   } catch (error) {
-    console.error('Quiz questions error:', error);
+    logger.error('Quiz questions error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
 import { timingSafeEqual } from 'crypto';
 import { parseBody } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface OtpVerifyBody {
   emailOrPhone: string;
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
     otpStore.delete(user.id);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('OTP verify error:', error);
+    logger.error('OTP verify error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

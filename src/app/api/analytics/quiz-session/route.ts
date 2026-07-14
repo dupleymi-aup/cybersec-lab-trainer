@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import type { Prisma } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 const CATEGORY_NAMES: Record<string, string> = {
   sql: 'SQL-инъекции',
@@ -280,7 +281,7 @@ export async function GET(request: NextRequest) {
       weekdayVsWeekend,
     });
   } catch (error) {
-    console.error('Quiz session error:', error);
+    logger.error('Quiz session error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

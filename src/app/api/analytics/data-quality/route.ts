@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { CORE_MODULE_IDS } from '@/lib/module-constants';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -153,7 +154,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Data quality error:', error);
+    logger.error('Data quality error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
