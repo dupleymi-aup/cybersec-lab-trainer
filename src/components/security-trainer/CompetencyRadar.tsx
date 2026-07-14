@@ -81,7 +81,7 @@ export default function CompetencyRadar({ groupId }: Props) {
     return (
       <div className="flex items-center justify-center py-16">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
-        <p className="text-muted-foreground ml-3 text-sm">Загрузка данных компетенций...</p>
+        <p className="text-muted-foreground ml-3 text-sm">{t('loading')}</p>
       </div>
     );
   }
@@ -132,7 +132,7 @@ export default function CompetencyRadar({ groupId }: Props) {
         <Card className="border-border lg:col-span-2">
           <CardContent className="p-5">
             <h3 className="mb-4 text-sm font-semibold">
-              {selectedStudent ? t('competencies', { name: selectedStudent.fullName }) : 'Средние компетенции группы'}
+              {selectedStudent ? t('competencies', { name: selectedStudent.fullName }) : t('groupAvg')}
             </h3>
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={400}>
@@ -156,7 +156,7 @@ export default function CompetencyRadar({ groupId }: Props) {
                   <Tooltip formatter={(value, name) => [`${value}%`, name]} />
                   <Legend
                     wrapperStyle={{ fontSize: 12 }}
-                    formatter={(value) => (value === 'completion' ? 'Завершение модулей' : 'Средний балл')}
+                    formatter={(value) => (value === 'completion' ? t('moduleCompletion') : t('avgScore'))}
                   />
                 </RadarChart>
               </ResponsiveContainer>

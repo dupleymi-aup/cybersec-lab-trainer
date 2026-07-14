@@ -298,7 +298,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
         />
         <KPICard
           icon={<Clock size={18} />}
-          value={kpis.lastActiveDays === 0 ? t('today') : `${kpis.lastActiveDays}д назад`}
+          value={kpis.lastActiveDays === 0 ? t('today') : `${kpis.lastActiveDays}{t('daysAgo')}`}
           label={t('lastActivity')}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"

@@ -251,7 +251,7 @@ export default function APISecurityLab() {
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
-          Интерактивный гид по 10 самым критическим угрозам безопасности API с примерами кода и мерами защиты.
+          {t('subtitle')}
         </p>
         <div className="mt-3 flex items-center gap-2">
           <Badge variant="secondary" className="text-xs">

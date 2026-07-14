@@ -52,7 +52,7 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
     return (
       <div className="flex flex-col items-center justify-center py-16 text-slate-400">
         <AlertCircle size={40} className="mb-3 opacity-50" />
-        <p className="text-sm">{error || 'Нет данных по категориям'}</p>
+        <p className="text-sm">{error || t('noData')}</p>
       </div>
     );
   }

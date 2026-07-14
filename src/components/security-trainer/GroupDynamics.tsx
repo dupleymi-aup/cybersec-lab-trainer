@@ -99,9 +99,9 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
             onChange={(e) => setInternalDays(Number(e.target.value))}
             className="border-border bg-card rounded-md border px-3 py-1.5 text-sm"
           >
-            <option value={30}>30 дней</option>
-            <option value={90}>90 дней</option>
-            <option value={180}>180 дней</option>
+            <option value={30}>{t('days30')}</option>
+            <option value={90}>{t('days90')}</option>
+            <option value={180}>{t('days180')}</option>
           </select>
         )}
       </div>

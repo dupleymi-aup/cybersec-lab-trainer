@@ -413,7 +413,16 @@
     "darkTheme": "深色",
     "lightTheme": "浅色",
     "switchTheme": "切换主题。当前：",
-    "currentTheme": "主题"
+    "currentTheme": "主题",
+    "loadingData": "加载数据中...",
+    "loadError": "加载数据出错",
+    "days7": "7天",
+    "days30": "30天",
+    "days90": "90天",
+    "days180": "180天",
+    "improving": "改善中",
+    "declining": "下降中",
+    "stable": "稳定"
   },
   "nav": {
     "dashboard": "控制台",
@@ -1673,6 +1682,22 @@
       "nextHeader": "下一个头部 →",
       "next": "下一步 →",
       "markComplete": "标记模块为已完成"
+    },
+    "apiSecurity": {
+      "title": "API 安全",
+      "subtitle": "交互式指南，涵盖10个最关键的API安全威胁，包含代码示例和防护措施。",
+      "topics": "10个主题",
+      "advanced": "高级",
+      "studied": "已学习",
+      "theory": "理论",
+      "code": "代码",
+      "defense": "防护",
+      "codeExample": "代码示例",
+      "defenseRecommendations": "防护建议",
+      "back": "返回",
+      "studiedDone": "已学习",
+      "markStudied": "标记为已学习",
+      "next": "下一个"
     }
   },
   "careerPaths": {
@@ -3028,7 +3053,11 @@
     "quizzes": "测验",
     "overallHealth": "小组整体健康趋势",
     "avgHealth": "平均健康度",
-    "activeCount": "活跃数"
+    "activeCount": "活跃数",
+    "days7": "7天",
+    "days30": "30天",
+    "days90": "90天",
+    "days180": "180天"
   },
   "moduleDeepDive": {
     "loading": "加载数据中...",

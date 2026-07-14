@@ -351,7 +351,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       );
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `at-risk-${effectiveDays}d-${date}.csv`);
-      setStatus('atRisk', 'success', `Экспортировано ${data.atRiskStudents.length} студентов`);
+      setStatus('atRisk', 'success', t('exportedN', { count: data.atRiskStudents.length }));
     } catch (e) {
       logger.warn('At-risk export failed', { error: e });
       setStatus('atRisk', 'error', t('exportError'));
@@ -382,7 +382,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       );
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `group-comparison-${effectiveDays}d-${date}.csv`);
-      setStatus('groupComparison', 'success', `Экспортировано ${data.dimensions.length} групп`);
+      setStatus('groupComparison', 'success', t('exportedGroups', { count: data.dimensions.length }));
     } catch (e) {
       logger.warn('Group comparison export failed', { error: e });
       setStatus('groupComparison', 'error', t('exportError'));
@@ -399,7 +399,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const csv = generateModulePerformanceCSV(moduleData);
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `module-performance-${effectiveDays}d-${date}.csv`);
-      setStatus('modulePerformance', 'success', `Экспортировано ${moduleData.length} модулей`);
+      setStatus('modulePerformance', 'success', t('exportedModules', { count: moduleData.length }));
     } catch (e) {
       logger.warn('Module performance export failed', { error: e });
       setStatus('modulePerformance', 'error', t('exportError'));
@@ -460,7 +460,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
         avgQuizScore: s.avgQuizScore,
       }));
       await generateAtRiskPDF(atRiskData);
-      setStatus('atRiskPdf', 'success', `PDF экспортирован: ${atRiskData.length} студентов`);
+      setStatus('atRiskPdf', 'success', t('pdfExported', { count: atRiskData.length }));
     } catch (e) {
       logger.warn('At-risk PDF export failed', { error: e });
       setStatus('atRiskPdf', 'error', t('pdfError'));
@@ -490,7 +490,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     try {
       const moduleData = await getModulePerformance(effectiveDays, groupId);
       await generateModulePerformancePDF(moduleData);
-      setStatus('modulePerformancePdf', 'success', `PDF экспортирован: ${moduleData.length} модулей`);
+      setStatus('modulePerformancePdf', 'success', t('pdfExported', { count: moduleData.length }));
     } catch (e) {
       logger.warn('Module performance PDF export failed', { error: e });
       setStatus('modulePerformancePdf', 'error', t('pdfError'));
@@ -505,7 +505,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     try {
       const data = await getGroupComparison(effectiveDays, 'group');
       await generateGroupComparisonPDF(data.dimensions, 'group');
-      setStatus('groupComparisonPdf', 'success', `PDF экспортирован: ${data.dimensions.length} групп`);
+      setStatus('groupComparisonPdf', 'success', t('pdfExported', { count: data.dimensions.length }));
     } catch (e) {
       logger.warn('Group comparison PDF export failed', { error: e });
       setStatus('groupComparisonPdf', 'error', t('pdfError'));
