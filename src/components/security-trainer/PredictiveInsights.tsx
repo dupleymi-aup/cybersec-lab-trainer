@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Legend, Line } from 'recharts';
 import { TrendingUp, TrendingDown, Loader2, AlertTriangle, Lightbulb, BarChart3 } from 'lucide-react';
@@ -55,6 +55,7 @@ function generateForecast(trend: TrendPoint[], days: number): TrendPoint[] {
 
 export default function PredictiveInsights({ groupId }: Props) {
   const t = useTranslations('predictiveInsights');
+  const locale = useLocale();
   const [days, setDays] = useState(90);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -150,7 +151,7 @@ export default function PredictiveInsights({ groupId }: Props) {
   const completionForecastData = useMemo(() => {
     if (trendData.length < 2) return [];
     const historical = trendData.slice(-14).map((p) => ({
-      date: new Date(p.date).toLocaleDateString('ru-RU', {
+      date: new Date(p.date).toLocaleDateString(locale, {
         day: 'numeric',
         month: 'short',
       }),
@@ -160,7 +161,7 @@ export default function PredictiveInsights({ groupId }: Props) {
       upper: null as number | null,
     }));
     const projected = forecast.slice(0, 8).map((p) => ({
-      date: new Date(p.date).toLocaleDateString('ru-RU', {
+      date: new Date(p.date).toLocaleDateString(locale, {
         day: 'numeric',
         month: 'short',
       }),
@@ -170,7 +171,7 @@ export default function PredictiveInsights({ groupId }: Props) {
       upper: p.modulesCompleted + 2,
     }));
     return [...historical, ...projected];
-  }, [trendData, forecast]);
+  }, [trendData, forecast, locale]);
 
   if (loading) {
     return (

@@ -46,12 +46,7 @@ import { generateStudentReportPDF, generateStudentReportCSV, downloadCSV } from 
 import KPICard from './KPICard';
 import { logger } from '@/lib/logger';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
+
 
 interface Props {
   userId: string;
@@ -61,6 +56,12 @@ interface Props {
 
 export default function StudentPerformanceReport({ userId, initialDays = 30, groupId: _groupId }: Props) {
   const t = useTranslations('studentPerformance');
+  const PERIOD_OPTIONS = [
+    { key: 7, label: t('days7') },
+    { key: 30, label: t('days30') },
+    { key: 90, label: t('days90') },
+    { key: 180, label: t('days180') },
+  ];
   const formatDate = useDateFormatter();
   const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);
@@ -277,28 +278,28 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
         <KPICard
           icon={<BookOpen size={18} />}
           value={`${kpis.modulesCompleted}/${kpis.totalModules}`}
-          label="Модули"
+          label={t('modules')}
           iconBg="bg-indigo-100"
           iconColor="text-indigo-600"
         />
         <KPICard
           icon={<Trophy size={18} />}
           value={`${kpis.avgQuizScore}%`}
-          label="Ср. балл квизов"
+          label={t('avgQuizScore')}
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
         />
         <KPICard
           icon={<Activity size={18} />}
           value={kpis.totalQuizAttempts}
-          label="Попыток квизов"
+          label={t('quizAttempts')}
           iconBg="bg-sky-100"
           iconColor="text-sky-600"
         />
         <KPICard
           icon={<Clock size={18} />}
-          value={kpis.lastActiveDays === 0 ? 'Сегодня' : `${kpis.lastActiveDays}д назад`}
-          label="Последняя активность"
+          value={kpis.lastActiveDays === 0 ? t('today') : `${kpis.lastActiveDays}д назад`}
+          label={t('lastActivity')}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
         />
@@ -508,10 +509,10 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                     </div>
                     <Badge variant="outline" className="text-[10px]">
                       {activity.type === 'login'
-                        ? 'Вход'
+                        ? t('login')
                         : activity.type === 'module_completed'
-                          ? 'Модуль'
-                          : 'Прогресс'}
+                          ? t('moduleProgress')
+                          : t('moduleProgress')}
                     </Badge>
                   </motion.div>
                 ))}
@@ -547,7 +548,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                       stroke="#6366f1"
                       fill="#6366f1"
                       fillOpacity={0.1}
-                      name="Балл"
+                      name={t('score')}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -574,8 +575,8 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                     <YAxis />
                     <Tooltip labelFormatter={(v) => formatDate(v)} />
                     <Legend />
-                    <Bar dataKey="count" fill="#6366f1" name="Входы" />
-                    <Bar dataKey="successCount" fill="#10b981" name="Успешные" />
+                    <Bar dataKey="count" fill="#6366f1" name={t('logins')} />
+                    <Bar dataKey="successCount" fill="#10b981" name={t('successful')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -642,21 +643,21 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                 <KPICard
                   icon={<AlertTriangle size={18} />}
                   value={skillsGap.filter((g) => g.severity === 'high').length}
-                  label="Критичные"
+                  label={t('critical')}
                   iconBg="bg-red-100"
                   iconColor="text-red-600"
                 />
                 <KPICard
                   icon={<AlertTriangle size={18} />}
                   value={skillsGap.filter((g) => g.severity === 'medium').length}
-                  label="Средние"
+                  label={t('average')}
                   iconBg="bg-amber-100"
                   iconColor="text-amber-600"
                 />
                 <KPICard
                   icon={<CheckCircle size={18} />}
                   value={skillsGap.filter((g) => g.severity === 'low').length}
-                  label="Норма"
+                  label={t('normal')}
                   iconBg="bg-emerald-100"
                   iconColor="text-emerald-600"
                 />
@@ -735,7 +736,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                                 {gap.gap}%
                               </span>
                               <Badge variant={severityColor} className="text-[10px]">
-                                {gap.severity === 'high' ? 'Критично' : gap.severity === 'medium' ? 'Средне' : 'Норма'}
+                                {gap.severity === 'high' ? t('criticalLevel') : gap.severity === 'medium' ? t('mediumLevel') : t('normal')}
                               </Badge>
                             </div>
                           </motion.div>
@@ -805,7 +806,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-bold">{rec.title}</p>
                               <Badge variant={priorityBadge} className="text-[10px]">
-                                {rec.priority === 'high' ? 'Высокий' : rec.priority === 'medium' ? 'Средний' : 'Низкий'}
+                                {rec.priority === 'high' ? t('high') : rec.priority === 'medium' ? t('medium') : t('low')}
                               </Badge>
                             </div>
                             <p className="text-muted-foreground mt-1 text-xs">{rec.description}</p>
@@ -821,7 +822,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
             <Card className="border-border">
               <CardContent className="p-8 text-center">
                 <Lightbulb size={32} className="text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground text-sm">Нет рекомендаций — отличная работа!</p>
+                <p className="text-muted-foreground text-sm">{t('noRecommendations')}</p>
               </CardContent>
             </Card>
           )}

@@ -80,10 +80,10 @@ interface ExportState {
 }
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
+  { key: 7, label: '7d' },
+  { key: 30, label: '30d' },
+  { key: 90, label: '90d' },
+  { key: 180, label: '180d' },
 ];
 
 const isControlled = (props: AnalyticsExportPanelProps): props is AnalyticsExportPanelProps & { days: number } =>
@@ -234,7 +234,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `gradebook-${date}.csv`);
 
-      setStatus('gradebook', 'success', `Экспортировано ${studentData.length} студентов`);
+      setStatus('gradebook', 'success', t('exportedN', { count: studentData.length }));
     } catch (error) {
       logger.error('Gradebook export failed', { error });
       setStatus('gradebook', 'error', t('exportError'));
@@ -354,7 +354,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       setStatus('atRisk', 'success', `Экспортировано ${data.atRiskStudents.length} студентов`);
     } catch (e) {
       logger.warn('At-risk export failed', { error: e });
-      setStatus('atRisk', 'error', 'Ошибка при экспорте');
+      setStatus('atRisk', 'error', t('exportError'));
     }
     scheduleReset('atRisk', 4000);
   };
@@ -385,7 +385,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       setStatus('groupComparison', 'success', `Экспортировано ${data.dimensions.length} групп`);
     } catch (e) {
       logger.warn('Group comparison export failed', { error: e });
-      setStatus('groupComparison', 'error', 'Ошибка при экспорте');
+      setStatus('groupComparison', 'error', t('exportError'));
     }
     scheduleReset('groupComparison', 4000);
   };
@@ -402,7 +402,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       setStatus('modulePerformance', 'success', `Экспортировано ${moduleData.length} модулей`);
     } catch (e) {
       logger.warn('Module performance export failed', { error: e });
-      setStatus('modulePerformance', 'error', 'Ошибка при экспорте');
+      setStatus('modulePerformance', 'error', t('exportError'));
     }
     scheduleReset('modulePerformance', 4000);
   };
@@ -435,10 +435,10 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
         }),
       );
       await generateGradebookPDF(studentData);
-      setStatus('gradebookPdf', 'success', `PDF экспортирован: ${studentData.length} студентов`);
+      setStatus('gradebookPdf', 'success', t('pdfExported', { count: studentData.length }));
     } catch (e) {
       logger.warn('Gradebook PDF export failed', { error: e });
-      setStatus('gradebookPdf', 'error', 'Ошибка при создании PDF');
+      setStatus('gradebookPdf', 'error', t('pdfError'));
     }
     scheduleReset('gradebookPdf', 4000);
   };
@@ -463,7 +463,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       setStatus('atRiskPdf', 'success', `PDF экспортирован: ${atRiskData.length} студентов`);
     } catch (e) {
       logger.warn('At-risk PDF export failed', { error: e });
-      setStatus('atRiskPdf', 'error', 'Ошибка при создании PDF');
+      setStatus('atRiskPdf', 'error', t('pdfError'));
     }
     scheduleReset('atRiskPdf', 4000);
   };
@@ -475,10 +475,10 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     try {
       const summary = await getComprehensiveSummary(effectiveDays, groupId);
       await generateAnalyticsPDF(summary, summary.moduleDistribution);
-      setStatus('analyticsPdf', 'success', 'Аналитический PDF экспортирован');
+      setStatus('analyticsPdf', 'success', t('analyticsPdfDone'));
     } catch (e) {
       logger.warn('Analytics PDF export failed', { error: e });
-      setStatus('analyticsPdf', 'error', 'Ошибка при создании PDF');
+      setStatus('analyticsPdf', 'error', t('pdfError'));
     }
     scheduleReset('analyticsPdf', 4000);
   };
@@ -493,7 +493,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       setStatus('modulePerformancePdf', 'success', `PDF экспортирован: ${moduleData.length} модулей`);
     } catch (e) {
       logger.warn('Module performance PDF export failed', { error: e });
-      setStatus('modulePerformancePdf', 'error', 'Ошибка при создании PDF');
+      setStatus('modulePerformancePdf', 'error', t('pdfError'));
     }
     scheduleReset('modulePerformancePdf', 4000);
   };
@@ -508,7 +508,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       setStatus('groupComparisonPdf', 'success', `PDF экспортирован: ${data.dimensions.length} групп`);
     } catch (e) {
       logger.warn('Group comparison PDF export failed', { error: e });
-      setStatus('groupComparisonPdf', 'error', 'Ошибка при создании PDF');
+      setStatus('groupComparisonPdf', 'error', t('pdfError'));
     }
     scheduleReset('groupComparisonPdf', 4000);
   };
@@ -569,10 +569,10 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
         quizData,
         [],
       );
-      setStatus('studentReportPdf', 'success', 'PDF студента экспортирован');
+      setStatus('studentReportPdf', 'success', t('studentPdfDone'));
     } catch (e) {
       logger.warn('Student report PDF export failed', { error: e });
-      setStatus('studentReportPdf', 'error', 'Ошибка при создании PDF');
+      setStatus('studentReportPdf', 'error', t('pdfError'));
     }
     scheduleReset('studentReportPdf', 4000);
   };
@@ -584,10 +584,10 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     try {
       const retryData = await getQuizRetryAnalytics(effectiveDays, groupId);
       await generateQuizRetryPDF(retryData.categoryRetryStats, retryData.topRetryers);
-      setStatus('quizRetryPdf', 'success', 'PDF повторов экспортирован');
+      setStatus('quizRetryPdf', 'success', t('retryPdfDone'));
     } catch (e) {
       logger.warn('Quiz retry PDF export failed', { error: e });
-      setStatus('quizRetryPdf', 'error', 'Ошибка при создании PDF');
+      setStatus('quizRetryPdf', 'error', t('pdfError'));
     }
     scheduleReset('quizRetryPdf', 4000);
   };
@@ -908,7 +908,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
           >
             <div className="border-border border-b p-6">
               <h3 className="text-lg font-bold">{t('printPreview')}</h3>
-              <p className="text-muted-foreground mt-1 text-sm">Текущий прогресс студентов будет распечатан</p>
+              <p className="text-muted-foreground mt-1 text-sm">{t('printProgress')}</p>
             </div>
 
             <div className="p-6">
