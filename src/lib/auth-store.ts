@@ -207,9 +207,9 @@ export async function createUser(
   },
   password: string,
 ): Promise<{ success: boolean; error?: string }> {
-  if (!data.fullName.trim()) return { success: false, error: 'Введите имя' };
-  if (!validateEmail(data.email)) return { success: false, error: 'Неверный email' };
-  if (!validatePhone(data.phone)) return { success: false, error: 'Неверный телефон' };
+  if (!data.fullName.trim()) return { success: false, error: 'Name is required' };
+  if (!validateEmail(data.email)) return { success: false, error: 'Invalid email' };
+  if (!validatePhone(data.phone)) return { success: false, error: 'Invalid phone number' };
 
   const pwCheck = validatePassword(password);
   if (!pwCheck.valid) return { success: false, error: pwCheck.errors.join(', ') };
@@ -249,13 +249,13 @@ export async function updateUser(
 export async function toggleUserBlock(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
     const { user: currentUser } = useAuthStore.getState();
-    if (!currentUser) return { success: false, error: 'Не авторизован' };
-    if (currentUser.id === userId) return { success: false, error: 'Нельзя заблокировать себя' };
+    if (!currentUser) return { success: false, error: 'Not authenticated' };
+    if (currentUser.id === userId) return { success: false, error: 'Cannot block yourself' };
 
     // Get current state first
     const users = await getAllUsers();
     const targetUser = users.find((u) => u.id === userId);
-    if (!targetUser) return { success: false, error: 'Пользователь не найден' };
+    if (!targetUser) return { success: false, error: 'User not found' };
 
     const res = await apiFetch(`/api/users/${userId}/block`, {
       method: 'PUT',
@@ -274,7 +274,7 @@ export async function bulkDeleteUsers(
   userIds: string[],
   currentUserId: string,
 ): Promise<{ success: boolean; error?: string; count: number }> {
-  if (userIds.includes(currentUserId)) return { success: false, error: 'Нельзя удалить себя', count: 0 };
+  if (userIds.includes(currentUserId)) return { success: false, error: 'Cannot delete yourself', count: 0 };
   const results = await Promise.allSettled(userIds.map((id) => deleteUser(id)));
   const count = results.filter((r) => r.status === 'fulfilled' && r.value.success).length;
   return { success: count > 0, count };
@@ -294,8 +294,8 @@ export async function bulkToggleBlock(
   currentUserId: string,
   _blocked: boolean,
 ): Promise<{ success: boolean; error?: string; count: number }> {
-  const action = _blocked ? 'заблокировать' : 'разблокировать';
-  if (userIds.includes(currentUserId)) return { success: false, error: `Нельзя ${action} себя`, count: 0 };
+  const action = _blocked ? 'block' : 'unblock';
+  if (userIds.includes(currentUserId)) return { success: false, error: `Cannot ${action} yourself`, count: 0 };
   const results = await Promise.allSettled(
     userIds.filter((id) => id !== currentUserId).map((id) => toggleUserBlock(id)),
   );
@@ -414,7 +414,7 @@ export async function startImpersonation(
   adminId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    if (targetUserId === adminId) return { success: false, error: 'Нельзя войти как себя' };
+    if (targetUserId === adminId) return { success: false, error: 'Cannot impersonate yourself' };
 
     // Save admin user data before impersonating (so we can restore later)
     const currentUser = useAuthStore.getState().user;
@@ -453,11 +453,11 @@ export async function stopImpersonation(): Promise<{
   error?: string;
 }> {
   const raw = localStorage.getItem(IMPERSONATION_KEY);
-  if (!raw) return { success: false, error: 'Нет активной имперсонации' };
+  if (!raw) return { success: false, error: 'No active impersonation' };
 
   try {
     const data = JSON.parse(raw);
-    if (!data.originalUserId) return { success: false, error: 'Нет активной имперсонации' };
+    if (!data.originalUserId) return { success: false, error: 'No active impersonation' };
 
     const originalUserData = data.originalUserData;
 
@@ -485,7 +485,7 @@ export async function stopImpersonation(): Promise<{
     return { success: true };
   } catch (e) {
     logger.warn('stopImpersonation failed', { error: e });
-    return { success: false, error: 'Ошибка завершения имперсонации' };
+    return { success: false, error: 'Failed to stop impersonation' };
   }
 }
 
@@ -542,7 +542,7 @@ export async function renameGroup(
   if (!newName.trim())
     return {
       success: false,
-      error: 'Название группы не может быть пустым',
+      error: 'Group name cannot be empty',
       count: 0,
     };
 
@@ -551,7 +551,7 @@ export async function renameGroup(
   if (groups.includes(trimmedNew) && trimmedNew !== oldName) {
     return {
       success: false,
-      error: 'Группа с таким названием уже существует',
+      error: 'A group with this name already exists',
       count: 0,
     };
   }
@@ -584,7 +584,7 @@ export async function assignUsersToGroup(
   if (!groupName.trim())
     return {
       success: false,
-      error: 'Название группы не может быть пустым',
+      error: 'Group name cannot be empty',
       count: 0,
     };
 
@@ -842,7 +842,7 @@ export const useAuthStore = create<AuthState>()(
 
       updatePassword: async (oldPassword, newPassword) => {
         const { user } = get();
-        if (!user) return { success: false, error: 'Пользователь не найден' };
+        if (!user) return { success: false, error: 'User not found' };
 
         try {
           const res = await fetch('/api/auth/password', {
@@ -909,8 +909,8 @@ export const useAuthStore = create<AuthState>()(
 
       resetPassword: async (otp, newPassword) => {
         const { recoveryState } = get();
-        if (!recoveryState) return { success: false, error: 'Сначала отправьте код' };
-        if (Date.now() > recoveryState.expiresAt) return { success: false, error: 'Код просрочен' };
+        if (!recoveryState) return { success: false, error: 'Please send the code first' };
+        if (Date.now() > recoveryState.expiresAt) return { success: false, error: 'Code has expired' };
 
         try {
           const res = await fetch('/api/auth/recovery/reset', {
@@ -935,8 +935,8 @@ export const useAuthStore = create<AuthState>()(
 
       deleteAccount: async (currentPassword: string) => {
         const { user } = get();
-        if (!user) return { success: false, error: 'Пользователь не найден' };
-        if (!currentPassword) return { success: false, error: 'Требуется подтверждение пароля' };
+        if (!user) return { success: false, error: 'User not found' };
+        if (!currentPassword) return { success: false, error: 'Password confirmation required' };
 
         try {
           const res = await fetch('/api/auth/delete', {

@@ -93,51 +93,51 @@ export const NotificationHelper = {
   achievementUnlocked: (name: string, description: string) => {
     useNotificationStore.getState().addNotification({
       type: 'achievement',
-      title: '🏆 Достижение разблокировано!',
+      title: 'Achievement Unlocked!',
       message: `${name}: ${description}`,
     });
   },
   moduleCompleted: (moduleName: string) => {
     useNotificationStore.getState().addNotification({
       type: 'progress',
-      title: '✅ Модуль завершён',
-      message: `Вы успешно завершили модуль "${moduleName}"`,
+      title: 'Module Completed',
+      message: `You have successfully completed the module "${moduleName}"`,
     });
   },
   quizCompleted: (category: string, score: number) => {
     useNotificationStore.getState().addNotification({
       type: 'quiz',
-      title: score >= 80 ? '🎉 Отличный результат!' : '📝 Квиз завершён',
-      message: `Категория: ${category}, Результат: ${score}%`,
+      title: score >= 80 ? 'Great Result!' : 'Quiz Completed',
+      message: `Category: ${category}, Score: ${score}%`,
     });
   },
   streakAchieved: (count: number) => {
     useNotificationStore.getState().addNotification({
       type: 'achievement',
-      title: '🔥 Серия!',
-      message: `Вы набрали серию из ${count} квизов с результатом 80%+`,
+      title: 'Streak!',
+      message: `You achieved a streak of ${count} quizzes with 80%+ score`,
     });
   },
   systemWarning: (message: string) => {
     useNotificationStore.getState().addNotification({
       type: 'warning',
-      title: '⚠️ Внимание',
+      title: 'Warning',
       message,
     });
   },
   announcement: (title: string, message: string, priority?: 'low' | 'normal' | 'high') => {
     useNotificationStore.getState().addNotification({
       type: 'announcement',
-      title: priority === 'high' ? '📢 Важное объявление' : '📢 Объявление',
+      title: priority === 'high' ? 'Important Announcement' : 'Announcement',
       message,
     });
   },
   deadlineWarning: (title: string, daysLeft: number) => {
     const urgency =
-      daysLeft <= 0 ? 'Просрочен!' : daysLeft === 1 ? 'Завтра последний день!' : `Осталось ${daysLeft} дн.`;
+      daysLeft <= 0 ? 'Overdue!' : daysLeft === 1 ? 'Last day tomorrow!' : `${daysLeft} days left`;
     useNotificationStore.getState().addNotification({
       type: 'deadline',
-      title: `Дедлайн: ${title}`,
+      title: `Deadline: ${title}`,
       message: urgency,
     });
   },
@@ -162,7 +162,7 @@ export async function loadAnnouncementsIntoNotifications() {
       if (!existing.has(key)) {
         store.addNotification({
           type: 'announcement',
-          title: a.priority === 'high' ? '📢 Важное объявление' : '📢 Объявление',
+          title: a.priority === 'high' ? 'Important Announcement' : 'Announcement',
           message: `${a.title}: ${a.content.split('\n')[0]}`,
         });
       }

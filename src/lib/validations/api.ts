@@ -38,7 +38,7 @@ export const registerSchema = z.object({
   phone: z.string().min(10, 'Invalid phone number').max(20),
   fullName: z.string().min(2, 'Name must be at least 2 characters').max(200),
   role: z.enum(['student', 'teacher', 'admin'], {
-    message: 'Допустимые роли: student, teacher, admin',
+    message: 'Valid roles: student, teacher, admin',
   }),
   department: z.string().optional(),
   year: z.enum(['1', '2', '3', '4', '5', '6']).optional(),
@@ -65,7 +65,7 @@ export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 // Role change validation
 export const roleChangeSchema = z.object({
   role: z.enum(['student', 'teacher', 'admin'], {
-    message: 'Допустимые роли: student, teacher, admin',
+    message: 'Valid roles: student, teacher, admin',
   }),
 });
 
@@ -93,7 +93,7 @@ export const createUserSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters').max(200),
   role: z
     .enum(['student', 'teacher', 'admin'], {
-      message: 'Допустимые роли: student, teacher, admin',
+      message: 'Valid roles: student, teacher, admin',
     })
     .optional(),
   password: z.string().min(8, 'Password must be at least 8 characters').max(128),

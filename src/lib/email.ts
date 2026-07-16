@@ -22,8 +22,8 @@ function getTransporter() {
   });
 }
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('ru-RU', {
+function formatDate(date: Date, locale = 'en-US'): string {
+  return date.toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -32,8 +32,8 @@ function formatDate(date: Date): string {
   });
 }
 
-function renderDeadlineEmail(fullName: string, deadlineTitle: string, dueAt: Date, isOverdue: boolean): string {
-  const subject = isOverdue ? 'Просрочен дедлайн' : 'Напоминание о дедлайне';
+function renderDeadlineEmail(fullName: string, deadlineTitle: string, dueAt: Date, isOverdue: boolean, locale = 'en-US'): string {
+  const subject = isOverdue ? 'Deadline Overdue' : 'Deadline Reminder';
 
   return `
     <!DOCTYPE html>
@@ -59,21 +59,21 @@ function renderDeadlineEmail(fullName: string, deadlineTitle: string, dueAt: Dat
           <h1>${subject}</h1>
         </div>
         <div class="content">
-          <p>Здравствуйте, <strong>${escapeHtml(fullName)}</strong>!</p>
+          <p>Hello, <strong>${escapeHtml(fullName)}</strong>!</p>
           ${
             isOverdue
-              ? `<p>К сожалению, срок выполнения дедлайна истёк.</p>`
-              : `<p>Напоминаем о предстоящем дедлайне.</p>`
+              ? `<p>Unfortunately, the deadline has passed.</p>`
+              : `<p>This is a reminder about an upcoming deadline.</p>`
           }
           <div class="deadline-info">
             <p><strong>${escapeHtml(deadlineTitle)}</strong></p>
-            <p>Срок: ${formatDate(dueAt)}</p>
+            <p>Due: ${formatDate(dueAt, locale)}</p>
           </div>
-          <p>Пожалуйста, завершите задание как можно скорее.</p>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" class="cta">Перейти к обучению</a>
+          <p>Please complete the assignment as soon as possible.</p>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" class="cta">Go to Learning</a>
         </div>
         <div class="footer">
-          CyberSec Lab Trainer — автоматическое уведомление
+          CyberSec Lab Trainer — automated notification
         </div>
       </div>
     </body>
@@ -86,7 +86,7 @@ export async function sendOTPRecoveryEmail(to: string, fullName: string, otp: st
     return false;
   }
 
-  const subject = 'CyberSec Lab — Код восстановления пароля';
+  const subject = 'CyberSec Lab — Password Recovery Code';
   const html = `
     <!DOCTYPE html>
     <html>
@@ -107,19 +107,19 @@ export async function sendOTPRecoveryEmail(to: string, fullName: string, otp: st
     <body>
       <div class="container">
         <div class="header">
-          <h1>Восстановление пароля</h1>
+          <h1>Password Recovery</h1>
         </div>
         <div class="content">
-          <p>Здравствуйте, <strong>${escapeHtml(fullName)}</strong>!</p>
-          <p>Вы запросили восстановление пароля. Используйте следующий код:</p>
+          <p>Hello, <strong>${escapeHtml(fullName)}</strong>!</p>
+          <p>You requested a password recovery. Use the following code:</p>
           <div class="otp-code">${otp}</div>
-          <p>Код действителен в течение 10 минут.</p>
+          <p>The code is valid for 10 minutes.</p>
           <div class="warning">
-            Если вы не запрашивали восстановление пароля, проигнорируйте это письмо.
+            If you did not request a password recovery, please ignore this email.
           </div>
         </div>
         <div class="footer">
-          CyberSec Lab Trainer — автоматическое уведомление
+          CyberSec Lab Trainer — automated notification
         </div>
       </div>
     </body>
@@ -153,8 +153,8 @@ export async function sendDeadlineReminderEmail(
   }
 
   const subject = isOverdue
-    ? `Просрочен дедлайн: ${deadlineTitle}`
-    : `Напоминание: ${deadlineTitle} — ${formatDate(dueAt)}`;
+    ? `Deadline Overdue: ${deadlineTitle}`
+    : `Reminder: ${deadlineTitle} — ${formatDate(dueAt)}`;
 
   try {
     const transporter = getTransporter();
