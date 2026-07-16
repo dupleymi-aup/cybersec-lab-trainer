@@ -72,14 +72,14 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loading'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, dimension, groupId]);
+  }, [days, dimension, groupId, t]);
 
   if (loading) {
     return (

@@ -671,6 +671,7 @@ const achievementIcons: Record<string, React.ReactNode> = {
 
 export default function AchievementsAndGlossary() {
   const tc = useTranslations('common');
+  const t = useTranslations('achievementsGlossary');
   const setCurrentPage = useAppStore((s) => s.setCurrentPage);
   const completedModules = useAppStore((s) => s.completedModules);
   const quizScores = useAppStore((s) => s.quizScores);
@@ -709,18 +710,18 @@ export default function AchievementsAndGlossary() {
           <Trophy size={20} className="text-amber-600" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Достижения и глоссарий</h1>
-          <p className="text-muted-foreground text-xs">Отслеживайте прогресс и изучайте термины</p>
+          <h1 className="text-xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'achievements' | 'glossary')}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="achievements" className="text-xs">
-            <Trophy size={14} className="mr-1" /> Достижения ({unlockedCount}/{achievementDefs.length})
+            <Trophy size={14} className="mr-1" /> {t('tabAchievements')} ({unlockedCount}/{achievementDefs.length})
           </TabsTrigger>
           <TabsTrigger value="glossary" className="text-xs">
-            <BookOpen size={14} className="mr-1" /> Глоссарий ({glossaryTerms.length})
+            <BookOpen size={14} className="mr-1" /> {t('tabGlossary')} ({glossaryTerms.length})
           </TabsTrigger>
         </TabsList>
 
@@ -730,15 +731,15 @@ export default function AchievementsAndGlossary() {
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold">Ваш уровень безопасности</h2>
+                  <h2 className="text-sm font-semibold">{t('yourSecurityLevel')}</h2>
                   <p className="text-muted-foreground mt-1 text-xs">
                     {unlockedCount === 0
-                      ? 'Начните обучение, чтобы получить первые достижения!'
+                      ? t('startLearning')
                       : unlockedCount < 5
-                        ? 'Вы на правильном пути! Продолжайте изучать модули.'
+                        ? t('onRightTrack')
                         : unlockedCount < achievementDefs.length
-                          ? 'Впечатляющий прогресс! Ещё немного до полного прохождения.'
-                          : 'Великолепно! Все достижения разблокированы!'}
+                          ? t('impressiveProgress')
+                          : t('allUnlocked')}
                   </p>
                 </div>
                 <div className="text-3xl font-bold text-amber-600">
@@ -788,7 +789,7 @@ export default function AchievementsAndGlossary() {
                           </h3>
                           {unlocked && (
                             <Badge className="border-0 bg-amber-500 text-[10px] text-white">
-                              <Flame size={10} className="mr-0.5" /> Получено
+                              <Flame size={10} className="mr-0.5" /> {t('unlocked')}
                             </Badge>
                           )}
                         </div>
@@ -812,7 +813,7 @@ export default function AchievementsAndGlossary() {
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Поиск по терминам..."
+              placeholder={t('searchTerms')}
               className="pl-10"
             />
           </div>
@@ -826,7 +827,7 @@ export default function AchievementsAndGlossary() {
               }`}
               onClick={() => setActiveCategory('')}
             >
-              Все ({glossaryTerms.length})
+              {t('all')} ({glossaryTerms.length})
             </Badge>
             {Object.keys(categoryColors).map((cat) => {
               const count = glossaryTerms.filter((t) => t.category === cat).length;
@@ -846,9 +847,9 @@ export default function AchievementsAndGlossary() {
           </div>
           {activeCategory && (
             <p className="text-muted-foreground text-xs">
-              Показано: <strong>{activeCategory}</strong> — {filteredTerms.length} терминов
+              {t('showingCategory', { category: activeCategory, count: filteredTerms.length })}
               <button type="button" className="ml-1 text-emerald-600 underline" onClick={() => setActiveCategory('')}>
-                Сбросить
+                {t('reset')}
               </button>
             </p>
           )}
@@ -879,7 +880,7 @@ export default function AchievementsAndGlossary() {
             ))}
             {filteredTerms.length === 0 && (
               <div className="py-8 text-center text-sm text-slate-400">
-                Ничего не найдено по запросу &quot;{searchTerm}&quot;
+                {t('nothingFound', { query: searchTerm })}
               </div>
             )}
           </div>

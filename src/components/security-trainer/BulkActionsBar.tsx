@@ -119,7 +119,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
                 className="text-slate-300 hover:bg-slate-800 hover:text-white dark:bg-slate-700"
                 onClick={() => setShowRolePicker(!showRolePicker)}
               >
-                <Shield size={14} className="mr-1" /> Роль
+                <Shield size={14} className="mr-1" /> {t('role')}
               </Button>
               {showRolePicker && (
                 <div className="bg-card absolute bottom-full left-0 mb-2 min-w-[160px] rounded-lg p-1 shadow-xl">
@@ -143,7 +143,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
               className="text-amber-400 hover:bg-slate-800 hover:text-amber-300 dark:bg-slate-700"
               onClick={() => handleBulkBlock(true)}
             >
-              <Ban size={14} className="mr-1" /> Блокировать
+              <Ban size={14} className="mr-1" /> {t('block')}
             </Button>
             <Button
               variant="ghost"
@@ -151,7 +151,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
               className="text-emerald-400 hover:bg-slate-800 hover:text-emerald-300 dark:bg-slate-700"
               onClick={() => handleBulkBlock(false)}
             >
-              <CheckCircle size={14} className="mr-1" /> Разблокировать
+              <CheckCircle size={14} className="mr-1" /> {t('unblock')}
             </Button>
 
             {/* Group assignment */}
@@ -162,7 +162,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
                 className="text-sky-400 hover:bg-slate-800 hover:text-sky-300 dark:bg-slate-700"
                 onClick={() => setShowGroupPicker(!showGroupPicker)}
               >
-                <Users size={14} className="mr-1" /> Группа
+                <Users size={14} className="mr-1" /> {t('group')}
               </Button>
               {showGroupPicker && (
                 <div className="bg-card absolute bottom-full left-0 mb-2 min-w-[220px] rounded-lg p-2 shadow-xl">
@@ -204,7 +204,7 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
               className="text-red-400 hover:bg-slate-800 hover:text-red-300 dark:bg-slate-700"
               onClick={handleBulkDelete}
             >
-              <Trash2 size={14} className="mr-1" /> Удалить
+              <Trash2 size={14} className="mr-1" /> {t('delete')}
             </Button>
 
             {/* Clear selection */}

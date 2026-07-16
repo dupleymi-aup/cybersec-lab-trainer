@@ -36,14 +36,14 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loading'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, propGroupId, internalGroupId]);
+  }, [days, propGroupId, internalGroupId, t]);
 
   if (loading) {
     return (
@@ -120,7 +120,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
             <Card className="border-border">
               <CardContent className="p-5">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
-                  <BarChart3 size={16} /> Прогресс по уровням
+                  <BarChart3 size={16} /> {t('levelProgress')}
                 </h3>
                 <div className="h-[250px]">
                   <ResponsiveContainer width="100%" height="100%">
@@ -204,7 +204,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
               <Card className="border-border">
                 <CardContent className="p-5">
                   <h3 className="mb-4 text-sm font-semibold">
-                    Распределение правильных ответов (Безопасное кодирование)
+                    {t('secureCoding')}
                   </h3>
                   <div className="h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">

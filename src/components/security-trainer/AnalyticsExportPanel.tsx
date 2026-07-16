@@ -598,7 +598,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'gradebook' as keyof ExportState,
       icon: FileText,
       title: t('gradebookCsv'),
-      description: 'Экспорт полного журнала оценок всех студентов с прогрессом по модулям и средними баллами',
+      description: t('gradebookDesc'),
       onClick: handleGradebookExport,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-50',
@@ -618,7 +618,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'analytics' as keyof ExportState,
       icon: BarChart3,
       title: t('analyticsCsv'),
-      description: 'Экспорт комплексной аналитики с KPI, распределением баллов и прогрессом по модулям',
+      description: t('analyticsDescFull'),
       onClick: handleAnalyticsExport,
       color: 'text-indigo-600',
       bgColor: 'bg-indigo-50',
@@ -628,7 +628,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'atRisk' as keyof ExportState,
       icon: AlertTriangle,
       title: t('atRiskCsv'),
-      description: 'Экспорт списка студентов в зоне риска с оценками риска, причинами и трендами',
+      description: t('atRiskDesc'),
       onClick: handleAtRiskExport,
       color: 'text-red-600',
       bgColor: 'bg-red-50',
@@ -638,7 +638,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'groupComparison' as keyof ExportState,
       icon: GitCompare,
       title: t('groupComparisonCsv'),
-      description: 'Экспорт сравнительной аналитики групп/курсов/университетов по метрикам',
+      description: t('groupCompDesc'),
       onClick: handleGroupComparisonExport,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
@@ -648,7 +648,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'modulePerformance' as keyof ExportState,
       icon: BookOpen,
       title: t('modulesCsv'),
-      description: 'Экспорт статистики по каждому модулю: завершение, баллы, сложность',
+      description: t('modulesCsvDesc'),
       onClick: handleModulePerformanceExport,
       color: 'text-amber-600',
       bgColor: 'bg-amber-50',
@@ -658,7 +658,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'gradebookPdf' as keyof ExportState,
       icon: FileText,
       title: t('gradebookPdf'),
-      description: 'Скачать журнал успеваемости в формате PDF для печати или отправки',
+      description: t('gradebookPdfDescFull'),
       onClick: handleGradebookPdfExport,
       color: 'text-emerald-700',
       bgColor: 'bg-emerald-50',
@@ -668,7 +668,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'atRiskPdf' as keyof ExportState,
       icon: AlertTriangle,
       title: t('atRiskPdf'),
-      description: 'Скачать отчёт по студентам в зоне риска в формате PDF',
+      description: t('atRiskPdfDescFull'),
       onClick: handleAtRiskPdfExport,
       color: 'text-red-700',
       bgColor: 'bg-red-50',
@@ -678,7 +678,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'analyticsPdf' as keyof ExportState,
       icon: BarChart3,
       title: t('analyticsPdf'),
-      description: 'Скачать комплексный аналитический отчёт с KPI и метриками в формате PDF',
+      description: t('analyticsPdfDescFull'),
       onClick: handleAnalyticsPdfExport,
       color: 'text-indigo-700',
       bgColor: 'bg-indigo-50',
@@ -688,7 +688,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'modulePerformancePdf' as keyof ExportState,
       icon: BookOpen,
       title: t('modulesPdf'),
-      description: 'Скачать статистику по модулям в формате PDF',
+      description: t('modulesPdfDescFull'),
       onClick: handleModulePerformancePdfExport,
       color: 'text-amber-700',
       bgColor: 'bg-amber-50',
@@ -698,7 +698,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'groupComparisonPdf' as keyof ExportState,
       icon: GitCompare,
       title: t('groupComparisonPdf'),
-      description: 'Скачать сравнительную аналитику групп в формате PDF',
+      description: t('groupCompPdfDesc'),
       onClick: handleGroupComparisonPdfExport,
       color: 'text-blue-700',
       bgColor: 'bg-blue-50',
@@ -718,7 +718,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'quizRetryPdf' as keyof ExportState,
       icon: Download,
       title: t('quizRetryPdf'),
-      description: 'Скачать аналитику по повторам квизов в формате PDF',
+      description: t('retryAnalysisDesc'),
       onClick: handleQuizRetryPdfExport,
       color: 'text-teal-700',
       bgColor: 'bg-teal-50',
@@ -728,7 +728,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       key: 'print' as keyof ExportState,
       icon: Printer,
       title: t('printReport'),
-      description: 'Открыть оптимизированную версию страницы для печати текущего состояния прогресса',
+      description: t('printOptimized'),
       onClick: handlePrint,
       color: 'text-muted-foreground',
       bgColor: 'bg-secondary',
@@ -742,9 +742,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold">{t('title')}</h2>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Экспортируйте данные о прогрессе студентов в различных форматах
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">{t('subtitle')}</p>
         </div>
         {!controlled && (
           <div className="bg-muted flex gap-1 rounded-lg p-1">
@@ -852,22 +850,22 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                     {status === 'loading' ? (
                       <>
                         <Loader2 size={16} className="mr-2 animate-spin" />
-                        Экспорт...
+                        {t('exporting')}
                       </>
                     ) : status === 'success' ? (
                       <>
                         <CheckCircle2 size={16} className="mr-2" />
-                        Готово
+                        {t('done')}
                       </>
                     ) : status === 'error' ? (
                       <>
                         <AlertCircle size={16} className="mr-2" />
-                        Ошибка
+                        {t('error')}
                       </>
                     ) : (
                       <>
                         <card.icon size={16} className="mr-2" />
-                        Экспортировать
+                        {t('export')}
                       </>
                     )}
                   </Button>
@@ -974,7 +972,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
 
             <div className="border-border flex justify-end gap-3 border-t p-6">
               <Button variant="outline" onClick={() => setPrintPreview(false)}>
-                Отмена
+                {t('cancel')}
               </Button>
               <Button
                 onClick={() => {
@@ -983,7 +981,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                 }}
               >
                 <Printer size={16} className="mr-2" />
-                Печать
+                {t('print')}
               </Button>
             </div>
           </div>

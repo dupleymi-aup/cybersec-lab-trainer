@@ -175,12 +175,12 @@ export default function PhishingAnalyzer() {
         <div>
           <h1 className="text-xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground text-xs">
-            Научитесь распознавать фишинг по заголовкам, содержимому и ссылкам
+            {t('subtitle')}
           </p>
         </div>
         {score.total > 0 && (
           <Badge className="ml-auto border-0 bg-emerald-100 text-emerald-700">
-            Правильно: {score.correct}/{score.total}
+            {t('correctScore', { correct: score.correct, total: score.total })}
           </Badge>
         )}
       </div>
@@ -192,14 +192,14 @@ export default function PhishingAnalyzer() {
           onClick={() => setCurrentPhase('education')}
           className={currentPhase === 'education' ? 'bg-blue-600' : ''}
         >
-          <BookOpen size={16} className="mr-2" /> Теория
+          <BookOpen size={16} className="mr-2" /> {t('theory')}
         </Button>
         <Button
           variant={currentPhase === 'practice' ? 'default' : 'outline'}
           onClick={() => setCurrentPhase('practice')}
           className={currentPhase === 'practice' ? 'bg-emerald-600' : ''}
         >
-          <Target size={16} className="mr-2" /> Практика ({phishingEmails.length} писем)
+          <Target size={16} className="mr-2" /> {t('practice', { count: phishingEmails.length })}
         </Button>
       </div>
 
@@ -233,7 +233,7 @@ export default function PhishingAnalyzer() {
 
           <div>
             <h3 className="mb-3 flex items-center gap-2 font-semibold">
-              <Lightbulb size={16} className="text-amber-500" /> Как распознать фишинг
+              <Lightbulb size={16} className="text-amber-500" /> {t('howToRecognize')}
             </h3>
             <div className="space-y-2">
               {phishingEducationContent.howToSpot.map((tip, i) => (
@@ -260,7 +260,7 @@ export default function PhishingAnalyzer() {
           </div>
 
           <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={() => setCurrentPhase('practice')}>
-            Перейти к практике <ArrowRight size={16} className="ml-2" />
+            {t('goToPractice')} <ArrowRight size={16} className="ml-2" />
           </Button>
         </motion.div>
       )}
@@ -332,11 +332,11 @@ export default function PhishingAnalyzer() {
                   >
                     {showRawBody ? (
                       <>
-                        <EyeOff size={12} className="mr-1" /> Скрыть HTML
+                        <EyeOff size={12} className="mr-1" /> {t('hideHtml')}
                       </>
                     ) : (
                       <>
-                        <Eye size={12} className="mr-1" /> Показать HTML
+                        <Eye size={12} className="mr-1" /> {t('showHtml')}
                       </>
                     )}
                   </Button>
@@ -376,13 +376,13 @@ export default function PhishingAnalyzer() {
           {!userVerdict ? (
             <div className="grid grid-cols-2 gap-3">
               <Button className="h-14 bg-red-600 text-base hover:bg-red-700" onClick={() => handleVerdict('phishing')}>
-                <AlertTriangle size={18} className="mr-2" /> Это фишинг
+                <AlertTriangle size={18} className="mr-2" /> {t('isPhishing')}
               </Button>
               <Button
                 className="h-14 bg-emerald-600 text-base hover:bg-emerald-700"
                 onClick={() => handleVerdict('legit')}
               >
-                <CheckCircle2 size={18} className="mr-2" /> Легитимное
+                <CheckCircle2 size={18} className="mr-2" /> {t('legitimate')}
               </Button>
             </div>
           ) : (
@@ -415,7 +415,7 @@ export default function PhishingAnalyzer() {
                 {currentEmail.isPhishing && currentEmail.indicators.length > 0 && (
                   <div className="mt-4 space-y-2">
                     <h3 className="flex items-center gap-2 text-sm font-semibold">
-                      <Shield size={14} className="text-red-500" /> Индикаторы фишинга (нажмите для подробностей)
+                      <Shield size={14} className="text-red-500" /> {t('phishingIndicators')}
                     </h3>
                     {currentEmail.indicators.map((ind) => (
                       <Card
@@ -464,7 +464,7 @@ export default function PhishingAnalyzer() {
                         setRevealedIndicators(new Set());
                       }}
                     >
-                      <RotateCcw size={14} className="mr-1" /> Сбросить счёт
+                      <RotateCcw size={14} className="mr-1" /> {t('resetScore')}
                     </Button>
                   )}
                 </div>
@@ -478,12 +478,12 @@ export default function PhishingAnalyzer() {
               className="w-full bg-emerald-600 hover:bg-emerald-700"
               onClick={() => completeModule('phishing-analyzer')}
             >
-              <CheckCircle2 size={16} className="mr-2" /> Отметить модуль как изученный
+              <CheckCircle2 size={16} className="mr-2" /> {t('markComplete')}
             </Button>
           )}
           {isCompleted && (
             <div className="flex items-center justify-center gap-2 text-center text-sm font-medium text-emerald-600">
-              <CheckCircle2 size={16} /> Модуль завершён!
+              <CheckCircle2 size={16} /> {t('moduleComplete')}
             </div>
           )}
         </motion.div>
@@ -492,7 +492,7 @@ export default function PhishingAnalyzer() {
       {currentPhase === 'practice' && filteredEmails.length === 0 && (
         <Card>
           <CardContent className="text-muted-foreground p-8 text-center">
-            Нет писем с такой сложностью. Выберите «Все».
+            {t('noEmails')}
           </CardContent>
         </Card>
       )}

@@ -256,7 +256,7 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
           value={summary.bestCohort ? `${summary.bestCohort.month}` : '—'}
           label={t('bestCohort')}
           delta={summary.bestCohort ? Math.round(summary.bestCohort.retention.week4 * 10) / 10 : undefined}
-          deltaSuffix="% (нед. 4)"
+          deltaSuffix={t('weekLabel')}
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
         />
@@ -293,8 +293,8 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
                   {RETENTION_WEEKS.map((w) => (
                     <th key={w.key} className="text-muted-foreground min-w-[90px] px-2 py-2 text-center font-semibold">
                       <div className="flex flex-col items-center">
-                        <span>{w.label}</span>
-                        <span className="text-[10px] font-normal text-slate-400">{w.daysLabel}</span>
+                        <span>{t(w.label)}</span>
+                        <span className="text-[10px] font-normal text-slate-400">{t(w.daysLabel)}</span>
                       </div>
                     </th>
                   ))}

@@ -59,14 +59,14 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки данных');
+          setError(e.message || t('loading'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [effectiveDays, props.groupId]);
+  }, [effectiveDays, props.groupId, t]);
 
   if (loading) {
     return (

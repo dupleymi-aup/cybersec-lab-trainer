@@ -84,14 +84,14 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loadingError'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [userId, days]);
+  }, [userId, days, t]);
 
   if (!userId) {
     return (
@@ -236,7 +236,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
             {exportStatus === 'loading' ? (
               '...'
             ) : exportStatus === 'success' ? (
-              'Готово'
+              t('done')
             ) : (
               <>
                 <FileText size={14} className="mr-1" /> PDF

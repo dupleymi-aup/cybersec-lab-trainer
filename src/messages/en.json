@@ -2618,7 +2618,16 @@
     "modulesPdfDesc2": "PDF module completion report",
     "groupCompPdfDesc": "PDF group comparison report",
     "retryAnalysisDesc": "PDF analysis of quiz retry patterns",
-    "printOptimized": "Open optimized page version for printing"
+    "printOptimized": "Open optimized page version for printing",
+    "exporting": "Exporting...",
+    "gradebookDescFull": "Export complete gradebook with student module progress and average scores",
+    "analyticsDescFull": "Export comprehensive analytics with KPIs, score distribution and module progress",
+    "modulesDescFull": "Module completion and score distribution per module",
+    "gradebookPdfDescFull": "Download gradebook PDF for printing or sharing",
+    "atRiskPdfDescFull": "Download at-risk students report PDF",
+    "analyticsPdfDescFull": "Download comprehensive analytics report with KPIs in PDF",
+    "modulesPdfDescFull": "Download module statistics PDF",
+    "subtitle": "Export student progress data in CSV and PDF formats"
   },
   "comprehensiveDashboard": {
     "loadingData": "Loading data...",
@@ -3317,5 +3326,35 @@
     "markComplete": "Mark module as completed",
     "moduleComplete": "Module completed!",
     "noEmails": "No emails with this difficulty. Select All."
+  },
+  "achievementsGlossary": {
+    "title": "Achievements & Glossary",
+    "subtitle": "Track progress and learn cybersecurity terms",
+    "tabAchievements": "Achievements",
+    "tabGlossary": "Glossary",
+    "yourSecurityLevel": "Your Security Level",
+    "startLearning": "Start learning to earn your first achievements!",
+    "onRightTrack": "You are on the right track! Keep studying modules.",
+    "impressiveProgress": "Impressive progress! A little more to go for full completion.",
+    "allUnlocked": "Excellent! All achievements unlocked!",
+    "unlocked": "Unlocked",
+    "searchTerms": "Search terms...",
+    "all": "All",
+    "showingCategory": "Showing: {category} \u2014 {count} terms",
+    "reset": "Reset",
+    "nothingFound": "Nothing found for \"{query}\""
+  },
+  "syncIndicator": {
+    "idle": "Offline",
+    "syncing": "Syncing...",
+    "synced": "Synced",
+    "syncedTime": "Synced {time}",
+    "error": "Sync failed",
+    "syncNow": "Sync now",
+    "justNow": "just now",
+    "secondsAgo": "{diff}s ago",
+    "minutesAgo": "{diff}m ago",
+    "syncSuccess": "Progress synced",
+    "syncError": "Sync failed"
   }
 }

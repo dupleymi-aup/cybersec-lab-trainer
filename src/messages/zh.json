@@ -2618,7 +2618,16 @@
     "modulesPdfDesc2": "PDF模块完成报告",
     "groupCompPdfDesc": "PDF小组对比报告",
     "retryAnalysisDesc": "PDF测验重试模式分析",
-    "printOptimized": "打开优化版本进行打印"
+    "printOptimized": "打开优化版本进行打印",
+    "exporting": "导出中...",
+    "gradebookDescFull": "导出成绩册，包含学生模块进度和平均分数",
+    "analyticsDescFull": "导出综合分析，包含KPI、分数分布和模块进度",
+    "modulesDescFull": "各模块完成情况、分数和难度统计",
+    "gradebookPdfDescFull": "下载成绩册PDF以供打印或分享",
+    "atRiskPdfDescFull": "下载有风险学生的PDF报告",
+    "analyticsPdfDescFull": "下载包含KPI的综合分析PDF报告",
+    "modulesPdfDescFull": "下载模块统计PDF",
+    "subtitle": "以CSV和PDF格式导出学生进度数据"
   },
   "comprehensiveDashboard": {
     "loadingData": "加载数据...",
@@ -3317,5 +3326,35 @@
     "markComplete": "标记模块为已完成",
     "moduleComplete": "模块已完成！",
     "noEmails": "没有此难度的邮件。请选择全部。"
+  },
+  "achievementsGlossary": {
+    "title": "成就与术语表",
+    "subtitle": "跟踪进度并学习安全术语",
+    "tabAchievements": "成就",
+    "tabGlossary": "术语表",
+    "yourSecurityLevel": "您的安全等级",
+    "startLearning": "开始学习以获得您的第一个成就！",
+    "onRightTrack": "您走在正确的道路上！继续学习模块。",
+    "impressiveProgress": "令人印象深刻的进步！距离全部完成只差一点。",
+    "allUnlocked": "太棒了！所有成就已解锁！",
+    "unlocked": "已获得",
+    "searchTerms": "搜索术语...",
+    "all": "全部",
+    "showingCategory": "显示：{category} — {count} 个术语",
+    "reset": "重置",
+    "nothingFound": "未找到 \"{query}\" 的相关结果"
+  },
+  "syncIndicator": {
+    "idle": "离线",
+    "syncing": "同步中...",
+    "synced": "已同步",
+    "syncedTime": "已同步于 {time}",
+    "error": "同步失败",
+    "syncNow": "立即同步",
+    "justNow": "刚刚",
+    "secondsAgo": "{diff}秒前",
+    "minutesAgo": "{diff}分钟前",
+    "syncSuccess": "进度已同步",
+    "syncError": "同步失败"
   }
 }

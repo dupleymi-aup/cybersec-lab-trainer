@@ -83,7 +83,7 @@ export default function PredictiveInsights({ groupId }: Props) {
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('error'));
           setLoading(false);
         }
       });
@@ -91,7 +91,7 @@ export default function PredictiveInsights({ groupId }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [days, groupId]);
+  }, [days, groupId, t]);
 
   const forecast = useMemo(() => generateForecast(trendData, days), [trendData, days]);
 
@@ -298,7 +298,7 @@ export default function PredictiveInsights({ groupId }: Props) {
                 <Tooltip />
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
-                  formatter={(value) => (value === 'actual' ? 'Факт' : value === 'predicted' ? 'Прогноз' : 'Диапазон')}
+                  formatter={(value) => (value === 'actual' ? t('actual') : value === 'predicted' ? t('forecast') : t('range'))}
                 />
                 <Area
                   type="monotone"
@@ -348,7 +348,7 @@ export default function PredictiveInsights({ groupId }: Props) {
         <CardContent className="p-5">
           <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
             <Lightbulb size={16} className="text-amber-500" />
-            Рекомендации на основе прогноза
+            {t('recommendations')}
           </h3>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {insights.filter((i) => i.trend === 'down').length > 0 && (
@@ -360,9 +360,7 @@ export default function PredictiveInsights({ groupId }: Props) {
                     .map((i) => (
                       <li key={i.label} className="flex items-start gap-1.5 text-xs text-red-600">
                         <AlertTriangle size={12} className="mt-0.5 flex-shrink-0" />
-                        Прогнозируется снижение {i.label.toLowerCase()} ({i.current}
-                        {i.unit} → {i.predicted}
-                        {i.unit})
+                        {t('forecastDecline', { label: i.label.toLowerCase(), current: i.current, predicted: i.predicted, unit: i.unit })}
                       </li>
                     ))}
                   {insights
@@ -370,9 +368,7 @@ export default function PredictiveInsights({ groupId }: Props) {
                     .map((i) => (
                       <li key={i.label} className="flex items-start gap-1.5 text-xs text-red-600">
                         <AlertTriangle size={12} className="mt-0.5 flex-shrink-0" />
-                        {t('riskGrowth', { current: i.current, predicted: i.predicted, unit: i.unit })} ({i.current}
-                        {i.unit} → {i.predicted}
-                        {i.unit})
+                        {t('riskGrowth', { current: i.current, predicted: i.predicted, unit: i.unit })}
                       </li>
                     ))}
                 </ul>
@@ -383,10 +379,7 @@ export default function PredictiveInsights({ groupId }: Props) {
                 (trendData[trendData.length - 1]?.modulesCompleted || 0) * 0.8 && (
                 <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
                   <p className="mb-2 text-sm font-medium text-amber-700">{t('longTermRisks')}</p>
-                  <p className="text-xs text-amber-600">
-                    Снижение темпа завершения модулей. Рекомендуется усилить мотивационную составляющую и добавить
-                    промежуточные цели для студентов.
-                  </p>
+                    <p className="text-xs text-amber-600">{t('longTermDesc')}</p>
                 </div>
               )}
             {insights.filter((i) => i.trend === 'up' && i.label !== t('riskOfFallingBehind')).length > 0 && (
@@ -398,9 +391,7 @@ export default function PredictiveInsights({ groupId }: Props) {
                     .map((i) => (
                       <li key={i.label} className="flex items-start gap-1.5 text-xs text-emerald-600">
                         <TrendingUp size={12} className="mt-0.5 flex-shrink-0" />
-                        Рост {i.label.toLowerCase()} ({i.current}
-                        {i.unit} → {i.predicted}
-                        {i.unit})
+                        {t('growthLabel', { label: i.label.toLowerCase(), current: i.current, predicted: i.predicted, unit: i.unit })}
                       </li>
                     ))}
                 </ul>
@@ -409,10 +400,7 @@ export default function PredictiveInsights({ groupId }: Props) {
             {insights.filter((i) => i.trend === 'stable').length > 0 && (
               <div className="rounded-lg border border-sky-100 bg-sky-50 p-3">
                 <p className="mb-2 text-sm font-medium text-sky-700">{t('stableIndicators')}</p>
-                <p className="text-xs text-sky-600">
-                  Текущий уровень сохраняется. Рекомендуется внедрить точечные улучшения для перехода к положительной
-                  динамике.
-                </p>
+                <p className="text-xs text-sky-600">{t('stableDesc')}</p>
               </div>
             )}
           </div>

@@ -163,7 +163,7 @@ export default function PredictiveRiskDashboard({
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis allowDecimals={false} />
               <Tooltip />
-              <Bar dataKey="value" name="Студенты" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="value" name={t('students')} radius={[4, 4, 0, 0]}>
                 {riskDistribution.map((entry, i) => (
                   <Bar key={i} dataKey="value" fill={entry.color} />
                 ))}

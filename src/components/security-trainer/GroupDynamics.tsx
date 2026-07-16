@@ -48,14 +48,14 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loading'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, propGroupId, internalGroupId]);
+  }, [days, propGroupId, internalGroupId, t]);
 
   if (loading) {
     return (
@@ -123,7 +123,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
                     <Badge
                       className={`text-[10px] ${g.trend === 'improving' ? 'bg-emerald-100 text-emerald-700' : g.trend === 'declining' ? 'bg-red-100 text-red-700' : 'bg-muted text-muted-foreground'}`}
                     >
-                      {g.trend === 'improving' ? 'Улучшение' : g.trend === 'declining' ? 'Снижение' : 'Стабильно'}
+                      {g.trend === 'improving' ? t('improving') : g.trend === 'declining' ? t('declining') : t('stable')}
                     </Badge>
                   </div>
                 </div>
@@ -189,7 +189,7 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
         <Card className="border-border">
           <CardContent className="p-5">
             <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
-              <TrendingUp size={16} /> Общая динамика здоровья групп
+              <TrendingUp size={16} /> {t('overallHealth')}
             </h3>
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">

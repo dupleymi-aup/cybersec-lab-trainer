@@ -14,10 +14,20 @@ export default function SyncIndicator() {
   const userId = useAppStore((s) => s.userId);
   const syncWithDatabase = useAppStore((s) => s.syncWithDatabase);
   const { isAuthenticated } = useSession();
-  const t = useTranslations('errors');
+  const t = useTranslations('syncIndicator');
   const [isManualSyncing, setIsManualSyncing] = useState(false);
 
   if (!isAuthenticated || !userId) return null;
+
+  const formatTime = (date: Date): string => {
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diff < 5) return t('justNow');
+    if (diff < 60) return t('secondsAgo', { diff });
+    if (diff < 3600) return t('minutesAgo', { diff: Math.floor(diff / 60) });
+    return date.toLocaleTimeString();
+  };
 
   const handleManualSync = async () => {
     if (isManualSyncing || syncStatus === 'syncing') return;
@@ -41,10 +51,10 @@ export default function SyncIndicator() {
   };
 
   const labels = {
-    idle: 'Offline',
-    syncing: 'Syncing...',
-    synced: lastSyncedAt ? `Synced ${formatTime(lastSyncedAt)}` : 'Synced',
-    error: 'Sync failed',
+    idle: t('idle'),
+    syncing: t('syncing'),
+    synced: lastSyncedAt ? t('syncedTime', { time: formatTime(lastSyncedAt) }) : t('synced'),
+    error: t('error'),
   };
 
   return (
@@ -55,20 +65,10 @@ export default function SyncIndicator() {
         onClick={handleManualSync}
         disabled={isManualSyncing || syncStatus === 'syncing'}
         className="ml-1 rounded p-0.5 transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-30"
-        title="Sync now"
+        title={t('syncNow')}
       >
         <RefreshCw size={12} className={isManualSyncing ? 'animate-spin' : ''} />
       </button>
     </div>
   );
-}
-
-function formatTime(date: Date): string {
-  const now = new Date();
-  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  if (diff < 5) return 'just now';
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  return date.toLocaleTimeString();
 }

@@ -255,10 +255,10 @@ export default function APISecurityLab() {
         </p>
         <div className="mt-3 flex items-center gap-2">
           <Badge variant="secondary" className="text-xs">
-            10 тем
+            {t('topics')}
           </Badge>
           <Badge variant="secondary" className="text-xs">
-            Продвинутый
+            {t('advanced')}
           </Badge>
           <div className="flex-1" />
           <span className="text-muted-foreground text-xs">
@@ -314,13 +314,13 @@ export default function APISecurityLab() {
           <Tabs defaultValue="theory" className="mt-4">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="theory" className="flex items-center gap-2">
-                <BookOpen size={14} /> Теория
+                <BookOpen size={14} /> {t('theory')}
               </TabsTrigger>
               <TabsTrigger value="code" className="flex items-center gap-2">
-                <Code2 size={14} /> Код
+                <Code2 size={14} /> {t('code')}
               </TabsTrigger>
               <TabsTrigger value="defense" className="flex items-center gap-2">
-                <Lightbulb size={14} /> Защита
+                <Lightbulb size={14} /> {t('defense')}
               </TabsTrigger>
             </TabsList>
 
@@ -334,7 +334,7 @@ export default function APISecurityLab() {
                   <div>
                     <h4 className="text-foreground mb-2 flex items-center gap-2 text-sm font-medium">
                       <Code2 size={16} className="text-violet-500" />
-                      Пример кода
+                      {t('codeExample')}
                     </h4>
                     <CodeBlock code={topic.codeExample} language="javascript" />
                   </div>
@@ -347,7 +347,7 @@ export default function APISecurityLab() {
                 <CardContent className="p-4">
                   <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold text-green-800 dark:text-green-400">
                     <CheckCircle2 size={16} />
-                    Рекомендации по защите
+                    {t('defenseRecommendations')}
                   </h4>
                   <ul className="space-y-2">
                     {defenseItems.map((item, i) => (
@@ -373,7 +373,7 @@ export default function APISecurityLab() {
               disabled={currentIndex === 0}
               className="flex items-center gap-1"
             >
-              <ChevronLeft size={16} /> Назад
+              <ChevronLeft size={16} /> {t('back')}
             </Button>
 
             <Button
@@ -385,7 +385,7 @@ export default function APISecurityLab() {
             >
               {isCompleted ? (
                 <>
-                  <CheckCircle2 size={16} /> Изучено
+                  <CheckCircle2 size={16} /> {t('studiedDone')}
                 </>
               ) : (
                 <>{t('markStudied')}</>
@@ -399,7 +399,7 @@ export default function APISecurityLab() {
               disabled={currentIndex === apiSecurityTopics.length - 1}
               className="flex items-center gap-1"
             >
-              Далее <ChevronRight size={16} />
+              {t('next')} <ChevronRight size={16} />
             </Button>
           </div>
         </CardContent>

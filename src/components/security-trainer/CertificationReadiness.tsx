@@ -75,14 +75,14 @@ export default function CertificationReadiness({
       })
       .catch((e) => {
         if (!cancelled) {
-          setError(e.message || 'Ошибка загрузки');
+          setError(e.message || t('loading'));
           setLoading(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [days, propGroupId, internalGroupId]);
+  }, [days, propGroupId, internalGroupId, t]);
 
   if (loading) {
     return (
