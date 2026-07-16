@@ -12,13 +12,13 @@ import KPICard from './KPICard';
 import { logger } from '@/lib/logger';
 
 const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
+  { key: 7, labelKey: 'days7' },
+  { key: 30, labelKey: 'days30' },
+  { key: 90, labelKey: 'days90' },
+  { key: 180, labelKey: 'days180' },
 ];
 
-const DAY_NAMES = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+const DAY_NAME_KEYS = ['daySun', 'dayMon', 'dayTue', 'dayWed', 'dayThu', 'dayFri', 'daySat'] as const;
 
 export interface EngagementAnalyticsProps {
   groupId?: string;
@@ -27,6 +27,7 @@ export interface EngagementAnalyticsProps {
 
 export default function EngagementAnalytics({ groupId: propGroupId, days: propDays }: EngagementAnalyticsProps = {}) {
   const t = useTranslations('engagementAnalytics');
+  const tc = useTranslations('common');
   const [data, setData] = useState<EngagementData | null>(null);
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,7 +112,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       <div className="flex flex-wrap items-center gap-3">
         {showPeriodSelector && (
           <div className="bg-muted flex gap-1 rounded-lg p-1">
-            {PERIOD_OPTIONS.map(({ key, label }) => (
+            {PERIOD_OPTIONS.map(({ key, labelKey }) => (
               <button
                 key={key}
                 onClick={() => setInternalDays(key)}
@@ -121,7 +122,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {label}
+                {tc(labelKey)}
               </button>
             ))}
           </div>
@@ -168,7 +169,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
         />
         <KPICard
           icon={<TrendingUp size={18} />}
-          value={DAY_NAMES[peakDay.day]}
+          value={tc(DAY_NAME_KEYS[peakDay.day])}
           label={t('peakDay')}
           iconBg="bg-emerald-100"
           iconColor="text-emerald-600"
@@ -214,7 +215,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={weeklyPattern}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" tickFormatter={(d) => DAY_NAMES[d]} tick={{ fontSize: 12 }} />
+              <XAxis dataKey="day" tickFormatter={(d) => tc(DAY_NAME_KEYS[d])} tick={{ fontSize: 12 }} />
               <YAxis />
               <Tooltip />
               <Bar dataKey="avgActivities" fill="#f59e0b" />

@@ -15,6 +15,7 @@ export interface QuizSessionAnalyticsProps {
 
 export default function QuizSessionAnalytics({ groupId: propGroupId, days: propDays }: QuizSessionAnalyticsProps = {}) {
   const t = useTranslations('quizSessionAnalytics');
+  const tc = useTranslations('common');
   const [data, setData] = useState<QuizSessionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -202,7 +203,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
                       <td className="text-muted-foreground p-2">{r.category}</td>
                       <td className="p-2 text-center">
                         <Badge variant="destructive" className="text-[10px]">
-                          {r.duration}с
+                          {r.duration}{tc('secondsShort')}
                         </Badge>
                       </td>
                       <td className="p-2 text-center">{r.questionCount}</td>

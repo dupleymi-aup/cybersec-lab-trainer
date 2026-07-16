@@ -9,13 +9,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
 import KPICard from './KPICard';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
-
 export default function QuizRetryAnalytics({
   groupId: controlledGroupId,
   days: controlledDays,
@@ -26,6 +19,14 @@ export default function QuizRetryAnalytics({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('quizRetryAnalytics');
+  const tc = useTranslations('common');
+
+  const PERIOD_OPTIONS = [
+    { key: 7, labelKey: 'days7' },
+    { key: 30, labelKey: 'days30' },
+    { key: 90, labelKey: 'days90' },
+    { key: 180, labelKey: 'days180' },
+  ];
 
   useEffect(() => {
     let cancelled = false;
@@ -85,14 +86,14 @@ export default function QuizRetryAnalytics({
       {/* Period selector */}
       {controlledDays === undefined && (
         <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
+          {PERIOD_OPTIONS.map(({ key, labelKey }) => (
             <button
               type="button"
               key={key}
               onClick={() => setInternalDays(key)}
               className={`rounded-md px-3 py-1.5 text-xs transition-all ${days === key ? 'bg-background text-foreground font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              {label}
+              {tc(labelKey)}
             </button>
           ))}
         </div>

@@ -10,13 +10,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
 import { CHART_COLORS } from '@/lib/constants';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
-
 export interface ProgressDynamicsChartProps {
   groupId?: string;
   days?: number;
@@ -26,6 +19,7 @@ const DEFAULT_DAYS = 30;
 
 export default function ProgressDynamicsChart({ groupId, days: controlledDays }: ProgressDynamicsChartProps = {}) {
   const t = useTranslations('progressDynamics');
+  const tc = useTranslations('common');
   const formatDate = useDateFormatter();
   const [daily, setDaily] = useState<ProgressDynamicsDay[]>([]);
   const [summary, setSummary] = useState<{
@@ -42,6 +36,13 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(DEFAULT_DAYS);
+
+  const PERIOD_OPTIONS = [
+    { key: 7, labelKey: 'days7' },
+    { key: 30, labelKey: 'days30' },
+    { key: 90, labelKey: 'days90' },
+    { key: 180, labelKey: 'days180' },
+  ];
 
   const isControlled = controlledDays !== undefined;
   const days = isControlled ? controlledDays : internalDays;
@@ -97,7 +98,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
       {/* Period selector (hidden when controlled externally) */}
       {!isControlled && (
         <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
+          {PERIOD_OPTIONS.map(({ key, labelKey }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
@@ -107,7 +108,7 @@ export default function ProgressDynamicsChart({ groupId, days: controlledDays }:
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {label}
+              {tc(labelKey)}
             </button>
           ))}
         </div>

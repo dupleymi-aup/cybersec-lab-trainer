@@ -9,13 +9,6 @@ import { getModulePerformance, type ModulePerformance } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
-
 const COLORS = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd', '#818cf8', '#7c3aed', '#a855f7', '#d8b4fe'];
 
 function getDifficultyColor(difficultyIndex: number): string {
@@ -40,10 +33,18 @@ const isControlled = (props: ModulePerformanceReportProps): props is ModulePerfo
 
 export default function ModulePerformanceReport(props: ModulePerformanceReportProps = {}) {
   const t = useTranslations('modulePerformance');
+  const tc = useTranslations('common');
   const [modules, setModules] = useState<ModulePerformance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
+
+  const PERIOD_OPTIONS = [
+    { key: 7, labelKey: 'days7' },
+    { key: 30, labelKey: 'days30' },
+    { key: 90, labelKey: 'days90' },
+    { key: 180, labelKey: 'days180' },
+  ];
 
   const effectiveDays = isControlled(props) ? props.days : internalDays;
   const controlled = isControlled(props);
@@ -100,7 +101,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
       {/* Period selector — hidden when controlled externally */}
       {!controlled && (
         <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
+          {PERIOD_OPTIONS.map(({ key, labelKey }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
@@ -110,7 +111,7 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {label}
+              {tc(labelKey)}
             </button>
           ))}
         </div>

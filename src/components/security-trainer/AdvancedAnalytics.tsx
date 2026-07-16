@@ -25,13 +25,6 @@ import { useTranslations } from 'next-intl';
 import KPICard from './KPICard';
 import { logger } from '@/lib/logger';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
-
 interface ModuleTimeEntry {
   moduleId: string;
   avg: number;
@@ -109,12 +102,20 @@ interface Props {
 export default function AdvancedAnalytics({ groupId, days: controlledDays }: Props) {
   const formatDate = useDateFormatter();
   const t = useTranslations('advancedAnalytics');
+  const tc = useTranslations('common');
   const [internalDays, setInternalDays] = useState(30);
   const [subTab, setSubTab] = useState<'time' | 'errors' | 'retry'>('time');
   const [timeData, setTimeData] = useState<TimeAnalyticsData | null>(null);
   const [errorData, setErrorData] = useState<ErrorAnalyticsData | null>(null);
   const [retryData, setRetryData] = useState<RetryAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const PERIOD_OPTIONS = [
+    { key: 7, labelKey: 'days7' },
+    { key: 30, labelKey: 'days30' },
+    { key: 90, labelKey: 'days90' },
+    { key: 180, labelKey: 'days180' },
+  ];
 
   const days = controlledDays ?? internalDays;
 
@@ -162,7 +163,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
       {/* Period selector and sub-tabs */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="bg-muted flex gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
+          {PERIOD_OPTIONS.map(({ key, labelKey }) => (
             <button
               key={key}
               onClick={() => setInternalDays(key)}
@@ -172,7 +173,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {label}
+              {tc(labelKey)}
             </button>
           ))}
         </div>
@@ -211,14 +212,14 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
             />
             <KPICard
               icon={<TrendingUp size={18} />}
-              value={`${timeData.moduleTimes?.[0]?.avg ?? 0}ч`}
+              value={`${timeData.moduleTimes?.[0]?.avg ?? 0}${tc('hoursShort')}`}
               label={t('avgTimeFastest')}
               iconBg="bg-emerald-100"
               iconColor="text-emerald-600"
             />
             <KPICard
               icon={<Clock size={18} />}
-              value={`${timeData.moduleTimes?.[timeData.moduleTimes.length - 1]?.avg ?? 0}ч`}
+              value={`${timeData.moduleTimes?.[timeData.moduleTimes.length - 1]?.avg ?? 0}${tc('hoursShort')}`}
               label={t('avgTimeSlowest')}
               iconBg="bg-amber-100"
               iconColor="text-amber-600"
@@ -291,7 +292,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                             s.avgHoursPerModule < 6 ? 'default' : s.avgHoursPerModule < 12 ? 'secondary' : 'destructive'
                           }
                         >
-                          {s.avgHoursPerModule}ч
+                          {s.avgHoursPerModule}{tc('hoursShort')}
                         </Badge>
                       </div>
                     </motion.div>

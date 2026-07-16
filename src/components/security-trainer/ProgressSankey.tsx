@@ -8,13 +8,6 @@ import { getComprehensiveSummary, type ComprehensiveSummary } from '@/lib/auth-s
 import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
-
 const STAGE_COLORS = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
 
 export default function ProgressSankey({
@@ -27,6 +20,14 @@ export default function ProgressSankey({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('progressSankey');
+  const tc = useTranslations('common');
+
+  const PERIOD_OPTIONS = [
+    { key: 7, labelKey: 'days7' },
+    { key: 30, labelKey: 'days30' },
+    { key: 90, labelKey: 'days90' },
+    { key: 180, labelKey: 'days180' },
+  ];
 
   useEffect(() => {
     let cancelled = false;
@@ -135,14 +136,14 @@ export default function ProgressSankey({
       {/* Period selector */}
       {controlledDays === undefined && (
         <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
+          {PERIOD_OPTIONS.map(({ key, labelKey }) => (
             <button
               type="button"
               key={key}
               onClick={() => setInternalDays(key)}
               className={`rounded-md px-3 py-1.5 text-xs transition-all ${days === key ? 'bg-background text-foreground font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              {label}
+              {tc(labelKey)}
             </button>
           ))}
         </div>
