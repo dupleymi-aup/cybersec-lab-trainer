@@ -12,6 +12,8 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`2479551b`**: fix: dynamic locale in root/dashboard redirects, try/catch in 2 API routes, localize period labels/day names/unit suffixes across 8 analytics components, fix remaining hardcoded Russian in StudentPerformanceReport
+- **`4fc3684e`**: i18n: localize 15 components (APISecurityLab, AchievementsGlossary, AnalyticsExportPanel, BulkActionsBar, CertificationReadiness, CohortAnalysis, GroupComparisonReport, GroupDynamics, LearningPathReport, ModuleDeepDive, PhishingAnalyzer, PredictiveInsights, PredictiveRiskDashboard, StudentPerformanceReport, SyncIndicator) with en/ru/zh keys
 - **`331b0c4c`**: fix: show invite code input for teacher role on register page, update i18n keys en/ru/zh
 - **`65481de7`**: i18n: localize 3 more components (QuizQuestionAnalytics, ProgressSankey, CohortAnalysis) with en/ru/zh keys
 - **`802d7674`**: i18n: localize 5 more analytics components (QuizRetryAnalytics, QuizDifficultyAnalysis, AdminSummaryReport, AdvancedAnalytics, ReportScheduler) with en/ru/zh keys
@@ -39,5 +41,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **Remote sync** — both remotes at `65481de7`
-- **Full verification passed**: lint ✓, build ✓
+- **Remote sync** — both remotes at `2479551b`
+- **Full verification passed**: lint ✓, typecheck ✓, build ✓
