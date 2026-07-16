@@ -96,9 +96,9 @@ export default function SQLInjectionLab() {
   };
 
   const levelColors: Record<string, string> = {
-    Новичок: 'bg-green-100 text-green-700',
-    Продвинутый: 'bg-yellow-100 text-yellow-700',
-    Эксперт: 'bg-red-100 text-red-700',
+    beginner: 'bg-green-100 text-green-700',
+    advanced: 'bg-yellow-100 text-yellow-700',
+    expert: 'bg-red-100 text-red-700',
   };
 
   return (
@@ -163,7 +163,7 @@ export default function SQLInjectionLab() {
           <Card className="border-border">
             <CardHeader className="pb-3">
               <div className="mb-2 flex items-center justify-between">
-                <Badge className={`text-[11px] ${levelColors[challenge.level]}`}>{challenge.level}</Badge>
+                <Badge className={`text-[11px] ${levelColors[challenge.level]}`}>{t(challenge.level)}</Badge>
                 <span className="text-xs text-slate-400">
                   {t('challengeNumber', { current: activeChallenge + 1, total: sqlChallenges.length })}
                 </span>
@@ -314,10 +314,7 @@ export default function SQLInjectionLab() {
                       {t('yourInput')} <code className="font-mono text-red-600">{userInput}</code>
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      Для SQL-инъекции попробуйте использовать: одинарные кавычки (<code className="font-mono">'</code>
-                      ), SQL-ключевые слова (<code className="font-mono">OR</code>,{' '}
-                      <code className="font-mono">UNION SELECT</code>, <code className="font-mono">--</code>), или
-                      другие конструкции. Нажмите «Пример» для подсказки.
+                      {t('trySuggestions')}
                     </p>
                   </div>
                 )}
@@ -345,9 +342,7 @@ export default function SQLInjectionLab() {
                             <ShieldCheck size={14} /> {t('howToProtect')}
                           </h4>
                           <p className="text-xs text-emerald-600">
-                            Используйте параметризованные запросы (prepared statements) или ORM-библиотеки (Prisma,
-                            Sequelize, TypeORM). Никогда не подставляйте пользовательский ввод напрямую в SQL-запрос
-                            через конкатенацию строк.
+                            {t('protectionText')}
                           </p>
                         </div>
                       </div>

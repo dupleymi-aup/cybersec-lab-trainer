@@ -21,19 +21,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import KPICard from './KPICard';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
-
 export default function PredictiveRiskDashboard({
   groupId: controlledGroupId,
   days: controlledDays,
 }: { groupId?: string; days?: number } = {}) {
   const t = useTranslations('predictiveRisk');
+  const tc = useTranslations('common');
   const [internalDays, setInternalDays] = useState(30);
+  const PERIOD_OPTIONS = [
+    { key: 7, label: tc('days7') },
+    { key: 30, label: tc('days30') },
+    { key: 90, label: tc('days90') },
+    { key: 180, label: tc('days180') },
+  ];
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [data, setData] = useState<PredictiveRiskData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -293,7 +293,7 @@ export default function PredictiveRiskDashboard({
                     </td>
                     <td className="px-3 py-2.5 text-right">{Math.round(student.dropoutProbability * 100)}%</td>
                     <td className="px-3 py-2.5 text-right">
-                      {student.predictedDropoutWeek ? `${student.predictedDropoutWeek} нед.` : '—'}
+                      {student.predictedDropoutWeek ? t('weeks', { n: student.predictedDropoutWeek }) : '—'}
                     </td>
                     <td className="px-3 py-2.5">
                       <div className="flex flex-wrap gap-1">

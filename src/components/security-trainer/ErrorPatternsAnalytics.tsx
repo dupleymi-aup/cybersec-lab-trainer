@@ -22,13 +22,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import KPICard from './KPICard';
 
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7д' },
-  { key: 30, label: '30д' },
-  { key: 90, label: '90д' },
-  { key: 180, label: '180д' },
-];
-
 const DIFFICULTY_LABELS: Record<string, string> = {
   easy: 'easy',
   medium: 'medium',
@@ -45,8 +38,15 @@ export default function ErrorPatternsAnalytics({
   days: controlledDays,
 }: { groupId?: string; days?: number } = {}) {
   const t = useTranslations('errorPatterns');
+  const tc = useTranslations('common');
   const formatDate = useDateFormatter();
   const [internalDays, setInternalDays] = useState(30);
+  const PERIOD_OPTIONS = [
+    { key: 7, label: tc('days7') },
+    { key: 30, label: tc('days30') },
+    { key: 90, label: tc('days90') },
+    { key: 180, label: tc('days180') },
+  ];
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [data, setData] = useState<ErrorPatternsData | null>(null);
   const [loading, setLoading] = useState(true);

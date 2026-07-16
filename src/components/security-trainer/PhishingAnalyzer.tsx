@@ -297,7 +297,7 @@ export default function PhishingAnalyzer() {
                   {t(currentEmail.difficulty)}
                 </Badge>
                 <span className="text-xs text-slate-400">
-                  Письмо {currentEmailIndex + 1} из {filteredEmails.length}
+                  {t('emailCounter', { current: currentEmailIndex + 1, total: filteredEmails.length })}
                 </span>
               </div>
 
@@ -405,7 +405,7 @@ export default function PhishingAnalyzer() {
                     </div>
                     <p className="text-foreground/70 mb-3 text-sm">
                       {t('email')} <b>{currentEmail.isPhishing ? t('phishingWord') : t('legitimateWord')}</b>.
-                      {currentEmail.isPhishing && ` Найдено ${currentEmail.indicators.length} индикаторов.`}
+                      {currentEmail.isPhishing && t('indicatorsFound', { count: currentEmail.indicators.length })}
                     </p>
                     <p className="text-muted-foreground text-xs leading-relaxed">{currentEmail.explanation}</p>
                   </CardContent>

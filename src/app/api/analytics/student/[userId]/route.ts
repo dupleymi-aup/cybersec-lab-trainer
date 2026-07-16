@@ -5,6 +5,7 @@ import { parseDays } from '@/lib/utils';
 import { getModuleName } from '@/lib/module-names';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
+  try {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
   const resolvedParams = await params;
@@ -533,4 +534,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     skillsGap,
     recommendations,
   });
+  } catch (error) {
+    console.error('Student report error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

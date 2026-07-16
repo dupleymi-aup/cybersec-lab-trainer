@@ -182,17 +182,7 @@ export default function XSSLab() {
                 : 'border-border bg-card text-muted-foreground hover:border-border'
             }`}
           >
-            {x.id === 'reflected'
-              ? 'Отражённый'
-              : x.id === 'stored'
-                ? 'Хранимый'
-                : x.id === 'dom'
-                  ? 'DOM-based'
-                  : x.id === 'svg'
-                    ? 'SVG'
-                    : x.id === 'markdown'
-                      ? 'Markdown'
-                      : 'PDF'}
+            {badgeTexts[x.id] || x.id}
             {xssCompletedLevels.includes(x.id) && <CheckCircle2 size={12} className="ml-1 inline" />}
           </button>
         ))}

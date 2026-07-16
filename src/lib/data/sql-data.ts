@@ -4,7 +4,7 @@
 export const sqlChallenges = [
   {
     id: 'beginner-1',
-    level: 'Новичок',
+    level: 'beginner',
     title: 'Обход аутентификации',
     description: 'Войдите в систему без знания реального пароля, используя SQL-инъекцию в форме логина.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'\n  AND password = 'password123'`,
@@ -16,7 +16,7 @@ export const sqlChallenges = [
   },
   {
     id: 'beginner-2',
-    level: 'Новичок',
+    level: 'beginner',
     title: 'Комментарий для обхода',
     description: 'Обойдите проверку пароля, используя SQL-комментарий для игнорирования оставшейся части запроса.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'\n  AND password = 'any'`,
@@ -28,7 +28,7 @@ export const sqlChallenges = [
   },
   {
     id: 'advanced-1',
-    level: 'Продвинутый',
+    level: 'advanced',
     title: 'Извлечение данных через UNION',
     description: 'Используйте UNION SELECT для извлечения данных из таблицы credit_cards.',
     initialQuery: `SELECT name, email FROM users\nWHERE name LIKE '%[ВВОД]%'`,
@@ -40,7 +40,7 @@ export const sqlChallenges = [
   },
   {
     id: 'expert-1',
-    level: 'Эксперт',
+    level: 'expert',
     title: 'Уничтожение данных (DROP TABLE)',
     description: 'Используйте инъекцию для выполнения деструктивной операции — удалите таблицу.',
     initialQuery: `SELECT * FROM products\nWHERE id = [ВВОД]`,
@@ -52,7 +52,7 @@ export const sqlChallenges = [
   },
   {
     id: 'beginner-3',
-    level: 'Новичок',
+    level: 'beginner',
     title: 'Error-based SQLi',
     description: 'Извлеките информацию о версии базы данных через сообщения об ошибках.',
     initialQuery: `SELECT * FROM users\nWHERE id = '[ВВОД]'`,
@@ -65,7 +65,7 @@ export const sqlChallenges = [
   },
   {
     id: 'beginner-4',
-    level: 'Новичок',
+    level: 'beginner',
     title: 'Boolean-based Blind SQLi',
     description: 'Определите, существует ли пользователь "admin", используя только ответы true/false от сервера.',
     initialQuery: `SELECT * FROM products\nWHERE name LIKE '%[ВВОД]%'`,
@@ -77,7 +77,7 @@ export const sqlChallenges = [
   },
   {
     id: 'advanced-2',
-    level: 'Продвинутый',
+    level: 'advanced',
     title: 'Time-based Blind SQLi',
     description:
       'Используйте задержки (SLEEP) для определения уязвимости, когда сервер не возвращает видимых различий.',
@@ -90,7 +90,7 @@ export const sqlChallenges = [
   },
   {
     id: 'advanced-3',
-    level: 'Продвинутый',
+    level: 'advanced',
     title: 'Second-order SQLi',
     description:
       'Внедрите SQL-инъекцию через регистрацию нового пользователя, которая сработает при изменении профиля.',
@@ -103,7 +103,7 @@ export const sqlChallenges = [
   },
   {
     id: 'expert-2',
-    level: 'Эксперт',
+    level: 'expert',
     title: 'Out-of-band SQLi (OOB)',
     description: 'Извлеките данные через внешний DNS-запрос, когда прямой ответ сервера недоступен.',
     initialQuery: `SELECT * FROM users\nWHERE id = [ВВОД]`,
@@ -115,7 +115,7 @@ export const sqlChallenges = [
   },
   {
     id: 'expert-3',
-    level: 'Эксперт',
+    level: 'expert',
     title: 'WAF Bypass — обход фильтрации',
     description: 'Обойдите Web Application Firewall, используя кодирование и обфускацию SQL-запроса.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
@@ -127,7 +127,7 @@ export const sqlChallenges = [
   },
   {
     id: 'expert-4',
-    level: 'Эксперт',
+    level: 'expert',
     title: 'Polyglot SQLi — универсальный пейлоад',
     description: 'Создайте пейлоад, работающий в MySQL, PostgreSQL и SQLite одновременно.',
     initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
@@ -139,7 +139,7 @@ export const sqlChallenges = [
   },
   {
     id: 'intermediate-1',
-    level: 'Продвинутый',
+    level: 'advanced',
     title: 'NoSQL Injection — инъекция в MongoDB',
     description: 'Используйте операторы MongoDB ($gt, $ne) для обхода аутентификации в NoSQL базе данных.',
     initialQuery: `db.users.findOne({\n  username: '[ВВОД]',\n  password: 'password123'\n})`,
@@ -151,7 +151,7 @@ export const sqlChallenges = [
   },
   {
     id: 'intermediate-2',
-    level: 'Продвинутый',
+    level: 'advanced',
     title: 'ORDER BY Injection',
     description: 'Используйте инъекцию в параметре сортировки для извлечения данных через CASE-выражения.',
     initialQuery: `SELECT name, email, role FROM users\nORDER BY [ВВОД]`,
@@ -164,7 +164,7 @@ export const sqlChallenges = [
   },
   {
     id: 'intermediate-3',
-    level: 'Продвинутый',
+    level: 'advanced',
     title: 'HTTP Header Injection — X-Forwarded-For',
     description: 'SQL-инъекция через HTTP-заголовок, который сервер использует без санитизации.',
     initialQuery: `-- Сервер логирует IP из заголовка:\nINSERT INTO access_logs (ip, timestamp)\nVALUES ('[X-Forwarded-For]', NOW())`,
@@ -176,7 +176,7 @@ export const sqlChallenges = [
   },
   {
     id: 'intermediate-4',
-    level: 'Продвинутый',
+    level: 'advanced',
     title: 'HQL Injection — инъекция в Hibernate Query Language',
     description: 'Используйте инъекцию в HQL-запросе Java/Hibernate приложения для обхода аутентификации.',
     initialQuery: `// HQL запрос:\nQuery q = session.createQuery(\n  "from User where username='" + input + "'");`,
@@ -188,7 +188,7 @@ export const sqlChallenges = [
   },
   {
     id: 'intermediate-5',
-    level: 'Продвинутый',
+    level: 'advanced',
     title: 'SQL-инъекция через INSERT — запись в чужой аккаунт',
     description: 'Используйте инъекцию в INSERT-запросе для создания аккаунта с произвольными правами.',
     initialQuery: `INSERT INTO users (username, email, role, active)\nVALUES ('[ВВОД]', 'user@test.com', 'user', 1)`,

@@ -1581,7 +1581,10 @@
       "protectionText": "Используйте параметризованные запросы (prepared statements) или ORM-библиотеки (Prisma, Sequelize, TypeORM). Никогда не подставляйте пользовательский ввод напрямую в SQL-запрос через конкатенацию строк.",
       "previous": "← Предыдущее",
       "next": "Следующее →",
-      "modifiedQuery": "Модифицированный запрос"
+      "modifiedQuery": "Модифицированный запрос",
+      "beginner": "Новичок",
+      "advanced": "Продвинутый",
+      "expert": "Эксперт"
     },
     "xss": {
       "title": "Лаборатория XSS-атак",
@@ -2918,6 +2921,7 @@
     "name": "ФИО",
     "group": "Группа",
     "dropoutWeek": "Неделя отсева",
+    "weeks": "{n} нед.",
     "recommendations": "Рекомендации"
   },
   "engagementAnalytics": {
@@ -3325,7 +3329,9 @@
     "resetScore": "Сбросить счёт",
     "markComplete": "Отметить модуль как изученный",
     "moduleComplete": "Модуль завершён!",
-    "noEmails": "Нет писем с такой сложностью. Выберите Все."
+    "noEmails": "Нет писем с такой сложностью. Выберите Все.",
+    "emailCounter": "Письмо {current} из {total}",
+    "indicatorsFound": "Найдено {count} индикаторов"
   },
   "achievementsGlossary": {
     "title": "Достижения и глоссарий",

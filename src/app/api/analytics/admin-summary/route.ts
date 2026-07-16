@@ -4,6 +4,7 @@ import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-mi
 import { MS_PER_DAY, PERCENT_ROUNDING_FACTOR, PERCENT_SCALE } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
+  try {
   const auth = await authenticate(request);
   if (!auth) return unauthorized();
   if (!requireRole(auth.role, 'admin')) return forbidden();
@@ -249,4 +250,8 @@ export async function GET(request: NextRequest) {
     trends,
     ...groupedData,
   });
+  } catch (error) {
+    console.error('Admin summary error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

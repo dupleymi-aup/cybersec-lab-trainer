@@ -1581,7 +1581,10 @@
       "protectionText": "Use parameterized queries (prepared statements) or ORM libraries (Prisma, Sequelize, TypeORM). Never insert user input directly into SQL queries via string concatenation.",
       "previous": "← Previous",
       "next": "Next →",
-      "modifiedQuery": "Modified query"
+      "modifiedQuery": "Modified query",
+      "beginner": "Beginner",
+      "advanced": "Advanced",
+      "expert": "Expert"
     },
     "xss": {
       "title": "XSS Attack Lab",
@@ -2918,6 +2921,7 @@
     "name": "Name",
     "group": "Group",
     "dropoutWeek": "Dropout week",
+    "weeks": "{n} wk.",
     "recommendations": "Recommendations"
   },
   "engagementAnalytics": {
@@ -3325,7 +3329,9 @@
     "resetScore": "Reset score",
     "markComplete": "Mark module as completed",
     "moduleComplete": "Module completed!",
-    "noEmails": "No emails with this difficulty. Select All."
+    "noEmails": "No emails with this difficulty. Select All.",
+    "emailCounter": "Email {current} of {total}",
+    "indicatorsFound": "{count} indicators found"
   },
   "achievementsGlossary": {
     "title": "Achievements & Glossary",

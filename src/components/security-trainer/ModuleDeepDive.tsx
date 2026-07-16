@@ -126,7 +126,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={m.levels.map((l) => ({
-                        level: `Ур. ${l.level}`,
+                        level: t('level', { n: l.level }),
                         started: l.started,
                         completed: l.completed,
                       }))}
@@ -147,7 +147,7 @@ export default function ModuleDeepDive({ groupId: propGroupId, days: propDays }:
             <div className="space-y-2">
               {m.levels.map((l) => (
                 <div key={l.level} className="flex items-center gap-3 text-xs">
-                  <span className="w-12 font-medium">Ур. {l.level}</span>
+                  <span className="w-12 font-medium">{t('level', { n: l.level })}</span>
                   <div className="bg-muted relative h-4 flex-1 overflow-hidden rounded-full">
                     <div className="h-full rounded-full bg-emerald-500" style={{ width: `${l.completionRate}%` }} />
                     <span className="text-foreground/70 absolute inset-0 flex items-center justify-center text-[10px] font-medium">

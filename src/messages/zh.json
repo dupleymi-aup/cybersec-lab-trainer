@@ -1557,7 +1557,10 @@
       "protectionText": "使用参数化查询(prepared statements)或ORM库(Prisma、Sequelize、TypeORM)。切勿通过字符串拼接将用户输入直接插入SQL查询。",
       "previous": "← 上一个",
       "next": "下一个 →",
-      "modifiedQuery": "修改后的查询"
+      "modifiedQuery": "修改后的查询",
+      "beginner": "初级",
+      "advanced": "高级",
+      "expert": "专家"
     },
     "xss": {
       "title": "XSS攻击实验室",
@@ -2918,6 +2921,7 @@
     "name": "姓名",
     "group": "分组",
     "dropoutWeek": "预计流失周",
+    "weeks": "{n} 周",
     "recommendations": "建议"
   },
   "engagementAnalytics": {
@@ -3325,7 +3329,9 @@
     "resetScore": "重置分数",
     "markComplete": "标记模块为已完成",
     "moduleComplete": "模块已完成！",
-    "noEmails": "没有此难度的邮件。请选择全部。"
+    "noEmails": "没有此难度的邮件。请选择全部。",
+    "emailCounter": "邮件 {current} / {total}",
+    "indicatorsFound": "发现 {count} 个指标"
   },
   "achievementsGlossary": {
     "title": "成就与术语表",

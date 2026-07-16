@@ -309,25 +309,25 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
       <Tabs defaultValue="overview">
         <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview" className="text-xs">
-            Обзор
+            {t('overview')}
           </TabsTrigger>
           <TabsTrigger value="modules" className="text-xs">
-            Модули
+            {t('modules')}
           </TabsTrigger>
           <TabsTrigger value="quizzes" className="text-xs">
-            Квизы
+            {t('quizzes')}
           </TabsTrigger>
           <TabsTrigger value="activity" className="text-xs">
-            Активность
+            {t('activity')}
           </TabsTrigger>
           <TabsTrigger value="timeline" className="text-xs">
-            Таймлайн
+            {t('timeline')}
           </TabsTrigger>
           <TabsTrigger value="skills-gap" className="text-xs">
-            Разрыв навыков
+            {t('skillGaps')}
           </TabsTrigger>
           <TabsTrigger value="recommendations" className="text-xs">
-            Рекомендации
+            {t('recommendations')}
           </TabsTrigger>
         </TabsList>
 
@@ -462,7 +462,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                       <div>
                         <p className="text-sm font-medium">{quiz.quizId}</p>
                         <p className="text-[10px] text-slate-400">
-                          {quiz.score}/{quiz.total} правильных
+                          {quiz.score}/{quiz.total} {t('correctAnswers')}
                         </p>
                       </div>
                       <Badge
@@ -529,7 +529,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
               <CardContent className="p-5">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <TrendingUp size={16} className="text-indigo-500" />
-                  Прогресс по модулям
+                  {t('moduleProgress')}
                 </h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <AreaChart data={moduleCompletionTimeline}>
@@ -562,7 +562,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
               <CardContent className="p-5">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <Activity size={16} className="text-emerald-500" />
-                  Активность входов
+                  {t('loginActivity')}
                 </h3>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={loginActivityTimeline}>
@@ -589,7 +589,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
               <CardContent className="p-5">
                 <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
                   <Target size={16} className="text-amber-500" />
-                  Траектория квизов по категориям
+                  {t('quizTrajectory')}
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={quizCategoryTrajectory}>
@@ -720,11 +720,11 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                               <div>
                                 <p className="text-sm font-medium">
                                   {gap.moduleId.startsWith('category:')
-                                    ? `Категория: ${gap.moduleId.replace('category:', '')}`
+                                    ? `${t('category')}: ${gap.moduleId.replace('category:', '')}`
                                     : gap.moduleId}
                                 </p>
                                 <p className="text-muted-foreground text-[10px]">
-                                  Студент: {gap.studentScore}% | Группа: {gap.cohortAvg}%
+                                  {t('student')}: {gap.studentScore}% | {t('group')}: {gap.cohortAvg}%
                                 </p>
                               </div>
                             </div>
