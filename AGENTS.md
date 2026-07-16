@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`10e48120`**: i18n: replace hardcoded Russian in 5 lib files with English (auth-store, notification-store, email, export-utils, validations)
 - **`2479551b`**: fix: dynamic locale in root/dashboard redirects, try/catch in 2 API routes, localize period labels/day names/unit suffixes across 8 analytics components, fix remaining hardcoded Russian in StudentPerformanceReport
 - **`4fc3684e`**: i18n: localize 15 components (APISecurityLab, AchievementsGlossary, AnalyticsExportPanel, BulkActionsBar, CertificationReadiness, CohortAnalysis, GroupComparisonReport, GroupDynamics, LearningPathReport, ModuleDeepDive, PhishingAnalyzer, PredictiveInsights, PredictiveRiskDashboard, StudentPerformanceReport, SyncIndicator) with en/ru/zh keys
 - **`331b0c4c`**: fix: show invite code input for teacher role on register page, update i18n keys en/ru/zh
