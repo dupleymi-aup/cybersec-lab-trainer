@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`6125c87f`**: fix: replace console.error with logger in 2 API routes, add .catch() to 9 unhandled promise rejections in useEffect, add try/catch to 3 clipboard API calls, centralize localhost:3000 fallback to DEFAULT_APP_URL constant
 - **`847a0d62`**: i18n: replace remaining hardcoded Russian in 5 more API routes (users/[id], role, block, scheduled-reports)
 - **`66cb43ae`**: i18n: replace hardcoded Russian in 16 analytics API routes (month/day names, category labels, time ranges, risk factors, recommendations, achievements)
 - **`48ae0e2b`**: i18n: replace hardcoded Russian in 11 API routes (login, register, password, delete, impersonate, recovery, profile, quiz, users, bulk)
@@ -47,5 +48,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **Remote sync** — both remotes at `847a0d62`
+- **Remote sync** — both remotes at `6125c87f`
 - **Full verification passed**: lint ✓, typecheck ✓, build ✓
