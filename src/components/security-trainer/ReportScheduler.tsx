@@ -65,13 +65,17 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
   const [lookbackDays, setLookbackDays] = useState(30);
 
   useEffect(() => {
+    let cancelled = false;
     loadReports();
     getAllUsers().then((users) => {
-      const uniqueGroups = [...new Set(users.map((u) => u.group).filter(Boolean))];
-      setGroups(uniqueGroups);
+      if (!cancelled) {
+        const uniqueGroups = [...new Set(users.map((u) => u.group).filter(Boolean))];
+        setGroups(uniqueGroups);
+      }
     }).catch((e) => {
       logger.error('Failed to load users for report scheduler', { error: e });
     });
+    return () => { cancelled = true; };
   }, []);
 
   const loadReports = async () => {

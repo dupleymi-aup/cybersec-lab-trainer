@@ -56,22 +56,28 @@ export default function ActivityHeatmap() {
   });
 
   useEffect(() => {
+    let cancelled = false;
     getAllUsers().then((users) => {
-      setStudents(users.filter((u) => u.role === 'student'));
+      if (!cancelled) setStudents(users.filter((u) => u.role === 'student'));
     }).catch((e) => {
       logger.error('Failed to load users for heatmap', { error: e });
     });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     getActivityHeatmap(selectedUserId || undefined, dateRange).then((data) => {
-      setHeatmapData(data);
-      setLoading(false);
+      if (!cancelled) {
+        setHeatmapData(data);
+        setLoading(false);
+      }
     }).catch((e) => {
       logger.error('Failed to load heatmap data', { error: e });
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     });
+    return () => { cancelled = true; };
   }, [selectedUserId, dateRange]);
 
   const dateRangeOptions: { value: DateRange; label: string }[] = useMemo(() => [

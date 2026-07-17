@@ -55,17 +55,21 @@ export default function QuizQuestionAnalytics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     const catParam = category === ALL_CATEGORIES ? undefined : category;
     const diffParam = difficulty === ALL_DIFFICULTIES ? undefined : difficulty;
 
     getQuizQuestionAnalytics(catParam, diffParam).then((data) => {
-      setStats(data);
-      setLoading(false);
+      if (!cancelled) {
+        setStats(data);
+        setLoading(false);
+      }
     }).catch((e) => {
       logger.error('Failed to load quiz question analytics', { error: e });
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     });
+    return () => { cancelled = true; };
   }, [category, difficulty]);
 
   const hardestQuestions = useMemo(() => {

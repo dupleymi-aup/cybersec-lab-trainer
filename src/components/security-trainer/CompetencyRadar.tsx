@@ -40,7 +40,9 @@ export default function CompetencyRadar({ groupId }: Props) {
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
 
   useEffect(() => {
-    getAllUsers().then(setAllUsers).catch(() => { /* ignore */ });
+    let cancelled = false;
+    getAllUsers().then((users) => { if (!cancelled) setAllUsers(users); }).catch(() => { /* ignore */ });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {

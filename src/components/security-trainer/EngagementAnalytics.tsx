@@ -40,12 +40,14 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
   const showGroupSelector = propGroupId === undefined;
 
   useEffect(() => {
+    let cancelled = false;
     getAllUsers()
-      .then(setAllUsers)
+      .then((users) => { if (!cancelled) setAllUsers(users); })
       .catch((err) => {
         if (process.env.NODE_ENV === 'development')
           logger.error('EngagementAnalytics failed to load users', { error: err });
       });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {

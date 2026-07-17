@@ -14,7 +14,9 @@ export default function AnalyticsFilterBar() {
   const [groups, setGroups] = useState<string[]>([]);
 
   useEffect(() => {
-    getAllGroups().then(setGroups).catch(() => { /* ignore */ });
+    let cancelled = false;
+    getAllGroups().then((g) => { if (!cancelled) setGroups(g); }).catch(() => { /* ignore */ });
+    return () => { cancelled = true; };
   }, []);
 
   return (

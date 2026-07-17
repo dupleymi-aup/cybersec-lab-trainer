@@ -52,9 +52,13 @@ export default function StudentComparisonView(props: Props = {}) {
   const controlled = isControlled(props);
 
   useEffect(() => {
-    getAllUsers().then((users) => setAllUsers(users.filter((u) => u.role === 'student'))).catch((e) => {
+    let cancelled = false;
+    getAllUsers().then((users) => {
+      if (!cancelled) setAllUsers(users.filter((u) => u.role === 'student'));
+    }).catch((e) => {
       logger.error('Failed to load users for comparison', { error: e });
     });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {

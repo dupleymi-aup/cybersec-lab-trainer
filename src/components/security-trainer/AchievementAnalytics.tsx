@@ -54,14 +54,18 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
   }), [t]);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     getAchievementAnalytics(groupId).then((result) => {
-      setData(result);
-      setLoading(false);
+      if (!cancelled) {
+        setData(result);
+        setLoading(false);
+      }
     }).catch((e) => {
       logger.error('Failed to load achievement analytics', { error: e });
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     });
+    return () => { cancelled = true; };
   }, [groupId]);
 
   const achievementMap = useMemo(() => {

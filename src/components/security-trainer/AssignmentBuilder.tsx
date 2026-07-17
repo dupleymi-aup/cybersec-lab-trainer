@@ -110,16 +110,20 @@ function useGroups() {
   const [groups, setGroups] = useState<string[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
     import('@/lib/auth-store').then(({ getAllUsers }) => {
       getAllUsers().then((users) => {
-        const unique = [...new Set(users.map((u) => u.group).filter(Boolean))];
-        setGroups(unique);
+        if (!cancelled) {
+          const unique = [...new Set(users.map((u) => u.group).filter(Boolean))];
+          setGroups(unique);
+        }
       }).catch((e) => {
         logger.error('Failed to load users for assignment groups', { error: e });
       });
     }).catch((e) => {
       logger.error('Failed to load auth-store for assignment groups', { error: e });
     });
+    return () => { cancelled = true; };
   }, []);
 
   return groups;
