@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`9b2baa97`**: fix: add .catch() to 10 unhandled promise chains across 7 components (ActivityHeatmap, QuizQuestionAnalytics, AchievementAnalytics, TeacherPanel, StudentComparisonView, ReportScheduler, AssignmentBuilder), wrap ReportScheduler.loadReports in try/catch, add PWA service worker error handling
 - **`686d9165`**: fix: replace console.error with logger in 9 terminal/ API routes, add .catch() to 4 unhandled promises, centralize localhost:3000 to DEFAULT_APP_URL in terminal/
 - **`6125c87f`**: fix: replace console.error with logger in 2 API routes, add .catch() to 9 unhandled promise rejections in useEffect, add try/catch to 3 clipboard API calls, centralize localhost:3000 fallback to DEFAULT_APP_URL constant
 - **`847a0d62`**: i18n: replace remaining hardcoded Russian in 5 more API routes (users/[id], role, block, scheduled-reports)
@@ -49,5 +50,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **Remote sync** — both remotes at `686d9165`
+- **Remote sync** — both remotes at `9b2baa97`
 - **Full verification passed**: lint ✓, typecheck ✓, build ✓
