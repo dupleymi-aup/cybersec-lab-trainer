@@ -2200,7 +2200,77 @@
     "authTitle": "认证 — 最佳实践",
     "cryptoTitle": "密码学 — 快速参考",
     "networkTitle": "网络安全",
-    "toolsTitle": "实用CLI命令"
+    "toolsTitle": "实用CLI命令",
+    "owasp": {
+      "a01": { "title": "A01 — 访问控制缺陷", "content": "在每个端点检查授权。使用默认拒绝策略。" },
+      "a02": { "title": "A02 — 加密失败", "content": "密码使用bcrypt，传输使用TLS 1.3，存储使用AES-256。" },
+      "a03": { "title": "A03 — 注入", "content": "使用参数化查询。永远不要拼接SQL。" },
+      "a04": { "title": "A04 — 不安全设计", "content": "设计阶段进行威胁建模。速率限制、CAPTCHA、业务逻辑验证。" },
+      "a05": { "title": "A05 — 安全配置错误", "content": "生产环境禁用调试模式。安全响应头。更新依赖。" },
+      "a06": { "title": "A06 — 易受攻击的组件", "content": "依赖审计: npm audit, Snyk, Dependabot。锁文件是必须的。" },
+      "a07": { "title": "A07 — 认证失败", "content": "强制MFA。短生命周期会话。安全的密码重置令牌。" },
+      "a08": { "title": "A08 — 数据完整性", "content": "CDN资源使用SRI。数字签名。CI/CD管道安全。" },
+      "a09": { "title": "A09 — 日志记录失败", "content": "记录认证事件、错误、访问。永远不要记录密码或令牌。" },
+      "a10": { "title": "A10 — SSRF", "content": "域名白名单。阻止私有IP。重定向后验证URL。" }
+    },
+    "headers": {
+      "csp": { "title": "Content-Security-Policy", "content": "控制脚本、样式、图片的来源。" },
+      "hsts": { "title": "Strict-Transport-Security", "content": "强制HTTPS。防止降级攻击。" },
+      "xcto": { "title": "X-Content-Type-Options", "content": "防止MIME类型嗅探。" },
+      "xfo": { "title": "X-Frame-Options", "content": "防护点击劫持。" },
+      "rp": { "title": "Referrer-Policy", "content": "控制Referer头传输。" },
+      "pp": { "title": "Permissions-Policy", "content": "限制浏览器API。" },
+      "cc": { "title": "Cache-Control", "content": "控制敏感数据缓存。" },
+      "dns": { "title": "X-DNS-Prefetch-Control", "content": "禁用DNS预取以保护隐私。" }
+    },
+    "sql": {
+      "prepared": { "title": "参数化查询", "content": "黄金标准防御。数据与SQL代码分开传递。" },
+      "orm": { "title": "ORM (Prisma, Sequelize)", "content": "ORM自动参数化查询。" },
+      "stored": { "title": "存储过程", "content": "复杂查询使用存储过程。" },
+      "validation": { "title": "输入验证", "content": "验证输入数据的类型、格式和长度。" },
+      "privilege": { "title": "最小权限数据库账户", "content": "应用不应使用SA/root数据库账户。" },
+      "waf": { "title": "WAF规则", "content": "额外的防御层。不能替代参数化！" }
+    },
+    "xss": {
+      "encoding": { "title": "输出编码", "content": "输出用户数据时转义HTML实体。" },
+      "dompurify": { "title": "DOMPurify", "content": "HTML消毒库。" },
+      "textcontent": { "title": "textContent vs innerHTML", "content": "textContent不解释HTML。" },
+      "csp": { "title": "CSP (内容安全策略)", "content": "阻止内联脚本和外部来源。" },
+      "httponly": { "title": "HttpOnly Cookies", "content": "JavaScript无法读取HttpOnly cookie。" },
+      "react": { "title": "React自动转义", "content": "React自动转义JSX，但dangerouslySetInnerHTML是危险的。" }
+    },
+    "auth": {
+      "hashing": { "title": "密码哈希", "content": "使用bcrypt或Argon2。永远不要用MD5/SHA1。" },
+      "jwt": { "title": "JWT最佳实践", "content": "验证算法、检查过期时间、短TTL、httpOnly cookie。" },
+      "ratelimit": { "title": "速率限制", "content": "防护暴力破解和凭证填充。" },
+      "mfa": { "title": "MFA / 2FA", "content": "TOTP (Google Authenticator), WebAuthn (passkeys)。" },
+      "reset": { "title": "密码重置", "content": "密码学随机令牌，1小时过期，一次性使用。" },
+      "session": { "title": "会话安全", "content": "Secure, HttpOnly, SameSite cookies。登录后重新生成。" }
+    },
+    "crypto": {
+      "hashing": { "title": "密码哈希", "content": "bcrypt (cost 12+), Argon2id (推荐)。" },
+      "symmetric": { "title": "对称加密", "content": "AES-256-GCM (认证加密)。" },
+      "asymmetric": { "title": "非对称加密", "content": "RSA-2048+, ECDSA (P-256), Ed25519。" },
+      "signatures": { "title": "数字签名", "content": "HMAC用于完整性，RSA/ECDSA用于认证。" },
+      "tls": { "title": "TLS/SSL", "content": "最低TLS 1.3。禁用SSLv3, TLS 1.0, 1.1。" },
+      "random": { "title": "随机数生成", "content": "crypto.randomBytes用于密码学安全随机值。" }
+    },
+    "network": {
+      "ports": { "title": "端口和协议", "content": "22:SSH, 53:DNS, 80:HTTP, 443:HTTPS, 3306:MySQL, 5432:PostgreSQL" },
+      "firewall": { "title": "防火墙 (iptables)", "content": "阻止一切，只允许必要的。" },
+      "dns": { "title": "DNS安全", "content": "签名记录使用DNSSEC。DoH/DoT保护隐私。" },
+      "ssh": { "title": "SSH加固", "content": "禁用root登录、密码认证。使用密钥。" },
+      "segmentation": { "title": "网络分段", "content": "将网络分为区域: 公共、私有、DMZ。" },
+      "ids": { "title": "IDS/IPS", "content": "Snort, Suricata用于异常检测。" }
+    },
+    "tools": {
+      "pwhash": { "title": "密码哈希生成", "content": "从命令行创建bcrypt哈希。" },
+      "jwtsecret": { "title": "JWT密钥生成", "content": "密码学安全的JWT密钥。" },
+      "sslcheck": { "title": "SSL证书检查", "content": "检查证书有效期和颁发者。" },
+      "jwtdecode": { "title": "Base64 JWT解码", "content": "解码JWT令牌载荷。" },
+      "aes": { "title": "文件加密 (AES)", "content": "使用OpenSSL加密文件。" },
+      "sshkey": { "title": "SSH密钥生成", "content": "创建Ed25519 SSH密钥。" }
+    }
   },
   "quizSessionAnalytics": {
     "title": "测验会话分析",

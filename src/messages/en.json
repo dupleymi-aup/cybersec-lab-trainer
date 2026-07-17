@@ -2200,7 +2200,77 @@
     "authTitle": "Authentication — Best Practices",
     "cryptoTitle": "Cryptography — Quick Reference",
     "networkTitle": "Network Security",
-    "toolsTitle": "Useful CLI Commands"
+    "toolsTitle": "Useful CLI Commands",
+    "owasp": {
+      "a01": { "title": "A01 — Broken Access Control", "content": "Check authorization on every endpoint. Use deny-by-default." },
+      "a02": { "title": "A02 — Cryptographic Failures", "content": "Use bcrypt for passwords, TLS 1.3 for transport, AES-256 for storage." },
+      "a03": { "title": "A03 — Injection", "content": "Use parameterized queries. Never concatenate SQL." },
+      "a04": { "title": "A04 — Insecure Design", "content": "Threat modeling at design stage. Rate limiting, CAPTCHA, business logic validation." },
+      "a05": { "title": "A05 — Security Misconfiguration", "content": "Disable debug mode in production. Security headers. Update dependencies." },
+      "a06": { "title": "A06 — Vulnerable Components", "content": "Dependency audit: npm audit, Snyk, Dependabot. Lock files are mandatory." },
+      "a07": { "title": "A07 — Auth Failures", "content": "MFA required. Short-lived sessions. Secure password reset tokens." },
+      "a08": { "title": "A08 — Data Integrity", "content": "SRI for CDN resources. Digital signatures. CI/CD pipeline security." },
+      "a09": { "title": "A09 — Logging Failures", "content": "Log auth events, errors, access. Never log passwords or tokens." },
+      "a10": { "title": "A10 — SSRF", "content": "Allowlist domains. Block private IPs. Validate URLs after redirect." }
+    },
+    "headers": {
+      "csp": { "title": "Content-Security-Policy", "content": "Controls sources for scripts, styles, images." },
+      "hsts": { "title": "Strict-Transport-Security", "content": "Enforces HTTPS. Prevents downgrade attacks." },
+      "xcto": { "title": "X-Content-Type-Options", "content": "Prevents MIME-type sniffing." },
+      "xfo": { "title": "X-Frame-Options", "content": "Protects against clickjacking." },
+      "rp": { "title": "Referrer-Policy", "content": "Controls Referer header transmission." },
+      "pp": { "title": "Permissions-Policy", "content": "Restricts browser APIs." },
+      "cc": { "title": "Cache-Control", "content": "Controls caching of sensitive data." },
+      "dns": { "title": "X-DNS-Prefetch-Control", "content": "Disables DNS prefetch for privacy." }
+    },
+    "sql": {
+      "prepared": { "title": "Parameterized Queries", "content": "Gold standard defense. Data is passed separately from SQL code." },
+      "orm": { "title": "ORM (Prisma, Sequelize)", "content": "ORM automatically parameterizes queries." },
+      "stored": { "title": "Stored Procedures", "content": "Use stored procedures for complex queries." },
+      "validation": { "title": "Input Validation", "content": "Validate type, format, and length of input data." },
+      "privilege": { "title": "Least Privilege DB Account", "content": "Application should not use SA/root DB account." },
+      "waf": { "title": "WAF Rules", "content": "Additional defense layer. Does not replace parameterization!" }
+    },
+    "xss": {
+      "encoding": { "title": "Output Encoding", "content": "Escape HTML entities when outputting user data." },
+      "dompurify": { "title": "DOMPurify", "content": "Library for HTML sanitization." },
+      "textcontent": { "title": "textContent vs innerHTML", "content": "textContent does not interpret HTML." },
+      "csp": { "title": "CSP (Content Security Policy)", "content": "Blocks inline scripts and external sources." },
+      "httponly": { "title": "HttpOnly Cookies", "content": "JavaScript cannot read HttpOnly cookies." },
+      "react": { "title": "React Auto-Escaping", "content": "React auto-escapes JSX, but dangerouslySetInnerHTML is dangerous." }
+    },
+    "auth": {
+      "hashing": { "title": "Password Hashing", "content": "Use bcrypt or Argon2. Never MD5/SHA1." },
+      "jwt": { "title": "JWT Best Practices", "content": "Verify algorithm, check exp, short TTL, httpOnly cookie." },
+      "ratelimit": { "title": "Rate Limiting", "content": "Protection against brute force and credential stuffing." },
+      "mfa": { "title": "MFA / 2FA", "content": "TOTP (Google Authenticator), WebAuthn (passkeys)." },
+      "reset": { "title": "Password Reset", "content": "Cryptographically random token, 1 hour expiry, single use." },
+      "session": { "title": "Session Security", "content": "Secure, HttpOnly, SameSite cookies. Regenerate after login." }
+    },
+    "crypto": {
+      "hashing": { "title": "Password Hashing", "content": "bcrypt (cost 12+), Argon2id (recommended)." },
+      "symmetric": { "title": "Symmetric Encryption", "content": "AES-256-GCM (authenticated encryption)." },
+      "asymmetric": { "title": "Asymmetric Encryption", "content": "RSA-2048+, ECDSA (P-256), Ed25519." },
+      "signatures": { "title": "Digital Signatures", "content": "HMAC for integrity, RSA/ECDSA for authentication." },
+      "tls": { "title": "TLS/SSL", "content": "TLS 1.3 minimum. Disable SSLv3, TLS 1.0, 1.1." },
+      "random": { "title": "Random Generation", "content": "crypto.randomBytes for cryptographically random values." }
+    },
+    "network": {
+      "ports": { "title": "Ports and Protocols", "content": "22:SSH, 53:DNS, 80:HTTP, 443:HTTPS, 3306:MySQL, 5432:PostgreSQL" },
+      "firewall": { "title": "Firewall (iptables)", "content": "Block everything, allow only what's needed." },
+      "dns": { "title": "DNS Security", "content": "DNSSEC for signed records. DoH/DoT for privacy." },
+      "ssh": { "title": "SSH Hardening", "content": "Disable root login, password auth. Use keys." },
+      "segmentation": { "title": "Network Segmentation", "content": "Separate network into zones: public, private, DMZ." },
+      "ids": { "title": "IDS/IPS", "content": "Snort, Suricata for anomaly detection." }
+    },
+    "tools": {
+      "pwhash": { "title": "Password Hash Generation", "content": "Create bcrypt hash from command line." },
+      "jwtsecret": { "title": "JWT Secret Generation", "content": "Cryptographically random JWT secret." },
+      "sslcheck": { "title": "SSL Certificate Check", "content": "Check certificate validity and issuer." },
+      "jwtdecode": { "title": "Base64 JWT Decoding", "content": "Decode JWT token payload." },
+      "aes": { "title": "File Encryption (AES)", "content": "Encrypt file using OpenSSL." },
+      "sshkey": { "title": "SSH Key Generation", "content": "Create Ed25519 SSH key." }
+    }
   },
   "quizSessionAnalytics": {
     "title": "Quiz Session Analytics",

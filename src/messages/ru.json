@@ -2200,7 +2200,77 @@
     "authTitle": "Аутентификация — Best Practices",
     "cryptoTitle": "Криптография — Quick Reference",
     "networkTitle": "Сетевая безопасность",
-    "toolsTitle": "Полезные CLI-команды"
+    "toolsTitle": "Полезные CLI-команды",
+    "owasp": {
+      "a01": { "title": "A01 — Broken Access Control", "content": "Проверяйте авторизацию на каждом эндпоинте. Используйте deny-by-default." },
+      "a02": { "title": "A02 — Cryptographic Failures", "content": "Используйте bcrypt для паролей, TLS 1.3 для передачи, AES-256 для хранения." },
+      "a03": { "title": "A03 — Injection", "content": "Используйте параметризованные запросы. Никогда не конкатенируйте SQL." },
+      "a04": { "title": "A04 — Insecure Design", "content": "Threat modeling на этапе проектирования. Rate limiting, CAPTCHA, business logic validation." },
+      "a05": { "title": "A05 — Security Misconfiguration", "content": "Отключите debug mode в production. Security headers. Обновляйте зависимости." },
+      "a06": { "title": "A06 — Vulnerable Components", "content": "Аудит зависимостей: npm audit, Snyk, Dependabot. Lock-файлы обязательны." },
+      "a07": { "title": "A07 — Auth Failures", "content": "MFA обязательна. Короткоживущие сессии. Secure password reset tokens." },
+      "a08": { "title": "A08 — Data Integrity", "content": "SRI для CDN-ресурсов. Цифровые подписи. CI/CD pipeline security." },
+      "a09": { "title": "A09 — Logging Failures", "content": "Логируйте auth events, ошибки, access. Никогда не логируйте пароли и токены." },
+      "a10": { "title": "A10 — SSRF", "content": "Allowlist доменов. Блокируйте private IPs. Валидируйте URL после redirect." }
+    },
+    "headers": {
+      "csp": { "title": "Content-Security-Policy", "content": "Контролирует источники скриптов, стилей, изображений." },
+      "hsts": { "title": "Strict-Transport-Security", "content": "Принудительный HTTPS. Предотвращает downgrade-атаки." },
+      "xcto": { "title": "X-Content-Type-Options", "content": "Запрещает MIME-type sniffing." },
+      "xfo": { "title": "X-Frame-Options", "content": "Защита от clickjacking." },
+      "rp": { "title": "Referrer-Policy", "content": "Контролирует передачу Referer." },
+      "pp": { "title": "Permissions-Policy", "content": "Ограничивает браузерные API." },
+      "cc": { "title": "Cache-Control", "content": "Контролирует кэширование чувствительных данных." },
+      "dns": { "title": "X-DNS-Prefetch-Control", "content": "Отключает DNS prefetch для приватности." }
+    },
+    "sql": {
+      "prepared": { "title": "Параметризованные запросы", "content": "Золотой стандарт защиты. Данные передаются отдельно от SQL-кода." },
+      "orm": { "title": "ORM (Prisma, Sequelize)", "content": "ORM автоматически параметризирует запросы." },
+      "stored": { "title": "Stored Procedures", "content": "Используйте хранимые процедуры для сложных запросов." },
+      "validation": { "title": "Input Validation", "content": "Валидируйте тип, формат, длину входных данных." },
+      "privilege": { "title": "Least Privilege DB Account", "content": "Приложение не должно использовать SA/root DB аккаунт." },
+      "waf": { "title": "WAF Rules", "content": "Дополнительный слой защиты. Не заменяет параметризацию!" }
+    },
+    "xss": {
+      "encoding": { "title": "Output Encoding", "content": "Экранируйте HTML-сущности при выводе пользовательских данных." },
+      "dompurify": { "title": "DOMPurify", "content": "Библиотека для санитизации HTML." },
+      "textcontent": { "title": "textContent вместо innerHTML", "content": "textContent не интерпретирует HTML." },
+      "csp": { "title": "CSP (Content Security Policy)", "content": "Блокирует inline-скрипты и внешние источники." },
+      "httponly": { "title": "HttpOnly Cookies", "content": "JavaScript не может прочитать HttpOnly cookie." },
+      "react": { "title": "React Auto-Escaping", "content": "React автоматически экранирует JSX, но опасен dangerouslySetInnerHTML." }
+    },
+    "auth": {
+      "hashing": { "title": "Password Hashing", "content": "Используйте bcrypt или Argon2. Никогда MD5/SHA1." },
+      "jwt": { "title": "JWT Best Practices", "content": "Verify algorithm, check exp, short TTL, httpOnly cookie." },
+      "ratelimit": { "title": "Rate Limiting", "content": "Защита от брутфорса и credential stuffing." },
+      "mfa": { "title": "MFA / 2FA", "content": "TOTP (Google Authenticator), WebAuthn (passkeys)." },
+      "reset": { "title": "Password Reset", "content": "Криптографически случайный токен, 1 час expiry, однократное использование." },
+      "session": { "title": "Session Security", "content": "Secure, HttpOnly, SameSite cookies. Регенерация после логина." }
+    },
+    "crypto": {
+      "hashing": { "title": "Хеширование паролей", "content": "bcrypt (cost 12+), Argon2id (рекомендуется)." },
+      "symmetric": { "title": "Симметричное шифрование", "content": "AES-256-GCM (authenticated encryption)." },
+      "asymmetric": { "title": "Асимметричное шифрование", "content": "RSA-2048+, ECDSA (P-256), Ed25519." },
+      "signatures": { "title": "Цифровые подписи", "content": "HMAC для integrity, RSA/ECDSA для authentication." },
+      "tls": { "title": "TLS/SSL", "content": "TLS 1.3 minimum. Отключите SSLv3, TLS 1.0, 1.1." },
+      "random": { "title": "Random Generation", "content": "crypto.randomBytes для криптографических случайных значений." }
+    },
+    "network": {
+      "ports": { "title": "Порты и протоколы", "content": "22:SSH, 53:DNS, 80:HTTP, 443:HTTPS, 3306:MySQL, 5432:PostgreSQL" },
+      "firewall": { "title": "Фаервол (iptables)", "content": "Блокируйте всё, разрешайте необходимое." },
+      "dns": { "title": "DNS Security", "content": "DNSSEC для подписанных записей. DoH/DoT для приватности." },
+      "ssh": { "title": "SSH Hardening", "content": "Отключите root login, password auth. Используйте ключи." },
+      "segmentation": { "title": "Network Segmentation", "content": "Разделяйте сеть на зоны: public, private, DMZ." },
+      "ids": { "title": "IDS/IPS", "content": "Snort, Suricata для обнаружения аномалий." }
+    },
+    "tools": {
+      "pwhash": { "title": "Генерация хеша пароля", "content": "Создать bcrypt-хеш из командной строки." },
+      "jwtsecret": { "title": "Генерация JWT секрета", "content": "Криптографически случайный JWT secret." },
+      "sslcheck": { "title": "Проверка SSL-сертификата", "content": "Проверить срок действия иissuer сертификата." },
+      "jwtdecode": { "title": "Декодирование Base64 JWT", "content": "Расшифровать payload JWT-токена." },
+      "aes": { "title": "Шифрование файла (AES)", "content": "Зашифровать файл с помощью OpenSSL." },
+      "sshkey": { "title": "Генерация SSH-ключа", "content": "Создать Ed25519 SSH-ключ." }
+    }
   },
   "quizSessionAnalytics": {
     "title": "Аналитика квиз-сессий",
