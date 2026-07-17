@@ -12,6 +12,11 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`847a0d62`**: i18n: replace remaining hardcoded Russian in 5 more API routes (users/[id], role, block, scheduled-reports)
+- **`66cb43ae`**: i18n: replace hardcoded Russian in 16 analytics API routes (month/day names, category labels, time ranges, risk factors, recommendations, achievements)
+- **`48ae0e2b`**: i18n: replace hardcoded Russian in 11 API routes (login, register, password, delete, impersonate, recovery, profile, quiz, users, bulk)
+- **`0eece45b`**: i18n: replace hardcoded Russian in hooks, auth-types, auth-utils, module-names, capabilities, EngagementAnalytics
+- **`6913ac79`**: fix: replace hardcoded Russian in Leaderboard/SQLInjectionLab, move prisma to devDeps, remove tailwindcss-animate duplicate
 - **`10e48120`**: i18n: replace hardcoded Russian in 5 lib files with English (auth-store, notification-store, email, export-utils, validations)
 - **`2479551b`**: fix: dynamic locale in root/dashboard redirects, try/catch in 2 API routes, localize period labels/day names/unit suffixes across 8 analytics components, fix remaining hardcoded Russian in StudentPerformanceReport
 - **`4fc3684e`**: i18n: localize 15 components (APISecurityLab, AchievementsGlossary, AnalyticsExportPanel, BulkActionsBar, CertificationReadiness, CohortAnalysis, GroupComparisonReport, GroupDynamics, LearningPathReport, ModuleDeepDive, PhishingAnalyzer, PredictiveInsights, PredictiveRiskDashboard, StudentPerformanceReport, SyncIndicator) with en/ru/zh keys
@@ -42,5 +47,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **Remote sync** — both remotes at `2479551b`
+- **Remote sync** — both remotes at `847a0d62`
 - **Full verification passed**: lint ✓, typecheck ✓, build ✓
