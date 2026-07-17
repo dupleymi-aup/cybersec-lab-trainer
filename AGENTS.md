@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`48e410c3`**: fix: add race condition guards to 10 data-fetching useEffect hooks to prevent stale responses from overwriting fresh state
 - **`d44a7a1b`**: fix: add try/catch to 30 async functions across 12 components (AdminPanel, AuthPages, BulkActionsBar, GroupManager, UserModal, AuditLogView, ProfilePage, PasswordResetModal, SystemAnnouncements, ReportScheduler, AnalyticsExportPanel, Recovery page)
 - **`9b2baa97`**: fix: add .catch() to 10 unhandled promise chains across 7 components (ActivityHeatmap, QuizQuestionAnalytics, AchievementAnalytics, TeacherPanel, StudentComparisonView, ReportScheduler, AssignmentBuilder), wrap ReportScheduler.loadReports in try/catch, add PWA service worker error handling
 - **`686d9165`**: fix: replace console.error with logger in 9 terminal/ API routes, add .catch() to 4 unhandled promises, centralize localhost:3000 to DEFAULT_APP_URL in terminal/
@@ -51,5 +52,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **Remote sync** — both remotes at `d44a7a1b`
+- **Remote sync** — both remotes at `48e410c3`
 - **Full verification passed**: lint ✓, typecheck ✓, build ✓
