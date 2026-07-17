@@ -32,8 +32,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
   const students = [
     {
       id: 'usr_1',
-      name: 'Алексей Петров',
-      group: 'ИС-21',
+      name: 'Alexey Petrov',
+      group: 'CS-21',
       modulesCompleted: 10,
       quizAvg: 92,
       achievements: 18,
@@ -42,8 +42,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_2',
-      name: 'Мария Иванова',
-      group: 'ИС-21',
+      name: 'Maria Ivanova',
+      group: 'CS-21',
       modulesCompleted: 9,
       quizAvg: 88,
       achievements: 16,
@@ -52,8 +52,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_3',
-      name: 'Дмитрий Козлов',
-      group: 'ИС-22',
+      name: 'Dmitry Kozlov',
+      group: 'CS-22',
       modulesCompleted: 8,
       quizAvg: 85,
       achievements: 14,
@@ -62,8 +62,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_4',
-      name: 'Анна Смирнова',
-      group: 'ИС-21',
+      name: 'Anna Smirnova',
+      group: 'CS-21',
       modulesCompleted: 8,
       quizAvg: 78,
       achievements: 12,
@@ -72,8 +72,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_5',
-      name: 'Игорь Волков',
-      group: 'ИС-22',
+      name: 'Igor Volkov',
+      group: 'CS-22',
       modulesCompleted: 7,
       quizAvg: 82,
       achievements: 13,
@@ -82,8 +82,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_6',
-      name: 'Елена Новикова',
-      group: 'ИС-21',
+      name: 'Elena Novikova',
+      group: 'CS-21',
       modulesCompleted: 6,
       quizAvg: 75,
       achievements: 10,
@@ -92,8 +92,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_7',
-      name: 'Сергей Морозов',
-      group: 'ИС-22',
+      name: 'Sergey Morozov',
+      group: 'CS-22',
       modulesCompleted: 6,
       quizAvg: 70,
       achievements: 9,
@@ -102,8 +102,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_8',
-      name: 'Ольга Соколова',
-      group: 'ИС-21',
+      name: 'Olga Sokolova',
+      group: 'CS-21',
       modulesCompleted: 5,
       quizAvg: 68,
       achievements: 8,
@@ -112,8 +112,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_9',
-      name: 'Андрей Лебедев',
-      group: 'ИС-22',
+      name: 'Andrey Lebedev',
+      group: 'CS-22',
       modulesCompleted: 4,
       quizAvg: 62,
       achievements: 6,
@@ -122,8 +122,8 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
     },
     {
       id: 'usr_10',
-      name: 'Наталья Кузнецова',
-      group: 'ИС-21',
+      name: 'Natalya Kuznetsova',
+      group: 'CS-21',
       modulesCompleted: 3,
       quizAvg: 55,
       achievements: 4,
@@ -141,7 +141,7 @@ const generateSimulatedStudents = (currentUserId: string): StudentStats[] => {
   // Add current user
   const currentUser: StudentStats = {
     id: currentUserId,
-    name: 'Вы',
+    name: 'You',
     group: '—',
     modulesCompleted: 0,
     quizAvg: 0,

