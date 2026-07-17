@@ -218,9 +218,14 @@ export default function ProfilePage() {
     }
     const reader = new FileReader();
     reader.onload = async (ev) => {
-      const base64 = ev.target?.result as string;
-      await updateProfile({ avatar: base64 });
-      toast.success(t('avatarUpdated'));
+      try {
+        const base64 = ev.target?.result as string;
+        await updateProfile({ avatar: base64 });
+        toast.success(t('avatarUpdated'));
+      } catch (e) {
+        logger.error('Failed to update avatar', { error: e });
+        toast.error(t('avatarUploadError'));
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -230,8 +235,12 @@ export default function ProfilePage() {
       toast.error(t('fullNameRequired'));
       return;
     }
-    await updateProfile({ fullName, group, course, university, bio });
-    toast.success(t('profileSaved'));
+    try {
+      await updateProfile({ fullName, group, course, university, bio });
+      toast.success(t('profileSaved'));
+    } catch (e) {
+      logger.error('Failed to save profile', { error: e });
+    }
   };
 
   const handlePasswordChange = async () => {
@@ -248,14 +257,18 @@ export default function ProfilePage() {
       toast.error(t('passwordsMismatch'));
       return;
     }
-    const result = await updatePassword(oldPassword, newPassword);
-    if (result.success) {
-      toast.success(t('passwordChanged'));
-      setOldPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await updatePassword(oldPassword, newPassword);
+      if (result.success) {
+        toast.success(t('passwordChanged'));
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to change password', { error: e });
     }
   };
 
@@ -335,12 +348,16 @@ export default function ProfilePage() {
       toast.error(t('wrongDeleteConfirmation'));
       return;
     }
-    const result = await deleteAccount(deletePassword);
-    if (result.success) {
-      toast.success(t('accountDeleted'));
-      window.location.reload();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await deleteAccount(deletePassword);
+      if (result.success) {
+        toast.success(t('accountDeleted'));
+        window.location.reload();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to delete account', { error: e });
     }
   };
 

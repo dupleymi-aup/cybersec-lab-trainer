@@ -105,11 +105,16 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const data = await fetchAnnouncements();
-    // Filter out expired ones client-side too (belt and suspenders)
-    const active = data.filter((a) => !a.expiresAt || new Date(a.expiresAt) >= new Date());
-    setAnnouncements(active);
-    setLoading(false);
+    try {
+      const data = await fetchAnnouncements();
+      // Filter out expired ones client-side too (belt and suspenders)
+      const active = data.filter((a) => !a.expiresAt || new Date(a.expiresAt) >= new Date());
+      setAnnouncements(active);
+    } catch (e) {
+      logger.error('Failed to load announcements', { error: e });
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -122,29 +127,39 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
       return;
     }
 
-    const result = await createAnnouncement(formTitle.trim(), formContent.trim(), formPriority, formExpiry);
-    if (!result.success) {
-      toast.error(result.error || t('creationError'));
-      return;
-    }
+    try {
+      const result = await createAnnouncement(formTitle.trim(), formContent.trim(), formPriority, formExpiry);
+      if (!result.success) {
+        toast.error(result.error || t('creationError'));
+        return;
+      }
 
-    setShowForm(false);
-    setFormTitle('');
-    setFormContent('');
-    setFormPriority('normal');
-    setFormExpiry('');
-    toast.success(t('announcementCreated'));
-    loadData();
+      setShowForm(false);
+      setFormTitle('');
+      setFormContent('');
+      setFormPriority('normal');
+      setFormExpiry('');
+      toast.success(t('announcementCreated'));
+      loadData();
+    } catch (e) {
+      logger.error('Failed to create announcement', { error: e });
+      toast.error(t('creationError'));
+    }
   };
 
   const handleDelete = async (id: string) => {
-    const result = await deleteAnnouncement(id);
-    if (!result.success) {
-      toast.error(result.error || t('deletionError'));
-      return;
+    try {
+      const result = await deleteAnnouncement(id);
+      if (!result.success) {
+        toast.error(result.error || t('deletionError'));
+        return;
+      }
+      toast.success(t('announcementDeleted'));
+      loadData();
+    } catch (e) {
+      logger.error('Failed to delete announcement', { error: e });
+      toast.error(t('deletionError'));
     }
-    toast.success(t('announcementDeleted'));
-    loadData();
   };
 
   const handleClearExpired = async () => {

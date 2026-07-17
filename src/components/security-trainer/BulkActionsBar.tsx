@@ -48,31 +48,44 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
 
   const handleBulkDelete = async () => {
     if (!confirm(t('deleteConfirm', { count: selectedIds.length }))) return;
-    const result = await bulkDeleteUsers(selectedIds, currentUserId);
-    if (result.success) {
-      toast.success(t('deleted', { count: result.count }));
-      onDone();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await bulkDeleteUsers(selectedIds, currentUserId);
+      if (result.success) {
+        toast.success(t('deleted', { count: result.count }));
+        onDone();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to bulk delete users', { error: e });
+      toast.error(t('deleted', { count: 0 }));
     }
   };
 
   const handleBulkRoleChange = async (role: UserRole) => {
-    const result = await bulkChangeRole(selectedIds, role);
-    if (result.success) {
-      toast.success(t('roleChanged', { count: result.count }));
-      setShowRolePicker(false);
-      onDone();
+    try {
+      const result = await bulkChangeRole(selectedIds, role);
+      if (result.success) {
+        toast.success(t('roleChanged', { count: result.count }));
+        setShowRolePicker(false);
+        onDone();
+      }
+    } catch (e) {
+      logger.error('Failed to bulk change roles', { error: e });
     }
   };
 
   const handleBulkBlock = async (blocked: boolean) => {
-    const result = await bulkToggleBlock(selectedIds, currentUserId, blocked);
-    if (result.success) {
-      toast.success(blocked ? t('blocked', { count: result.count }) : t('unblocked', { count: result.count }));
-      onDone();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await bulkToggleBlock(selectedIds, currentUserId, blocked);
+      if (result.success) {
+        toast.success(blocked ? t('blocked', { count: result.count }) : t('unblocked', { count: result.count }));
+        onDone();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to bulk toggle block', { error: e });
     }
   };
 
@@ -81,14 +94,18 @@ export default function BulkActionsBar({ selectedIds, currentUserId, onDone }: B
       toast.error(t('enterGroupName'));
       return;
     }
-    const result = await assignUsersToGroup(selectedIds, groupName);
-    if (result.success) {
-      toast.success(t('groupAssigned', { name: groupName.trim(), count: result.count }));
-      setShowGroupPicker(false);
-      setNewGroupInput('');
-      onDone();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await assignUsersToGroup(selectedIds, groupName);
+      if (result.success) {
+        toast.success(t('groupAssigned', { name: groupName.trim(), count: result.count }));
+        setShowGroupPicker(false);
+        setNewGroupInput('');
+        onDone();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to assign users to group', { error: e });
     }
   };
 

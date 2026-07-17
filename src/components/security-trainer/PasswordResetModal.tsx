@@ -14,6 +14,7 @@ import { X, Eye, EyeOff, Check, Copy, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/lib/auth-store';
 import { useTranslations } from 'next-intl';
+import { logger } from '@/lib/logger';
 
 interface PasswordResetModalProps {
   user: User;
@@ -69,13 +70,17 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
       return;
     }
 
-    const result = await resetUserPassword(user.id, password);
-    if (result.success) {
-      setNewPassword(password);
-      setResetDone(true);
-      toast.success(t('success'));
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await resetUserPassword(user.id, password);
+      if (result.success) {
+        setNewPassword(password);
+        setResetDone(true);
+        toast.success(t('success'));
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to reset user password', { error: e });
     }
   };
 

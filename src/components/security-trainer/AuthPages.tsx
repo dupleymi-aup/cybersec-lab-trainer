@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePasswordStrength } from '@/hooks/use-password-strength';
 import { Progress } from '@/components/ui/progress';
+import { logger } from '@/lib/logger';
 
 type AuthPage = 'login' | 'register' | 'recovery';
 type RecoveryStep = 'enter-contact' | 'enter-otp' | 'new-password';
@@ -88,10 +89,16 @@ export default function AuthPages() {
       return;
     }
     setLoading(true);
-    const result = await login(loginContact, loginPassword, rememberMe);
-    setLoading(false);
-    if (!result.success) {
-      toast.error(result.error);
+    try {
+      const result = await login(loginContact, loginPassword, rememberMe);
+      if (!result.success) {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Login failed', { error: e });
+      toast.error(t('validation.allFieldsRequired'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -119,21 +126,27 @@ export default function AuthPages() {
       return;
     }
     setLoading(true);
-    const result = await register(
-      {
-        email: regEmail,
-        phone: regPhone,
-        fullName: regName,
-        role: selectedRole,
-        inviteCode: adminInviteCode,
-      },
-      regPassword,
-    );
-    setLoading(false);
-    if (!result.success) {
-      toast.error(result.error);
-    } else {
-      setAdminInviteCode('');
+    try {
+      const result = await register(
+        {
+          email: regEmail,
+          phone: regPhone,
+          fullName: regName,
+          role: selectedRole,
+          inviteCode: adminInviteCode,
+        },
+        regPassword,
+      );
+      if (!result.success) {
+        toast.error(result.error);
+      } else {
+        setAdminInviteCode('');
+      }
+    } catch (e) {
+      logger.error('Registration failed', { error: e });
+      toast.error(t('validation.allFieldsRequired'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -151,36 +164,53 @@ export default function AuthPages() {
       return;
     }
     setLoading(true);
-    const result = await sendRecoveryOTP(recoveryContact);
-    setLoading(false);
-    if (result.success) {
-      toast.success(t('recovery.otpSent'));
-      setShowRecoveryOtp(false);
-      setRecoveryStep('enter-otp');
-      setCountdown(60);
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await sendRecoveryOTP(recoveryContact);
+      if (result.success) {
+        toast.success(t('recovery.otpSent'));
+        setShowRecoveryOtp(false);
+        setRecoveryStep('enter-otp');
+        setCountdown(60);
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Send recovery OTP failed', { error: e });
+      toast.error(t('validation.allFieldsRequired'));
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleVerifyOTP = async () => {
-    const valid = await verifyRecoveryOTP(recoveryOtp);
-    if (valid) {
-      setRecoveryStep('new-password');
-    } else {
+    try {
+      const valid = await verifyRecoveryOTP(recoveryOtp);
+      if (valid) {
+        setRecoveryStep('new-password');
+      } else {
+        toast.error(t('recovery.invalidOtp'));
+      }
+    } catch (e) {
+      logger.error('Verify OTP failed', { error: e });
       toast.error(t('recovery.invalidOtp'));
     }
   };
 
   const handleResendOTP = async () => {
     setLoading(true);
-    const result = await sendRecoveryOTP(recoveryContact);
-    setLoading(false);
-    if (result.success) {
-      toast.success(t('recovery.otpResent'));
-      setCountdown(60);
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await sendRecoveryOTP(recoveryContact);
+      if (result.success) {
+        toast.success(t('recovery.otpResent'));
+        setCountdown(60);
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Resend OTP failed', { error: e });
+      toast.error(t('validation.allFieldsRequired'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -198,17 +228,22 @@ export default function AuthPages() {
       toast.error(t('validation.passwordMismatch'));
       return;
     }
-    const result = await resetPassword(recoveryOtp, recoveryNewPassword);
-    if (result.success) {
-      toast.success(t('recovery.passwordResetSuccess'));
-      setPage('login');
-      setRecoveryStep('enter-contact');
-      setRecoveryContact('');
-      setRecoveryOtp('');
-      setRecoveryNewPassword('');
-      setRecoveryConfirmPassword('');
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await resetPassword(recoveryOtp, recoveryNewPassword);
+      if (result.success) {
+        toast.success(t('recovery.passwordResetSuccess'));
+        setPage('login');
+        setRecoveryStep('enter-contact');
+        setRecoveryContact('');
+        setRecoveryOtp('');
+        setRecoveryNewPassword('');
+        setRecoveryConfirmPassword('');
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Reset password failed', { error: e });
+      toast.error(t('validation.allFieldsRequired'));
     }
   };
 

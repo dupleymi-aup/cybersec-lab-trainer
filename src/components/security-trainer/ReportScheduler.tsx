@@ -111,37 +111,52 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
     if (frequency === 'weekly') data.dayOfWeek = dayOfWeek;
     if (frequency === 'monthly') data.dayOfMonth = dayOfMonth;
 
-    const result = await createScheduledReport(data);
-    if (result.success) {
-      toast.success(t('reportCreated'));
-      setShowForm(false);
-      resetForm();
-      loadReports();
-    } else {
-      toast.error(result.error || t('creationError'));
+    try {
+      const result = await createScheduledReport(data);
+      if (result.success) {
+        toast.success(t('reportCreated'));
+        setShowForm(false);
+        resetForm();
+        loadReports();
+      } else {
+        toast.error(result.error || t('creationError'));
+      }
+    } catch (e) {
+      logger.error('Failed to create scheduled report', { error: e });
+      toast.error(t('creationError'));
     }
   };
 
   const handleToggleActive = async (id: string, currentActive: boolean) => {
-    const result = await updateScheduledReport(id, {
-      isActive: !currentActive,
-    });
-    if (result.success) {
-      toast.success(currentActive ? t('reportDisabled') : t('reportEnabled'));
-      loadReports();
-    } else {
-      toast.error(result.error || t('updateError'));
+    try {
+      const result = await updateScheduledReport(id, {
+        isActive: !currentActive,
+      });
+      if (result.success) {
+        toast.success(currentActive ? t('reportDisabled') : t('reportEnabled'));
+        loadReports();
+      } else {
+        toast.error(result.error || t('updateError'));
+      }
+    } catch (e) {
+      logger.error('Failed to toggle scheduled report', { error: e });
+      toast.error(t('updateError'));
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm(t('confirmDelete'))) return;
-    const result = await deleteScheduledReport(id);
-    if (result.success) {
-      toast.success(t('reportDeleted'));
-      loadReports();
-    } else {
-      toast.error(result.error || t('deleteError'));
+    try {
+      const result = await deleteScheduledReport(id);
+      if (result.success) {
+        toast.success(t('reportDeleted'));
+        loadReports();
+      } else {
+        toast.error(result.error || t('deleteError'));
+      }
+    } catch (e) {
+      logger.error('Failed to delete scheduled report', { error: e });
+      toast.error(t('deleteError'));
     }
   };
 

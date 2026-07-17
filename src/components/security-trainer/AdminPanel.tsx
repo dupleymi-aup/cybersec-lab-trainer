@@ -206,34 +206,46 @@ export default function AdminPanel() {
   const storageKB = (storageUsed / 1024).toFixed(1);
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
-    const result = await changeUserRole(userId, newRole);
-    if (result.success) {
-      toast.success(t('actions.roleChanged', { role: getRoleLabel(newRole) }));
-      refresh();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await changeUserRole(userId, newRole);
+      if (result.success) {
+        toast.success(t('actions.roleChanged', { role: getRoleLabel(newRole) }));
+        refresh();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to change user role', { error: e });
     }
   };
 
   const handleDeleteUser = async (userId: string, fullName: string) => {
     if (!confirm(t('actions.confirmDelete', { name: fullName }))) return;
-    const result = await deleteUser(userId);
-    if (result.success) {
-      toast.success(t('actions.userDeleted'));
-      refresh();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await deleteUser(userId);
+      if (result.success) {
+        toast.success(t('actions.userDeleted'));
+        refresh();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to delete user', { error: e });
     }
   };
 
   const handleToggleBlock = async (userId: string) => {
-    const result = await toggleUserBlock(userId);
-    if (result.success) {
-      const isNowBlocked = allUsers.find((u) => u.id === userId)?.isBlocked;
-      toast.success(isNowBlocked ? t('actions.userBlocked') : t('actions.userUnblocked'));
-      refresh();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await toggleUserBlock(userId);
+      if (result.success) {
+        const isNowBlocked = allUsers.find((u) => u.id === userId)?.isBlocked;
+        toast.success(isNowBlocked ? t('actions.userBlocked') : t('actions.userUnblocked'));
+        refresh();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to toggle user block', { error: e });
     }
   };
 
@@ -599,9 +611,13 @@ export default function AdminPanel() {
                                   size="icon"
                                   className="text-muted-foreground hover:bg-purple-50 hover:text-purple-700"
                                   onClick={async () => {
-                                    const result = await startImpersonation(u.id, user?.id || '');
-                                    if (result.success) {
-                                      toast.success(t('users.impersonationStarted'));
+                                    try {
+                                      const result = await startImpersonation(u.id, user?.id || '');
+                                      if (result.success) {
+                                        toast.success(t('users.impersonationStarted'));
+                                      }
+                                    } catch (e) {
+                                      logger.error('Failed to start impersonation', { error: e });
                                     }
                                   }}
                                   aria-label="Impersonate user"

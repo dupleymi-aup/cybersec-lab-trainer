@@ -65,15 +65,20 @@ export default function RecoveryPage() {
       return;
     }
     setLoading(true);
-    const result = await sendRecoveryOTP(emailOrPhone.trim());
-    setLoading(false);
-    if (!result.success) {
-      toast.error(result.error);
-      return;
+    try {
+      const result = await sendRecoveryOTP(emailOrPhone.trim());
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(t('recovery.otpSent'));
+      setCooldown(30);
+      setStep('otp');
+    } catch {
+      toast.error(t('validation.allFieldsRequired'));
+    } finally {
+      setLoading(false);
     }
-    toast.success(t('recovery.otpSent'));
-    setCooldown(30);
-    setStep('otp');
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -112,20 +117,30 @@ export default function RecoveryPage() {
       return;
     }
     setLoading(true);
-    const valid = await verifyRecoveryOTP(code);
-    setLoading(false);
-    if (!valid) {
+    try {
+      const valid = await verifyRecoveryOTP(code);
+      if (!valid) {
+        toast.error(t('recovery.invalidOtp'));
+        return;
+      }
+      setStep('reset');
+    } catch {
       toast.error(t('recovery.invalidOtp'));
-      return;
+    } finally {
+      setLoading(false);
     }
-    setStep('reset');
   };
 
   const handleResendOTP = async () => {
     if (cooldown > 0) return;
     setLoading(true);
-    await sendRecoveryOTP(emailOrPhone);
-    setLoading(false);
+    try {
+      await sendRecoveryOTP(emailOrPhone);
+    } catch {
+      // silently ignore
+    } finally {
+      setLoading(false);
+    }
     setDigits(['', '', '', '', '', '']);
     setCooldown(30);
     toast.success(t('recovery.otpResent'));
@@ -149,14 +164,19 @@ export default function RecoveryPage() {
     }
     const code = digits.join('');
     setLoading(true);
-    const result = await resetPassword(code, password);
-    setLoading(false);
-    if (!result.success) {
-      toast.error(result.error);
-      return;
+    try {
+      const result = await resetPassword(code, password);
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(t('recovery.passwordResetSuccess'));
+      setStep('done');
+    } catch {
+      toast.error(t('validation.allFieldsRequired'));
+    } finally {
+      setLoading(false);
     }
-    toast.success(t('recovery.passwordResetSuccess'));
-    setStep('done');
   };
 
   return (

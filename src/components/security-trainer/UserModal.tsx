@@ -14,6 +14,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, Eye, EyeOff, GraduationCap, Briefcase, Shield, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { logger } from '@/lib/logger';
 
 const roleIcons: Record<UserRole, React.ReactNode> = {
   student: <GraduationCap size={16} className="text-violet-500" />,
@@ -111,12 +112,17 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
       return;
     }
 
-    const result = await createUser({ email, phone, fullName, role, group, course, university, inviteCode }, password);
-    if (result.success) {
-      toast.success(t('userCreated'));
-      onSuccess();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await createUser({ email, phone, fullName, role, group, course, university, inviteCode }, password);
+      if (result.success) {
+        toast.success(t('userCreated'));
+        onSuccess();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to create user', { error: e });
+      toast.error(te('invalidEmail'));
     }
   };
 
@@ -135,20 +141,25 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
       return;
     }
 
-    const result = await updateUser(user.id, {
-      fullName: editFullName,
-      email: editEmail,
-      phone: editPhone,
-      group: editGroup,
-      course: editCourse,
-      university: editUniversity,
-      bio: editBio,
-    });
-    if (result.success) {
-      toast.success(t('profileUpdated'));
-      onSuccess();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await updateUser(user.id, {
+        fullName: editFullName,
+        email: editEmail,
+        phone: editPhone,
+        group: editGroup,
+        course: editCourse,
+        university: editUniversity,
+        bio: editBio,
+      });
+      if (result.success) {
+        toast.success(t('profileUpdated'));
+        onSuccess();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to update user', { error: e });
+      toast.error(te('invalidEmail'));
     }
   };
 

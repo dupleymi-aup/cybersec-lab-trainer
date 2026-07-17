@@ -149,15 +149,19 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
     }
 
     const loadStudents = async () => {
-      const allUsers = await getAllUsers();
-      const studentUsers = allUsers.filter((u: User) => u.role === 'student');
-      const mapped = studentUsers.map((u: User) => ({
-        id: u.id,
-        fullName: u.fullName,
-        email: u.email,
-        group: u.group,
-      }));
-      setStudents(groupId ? mapped.filter((s) => s.group === groupId) : mapped);
+      try {
+        const allUsers = await getAllUsers();
+        const studentUsers = allUsers.filter((u: User) => u.role === 'student');
+        const mapped = studentUsers.map((u: User) => ({
+          id: u.id,
+          fullName: u.fullName,
+          email: u.email,
+          group: u.group,
+        }));
+        setStudents(groupId ? mapped.filter((s) => s.group === groupId) : mapped);
+      } catch (e) {
+        logger.error('Failed to load students for export', { error: e });
+      }
     };
     loadStudents();
   }, [propStudents, groupId]);

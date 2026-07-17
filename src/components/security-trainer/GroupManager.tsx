@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Users, Plus, Check, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { logger } from '@/lib/logger';
 
 interface GroupManagerProps {
   onRefresh: () => void;
@@ -23,14 +24,18 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
   const [newGroupName, setNewGroupName] = useState('');
 
   const loadData = async () => {
-    const allGroups = await getAllGroups();
-    setGroups(allGroups);
-    const users = await getAllUsers();
-    const counts: Record<string, number> = {};
-    for (const g of allGroups) {
-      counts[g] = users.filter((u) => u.group === g).length;
+    try {
+      const allGroups = await getAllGroups();
+      setGroups(allGroups);
+      const users = await getAllUsers();
+      const counts: Record<string, number> = {};
+      for (const g of allGroups) {
+        counts[g] = users.filter((u) => u.group === g).length;
+      }
+      setGroupCounts(counts);
+    } catch (e) {
+      logger.error('Failed to load group data', { error: e });
     }
-    setGroupCounts(counts);
   };
 
   useEffect(() => {
@@ -42,28 +47,37 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
       toast.error(t('emptyName'));
       return;
     }
-    const result = await renameGroup(oldName, editValue);
-    if (result.success) {
-      toast.success(t('renamed', { count: result.count }));
-      setEditingGroup(null);
-      setEditValue('');
-      loadData();
-      onRefresh();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await renameGroup(oldName, editValue);
+      if (result.success) {
+        toast.success(t('renamed', { count: result.count }));
+        setEditingGroup(null);
+        setEditValue('');
+        loadData();
+        onRefresh();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to rename group', { error: e });
+      toast.error(t('emptyName'));
     }
   };
 
   const handleDelete = async (name: string) => {
     const count = groupCounts[name] || 0;
     if (!confirm(t('confirmDelete', { name, count }))) return;
-    const result = await deleteGroup(name);
-    if (result.success) {
-      toast.success(t('deleted', { count: result.count }));
-      loadData();
-      onRefresh();
-    } else {
-      toast.error(result.error);
+    try {
+      const result = await deleteGroup(name);
+      if (result.success) {
+        toast.success(t('deleted', { count: result.count }));
+        loadData();
+        onRefresh();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (e) {
+      logger.error('Failed to delete group', { error: e });
     }
   };
 

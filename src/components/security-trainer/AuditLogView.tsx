@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Trash2, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { AnimatePresence, motion } from 'framer-motion';
+import { logger } from '@/lib/logger';
 
 const actionColors: Record<AuditAction, string> = {
   role_change: 'bg-violet-100 text-violet-700',
@@ -61,8 +62,12 @@ export default function AuditLogView() {
   ) as Record<AuditAction, string>;
 
   const loadData = async () => {
-    const result = await getAuditLogEntries();
-    setEntries([...result].reverse());
+    try {
+      const result = await getAuditLogEntries();
+      setEntries([...result].reverse());
+    } catch (e) {
+      logger.error('Failed to load audit log entries', { error: e });
+    }
   };
 
   useEffect(() => {
@@ -84,16 +89,21 @@ export default function AuditLogView() {
 
   const handleClear = async () => {
     if (!confirm(t('confirmClear'))) return;
-    const result = await clearAuditLog(90);
-    if (result.success) {
-      loadData();
-      if (result.deletedCount > 0) {
-        toast.success(t('entriesDeleted', { count: result.deletedCount }));
+    try {
+      const result = await clearAuditLog(90);
+      if (result.success) {
+        loadData();
+        if (result.deletedCount > 0) {
+          toast.success(t('entriesDeleted', { count: result.deletedCount }));
+        } else {
+          toast.info(t('noEntriesToDelete'));
+        }
       } else {
-        toast.info(t('noEntriesToDelete'));
+        toast.error(result.error || t('clearError'));
       }
-    } else {
-      toast.error(result.error || t('clearError'));
+    } catch (e) {
+      logger.error('Failed to clear audit log', { error: e });
+      toast.error(t('clearError'));
     }
   };
 
