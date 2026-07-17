@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     // Only admins can stop impersonation
     if (auth.role !== 'admin') {
-      return forbidden('Только администраторы могут остановить имперсонацию');
+      return forbidden('Only administrators can stop impersonation');
     }
 
     // Re-issue a proper JWT for the admin with current tokenVersion from DB

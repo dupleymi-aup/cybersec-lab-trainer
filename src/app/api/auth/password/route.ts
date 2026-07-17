@@ -25,7 +25,7 @@ export async function PUT(request: NextRequest) {
   if (!passwordValidation.valid) {
     return NextResponse.json(
       {
-        error: 'Пароль не соответствует требованиям',
+        error: 'Password does not meet requirements',
         details: passwordValidation.errors,
       },
       { status: 400 },
@@ -37,12 +37,12 @@ export async function PUT(request: NextRequest) {
 
   const isValid = await verifyPassword(currentPassword, user.passwordHash);
   if (!isValid) {
-    return NextResponse.json({ error: 'Неверный текущий пароль' }, { status: 401 });
+    return NextResponse.json({ error: 'Incorrect current password' }, { status: 401 });
   }
 
   const isSamePassword = await verifyPassword(newPassword, user.passwordHash);
   if (isSamePassword) {
-    return NextResponse.json({ error: 'Новый пароль должен отличаться от текущего' }, { status: 400 });
+    return NextResponse.json({ error: 'New password must differ from current password' }, { status: 400 });
   }
 
   const newHash = await hashPassword(newPassword);

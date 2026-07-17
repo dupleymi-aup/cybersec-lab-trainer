@@ -20,7 +20,7 @@ export async function DELETE(request: NextRequest) {
     if (!rateResult.allowed) {
       return NextResponse.json(
         {
-          error: 'Слишком много попыток удаления. Подождите',
+          error: 'Too many deletion attempts. Please wait',
           retryAfter: rateResult.retryAfter,
         },
         { status: 429 },
@@ -33,7 +33,7 @@ export async function DELETE(request: NextRequest) {
     if (!ipRateResult.allowed) {
       return NextResponse.json(
         {
-          error: 'Слишком много попыток. Подождите',
+          error: 'Too many attempts. Please wait',
           retryAfter: ipRateResult.retryAfter,
         },
         { status: 429 },
@@ -46,7 +46,7 @@ export async function DELETE(request: NextRequest) {
     const { currentPassword } = bodyResult.data;
 
     if (!currentPassword) {
-      return NextResponse.json({ error: 'Требуется подтверждение пароля' }, { status: 400 });
+      return NextResponse.json({ error: 'Password confirmation required' }, { status: 400 });
     }
 
     const user = await getPrisma().user.findUnique({ where: { id: auth.id } });
@@ -54,7 +54,7 @@ export async function DELETE(request: NextRequest) {
 
     const isValid = await verifyPassword(currentPassword, user.passwordHash);
     if (!isValid) {
-      return NextResponse.json({ error: 'Неверный пароль' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }
 
     await getPrisma().user.delete({ where: { id: auth.id } });

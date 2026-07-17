@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (!rateResult.allowed) {
       return NextResponse.json(
         {
-          error: 'Слишком много попыток. Подождите',
+          error: 'Too many attempts. Please wait',
           retryAfter: rateResult.retryAfter,
         },
         { status: 429 },

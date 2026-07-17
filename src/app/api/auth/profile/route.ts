@@ -52,7 +52,7 @@ export async function PUT(request: NextRequest) {
   }
 
   if (Object.keys(parsed.data).length === 0) {
-    return NextResponse.json({ error: 'Необходимо указать хотя бы одно поле для обновления' }, { status: 400 });
+    return NextResponse.json({ error: 'At least one field must be provided for update' }, { status: 400 });
   }
 
   const user = await getPrisma().user.update({

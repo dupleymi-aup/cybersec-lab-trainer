@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (!admin) return unauthorized();
 
     if (admin.role !== 'admin') {
-      return forbidden('Только администраторы могут использовать имперсонацию');
+      return forbidden('Only administrators can use impersonation');
     }
 
     const body = await request.json();
@@ -27,24 +27,24 @@ export async function POST(request: NextRequest) {
     }
 
     if (targetUserId === admin.id) {
-      return NextResponse.json({ error: 'Нельзя войти как себя' }, { status: 400 });
+      return NextResponse.json({ error: 'Cannot impersonate yourself' }, { status: 400 });
     }
 
     const targetUser = await getPrisma().user.findUnique({
       where: { id: targetUserId },
     });
     if (!targetUser) {
-      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Prevent impersonating blocked users
     if (targetUser.isBlocked) {
-      return NextResponse.json({ error: 'Нельзя войти как заблокированный пользователь' }, { status: 403 });
+      return NextResponse.json({ error: 'Cannot impersonate a blocked user' }, { status: 403 });
     }
 
     // Prevent admin impersonating another admin (privilege escalation concern)
     if (targetUser.role === 'admin') {
-      return NextResponse.json({ error: 'Нельзя войти как другой администратор' }, { status: 403 });
+      return NextResponse.json({ error: 'Cannot impersonate another administrator' }, { status: 403 });
     }
 
     const token = await generateToken(targetUser.id, targetUser.role, {

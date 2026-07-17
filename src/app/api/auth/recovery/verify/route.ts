@@ -34,14 +34,14 @@ export async function POST(request: NextRequest) {
     if (!rateResult.allowed) {
       return NextResponse.json(
         {
-          error: 'Слишком много попыток. Подождите',
+          error: 'Too many attempts. Please wait',
           retryAfter: rateResult.retryAfter,
         },
         { status: 429 },
       );
     }
 
-    const genericError = NextResponse.json({ error: 'Неверный или просроченный OTP' }, { status: 400 });
+    const genericError = NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 400 });
 
     if (!user) {
       return genericError;

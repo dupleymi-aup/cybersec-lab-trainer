@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
   // Prevent self-action
   if (userIds.includes(auth.id)) {
-    return NextResponse.json({ error: 'Нельзя применить операцию к себе' }, { status: 403 });
+    return NextResponse.json({ error: 'Cannot perform bulk operations on yourself' }, { status: 403 });
   }
 
   // Prevent last admin deletion
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       where: { id: { in: userIds }, role: 'admin' },
     });
     if (adminCount - adminsToDelete < 1) {
-      return NextResponse.json({ error: 'Нельзя удалить последнего администратора' }, { status: 403 });
+      return NextResponse.json({ error: 'Cannot delete the last administrator' }, { status: 403 });
     }
   }
 

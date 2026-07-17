@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     if (!idRateResult.allowed) {
       return NextResponse.json(
         {
-          error: 'Слишком много попыток. Подождите',
+          error: 'Too many attempts. Please wait',
           retryAfter: idRateResult.retryAfter,
         },
         { status: 429 },
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     if (!ipRateResult.allowed) {
       return NextResponse.json(
         {
-          error: 'Слишком много попыток с этого IP. Подождите',
+          error: 'Too many attempts from this IP. Please wait',
           retryAfter: ipRateResult.retryAfter,
         },
         { status: 429 },
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       await logActivity({ email: emailOrPhone, ip, userAgent, success: false });
-      return NextResponse.json({ error: 'Неверный email или пароль' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     if (user.isBlocked) {
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         userAgent,
         success: false,
       });
-      return NextResponse.json({ error: 'Аккаунт заблокирован' }, { status: 403 });
+      return NextResponse.json({ error: 'Account is blocked' }, { status: 403 });
     }
 
     const isValid = await verifyPassword(password, user.passwordHash);
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         userAgent,
         success: false,
       });
-      return NextResponse.json({ error: 'Неверный email или пароль' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     // Update login stats atomically to prevent race condition

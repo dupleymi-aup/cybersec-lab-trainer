@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     if (!rateLimit.allowed) {
       return NextResponse.json(
         {
-          error: 'Слишком много попыток регистрации. Подождите',
+          error: 'Too many registration attempts. Please wait',
           retryAfter: rateLimit.retryAfter,
         },
         { status: 429 },
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     const pwValidation = validatePassword(password);
     if (!pwValidation.valid) {
       return NextResponse.json(
-        { error: 'Пароль недостаточно надёжный', details: pwValidation.errors },
+        { error: 'Password does not meet requirements', details: pwValidation.errors },
         { status: 400 },
       );
     }
@@ -43,17 +43,17 @@ export async function POST(request: NextRequest) {
       where: { OR: [{ email }, { phone }] },
     });
     if (existing) {
-      return NextResponse.json({ error: 'Пользователь с таким email или телефоном уже существует' }, { status: 409 });
+      return NextResponse.json({ error: 'A user with this email or phone already exists' }, { status: 409 });
     }
 
     // Check invite code for admin/teacher
     const adminInviteCode = getAdminInviteCode();
     if (role === 'admin' || role === 'teacher') {
       if (!adminInviteCode) {
-        return NextResponse.json({ error: 'Регистрация с этой ролью отключена' }, { status: 403 });
+        return NextResponse.json({ error: 'Registration with this role is disabled' }, { status: 403 });
       }
       if (!inviteCode || inviteCode.toUpperCase() !== adminInviteCode) {
-        return NextResponse.json({ error: 'Неверный код приглашения' }, { status: 403 });
+        return NextResponse.json({ error: 'Invalid invite code' }, { status: 403 });
       }
     }
 

@@ -111,14 +111,14 @@ export async function POST(request: NextRequest) {
   // Enforce password strength requirements server-side
   const pwValidation = validatePassword(password);
   if (!pwValidation.valid) {
-    return NextResponse.json({ error: 'Пароль недостаточно надёжный', details: pwValidation.errors }, { status: 400 });
+    return NextResponse.json({ error: 'Password does not meet requirements', details: pwValidation.errors }, { status: 400 });
   }
 
   const existing = await getPrisma().user.findFirst({
     where: { OR: [{ email }, { phone }] },
   });
   if (existing) {
-    return NextResponse.json({ error: 'Пользователь уже существует' }, { status: 409 });
+    return NextResponse.json({ error: 'User already exists' }, { status: 409 });
   }
 
   const passwordHash = await hashPassword(password);

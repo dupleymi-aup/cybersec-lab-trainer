@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
   if (!rateResult.allowed) {
     return NextResponse.json(
       {
-        error: 'Слишком много запросов. Подождите',
+        error: 'Too many requests. Please wait',
         retryAfter: rateResult.retryAfter,
       },
       { status: 429 },
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
   if (!ipRateResult.allowed) {
     return NextResponse.json(
       {
-        error: 'Слишком много запросов. Подождите',
+        error: 'Too many requests. Please wait',
         retryAfter: ipRateResult.retryAfter,
       },
       { status: 429 },
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   // Always return same generic response to prevent user enumeration
   const genericResponse = {
     success: true,
-    message: 'Если пользователь найден, OTP отправлен на email',
+    message: 'If the user exists, an OTP has been sent to their email',
   };
 
   if (!user) {
