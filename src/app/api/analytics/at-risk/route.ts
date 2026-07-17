@@ -147,30 +147,30 @@ export async function GET(request: NextRequest) {
       if (lastActiveDays > inactivityDays) {
         const inactivityScore = Math.min(35, Math.round((lastActiveDays / 30) * 35));
         riskScore += inactivityScore;
-        reasons.push(`Неактивен ${lastActiveDays} дн.`);
+        reasons.push(`Inactive for ${lastActiveDays} days`);
       }
 
       // Quiz performance factor (up to 25 points)
       if (studentQuizResults.length > 0 && avgQuizScore < minScore) {
         const scoreRisk = Math.round(((minScore - avgQuizScore) / minScore) * 25);
         riskScore += scoreRisk;
-        reasons.push(`Ср. балл квизов ${avgQuizScore}%`);
+        reasons.push(`Avg quiz score ${avgQuizScore}%`);
       } else if (studentQuizResults.length === 0 && days > 7) {
         riskScore += 15;
-        reasons.push('Нет попыток квизов');
+        reasons.push('No quiz attempts');
       }
 
       // Module completion factor (up to 25 points)
       if (modulesCompleted < minModules) {
         const moduleRisk = Math.round(((minModules - modulesCompleted) / minModules) * 25);
         riskScore += moduleRisk;
-        reasons.push(`Завершено модулей: ${modulesCompleted}`);
+        reasons.push(`Modules completed: ${modulesCompleted}`);
       }
 
       // Trend factor (up to 15 points)
       if (trend === 'declining') {
         riskScore += 15;
-        reasons.push('Снижающийся тренд');
+        reasons.push('Declining trend');
       }
 
       riskScore = Math.min(100, riskScore);

@@ -6,12 +6,12 @@ import { logger } from '@/lib/logger';
 
 const MODULE_NAMES: Record<string, string> = {
   owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL-инъекции',
+  'sql-injection': 'SQL Injection',
   xss: 'XSS',
   csrf: 'CSRF',
-  auth: 'Аутентификация',
-  'secure-coding': 'Безопасный код',
-  tools: 'Инструменты',
+  auth: 'Authentication',
+  'secure-coding': 'Secure Coding',
+  tools: 'Tools',
   'security-headers': 'Security Headers',
 };
 
@@ -84,14 +84,14 @@ export async function GET(request: NextRequest) {
       const studentById = new Map(students.map((s) => [s.id, s]));
 
       for (const s of students) {
-        const key = s[field] || '(не указано)';
+        const key = s[field] || '(not specified)';
         if (!groups.has(key)) groups.set(key, []);
       }
 
       for (const p of progressRecords) {
         const student = studentById.get(p.userId);
         if (student) {
-          const key = student[field] || '(не указано)';
+          const key = student[field] || '(not specified)';
           groups.get(key)?.push(p);
         }
       }

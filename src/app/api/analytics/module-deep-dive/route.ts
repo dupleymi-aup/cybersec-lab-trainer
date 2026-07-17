@@ -7,13 +7,13 @@ import type { Prisma } from '@prisma/client';
 
 const MODULE_NAMES: Record<string, string> = {
   owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL-инъекции',
-  xss: 'XSS-атаки',
-  csrf: 'CSRF-атаки',
-  auth: 'Аутентификация',
-  'secure-coding': 'Безопасное кодирование',
-  tools: 'Инструменты',
-  'security-headers': 'Заголовки безопасности',
+  'sql-injection': 'SQL Injection',
+  xss: 'XSS Attacks',
+  csrf: 'CSRF Attacks',
+  auth: 'Authentication',
+  'secure-coding': 'Secure Coding',
+  tools: 'Tools',
+  'security-headers': 'Security Headers',
   idor: 'IDOR',
   ssrf: 'SSRF',
 };

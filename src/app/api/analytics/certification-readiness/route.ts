@@ -9,15 +9,15 @@ import { logger } from '@/lib/logger';
 
 const ALL_QUIZ_CATEGORIES = ['sql', 'xss', 'csrf', 'auth', 'general', 'owasp', 'coding', 'network', 'social'];
 const CATEGORY_NAMES: Record<string, string> = {
-  sql: 'SQL-инъекции',
-  xss: 'XSS-атаки',
-  csrf: 'CSRF-атаки',
-  auth: 'Аутентификация',
-  general: 'Общие',
+  sql: 'SQL Injection',
+  xss: 'XSS Attacks',
+  csrf: 'CSRF Attacks',
+  auth: 'Authentication',
+  general: 'General',
   owasp: 'OWASP Top 10',
-  coding: 'Безопасное кодирование',
-  network: 'Сети',
-  social: 'Социальная инженерия',
+  coding: 'Secure Coding',
+  network: 'Networks',
+  social: 'Social Engineering',
 };
 
 export async function GET(request: NextRequest) {
@@ -191,17 +191,17 @@ export async function GET(request: NextRequest) {
         if (cat.ready) strengths.push(cat.category);
         else weaknesses.push(cat.category);
       }
-      if (modulesCompleted >= TOTAL_MODULES) strengths.push('Все модули завершены');
-      if (modulesCompleted < 5) weaknesses.push('Мало завершённых модулей');
+      if (modulesCompleted >= TOTAL_MODULES) strengths.push('All modules completed');
+      if (modulesCompleted < 5) weaknesses.push('Few modules completed');
 
       // Generate recommendations
       for (const cat of categoryReadiness) {
-        if (!cat.ready) recommendations.push(`Повторите категорию "${cat.category}" (текущий балл: ${cat.score}%)`);
+        if (!cat.ready) recommendations.push(`Review category "${cat.category}" (current score: ${cat.score}%)`);
       }
       if (modulesCompleted < TOTAL_MODULES)
-        recommendations.push(`Завершите оставшиеся ${TOTAL_MODULES - modulesCompleted} модулей`);
+        recommendations.push(`Complete the remaining ${TOTAL_MODULES - modulesCompleted} modules`);
       if (recommendations.length === 0)
-        recommendations.push('Отличная подготовка! Рекомендуется повторное прохождение квизов для закрепления');
+        recommendations.push('Excellent preparation! Re-taking quizzes is recommended for reinforcement');
 
       studentsData.push({
         userId: student.id,

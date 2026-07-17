@@ -6,15 +6,15 @@ import type { Prisma } from '@prisma/client';
 import { logger } from '@/lib/logger';
 
 const CATEGORY_NAMES: Record<string, string> = {
-  sql: 'SQL-инъекции',
-  xss: 'XSS-атаки',
-  csrf: 'CSRF-атаки',
-  auth: 'Аутентификация',
-  general: 'Общие',
+  sql: 'SQL Injection',
+  xss: 'XSS Attacks',
+  csrf: 'CSRF Attacks',
+  auth: 'Authentication',
+  general: 'General',
   owasp: 'OWASP Top 10',
-  coding: 'Безопасное кодирование',
-  network: 'Сети',
-  social: 'Социальная инженерия',
+  coding: 'Secure Coding',
+  network: 'Networks',
+  social: 'Social Engineering',
 };
 
 export async function GET(request: NextRequest) {
@@ -174,13 +174,13 @@ export async function GET(request: NextRequest) {
 
     // Time vs performance buckets
     const durationBuckets = [
-      { range: '< 15 сек', min: 0, max: 15, percents: [] as number[] },
-      { range: '15-30 сек', min: 15, max: 30, percents: [] as number[] },
-      { range: '30-60 сек', min: 30, max: 60, percents: [] as number[] },
-      { range: '1-3 мин', min: 60, max: 180, percents: [] as number[] },
-      { range: '3-5 мин', min: 180, max: 300, percents: [] as number[] },
-      { range: '5-10 мин', min: 300, max: 600, percents: [] as number[] },
-      { range: '> 10 мин', min: 600, max: 3600, percents: [] as number[] },
+      { range: '< 15s', min: 0, max: 15, percents: [] as number[] },
+      { range: '15-30s', min: 15, max: 30, percents: [] as number[] },
+      { range: '30-60s', min: 30, max: 60, percents: [] as number[] },
+      { range: '1-3 min', min: 60, max: 180, percents: [] as number[] },
+      { range: '3-5 min', min: 180, max: 300, percents: [] as number[] },
+      { range: '5-10 min', min: 300, max: 600, percents: [] as number[] },
+      { range: '> 10 min', min: 600, max: 3600, percents: [] as number[] },
     ];
     for (const s of sessionsWithDuration) {
       for (const b of durationBuckets) {

@@ -10,12 +10,12 @@ const CACHE_TTL = 30_000; // 30 seconds
 
 const MODULE_NAMES: Record<string, string> = {
   owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL-инъекции',
+  'sql-injection': 'SQL Injection',
   xss: 'XSS',
   csrf: 'CSRF',
-  auth: 'Аутентификация',
-  'secure-coding': 'Безопасный код',
-  tools: 'Инструменты',
+  auth: 'Authentication',
+  'secure-coding': 'Secure Coding',
+  tools: 'Tools',
   'security-headers': 'Security Headers',
 };
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   try {
     const auth = await authenticate(request);
     if (!auth) return unauthorized();
-    if (!requireRole(auth.role, 'admin')) return forbidden('Требуется роль администратора');
+    if (!requireRole(auth.role, 'admin')) return forbidden('Admin role required');
 
     const { searchParams } = new URL(request.url);
     const days = parseDays(searchParams);
@@ -259,7 +259,7 @@ export async function GET(request: NextRequest) {
             userId: login.userId,
             fullName: student.fullName,
             timestamp: login.timestamp.toISOString(),
-            details: login.success ? 'Успешный вход' : 'Неудачный вход',
+            details: login.success ? 'Successful login' : 'Failed login',
           });
         }
       }

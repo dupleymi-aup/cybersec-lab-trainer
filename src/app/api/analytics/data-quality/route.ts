@@ -96,8 +96,8 @@ export async function GET(request: NextRequest) {
       {
         type: 'inactive-students',
         severity: 'warning' as const,
-        title: 'Неактивные студенты',
-        description: 'Студенты без входов за последние 30 дней',
+        title: 'Inactive Students',
+        description: 'Students with no logins in the last 30 days',
         count: inactiveStudents.length,
         affectedStudents: inactiveStudents
           .slice(0, 20)
@@ -106,8 +106,8 @@ export async function GET(request: NextRequest) {
       {
         type: 'missing-quiz',
         severity: 'info' as const,
-        title: 'Отсутствуют квизы',
-        description: 'Студенты начали модули, но не проходили квизы',
+        title: 'Missing Quizzes',
+        description: 'Students who started modules but did not take quizzes',
         count: missingQuizStudents.length,
         affectedStudents: missingQuizStudents
           .slice(0, 20)
@@ -116,16 +116,16 @@ export async function GET(request: NextRequest) {
       {
         type: 'zero-completion-modules',
         severity: 'warning' as const,
-        title: 'Модули без завершений',
-        description: 'Модули, которые никто не завершил',
+        title: 'Modules with No Completions',
+        description: 'Modules that no one has completed',
         count: zeroCompletionModules.length,
         affectedModules: zeroCompletionModules,
       },
       {
         type: 'stale-progress',
         severity: 'info' as const,
-        title: 'Устаревший прогресс',
-        description: 'Прогресс не обновлялся более 60 дней',
+        title: 'Stale Progress',
+        description: 'Progress not updated in over 60 days',
         count: staleStudents.length,
         affectedStudents: staleStudents
           .slice(0, 20)
@@ -134,8 +134,8 @@ export async function GET(request: NextRequest) {
       {
         type: 'failed-quizzes',
         severity: 'warning' as const,
-        title: 'Квизы с 0%',
-        description: 'Квизы, пройденные с нулевым результатом',
+        title: 'Quizzes with 0%',
+        description: 'Quizzes completed with zero score',
         count: failedQuizzes,
       },
     ].filter((issue) => issue.count > 0);

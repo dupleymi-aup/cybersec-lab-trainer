@@ -151,10 +151,10 @@ export async function GET(request: NextRequest) {
     }
 
     const retryDistribution = [
-      { range: 'Без повторов', count: 0 },
-      { range: '1 повтор', count: 0 },
-      { range: '2 повтора', count: 0 },
-      { range: '3+ повторов', count: 0 },
+      { range: 'No retries', count: 0 },
+      { range: '1 retry', count: 0 },
+      { range: '2 retries', count: 0 },
+      { range: '3+ retries', count: 0 },
     ];
     for (const count of userRetryCounts.values()) {
       if (count === 0) retryDistribution[0].count++;
@@ -179,9 +179,9 @@ export async function GET(request: NextRequest) {
 
     // Score improvement by retry attempts
     const improvementByRetries = [
-      { attempts: '1 попытка', avgScore: 0, count: 0 },
-      { attempts: '2 попытки', avgScore: 0, count: 0 },
-      { attempts: '3+ попыток', avgScore: 0, count: 0 },
+      { attempts: '1 attempt', avgScore: 0, count: 0 },
+      { attempts: '2 attempts', avgScore: 0, count: 0 },
+      { attempts: '3+ attempts', avgScore: 0, count: 0 },
     ];
 
     for (const r of retryData) {

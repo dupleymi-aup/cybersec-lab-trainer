@@ -126,15 +126,15 @@ export async function GET(request: NextRequest) {
       const quizDeclineScore = Math.max(0, Math.min(100, Math.round(quizDeclineRatio * 100)));
 
       const riskFactors: RiskFactor[] = [
-        { name: 'Снижение входов', weight: 25, score: loginScore },
-        { name: 'Тренд баллов квизов', weight: 25, score: quizScoreTrend },
+        { name: 'Login Decline', weight: 25, score: loginScore },
+        { name: 'Quiz Score Trend', weight: 25, score: quizScoreTrend },
         {
-          name: 'Скорость завершения модулей',
+          name: 'Module Completion Speed',
           weight: 20,
           score: completionScore,
         },
-        { name: 'Дни без активности', weight: 20, score: inactivityScore },
-        { name: 'Снижение попыток квизов', weight: 10, score: quizDeclineScore },
+        { name: 'Days Without Activity', weight: 20, score: inactivityScore },
+        { name: 'Quiz Attempt Decline', weight: 10, score: quizDeclineScore },
       ];
 
       // Weighted risk score
@@ -145,12 +145,12 @@ export async function GET(request: NextRequest) {
 
       // Recommended interventions
       const interventions: string[] = [];
-      if (loginScore >= 60) interventions.push('Связаться со студентом и уточнить причины отсутствия');
-      if (quizScoreTrend >= 60) interventions.push('Предложить дополнительную помощь по квизам');
-      if (completionScore >= 60) interventions.push('Упростить доступ к следующим модулям');
-      if (inactivityScore >= 70) interventions.push('Отправить уведомление о прогрессе');
-      if (quizDeclineScore >= 60) interventions.push('Предложить повторное прохождение квизов');
-      if (interventions.length === 0) interventions.push('Продолжать мониторинг');
+      if (loginScore >= 60) interventions.push('Contact student to clarify reasons for absence');
+      if (quizScoreTrend >= 60) interventions.push('Offer additional quiz help');
+      if (completionScore >= 60) interventions.push('Simplify access to next modules');
+      if (inactivityScore >= 70) interventions.push('Send progress notification');
+      if (quizDeclineScore >= 60) interventions.push('Recommend retaking quizzes');
+      if (interventions.length === 0) interventions.push('Continue monitoring');
 
       // Predicted dropout week (if high risk)
       let predictedDropoutWeek: number | undefined;

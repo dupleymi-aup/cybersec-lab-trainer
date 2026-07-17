@@ -154,11 +154,11 @@ export async function GET(request: NextRequest) {
     const timeDistribution = moduleTimeResults.map(({ moduleId, ...rest }) => {
       const times = moduleTimes.get(moduleId) || [];
       const ranges = [
-        { range: '0-2ч', min: 0, max: 2, count: 0 },
-        { range: '2-6ч', min: 2, max: 6, count: 0 },
-        { range: '6-12ч', min: 6, max: 12, count: 0 },
-        { range: '12-24ч', min: 12, max: 24, count: 0 },
-        { range: '24ч+', min: 24, max: Infinity, count: 0 },
+        { range: '0-2h', min: 0, max: 2, count: 0 },
+        { range: '2-6h', min: 2, max: 6, count: 0 },
+        { range: '6-12h', min: 6, max: 12, count: 0 },
+        { range: '12-24h', min: 12, max: 24, count: 0 },
+        { range: '24h+', min: 24, max: Infinity, count: 0 },
       ];
       for (const t of times) {
         for (const r of ranges) {

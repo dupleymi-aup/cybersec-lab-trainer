@@ -378,15 +378,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (gap.severity === 'high') {
       recommendations.push({
         type: 'module',
-        title: `Повторите модуль "${gap.moduleId}"`,
-        description: `Ваш результат (${gap.studentScore}%) значительно ниже среднего (${gap.cohortAvg}%). Рекомендуется повторное изучение материала.`,
+        title: `Review module "${gap.moduleId}"`,
+        description: `Your score (${gap.studentScore}%) is significantly below average (${gap.cohortAvg}%). Re-studying the material is recommended.`,
         priority: 'high',
       });
     } else if (gap.severity === 'medium' && gap.studentScore < 60) {
       recommendations.push({
         type: 'module',
-        title: `Закрепите модуль "${gap.moduleId}"`,
-        description: `Ваш результат (${gap.studentScore}%) ниже среднего (${gap.cohortAvg}%). Рекомендуется дополнительная практика.`,
+        title: `Reinforce module "${gap.moduleId}"`,
+        description: `Your score (${gap.studentScore}%) is below average (${gap.cohortAvg}%). Additional practice is recommended.`,
         priority: 'medium',
       });
     }
@@ -398,8 +398,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (gap.severity === 'high') {
       recommendations.push({
         type: 'quiz',
-        title: `Изучите тему "${category}"`,
-        description: `Правильных ответов: ${gap.studentScore}%, средний по группе: ${gap.cohortAvg}%. Рекомендуется повторить теорию.`,
+        title: `Study topic "${category}"`,
+        description: `Correct answers: ${gap.studentScore}%, group average: ${gap.cohortAvg}%. Reviewing the theory is recommended.`,
         priority: 'high',
       });
     }
@@ -410,8 +410,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const remainingModules = totalModules - modulesCompleted;
     recommendations.push({
       type: 'practice',
-      title: 'Ускорьте прохождение модулей',
-      description: `Завершено ${modulesCompleted} из ${totalModules} модулей. Осталось ${remainingModules}. Рекомендуется заниматься регулярно.`,
+      title: 'Speed up module completion',
+      description: `Completed ${modulesCompleted} of ${totalModules} modules. ${remainingModules} remaining. Regular study is recommended.`,
       priority: modulesCompleted === 0 ? 'high' : 'medium',
     });
   }
@@ -420,8 +420,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (lastActiveDays > 7) {
     recommendations.push({
       type: 'practice',
-      title: 'Вернитесь к обучению',
-      description: `Последняя активность была ${lastActiveDays} дней назад. Регулярные занятия улучшают усвоение материала.`,
+      title: 'Return to studying',
+      description: `Last activity was ${lastActiveDays} days ago. Regular study improves material retention.`,
       priority: lastActiveDays > 14 ? 'high' : 'medium',
     });
   }
@@ -444,7 +444,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     activityTimeline.push({
       date: login.timestamp.toISOString(),
       type: 'login',
-      details: login.success ? 'Успешный вход' : 'Неудачная попытка входа',
+      details: login.success ? 'Successful login' : 'Failed login attempt',
     });
   }
 
@@ -452,7 +452,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     activityTimeline.push({
       date: snapshot.recordedAt.toISOString(),
       type: snapshot.completed ? 'module_completed' : 'progress_update',
-      details: `Модуль ${snapshot.moduleId}${snapshot.score !== null ? ` (${snapshot.score}%)` : ''}`,
+      details: `Module ${snapshot.moduleId}${snapshot.score !== null ? ` (${snapshot.score}%)` : ''}`,
     });
   }
 
@@ -462,37 +462,37 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const achievements = [
     {
       id: 'first_login',
-      title: 'Первый вход',
-      description: 'Войти в систему',
+      title: 'First Login',
+      description: 'Log in to the system',
       unlocked: user.loginCount > 0,
       unlockedAt: user.createdAt.toISOString(),
     },
     {
       id: 'first_module',
-      title: 'Первый модуль',
-      description: 'Завершить первый модуль',
+      title: 'First Module',
+      description: 'Complete the first module',
       unlocked: modulesCompleted >= 1,
       unlockedAt:
         modulesCompleted >= 1 ? (progressRecords.find((p) => p.completed)?.updatedAt.toISOString() ?? null) : null,
     },
     {
       id: 'five_modules',
-      title: 'Пять модулей',
-      description: 'Завершить 5 модулей',
+      title: 'Five Modules',
+      description: 'Complete 5 modules',
       unlocked: modulesCompleted >= 5,
       unlockedAt: null,
     },
     {
       id: 'quiz_master',
-      title: 'Мастер квизов',
-      description: 'Набрать 90%+ во всех квизах',
+      title: 'Quiz Master',
+      description: 'Score 90%+ on all quizzes',
       unlocked: quizResults.length > 0 && quizResults.every((q) => q.percentage >= 90),
       unlockedAt: null,
     },
     {
       id: 'active_learner',
-      title: 'Активный студент',
-      description: 'Активность 7 дней подряд',
+      title: 'Active Student',
+      description: 'Active for 7 consecutive days',
       unlocked: lastActiveDays <= 7,
       unlockedAt: null,
     },

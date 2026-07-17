@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
     >();
 
     for (const s of students) {
-      const key = s[field] || '(не указано)';
+      const key = s[field] || '(not specified)';
       let g = groups.get(key);
       if (!g) {
         g = {
@@ -204,7 +204,7 @@ export async function GET(request: NextRequest) {
     for (const p of progressRecords) {
       const student = students.find((s) => s.id === p.userId);
       if (student) {
-        const key = student[field] || '(не указано)';
+        const key = student[field] || '(not specified)';
         const g = groups.get(key);
         if (g) g.progressRecords.push(p);
       }
@@ -213,7 +213,7 @@ export async function GET(request: NextRequest) {
     for (const q of quizResults) {
       const student = students.find((s) => s.id === q.userId);
       if (student) {
-        const key = student[field] || '(не указано)';
+        const key = student[field] || '(not specified)';
         const g = groups.get(key);
         if (g) g.quizResults.push(q);
       }

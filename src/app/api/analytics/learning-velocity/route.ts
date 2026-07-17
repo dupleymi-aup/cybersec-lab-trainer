@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
 
     const groupMap = new Map<string, { days: number; improvement: number; count: number }>();
     for (const v of studentVelocities) {
-      const g = v.group || '(без группы)';
+      const g = v.group || '(no group)';
       const existing = groupMap.get(g) || { days: 0, improvement: 0, count: 0 };
       existing.days += v.avgDaysPerModule;
       existing.improvement += v.scoreImprovement;

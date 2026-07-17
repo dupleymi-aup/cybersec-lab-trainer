@@ -5,7 +5,7 @@ import { parseDays } from '@/lib/utils';
 import type { Prisma } from '@prisma/client';
 import { logger } from '@/lib/logger';
 
-const _DAY_NAMES = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+const _DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export async function GET(request: NextRequest) {
   try {

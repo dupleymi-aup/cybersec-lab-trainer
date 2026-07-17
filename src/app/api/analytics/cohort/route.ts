@@ -4,18 +4,18 @@ import { logger } from '@/lib/logger';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 
 const MONTH_NAMES = [
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 interface RetentionWeeks {
@@ -56,7 +56,7 @@ function calculateStudentRetention(registrationDate: Date, progressDates: Date[]
 }
 
 /**
- * Format a year-month string like "2024-01" into a Russian label like "Январь 2024".
+ * Format a year-month string like "2024-01" into a label like "January 2024".
  */
 function formatMonthLabel(ym: string): string {
   const [year, month] = ym.split('-').map(Number);
