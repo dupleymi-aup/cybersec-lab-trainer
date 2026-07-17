@@ -39,7 +39,7 @@ export default function GradebookView({ groupId: controlledGroupId, days: contro
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
   useEffect(() => {
-    getAllUsers().then(setAllUsers);
+    getAllUsers().then(setAllUsers).catch(() => { /* ignore */ });
   }, []);
 
   useEffect(() => {

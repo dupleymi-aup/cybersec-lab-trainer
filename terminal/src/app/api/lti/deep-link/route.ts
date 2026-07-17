@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { modules } from '@/lib/data';
 import { logger } from '@/lib/logger';
+import { DEFAULT_APP_URL } from '@/lib/constants';
 
 /**
  * POST /api/lti/deep-link
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
         ...modules.map((m) => ({
           type: 'ltiResourceLink',
           title: m.title,
-          url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/?module=${m.id}`,
+          url: `${process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL}/?module=${m.id}`,
           icon: m.icon,
           description: m.description,
         })),
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
         ...quizCategories.map((q) => ({
           type: 'ltiResourceLink',
           title: q.title,
-          url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/?quiz=${q.id}`,
+          url: `${process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL}/?quiz=${q.id}`,
           description: `Quiz category: ${q.title}`,
         })),
       );

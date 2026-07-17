@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/api-middleware';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/ctf-labs
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(sanitizedLabs);
   } catch (error) {
-    console.error('GET /api/ctf-labs error:', error);
+    logger.error('GET /api/ctf-labs error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(lab, { status: 201 });
   } catch (error) {
-    console.error('POST /api/ctf-labs error:', error);
+    logger.error('POST /api/ctf-labs error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

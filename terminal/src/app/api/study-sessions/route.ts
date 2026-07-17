@@ -10,6 +10,7 @@ import {
   getHeatmapData,
 } from '@/lib/study-sessions-utils';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const createSessionSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
       }
     }
   } catch (error) {
-    console.error('GET /api/study-sessions error:', error);
+    logger.error('GET /api/study-sessions error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(session, { status: 201 });
   } catch (error) {
-    console.error('POST /api/study-sessions error:', error);
+    logger.error('POST /api/study-sessions error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

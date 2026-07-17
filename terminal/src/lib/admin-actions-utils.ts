@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /**
  * Admin Action Types
@@ -91,7 +92,7 @@ export async function logAdminAction(data: {
       },
     });
   } catch (error) {
-    console.error('Failed to log admin action:', error);
+    logger.error('Failed to log admin action:', { error: String(error) });
   }
 }
 

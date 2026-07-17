@@ -3,6 +3,7 @@ import { authenticate } from '@/lib/api-middleware';
 import { prisma } from '@/lib/db';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { hash } from 'bcryptjs';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/ctf-labs/[id]
@@ -41,7 +42,7 @@ export async function GET(
       isCompleted: !!userSubmission,
     });
   } catch (error) {
-    console.error('GET /api/ctf-labs/[id] error:', error);
+    logger.error('GET /api/ctf-labs/[id] error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -92,7 +93,7 @@ export async function PUT(
 
     return NextResponse.json(lab);
   } catch (error) {
-    console.error('PUT /api/ctf-labs/[id] error:', error);
+    logger.error('PUT /api/ctf-labs/[id] error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -120,7 +121,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Lab deleted' });
   } catch (error) {
-    console.error('DELETE /api/ctf-labs/[id] error:', error);
+    logger.error('DELETE /api/ctf-labs/[id] error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -233,7 +234,7 @@ export async function POST(
       }, { status: 400 });
     }
   } catch (error) {
-    console.error('POST /api/ctf-labs/[id]/submit error:', error);
+    logger.error('POST /api/ctf-labs/[id]/submit error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

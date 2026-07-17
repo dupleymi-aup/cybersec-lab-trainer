@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/api-middleware';
 import { createNote, getUserNotes, searchNotes } from '@/lib/notes-utils';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const createNoteSchema = z.object({
   itemId: z.string().min(1),
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(notes);
   } catch (error) {
-    console.error('GET /api/notes error:', error);
+    logger.error('GET /api/notes error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(note, { status: 201 });
   } catch (error) {
-    console.error('POST /api/notes error:', error);
+    logger.error('POST /api/notes error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

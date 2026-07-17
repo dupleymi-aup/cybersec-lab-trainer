@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/api-middleware';
 import { prisma } from '@/lib/db';
 import { getAdminActionStats, getRecentAdminActions } from '@/lib/admin-actions-utils';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/admin-actions
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('GET /api/admin-actions error:', error);
+    logger.error('GET /api/admin-actions error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

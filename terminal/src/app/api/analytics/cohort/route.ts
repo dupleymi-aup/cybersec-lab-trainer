@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { logger } from '@/lib/logger';
 
 const MONTH_NAMES = [
   'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -199,7 +200,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ cohorts, overallRetention });
   } catch (error) {
-    console.error('[analytics/cohort] GET error:', error);
+    logger.error('[analytics/cohort] GET error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }

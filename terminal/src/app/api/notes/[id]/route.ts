@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/api-middleware';
 import { getNoteById, updateNote, deleteNote } from '@/lib/notes-utils';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const updateNoteSchema = z.object({
   content: z.string().min(1).max(2000),
@@ -34,7 +35,7 @@ export async function GET(
 
     return NextResponse.json(note);
   } catch (error) {
-    console.error('GET /api/notes/[id] error:', error);
+    logger.error('GET /api/notes/[id] error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -81,7 +82,7 @@ export async function PUT(
 
     return NextResponse.json(updatedNote);
   } catch (error) {
-    console.error('PUT /api/notes/[id] error:', error);
+    logger.error('PUT /api/notes/[id] error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -118,7 +119,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Note deleted' });
   } catch (error) {
-    console.error('DELETE /api/notes/[id] error:', error);
+    logger.error('DELETE /api/notes/[id] error:', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
