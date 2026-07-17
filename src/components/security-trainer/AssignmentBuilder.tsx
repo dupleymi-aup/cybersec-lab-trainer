@@ -114,7 +114,11 @@ function useGroups() {
       getAllUsers().then((users) => {
         const unique = [...new Set(users.map((u) => u.group).filter(Boolean))];
         setGroups(unique);
+      }).catch((e) => {
+        logger.error('Failed to load users for assignment groups', { error: e });
       });
+    }).catch((e) => {
+      logger.error('Failed to load auth-store for assignment groups', { error: e });
     });
   }, []);
 

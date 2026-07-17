@@ -7,6 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { getQuizQuestionAnalytics, type QuizQuestionStat } from '@/lib/auth-store';
 import { quizCategories } from '@/lib/data/quiz-data';
 import { Card, CardContent } from '@/components/ui/card';
+import { logger } from '@/lib/logger';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Filter, Loader2, AlertCircle } from 'lucide-react';
@@ -60,6 +61,9 @@ export default function QuizQuestionAnalytics() {
 
     getQuizQuestionAnalytics(catParam, diffParam).then((data) => {
       setStats(data);
+      setLoading(false);
+    }).catch((e) => {
+      logger.error('Failed to load quiz question analytics', { error: e });
       setLoading(false);
     });
   }, [category, difficulty]);

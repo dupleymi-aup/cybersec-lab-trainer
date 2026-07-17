@@ -21,6 +21,7 @@ import { getStudentComparison, getAllUsers, type StudentComparisonData, type Use
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
+import { logger } from '@/lib/logger';
 
 const STUDENT_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444'];
 
@@ -51,7 +52,9 @@ export default function StudentComparisonView(props: Props = {}) {
   const controlled = isControlled(props);
 
   useEffect(() => {
-    getAllUsers().then((users) => setAllUsers(users.filter((u) => u.role === 'student')));
+    getAllUsers().then((users) => setAllUsers(users.filter((u) => u.role === 'student'))).catch((e) => {
+      logger.error('Failed to load users for comparison', { error: e });
+    });
   }, []);
 
   useEffect(() => {

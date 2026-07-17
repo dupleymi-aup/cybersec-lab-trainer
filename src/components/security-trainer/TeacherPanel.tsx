@@ -133,6 +133,7 @@ export default function TeacherPanel() {
   useEffect(() => {
     getAllUsers()
       .then((users) => setStudents(users.filter((u) => u.role === 'student')))
+      .catch((e) => { logger.error('Failed to load users for teacher panel', { error: e }); })
       .finally(() => setLoadingStudents(false));
   }, []);
 

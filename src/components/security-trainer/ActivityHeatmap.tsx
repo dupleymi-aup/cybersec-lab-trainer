@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Clock, Calendar, Zap, Flame, Loader2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 type DateRange = '90d' | '180d' | '365d';
 
@@ -57,6 +58,8 @@ export default function ActivityHeatmap() {
   useEffect(() => {
     getAllUsers().then((users) => {
       setStudents(users.filter((u) => u.role === 'student'));
+    }).catch((e) => {
+      logger.error('Failed to load users for heatmap', { error: e });
     });
   }, []);
 
@@ -64,6 +67,9 @@ export default function ActivityHeatmap() {
     setLoading(true);
     getActivityHeatmap(selectedUserId || undefined, dateRange).then((data) => {
       setHeatmapData(data);
+      setLoading(false);
+    }).catch((e) => {
+      logger.error('Failed to load heatmap data', { error: e });
       setLoading(false);
     });
   }, [selectedUserId, dateRange]);

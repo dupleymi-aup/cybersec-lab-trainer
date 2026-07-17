@@ -19,6 +19,7 @@ import { Award, Loader2 } from 'lucide-react';
 import { getAchievementAnalytics, type AchievementStat } from '@/lib/auth-store';
 import { achievements } from '@/lib/data/achievements-data';
 import { Card, CardContent } from '@/components/ui/card';
+import { logger } from '@/lib/logger';
 import { Badge } from '@/components/ui/badge';
 
 interface AchievementAnalyticsProps {
@@ -56,6 +57,9 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
     setLoading(true);
     getAchievementAnalytics(groupId).then((result) => {
       setData(result);
+      setLoading(false);
+    }).catch((e) => {
+      logger.error('Failed to load achievement analytics', { error: e });
       setLoading(false);
     });
   }, [groupId]);

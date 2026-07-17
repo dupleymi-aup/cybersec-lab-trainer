@@ -31,6 +31,7 @@ import {
 import type { ScheduledReport } from '@/lib/auth-types';
 import { getAllUsers } from '@/lib/auth-store';
 import { useTranslations, useLocale } from 'next-intl';
+import { logger } from '@/lib/logger';
 
 export default function ReportScheduler({ groupId, days: _days }: { groupId?: string; days?: number }) {
   const [reports, setReports] = useState<ScheduledReport[]>([]);
@@ -68,14 +69,21 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
     getAllUsers().then((users) => {
       const uniqueGroups = [...new Set(users.map((u) => u.group).filter(Boolean))];
       setGroups(uniqueGroups);
+    }).catch((e) => {
+      logger.error('Failed to load users for report scheduler', { error: e });
     });
   }, []);
 
   const loadReports = async () => {
     setLoading(true);
-    const result = await getScheduledReports();
-    setReports(result.reports || []);
-    setLoading(false);
+    try {
+      const result = await getScheduledReports();
+      setReports(result.reports || []);
+    } catch (e) {
+      logger.error('Failed to load scheduled reports', { error: e });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreate = async () => {

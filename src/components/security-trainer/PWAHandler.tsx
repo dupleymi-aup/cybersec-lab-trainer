@@ -45,6 +45,8 @@ export default function PWAHandler() {
       navigator.serviceWorker.ready.then((reg) => {
         regRef = reg;
         reg.addEventListener('updatefound', updateFoundHandler);
+      }).catch(() => {
+        // Service worker registration not available
       });
 
       return () => {
