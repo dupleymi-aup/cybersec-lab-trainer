@@ -161,9 +161,13 @@ export default function PasswordStrengthChecker() {
 
   const handleCopy = async () => {
     if (password) {
-      await navigator.clipboard.writeText(password);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      try {
+        await navigator.clipboard.writeText(password);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        // Clipboard API unavailable (non-HTTPS or permission denied)
+      }
     }
   };
 

@@ -35,7 +35,9 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
         setDataB(b);
         setLoading(false);
       },
-    );
+    ).catch(() => {
+      setLoading(false);
+    });
   }, [periodA, periodB, groupId]);
 
   if (loading || !dataA || !dataB) {

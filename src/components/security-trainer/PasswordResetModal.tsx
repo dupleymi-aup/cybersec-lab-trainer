@@ -80,7 +80,9 @@ export default function PasswordResetModal({ user, onClose, onSuccess }: Passwor
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(newPassword);
+    navigator.clipboard.writeText(newPassword).catch(() => {
+      // Clipboard API unavailable
+    });
     setCopied(true);
     toast.success(t('copied'));
     setTimeout(() => setCopied(false), 2000);

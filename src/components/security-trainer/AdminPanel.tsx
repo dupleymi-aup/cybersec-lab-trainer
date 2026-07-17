@@ -1006,7 +1006,7 @@ function AnalyticsSubTabs({
   const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
 
   useEffect(() => {
-    getComprehensiveSummary(days, groupId).then(setSummary);
+    getComprehensiveSummary(days, groupId).then(setSummary).catch(() => { /* ignore */ });
   }, [days, groupId]);
 
   return (

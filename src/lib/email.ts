@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { logger } from '@/lib/logger';
+import { DEFAULT_APP_URL } from '@/lib/constants';
 
 function escapeHtml(str: string): string {
   return str
@@ -70,7 +71,7 @@ function renderDeadlineEmail(fullName: string, deadlineTitle: string, dueAt: Dat
             <p>Due: ${formatDate(dueAt, locale)}</p>
           </div>
           <p>Please complete the assignment as soon as possible.</p>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}" class="cta">Go to Learning</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL}" class="cta">Go to Learning</a>
         </div>
         <div class="footer">
           CyberSec Lab Trainer — automated notification

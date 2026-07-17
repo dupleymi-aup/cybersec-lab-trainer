@@ -35,6 +35,8 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
     getProgressTrends(selectedUserId || undefined, dateRange).then((data) => {
       setTrends(data);
       setLoading(false);
+    }).catch(() => {
+      setLoading(false);
     });
   }, [dateRange, selectedUserId]);
 

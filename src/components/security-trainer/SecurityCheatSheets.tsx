@@ -413,7 +413,9 @@ export default function SecurityCheatSheets() {
   });
 
   const handleCopy = (code: string, id: string) => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(code).catch(() => {
+      // Clipboard API unavailable
+    });
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };

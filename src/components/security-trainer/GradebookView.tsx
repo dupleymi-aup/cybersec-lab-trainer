@@ -41,7 +41,7 @@ export default function GradebookView({
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
   useEffect(() => {
-    getAllUsers().then(setAllUsers);
+    getAllUsers().then(setAllUsers).catch(() => { /* ignore */ });
   }, []);
 
   useEffect(() => {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { MS_PER_DAY, PERCENT_ROUNDING_FACTOR, PERCENT_SCALE } from '@/lib/constants';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -251,7 +252,7 @@ export async function GET(request: NextRequest) {
     ...groupedData,
   });
   } catch (error) {
-    console.error('Admin summary error:', error);
+    logger.error('Admin summary error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

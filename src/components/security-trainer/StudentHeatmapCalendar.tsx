@@ -31,14 +31,18 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
 
   useEffect(() => {
     const loadStudents = async () => {
-      const allUsers = await getAllUsers();
-      const studentUsers = allUsers.filter((u: User) => u.role === 'student');
-      const mapped = studentUsers.map((u: User) => ({
-        id: u.id,
-        fullName: u.fullName,
-        group: u.group,
-      }));
-      setStudents(controlledGroupId ? mapped.filter((s) => s.group === controlledGroupId) : mapped);
+      try {
+        const allUsers = await getAllUsers();
+        const studentUsers = allUsers.filter((u: User) => u.role === 'student');
+        const mapped = studentUsers.map((u: User) => ({
+          id: u.id,
+          fullName: u.fullName,
+          group: u.group,
+        }));
+        setStudents(controlledGroupId ? mapped.filter((s) => s.group === controlledGroupId) : mapped);
+      } catch {
+        // Failed to load students
+      }
     };
     loadStudents();
   }, [controlledGroupId]);

@@ -31,7 +31,7 @@ export default function DataQualityMonitor({ groupId, days }: { groupId?: string
 
   const loadData = useCallback(() => {
     setLoading(true);
-    getDataQuality(days || 30, groupId).then((d) => { setData(d); setLoading(false); });
+    getDataQuality(days || 30, groupId).then((d) => { setData(d); setLoading(false); }).catch(() => { setLoading(false); });
   }, [days, groupId]);
 
   useEffect(() => { loadData(); }, [loadData]);

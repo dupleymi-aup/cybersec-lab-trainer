@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { getModuleName } from '@/lib/module-names';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
@@ -535,7 +536,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     recommendations,
   });
   } catch (error) {
-    console.error('Student report error:', error);
+    logger.error('Student report error:', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

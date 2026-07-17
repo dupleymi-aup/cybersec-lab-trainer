@@ -3,6 +3,7 @@
  * Validates required env vars at startup.
  */
 import { logger } from '@/lib/logger';
+import { DEFAULT_APP_URL } from '@/lib/constants';
 
 export interface EnvConfig {
   nodeEnv: 'development' | 'production' | 'test';
@@ -17,7 +18,7 @@ function validateEnv(): EnvConfig {
     throw new Error(`Invalid NODE_ENV: ${nodeEnv}. Must be development, production, or test.`);
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL;
   try {
     new URL(appUrl);
   } catch (e) {

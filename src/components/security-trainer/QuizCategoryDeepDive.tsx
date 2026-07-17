@@ -36,6 +36,9 @@ export default function QuizCategoryDeepDive({ groupId, days = 30 }: QuizCategor
       setCategories(data.categories);
       setHardestQuestions(data.hardestQuestions);
       setLoading(false);
+    }).catch((err) => {
+      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setLoading(false);
     });
   }, [days, groupId]);
 
