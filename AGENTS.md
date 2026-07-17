@@ -12,6 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
+- **`35b05116`**: i18n: extract AchievementsGlossary content to locale files (en/ru/zh), move data to glossary-data.ts
 - **`94b33d5a`**: i18n: extract SecurityCheatSheets content to locale files (en/ru/zh), move data to cheatsheets-data.ts
 - **`48e410c3`**: fix: add race condition guards to 10 data-fetching useEffect hooks to prevent stale responses from overwriting fresh state
 - **`d44a7a1b`**: fix: add try/catch to 30 async functions across 12 components (AdminPanel, AuthPages, BulkActionsBar, GroupManager, UserModal, AuditLogView, ProfilePage, PasswordResetModal, SystemAnnouncements, ReportScheduler, AnalyticsExportPanel, Recovery page)
@@ -53,5 +54,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **`e8f83058`**: Fixed hardcoded `locale: 'ru'` in 7 redirect pages → dynamic locale from cookie; fixed missing `catch` block + try/catch in 7 analytics routes
 - **`dbdae417`**: i18n locale-aware not-found and error pages (Phase 1.6)
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **Remote sync** — both remotes at `94b33d5a`
+- **Remote sync** — both remotes at `35b05116`
 - **Full verification passed**: lint ✓, typecheck ✓, build ✓
