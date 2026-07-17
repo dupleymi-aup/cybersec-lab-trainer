@@ -1,17 +1,17 @@
 // Server-safe module name lookup (can be imported by API routes)
 export const MODULE_NAME_MAP: Record<string, string> = {
   owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL-инъекции',
-  xss: 'XSS-атаки',
-  csrf: 'CSRF-атаки',
-  auth: 'Аутентификация',
-  'secure-coding': 'Безопасное кодирование',
-  tools: 'Инструменты безопасности',
+  'sql-injection': 'SQL Injection',
+  xss: 'XSS Attacks',
+  csrf: 'CSRF Attacks',
+  auth: 'Authentication',
+  'secure-coding': 'Secure Coding',
+  tools: 'Security Tools',
   'security-headers': 'Security Headers',
-  idor: 'IDOR-атаки',
-  ssrf: 'SSRF-атаки',
-  'api-security': 'Безопасность API',
-  'phishing-analyzer': 'Анализатор фишинговых писем',
+  idor: 'IDOR Attacks',
+  ssrf: 'SSRF Attacks',
+  'api-security': 'API Security',
+  'phishing-analyzer': 'Phishing Analyzer',
 };
 
 export function getModuleName(moduleId: string): string {

@@ -6,89 +6,89 @@ import type { UserRole } from './auth-types';
 
 export const CAPABILITIES = {
   // Modules — learning content
-  'modules:read': 'Чтение учебных модулей',
-  'modules:read_all': 'Чтение всех модулей (включая скрытые)',
+  'modules:read': 'Read learning modules',
+  'modules:read_all': 'Read all modules (including hidden)',
 
   // Quizzes
-  'quizzes:take': 'Прохождение тестов и квизов',
-  'quizzes:read_results': 'Просмотр результатов тестов',
-  'quizzes:read_all_results': 'Просмотр результатов всех тестов',
+  'quizzes:take': 'Take quizzes and tests',
+  'quizzes:read_results': 'View quiz results',
+  'quizzes:read_all_results': 'View all quiz results',
 
   // Progress
-  'progress:read_own': 'Просмотр своего прогресса',
-  'progress:write_own': 'Обновление своего прогресса',
-  'progress:read_group': 'Просмотр прогресса студентов группы',
-  'progress:read_all': 'Просмотр прогресса всех студентов',
+  'progress:read_own': 'View own progress',
+  'progress:write_own': 'Update own progress',
+  'progress:read_group': 'View group student progress',
+  'progress:read_all': 'View all student progress',
 
   // Assignments
-  'assignments:read_own': 'Просмотр своих заданий',
-  'assignments:submit': 'Отправка заданий',
-  'assignments:create': 'Создание заданий',
-  'assignments:edit': 'Редактирование заданий',
-  'assignments:delete': 'Удаление заданий',
-  'assignments:grade': 'Оценка заданий',
-  'assignments:read_all': 'Просмотр всех заданий',
+  'assignments:read_own': 'View own assignments',
+  'assignments:submit': 'Submit assignments',
+  'assignments:create': 'Create assignments',
+  'assignments:edit': 'Edit assignments',
+  'assignments:delete': 'Delete assignments',
+  'assignments:grade': 'Grade assignments',
+  'assignments:read_all': 'View all assignments',
 
   // Deadlines
-  'deadlines:read': 'Просмотр дедлайнов',
-  'deadlines:create': 'Создание дедлайнов',
-  'deadlines:edit': 'Редактирование дедлайнов',
-  'deadlines:delete': 'Удаление дедлайнов',
+  'deadlines:read': 'View deadlines',
+  'deadlines:create': 'Create deadlines',
+  'deadlines:edit': 'Edit deadlines',
+  'deadlines:delete': 'Delete deadlines',
 
   // Analytics
-  'analytics:read_own': 'Просмотр своей аналитики',
-  'analytics:read_group': 'Просмотр аналитики группы',
-  'analytics:read_all': 'Просмотр всей аналитики',
+  'analytics:read_own': 'View own analytics',
+  'analytics:read_group': 'View group analytics',
+  'analytics:read_all': 'View all analytics',
 
   // Grade export
-  'grades:export': 'Экспорт оценок',
+  'grades:export': 'Export grades',
 
   // User management
-  'users:read': 'Просмотр пользователей',
-  'users:create': 'Создание пользователей',
-  'users:edit': 'Редактирование пользователей',
-  'users:delete': 'Удаление пользователей',
-  'users:block': 'Блокировка/разблокировка пользователей',
-  'users:change_role': 'Изменение ролей',
-  'users:import': 'Импорт пользователей',
-  'users:export': 'Экспорт пользователей',
-  'users:bulk_ops': 'Массовые операции (удаление, блокировка, смена роли)',
+  'users:read': 'View users',
+  'users:create': 'Create users',
+  'users:edit': 'Edit users',
+  'users:delete': 'Delete users',
+  'users:block': 'Block/unblock users',
+  'users:change_role': 'Change roles',
+  'users:import': 'Import users',
+  'users:export': 'Export users',
+  'users:bulk_ops': 'Bulk operations (delete, block, role change)',
 
   // Profile
-  'profile:read_own': 'Просмотр своего профиля',
-  'profile:write_own': 'Редактирование своего профиля',
-  'profile:delete_own': 'Удаление своего аккаунта',
-  'profile:read_any': 'Просмотр любого профиля',
+  'profile:read_own': 'View own profile',
+  'profile:write_own': 'Edit own profile',
+  'profile:delete_own': 'Delete own account',
+  'profile:read_any': 'View any profile',
 
   // Impersonation
-  'auth:impersonate': 'Имперсонация (вход под другим пользователем)',
+  'auth:impersonate': 'Impersonation (login as another user)',
 
   // Audit
-  'audit:read': 'Просмотр аудит-логов',
+  'audit:read': 'View audit logs',
 
   // Announcements
-  'announcements:read': 'Чтение объявлений',
-  'announcements:create': 'Создание объявлений',
-  'announcements:edit': 'Редактирование объявлений',
-  'announcements:delete': 'Удаление объявлений',
+  'announcements:read': 'Read announcements',
+  'announcements:create': 'Create announcements',
+  'announcements:edit': 'Edit announcements',
+  'announcements:delete': 'Delete announcements',
 
   // LTI
-  'lti:manage': 'Управление LTI-интеграцией',
+  'lti:manage': 'Manage LTI integration',
 
   // System
-  'system:health': 'Просмотр состояния системы',
-  'system:settings': 'Управление настройками системы',
-  'system:reports': 'Управление отчётами по расписанию',
+  'system:health': 'View system health',
+  'system:settings': 'Manage system settings',
+  'system:reports': 'Manage scheduled reports',
 
   // Leaderboard
-  'leaderboard:read': 'Просмотр таблицы лидеров',
+  'leaderboard:read': 'View leaderboard',
 
   // Career
-  'career:read': 'Просмотр карьерных путей',
+  'career:read': 'View career paths',
 
   // ═══ Compound / Shortcut capabilities ═══
   // These expand to multiple capabilities for convenience
-  'assignments:manage': 'Полное управление заданиями (create+edit+delete+grade)',
+  'assignments:manage': 'Full assignment management (create+edit+delete+grade)',
 } as const;
 
 export type Capability = keyof typeof CAPABILITIES;

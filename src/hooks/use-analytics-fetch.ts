@@ -72,7 +72,7 @@ export function useAnalyticsFetch<T = unknown>({
         if (!cancelled) {
           if (err.name === 'AbortError') return;
           logger.error(`useAnalyticsFetch: Failed to fetch ${endpoint}`, { error: err });
-          setError(err.message || 'Ошибка загрузки данных');
+          setError(err.message || 'Failed to load data');
           setLoading(false);
         }
       });
@@ -127,7 +127,7 @@ export function useAnalyticsFetcher<T = unknown>(
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Ошибка загрузки данных');
+          setError(err instanceof Error ? err.message : 'Failed to load data');
           setLoading(false);
         }
       });
@@ -206,7 +206,7 @@ export function useAnalyticsMutation<TResult = unknown, TBody = unknown>() {
         return result;
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') return null;
-        const message = err instanceof Error ? err.message : 'Ошибка выполнения';
+        const message = err instanceof Error ? err.message : 'Execution error';
         setError(message);
         setLoading(false);
         return null;

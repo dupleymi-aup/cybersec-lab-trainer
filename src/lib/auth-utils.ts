@@ -34,10 +34,10 @@ export function validatePassword(password: string): {
   errors: string[];
 } {
   const errors: string[] = [];
-  if (password.length < 8) errors.push('Минимум 8 символов');
-  if (!/[a-z]/.test(password)) errors.push('Хотя бы одна строчная буква');
-  if (!/[A-Z]/.test(password)) errors.push('Хотя бы одна заглавная буква');
-  if (!/[0-9]/.test(password)) errors.push('Хотя бы одна цифра');
-  if (!/[!@#$%^&*()_+\-[\]{};':"\\|,.<>/?]/.test(password)) errors.push('Хотя бы один спецсимвол');
+  if (password.length < 8) errors.push('Minimum 8 characters');
+  if (!/[a-z]/.test(password)) errors.push('At least one lowercase letter');
+  if (!/[A-Z]/.test(password)) errors.push('At least one uppercase letter');
+  if (!/[0-9]/.test(password)) errors.push('At least one digit');
+  if (!/[!@#$%^&*()_+\-[\]{};':"\\|,.<>/?]/.test(password)) errors.push('At least one special character');
   return { valid: errors.length === 0, errors };
 }

@@ -17,12 +17,12 @@ export function usePasswordStrength(password: string): PasswordStrength {
     if (!password) return { score: 0, label: '', color: 'bg-slate-200', checks: [] };
 
     const checks: PasswordCheck[] = [
-      { label: 'Минимум 8 символов', passed: password.length >= 8 },
-      { label: 'Строчные буквы (a-z)', passed: /[a-z]/.test(password) },
-      { label: 'Заглавные буквы (A-Z)', passed: /[A-Z]/.test(password) },
-      { label: 'Цифры (0-9)', passed: /[0-9]/.test(password) },
-      { label: 'Спецсимволы (!@#$...)', passed: /[^a-zA-Z0-9]/.test(password) },
-      { label: 'Минимум 12 символов', passed: password.length >= 12 },
+      { label: 'Minimum 8 characters', passed: password.length >= 8 },
+      { label: 'Lowercase letters (a-z)', passed: /[a-z]/.test(password) },
+      { label: 'Uppercase letters (A-Z)', passed: /[A-Z]/.test(password) },
+      { label: 'Numbers (0-9)', passed: /[0-9]/.test(password) },
+      { label: 'Special characters (!@#$...)', passed: /[^a-zA-Z0-9]/.test(password) },
+      { label: 'Minimum 12 characters', passed: password.length >= 12 },
     ];
 
     const passedCount = checks.filter((c) => c.passed).length;
@@ -40,16 +40,16 @@ export function usePasswordStrength(password: string): PasswordStrength {
                 : 100;
     const label =
       passedCount <= 1
-        ? 'Очень слабый'
+        ? 'Very weak'
         : passedCount <= 2
-          ? 'Слабый'
+          ? 'Weak'
           : passedCount <= 3
-            ? 'Средний'
+            ? 'Fair'
             : passedCount <= 4
-              ? 'Хороший'
+              ? 'Good'
               : passedCount <= 5
-                ? 'Надёжный'
-                : 'Отличный';
+                ? 'Strong'
+                : 'Excellent';
     const color =
       passedCount <= 1
         ? 'bg-red-500'

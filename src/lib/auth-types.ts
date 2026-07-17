@@ -53,18 +53,18 @@ export function hasPermission(userRole: UserRole | null | undefined, permission:
 
 export function getRoleLabel(role: UserRole): string {
   const labels: Record<UserRole, string> = {
-    student: 'Студент',
-    teacher: 'Преподаватель',
-    admin: 'Администратор',
+    student: 'Student',
+    teacher: 'Teacher',
+    admin: 'Administrator',
   };
   return labels[role] || role;
 }
 
 export function getRoleDescription(role: UserRole): string {
   const descriptions: Record<UserRole, string> = {
-    student: 'Доступ к учебным модулям, тестам и отслеживанию прогресса',
-    teacher: 'Создание заданий, проверка работ, аналитика студентов',
-    admin: 'Полный доступ: управление пользователями, настройки системы',
+    student: 'Access to learning modules, quizzes, and progress tracking',
+    teacher: 'Create assignments, grade submissions, view student analytics',
+    admin: 'Full access: user management, system settings',
   };
   return descriptions[role] || '';
 }

@@ -155,7 +155,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
         />
         <KPICard
           icon={<Flame size={18} />}
-          value={`${avgStreak}д`}
+          value={`${avgStreak}d`}
           label={t('avgStreak')}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
@@ -279,7 +279,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
                   </div>
                   <Badge variant="default" className="bg-amber-500">
                     <Flame size={14} className="mr-1" />
-                    {student.streakDays}д
+                    {student.streakDays}d
                   </Badge>
                 </motion.div>
               ))}
