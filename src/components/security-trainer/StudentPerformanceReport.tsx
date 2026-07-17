@@ -298,7 +298,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
         />
         <KPICard
           icon={<Clock size={18} />}
-          value={kpis.lastActiveDays === 0 ? t('today') : `${kpis.lastActiveDays}{t('daysAgo')}`}
+          value={kpis.lastActiveDays === 0 ? t('today') : `${kpis.lastActiveDays} ${t('daysAgo')}`}
           label={t('lastActivity')}
           iconBg="bg-amber-100"
           iconColor="text-amber-600"
@@ -774,7 +774,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                 const TypeIcon = rec.type === 'module' ? BookOpen : rec.type === 'quiz' ? Target : Lightbulb;
                 return (
                   <motion.div
-                    key={i}
+                    key={rec.title}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}

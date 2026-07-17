@@ -294,12 +294,13 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
                         {i + 1}
                       </span>
                       <div>
-                        <p
-                          className="cursor-pointer text-sm font-medium transition-colors hover:text-indigo-600"
+                        <button
+                          type="button"
+                          className="text-sm font-medium transition-colors hover:text-indigo-600"
                           onClick={() => setSelectedStudentId(student.userId)}
                         >
                           {student.fullName}
-                        </p>
+                        </button>
                         {student.group && <p className="text-xs text-slate-400">{student.group}</p>}
                       </div>
                     </div>

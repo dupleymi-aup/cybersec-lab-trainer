@@ -5,31 +5,31 @@ describe('password change - strength validation', () => {
   it('should reject weak passwords: too short', () => {
     const result = validatePassword('Ab1!x');
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain('Минимум 8 символов');
+    expect(result.errors).toContain('Minimum 8 characters');
   });
 
   it('should reject passwords without uppercase', () => {
     const result = validatePassword('weakpassword1!');
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.includes('заглавная'))).toBe(true);
+    expect(result.errors.some(e => e.includes('uppercase'))).toBe(true);
   });
 
   it('should reject passwords without lowercase', () => {
     const result = validatePassword('STRONGPASSWORD1!');
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.includes('строчная'))).toBe(true);
+    expect(result.errors.some(e => e.includes('lowercase'))).toBe(true);
   });
 
   it('should reject passwords without digit', () => {
     const result = validatePassword('StrongPassword!');
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.includes('цифра'))).toBe(true);
+    expect(result.errors.some(e => e.includes('digit'))).toBe(true);
   });
 
   it('should reject passwords without special char', () => {
     const result = validatePassword('StrongPass1');
     expect(result.valid).toBe(false);
-    expect(result.errors.some(e => e.includes('спецсимвол'))).toBe(true);
+    expect(result.errors.some(e => e.includes('special character'))).toBe(true);
   });
 
   it('should accept strong password for change', () => {

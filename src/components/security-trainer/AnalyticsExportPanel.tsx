@@ -202,7 +202,12 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
 
           // Compute last active from localStorage
           const key = `security-trainer-progress-${s.id}`;
-          const raw = localStorage.getItem(key);
+          let raw: string | null = null;
+          try {
+            raw = localStorage.getItem(key);
+          } catch {
+            // localStorage unavailable
+          }
           let lastActive = '—';
           if (raw) {
             try {
@@ -929,7 +934,12 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
               <div className="space-y-4">
                 {students.map((s) => {
                   const progressKey = `security-trainer-progress-${s.id}`;
-                  const raw = localStorage.getItem(progressKey);
+                  let raw: string | null = null;
+                  try {
+                    raw = localStorage.getItem(progressKey);
+                  } catch {
+                    // localStorage unavailable
+                  }
                   let moduleCount = 0;
                   let quizCount = 0;
                   if (raw) {

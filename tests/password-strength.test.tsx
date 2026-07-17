@@ -20,42 +20,42 @@ describe('usePasswordStrength', () => {
   it('should detect very weak password (1 check passed)', () => {
     const { result } = renderPasswordStrength('abc');
     expect(result.current.score).toBe(15);
-    expect(result.current.label).toBe('Очень слабый');
+    expect(result.current.label).toBe('Very weak');
     expect(result.current.color).toBe('bg-red-500');
   });
 
   it('should detect weak password (2 checks passed)', () => {
     const { result } = renderPasswordStrength('abcDEF');
     expect(result.current.score).toBe(30);
-    expect(result.current.label).toBe('Слабый');
+    expect(result.current.label).toBe('Weak');
     expect(result.current.color).toBe('bg-red-400');
   });
 
   it('should detect medium password (3 checks passed)', () => {
     const { result } = renderPasswordStrength('abcdef123');
     expect(result.current.score).toBe(50);
-    expect(result.current.label).toBe('Средний');
+    expect(result.current.label).toBe('Fair');
     expect(result.current.color).toBe('bg-yellow-500');
   });
 
   it('should detect good password (4 checks passed)', () => {
     const { result } = renderPasswordStrength('Abcdef123');
     expect(result.current.score).toBe(70);
-    expect(result.current.label).toBe('Хороший');
+    expect(result.current.label).toBe('Good');
     expect(result.current.color).toBe('bg-emerald-400');
   });
 
   it('should detect strong password (5 checks passed)', () => {
     const { result } = renderPasswordStrength('Abcdef123!');
     expect(result.current.score).toBe(85);
-    expect(result.current.label).toBe('Надёжный');
+    expect(result.current.label).toBe('Strong');
     expect(result.current.color).toBe('bg-emerald-500');
   });
 
   it('should detect excellent password (6 checks passed)', () => {
     const { result } = renderPasswordStrength('Admin@123456');
     expect(result.current.score).toBe(100);
-    expect(result.current.label).toBe('Отличный');
+    expect(result.current.label).toBe('Excellent');
     expect(result.current.color).toBe('bg-emerald-600');
   });
 

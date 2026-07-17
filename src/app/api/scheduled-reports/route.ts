@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
+import { createScheduledReportSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
@@ -28,30 +29,12 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { reportType, frequency, dayOfWeek, dayOfMonth, email, groupId, days } = body;
-
-    if (!reportType || !frequency) {
-      return NextResponse.json({ success: false, error: 'reportType and frequency are required' }, { status: 400 });
+    const parsed = createScheduledReportSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const validFrequencies = ['daily', 'weekly', 'monthly'];
-    if (!validFrequencies.includes(frequency)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'frequency must be daily, weekly, or monthly',
-        },
-        { status: 400 },
-      );
-    }
-
-    if (frequency === 'weekly' && (dayOfWeek === undefined || dayOfWeek < 0 || dayOfWeek > 6)) {
-      return NextResponse.json({ success: false, error: 'dayOfWeek must be 0-6 for weekly' }, { status: 400 });
-    }
-
-    if (frequency === 'monthly' && (dayOfMonth === undefined || dayOfMonth < 1 || dayOfMonth > 31)) {
-      return NextResponse.json({ success: false, error: 'dayOfMonth must be 1-31 for monthly' }, { status: 400 });
-    }
+    const { reportType, frequency, dayOfWeek, dayOfMonth, email, groupId, days } = parsed.data;
 
     const report = await getPrisma().scheduledReport.create({
       data: {

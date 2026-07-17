@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, generateToken, getClientIp } from '@/lib/api-middleware';
 import { setAuthCookie } from '@/lib/cookie-auth';
-import { validateUuid } from '@/lib/validate-uuid';
+import { impersonateSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
@@ -15,16 +15,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { targetUserId } = body;
-
-    if (!targetUserId) {
-      return NextResponse.json({ error: 'targetUserId required' }, { status: 400 });
+    const parsed = impersonateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    // Validate UUID format
-    if (!validateUuid(targetUserId)) {
-      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
-    }
+    const { targetUserId } = parsed.data;
 
     if (targetUserId === admin.id) {
       return NextResponse.json({ error: 'Cannot impersonate yourself' }, { status: 400 });

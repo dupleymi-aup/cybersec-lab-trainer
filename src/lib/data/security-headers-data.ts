@@ -21,7 +21,7 @@ export const securityHeaders: SecurityHeader[] = [
   {
     id: 'csp',
     name: 'Content-Security-Policy',
-    category: 'Защита от XSS',
+    category: 'xss',
     description:
       'CSP — самый мощный HTTP-заголовок для защиты от XSS. Он определяет, откуда браузер может загружать скрипты, стили, изображения, шрифты и другие ресурсы. Правильно настроенный CSP блокирует выполнение inline-скриптов и загрузку ресурсов с неавторизованных доменов.',
     attackDemo:
@@ -60,7 +60,7 @@ app.use(helmet.contentSecurityPolicy({
   {
     id: 'hsts',
     name: 'Strict-Transport-Security',
-    category: 'Защита соединения',
+    category: 'connection',
     description:
       'HSTS заставляет браузер всегда использовать HTTPS для данного домена, даже если пользователь вводит http://. Это предотвращает downgrade-атаки (SSL stripping), при которых злоумышленник на уровне сети конвертирует HTTPS-соединение в HTTP.',
     attackDemo:
@@ -113,7 +113,7 @@ app.use((req, res, next) => {
   {
     id: 'x-frame-options',
     name: 'X-Frame-Options',
-    category: 'Защита от кликджекинга',
+    category: 'clickjacking',
     description:
       'X-Frame-Options запрещает (DEPRECATED: современные браузеры рекомендуют использовать CSP frame-ancestors вместо X-Frame-Options).  встраивание страницы в iframe, frame или object. Это защита от clickjacking — атаки, при которой невидимый iframe с целевым сайтом накладывается на видимую страницу, заставляя пользователя нажать на кнопку, которую он не видит.',
     attackDemo:
@@ -157,7 +157,7 @@ app.use(helmet.contentSecurityPolicy({
   {
     id: 'x-content-type',
     name: 'X-Content-Type-Options',
-    category: 'Защита от MIME-sniffing',
+    category: 'mime',
     description:
       'X-Content-Type-Options: nosniff запрещает браузеру определять MIME-тип файла по содержимому. Без этого заголовка браузер может интерпретировать файл с расширением .jpg как JavaScript, если содержимое выглядит как JS-код.',
     attackDemo:
@@ -199,7 +199,7 @@ app.get('/uploads/:filename', (req, res) => {
   {
     id: 'referrer-policy',
     name: 'Referrer-Policy',
-    category: 'Защита приватности',
+    category: 'privacy',
     description:
       'Referrer-Policy контролирует, сколько информации о предыдущей странице передаётся в заголовке Referer при переходе на другой сайт. Это важно для приватности — Referer может содержать sensitive данные (URL с параметрами, токены, поисковые запросы).',
     attackDemo:
@@ -237,7 +237,7 @@ res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   {
     id: 'permissions-policy',
     name: 'Permissions-Policy',
-    category: 'Контроль API браузера',
+    category: 'browserApi',
     description:
       'Permissions-Policy ограничивает использование браузерных API (камера, микрофон, геолокация, USB, Bluetooth и др.) для текущего документа и iframe. Замена устаревшего Feature-Policy. Защищает от злоупотребления API браузера через XSS или вредоносные iframe.',
     attackDemo:
@@ -285,7 +285,7 @@ res.setHeader('Permissions-Policy', [
   {
     id: 'coop',
     name: 'Cross-Origin-Opener-Policy (COOP)',
-    category: 'Изоляция процессов',
+    category: 'processIsolation',
     description:
       'Изолирует browsing context от кросс-origin окон, предотвращая атаки типа Spectre и Side Channel через window references.',
     attackDemo:
@@ -311,7 +311,7 @@ res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   {
     id: 'coep',
     name: 'Cross-Origin-Embedder-Policy (COEP)',
-    category: 'Изоляция ресурсов',
+    category: 'resourceIsolation',
     description:
       'Контролирует загрузку кросс-origin ресурсов (изображений, скриптов, iframe). Вместе с COOP защищает от Spectre-подобных атак.',
     attackDemo:
@@ -341,7 +341,7 @@ res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   {
     id: 'corp',
     name: 'Cross-Origin-Resource-Policy (CORP)',
-    category: 'Защита ресурсов',
+    category: 'resourceProtection',
     description:
       'Предотвращает чтение ресурсов (изображений, скриптов, CSS) другими origin. Защищает от XSS и side-channel атак на уровне ресурсов.',
     attackDemo:
@@ -373,7 +373,7 @@ res.setHeader('Cross-Origin-Resource-Policy', 'same-site');
   {
     id: 'cache-control',
     name: 'Cache-Control (для чувствительных данных)',
-    category: 'Кэширование',
+    category: 'caching',
     description:
       'Контролирует кэширование страниц и ответов сервера. Без правильных директив чувствительные данные (пароли, токены, персональная информация) могут сохраняться на диске браузера или в кэше промежуточных прокси.',
     attackDemo:
@@ -408,7 +408,7 @@ app.use('/api', (req, res, next) => {
   {
     id: 'x-dns-prefetch-control',
     name: 'X-DNS-Prefetch-Control',
-    category: 'Приватность',
+    category: 'browserPrivacy',
     description:
       'Контролирует DNS-prefetching — функцию браузера, которая заранее разрешает домены из ссылок на странице. Может раскрывать пользовательскую активность DNS-серверу.',
     attackDemo:
@@ -438,7 +438,7 @@ res.setHeader('X-DNS-Prefetch-Control', 'off');
   {
     id: 'clear-site-data',
     name: 'Clear-Site-Data',
-    category: 'Безопасный выход',
+    category: 'safeExit',
     description:
       'Очищает данные браузера (cookies, storage, cache) для текущего origin при logout. Гарантирует, что после выхода не остаётся следов аутентификации.',
     attackDemo:

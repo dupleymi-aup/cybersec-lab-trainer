@@ -106,7 +106,7 @@ export default function PhishingAnalyzer() {
 
   const sanitizedBody = useMemo(
     () =>
-      DOMPurify.sanitize(currentEmail.body, {
+      DOMPurify.sanitize(currentEmail?.body ?? '', {
         ALLOWED_TAGS: [
           'p',
           'br',

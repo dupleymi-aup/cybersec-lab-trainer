@@ -100,12 +100,21 @@ export default function OnboardingTour() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [isComplete, setIsComplete] = useState(() => {
-    return localStorage.getItem(`cybersec-onboarding-seen-${role}`) === 'true';
+    try {
+      return localStorage.getItem(`cybersec-onboarding-seen-${role}`) === 'true';
+    } catch {
+      return false;
+    }
   });
 
   useEffect(() => {
     const storageKey = `cybersec-onboarding-seen-${role}`;
-    const hasSeenTour = localStorage.getItem(storageKey);
+    let hasSeenTour: string | null = null;
+    try {
+      hasSeenTour = localStorage.getItem(storageKey);
+    } catch {
+      // localStorage unavailable
+    }
     const isNewUser = user?.createdAt && Date.now() - new Date(user.createdAt).getTime() < 24 * 60 * 60 * 1000;
     if (!hasSeenTour && (!user?.createdAt || isNewUser)) {
       setIsOpen(true);
@@ -114,13 +123,21 @@ export default function OnboardingTour() {
 
   useEffect(() => {
     const storageKey = `cybersec-onboarding-seen-${role}`;
-    setIsComplete(localStorage.getItem(storageKey) === 'true');
+    try {
+      setIsComplete(localStorage.getItem(storageKey) === 'true');
+    } catch {
+      setIsComplete(false);
+    }
     setCurrentStep(0);
   }, [role]);
 
   const handleClose = () => {
     const storageKey = `cybersec-onboarding-seen-${role}`;
-    localStorage.setItem(storageKey, 'true');
+    try {
+      localStorage.setItem(storageKey, 'true');
+    } catch {
+      // localStorage unavailable
+    }
     setIsOpen(false);
     setIsComplete(true);
   };
@@ -158,6 +175,7 @@ export default function OnboardingTour() {
           onClick={handleStartTour}
           className="fixed right-6 bottom-6 z-50 rounded-full bg-emerald-600 p-3 text-white shadow-lg transition-all hover:scale-105 hover:bg-emerald-700"
           title={t('startTour')}
+          aria-label={t('startTour')}
         >
           <Shield className="h-6 w-6" />
         </button>
@@ -190,6 +208,7 @@ export default function OnboardingTour() {
                     onClick={handleSkip}
                     className="hover:bg-muted rounded-lg p-1.5 transition-colors"
                     title={t('skip')}
+                    aria-label={t('skip')}
                   >
                     <X size={18} />
                   </button>

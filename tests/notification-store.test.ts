@@ -80,7 +80,7 @@ describe('NotificationHelper', () => {
     const state = useNotificationStore.getState();
     expect(state.notifications).toHaveLength(1);
     expect(state.notifications[0].type).toBe('achievement');
-    expect(state.notifications[0].title).toContain('Достижение');
+    expect(state.notifications[0].title).toContain('Achievement Unlocked');
   });
 
   it('should create module completion notification', () => {

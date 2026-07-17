@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { clearAuditLogsSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
-
-interface ClearRequestBody {
-  olderThan?: string;
-  action?: string;
-  maxCount?: number;
-  dryRun?: boolean;
-}
 
 // POST /api/admin/audit-logs/clear - clear old audit logs
 export async function POST(request: NextRequest) {
@@ -22,7 +16,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
-  let body: ClearRequestBody;
+  let body: unknown;
   try {
     body = await request.json();
   } catch (e) {
@@ -30,36 +24,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { olderThan, action, maxCount, dryRun } = body;
-
-  // Safety: NEVER allow clearing all logs without a date filter
-  if (!olderThan) {
-    return NextResponse.json(
-      {
-        error: 'olderThan date filter is required. Cannot clear all audit logs without a date constraint.',
-      },
-      { status: 400 },
-    );
+  const parsed = clearAuditLogsSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
   }
 
-  // Validate olderThan is a valid ISO date
-  const olderThanDate = new Date(olderThan);
-  if (isNaN(olderThanDate.getTime())) {
-    return NextResponse.json({ error: 'Invalid olderThan date format. Use ISO 8601 format.' }, { status: 400 });
-  }
-
-  // Validate and cap maxCount
-  let limit = maxCount ?? 1000;
-  if (typeof limit !== 'number' || limit < 1) {
-    return NextResponse.json({ error: 'maxCount must be a positive number' }, { status: 400 });
-  }
-  if (limit > 5000) {
-    limit = 5000;
-  }
+  const { olderThan, action, maxCount, dryRun } = parsed.data;
 
   // Build where clause
   const where: Record<string, unknown> = {
-    timestamp: { lt: olderThanDate },
+    timestamp: { lt: new Date(olderThan) },
   };
   if (action) {
     where.action = action;
@@ -72,7 +46,7 @@ export async function POST(request: NextRequest) {
   if (dryRun) {
     return NextResponse.json({
       success: true,
-      deletedCount: Math.min(count, limit),
+      deletedCount: Math.min(count, maxCount),
       totalMatching: count,
       dryRun: true,
     });
@@ -83,7 +57,7 @@ export async function POST(request: NextRequest) {
   const recordsToDelete = await getPrisma().auditLog.findMany({
     where,
     select: { id: true },
-    take: limit,
+    take: maxCount,
   });
 
   let deletedCount = 0;

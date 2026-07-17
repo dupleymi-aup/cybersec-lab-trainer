@@ -62,31 +62,31 @@ describe('validatePassword', () => {
   it('should reject short passwords', () => {
     const result = validatePassword('Ab1!');
     expect(result.valid).toBe(false);
-    expect(result.errors).toContain('Минимум 8 символов');
+    expect(result.errors).toContain('Minimum 8 characters');
   });
 
   it('should reject passwords without uppercase', () => {
     const result = validatePassword('password@123');
     expect(result.valid).toBe(false);
-    expect(result.errors.some((e) => e.includes('заглавная'))).toBe(true);
+    expect(result.errors.some((e) => e.includes('uppercase'))).toBe(true);
   });
 
   it('should reject passwords without lowercase', () => {
     const result = validatePassword('PASSWORD@123');
     expect(result.valid).toBe(false);
-    expect(result.errors.some((e) => e.includes('строчная'))).toBe(true);
+    expect(result.errors.some((e) => e.includes('lowercase'))).toBe(true);
   });
 
   it('should reject passwords without digits', () => {
     const result = validatePassword('Password@abc');
     expect(result.valid).toBe(false);
-    expect(result.errors.some((e) => e.includes('цифра'))).toBe(true);
+    expect(result.errors.some((e) => e.includes('digit'))).toBe(true);
   });
 
   it('should reject passwords without special chars', () => {
     const result = validatePassword('Password123');
     expect(result.valid).toBe(false);
-    expect(result.errors.some((e) => e.includes('спецсимвол'))).toBe(true);
+    expect(result.errors.some((e) => e.includes('special character'))).toBe(true);
   });
 
   it('should return all applicable errors', () => {

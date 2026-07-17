@@ -44,7 +44,10 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
         // Failed to load students
       }
     };
-    loadStudents();
+    loadStudents().catch((err) => {
+      logger.error('Failed to load students', { error: err });
+      setLoading(false);
+    });
   }, [controlledGroupId]);
 
   useEffect(() => {

@@ -289,3 +289,35 @@ export const adminResetPasswordSchema = z.object({
 });
 
 export type AdminResetPasswordInput = z.infer<typeof adminResetPasswordSchema>;
+
+// Scheduled report creation validation
+export const createScheduledReportSchema = z.object({
+  reportType: z.string().min(1, 'Report type is required'),
+  frequency: z.enum(['daily', 'weekly', 'monthly'], {
+    message: 'Frequency must be daily, weekly, or monthly',
+  }),
+  dayOfWeek: z.number().int().min(0).max(6).optional(),
+  dayOfMonth: z.number().int().min(1).max(31).optional(),
+  email: z.string().email('Invalid email').max(255).optional(),
+  groupId: z.string().max(100).optional(),
+  days: z.number().int().min(1).optional().default(30),
+});
+
+export type CreateScheduledReportInput = z.infer<typeof createScheduledReportSchema>;
+
+// Audit log clear validation
+export const clearAuditLogsSchema = z.object({
+  olderThan: z.string().datetime('Invalid olderThan date format'),
+  action: z.string().max(100).optional(),
+  maxCount: z.number().int().min(1).max(5000).optional().default(1000),
+  dryRun: z.boolean().optional().default(false),
+});
+
+export type ClearAuditLogsInput = z.infer<typeof clearAuditLogsSchema>;
+
+// Impersonate validation
+export const impersonateSchema = z.object({
+  targetUserId: z.string().uuid('Invalid user ID format'),
+});
+
+export type ImpersonateInput = z.infer<typeof impersonateSchema>;
