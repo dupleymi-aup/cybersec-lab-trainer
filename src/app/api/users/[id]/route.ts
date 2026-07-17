@@ -72,14 +72,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   // Prevent self-role-change
   if (id === auth.id && role !== undefined) {
-    return NextResponse.json({ error: 'Нельзя изменить свою роль через этот endpoint' }, { status: 403 });
+    return NextResponse.json({ error: 'Cannot change your own role via this endpoint' }, { status: 403 });
   }
 
   // Validate phone format if provided
   if (phone !== undefined) {
     const { validatePhone } = await import('@/lib/auth-utils');
     if (phone && !validatePhone(phone)) {
-      return NextResponse.json({ error: 'Неверный формат телефона' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid phone format' }, { status: 400 });
     }
   }
 
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   if (email !== undefined) {
     const { validateEmail } = await import('@/lib/auth-utils');
     if (!validateEmail(email)) {
-      return NextResponse.json({ error: 'Неверный формат email' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
     // Check for duplicate email
@@ -95,7 +95,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       where: { email: email, id: { not: id } },
     });
     if (existing) {
-      return NextResponse.json({ error: 'Email уже используется' }, { status: 409 });
+      return NextResponse.json({ error: 'Email is already in use' }, { status: 409 });
     }
   }
 
@@ -187,7 +187,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   // Prevent self-deletion
   if (id === auth.id) {
-    return NextResponse.json({ error: 'Нельзя удалить свой аккаунт через этот endpoint' }, { status: 403 });
+    return NextResponse.json({ error: 'Cannot delete your own account via this endpoint' }, { status: 403 });
   }
 
   const user = await getPrisma().user.findUnique({ where: { id } });

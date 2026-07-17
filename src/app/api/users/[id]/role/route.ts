@@ -33,7 +33,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   // Prevent self-role-change
   if (id === auth.id) {
-    return NextResponse.json({ error: 'Нельзя изменить свою роль' }, { status: 403 });
+    return NextResponse.json({ error: 'Cannot change your own role' }, { status: 403 });
   }
 
   const bodyResult = await parseBody<RoleChangeInput>(request);

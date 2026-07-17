@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const { reportType, frequency, dayOfWeek, dayOfMonth, email, groupId, days } = body;
 
     if (!reportType || !frequency) {
-      return NextResponse.json({ success: false, error: 'reportType и frequency обязательны' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'reportType and frequency are required' }, { status: 400 });
     }
 
     const validFrequencies = ['daily', 'weekly', 'monthly'];
@@ -39,18 +39,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'frequency должен быть daily, weekly или monthly',
+          error: 'frequency must be daily, weekly, or monthly',
         },
         { status: 400 },
       );
     }
 
     if (frequency === 'weekly' && (dayOfWeek === undefined || dayOfWeek < 0 || dayOfWeek > 6)) {
-      return NextResponse.json({ success: false, error: 'dayOfWeek должен быть 0-6 для weekly' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'dayOfWeek must be 0-6 for weekly' }, { status: 400 });
     }
 
     if (frequency === 'monthly' && (dayOfMonth === undefined || dayOfMonth < 1 || dayOfMonth > 31)) {
-      return NextResponse.json({ success: false, error: 'dayOfMonth должен быть 1-31 для monthly' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'dayOfMonth must be 1-31 for monthly' }, { status: 400 });
     }
 
     const report = await getPrisma().scheduledReport.create({

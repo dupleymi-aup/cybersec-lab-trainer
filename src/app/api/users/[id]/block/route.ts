@@ -26,7 +26,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   // Prevent self-block
   if (id === auth.id) {
-    return NextResponse.json({ error: 'Нельзя заблокировать себя' }, { status: 403 });
+    return NextResponse.json({ error: 'Cannot block yourself' }, { status: 403 });
   }
 
   const bodyResult = await parseBody<BlockUserInput>(request);
