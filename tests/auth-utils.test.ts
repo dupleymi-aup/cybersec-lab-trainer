@@ -5,6 +5,8 @@ import {
   validatePhone,
   validatePassword,
   generateUserId,
+  hashPassword,
+  verifyPassword,
 } from '@/lib/auth-utils';
 
 describe('generateOTP', () => {
@@ -102,5 +104,33 @@ describe('generateUserId', () => {
       ids.add(generateUserId());
     }
     expect(ids.size).toBe(100);
+  });
+});
+
+describe('hashPassword', () => {
+  it('should return a bcrypt hash string', async () => {
+    const hash = await hashPassword('TestPassword123!');
+    expect(typeof hash).toBe('string');
+    expect(hash).toMatch(/^\$2[aby]?\$/);
+  });
+
+  it('should produce different hashes for the same input', async () => {
+    const hash1 = await hashPassword('same-password');
+    const hash2 = await hashPassword('same-password');
+    expect(hash1).not.toBe(hash2);
+  });
+});
+
+describe('verifyPassword', () => {
+  it('should return true for matching password and hash', async () => {
+    const hash = await hashPassword('CorrectPassword!');
+    const result = await verifyPassword('CorrectPassword!', hash);
+    expect(result).toBe(true);
+  });
+
+  it('should return false for non-matching password', async () => {
+    const hash = await hashPassword('CorrectPassword!');
+    const result = await verifyPassword('WrongPassword!', hash);
+    expect(result).toBe(false);
   });
 });
