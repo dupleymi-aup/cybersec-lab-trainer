@@ -25,7 +25,9 @@ This project belongs to the work account — always use the `github-work` host a
 - **Phase 5 test coverage push**: Added 9 tests across 2 files, boosting coverage from 95% to 96% statements:
   - `tests/achievement-utils.test.ts` (+8 tests): headers-master, auth-challenger (locked/unlocked), first-challenge (owasp/auth/zero), unknown id — **achievement-utils.ts from 88% → 92%**
   - `tests/api-middleware.test.ts` (+1 test): rate limit store eviction when full (10001 entries) — **api-middleware.ts from 92.77% → 94%**
-- **Overall coverage**: 59.81% → **96.09%** statements, 87% branches, 98.6% functions
+- **Phase 6 test coverage push**: Added 8 tests for verifyLtiLaunch, boosting coverage from 96% to 99% statements:
+  - `tests/lti-utils.test.ts` (+8 tests): valid token verification, no matching keys, JWKS fetch failure, issuer mismatch, missing sub, deployment ID mismatch, invalid message type, LtiDeepLinkingRequest acceptance — **lti-utils.ts from 71% → 100%**
+- **Overall coverage**: 59.81% → **98.95%** statements, 90.5% branches, 99.3% functions
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **471/471 tests pass** — 28/28 test files, 0 failures
+- **479/479 tests pass** — 28/28 test files, 0 failures
 - **Full verification**: lint ✓, typecheck ✓, tests ✓
