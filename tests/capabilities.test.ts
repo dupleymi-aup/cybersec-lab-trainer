@@ -131,6 +131,22 @@ describe('Capability System', () => {
     it('teacher gets group scope for progress:read', () => {
       expect(getScopeForCap('teacher', 'progress:read_group')).toBe('own');
     });
+
+    it('teacher gets group scope for analytics:read (has read_group variant)', () => {
+      expect(getScopeForCap('teacher', 'analytics:read')).toBe('group');
+    });
+
+    it('admin gets all scope for analytics:read (has read_all variant)', () => {
+      expect(getScopeForCap('admin', 'analytics:read')).toBe('all');
+    });
+
+    it('student gets own scope for analytics:read (no group/all variant)', () => {
+      expect(getScopeForCap('student', 'analytics:read')).toBe('own');
+    });
+
+    it('teacher gets own for assignments:read (own-scoped)', () => {
+      expect(getScopeForCap('teacher', 'assignments:read_own')).toBe('own');
+    });
   });
 
   describe('listCapabilities', () => {
