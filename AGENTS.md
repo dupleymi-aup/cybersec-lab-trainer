@@ -12,12 +12,14 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
-- **Phase 2 test coverage push**: Added 105 tests across 4 new test files, boosting coverage from 40% to 60% statements:
-  - `tests/api-middleware.test.ts` (49 tests): getTokenFromRequest, requireRole, requirePermission, requireCapability, withCapability/withAnyCapability/withAllCapabilities, unauthorized/forbidden, getClientIp, checkRateLimit, authenticate
-  - `tests/auth-types.test.ts` (22 tests): ROLE_HIERARCHY, ROLE_PERMISSIONS, hasRole, hasPermission, getRoleLabel, getRoleDescription — **auth-types.ts now at 100% statements**
-  - `tests/export-utils.test.ts` (22 tests): buildCSV (including CSV injection sanitization), generateGradebookCSV, generateStudentReportCSV, generateModulePerformanceCSV, generateAtRiskCSV, generateGroupComparisonCSV, generateAnalyticsCSV
-  - `tests/lti-utils.test.ts` (18 tests): generateToolKeyPair, fetchPlatformJwks (with cache), signAgsToken, syncGradesToPlatform, fetchNrpsMembers — **lti-utils.ts from 25% → 71%**
-- **api-middleware.ts**: 15.66% → **92.77%** statements
+- **Phase 3 test coverage push**: Added 78 tests across 5 new test files, boosting coverage from 60% to 91% statements:
+  - `tests/auth-server-extended.test.ts` (13 tests): signJwt, generateToken with rememberMe, getTokenPayload, authenticate, verifyToken edge cases — **auth-server.ts from 65% → 100%**
+  - `tests/logger.test.ts` (10 tests): info/warn/error in dev and production, context logging, sensitive key redaction — **logger.ts from 75% → 100%**
+  - `tests/env.test.ts` (8 tests): env validation, invalid URL/NODE_ENV, missing TOKEN_SECRET in prod, random secret generation, DATABASE_URL warning — **env.ts from 60% → 88%**
+  - `tests/notification-store-extended.test.ts` (24 tests): addNotification cap at 100, markAsRead/markAllAsRead/clear/removeNotification, NotificationHelper (all 7 types), loadAnnouncementsIntoNotifications with dedup — **notification-store.ts from 60% → 100%**
+  - `tests/export-pdf.test.ts` (19 tests): all 7 PDF generators (mocked jsPDF), downloadCSV, all 6 CSV generators with full data — **export-utils.ts from 20% → 98%**
+  - `tests/capabilities.test.ts` (+4 tests): getScopeForCap group/all/own scope returns — **capabilities.ts from 96% → 98%**
+- **Overall coverage**: 59.81% → **91.15%** statements, 76% branches, 95.1% functions
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **344/344 tests pass** — 22/22 test files, 0 failures
+- **422/422 tests pass** — 27/27 test files, 0 failures
 - **Full verification**: lint ✓, typecheck ✓, tests ✓
