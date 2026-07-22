@@ -4,6 +4,7 @@ import type { PrismaClient } from '@prisma/client';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseBody } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { batchProgressSchema } from '@/lib/validations/api';
 
 // GET /api/progress/batch?userIds=id1,id2,id3
 // Fetch progress for multiple students at once (teacher/admin only)
@@ -136,8 +137,11 @@ export async function POST(request: NextRequest) {
 
     const bodyResult = await parseBody(request);
     if (!bodyResult.ok) return bodyResult.response;
-    const body = bodyResult.data as Record<string, unknown>;
-    const { progress, quizResults } = body;
+    const parsed = batchProgressSchema.safeParse(bodyResult.data);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const { progress, quizResults } = parsed.data;
 
     if (!progress && !quizResults) {
       return NextResponse.json({ error: 'No data to save' }, { status: 400 });
