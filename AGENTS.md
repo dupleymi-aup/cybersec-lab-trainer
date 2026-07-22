@@ -30,4 +30,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **Overall coverage**: 59.81% → **98.95%** statements, 90.5% branches, 99.3% functions
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
 - **479/479 tests pass** — 28/28 test files, 0 failures
+- **API route hardening**: Added try/catch + logger.error to `auth/profile`, `auth/password`, and `scheduled-reports/[id]` routes — now all 85 API routes have proper error handling
 - **Full verification**: lint ✓, typecheck ✓, tests ✓
