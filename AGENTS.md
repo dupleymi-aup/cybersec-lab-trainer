@@ -12,21 +12,12 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done last
-- **(working tree)**: Phase 1.8 root layout fix: `NEXT_LOCALE` cookie drives `<html lang>`, localized skip-link, and `generateMetadata()` title/description via `landing.header`/`landing.hero` translations (3 locale JSON files imported statically); `LocaleLangSetter` retained as fallback for client-side nav
-- **(working tree)**: Fixed 22 pre-existing test failures (stale Russian assertions from i18n English conversion):
-  - `tests/auth-utils.test.ts` (5): Russian error messages → English (`'Minimum 8 characters'`, `'uppercase'`, `'lowercase'`, `'digit'`, `'special character'`)
-  - `tests/password-strength.test.tsx` (6): Russian labels → English (`'Very weak'`, `'Weak'`, `'Fair'`, `'Good'`, `'Strong'`, `'Excellent'`)
-  - `tests/recovery-validation.test.ts` (5): same as auth-utils
-  - `tests/security-fixes.test.ts` (5): same as auth-utils
-  - `tests/notification-store.test.ts` (1): `'Достижение'` → `'Achievement Unlocked'`
-- **(working tree)**: Bug fixes in 8 files:
-  - `PhishingAnalyzer.tsx`: `currentEmail?.body ?? ''` guard against crash when filter yields empty list
-  - `OnboardingTour.tsx`: 2 aria-labels added on icon buttons; 5 localStorage calls wrapped in try/catch
-  - `ComprehensiveDashboard.tsx`: `<p onClick>` → `<button type="button">` for keyboard accessibility
-  - `StudentPerformanceReport.tsx`: array index → stable key `rec.title`
-  - `StudentHeatmapCalendar.tsx`: `.catch()` on `loadStudents()` promise
-  - `AnalyticsExportPanel.tsx`: 2 localStorage accesss wrapped in try/catch
-  - `SecurityHeadersLab.tsx` + `security-headers-data.ts`: Russian category keys → English keys (xss, connection, clickjacking, mime, privacy, browserApi, processIsolation, resourceIsolation, resourceProtection, caching, browserPrivacy, safeExit)
+- **Phase 2 test coverage push**: Added 105 tests across 4 new test files, boosting coverage from 40% to 60% statements:
+  - `tests/api-middleware.test.ts` (49 tests): getTokenFromRequest, requireRole, requirePermission, requireCapability, withCapability/withAnyCapability/withAllCapabilities, unauthorized/forbidden, getClientIp, checkRateLimit, authenticate
+  - `tests/auth-types.test.ts` (22 tests): ROLE_HIERARCHY, ROLE_PERMISSIONS, hasRole, hasPermission, getRoleLabel, getRoleDescription — **auth-types.ts now at 100% statements**
+  - `tests/export-utils.test.ts` (22 tests): buildCSV (including CSV injection sanitization), generateGradebookCSV, generateStudentReportCSV, generateModulePerformanceCSV, generateAtRiskCSV, generateGroupComparisonCSV, generateAnalyticsCSV
+  - `tests/lti-utils.test.ts` (18 tests): generateToolKeyPair, fetchPlatformJwks (with cache), signAgsToken, syncGradesToPlatform, fetchNrpsMembers — **lti-utils.ts from 25% → 71%**
+- **api-middleware.ts**: 15.66% → **92.77%** statements
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **239/239 tests pass** — 19/19 test files, 0 failures
-- **Full verification**: lint ✓, typecheck ✓, build ✓, tests ✓
+- **344/344 tests pass** — 22/22 test files, 0 failures
+- **Full verification**: lint ✓, typecheck ✓, tests ✓
