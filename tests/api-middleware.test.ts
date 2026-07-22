@@ -279,6 +279,18 @@ describe('checkRateLimit', () => {
     const result = checkRateLimit('key-b', 5, 60000);
     expect(result.allowed).toBe(true);
   });
+
+  it('evicts expired entries when store is full', () => {
+    // Fill store with entries that will expire immediately
+    for (let i = 0; i < 10001; i++) {
+      checkRateLimit(`evict-${i}`, 5, 1); // 1ms window
+    }
+    // Advance past expiration
+    vi.advanceTimersByTime(2);
+    // New request triggers cleanup of expired entries
+    const result = checkRateLimit('evict-new', 5, 60000);
+    expect(result.allowed).toBe(true);
+  });
 });
 
 describe('authenticate', () => {

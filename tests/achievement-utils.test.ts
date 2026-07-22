@@ -52,6 +52,38 @@ describe('getAchievementStatus', () => {
     // Since we test getAchievementStatus which uses >= 8, this should pass
     expect(getAchievementStatus('full-completion', allModules, {}, undefined)).toBe(true);
   });
+
+  it('should unlock headers-master with security-headers module', () => {
+    expect(getAchievementStatus('headers-master', ['security-headers'], {}, undefined)).toBe(true);
+  });
+
+  it('should not unlock headers-master without security-headers', () => {
+    expect(getAchievementStatus('headers-master', ['owasp'], {}, undefined)).toBe(false);
+  });
+
+  it('should unlock auth-challenger with 8+ auth correct', () => {
+    expect(getAchievementStatus('auth-challenger', [], {}, { owaspCorrect: 0, authCorrect: 8 })).toBe(true);
+  });
+
+  it('should not unlock auth-challenger with fewer than 8', () => {
+    expect(getAchievementStatus('auth-challenger', [], {}, { owaspCorrect: 0, authCorrect: 7 })).toBe(false);
+  });
+
+  it('should unlock first-challenge with owasp correct > 0', () => {
+    expect(getAchievementStatus('first-challenge', [], {}, { owaspCorrect: 1, authCorrect: 0 })).toBe(true);
+  });
+
+  it('should unlock first-challenge with auth correct > 0', () => {
+    expect(getAchievementStatus('first-challenge', [], {}, { owaspCorrect: 0, authCorrect: 1 })).toBe(true);
+  });
+
+  it('should not unlock first-challenge with 0 correct', () => {
+    expect(getAchievementStatus('first-challenge', [], {}, { owaspCorrect: 0, authCorrect: 0 })).toBe(false);
+  });
+
+  it('should return false for unknown achievement id', () => {
+    expect(getAchievementStatus('nonexistent', [], {}, undefined)).toBe(false);
+  });
 });
 
 describe('countUnlockedAchievements', () => {
