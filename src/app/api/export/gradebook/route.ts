@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const userIds = users.map((u) => u.id);
+    const userIds = users.map((u: { id: string; fullName: string | null; email: string; group: string | null }) => u.id);
 
     const progressRecords = await getPrisma().progress.findMany({
       where: { userId: { in: userIds } },
@@ -49,19 +49,19 @@ export async function GET(request: NextRequest) {
       quizByUser.set(q.userId, existing);
     }
 
-    const students = users.map((user) => {
+    const students = users.map((user: { id: string; fullName: string | null; email: string; group: string | null }) => {
       const userProgress = progressByUser.get(user.id) || [];
       const userQuizzes = quizByUser.get(user.id) || [];
 
-      const modulesCompleted = userProgress.filter((p) => p.completed).length;
+      const modulesCompleted = userProgress.filter((p: { userId: string; completed: boolean; updatedAt: Date }) => p.completed).length;
       const quizCount = userQuizzes.length;
       const avgScore =
-        userQuizzes.length > 0 ? userQuizzes.reduce((sum, q) => sum + q.percentage, 0) / userQuizzes.length : 0;
+        userQuizzes.length > 0 ? userQuizzes.reduce((sum: number, q: { userId: string; percentage: number; updatedAt: Date }) => sum + q.percentage, 0) / userQuizzes.length : 0;
 
       const lastProgressDate =
-        userProgress.length > 0 ? new Date(Math.max(...userProgress.map((p) => p.updatedAt.getTime()))) : null;
+        userProgress.length > 0 ? new Date(Math.max(...userProgress.map((p: { userId: string; completed: boolean; updatedAt: Date }) => p.updatedAt.getTime()))) : null;
       const lastQuizDate =
-        userQuizzes.length > 0 ? new Date(Math.max(...userQuizzes.map((q) => q.updatedAt.getTime()))) : null;
+        userQuizzes.length > 0 ? new Date(Math.max(...userQuizzes.map((q: { userId: string; percentage: number; updatedAt: Date }) => q.updatedAt.getTime()))) : null;
 
       let lastActive = 'N/A';
       if (lastProgressDate && lastQuizDate) {

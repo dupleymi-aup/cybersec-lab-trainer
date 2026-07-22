@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       select: { id: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: { id: string }) => s.id);
     if (studentIds.length === 0) {
       return NextResponse.json({ trajectories: [], categories: [] });
     }
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => a.week.localeCompare(b.week) || a.category.localeCompare(b.category));
 
     // Collect unique categories
-    const categories = [...new Set(attempts.map((a) => a.category))].sort();
+    const categories = [...new Set(attempts.map((a: { category: string }) => a.category))].sort();
 
     return NextResponse.json({ trajectories, categories });
   } catch (error) {

@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         where: userWhere,
         select: { id: true },
       });
-      studentIds = students.map((s) => s.id);
+      studentIds = students.map((s: { id: string }) => s.id);
     }
 
     if (studentIds.length === 0) {

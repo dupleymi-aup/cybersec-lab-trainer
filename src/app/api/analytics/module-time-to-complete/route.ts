@@ -31,10 +31,13 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true, group: true },
     });
 
-    const userMap = new Map(users.map((u) => [u.id, u]));
-    const filteredUsers = new Set(users.filter((u) => !groupId || u.group === groupId).map((u) => u.id));
+    type UserRow = { id: string; fullName: string; group: string };
+    type ProgressRow = { userId: string; moduleId: string; score: number | null; completed: boolean; updatedAt: Date };
 
-    const progress = allProgress.filter((p) => filteredUsers.has(p.userId));
+    const userMap = new Map<string, UserRow>(users.map((u: UserRow) => [u.id, u]));
+    const filteredUsers: Set<string> = new Set(users.filter((u: UserRow) => !groupId || u.group === groupId).map((u: UserRow) => u.id));
+
+    const progress = allProgress.filter((p: ProgressRow) => filteredUsers.has(p.userId));
 
     const userModuleTimelines = new Map<string, Map<string, Date>>();
     for (const p of progress) {
@@ -83,7 +86,7 @@ export async function GET(request: NextRequest) {
       const userTimes: number[] = [];
 
       for (const [moduleId, completionDate] of completions) {
-        const progressEntry = progress.find((p) => p.userId === userId && p.moduleId === moduleId && p.completed);
+        const progressEntry = progress.find((p: ProgressRow) => p.userId === userId && p.moduleId === moduleId && p.completed);
         if (!progressEntry) continue;
 
         const startDate = userModuleStarts.get(userId)?.get(moduleId) || completionDate;

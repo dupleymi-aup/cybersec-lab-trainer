@@ -215,8 +215,8 @@ export async function POST(request: NextRequest) {
     select: { email: true, phone: true },
   });
 
-  const existingEmails = new Set(existingUsers.map((u) => u.email.toLowerCase()));
-  const existingPhones = new Set(existingUsers.map((u) => u.phone));
+  const existingEmails = new Set(existingUsers.map((u: { email: string; phone: string }) => u.email.toLowerCase()));
+  const existingPhones = new Set(existingUsers.map((u: { email: string; phone: string }) => u.phone));
 
   // Filter out rows that conflict with existing users
   const rowsToImport: (ParsedRow & { rowNum: number })[] = [];

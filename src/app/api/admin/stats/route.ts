@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
           where: { timestamp: { gte: dateFrom } },
           _count: true,
         })
-        .then((results) => results.length),
+        .then((results: Array<{ userId: string; _count: { userId: number } }>) => results.length),
 
       // Audit stats
       getPrisma().auditLog.count(),
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build top actions
-    const topActionsList = topActions.map((a) => ({
+    const topActionsList = topActions.map((a: { action: string; _count: { action: number } }) => ({
       action: a.action,
       count: a._count,
     }));

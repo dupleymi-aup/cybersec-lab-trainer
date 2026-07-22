@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         where: { role: 'student' },
         select: { id: true },
       });
-      studentIds = students.map((s) => s.id);
+      studentIds = students.map((s: { id: string }) => s.id);
     }
 
     if (studentIds.length === 0) {

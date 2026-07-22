@@ -7,7 +7,7 @@ import reactHooksPlugin from "eslint-plugin-react-hooks";
 /** @type {import("eslint").Linter.FlatConfig[]} */
 const eslintConfig = [
   {
-    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "coverage/**", "next-env.d.ts", "public/**", "scripts/*.js", "cyberlab-mtusi/**", "other-repo/**", "terminal/**", "*.config.ts", "*.config.mjs", "playwright.config.ts", "vitest.config.ts", "e2e/**", "tests/**", "prisma/seed.ts", ".lint_output.txt"],
+    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "coverage/**", "next-env.d.ts", "public/**", "scripts/*.js", "scripts/*.mjs", "cyberlab-mtusi/**", "other-repo/**", "terminal/**", "*.config.ts", "*.config.mjs", "playwright.config.ts", "vitest.config.ts", "e2e/**", "tests/**", "prisma/seed.ts", ".lint_output.txt"],
   },
   js.configs.recommended,
   {

@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     where: userFilter,
     select: { id: true },
   });
-  const studentIds = students.map((s) => s.id);
+  const studentIds = students.map((s: { id: string }) => s.id);
   const totalStudents = students.length;
 
   const progress = await getPrisma().progress.findMany({
@@ -101,13 +101,13 @@ export async function GET(request: NextRequest) {
   }> = [];
 
   for (const [moduleId, levelCount] of Object.entries(MODULE_LEVEL_COUNTS)) {
-    const moduleProgress = progress.filter((p) => p.moduleId === moduleId);
-    const completedCount = moduleProgress.filter((p) => p.completed).length;
+    const moduleProgress = progress.filter((p: { moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; secureCodingCorrectCount: number; studiedOwaspItems: string | null; challengeScores: string | null }) => p.moduleId === moduleId);
+    const completedCount = moduleProgress.filter((p: { moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; secureCodingCorrectCount: number; studiedOwaspItems: string | null; challengeScores: string | null }) => p.completed).length;
     const avgScore =
       moduleProgress.length > 0
         ? Math.round(
-            moduleProgress.filter((p) => p.score != null).reduce((sum, p) => sum + (p.score ?? 0), 0) /
-              Math.max(1, moduleProgress.filter((p) => p.score != null).length),
+            moduleProgress.filter((p: { moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; secureCodingCorrectCount: number; studiedOwaspItems: string | null; challengeScores: string | null }) => p.score != null).reduce((sum: number, p: { moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; secureCodingCorrectCount: number; studiedOwaspItems: string | null; challengeScores: string | null }) => sum + (p.score ?? 0), 0) /
+              Math.max(1, moduleProgress.filter((p: { moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; secureCodingCorrectCount: number; studiedOwaspItems: string | null; challengeScores: string | null }) => p.score != null).length),
           )
         : 0;
 

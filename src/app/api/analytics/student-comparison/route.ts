@@ -61,20 +61,25 @@ export async function GET(request: NextRequest) {
 
     const totalModules = 12;
 
-    const students = users.map((user) => {
-      const userProgress = progressRecords.filter((p) => p.userId === user.id);
-      const userQuizResults = quizResults.filter((q) => q.userId === user.id);
-      const userQuizAttempts = quizAttempts.filter((q) => q.userId === user.id);
+    type UserRow = { id: string; fullName: string; email: string; group: string; avatar: string | null; lastLoginAt: Date | null };
+    type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
+    type QuizResultRow = { userId: string; quizId: string; percentage: number };
+    type QuizAttemptRow = { userId: string; category: string; correct: boolean };
 
-      const modulesCompleted = userProgress.filter((p) => p.completed).length;
+    const students = users.map((user: UserRow) => {
+      const userProgress = progressRecords.filter((p: ProgressRow) => p.userId === user.id);
+      const userQuizResults = quizResults.filter((q: QuizResultRow) => q.userId === user.id);
+      const userQuizAttempts = quizAttempts.filter((q: QuizAttemptRow) => q.userId === user.id);
+
+      const modulesCompleted = userProgress.filter((p: ProgressRow) => p.completed).length;
       const avgQuizScore =
         userQuizResults.length > 0
-          ? Math.round((userQuizResults.reduce((sum, q) => sum + q.percentage, 0) / userQuizResults.length) * 10) / 10
+          ? Math.round((userQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / userQuizResults.length) * 10) / 10
           : 0;
       const totalQuizAttempts = userQuizAttempts.length;
 
       // Last active days
-      const progressTimestamps = userProgress.map((p) => p.updatedAt.getTime());
+      const progressTimestamps = userProgress.map((p: ProgressRow) => p.updatedAt.getTime());
       const lastActivityDate = user.lastLoginAt
         ? new Date(Math.max(user.lastLoginAt.getTime(), ...(progressTimestamps.length > 0 ? progressTimestamps : [0])))
         : null;

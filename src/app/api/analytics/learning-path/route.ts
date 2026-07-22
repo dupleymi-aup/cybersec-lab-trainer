@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       select: { id: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: { id: string }) => s.id);
     const totalStudents = students.length;
 
     const progressRecords = await getPrisma().progress.findMany({

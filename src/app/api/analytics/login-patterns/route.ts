@@ -34,7 +34,10 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const studentIds = students.map((s) => s.id);
+    type StudentRow = { id: string; fullName: string; group: string; lastLoginAt: Date | null; loginCount: number };
+    type LoginActivityRow = { userId: string; success: boolean; ip: string; timestamp: Date };
+
+    const studentIds = students.map((s: StudentRow) => s.id);
 
     const loginActivities = await getPrisma().loginActivity.findMany({
       where: { userId: { in: studentIds }, timestamp: { gte: since } },
@@ -43,9 +46,9 @@ export async function GET(request: NextRequest) {
     });
 
     const loginFrequency = students
-      .map((s) => {
-        const userLogins = loginActivities.filter((l) => l.userId === s.id);
-        const successCount = userLogins.filter((l) => l.success).length;
+      .map((s: StudentRow) => {
+        const userLogins = loginActivities.filter((l: LoginActivityRow) => l.userId === s.id);
+        const successCount = userLogins.filter((l: LoginActivityRow) => l.success).length;
         const totalCount = userLogins.length;
         const lastLogin = s.lastLoginAt ? s.lastLoginAt.toISOString() : '';
         return {
@@ -57,7 +60,7 @@ export async function GET(request: NextRequest) {
           successRate: totalCount > 0 ? Math.round((successCount / totalCount) * 10000) / 100 : 0,
         };
       })
-      .sort((a, b) => b.loginCount - a.loginCount);
+      .sort((a: { loginCount: number }, b: { loginCount: number }) => b.loginCount - a.loginCount);
 
     const failedMap = new Map<
       string,
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest) {
     >();
     for (const activity of loginActivities) {
       if (!activity.success && activity.userId) {
-        const student = students.find((s) => s.id === activity.userId);
+        const student = students.find((s: StudentRow) => s.id === activity.userId);
         if (!student) continue;
         if (!failedMap.has(activity.userId)) {
           failedMap.set(activity.userId, {
@@ -95,10 +98,10 @@ export async function GET(request: NextRequest) {
       .filter((f) => f.count >= 2)
       .sort((a, b) => b.count - a.count);
 
-    const activeUserIds = new Set(loginActivities.map((l) => l.userId));
+    const activeUserIds = new Set(loginActivities.map((l: LoginActivityRow) => l.userId));
     const dormantAccounts = students
-      .filter((s) => !activeUserIds.has(s.id) && s.lastLoginAt)
-      .map((s) => {
+      .filter((s: StudentRow) => !activeUserIds.has(s.id) && s.lastLoginAt)
+      .map((s: StudentRow) => {
         const lastLogin = s.lastLoginAt ?? new Date(0);
         const daysInactive = Math.floor((now.getTime() - lastLogin.getTime()) / (24 * 60 * 60 * 1000));
         return {
@@ -109,7 +112,7 @@ export async function GET(request: NextRequest) {
           daysInactive,
         };
       })
-      .sort((a, b) => b.daysInactive - a.daysInactive)
+      .sort((a: { daysInactive: number }, b: { daysInactive: number }) => b.daysInactive - a.daysInactive)
       .slice(0, 50);
 
     const hourlyCounts = new Array(24).fill(0);

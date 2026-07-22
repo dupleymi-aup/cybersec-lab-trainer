@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   });
 
   return NextResponse.json({
-    announcements: announcements.map((a) => ({
+    announcements: announcements.map((a: { id: string; title: string; content: string; priority: string; active: boolean; expiresAt: Date | null; createdAt: Date }) => ({
       id: a.id,
       title: a.title,
       content: a.content,

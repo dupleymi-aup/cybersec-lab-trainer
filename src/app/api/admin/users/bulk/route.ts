@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     select: { id: true, email: true, fullName: true, role: true },
   });
 
-  const foundIds = new Set(targetUsers.map((u) => u.id));
+  const foundIds = new Set(targetUsers.map((u: { id: string }) => u.id));
   const missingIds = userIds.filter((id) => !foundIds.has(id));
 
   let resultCount = 0;

@@ -38,8 +38,8 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true },
     });
 
-    const studentIds = students.map((s) => s.id);
-    const studentNameMap = new Map(students.map((s) => [s.id, s.fullName]));
+    const studentIds = students.map((s: { id: string; fullName: string | null }) => s.id);
+    const studentNameMap = new Map(students.map((s: { id: string; fullName: string | null }) => [s.id, s.fullName]));
 
     const quizAttempts = await getPrisma().quizAttempt.findMany({
       where: { userId: { in: studentIds }, attemptedAt: { gte: since } },
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
       const percentage = Math.round((correctCount / session.attempts.length) * 100);
 
       // Get quiz result score if available
-      const qr = quizResults.find((r) => r.userId === session.userId && r.quizId === session.quizId);
+      const qr = quizResults.find((r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) => r.userId === session.userId && r.quizId === session.quizId);
 
       sessionsWithDuration.push({
         userId: session.userId,
@@ -204,7 +204,7 @@ export async function GET(request: NextRequest) {
       const firstAttempt = sessionsWithDuration.find((a) => a.userId === s.userId && a.quizId === s.quizId);
       if (!firstAttempt) continue;
       // Use the quiz result updatedAt for the hour
-      const qr = quizResults.find((r) => r.userId === s.userId && r.quizId === s.quizId);
+      const qr = quizResults.find((r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) => r.userId === s.userId && r.quizId === s.quizId);
       if (!qr) continue;
       const hour = qr.updatedAt.getHours();
       const existing = hourlyMap.get(hour) || { total: 0, count: 0 };
@@ -238,11 +238,11 @@ export async function GET(request: NextRequest) {
     }
     // Use session durations for the avgDuration calculation
     const weekdaySessions = sessionsWithDuration.filter((s) => {
-      const qr = quizResults.find((r) => r.userId === s.userId && r.quizId === s.quizId);
+      const qr = quizResults.find((r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) => r.userId === s.userId && r.quizId === s.quizId);
       return qr && qr.updatedAt.getDay() !== 0 && qr.updatedAt.getDay() !== 6;
     });
     const weekendSessions = sessionsWithDuration.filter((s) => {
-      const qr = quizResults.find((r) => r.userId === s.userId && r.quizId === s.quizId);
+      const qr = quizResults.find((r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) => r.userId === s.userId && r.quizId === s.quizId);
       return qr && (qr.updatedAt.getDay() === 0 || qr.updatedAt.getDay() === 6);
     });
 

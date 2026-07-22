@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: { id: string; fullName: string | null }) => s.id);
     const totalStudents = students.length;
 
     // Get login activity for hourly patterns
@@ -111,14 +111,14 @@ export async function GET(request: NextRequest) {
 
       const avgQuizScore =
         studentQuizResults.length > 0
-          ? studentQuizResults.reduce((sum, q) => sum + q.percentage, 0) / studentQuizResults.length
+          ? studentQuizResults.reduce((sum: number, q: { percentage: number }) => sum + q.percentage, 0) / studentQuizResults.length
           : 0;
 
       // Calculate last active days
       const allDates = [
-        ...studentLogins.map((l) => l.timestamp.getTime()),
-        ...studentProgress.map((p) => p.updatedAt.getTime()),
-        ...studentQuizzes.map((q) => q.attemptedAt.getTime()),
+        ...studentLogins.map((l: { userId: string; timestamp: Date }) => l.timestamp.getTime()),
+        ...studentProgress.map((p: { userId: string; updatedAt: Date }) => p.updatedAt.getTime()),
+        ...studentQuizzes.map((q: { userId: string; attemptedAt: Date }) => q.attemptedAt.getTime()),
       ];
       const lastActiveDate = allDates.length > 0 ? new Date(Math.max(...allDates)) : null;
       const lastActiveDays = lastActiveDate
@@ -213,7 +213,7 @@ export async function GET(request: NextRequest) {
       const dayStart = new Date(dateStr);
       const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
 
-      const dayLogins = loginActivity.filter((l) => l.timestamp >= dayStart && l.timestamp < dayEnd);
+      const dayLogins = loginActivity.filter((l: { userId: string; timestamp: Date }) => l.timestamp >= dayStart && l.timestamp < dayEnd);
       const avgLoginsPerStudent = totalStudents > 0 ? Math.round((dayLogins.length / totalStudents) * 1000) / 10 : 0;
 
       engagementTrend.push({ date: dateStr, avgLoginsPerStudent });

@@ -29,9 +29,14 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const studentIds = students.map((s) => s.id);
+  type StudentRow = { id: string; group: string; course: string; university: string; lastLoginAt: Date | null };
+  type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null };
+  type QuizResultRow = { userId: string; percentage: number };
+  type PrevQuizResultRow = { percentage: number };
+
+  const studentIds = students.map((s: StudentRow) => s.id);
   const totalStudents = students.length;
-  const activeStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo).length;
+  const activeStudents = students.filter((s: StudentRow) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo).length;
   const activePercentage =
     totalStudents > 0 ? Math.round((activeStudents / totalStudents) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE : 0;
 
@@ -75,14 +80,14 @@ export async function GET(request: NextRequest) {
   // Avg quiz score
   const avgQuizScore =
     quizResults.length > 0
-      ? Math.round((quizResults.reduce((sum, q) => sum + q.percentage, 0) / quizResults.length) * 100) / 100
+      ? Math.round((quizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / quizResults.length) * 100) / 100
       : 0;
 
   const totalQuizAttempts = quizResults.length;
 
   // Previous period student count (total students active in 30-60 days ago period)
   const prevPeriodStudents = students.filter(
-    (s) => s.lastLoginAt && s.lastLoginAt >= sixtyDaysAgo && s.lastLoginAt < thirtyDaysAgo,
+    (s: StudentRow) => s.lastLoginAt && s.lastLoginAt >= sixtyDaysAgo && s.lastLoginAt < thirtyDaysAgo,
   );
   const prevActiveStudents = prevPeriodStudents.length;
   const prevActivePercentage =
@@ -132,7 +137,7 @@ export async function GET(request: NextRequest) {
 
   const prevAvgQuizScore =
     prevQuizResults.length > 0
-      ? Math.round((prevQuizResults.reduce((sum, q) => sum + q.percentage, 0) / prevQuizResults.length) * 100) / 100
+      ? Math.round((prevQuizResults.reduce((sum: number, q: PrevQuizResultRow) => sum + q.percentage, 0) / prevQuizResults.length) * 100) / 100
       : 0;
 
   function trendIndicator(current: number, previous: number): 'up' | 'down' | 'stable' {
@@ -203,7 +208,7 @@ export async function GET(request: NextRequest) {
     }
 
     for (const p of progressRecords) {
-      const student = students.find((s) => s.id === p.userId);
+      const student = students.find((s: StudentRow) => s.id === p.userId);
       if (student) {
         const key = student[field] || '(not specified)';
         const g = groups.get(key);
@@ -212,7 +217,7 @@ export async function GET(request: NextRequest) {
     }
 
     for (const q of quizResults) {
-      const student = students.find((s) => s.id === q.userId);
+      const student = students.find((s: StudentRow) => s.id === q.userId);
       if (student) {
         const key = student[field] || '(not specified)';
         const g = groups.get(key);
@@ -222,14 +227,14 @@ export async function GET(request: NextRequest) {
 
     const byField: Record<string, unknown>[] = [];
     for (const [key, g] of groups.entries()) {
-      const completedCount = g.progressRecords.filter((p) => p.completed).length;
+      const completedCount = g.progressRecords.filter((p: ProgressRow) => p.completed).length;
       const groupAvgCompletion =
         g.totalStudents > 0
           ? Math.round((completedCount / (g.totalStudents * totalModules)) * PERCENT_ROUNDING_FACTOR) / PERCENT_SCALE
           : 0;
       const groupAvgQuiz =
         g.quizResults.length > 0
-          ? Math.round((g.quizResults.reduce((sum, q) => sum + q.percentage, 0) / g.quizResults.length) * 100) / 100
+          ? Math.round((g.quizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / g.quizResults.length) * 100) / 100
           : 0;
       byField.push({
         name: key,

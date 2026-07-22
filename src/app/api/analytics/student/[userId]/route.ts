@@ -19,6 +19,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
   const userId = resolvedParams.userId;
 
+  type ProgressRow = { moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
+  type QuizResultRow = { quizId: string; score: number; total: number; percentage: number; createdAt: Date; updatedAt: Date };
   // Get user profile
   const user = await getPrisma().user.findUnique({
     where: { id: userId },
@@ -83,16 +85,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   // Calculate KPIs
   const totalModules = 12; // Total number of modules in the system
-  const modulesCompleted = progressRecords.filter((p) => p.completed).length;
+  const modulesCompleted = progressRecords.filter((p: ProgressRow) => p.completed).length;
   const avgQuizScore =
     quizResults.length > 0
-      ? Math.round((quizResults.reduce((sum, q) => sum + q.percentage, 0) / quizResults.length) * 10) / 10
+      ? Math.round((quizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / quizResults.length) * 10) / 10
       : 0;
   const totalQuizAttempts = quizAttempts.length;
 
   // Last active days
-  const progressTimestamps = progressRecords.map((p) => p.updatedAt.getTime());
-  const quizTimestamps = quizResults.map((q) => q.updatedAt.getTime());
+  const progressTimestamps = progressRecords.map((p: ProgressRow) => p.updatedAt.getTime());
+  const quizTimestamps = quizResults.map((q: QuizResultRow) => q.updatedAt.getTime());
   const lastActivityDate = user.lastLoginAt
     ? new Date(
         Math.max(
@@ -156,9 +158,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   // ─── Module Completion Timeline ───
   const moduleCompletionTimeline = progressRecords
-    .filter((p) => p.completed || p.score !== null)
-    .sort((a, b) => a.updatedAt.getTime() - b.updatedAt.getTime())
-    .map((p) => ({
+    .filter((p: ProgressRow) => p.completed || p.score !== null)
+    .sort((a: ProgressRow, b: ProgressRow) => a.updatedAt.getTime() - b.updatedAt.getTime())
+    .map((p: ProgressRow) => ({
       date: p.updatedAt.toISOString().split('T')[0],
       moduleId: p.moduleId,
       score: p.score,
@@ -262,7 +264,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           where: { group: user.group },
           select: { id: true },
         })
-      ).map((u) => u.id)
+      ).map((u: { id: string }) => u.id)
     : [];
   const allUserProgress =
     cohortUserIds.length > 0
@@ -474,7 +476,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       description: 'Complete the first module',
       unlocked: modulesCompleted >= 1,
       unlockedAt:
-        modulesCompleted >= 1 ? (progressRecords.find((p) => p.completed)?.updatedAt.toISOString() ?? null) : null,
+        modulesCompleted >= 1 ? (progressRecords.find((p: ProgressRow) => p.completed)?.updatedAt.toISOString() ?? null) : null,
     },
     {
       id: 'five_modules',
@@ -487,7 +489,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       id: 'quiz_master',
       title: 'Quiz Master',
       description: 'Score 90%+ on all quizzes',
-      unlocked: quizResults.length > 0 && quizResults.every((q) => q.percentage >= 90),
+      unlocked: quizResults.length > 0 && quizResults.every((q: QuizResultRow) => q.percentage >= 90),
       unlockedAt: null,
     },
     {
@@ -510,14 +512,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       engagementScore,
       riskScore,
     },
-    moduleProgress: progressRecords.map((p) => ({
+    moduleProgress: progressRecords.map((p: ProgressRow) => ({
       moduleId: p.moduleId,
       moduleName: getModuleName(p.moduleId),
       completed: p.completed,
       score: p.score,
       updatedAt: p.updatedAt.toISOString(),
     })),
-    quizResults: quizResults.map((q) => ({
+    quizResults: quizResults.map((q: QuizResultRow) => ({
       quizId: q.quizId,
       score: q.score,
       total: q.total,

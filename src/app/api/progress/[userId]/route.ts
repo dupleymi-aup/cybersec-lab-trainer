@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     return NextResponse.json({
-      progress: progress.map((p) => ({
+      progress: progress.map((p: { moduleId: string; completed: boolean; score: number | null; sqlLevels: string; xssLevels: string; csrfSteps: string; secureCodingAnswers: string; secureCodingCorrectCount: number; studiedOwaspItems: string; challengeScores: string | null; updatedAt: Date }) => ({
         moduleId: p.moduleId,
         completed: p.completed,
         score: p.score,
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         challengeScores: p.challengeScores,
         updatedAt: p.updatedAt.toISOString(),
       })),
-      quizResults: quizResults.map((q) => ({
+      quizResults: quizResults.map((q: { quizId: string; score: number; total: number; percentage: number; updatedAt: Date }) => ({
         quizId: q.quizId,
         score: q.score,
         total: q.total,

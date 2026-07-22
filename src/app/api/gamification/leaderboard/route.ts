@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
       getPrisma().user.count({ where }),
     ]);
 
-    const leaderboard = users.map((u, index) => ({
+    const leaderboard = users.map((u: { id: string; fullName: string; group: string; xp: number; level: number; streak: number; lastActivityAt: Date | null }, index: number) => ({
       position: index + 1,
       id: u.id,
       fullName: u.fullName,
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     }));
 
     // Get user's own rank if not in top list
-    let userRank = leaderboard.find((u) => u.isCurrentUser);
+    let userRank = leaderboard.find((u: { isCurrentUser: boolean }) => u.isCurrentUser);
     if (!userRank) {
       const [ownUser] = await getPrisma().user.findMany({
         where: { id: auth.id, role: 'student', isBlocked: false },

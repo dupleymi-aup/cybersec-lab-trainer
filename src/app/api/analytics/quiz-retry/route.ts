@@ -33,8 +33,13 @@ export async function GET(request: NextRequest) {
     const users = await getPrisma().user.findMany({
       select: { id: true, fullName: true, group: true },
     });
-    const userMap = new Map(users.map((u) => [u.id, u]));
-    const filteredUsers = new Set(users.filter((u) => !groupId || u.group === groupId).map((u) => u.id));
+    type UserRecord = { id: string; fullName: string | null; group: string };
+    const userMap = new Map<string, UserRecord>(
+      users.map((u: UserRecord) => [u.id, u])
+    );
+    const filteredUsers = new Set(
+      users.filter((u: UserRecord) => !groupId || u.group === groupId).map((u: UserRecord) => u.id)
+    );
 
     // Group attempts by user+quiz to find session boundaries
     const userQuizMap = new Map<string, Map<string, Array<{ correct: boolean; attemptedAt: Date; category: string }>>>();
@@ -89,7 +94,7 @@ export async function GET(request: NextRequest) {
 
         retryData.push({
           userId,
-          fullName: user.fullName,
+          fullName: user.fullName ?? '',
           group: user.group,
           quizId,
           category: attemptList[0]?.category || '',

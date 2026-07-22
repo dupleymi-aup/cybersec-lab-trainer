@@ -18,6 +18,11 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
+    type StudentRow = { id: string; fullName: string | null; group: string | null; createdAt: Date };
+    type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
+    type QuizAttemptRow = { userId: string; attemptedAt: Date };
+    type QuizResultRow = { userId: string; percentage: number; updatedAt: Date };
+
     const userFilter: Prisma.UserWhereInput = { role: 'student' };
     if (groupId) userFilter.group = groupId;
 
@@ -26,7 +31,7 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true, group: true, createdAt: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: StudentRow) => s.id);
 
     const progress = await getPrisma().progress.findMany({
       where: { userId: { in: studentIds }, updatedAt: { gte: since } },
@@ -49,7 +54,7 @@ export async function GET(request: NextRequest) {
       select: { userId: true, percentage: true, updatedAt: true },
     });
 
-    const groupNames = [...new Set(students.map((s) => s.group).filter(Boolean))];
+    const groupNames = [...new Set(students.map((s: StudentRow) => s.group).filter(Boolean))] as string[];
 
     interface GroupData {
       groupName: string;
@@ -70,12 +75,12 @@ export async function GET(request: NextRequest) {
     const groupsData: GroupData[] = [];
 
     for (const groupName of groupNames) {
-      const groupStudents = students.filter((s) => s.group === groupName);
-      const groupStudentIds = groupStudents.map((s) => s.id);
+      const groupStudents = students.filter((s: StudentRow) => s.group === groupName);
+      const groupStudentIds = groupStudents.map((s: StudentRow) => s.id);
 
-      const groupProgress = progress.filter((p) => groupStudentIds.includes(p.userId));
-      const groupQuizAttempts = quizAttempts.filter((q) => groupStudentIds.includes(q.userId));
-      const groupQuizResults = quizResults.filter((q) => groupStudentIds.includes(q.userId));
+      const groupProgress = progress.filter((p: ProgressRow) => groupStudentIds.includes(p.userId));
+      const groupQuizAttempts = quizAttempts.filter((q: QuizAttemptRow) => groupStudentIds.includes(q.userId));
+      const groupQuizResults = quizResults.filter((q: QuizResultRow) => groupStudentIds.includes(q.userId));
 
       const weekMap = new Map<
         string,
@@ -127,31 +132,31 @@ export async function GET(request: NextRequest) {
           quizAttempts: data.quizAttempts,
         }));
 
-      const scores = groupProgress.filter((p) => p.score != null).map((p) => p.score ?? 0);
-      const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+      const scores = groupProgress.filter((p: ProgressRow) => p.score != null).map((p: ProgressRow) => p.score ?? 0);
+      const avgScore = scores.length > 0 ? scores.reduce((a: number, b: number) => a + b, 0) / scores.length : 0;
       const variance =
-        scores.length > 1 ? scores.reduce((sum, s) => sum + Math.pow(s - avgScore, 2), 0) / scores.length : 0;
+        scores.length > 1 ? scores.reduce((sum: number, s: number) => sum + Math.pow(s - avgScore, 2), 0) / scores.length : 0;
       const performanceVariance = Math.round(Math.sqrt(variance) * 10) / 10;
 
       const studentScores = groupStudents
-        .map((s) => {
-          const sProgress = groupProgress.filter((p) => p.userId === s.id);
-          const sScores = sProgress.filter((p) => p.score != null).map((p) => p.score ?? 0);
-          return sScores.length > 0 ? sScores.reduce((a, b) => a + b, 0) / sScores.length : 0;
+        .map((s: StudentRow) => {
+          const sProgress = groupProgress.filter((p: ProgressRow) => p.userId === s.id);
+          const sScores = sProgress.filter((p: ProgressRow) => p.score != null).map((p: ProgressRow) => p.score ?? 0);
+          return sScores.length > 0 ? sScores.reduce((a: number, b: number) => a + b, 0) / sScores.length : 0;
         })
-        .sort((a, b) => b - a);
+        .sort((a: number, b: number) => b - a);
 
       const topQuartile = studentScores.slice(0, Math.max(1, Math.floor(studentScores.length / 4)));
       const restScores = studentScores.slice(Math.max(1, Math.floor(studentScores.length / 4)));
-      const topAvg = topQuartile.length > 0 ? topQuartile.reduce((a, b) => a + b, 0) / topQuartile.length : 0;
-      const restAvg = restScores.length > 0 ? restScores.reduce((a, b) => a + b, 0) / restScores.length : 0;
+      const topAvg = topQuartile.length > 0 ? topQuartile.reduce((a: number, b: number) => a + b, 0) / topQuartile.length : 0;
+      const restAvg = restScores.length > 0 ? restScores.reduce((a: number, b: number) => a + b, 0) / restScores.length : 0;
       const peerInfluenceScore = topAvg > 0 && restAvg > 0 ? Math.round((restAvg / topAvg) * 100) : 0;
 
       const integrationDays: number[] = [];
       for (const s of groupStudents) {
-        const sProgress = groupProgress.filter((p) => p.userId === s.id);
+        const sProgress = groupProgress.filter((p: ProgressRow) => p.userId === s.id);
         if (sProgress.length > 0) {
-          const firstActivity = new Date(Math.min(...sProgress.map((p) => p.updatedAt.getTime())));
+          const firstActivity = new Date(Math.min(...sProgress.map((p: ProgressRow) => p.updatedAt.getTime())));
           const daysToIntegrate = Math.floor(
             (firstActivity.getTime() - s.createdAt.getTime()) / (24 * 60 * 60 * 1000),
           );
@@ -173,7 +178,7 @@ export async function GET(request: NextRequest) {
           : 0;
       const completionRate =
         groupStudents.length > 0
-          ? Math.round((groupProgress.filter((p) => p.completed).length / (groupStudents.length * 10)) * 100)
+          ? Math.round((groupProgress.filter((p: ProgressRow) => p.completed).length / (groupStudents.length * 10)) * 100)
           : 0;
       const quizRate =
         groupStudents.length > 0
@@ -220,12 +225,12 @@ export async function GET(request: NextRequest) {
         week,
         avgHealthScore:
           Math.round((data.healthScores.reduce((a, b) => a + b, 0) / data.healthScores.length) * 10) / 10,
-        totalActive: students.filter((s) => {
+        totalActive: students.filter((s: StudentRow) => {
           const weekStart = new Date(week);
           const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
           return (
-            progress.some((p) => p.userId === s.id && p.updatedAt >= weekStart && p.updatedAt < weekEnd) ||
-            quizAttempts.some((q) => q.userId === s.id && q.attemptedAt >= weekStart && q.attemptedAt < weekEnd)
+            progress.some((p: ProgressRow) => p.userId === s.id && p.updatedAt >= weekStart && p.updatedAt < weekEnd) ||
+            quizAttempts.some((q: QuizAttemptRow) => q.userId === s.id && q.attemptedAt >= weekStart && q.attemptedAt < weekEnd)
           );
         }).length,
       }));

@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true, email: true, group: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: { id: string; fullName: string | null; email: string; group: string | null }) => s.id);
 
     const progress = await getPrisma().progress.findMany({
       where: { userId: { in: studentIds } },
@@ -97,12 +97,12 @@ export async function GET(request: NextRequest) {
     const studentsData: CertificationStudent[] = [];
 
     for (const student of students) {
-      const studentProgress = progress.filter((p) => p.userId === student.id);
-      const studentQuizResults = quizResults.filter((q) => q.userId === student.id);
-      const studentQuizAttempts = quizAttempts.filter((q) => q.userId === student.id);
+      const studentProgress = progress.filter((p: { userId: string; moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; studiedOwaspItems: string | null }) => p.userId === student.id);
+      const studentQuizResults = quizResults.filter((q: { userId: string; quizId: string; percentage: number }) => q.userId === student.id);
+      const studentQuizAttempts = quizAttempts.filter((q: { userId: string; category: string; correct: boolean }) => q.userId === student.id);
 
       // Modules completed
-      const modulesCompleted = studentProgress.filter((p) => p.completed).length;
+      const modulesCompleted = studentProgress.filter((p: { userId: string; moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; studiedOwaspItems: string | null }) => p.completed).length;
 
       // Quiz category scores
       const categoryScores: Record<string, number[]> = {};
@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
       });
 
       // Achievements count
-      const completedModuleIds = studentProgress.filter((p) => p.completed).map((p) => p.moduleId);
+      const completedModuleIds = studentProgress.filter((p: { userId: string; moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; studiedOwaspItems: string | null }) => p.completed).map((p: { userId: string; moduleId: string; completed: boolean; score: number | null; sqlLevels: string | null; xssLevels: string | null; csrfSteps: string | null; secureCodingAnswers: string | null; studiedOwaspItems: string | null }) => p.moduleId);
       const quizState: Record<string, number> = {};
       for (const qr of studentQuizResults) {
         quizState[qr.quizId] = qr.percentage;

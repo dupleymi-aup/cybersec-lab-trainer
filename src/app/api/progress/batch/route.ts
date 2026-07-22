@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
+import type { PrismaClient } from '@prisma/client';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseBody } from '@/lib/utils';
 import { logger } from '@/lib/logger';
@@ -36,13 +37,13 @@ export async function GET(request: NextRequest) {
         where: { id: { in: userIds }, role: 'student' },
         select: { id: true, group: true },
       });
-      allowedIds = targetUsers.filter((u) => u.group === auth.group).map((u) => u.id);
+      allowedIds = targetUsers.filter((u: { id: string; group: string | null }) => u.group === auth.group).map((u: { id: string }) => u.id);
     } else if (auth.role === 'admin') {
       const targetUsers = await getPrisma().user.findMany({
         where: { id: { in: userIds }, role: 'student' },
         select: { id: true },
       });
-      allowedIds = targetUsers.map((u) => u.id);
+      allowedIds = targetUsers.map((u: { id: string }) => u.id);
     }
 
     if (allowedIds.length === 0) {
@@ -153,12 +154,13 @@ export async function POST(request: NextRequest) {
 
     // Wrap all operations in a transaction for atomicity
     const results = await getPrisma().$transaction(async (tx) => {
+      const client = tx as unknown as PrismaClient;
       let progressSaved = 0;
       let quizSaved = 0;
 
       // Save progress
       for (const p of progressArray) {
-        await tx.progress.upsert({
+        await client.progress.upsert({
           where: { userId_moduleId: { userId: auth.id, moduleId: p.moduleId } },
           create: {
             id: crypto.randomUUID(),
@@ -223,7 +225,7 @@ export async function POST(request: NextRequest) {
       // Save quiz results
       for (const q of quizArray) {
         const percentage = q.total > 0 ? Math.round((q.score / q.total) * 100) : 0;
-        await tx.quizResult.upsert({
+        await client.quizResult.upsert({
           where: { userId_quizId: { userId: auth.id, quizId: q.quizId } },
           create: {
             id: crypto.randomUUID(),

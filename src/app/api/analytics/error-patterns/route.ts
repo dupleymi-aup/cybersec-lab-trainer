@@ -45,10 +45,10 @@ export async function GET(request: NextRequest) {
     const users = await getPrisma().user.findMany({
       select: { id: true, group: true },
     });
-    const filteredUsers = new Set(users.filter((u) => !groupId || u.group === groupId).map((u) => u.id));
+    const filteredUsers = new Set(users.filter((u: { id: string; group: string }) => !groupId || u.group === groupId).map((u: { id: string; group: string }) => u.id));
 
     // Filter attempts
-    const _filteredIncorrect = incorrectAttempts.filter((a) => filteredUsers.has(a.userId));
+    const _filteredIncorrect = incorrectAttempts.filter((a: { userId: string }) => filteredUsers.has(a.userId));
     const filteredAll = allAttempts; // We need all for question stats
 
     // Calculate question-level error rates

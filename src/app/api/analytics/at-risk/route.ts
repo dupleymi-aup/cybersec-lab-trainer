@@ -21,6 +21,9 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
+    type StudentRow = { id: string; fullName: string; email: string; group: string; course: string; university: string; lastLoginAt: Date | null };
+    type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
+    type QuizResultRow = { userId: string; percentage: number; updatedAt: Date };
     const students = await getPrisma().user.findMany({
       where: userWhere,
       select: {
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: StudentRow) => s.id);
     const totalStudents = students.length;
 
     const progressRecords = await getPrisma().progress.findMany({
@@ -97,11 +100,11 @@ export async function GET(request: NextRequest) {
       const studentQuizResults = quizByUser.get(student.id) || [];
       const studentQuizAttempts = attemptsByUser.get(student.id) || [];
 
-      const modulesCompleted = studentProgress.filter((p) => p.completed).length;
+      const modulesCompleted = studentProgress.filter((p: ProgressRow) => p.completed).length;
       const avgQuizScore =
         studentQuizResults.length > 0
           ? Math.round(
-              (studentQuizResults.reduce((sum, q) => sum + q.percentage, 0) / studentQuizResults.length) * 10,
+              (studentQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / studentQuizResults.length) * 10,
             ) / 10
           : 0;
 
@@ -110,8 +113,8 @@ export async function GET(request: NextRequest) {
         ? new Date(
             Math.max(
               student.lastLoginAt.getTime(),
-              ...studentProgress.map((p) => p.updatedAt.getTime()),
-              ...studentQuizResults.map((q) => q.updatedAt.getTime()),
+              ...studentProgress.map((p: ProgressRow) => p.updatedAt.getTime()),
+              ...studentQuizResults.map((q: QuizResultRow) => q.updatedAt.getTime()),
             ),
           )
         : null;
@@ -122,17 +125,17 @@ export async function GET(request: NextRequest) {
       // Trend calculation: compare last 2 weeks vs previous 2 weeks
       const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
       const fourWeeksAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000);
-      const recentActivity = studentQuizResults.filter((q) => q.updatedAt >= twoWeeksAgo).length;
+      const recentActivity = studentQuizResults.filter((q: QuizResultRow) => q.updatedAt >= twoWeeksAgo).length;
       const previousActivity = studentQuizResults.filter(
-        (q) => q.updatedAt >= fourWeeksAgo && q.updatedAt < twoWeeksAgo,
+        (q: QuizResultRow) => q.updatedAt >= fourWeeksAgo && q.updatedAt < twoWeeksAgo,
       ).length;
-      const recentScores = studentQuizResults.filter((q) => q.updatedAt >= twoWeeksAgo).map((q) => q.percentage);
+      const recentScores = studentQuizResults.filter((q: QuizResultRow) => q.updatedAt >= twoWeeksAgo).map((q: QuizResultRow) => q.percentage);
       const previousScores = studentQuizResults
-        .filter((q) => q.updatedAt >= fourWeeksAgo && q.updatedAt < twoWeeksAgo)
-        .map((q) => q.percentage);
-      const recentAvg = recentScores.length > 0 ? recentScores.reduce((a, b) => a + b, 0) / recentScores.length : 0;
+        .filter((q: QuizResultRow) => q.updatedAt >= fourWeeksAgo && q.updatedAt < twoWeeksAgo)
+        .map((q: QuizResultRow) => q.percentage);
+      const recentAvg = recentScores.length > 0 ? recentScores.reduce((a: number, b: number) => a + b, 0) / recentScores.length : 0;
       const previousAvg =
-        previousScores.length > 0 ? previousScores.reduce((a, b) => a + b, 0) / previousScores.length : 0;
+        previousScores.length > 0 ? previousScores.reduce((a: number, b: number) => a + b, 0) / previousScores.length : 0;
 
       let trend: 'improving' | 'declining' | 'stable' = 'stable';
       if (recentAvg > previousAvg + 5 || recentActivity > previousActivity + 2) trend = 'improving';

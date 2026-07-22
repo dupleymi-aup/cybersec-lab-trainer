@@ -22,8 +22,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       take: 50,
     });
 
+    type LoginActivityRow = { id: string; userId: string; email: string; ip: string; userAgent: string; success: boolean; timestamp: Date };
     return NextResponse.json({
-      activities: activities.map((a) => ({
+      activities: activities.map((a: LoginActivityRow) => ({
         id: a.id,
         userId: a.userId,
         email: a.email,

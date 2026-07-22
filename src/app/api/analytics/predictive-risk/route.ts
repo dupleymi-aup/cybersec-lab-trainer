@@ -29,9 +29,14 @@ export async function GET(request: NextRequest) {
     });
 
     // Get quiz results for each student
+    type StudentRow = { id: string; fullName: string; group: string; lastLoginAt: Date | null; loginCount: number };
+    type QuizResultRow = { userId: string; percentage: number; createdAt: Date };
+    type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
+    type LoginRow = { userId: string; timestamp: Date };
+
     const quizResults = await getPrisma().quizResult.findMany({
       where: {
-        userId: { in: students.map((s) => s.id) },
+        userId: { in: students.map((s: StudentRow) => s.id) },
         createdAt: { gte: since },
       },
       select: { userId: true, percentage: true, createdAt: true },
@@ -41,7 +46,7 @@ export async function GET(request: NextRequest) {
     // Get progress for each student
     const progress = await getPrisma().progress.findMany({
       where: {
-        userId: { in: students.map((s) => s.id) },
+        userId: { in: students.map((s: StudentRow) => s.id) },
         updatedAt: { gte: since },
       },
       select: {
@@ -56,7 +61,7 @@ export async function GET(request: NextRequest) {
     // Get login activity
     const logins = await getPrisma().loginActivity.findMany({
       where: {
-        userId: { in: students.map((s) => s.id) },
+        userId: { in: students.map((s: StudentRow) => s.id) },
         timestamp: { gte: since },
       },
       select: { userId: true, timestamp: true },
@@ -84,9 +89,9 @@ export async function GET(request: NextRequest) {
     const studentRisks: StudentRisk[] = [];
 
     for (const student of students) {
-      const studentQuizzes = quizResults.filter((q) => q.userId === student.id);
-      const studentProgress = progress.filter((p) => p.userId === student.id);
-      const studentLogins = logins.filter((l) => l.userId === student.id);
+      const studentQuizzes = quizResults.filter((q: QuizResultRow) => q.userId === student.id);
+      const studentProgress = progress.filter((p: ProgressRow) => p.userId === student.id);
+      const studentLogins = logins.filter((l: LoginRow) => l.userId === student.id);
 
       // Factor 1: Login frequency decay (weight: 25%)
       const expectedLogins = (days / 7) * 2; // Assume 2 logins per week
@@ -97,15 +102,15 @@ export async function GET(request: NextRequest) {
       let quizScoreTrend = 50; // neutral
       if (studentQuizzes.length >= 2) {
         const midPoint = Math.floor(studentQuizzes.length / 2);
-        const firstHalf = studentQuizzes.slice(0, midPoint).reduce((s, q) => s + q.percentage, 0) / midPoint;
+        const firstHalf = studentQuizzes.slice(0, midPoint).reduce((s: number, q: QuizResultRow) => s + q.percentage, 0) / midPoint;
         const secondHalf =
-          studentQuizzes.slice(midPoint).reduce((s, q) => s + q.percentage, 0) / (studentQuizzes.length - midPoint);
+          studentQuizzes.slice(midPoint).reduce((s: number, q: QuizResultRow) => s + q.percentage, 0) / (studentQuizzes.length - midPoint);
         const trend = secondHalf - firstHalf; // positive = improving, negative = declining
         quizScoreTrend = Math.max(0, Math.min(100, Math.round(50 - trend)));
       }
 
       // Factor 3: Module completion velocity (weight: 20%)
-      const completedModules = studentProgress.filter((p) => p.completed).length;
+      const completedModules = studentProgress.filter((p: ProgressRow) => p.completed).length;
       const totalModules = 8; // Total modules in system
       const completionRatio = completedModules / totalModules;
       const completionScore = Math.max(0, Math.min(100, Math.round((1 - completionRatio) * 100)));
@@ -117,7 +122,7 @@ export async function GET(request: NextRequest) {
       const inactivityScore = Math.min(100, Math.round((daysSinceLastLogin / days) * 100));
 
       // Factor 5: Quiz attempt decline (weight: 10%)
-      const recentQuizzes = studentQuizzes.filter((q) => {
+      const recentQuizzes = studentQuizzes.filter((q: QuizResultRow) => {
         const daysAgo = Math.floor((now.getTime() - q.createdAt.getTime()) / (24 * 60 * 60 * 1000));
         return daysAgo <= days / 2;
       }).length;

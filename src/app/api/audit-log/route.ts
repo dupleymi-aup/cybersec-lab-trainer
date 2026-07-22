@@ -22,8 +22,9 @@ export async function GET(request: NextRequest) {
       take: 500,
     });
 
+    type AuditLogRow = { id: string; adminId: string; adminName: string; action: string; targetId: string; targetName: string; details: string; timestamp: Date };
     return NextResponse.json({
-      logs: logs.map((l) => ({
+      logs: logs.map((l: AuditLogRow) => ({
         id: l.id,
         adminId: l.adminId,
         adminName: l.adminName,

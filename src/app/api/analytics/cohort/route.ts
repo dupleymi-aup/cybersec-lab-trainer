@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: { id: string }) => s.id);
 
     // Fetch all progress records for these students
     const progressRecords = await getPrisma().progress.findMany({

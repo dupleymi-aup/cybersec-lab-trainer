@@ -49,12 +49,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         course: user.course,
         university: user.university,
       },
-      progress.map((p) => ({
+      progress.map((p: { moduleId: string; completed: boolean; score: number | null }) => ({
         moduleId: p.moduleId,
         completed: p.completed,
         score: p.score,
       })),
-      quizResults.map((q) => ({
+      quizResults.map((q: { quizId: string; score: number; total: number; percentage: number }) => ({
         quizId: q.quizId,
         score: q.score,
         total: q.total,

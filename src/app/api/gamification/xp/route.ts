@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPrisma, PrismaTransactionClient } from '@/lib/db';
+import { getPrisma } from '@/lib/db';
+import type { PrismaClient } from '@prisma/client';
 import { authenticate, unauthorized, forbidden, checkRateLimit } from '@/lib/api-middleware';
 import { getLevel, XP_REWARDS } from '@/lib/xp-utils';
 import { xpActionSchema } from '@/lib/validations/api';
@@ -34,9 +35,10 @@ export async function POST(request: NextRequest) {
     // Use transaction to prevent race condition on XP + streak updates
     const result = await getPrisma()
       .$transaction(async (tx) => {
+        const client = tx as unknown as PrismaClient;
         const xpAmount =
           action === 'daily_login'
-            ? await calculateDailyLoginXp(tx, auth.id)
+            ? await calculateDailyLoginXp(client, auth.id)
             : (() => {
                 switch (action) {
                   case 'module_complete':
@@ -61,7 +63,7 @@ export async function POST(request: NextRequest) {
         // Re-check daily cap inside transaction
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
-        const xpToday = await tx.xpLog.aggregate({
+        const xpToday = await client.xpLog.aggregate({
           where: { userId: auth.id, createdAt: { gte: todayStart } },
           _sum: { amount: true },
         });
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
           throw new Error('DAILY_CAP');
         }
 
-        const user = await tx.user.update({
+        const user = await client.user.update({
           where: { id: auth.id },
           data: {
             xp: { increment: xpAmount },
@@ -80,7 +82,7 @@ export async function POST(request: NextRequest) {
           select: { id: true, xp: true, level: true, streak: true },
         });
 
-        await tx.xpLog.create({
+        await client.xpLog.create({
           data: {
             userId: auth.id,
             amount: xpAmount,
@@ -91,7 +93,7 @@ export async function POST(request: NextRequest) {
         const newLevel = getLevel(user.xp);
         const leveledUp = newLevel.level > user.level;
 
-        const updated = await tx.user.update({
+        const updated = await client.user.update({
           where: { id: auth.id },
           data: { level: newLevel.level },
         });
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
           streak: user.streak,
         };
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         if (err instanceof Error && err.message === 'NO_XP') return null;
         if (err instanceof Error && err.message === 'DAILY_CAP') return null;
         throw err;
@@ -152,8 +154,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function calculateDailyLoginXp(tx: PrismaTransactionClient, userId: string): Promise<number> {
-  const user = await tx.user.findUnique({
+async function calculateDailyLoginXp(client: PrismaClient, userId: string): Promise<number> {
+  const user = await client.user.findUnique({
     where: { id: userId },
     select: { lastActivityAt: true, streak: true },
   });
@@ -164,7 +166,7 @@ async function calculateDailyLoginXp(tx: PrismaTransactionClient, userId: string
   const last = user.lastActivityAt;
 
   if (!last) {
-    await tx.user.update({
+    await client.user.update({
       where: { id: userId },
       data: { streak: 1 },
     });
@@ -180,14 +182,14 @@ async function calculateDailyLoginXp(tx: PrismaTransactionClient, userId: string
   if (diffDays === 1) {
     const newStreak = (user.streak || 0) + 1;
     const bonusXP = XP_REWARDS.dailyLogin + newStreak * XP_REWARDS.streakBonus;
-    await tx.user.update({
+    await client.user.update({
       where: { id: userId },
       data: { streak: newStreak },
     });
     return bonusXP;
   }
 
-  await tx.user.update({
+  await client.user.update({
     where: { id: userId },
     data: { streak: 1 },
   });

@@ -42,16 +42,19 @@ export async function GET(request: NextRequest) {
     const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
     const prevSince = new Date(now.getTime() - days * 2 * 24 * 60 * 60 * 1000);
 
+    type StudentRow = { id: string; fullName: string | null; group: string | null; lastLoginAt: Date | null };
+    type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null };
+    type QuizResultRow = { userId: string; percentage: number; score: number; total: number };
     const students = await getPrisma().user.findMany({
       where: userWhere,
       select: { id: true, fullName: true, group: true, lastLoginAt: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: StudentRow) => s.id);
     const totalStudents = students.length;
 
     // Current period data
-    const activeStudents = students.filter((s) => s.lastLoginAt && s.lastLoginAt >= since).length;
+    const activeStudents = students.filter((s: StudentRow) => s.lastLoginAt && s.lastLoginAt >= since).length;
     const activePercentage = totalStudents > 0 ? Math.round((activeStudents / totalStudents) * 10000) / 100 : 0;
 
     const progressRecords = await getPrisma().progress.findMany({
@@ -71,13 +74,13 @@ export async function GET(request: NextRequest) {
 
     // Compute metrics
     const totalModules = 8;
-    const totalCompleted = progressRecords.filter((p) => p.completed).length;
+    const totalCompleted = progressRecords.filter((p: ProgressRow) => p.completed).length;
     const avgCompletionRate =
       totalStudents > 0 ? Math.round((totalCompleted / (totalStudents * totalModules)) * 10000) / 100 : 0;
 
     const avgQuizScore =
       quizResults.length > 0
-        ? Math.round((quizResults.reduce((sum, q) => sum + q.percentage, 0) / quizResults.length) * 10) / 10
+        ? Math.round((quizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / quizResults.length) * 10) / 10
         : 0;
 
     // Engagement score (composite 0-100)
@@ -101,7 +104,7 @@ export async function GET(request: NextRequest) {
 
     // Previous period data
     const prevActiveStudents = students.filter(
-      (s) => s.lastLoginAt && s.lastLoginAt >= prevSince && s.lastLoginAt < since,
+      (s: StudentRow) => s.lastLoginAt && s.lastLoginAt >= prevSince && s.lastLoginAt < since,
     ).length;
     const prevActivePercentage =
       totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * 10000) / 100 : 0;
@@ -122,12 +125,12 @@ export async function GET(request: NextRequest) {
       select: { percentage: true },
     });
 
-    const prevCompleted = prevProgress.filter((p) => p.completed).length;
+    const prevCompleted = prevProgress.filter((p: ProgressRow) => p.completed).length;
     const prevAvgCompletionRate =
       totalStudents > 0 ? Math.round((prevCompleted / (totalStudents * totalModules)) * 10000) / 100 : 0;
     const prevAvgQuizScore =
       prevQuizResults.length > 0
-        ? Math.round((prevQuizResults.reduce((sum, q) => sum + q.percentage, 0) / prevQuizResults.length) * 10) / 10
+        ? Math.round((prevQuizResults.reduce((sum: number, q: { percentage: number }) => sum + q.percentage, 0) / prevQuizResults.length) * 10) / 10
         : 0;
 
     const prevActivityFactor = Math.min(25, Math.round((prevActivePercentage / 100) * 25));
@@ -186,11 +189,11 @@ export async function GET(request: NextRequest) {
 
     const moduleDistribution = Object.keys(MODULE_NAMES).map((moduleId) => {
       const mp = progressByModule.get(moduleId) || [];
-      const completed = mp.filter((p) => p.completed).length;
+      const completed = mp.filter((p: ProgressRow) => p.completed).length;
       const completionRate = totalStudents > 0 ? Math.round((completed / totalStudents) * 10000) / 100 : 0;
-      const scores = mp.filter((p) => p.score != null).map((p) => p.score as number);
+      const scores = mp.filter((p: ProgressRow) => p.score != null).map((p: ProgressRow) => p.score as number);
       const avgScore =
-        scores.length > 0 ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10 : 0;
+        scores.length > 0 ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 10) / 10 : 0;
       return {
         moduleId,
         moduleName: MODULE_NAMES[moduleId],
@@ -200,29 +203,29 @@ export async function GET(request: NextRequest) {
     });
 
     // Score distribution
-    const studentScores = students.map((student) => {
+    const studentScores = students.map((student: StudentRow) => {
       const studentQuizzes = quizByUser.get(student.id) || [];
       return studentQuizzes.length > 0
-        ? studentQuizzes.reduce((sum, q) => sum + q.percentage, 0) / studentQuizzes.length
+        ? studentQuizzes.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / studentQuizzes.length
         : -1; // not attempted
     });
 
     const scoreDistribution = {
-      excellent: studentScores.filter((s) => s >= 90).length,
-      good: studentScores.filter((s) => s >= 70 && s < 90).length,
-      average: studentScores.filter((s) => s >= 50 && s < 70).length,
-      poor: studentScores.filter((s) => s >= 0 && s < 50).length,
-      notAttempted: studentScores.filter((s) => s < 0).length,
+      excellent: studentScores.filter((s: number) => s >= 90).length,
+      good: studentScores.filter((s: number) => s >= 70 && s < 90).length,
+      average: studentScores.filter((s: number) => s >= 50 && s < 70).length,
+      poor: studentScores.filter((s: number) => s >= 0 && s < 50).length,
+      notAttempted: studentScores.filter((s: number) => s < 0).length,
     };
 
     // Top performers
-    const studentPerformance = students.map((student) => {
+    const studentPerformance = students.map((student: StudentRow) => {
       const studentQuizzes = quizByUser.get(student.id) || [];
       const avgScore =
         studentQuizzes.length > 0
-          ? studentQuizzes.reduce((sum, q) => sum + q.percentage, 0) / studentQuizzes.length
+          ? studentQuizzes.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / studentQuizzes.length
           : 0;
-      const studentProgress = (progressByUser.get(student.id) || []).filter((p) => p.completed).length;
+      const studentProgress = (progressByUser.get(student.id) || []).filter((p: ProgressRow) => p.completed).length;
       const compositeScore = Math.round((avgScore * 0.6 + (studentProgress / totalModules) * 100 * 0.4) * 10) / 10;
       return {
         userId: student.id,
@@ -232,7 +235,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    const topPerformers = studentPerformance.sort((a, b) => b.score - a.score).slice(0, 10);
+    const topPerformers = studentPerformance.sort((a: { score: number }, b: { score: number }) => b.score - a.score).slice(0, 10);
 
     // Recent activity (simplified - last 20 events from various sources)
     const recentActivity: Array<{
@@ -252,7 +255,7 @@ export async function GET(request: NextRequest) {
 
     for (const login of recentLogins) {
       if (login.userId) {
-        const student = students.find((s) => s.id === login.userId);
+        const student = students.find((s: StudentRow) => s.id === login.userId);
         if (student) {
           recentActivity.push({
             type: 'login',

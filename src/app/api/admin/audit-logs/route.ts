@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     return NextResponse.json({
-      logs: logs.map((log) => ({
+      logs: logs.map((log: { id: string; adminId: string; adminName: string; action: string; targetId: string; targetName: string; details: string; timestamp: Date; admin: { id: string; email: string; fullName: string; role: string } | null }) => ({
         id: log.id,
         adminId: log.adminId,
         adminName: log.adminName,

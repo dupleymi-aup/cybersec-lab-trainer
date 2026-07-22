@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
   let deletedCount = 0;
   if (recordsToDelete.length > 0) {
-    const ids = recordsToDelete.map((r) => r.id);
+    const ids = recordsToDelete.map((r: { id: string }) => r.id);
     const deleteResult = await getPrisma().auditLog.deleteMany({
       where: { id: { in: ids } },
     });

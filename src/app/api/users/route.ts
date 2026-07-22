@@ -73,8 +73,9 @@ export async function GET(request: NextRequest) {
     getPrisma().user.count({ where }),
   ]);
 
+  type UserRow = { id: string; email: string; phone: string | null; fullName: string | null; group: string | null; course: string | null; university: string | null; avatar: string | null; bio: string | null; role: string; createdAt: Date; lastLoginAt: Date | null; loginCount?: number; isBlocked?: boolean };
   return NextResponse.json({
-    users: users.map((u) => ({
+    users: users.map((u: UserRow) => ({
       ...u,
       createdAt: u.createdAt.toISOString(),
       lastLoginAt: u.lastLoginAt?.toISOString(),

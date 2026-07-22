@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       select: { id: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: { id: string }) => s.id);
 
     const quizAttempts = await getPrisma().quizAttempt.findMany({
       where: {
@@ -65,11 +65,11 @@ export async function GET(request: NextRequest) {
     }
 
     const categories = Array.from(categoriesMap.entries()).map(([catId, attempts]) => {
-      const uniqueStudents = new Set(attempts.map((a) => a.userId)).size;
-      const correctCount = attempts.filter((a) => a.correct).length;
+      const uniqueStudents = new Set(attempts.map((a: { questionId: string; category: string; difficulty: string; correct: boolean; userId: string }) => a.userId)).size;
+      const correctCount = attempts.filter((a: { questionId: string; category: string; difficulty: string; correct: boolean; userId: string }) => a.correct).length;
       const avgScore = attempts.length > 0 ? Math.round((correctCount / attempts.length) * 10000) / 100 : 0;
       const passRate =
-        attempts.length > 0 ? Math.round((attempts.filter((a) => a.correct).length / attempts.length) * 10000) / 100 : 0;
+        attempts.length > 0 ? Math.round((attempts.filter((a: { questionId: string; category: string; difficulty: string; correct: boolean; userId: string }) => a.correct).length / attempts.length) * 10000) / 100 : 0;
 
       // Question-level stats
       const questionMap = new Map<string, typeof attempts>();
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
       }
 
       const questionStats = Array.from(questionMap.entries()).map(([questionId, qAttempts]) => {
-        const qCorrect = qAttempts.filter((a) => a.correct).length;
+        const qCorrect = qAttempts.filter((a: { questionId: string; category: string; difficulty: string; correct: boolean; userId: string }) => a.correct).length;
         const correctRate = qAttempts.length > 0 ? Math.round((qCorrect / qAttempts.length) * 10000) / 100 : 0;
         const first = qAttempts[0];
         return {

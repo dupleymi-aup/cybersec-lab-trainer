@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
   // Build CSV rows
   const rows = [
     headers.join(','),
-    ...users.map((u) =>
+    ...users.map((u: { id: string; email: string; phone: string | null; fullName: string; group: string | null; course: string | null; university: string | null; role: string; createdAt: Date; lastLoginAt: Date | null; loginCount: number; isBlocked: boolean }) =>
       [
         escapeCsvField(u.id),
         escapeCsvField(u.email),

@@ -34,7 +34,11 @@ export async function GET(request: NextRequest) {
       orderBy: { fullName: 'asc' },
     });
 
-    const studentIds = students.map((s) => s.id);
+    type StudentRow = { id: string; fullName: string; email: string; group: string };
+    type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
+    type QuizResultRow = { userId: string; percentage: number; updatedAt: Date };
+
+    const studentIds = students.map((s: StudentRow) => s.id);
 
     // Get progress for all students
     const progressRecords = await getPrisma().progress.findMany({
@@ -55,21 +59,21 @@ export async function GET(request: NextRequest) {
     });
 
     // Get unique module IDs
-    const moduleIds = Array.from(new Set(progressRecords.map((p) => p.moduleId)));
+    const moduleIds: string[] = Array.from(new Set(progressRecords.map((p: ProgressRow) => p.moduleId)));
     const modules = moduleIds.map((id) => ({
       moduleId: id,
       moduleName: getModuleName(id),
     }));
 
     // Build student data
-    const studentData = students.map((student) => {
-      const studentProgress = progressRecords.filter((p) => p.userId === student.id);
-      const studentQuizResults = quizResults.filter((q) => q.userId === student.id);
+    const studentData = students.map((student: StudentRow) => {
+      const studentProgress = progressRecords.filter((p: ProgressRow) => p.userId === student.id);
+      const studentQuizResults = quizResults.filter((q: QuizResultRow) => q.userId === student.id);
 
       const avgQuizScore =
         studentQuizResults.length > 0
           ? Math.round(
-              (studentQuizResults.reduce((sum, q) => sum + q.percentage, 0) / studentQuizResults.length) * 10,
+              (studentQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / studentQuizResults.length) * 10,
             ) / 10
           : 0;
 
@@ -78,8 +82,8 @@ export async function GET(request: NextRequest) {
         studentProgress.length > 0 || studentQuizResults.length > 0
           ? new Date(
               Math.max(
-                ...studentProgress.map((p) => p.updatedAt.getTime()),
-                ...studentQuizResults.map((q) => q.updatedAt.getTime()),
+                ...studentProgress.map((p: ProgressRow) => p.updatedAt.getTime()),
+                ...studentQuizResults.map((q: QuizResultRow) => q.updatedAt.getTime()),
               ),
             )
           : null;

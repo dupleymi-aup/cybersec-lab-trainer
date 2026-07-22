@@ -23,8 +23,9 @@ export async function GET(_request: NextRequest) {
       },
     });
 
+    type AnnouncementRow = { id: string; title: string; content: string; author: string; priority: string; expiresAt: Date | null; createdAt: Date };
     return NextResponse.json({
-      announcements: announcements.map((a) => ({
+      announcements: announcements.map((a: AnnouncementRow) => ({
         ...a,
         expiresAt: a.expiresAt?.toISOString() ?? null,
         createdAt: a.createdAt.toISOString(),

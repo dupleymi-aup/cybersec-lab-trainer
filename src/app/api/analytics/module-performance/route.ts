@@ -30,12 +30,15 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
+    type StudentRow = { id: string; group: string | null; course: string | null; university: string | null };
+    type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null };
+
     const students = await getPrisma().user.findMany({
       where: userWhere,
       select: { id: true, group: true, course: true, university: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: StudentRow) => s.id);
     const totalStudents = students.length;
 
     const progressRecords = await getPrisma().progress.findMany({
@@ -48,18 +51,18 @@ export async function GET(request: NextRequest) {
 
     const moduleIds = Object.keys(MODULE_NAMES);
     const modules = moduleIds.map((moduleId) => {
-      const moduleProgress = progressRecords.filter((p) => p.moduleId === moduleId);
-      const completedCount = moduleProgress.filter((p) => p.completed).length;
-      const scores = moduleProgress.filter((p) => p.score != null).map((p) => p.score as number);
+      const moduleProgress = progressRecords.filter((p: ProgressRow) => p.moduleId === moduleId);
+      const completedCount = moduleProgress.filter((p: ProgressRow) => p.completed).length;
+      const scores = moduleProgress.filter((p: ProgressRow) => p.score != null).map((p: ProgressRow) => p.score as number);
       const avgScore =
-        scores.length > 0 ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100) / 100 : 0;
+        scores.length > 0 ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 100) / 100 : 0;
       const avgScoreForCompleted =
-        moduleProgress.filter((p) => p.completed && p.score != null).length > 0
+        moduleProgress.filter((p: ProgressRow) => p.completed && p.score != null).length > 0
           ? Math.round(
               (moduleProgress
-                .filter((p) => p.completed && p.score != null)
-                .reduce((sum, p) => sum + (p.score as number), 0) /
-                moduleProgress.filter((p) => p.completed && p.score != null).length) *
+                .filter((p: ProgressRow) => p.completed && p.score != null)
+                .reduce((sum: number, p: ProgressRow) => sum + (p.score as number), 0) /
+                moduleProgress.filter((p: ProgressRow) => p.completed && p.score != null).length) *
                 100,
             ) / 100
           : 0;
@@ -81,7 +84,7 @@ export async function GET(request: NextRequest) {
     if (groupBy === 'group' || groupBy === 'course' || groupBy === 'university') {
       const field = groupBy as 'group' | 'course' | 'university';
       const groups = new Map<string, typeof progressRecords>();
-      const studentById = new Map(students.map((s) => [s.id, s]));
+      const studentById = new Map<string, StudentRow>(students.map((s: StudentRow) => [s.id, s]));
 
       for (const s of students) {
         const key = s[field] || '(not specified)';
@@ -98,11 +101,11 @@ export async function GET(request: NextRequest) {
 
       byGroup = Array.from(groups.entries()).map(([key, records]) => {
         const groupModules = moduleIds.map((moduleId) => {
-          const mp = records.filter((p) => p.moduleId === moduleId);
-          const completedCount = mp.filter((p) => p.completed).length;
-          const scores = mp.filter((p) => p.score != null).map((p) => p.score as number);
+          const mp = records.filter((p: ProgressRow) => p.moduleId === moduleId);
+          const completedCount = mp.filter((p: ProgressRow) => p.completed).length;
+          const scores = mp.filter((p: ProgressRow) => p.score != null).map((p: ProgressRow) => p.score as number);
           const avgScore =
-            scores.length > 0 ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100) / 100 : 0;
+            scores.length > 0 ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 100) / 100 : 0;
           const completionRate = totalStudents > 0 ? Math.round((completedCount / totalStudents) * 10000) / 100 : 0;
           return {
             moduleId,
