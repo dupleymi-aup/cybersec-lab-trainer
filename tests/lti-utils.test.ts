@@ -45,6 +45,7 @@ import {
   signAgsToken,
   syncGradesToPlatform,
   fetchNrpsMembers,
+  verifyLtiLaunch,
 } from '@/lib/lti-utils';
 import { getPrisma } from '@/lib/db';
 import { jwtVerify } from 'jose';
@@ -351,5 +352,152 @@ describe('fetchNrpsMembers', () => {
     expect(members[0]).toEqual({
       userId: 'u1', email: '', name: '', status: 'Active',
     });
+  });
+});
+
+describe('verifyLtiLaunch', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const validPayload = {
+    sub: 'user-123',
+    iss: 'https://lms.example.com',
+    name: 'Test User',
+    email: 'test@example.com',
+    roles: ['http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'],
+    'https://purl.imsglobal.org/spec/lti/claim/deployment_id': 'dep-1',
+    'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest',
+    'https://purl.imsglobal.org/spec/lti/claim/version': '1.3.0',
+  };
+
+  it('should verify a valid LTI launch token', async () => {
+    vi.mocked(jwtVerify).mockResolvedValue({
+      payload: validPayload as any,
+      keyHeader: { alg: 'RS256' },
+    } as any);
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ keys: [{ kty: 'RSA', kid: 'key1' }] }),
+    });
+
+    const result = await verifyLtiLaunch(
+      'valid-token',
+      'https://lms.example.com',
+      'https://lms.example.com/jwks',
+      'client-1',
+      'dep-1',
+    );
+    expect(result.sub).toBe('user-123');
+    expect(result.iss).toBe('https://lms.example.com');
+  });
+
+  it('should throw when no keys match', async () => {
+    vi.mocked(jwtVerify).mockRejectedValue(new Error('invalid signature'));
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ keys: [{ kty: 'RSA', kid: 'key1' }] }),
+    });
+
+    await expect(verifyLtiLaunch(
+      'bad-token', 'https://lms.example.com', 'https://lms.example.com/jwks', 'client-1', 'dep-1',
+    )).rejects.toThrow('Invalid LTI launch token');
+  });
+
+  it('should throw when JWKS fetch fails', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+
+    await expect(verifyLtiLaunch(
+      'token', 'https://lms.example.com', 'https://lms.example.com/jwks', 'client-1', 'dep-1',
+    )).rejects.toThrow();
+  });
+
+  it('should throw on issuer mismatch', async () => {
+    vi.mocked(jwtVerify).mockResolvedValue({
+      payload: { ...validPayload, iss: 'https://evil.com' } as any,
+      keyHeader: { alg: 'RS256' },
+    } as any);
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ keys: [{ kty: 'RSA', kid: 'key1' }] }),
+    });
+
+    await expect(verifyLtiLaunch(
+      'token', 'https://lms.example.com', 'https://lms.example.com/jwks', 'client-1', 'dep-1',
+    )).rejects.toThrow('Issuer mismatch');
+  });
+
+  it('should throw when sub is missing', async () => {
+    vi.mocked(jwtVerify).mockResolvedValue({
+      payload: { ...validPayload, sub: undefined } as any,
+      keyHeader: { alg: 'RS256' },
+    } as any);
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ keys: [{ kty: 'RSA', kid: 'key1' }] }),
+    });
+
+    await expect(verifyLtiLaunch(
+      'token', 'https://lms.example.com', 'https://lms.example.com/jwks', 'client-1', 'dep-1',
+    )).rejects.toThrow('Missing sub claim');
+  });
+
+  it('should throw on deployment ID mismatch', async () => {
+    vi.mocked(jwtVerify).mockResolvedValue({
+      payload: { ...validPayload, 'https://purl.imsglobal.org/spec/lti/claim/deployment_id': 'wrong-dep' } as any,
+      keyHeader: { alg: 'RS256' },
+    } as any);
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ keys: [{ kty: 'RSA', kid: 'key1' }] }),
+    });
+
+    await expect(verifyLtiLaunch(
+      'token', 'https://lms.example.com', 'https://lms.example.com/jwks', 'client-1', 'dep-1',
+    )).rejects.toThrow('Deployment ID mismatch');
+  });
+
+  it('should throw on invalid message type', async () => {
+    vi.mocked(jwtVerify).mockResolvedValue({
+      payload: {
+        ...validPayload,
+        'https://purl.imsglobal.org/spec/lti/claim/message_type': 'InvalidType',
+      } as any,
+      keyHeader: { alg: 'RS256' },
+    } as any);
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ keys: [{ kty: 'RSA', kid: 'key1' }] }),
+    });
+
+    await expect(verifyLtiLaunch(
+      'token', 'https://lms.example.com', 'https://lms.example.com/jwks', 'client-1', 'dep-1',
+    )).rejects.toThrow('Invalid LTI message type');
+  });
+
+  it('should accept LtiDeepLinkingRequest message type', async () => {
+    vi.mocked(jwtVerify).mockResolvedValue({
+      payload: {
+        ...validPayload,
+        'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiDeepLinkingRequest',
+      } as any,
+      keyHeader: { alg: 'RS256' },
+    } as any);
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ keys: [{ kty: 'RSA', kid: 'key1' }] }),
+    });
+
+    const result = await verifyLtiLaunch(
+      'token', 'https://lms.example.com', 'https://lms.example.com/jwks', 'client-1', 'dep-1',
+    );
+    expect(result.sub).toBe('user-123');
   });
 });
