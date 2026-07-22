@@ -19,7 +19,10 @@ This project belongs to the work account — always use the `github-work` host a
   - `tests/notification-store-extended.test.ts` (24 tests): addNotification cap at 100, markAsRead/markAllAsRead/clear/removeNotification, NotificationHelper (all 7 types), loadAnnouncementsIntoNotifications with dedup — **notification-store.ts from 60% → 100%**
   - `tests/export-pdf.test.ts` (19 tests): all 7 PDF generators (mocked jsPDF), downloadCSV, all 6 CSV generators with full data — **export-utils.ts from 20% → 98%**
   - `tests/capabilities.test.ts` (+4 tests): getScopeForCap group/all/own scope returns — **capabilities.ts from 96% → 98%**
-- **Overall coverage**: 59.81% → **91.15%** statements, 76% branches, 95.1% functions
+- **Phase 4 test coverage push**: Added 40 tests across 2 files, boosting coverage from 91% to 95% statements:
+  - `tests/achievements-data.test.ts` (36 tests): all 22 switch cases of isAchievementUnlocked (module-based, OWASP-based, quiz-based, secure coding, full-completion, unknown), achievements data structure validation — **achievements-data.ts from 3.57% → 100%**
+  - `tests/auth-utils.test.ts` (+4 tests): hashPassword (bcrypt hash output, different hashes for same input), verifyPassword (matching/non-matching) — **auth-utils.ts from 90.9% → 100%**
+- **Overall coverage**: 59.81% → **94.66%** statements, 83.75% branches, 97.2% functions
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
-- **422/422 tests pass** — 27/27 test files, 0 failures
+- **462/462 tests pass** — 28/28 test files, 0 failures
 - **Full verification**: lint ✓, typecheck ✓, tests ✓
