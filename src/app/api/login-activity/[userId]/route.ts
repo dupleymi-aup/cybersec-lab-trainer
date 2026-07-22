@@ -16,6 +16,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return forbidden();
     }
 
+    // Teachers can only view students in their own group
+    if (auth.id !== userId && requireRole(auth.role, 'teacher')) {
+      const targetUser = await getPrisma().user.findUnique({ where: { id: userId }, select: { group: true } });
+      if (!targetUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      const teacher = await getPrisma().user.findUnique({ where: { id: auth.id }, select: { group: true } });
+      if (!teacher || teacher.group !== targetUser.group) return forbidden();
+    }
+
     const activities = await getPrisma().loginActivity.findMany({
       where: { userId },
       orderBy: { timestamp: 'desc' },

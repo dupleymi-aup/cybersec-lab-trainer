@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
-import { authenticate, unauthorized, requireRole } from '@/lib/api-middleware';
+import { authenticate, unauthorized, requireRole, forbidden } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { getModuleName } from '@/lib/module-names';
 import { logger } from '@/lib/logger';
@@ -12,6 +12,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const resolvedParams = await params;
   // Teacher+ can view any student, or user can view their own report
   if (!requireRole(auth.role, 'teacher') && auth.id !== resolvedParams.userId) return unauthorized();
+
+  // Teachers can only view students in their own group
+  const targetUser = await getPrisma().user.findUnique({
+    where: { id: resolvedParams.userId },
+    select: { id: true, group: true },
+  });
+  if (!targetUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  if (requireRole(auth.role, 'teacher') && auth.id !== resolvedParams.userId) {
+    const teacher = await getPrisma().user.findUnique({ where: { id: auth.id }, select: { group: true } });
+    if (!teacher || teacher.group !== targetUser.group) return forbidden();
+  }
 
   const { searchParams } = new URL(request.url);
   const days = parseDays(searchParams);

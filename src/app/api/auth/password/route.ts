@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
-import { authenticate, unauthorized } from '@/lib/api-middleware';
+import { authenticate, unauthorized, checkRateLimit } from '@/lib/api-middleware';
 import { hashPassword, verifyPassword, validatePassword } from '@/lib/auth-utils';
 import { passwordChangeSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
@@ -9,6 +9,15 @@ export async function PUT(request: NextRequest) {
   try {
     const auth = await authenticate(request);
     if (!auth) return unauthorized();
+
+    // Rate limit: 5 password changes per 15 minutes per user
+    const rateLimit = checkRateLimit(`password:${auth.id}`, 5, 15 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many password change attempts. Please try again later.' },
+        { status: 429 },
+      );
+    }
 
     let body: unknown;
     try {
