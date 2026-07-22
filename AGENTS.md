@@ -31,5 +31,5 @@ This project belongs to the work account — always use the `github-work` host a
 - **0 ESLint warnings, 0 TypeScript errors** — lint clean, typecheck clean
 - **479/479 tests pass** — 28/28 test files, 0 failures
 - **API route hardening**: Added try/catch + logger.error to `auth/profile`, `auth/password`, and `scheduled-reports/[id]` routes — now all 85 API routes have proper error handling
-- **Security hardening**: Fixed 3 IDOR vulnerabilities (teachers can now only view students in their own group for analytics, login-activity, and export endpoints) and added rate limiting to password change endpoint (5 attempts per 15 min)
+- **Security hardening**: Fixed 3 IDOR vulnerabilities (teachers can now only view students in their own group for analytics, login-activity, and export endpoints), added rate limiting to password change endpoint (5 attempts per 15 min), and added Zod validation to batch progress endpoint
 - **Full verification**: lint ✓, typecheck ✓, tests ✓
