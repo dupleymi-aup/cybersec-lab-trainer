@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
       select: { percentage: true },
     });
 
-    const prevCompleted = prevProgress.filter((p: ProgressRow) => p.completed).length;
+    const prevCompleted = prevProgress.filter((p: { completed: boolean }) => p.completed).length;
     const prevAvgCompletionRate =
       totalStudents > 0 ? Math.round((prevCompleted / (totalStudents * totalModules)) * 10000) / 100 : 0;
     const prevAvgQuizScore =

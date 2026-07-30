@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
           select: { userId: true },
           distinct: ['userId'],
         })
-      ).map((l: { userId: string }) => l.userId),
+      ).map((l: { userId: string | null }) => l.userId).filter(Boolean) as string[],
     );
     const inactiveStudents = students.filter((s: StudentRow) => !activeLoginIds.has(s.id));
 

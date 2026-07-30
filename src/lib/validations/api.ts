@@ -121,6 +121,7 @@ export const batchProgressSchema = z.object({
         secureCodingCorrectCount: z.number().optional(),
         studiedOwaspItems: z.array(z.string().max(100)).optional(),
         challengeScores: z.unknown().optional(),
+        csrfChallengeScores: z.array(z.number()).optional(),
       }),
     )
     .optional(),

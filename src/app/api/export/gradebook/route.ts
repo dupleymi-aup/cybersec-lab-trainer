@@ -77,9 +77,9 @@ export async function GET(request: NextRequest) {
 
       return {
         id: user.id,
-        fullName: user.fullName,
+        fullName: user.fullName ?? '',
         email: user.email,
-        group: user.group,
+        group: user.group ?? '',
         modulesCompleted,
         quizCount,
         avgScore,

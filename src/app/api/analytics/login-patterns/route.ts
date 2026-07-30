@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     });
 
     type StudentRow = { id: string; fullName: string; group: string; lastLoginAt: Date | null; loginCount: number };
-    type LoginActivityRow = { userId: string; success: boolean; ip: string; timestamp: Date };
+    type LoginActivityRow = { userId: string | null; success: boolean; ip: string; timestamp: Date };
 
     const studentIds = students.map((s: StudentRow) => s.id);
 

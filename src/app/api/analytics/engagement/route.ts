@@ -116,9 +116,9 @@ export async function GET(request: NextRequest) {
 
       // Calculate last active days
       const allDates = [
-        ...studentLogins.map((l: { userId: string; timestamp: Date }) => l.timestamp.getTime()),
-        ...studentProgress.map((p: { userId: string; updatedAt: Date }) => p.updatedAt.getTime()),
-        ...studentQuizzes.map((q: { userId: string; attemptedAt: Date }) => q.attemptedAt.getTime()),
+        ...studentLogins.map((l: { userId: string | null; timestamp: Date }) => l.timestamp.getTime()),
+        ...studentProgress.map((p: { userId: string | null; updatedAt: Date }) => p.updatedAt.getTime()),
+        ...studentQuizzes.map((q: { userId: string | null; attemptedAt: Date }) => q.attemptedAt.getTime()),
       ];
       const lastActiveDate = allDates.length > 0 ? new Date(Math.max(...allDates)) : null;
       const lastActiveDays = lastActiveDate
@@ -213,7 +213,7 @@ export async function GET(request: NextRequest) {
       const dayStart = new Date(dateStr);
       const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
 
-      const dayLogins = loginActivity.filter((l: { userId: string; timestamp: Date }) => l.timestamp >= dayStart && l.timestamp < dayEnd);
+      const dayLogins = loginActivity.filter((l: { userId: string | null; timestamp: Date }) => l.timestamp >= dayStart && l.timestamp < dayEnd);
       const avgLoginsPerStudent = totalStudents > 0 ? Math.round((dayLogins.length / totalStudents) * 1000) / 10 : 0;
 
       engagementTrend.push({ date: dateStr, avgLoginsPerStudent });

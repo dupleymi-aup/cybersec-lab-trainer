@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     type StudentRow = { id: string; fullName: string; group: string; lastLoginAt: Date | null; loginCount: number };
     type QuizResultRow = { userId: string; percentage: number; createdAt: Date };
     type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
-    type LoginRow = { userId: string; timestamp: Date };
+    type LoginRow = { userId: string | null; timestamp: Date };
 
     const quizResults = await getPrisma().quizResult.findMany({
       where: {
