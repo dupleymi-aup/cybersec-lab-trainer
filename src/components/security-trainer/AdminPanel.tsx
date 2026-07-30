@@ -207,8 +207,9 @@ export default function AdminPanel() {
             keysCount++;
           }
         }
-      } catch {
+      } catch (e) {
         // SecurityError in restricted contexts — show 0 gracefully
+        logger.warn('AdminPanel: localStorage iteration failed', { error: String(e) });
       }
     }
     return { storageKB: (storageUsed / 1024).toFixed(1), keysCount };
@@ -357,8 +358,9 @@ export default function AdminPanel() {
         }
       }
       keysToRemove.forEach((key) => localStorage.removeItem(key));
-    } catch {
+    } catch (e) {
       // Non-fatal — proceed with success toast
+      logger.warn('AdminPanel: localStorage clear failed', { error: String(e) });
     }
     toast.success(t('actions.progressCleared'));
   };

@@ -359,7 +359,8 @@ function createDynamicStorage() {
       try {
         const userId = getCurrentUserId();
         return localStorage.getItem(`${name}-${userId}`);
-      } catch {
+      } catch (e) {
+        logger.warn('Store: localStorage getItem failed', { name, error: String(e) });
         return null;
       }
     },
@@ -367,16 +368,16 @@ function createDynamicStorage() {
       try {
         const userId = getCurrentUserId();
         localStorage.setItem(`${name}-${userId}`, value);
-      } catch {
-        // QuotaExceededError or SecurityError — non-fatal
+      } catch (e) {
+        logger.warn('Store: localStorage setItem failed', { name, error: String(e) });
       }
     },
     removeItem: (name: string) => {
       try {
         const userId = getCurrentUserId();
         localStorage.removeItem(`${name}-${userId}`);
-      } catch {
-        // Non-fatal
+      } catch (e) {
+        logger.warn('Store: localStorage removeItem failed', { name, error: String(e) });
       }
     },
   }));

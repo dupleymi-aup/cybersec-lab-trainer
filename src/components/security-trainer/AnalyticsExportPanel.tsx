@@ -219,8 +219,9 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
           let raw: string | null = null;
           try {
             raw = localStorage.getItem(key);
-          } catch {
+          } catch (e) {
             // localStorage unavailable
+            logger.warn('AnalyticsExportPanel: localStorage getItem failed', { key, error: String(e) });
           }
           let lastActive = '—';
           if (raw) {
@@ -951,8 +952,9 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                   let raw: string | null = null;
                   try {
                     raw = localStorage.getItem(progressKey);
-                  } catch {
+                  } catch (e) {
                     // localStorage unavailable
+                    logger.warn('AnalyticsExportPanel: localStorage getItem failed', { key: progressKey, error: String(e) });
                   }
                   let moduleCount = 0;
                   let quizCount = 0;

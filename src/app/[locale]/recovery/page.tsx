@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
+import { logger } from '@/lib/logger';
 
 type Step = 'contact' | 'otp' | 'reset' | 'done';
 
@@ -136,8 +137,8 @@ export default function RecoveryPage() {
     setLoading(true);
     try {
       await sendRecoveryOTP(emailOrPhone);
-    } catch {
-      // silently ignore
+    } catch (e) {
+      logger.warn('Recovery page: OTP resend failed', { error: String(e) });
     } finally {
       setLoading(false);
     }

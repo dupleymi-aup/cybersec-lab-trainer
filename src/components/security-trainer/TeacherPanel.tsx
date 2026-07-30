@@ -229,8 +229,8 @@ export default function TeacherPanel() {
               lastActive,
             };
           }
-        } catch {
-          // Skip failed batch silently
+        } catch (e) {
+          logger.warn('TeacherPanel: batch progress parse failed', { error: String(e) });
         }
       }
 

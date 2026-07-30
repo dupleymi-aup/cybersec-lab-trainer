@@ -193,8 +193,8 @@ function CopyButton({ text }: { text: string }) {
         document.execCommand('copy');
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
-      } catch {
-        // Silently fail
+      } catch (e) {
+        logger.warn('ToolsLab: clipboard execCommand fallback failed', { error: String(e) });
       }
       document.body.removeChild(ta);
     }

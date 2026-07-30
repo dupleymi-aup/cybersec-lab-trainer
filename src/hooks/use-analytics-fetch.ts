@@ -194,8 +194,8 @@ export function useAnalyticsMutation<TResult = unknown, TBody = unknown>() {
           try {
             const errBody = await res.json();
             if (errBody.error) errorMsg = errBody.error;
-          } catch {
-            // response body not JSON
+          } catch (e) {
+            logger.warn('useAnalyticsFetch: error response body not JSON', { error: String(e) });
           }
           throw new Error(errorMsg);
         }

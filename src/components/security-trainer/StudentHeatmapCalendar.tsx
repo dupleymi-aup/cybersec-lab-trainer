@@ -40,14 +40,11 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
           group: u.group,
         }));
         setStudents(controlledGroupId ? mapped.filter((s) => s.group === controlledGroupId) : mapped);
-      } catch {
-        // Failed to load students
+      } catch (e) {
+        logger.warn('StudentHeatmapCalendar: loadStudents failed', { error: String(e) });
       }
     };
-    loadStudents().catch((err) => {
-      logger.error('Failed to load students', { error: err });
-      setLoading(false);
-    });
+    loadStudents();
   }, [controlledGroupId]);
 
   useEffect(() => {
@@ -68,8 +65,9 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
     let raw: string | null = null;
     try {
       raw = localStorage.getItem(key);
-    } catch {
+    } catch (e) {
       // Non-fatal — fall through to empty data
+      logger.warn('StudentHeatmapCalendar: localStorage getItem failed', { key, error: String(e) });
     }
 
     const data: Record<string, number> = {};

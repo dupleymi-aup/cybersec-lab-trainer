@@ -8,6 +8,7 @@ import ThemeColorMeta from '@/components/security-trainer/ThemeColorMeta';
 import ServiceWorkerRegistration from '@/components/pwa/ServiceWorkerRegistration';
 import LocaleLangSetter from '@/components/LocaleLangSetter';
 import { routing } from '@/routing';
+import { logger } from '@/lib/logger';
 import enMessages from '@/messages/en.json';
 import ruMessages from '@/messages/ru.json';
 import zhMessages from '@/messages/zh.json';
@@ -27,8 +28,8 @@ async function resolveLocale(): Promise<string> {
     const cookieStore = await cookies();
     const locale = cookieStore.get('NEXT_LOCALE')?.value;
     if (locale && routing.locales.includes(locale as (typeof routing.locales)[number])) return locale;
-  } catch {
-    // cookies() unavailable during static generation
+  } catch (e) {
+    logger.warn('Root layout: cookies() unavailable during static generation', { error: String(e) });
   }
   return routing.defaultLocale;
 }

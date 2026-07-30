@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
+import { logger } from '@/lib/logger';
 import {
   Eye,
   EyeOff,
@@ -177,8 +178,8 @@ export default function PasswordStrengthChecker() {
         await navigator.clipboard.writeText(password);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-      } catch {
-        // Clipboard API unavailable (non-HTTPS or permission denied)
+      } catch (e) {
+        logger.warn('PasswordStrengthChecker: clipboard write failed', { error: String(e) });
       }
     }
   };

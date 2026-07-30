@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { logger } from '@/lib/logger';
 import { useAuthStore } from '@/lib/auth-store';
 import { UserRole } from '@/lib/auth-types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -102,7 +103,8 @@ export default function OnboardingTour() {
   const [isComplete, setIsComplete] = useState(() => {
     try {
       return localStorage.getItem(`cybersec-onboarding-seen-${role}`) === 'true';
-    } catch {
+    } catch (e) {
+      logger.warn('OnboardingTour: localStorage getItem (init) failed', { error: String(e) });
       return false;
     }
   });
@@ -112,8 +114,8 @@ export default function OnboardingTour() {
     let hasSeenTour: string | null = null;
     try {
       hasSeenTour = localStorage.getItem(storageKey);
-    } catch {
-      // localStorage unavailable
+    } catch (e) {
+      logger.warn('OnboardingTour: localStorage getItem (effect) failed', { error: String(e) });
     }
     const isNewUser = user?.createdAt && Date.now() - new Date(user.createdAt).getTime() < 24 * 60 * 60 * 1000;
     if (!hasSeenTour && (!user?.createdAt || isNewUser)) {
@@ -125,7 +127,8 @@ export default function OnboardingTour() {
     const storageKey = `cybersec-onboarding-seen-${role}`;
     try {
       setIsComplete(localStorage.getItem(storageKey) === 'true');
-    } catch {
+    } catch (e) {
+      logger.warn('OnboardingTour: localStorage getItem (sync) failed', { error: String(e) });
       setIsComplete(false);
     }
     setCurrentStep(0);
@@ -135,8 +138,8 @@ export default function OnboardingTour() {
     const storageKey = `cybersec-onboarding-seen-${role}`;
     try {
       localStorage.setItem(storageKey, 'true');
-    } catch {
-      // localStorage unavailable
+    } catch (e) {
+      logger.warn('OnboardingTour: localStorage setItem failed', { error: String(e) });
     }
     setIsOpen(false);
     setIsComplete(true);
