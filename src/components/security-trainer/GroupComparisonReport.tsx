@@ -45,11 +45,6 @@ export interface GroupComparisonReportProps {
 export default function GroupComparisonReport({ groupId, days: controlledDays }: GroupComparisonReportProps = {}) {
   const t = useTranslations('groupComparison');
   const [dimensions, setDimensions] = useState<GroupComparisonDimension[]>([]);
-  const [_rankings, setRankings] = useState({
-    byCompletion: [] as Array<{ name: string; value: number }>,
-    byQuizScore: [] as Array<{ name: string; value: number }>,
-    byActivity: [] as Array<{ name: string; value: number }>,
-  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
@@ -66,7 +61,6 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       .then((d) => {
         if (!cancelled) {
           setDimensions(d.dimensions);
-          setRankings(d.rankings);
           setLoading(false);
         }
       })

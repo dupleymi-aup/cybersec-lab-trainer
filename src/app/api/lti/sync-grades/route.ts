@@ -3,6 +3,16 @@ import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-mi
 import { getPrisma } from '@/lib/db';
 import { syncGradesToPlatform } from '@/lib/lti-utils';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+const syncGradesSchema = z.object({
+  platformId: z.string().min(1).max(128),
+  userId: z.string().min(1).max(128),
+  moduleId: z.string().min(1).max(128),
+  score: z.number().min(0).max(10000).optional(),
+  maximumScore: z.number().min(1).max(10000).optional(),
+  label: z.string().max(256).optional(),
+});
 
 /**
  * POST /api/lti/sync-grades
@@ -16,11 +26,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { platformId, userId, moduleId, score, maximumScore, label } = body;
+    const parsed = syncGradesSchema.safeParse(body);
 
-    if (!platformId || !userId || !moduleId) {
-      return NextResponse.json({ error: 'Missing required fields: platformId, userId, moduleId' }, { status: 400 });
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
     }
+
+    const { platformId, userId, moduleId, score, maximumScore, label } = parsed.data;
 
     const result = await syncGradesToPlatform(
       platformId,

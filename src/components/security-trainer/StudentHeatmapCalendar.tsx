@@ -65,7 +65,12 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
 
     // Read from localStorage (same pattern as AnalyticsExportPanel)
     const key = `security-trainer-progress-${selectedStudentId}`;
-    const raw = localStorage.getItem(key);
+    let raw: string | null = null;
+    try {
+      raw = localStorage.getItem(key);
+    } catch {
+      // Non-fatal — fall through to empty data
+    }
 
     const data: Record<string, number> = {};
     let max = 1;
@@ -159,6 +164,7 @@ export default function StudentHeatmapCalendar({ groupId: controlledGroupId }: {
           value={selectedStudentId}
           onChange={(e) => setSelectedStudentId(e.target.value)}
           className="border-border bg-card min-w-[250px] rounded-md border px-3 py-2 text-sm"
+          aria-label={t('selectStudent')}
         >
           <option value="">{t('selectStudent')}</option>
           {students.map((s) => (

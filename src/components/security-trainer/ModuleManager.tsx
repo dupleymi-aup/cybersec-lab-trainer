@@ -38,7 +38,11 @@ function loadConfig(): StoredConfig {
 }
 
 function saveConfig(config: StoredConfig) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+  } catch (e) {
+    logger.warn('ModuleManager saveConfig failed', { error: e });
+  }
 }
 
 export default function ModuleManager() {

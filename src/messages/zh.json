@@ -22,6 +22,7 @@
     "announcementCreated": "公告已创建",
     "deletionError": "删除失败",
     "announcementDeleted": "公告已删除",
+    "networkError": "网络错误",
     "listRefreshed": "列表已更新",
     "priorityHighBadge": "重要",
     "priorityNormalBadge": "普通",
@@ -270,7 +271,22 @@
       "alert": "检测到SQL注入漏洞！",
       "alertDescription": "在CyberSec Lab中学习如何修复漏洞"
     },
-    "skipToContent": "跳转到主要内容"
+    "skipToContent": "跳转到主要内容",
+    "ariaLabels": {
+      "mainNav": "主导航",
+      "toggleMenu": "切换菜单",
+      "mobileNav": "移动导航",
+      "github": "GitHub",
+      "email": "电子邮件",
+      "footerNav": "页脚导航",
+      "statistics": "统计数据",
+      "features": "功能特性",
+      "demoModules": "演示模块",
+      "callToAction": "行动号召",
+      "codeTerminal": "代码终端",
+      "animatedCodeTerminal": "动画代码终端",
+      "rating": "评分：{rating} / {total}"
+    }
   },
   "auth": {
     "login": {
@@ -748,7 +764,11 @@
     "showDetails": "显示详情",
     "hideDetails": "隐藏详情",
     "copy": "复制",
-    "errorHandling": "错误处理"
+    "errorHandling": "错误处理",
+    "maxRetriesReached": "已达最大重试次数",
+    "retryAttempt": "第 {current} 次尝试，共 {max} 次",
+    "chartFailed": "图表加载失败",
+    "tryAgain": "重试"
   },
   "profile": {
     "title": "个人资料",
@@ -1365,6 +1385,8 @@
         "symbols": "!@# 符号",
         "charCount": "长度: {count} 个字符",
         "entropy": "熵: ~{bits} 位",
+        "showPassword": "显示密码",
+        "hidePassword": "隐藏密码",
         "managersTitle": "密码管理器",
         "managersDescription": "生成密码还不够——需要安全地存储它们。使用经过验证的密码管理器，它们用主密码加密存储库:",
         "bitwarden": "开源、免费、跨平台",
@@ -1812,6 +1834,8 @@
     "error": "错误",
     "typeQuiz": "测验",
     "typeAttack": "攻击",
+    "typeCodeReview": "代码审查",
+    "typeWriteup": "报告",
     "typeCustom": "自定义",
     "draft": "草稿",
     "back": "返回",
@@ -1889,6 +1913,7 @@
     "moodleStep2Prefix": "点击",
     "moodleStep3Prefix": "填写",
     "moodleStep4Prefix": "复制",
+    "moodleStep4From": "从Moodle",
     "moodleStep4Suffix": "并粘贴到下方表单",
     "moodleStep6": "保存平台并激活",
     "editPlatform": "编辑平台",

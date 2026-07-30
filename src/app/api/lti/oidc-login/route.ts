@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { DEFAULT_APP_URL } from '@/lib/constants';
+import { checkRateLimit, getClientIp } from '@/lib/api-middleware';
 
 /**
  * POST /api/lti/oidc-login
@@ -9,6 +10,16 @@ import { DEFAULT_APP_URL } from '@/lib/constants';
  * Moodle sends a login_hint and target_link_uri, we redirect to the platform's auth URL
  */
 export async function POST(request: NextRequest) {
+  // Rate limit: 10 OIDC login initiations per minute per IP
+  const ip = getClientIp(request);
+  const rateResult = checkRateLimit(`lti-oidc-${ip}`, 10, 60_000);
+  if (!rateResult.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(rateResult.retryAfter) } },
+    );
+  }
+
   try {
     const body = await request.json();
     const {
@@ -76,6 +87,16 @@ export async function POST(request: NextRequest) {
  * Handle GET OIDC login request (Moodle may send as GET)
  */
 export async function GET(request: NextRequest) {
+  // Rate limit: 10 OIDC login initiations per minute per IP
+  const ip = getClientIp(request);
+  const rateResult = checkRateLimit(`lti-oidc-${ip}`, 10, 60_000);
+  if (!rateResult.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(rateResult.retryAfter) } },
+    );
+  }
+
   const { searchParams } = new URL(request.url);
 
   const body = {

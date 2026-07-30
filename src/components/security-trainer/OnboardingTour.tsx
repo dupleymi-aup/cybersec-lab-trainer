@@ -172,6 +172,7 @@ export default function OnboardingTour() {
     <>
       {!isOpen && !isComplete && (
         <button
+          type="button"
           onClick={handleStartTour}
           className="fixed right-6 bottom-6 z-50 rounded-full bg-emerald-600 p-3 text-white shadow-lg transition-all hover:scale-105 hover:bg-emerald-700"
           title={t('startTour')}
@@ -205,6 +206,7 @@ export default function OnboardingTour() {
                     <h2 className="text-lg font-bold">{steps[currentStep].title}</h2>
                   </div>
                   <button
+                    type="button"
                     onClick={handleSkip}
                     className="hover:bg-muted rounded-lg p-1.5 transition-colors"
                     title={t('skip')}
@@ -242,8 +244,10 @@ export default function OnboardingTour() {
 
                 <div className="bg-muted/30 flex items-center justify-between border-t p-5">
                   <button
+                    type="button"
                     onClick={handleSkip}
                     className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                    aria-label={t('skipTour')}
                   >
                     {t('skipTour')}
                   </button>

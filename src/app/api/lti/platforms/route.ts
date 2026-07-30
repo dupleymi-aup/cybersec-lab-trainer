@@ -8,35 +8,40 @@ import { logger } from '@/lib/logger';
  * List all LTI platforms (admin/teacher only)
  */
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
 
-  if (!requireRole(auth.role, 'admin', 'teacher')) return forbidden();
+    if (!requireRole(auth.role, 'admin', 'teacher')) return forbidden();
 
-  const platforms = await getPrisma().ltiPlatform.findMany({
-    select: {
-      id: true,
-      name: true,
-      issuer: true,
-      clientId: true,
-      authUrl: true,
-      tokenUrl: true,
-      keysetUrl: true,
-      deploymentId: true,
-      isActive: true,
-      createdAt: true,
-      updatedAt: true,
-      _count: {
-        select: {
-          gradeSyncs: true,
-          launchLogs: true,
+    const platforms = await getPrisma().ltiPlatform.findMany({
+      select: {
+        id: true,
+        name: true,
+        issuer: true,
+        clientId: true,
+        authUrl: true,
+        tokenUrl: true,
+        keysetUrl: true,
+        deploymentId: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            gradeSyncs: true,
+            launchLogs: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+      orderBy: { createdAt: 'desc' },
+    });
 
-  return NextResponse.json(platforms);
+    return NextResponse.json(platforms);
+  } catch (error) {
+    logger.error('Failed to list LTI platforms', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 /**

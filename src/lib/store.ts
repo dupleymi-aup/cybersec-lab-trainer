@@ -356,16 +356,28 @@ type PersistedState = Pick<
 function createDynamicStorage() {
   return createJSONStorage<PersistedState>(() => ({
     getItem: (name: string) => {
-      const userId = getCurrentUserId();
-      return localStorage.getItem(`${name}-${userId}`);
+      try {
+        const userId = getCurrentUserId();
+        return localStorage.getItem(`${name}-${userId}`);
+      } catch {
+        return null;
+      }
     },
     setItem: (name: string, value: string) => {
-      const userId = getCurrentUserId();
-      localStorage.setItem(`${name}-${userId}`, value);
+      try {
+        const userId = getCurrentUserId();
+        localStorage.setItem(`${name}-${userId}`, value);
+      } catch {
+        // QuotaExceededError or SecurityError — non-fatal
+      }
     },
     removeItem: (name: string) => {
-      const userId = getCurrentUserId();
-      localStorage.removeItem(`${name}-${userId}`);
+      try {
+        const userId = getCurrentUserId();
+        localStorage.removeItem(`${name}-${userId}`);
+      } catch {
+        // Non-fatal
+      }
     },
   }));
 }

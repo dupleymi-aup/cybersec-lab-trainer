@@ -24,7 +24,8 @@ export async function POST(request: NextRequest) {
     });
 
     return new NextResponse(null, { status: 204 });
-  } catch {
+  } catch (error) {
+    logger.warn('CSP report parse failed', { error: error instanceof Error ? error.message : 'Unknown' });
     return new NextResponse(null, { status: 204 });
   }
 }

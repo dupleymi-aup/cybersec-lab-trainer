@@ -25,12 +25,17 @@ function loadAll(): Announcement[] {
 }
 
 function saveAll(items: Announcement[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch (e) {
+    logger.warn('TeacherMessaging saveAll failed', { error: e });
+  }
 }
 
 export default function TeacherMessaging({ currentUser, groups = [] }: { currentUser: string; groups: string[] }) {
   const formatDate = useDateFormatter();
   const t = useTranslations('teacher.messaging');
+  const tc = useTranslations('common');
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -203,7 +208,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                     <p className="mt-1 text-[10px] text-slate-400">{formatDate(msg.createdAt)}</p>
                   </div>
                 </div>
-                <button onClick={() => handleDelete(msg.id)} className="shrink-0 text-slate-300 hover:text-red-500">
+                <button type="button" onClick={() => handleDelete(msg.id)} className="shrink-0 text-slate-300 hover:text-red-500" aria-label={tc('delete')}>
                   <X size={14} />
                 </button>
               </div>

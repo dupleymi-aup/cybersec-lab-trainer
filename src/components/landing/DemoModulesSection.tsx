@@ -27,9 +27,10 @@ const lessonCounts = [10, 5, 4, 6];
 
 export default function DemoModulesSection() {
   const t = useTranslations('landing.demoModules');
+  const ta = useTranslations('landing.ariaLabels');
   const locale = useLocale();
   return (
-    <section id="modules" className="bg-accent/30 py-20" aria-label="Demo modules">
+    <section id="modules" className="bg-accent/30 py-20" aria-label={ta('demoModules')}>
       <div className="container mx-auto px-4">
         <div className="mb-12 text-center">
           <h2 className="text-foreground mb-4 text-3xl font-bold md:text-4xl">{t('title')}</h2>

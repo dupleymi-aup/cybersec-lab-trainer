@@ -95,6 +95,7 @@ export default function StudentProgressView({
   const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
   const [trends, setTrends] = useState<TrendPoint[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const t = useTranslations('studentProgress');
 
@@ -109,6 +110,7 @@ export default function StudentProgressView({
     setData(null);
     setSummary(null);
     setTrends([]);
+    setLoadError(false);
     Promise.all([
       getStudentPerformance(selectedId, 30),
       getComprehensiveSummary(30, groupId),
@@ -122,6 +124,7 @@ export default function StudentProgressView({
       .catch((err) => {
         if (process.env.NODE_ENV === 'development')
           logger.error('StudentProgressView failed to load student data', { error: err });
+        setLoadError(true);
       })
       .finally(() => setLoading(false));
   }, [selectedId, groupId]);
@@ -234,6 +237,7 @@ export default function StudentProgressView({
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
+          type="button"
           onClick={() => {
             setSelectedId(null);
             setData(null);
@@ -279,6 +283,11 @@ export default function StudentProgressView({
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 size={24} className="animate-spin text-slate-300" />
+        </div>
+      ) : loadError ? (
+        <div className="flex items-center justify-center py-16 text-slate-400">
+          <AlertTriangle size={24} className="mr-2" />
+          <span className="text-sm">{t('loadFailed')}</span>
         </div>
       ) : data ? (
         <>

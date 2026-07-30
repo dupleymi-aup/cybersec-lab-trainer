@@ -105,29 +105,16 @@ export default function AuthSecurityLab() {
     ];
 
     const passedCount = checks.filter((c) => c.passed).length;
-    const score = passedCount <= 2 ? 20 : passedCount <= 3 ? 40 : passedCount <= 5 ? 60 : passedCount <= 6 ? 80 : 100;
-    const label =
-      passedCount <= 2
-        ? t('password.veryWeak')
-        : passedCount <= 3
-          ? t('password.weak')
-          : passedCount <= 5
-            ? t('password.medium')
-            : passedCount <= 6
-              ? t('password.strong')
-              : t('password.excellent');
-    const color =
-      passedCount <= 2
-        ? 'bg-red-500'
-        : passedCount <= 3
-          ? 'bg-red-400'
-          : passedCount <= 5
-            ? 'bg-yellow-500'
-            : passedCount <= 6
-              ? 'bg-emerald-500'
-              : 'bg-emerald-600';
+    const strengthLevels = [
+      { max: 2, score: 20, labelKey: 'password.veryWeak', color: 'bg-red-500' },
+      { max: 3, score: 40, labelKey: 'password.weak', color: 'bg-red-400' },
+      { max: 5, score: 60, labelKey: 'password.medium', color: 'bg-yellow-500' },
+      { max: 6, score: 80, labelKey: 'password.strong', color: 'bg-emerald-500' },
+      { max: Infinity, score: 100, labelKey: 'password.excellent', color: 'bg-emerald-600' },
+    ];
+    const level = strengthLevels.find((l) => passedCount <= l.max) ?? strengthLevels[strengthLevels.length - 1];
 
-    return { score, label, color, checks };
+    return { score: level.score, label: t(level.labelKey), color: level.color, checks };
   }, [password, t]);
 
   const formatTime = useCallback(

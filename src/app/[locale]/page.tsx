@@ -1,23 +1,20 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
-
+import dynamic from 'next/dynamic';
 import LandingHeader from '@/components/landing/LandingHeader';
 import HeroSection from '@/components/landing/HeroSection';
 import StatsSection from '@/components/landing/StatsSection';
-import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import FeaturesSection from '@/components/landing/FeaturesSection';
-import DemoModulesSection from '@/components/landing/DemoModulesSection';
-import ReviewsSection from '@/components/landing/ReviewsSection';
-import CTASection from '@/components/landing/CTASection';
-import FAQSection from '@/components/landing/FAQSection';
-import LandingFooter from '@/components/landing/LandingFooter';
 import LanguageSwitcher from '@/components/landing/LanguageSwitcher';
 
+const HowItWorksSection = dynamic(() => import('@/components/landing/HowItWorksSection'), { ssr: false });
+const FeaturesSection = dynamic(() => import('@/components/landing/FeaturesSection'), { ssr: false });
+const DemoModulesSection = dynamic(() => import('@/components/landing/DemoModulesSection'), { ssr: false });
+const ReviewsSection = dynamic(() => import('@/components/landing/ReviewsSection'), { ssr: false });
+const CTASection = dynamic(() => import('@/components/landing/CTASection'), { ssr: false });
+const FAQSection = dynamic(() => import('@/components/landing/FAQSection'), { ssr: false });
+const LandingFooter = dynamic(() => import('@/components/landing/LandingFooter'), { ssr: false });
+
 export default function LandingPage() {
-  const _t = useTranslations('landing');
-  const _locale = useLocale();
   return (
     <div className="bg-background text-foreground min-h-screen">
       <LanguageSwitcher />

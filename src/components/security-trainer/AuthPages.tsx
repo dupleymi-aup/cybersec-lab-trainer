@@ -690,6 +690,7 @@ export default function AuthPages() {
                           </p>
                         ) : (
                           <button
+                            type="button"
                             onClick={handleResendOTP}
                             disabled={loading}
                             className="text-sm text-violet-400 hover:text-violet-300 disabled:cursor-not-allowed disabled:opacity-50"
@@ -699,6 +700,7 @@ export default function AuthPages() {
                         )}
                       </div>
                       <button
+                        type="button"
                         onClick={() => setRecoveryStep('enter-contact')}
                         className="text-muted-foreground w-full text-sm hover:text-slate-400"
                       >

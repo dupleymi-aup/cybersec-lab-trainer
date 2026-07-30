@@ -126,7 +126,7 @@ export default function DataQualityMonitor({ groupId, days }: { groupId?: string
               <motion.div key={issue.type} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                 <Card className={`border-border transition-colors hover:border-indigo-200 ${colorClass}`}>
                   <CardContent className="p-4">
-                    <div className="flex cursor-pointer items-center justify-between" onClick={() => toggleIssue(issue.type)}>
+                    <div className="flex cursor-pointer items-center justify-between" onClick={() => toggleIssue(issue.type)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleIssue(issue.type); } }}>
                       <div className="flex items-center gap-3">
                         <Icon size={18} />
                         <div>

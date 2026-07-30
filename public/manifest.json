@@ -1,8 +1,9 @@
 {
-  "name": "CyberSec Lab — Тренажёр по информационной безопасности",
+  "name": "CyberSec Lab — Cybersecurity Training Platform",
   "short_name": "CyberSec Lab",
-  "description": "Интерактивная платформа для изучения уязвимостей веб-приложений",
-  "start_url": "/dashboard-app",
+  "description": "Interactive platform for learning web application vulnerabilities",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
@@ -28,6 +29,7 @@
     }
   ],
   "categories": ["education", "security"],
-  "lang": "ru",
-  "dir": "ltr"
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false
 }

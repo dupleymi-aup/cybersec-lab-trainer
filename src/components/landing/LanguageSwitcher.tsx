@@ -1,21 +1,23 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from '@/routing';
+import { useRouter, usePathname, routing } from '@/routing';
 import { Globe } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 
-const locales = [
-  { code: 'en', label: 'EN', name: 'English' },
-  { code: 'ru', label: 'РУ', name: 'Русский' },
-  { code: 'zh', label: '中', name: '中文' },
-];
+const localeMeta: Record<string, { label: string; name: string }> = {
+  en: { label: 'EN', name: 'English' },
+  ru: { label: 'РУ', name: 'Русский' },
+  zh: { label: '中', name: '中文' },
+};
+
+const locales = routing.locales
+  .filter((code) => code in localeMeta)
+  .map((code) => ({ code, ...localeMeta[code] }));
 
 export default function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const _t = useTranslations('common');
 
   const switchLocale = (newLocale: string) => {
     router.push(pathname, { locale: newLocale });

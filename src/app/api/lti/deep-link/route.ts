@@ -3,6 +3,12 @@ import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-mi
 import { modules } from '@/lib/data';
 import { logger } from '@/lib/logger';
 import { DEFAULT_APP_URL } from '@/lib/constants';
+import { z } from 'zod';
+
+const deepLinkSchema = z.object({
+  platformId: z.string().min(1).max(128).optional(),
+  type: z.enum(['all', 'modules', 'quizzes']).optional(),
+});
 
 /**
  * POST /api/lti/deep-link
@@ -16,7 +22,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { platformId, type } = body;
+    const parsed = deepLinkSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
+    }
+
+    const { platformId, type } = parsed.data;
 
     // type can be: 'all', 'modules', 'quizzes'
     const contentType = type || 'all';

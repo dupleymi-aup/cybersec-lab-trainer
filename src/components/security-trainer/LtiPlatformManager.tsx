@@ -61,6 +61,7 @@ interface GradeSync {
 
 export default function LtiPlatformManager() {
   const t = useTranslations('ltiPlatform');
+  const tc = useTranslations('common');
   const [platforms, setPlatforms] = useState<LtiPlatform[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -296,7 +297,7 @@ export default function LtiPlatformManager() {
               <code className="bg-muted rounded px-1">{appUrl}/api/lti/oidc-login</code>
             </li>
             <li>
-              {t('moodleStep4Prefix')} <strong>Issuer, Client ID, Deployment ID</strong> из Moodle {t('moodleStep4Suffix')}
+              {t('moodleStep4Prefix')} <strong>Issuer, Client ID, Deployment ID</strong> {t('moodleStep4From')} {t('moodleStep4Suffix')}
             </li>
             <li>
               {t('moodleStep3Prefix')} <strong>Keyset URL</strong>:{' '}
@@ -503,7 +504,7 @@ export default function LtiPlatformManager() {
                     >
                       <TrendingUp size={14} className="mr-1" /> {t('sync')}
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => startEdit(p)} aria-label="Edit platform">
+                    <Button variant="ghost" size="icon" onClick={() => startEdit(p)} aria-label={tc('edit')}>
                       <Pencil size={14} />
                     </Button>
                     <Switch
@@ -516,7 +517,7 @@ export default function LtiPlatformManager() {
                       size="icon"
                       className="text-red-500 hover:bg-red-50 hover:text-red-700"
                       onClick={() => handleDelete(p.id, p.name)}
-                      aria-label="Delete platform"
+                      aria-label={tc('delete')}
                     >
                       <Trash2 size={14} />
                     </Button>
@@ -526,14 +527,14 @@ export default function LtiPlatformManager() {
                 {/* Connection Details */}
                 <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                   <div className="flex items-center gap-1">
-                    <span className="text-muted-foreground">Client ID:</span>
+                    <span className="text-muted-foreground">{t('clientIdLabel')}:</span>
                     <code className="bg-muted rounded px-1 text-[10px]">{p.clientId}</code>
-                    <button type="button" onClick={() => copyToClipboard(p.clientId, 'Client ID')}>
+                    <button type="button" onClick={() => copyToClipboard(p.clientId, t('clientIdLabel'))}>
                       <Copy size={10} className="text-muted-foreground" />
                     </button>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-muted-foreground">Deployment:</span>
+                    <span className="text-muted-foreground">{t('deploymentIdLabel')}:</span>
                     <code className="bg-muted rounded px-1 text-[10px]">{p.deploymentId}</code>
                   </div>
                 </div>

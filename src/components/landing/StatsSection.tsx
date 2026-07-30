@@ -16,10 +16,11 @@ const statKeys = ['modules', 'quizQuestions', 'achievements', 'careerPaths'];
 
 export default function StatsSection() {
   const t = useTranslations('landing.stats');
+  const ta = useTranslations('landing.ariaLabels');
   return (
     <section
       className="via-accent/30 border-border/50 border-y bg-gradient-to-r from-violet-500/5 to-emerald-500/5 py-16"
-      aria-label="Statistics"
+      aria-label={ta('statistics')}
     >
       <div className="container mx-auto px-4">
         <div className="mx-auto grid max-w-4xl grid-cols-2 gap-6 md:grid-cols-4">

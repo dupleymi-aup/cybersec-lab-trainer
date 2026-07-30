@@ -17,6 +17,7 @@ interface State {
   error: Error | null;
   errorInfo: ErrorInfo | null;
   showDetails: boolean;
+  retryCount: number;
 }
 
 function ErrorFallback({
@@ -28,6 +29,8 @@ function ErrorFallback({
   onReload,
   onCopy,
   componentName,
+  retryCount,
+  maxRetries,
 }: {
   error: Error;
   errorInfo: ErrorInfo | null;
@@ -37,8 +40,11 @@ function ErrorFallback({
   onReload: () => void;
   onCopy: () => void;
   componentName: string;
+  retryCount: number;
+  maxRetries: number;
 }) {
   const t = useTranslations('errors');
+  const canRetry = retryCount < maxRetries;
 
   return (
     <div className="bg-background flex min-h-[200px] items-center justify-center p-4">
@@ -51,13 +57,16 @@ function ErrorFallback({
 
         <div className="mb-4 flex flex-wrap justify-center gap-2">
           <button
+            type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+            disabled={!canRetry}
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw size={16} />
-            {t('tryAgain')}
+            {canRetry ? t('tryAgain') : t('maxRetriesReached')}
           </button>
           <button
+            type="button"
             onClick={onReload}
             className="bg-muted text-foreground/70 hover:bg-accent inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition"
           >
@@ -65,10 +74,16 @@ function ErrorFallback({
             {t('reloadPage')}
           </button>
         </div>
+        {retryCount > 0 && (
+          <p className="text-muted-foreground mb-2 text-xs">
+            {t('retryAttempt', { current: retryCount, max: maxRetries })}
+          </p>
+        )}
 
         {error && (
           <div className="text-left">
             <button
+              type="button"
               onClick={onToggleDetails}
               className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs transition-colors"
             >
@@ -83,9 +98,10 @@ function ErrorFallback({
                     {error.name}: {error.message}
                   </span>
                   <button
+                    type="button"
                     onClick={onCopy}
                     className="rounded p-1 transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-800"
-                    title={t('copy')}
+                    aria-label={t('copy')}
                   >
                     <Copy size={14} />
                   </button>
@@ -122,6 +138,7 @@ export class ErrorBoundary extends Component<Props, State> {
       error: null,
       errorInfo: null,
       showDetails: false,
+      retryCount: 0,
     };
   }
 
@@ -138,12 +155,13 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   handleReset = () => {
-    this.setState({
+    this.setState((prev) => ({
       hasError: false,
       error: null,
       errorInfo: null,
       showDetails: false,
-    });
+      retryCount: prev.retryCount + 1,
+    }));
     if (this.props.onReset) {
       this.props.onReset();
     }
@@ -166,8 +184,9 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
 
-      const { error, errorInfo, showDetails } = this.state;
+      const { error, errorInfo, showDetails, retryCount } = this.state;
       const componentName = this.props.name || 'component';
+      const maxRetries = 3;
 
       return (
         <ErrorFallback
@@ -179,6 +198,8 @@ export class ErrorBoundary extends Component<Props, State> {
           onReload={() => window.location.reload()}
           onCopy={this.handleCopyError}
           componentName={componentName}
+          retryCount={retryCount}
+          maxRetries={maxRetries}
         />
       );
     }

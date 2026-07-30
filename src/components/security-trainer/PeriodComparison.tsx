@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { ArrowUpRight, ArrowDownRight, Minus, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Minus, TrendingUp, TrendingDown, Loader2, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getComprehensiveSummary, type ComprehensiveSummary } from '@/lib/auth-store';
@@ -26,9 +26,11 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
   const [dataA, setDataA] = useState<ComprehensiveSummary | null>(null);
   const [dataB, setDataB] = useState<ComprehensiveSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+    setError(false);
     Promise.all([getComprehensiveSummary(periodA, groupId), getComprehensiveSummary(periodB, groupId)]).then(
       ([a, b]) => {
         setDataA(a);
@@ -36,9 +38,19 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
         setLoading(false);
       },
     ).catch(() => {
+      setError(true);
       setLoading(false);
     });
   }, [periodA, periodB, groupId]);
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+        <AlertTriangle size={32} className="mb-2" />
+        <p className="text-sm">{t('loading')}</p>
+      </div>
+    );
+  }
 
   if (loading || !dataA || !dataB) {
     return (

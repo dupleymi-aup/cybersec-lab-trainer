@@ -73,7 +73,7 @@ async function createAnnouncement(
   } catch (e) {
     if (process.env.NODE_ENV === 'development')
       logger.warn('SystemAnnouncements createAnnouncement failed', { error: e });
-    return { success: false, error: 'Network error' };
+    return { success: false };
   }
 }
 
@@ -88,12 +88,13 @@ async function deleteAnnouncement(id: string): Promise<{ success: boolean; error
   } catch (e) {
     if (process.env.NODE_ENV === 'development')
       logger.warn('SystemAnnouncements deleteAnnouncement failed', { error: e });
-    return { success: false, error: 'Network error' };
+    return { success: false };
   }
 }
 
 export default function SystemAnnouncements({ currentUser: _currentUser }: { currentUser: string }) {
   const t = useTranslations('systemAnnouncements');
+  const tc = useTranslations('common');
   const formatDate = useDateFormatter();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -318,7 +319,7 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
                       size="icon"
                       className="flex-shrink-0 text-slate-400 hover:bg-red-50 hover:text-red-600"
                       onClick={() => handleDelete(ann.id)}
-                      aria-label="Delete announcement"
+                      aria-label={tc('delete')}
                     >
                       <Trash2 size={14} />
                     </Button>

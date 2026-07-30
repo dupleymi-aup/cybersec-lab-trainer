@@ -214,6 +214,9 @@ export default function AchievementsAndGlossary() {
                 activeCategory === '' ? '' : 'bg-muted text-foreground/70'
               }`}
               onClick={() => setActiveCategory('')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveCategory(''); } }}
             >
               {t('all')} ({glossaryTerms.length})
             </Badge>
@@ -227,6 +230,9 @@ export default function AchievementsAndGlossary() {
                     activeCategory === catKey ? 'ring-2 ring-slate-400' : ''
                   } ${glossaryCategoryColors[catKey] || 'bg-muted text-foreground/70'}`}
                   onClick={() => setActiveCategory(activeCategory === catKey ? '' : catKey)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveCategory(activeCategory === catKey ? '' : catKey); } }}
                 >
                   {t(catKey)} ({count})
                 </Badge>

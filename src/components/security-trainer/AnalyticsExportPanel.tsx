@@ -137,6 +137,20 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
   const [printPreview, setPrintPreview] = useState(false);
   const [internalDays, setInternalDays] = useState(30);
 
+  const handlePrintPreviewEscape = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPrintPreview(false);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (printPreview) {
+      document.addEventListener('keydown', handlePrintPreviewEscape);
+      return () => document.removeEventListener('keydown', handlePrintPreviewEscape);
+    }
+  }, [printPreview, handlePrintPreviewEscape]);
+
   const effectiveDays = isControlled(props) ? props.days : internalDays;
   const controlled = isControlled(props);
 

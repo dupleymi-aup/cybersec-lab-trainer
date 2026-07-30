@@ -20,10 +20,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     return NextResponse.json({ success: true, report });
-  } catch (error: unknown) {
-    logger.error('scheduled-reports error:', { error });
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+  } catch (error) {
+    logger.error('Failed to fetch scheduled report', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -85,10 +84,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     });
 
     return NextResponse.json({ success: true, report });
-  } catch (error: unknown) {
-    logger.error('scheduled-reports error:', { error });
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+  } catch (error) {
+    logger.error('Failed to update scheduled report', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -112,9 +110,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    logger.error('scheduled-reports error:', { error });
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+  } catch (error) {
+    logger.error('Failed to delete scheduled report', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

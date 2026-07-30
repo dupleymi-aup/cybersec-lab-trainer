@@ -9,9 +9,10 @@ import { type AdminResetPasswordInput } from '@/lib/validations/api';
 
 // POST /api/admin/users/[id]/reset-password - admin resets another user's password
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireAdmin(auth)) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireAdmin(auth)) return forbidden();
 
   // Rate limit: 10 password resets per minute per admin
   const rateLimit = checkRateLimit(`reset-pw:${auth.id}`, 10, 60_000);
@@ -71,6 +72,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   return NextResponse.json({ success: true });
+  } catch (error) {
+    logger.error('Failed to reset user password', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 function requireAdmin(auth: { id: string; role: string }): boolean {

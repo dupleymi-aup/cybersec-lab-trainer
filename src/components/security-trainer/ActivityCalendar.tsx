@@ -29,8 +29,6 @@ export default function ActivityCalendar() {
       dayMap.set(day, entry);
     }
 
-    const _sortedDays = [...dayMap.keys()].sort().reverse();
-
     // Current streak
     let streak = 0;
     const today = new Date().toISOString().slice(0, 10);

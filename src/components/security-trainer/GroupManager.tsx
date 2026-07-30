@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { getAllGroups, renameGroup, deleteGroup, getAllUsers } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ interface GroupManagerProps {
   onRefresh: () => void;
 }
 
-export default function GroupManager({ onRefresh }: GroupManagerProps) {
+export default memo(function GroupManager({ onRefresh }: GroupManagerProps) {
   const t = useTranslations('admin.groupManager');
   const tc = useTranslations('common');
   const [groups, setGroups] = useState<string[]>([]);
@@ -156,7 +156,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                         size="icon"
                         onClick={() => handleRename(name)}
                         className="text-emerald-600"
-                        aria-label="Confirm rename"
+                        aria-label={tc('confirm')}
                       >
                         <Check size={16} />
                       </Button>
@@ -167,7 +167,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                           setEditingGroup(null);
                           setEditValue('');
                         }}
-                        aria-label="Cancel rename"
+                        aria-label={tc('cancel')}
                       >
                         <X size={16} />
                       </Button>
@@ -192,7 +192,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                             setEditValue(name);
                           }}
                           className="text-muted-foreground hover:text-emerald-700"
-                          aria-label="Edit group"
+                          aria-label={tc('edit')}
                         >
                           <Pencil size={14} />
                         </Button>
@@ -201,7 +201,7 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
                           size="icon"
                           onClick={() => handleDelete(name)}
                           className="text-muted-foreground hover:text-red-700"
-                          aria-label="Delete group"
+                          aria-label={tc('delete')}
                         >
                           <Trash2 size={14} />
                         </Button>
@@ -222,4 +222,4 @@ export default function GroupManager({ onRefresh }: GroupManagerProps) {
       </div>
     </div>
   );
-}
+});

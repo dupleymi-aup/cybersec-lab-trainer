@@ -205,8 +205,6 @@ export default function StudentAssignments() {
     }, mySubs[0]);
   };
 
-  const _getMyAttemptCount = (a: Assignment) => (submissions[a.id] || []).length;
-
   // View single assignment
   if (viewingId) {
     const a = assignments.find((x) => x.id === viewingId);

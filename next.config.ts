@@ -12,18 +12,7 @@ const baseConfig = {
     ignoreBuildErrors: false,
   },
   async redirects() {
-    return [
-      {
-        source: '/app',
-        destination: '/dashboard-app',
-        permanent: true,
-      },
-      {
-        source: '/app/:path*',
-        destination: '/dashboard-app/:path*',
-        permanent: true,
-      },
-    ];
+    return [];
   },
   async headers() {
     return [

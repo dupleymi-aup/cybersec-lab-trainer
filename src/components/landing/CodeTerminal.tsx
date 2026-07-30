@@ -31,6 +31,7 @@ const codeLines = [
 
 export default function CodeTerminal() {
   const t = useTranslations('landing.codeTerminal');
+  const ta = useTranslations('landing.ariaLabels');
   const [displayedLines, setDisplayedLines] = useState(0);
   const [cursorVisible, setCursorVisible] = useState(true);
   const [isComplete, setIsComplete] = useState(false);
@@ -64,7 +65,7 @@ export default function CodeTerminal() {
 
   if (!isMounted) {
     return (
-      <div className="mx-auto w-full max-w-xl" role="img" aria-label="Code terminal">
+      <div className="mx-auto w-full max-w-xl" role="img" aria-label={ta('codeTerminal')}>
         <div className="bg-card border-border overflow-hidden rounded-xl border shadow-2xl shadow-violet-500/10">
           <div className="bg-muted/50 border-border flex items-center justify-between border-b px-4 py-3">
             <div className="flex items-center gap-2">
@@ -96,7 +97,7 @@ export default function CodeTerminal() {
       transition={{ duration: 0.6, delay: 0.3 }}
       className="mx-auto w-full max-w-xl"
       role="img"
-      aria-label="Animated code terminal"
+      aria-label={ta('animatedCodeTerminal')}
     >
       <div className="bg-card border-border overflow-hidden rounded-xl border shadow-2xl shadow-violet-500/10">
         <div className="bg-muted/50 border-border flex items-center justify-between border-b px-4 py-3">

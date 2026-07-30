@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, reports });
   } catch (error: unknown) {
     logger.error('Failed to load scheduled reports', { error: String(error) });
-    return NextResponse.json({ success: false, error: 'Failed to load reports' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to load reports' }, { status: 500 });
   }
 }
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const parsed = createScheduledReportSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 });
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
 
     const { reportType, frequency, dayOfWeek, dayOfMonth, email, groupId, days } = parsed.data;
@@ -52,6 +52,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, report });
   } catch (error: unknown) {
     logger.error('Failed to create scheduled report', { error: String(error) });
-    return NextResponse.json({ success: false, error: 'Failed to create report' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create report' }, { status: 500 });
   }
 }

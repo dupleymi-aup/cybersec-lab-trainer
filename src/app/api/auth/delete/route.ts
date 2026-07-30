@@ -5,9 +5,11 @@ import { verifyPassword } from '@/lib/auth-utils';
 import { parseBody } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
-interface DeleteAccountBody {
-  currentPassword: string;
-}
+import { z } from 'zod';
+
+const deleteAccountSchema = z.object({
+  currentPassword: z.string().min(1).max(128),
+});
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -41,13 +43,13 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Require password confirmation to prevent deletion via stolen tokens
-    const bodyResult = await parseBody<DeleteAccountBody>(request);
+    const bodyResult = await parseBody<z.infer<typeof deleteAccountSchema>>(request);
     if (!bodyResult.ok) return bodyResult.response;
-    const { currentPassword } = bodyResult.data;
-
-    if (!currentPassword) {
-      return NextResponse.json({ error: 'Password confirmation required' }, { status: 400 });
+    const parsed = deleteAccountSchema.safeParse(bodyResult.data);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
+    const { currentPassword } = parsed.data;
 
     const user = await getPrisma().user.findUnique({ where: { id: auth.id } });
     if (!user) return unauthorized();

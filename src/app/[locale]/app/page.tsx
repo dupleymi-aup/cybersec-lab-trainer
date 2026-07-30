@@ -20,6 +20,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
+import DashboardSkeleton from '@/components/security-trainer/DashboardSkeleton';
 
 const ModuleLoader = () => (
   <div className="flex min-h-[200px] items-center justify-center py-12">
@@ -27,13 +28,15 @@ const ModuleLoader = () => (
   </div>
 );
 
+const DashboardLoader = () => <DashboardSkeleton />;
+
 const Sidebar = dynamic(() => import('@/components/security-trainer/Sidebar'), {
   ssr: false,
   loading: ModuleLoader,
 });
 const Dashboard = dynamic(() => import('@/components/security-trainer/Dashboard'), {
   ssr: false,
-  loading: ModuleLoader,
+  loading: DashboardLoader,
 });
 const PWAHandler = dynamic(() => import('@/components/security-trainer/PWAHandler'), { ssr: false });
 const OnboardingTour = dynamic(() => import('@/components/security-trainer/OnboardingTour'), { ssr: false });

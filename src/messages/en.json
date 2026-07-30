@@ -22,6 +22,7 @@
     "announcementCreated": "Announcement created",
     "deletionError": "Deletion error",
     "announcementDeleted": "Announcement deleted",
+    "networkError": "Network error",
     "listRefreshed": "List refreshed",
     "priorityHighBadge": "Important",
     "priorityNormalBadge": "Normal",
@@ -270,7 +271,22 @@
       "alert": "SQL Injection vulnerability detected!",
       "alertDescription": "Learn to fix vulnerabilities in CyberSec Lab"
     },
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Skip to main content",
+    "ariaLabels": {
+      "mainNav": "Main navigation",
+      "toggleMenu": "Toggle menu",
+      "mobileNav": "Mobile navigation",
+      "github": "GitHub",
+      "email": "Email",
+      "footerNav": "Footer navigation",
+      "statistics": "Statistics",
+      "features": "Features",
+      "demoModules": "Demo modules",
+      "callToAction": "Call to action",
+      "codeTerminal": "Code terminal",
+      "animatedCodeTerminal": "Animated code terminal",
+      "rating": "Rating: {rating} out of {total}"
+    }
   },
   "auth": {
     "login": {
@@ -772,7 +788,11 @@
     "showDetails": "Show details",
     "hideDetails": "Hide details",
     "copy": "Copy",
-    "errorHandling": "Error handling"
+    "errorHandling": "Error handling",
+    "maxRetriesReached": "Max retries reached",
+    "retryAttempt": "Attempt {current} of {max}",
+    "chartFailed": "Chart failed to load",
+    "tryAgain": "Try again"
   },
   "profile": {
     "title": "Personal Profile",
@@ -1389,6 +1409,8 @@
         "symbols": "!@# Symbols",
         "charCount": "Length: {count} characters",
         "entropy": "Entropy: ~{bits} bits",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
         "managersTitle": "Password Managers",
         "managersDescription": "Generating passwords isn't enough — you need to store them securely. Use trusted password managers that encrypt the vault with a master password:",
         "bitwarden": "Open source, free, cross-platform",
@@ -1812,6 +1834,8 @@
     "error": "Error",
     "typeQuiz": "Quiz",
     "typeAttack": "Attack",
+    "typeCodeReview": "Code Review",
+    "typeWriteup": "Write-up",
     "typeCustom": "Custom",
     "draft": "Draft",
     "back": "Back",
@@ -1889,6 +1913,7 @@
     "moodleStep2Prefix": "Click",
     "moodleStep3Prefix": "Specify",
     "moodleStep4Prefix": "Copy",
+    "moodleStep4From": "from Moodle",
     "moodleStep4Suffix": "and paste into the form below",
     "moodleStep6": "Save the platform and activate it",
     "editPlatform": "Edit platform",

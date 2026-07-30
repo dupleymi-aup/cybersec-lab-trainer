@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useNotificationStore, type Notification as NotifType } from '@/lib/notification-store';
 import {
@@ -41,10 +41,15 @@ function formatTime(ts: number, t: (key: string) => string): string {
 
 type FilterKey = 'all' | 'unread' | 'announcement';
 
-export default function NotificationBell() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications, removeNotification } =
-    useNotificationStore();
+export default memo(function NotificationBell() {
+  const notifications = useNotificationStore((s) => s.notifications);
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const markAsRead = useNotificationStore((s) => s.markAsRead);
+  const markAllAsRead = useNotificationStore((s) => s.markAllAsRead);
+  const clearNotifications = useNotificationStore((s) => s.clearNotifications);
+  const removeNotification = useNotificationStore((s) => s.removeNotification);
   const t = useTranslations('notificationBell');
+  const tc = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<FilterKey>('all');
 
@@ -53,6 +58,20 @@ export default function NotificationBell() {
     { key: 'unread', label: t('filterUnread') },
     { key: 'announcement', label: t('filterAnnouncements') },
   ], [t]);
+
+  const handleEscape = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isOpen, handleEscape]);
 
   const filtered = useMemo(() => {
     if (filter === 'unread') return notifications.filter((n) => !n.read);
@@ -63,6 +82,7 @@ export default function NotificationBell() {
   return (
     <div className="relative">
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="hover:bg-muted relative rounded-lg p-2 transition-colors"
         aria-label={t('title')}
@@ -92,23 +112,27 @@ export default function NotificationBell() {
                 <div className="flex gap-1">
                   {unreadCount > 0 && (
                     <button
+                      type="button"
                       onClick={markAllAsRead}
                       className="hover:bg-muted rounded p-1.5 transition-colors"
                       title={t('markAllRead')}
+                      aria-label={t('markAllRead')}
                     >
                       <Check className="h-4 w-4" />
                     </button>
                   )}
                   {notifications.length > 0 && (
                     <button
+                      type="button"
                       onClick={clearNotifications}
                       className="hover:bg-muted rounded p-1.5 text-red-500 transition-colors"
                       title={t('clear')}
+                      aria-label={t('clear')}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   )}
-                  <button onClick={() => setIsOpen(false)} className="hover:bg-muted rounded p-1.5 transition-colors">
+                  <button type="button" onClick={() => setIsOpen(false)} className="hover:bg-muted rounded p-1.5 transition-colors" aria-label={tc('close')}>
                     <X className="h-4 w-4" />
                   </button>
                 </div>
@@ -118,6 +142,7 @@ export default function NotificationBell() {
               <div className="bg-muted/20 flex gap-1 border-b px-4 py-2">
                 {FILTERS.map((f) => (
                   <button
+                    type="button"
                     key={f.key}
                     onClick={() => setFilter(f.key as FilterKey)}
                     className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
@@ -166,11 +191,13 @@ export default function NotificationBell() {
                               <div className="flex items-start justify-between gap-2">
                                 <p className="truncate text-sm font-medium">{notif.title}</p>
                                 <button
+                                  type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     removeNotification(notif.id);
                                   }}
                                   className="hover:bg-muted shrink-0 rounded p-0.5 transition-colors"
+                                  aria-label={tc('close')}
                                 >
                                   <X className="text-muted-foreground h-3 w-3" />
                                 </button>
@@ -191,4 +218,4 @@ export default function NotificationBell() {
       </AnimatePresence>
     </div>
   );
-}
+});

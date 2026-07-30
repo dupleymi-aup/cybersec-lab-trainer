@@ -273,7 +273,7 @@ export default function SSRFLab() {
       {/* Defense mechanisms */}
       <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
         <CardContent className="p-5">
-          <button onClick={() => setShowAllDefenses(!showAllDefenses)} className="flex w-full items-center gap-2">
+          <button type="button" onClick={() => setShowAllDefenses(!showAllDefenses)} className="flex w-full items-center gap-2">
             <Shield size={20} className="text-emerald-600" />
             <h3 className="font-semibold text-emerald-800">{t('ssrfDefense')}</h3>
             <ChevronLeft

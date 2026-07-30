@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const idToken = formData.get('id_token') as string;
-    const _state = formData.get('state') as string;
 
     if (!idToken) {
       return NextResponse.json({ error: 'Missing id_token' }, { status: 400 });

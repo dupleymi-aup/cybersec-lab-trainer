@@ -22,6 +22,7 @@
     "announcementCreated": "Объявление создано",
     "deletionError": "Ошибка удаления",
     "announcementDeleted": "Объявление удалено",
+    "networkError": "Ошибка сети",
     "listRefreshed": "Список обновлён",
     "priorityHighBadge": "Важно",
     "priorityNormalBadge": "Обычное",
@@ -270,7 +271,22 @@
       "alert": "Обнаружена SQL-инъекция!",
       "alertDescription": "Научись исправлять уязвимости в CyberSec Lab"
     },
-    "skipToContent": "Перейти к основному содержимому"
+    "skipToContent": "Перейти к основному содержимому",
+    "ariaLabels": {
+      "mainNav": "Основная навигация",
+      "toggleMenu": "Переключить меню",
+      "mobileNav": "Мобильная навигация",
+      "github": "GitHub",
+      "email": "Электронная почта",
+      "footerNav": "Навигация в подвале",
+      "statistics": "Статистика",
+      "features": "Возможности",
+      "demoModules": "Демо модули",
+      "callToAction": "Призыв к действию",
+      "codeTerminal": "Терминал кода",
+      "animatedCodeTerminal": "Анимированный терминал кода",
+      "rating": "Рейтинг: {rating} из {total}"
+    }
   },
   "auth": {
     "login": {
@@ -772,7 +788,11 @@
     "showDetails": "Показать детали",
     "hideDetails": "Скрыть детали",
     "copy": "Копировать",
-    "errorHandling": "Обработка ошибок"
+    "errorHandling": "Обработка ошибок",
+    "maxRetriesReached": "Достигнут лимит попыток",
+    "retryAttempt": "Попытка {current} из {max}",
+    "chartFailed": "Не удалось загрузить график",
+    "tryAgain": "Попробовать снова"
   },
   "profile": {
     "title": "Личный профиль",
@@ -1389,6 +1409,8 @@
         "symbols": "!@# Символы",
         "charCount": "Длина: {count} символов",
         "entropy": "Энтропия: ~{bits} бит",
+        "showPassword": "Показать пароль",
+        "hidePassword": "Скрыть пароль",
         "managersTitle": "Менеджеры паролей",
         "managersDescription": "Генерировать пароли недостаточно — их нужно безопасно хранить. Используйте проверенные менеджеры паролей, которые шифруют хранилище мастер-паролем:",
         "bitwarden": "Открытый исходный код, бесплатный, кроссплатформенный",
@@ -1812,6 +1834,8 @@
     "error": "Ошибка",
     "typeQuiz": "Квиз",
     "typeAttack": "Атака",
+    "typeCodeReview": "Обзор кода",
+    "typeWriteup": "Отчёт",
     "typeCustom": "Своё",
     "draft": "Черновик",
     "back": "Назад",
@@ -1889,6 +1913,7 @@
     "moodleStep2Prefix": "Нажмите",
     "moodleStep3Prefix": "Укажите",
     "moodleStep4Prefix": "Скопируйте",
+    "moodleStep4From": "из Moodle",
     "moodleStep4Suffix": "и вставьте в форму ниже",
     "moodleStep6": "Сохраните платформу и активируйте",
     "editPlatform": "Редактировать платформу",

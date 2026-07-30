@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import {
   useAuthStore,
   getAllUsers,
@@ -174,36 +174,45 @@ export default function AdminPanel() {
       })
       .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
-  const filteredUsers = allUsers.filter((u) => {
+  const filteredUsers = useMemo(() => allUsers.filter((u) => {
     const matchesSearch =
       searchTerm === '' ||
       u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === '' || u.role === roleFilter;
     return matchesSearch && matchesRole;
-  });
+  }), [allUsers, searchTerm, roleFilter]);
 
   // DB Stats
-  const totalUsers = allUsers.length;
-  const studentCount = allUsers.filter((u) => u.role === 'student').length;
-  const teacherCount = allUsers.filter((u) => u.role === 'teacher').length;
-  const adminCount = allUsers.filter((u) => u.role === 'admin').length;
-  const blockedCount = allUsers.filter((u) => u.isBlocked).length;
+  const userStats = useMemo(() => ({
+    totalUsers: allUsers.length,
+    studentCount: allUsers.filter((u) => u.role === 'student').length,
+    teacherCount: allUsers.filter((u) => u.role === 'teacher').length,
+    adminCount: allUsers.filter((u) => u.role === 'admin').length,
+    blockedCount: allUsers.filter((u) => u.isBlocked).length,
+  }), [allUsers]);
+  const { totalUsers, studentCount, teacherCount, adminCount, blockedCount } = userStats;
 
   // LocalStorage usage
-  let storageUsed = 0;
-  let keysCount = 0;
-  if (typeof window !== 'undefined') {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key) {
-        const value = localStorage.getItem(key) || '';
-        storageUsed += key.length + value.length;
-        keysCount++;
+  const storageInfo = useMemo(() => {
+    let storageUsed = 0;
+    let keysCount = 0;
+    if (typeof window !== 'undefined') {
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key) {
+            const value = localStorage.getItem(key) || '';
+            storageUsed += key.length + value.length;
+            keysCount++;
+          }
+        }
+      } catch {
+        // SecurityError in restricted contexts — show 0 gracefully
       }
     }
-  }
-  const storageKB = (storageUsed / 1024).toFixed(1);
+    return { storageKB: (storageUsed / 1024).toFixed(1), keysCount };
+  }, []);
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
     try {
@@ -284,11 +293,11 @@ export default function AdminPanel() {
 
         // Parse header
         const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
-        const nameIdx = headers.findIndex((h) => h.includes('name') || h.includes('имя'));
+        const nameIdx = headers.findIndex((h) => h.includes('name'));
         const emailIdx = headers.findIndex((h) => h.includes('email'));
-        const phoneIdx = headers.findIndex((h) => h.includes('phone') || h.includes('телефон'));
-        const roleIdx = headers.findIndex((h) => h.includes('role') || h.includes('роль'));
-        const groupIdx = headers.findIndex((h) => h.includes('group') || h.includes('группа'));
+        const phoneIdx = headers.findIndex((h) => h.includes('phone'));
+        const roleIdx = headers.findIndex((h) => h.includes('role'));
+        const groupIdx = headers.findIndex((h) => h.includes('group'));
 
         if (nameIdx === -1 || emailIdx === -1) {
           toast.error(t('actions.csvMissingColumns'));
@@ -339,14 +348,18 @@ export default function AdminPanel() {
   const handleClearProgress = () => {
     if (!confirm(t('actions.confirmClearProgress'))) return;
     if (typeof window === 'undefined') return;
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('security-trainer-progress-')) {
-        keysToRemove.push(key);
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('security-trainer-progress-')) {
+          keysToRemove.push(key);
+        }
       }
+      keysToRemove.forEach((key) => localStorage.removeItem(key));
+    } catch {
+      // Non-fatal — proceed with success toast
     }
-    keysToRemove.forEach((key) => localStorage.removeItem(key));
     toast.success(t('actions.progressCleared'));
   };
 
@@ -584,7 +597,7 @@ export default function AdminPanel() {
                                   size="icon"
                                   className="text-muted-foreground hover:bg-sky-50 hover:text-sky-700"
                                   onClick={() => setActivityUser(u)}
-                                  title={t('users.activity')}
+                                  aria-label={t('users.activity')}
                                 >
                                   <Activity size={16} />
                                 </Button>
@@ -593,7 +606,7 @@ export default function AdminPanel() {
                                   size="icon"
                                   className="text-muted-foreground hover:bg-emerald-50 hover:text-emerald-700"
                                   onClick={() => setEditModalUser(u)}
-                                  aria-label="Edit user"
+                                  aria-label={tc('edit')}
                                 >
                                   <Pencil size={16} />
                                 </Button>
@@ -602,7 +615,7 @@ export default function AdminPanel() {
                                   size="icon"
                                   className="text-muted-foreground hover:bg-amber-50 hover:text-amber-700"
                                   onClick={() => setPasswordResetUser(u)}
-                                  title={t('users.resetPassword')}
+                                  aria-label={t('users.resetPassword')}
                                 >
                                   <KeyRound size={16} />
                                 </Button>
@@ -620,7 +633,7 @@ export default function AdminPanel() {
                                       logger.error('Failed to start impersonation', { error: e });
                                     }
                                   }}
-                                  aria-label="Impersonate user"
+                                  aria-label={t('users.loginAs')}
                                 >
                                   <LogIn size={16} />
                                 </Button>
@@ -634,7 +647,7 @@ export default function AdminPanel() {
                                   size="icon"
                                   className="text-red-500 hover:bg-red-50 hover:text-red-700"
                                   onClick={() => handleDeleteUser(u.id, u.fullName)}
-                                  aria-label="Delete user"
+                                  aria-label={tc('delete')}
                                 >
                                   <Trash2 size={16} />
                                 </Button>
@@ -677,11 +690,11 @@ export default function AdminPanel() {
                 <h3 className="mb-4 text-sm font-semibold">{t('database.localStorage')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg bg-sky-50 p-4 text-center">
-                    <p className="text-3xl font-bold text-sky-600">{keysCount}</p>
+                    <p className="text-3xl font-bold text-sky-600">{storageInfo.keysCount}</p>
                     <p className="text-muted-foreground mt-1 text-xs">{t('kpi.keys')}</p>
                   </div>
                   <div className="rounded-lg bg-emerald-50 p-4 text-center">
-                    <p className="text-3xl font-bold text-emerald-600">{storageKB} KB</p>
+                    <p className="text-3xl font-bold text-emerald-600">{storageInfo.storageKB} KB</p>
                     <p className="text-muted-foreground mt-1 text-xs">{t('kpi.used')}</p>
                   </div>
                 </div>
@@ -752,11 +765,11 @@ export default function AdminPanel() {
                     <p className="text-muted-foreground mt-1 text-xs">{t('kpi.blocked')}</p>
                   </div>
                   <div className="rounded-lg bg-sky-50 p-3 text-center">
-                    <p className="text-2xl font-bold text-sky-600">{keysCount}</p>
+                    <p className="text-2xl font-bold text-sky-600">{storageInfo.keysCount}</p>
                     <p className="text-muted-foreground mt-1 text-xs">{t('kpi.localStorageKeys')}</p>
                   </div>
                   <div className="rounded-lg bg-emerald-50 p-3 text-center">
-                    <p className="text-2xl font-bold text-emerald-600">{storageKB} KB</p>
+                    <p className="text-2xl font-bold text-emerald-600">{storageInfo.storageKB} KB</p>
                     <p className="text-muted-foreground mt-1 text-xs">{t('kpi.storage')}</p>
                   </div>
                 </div>

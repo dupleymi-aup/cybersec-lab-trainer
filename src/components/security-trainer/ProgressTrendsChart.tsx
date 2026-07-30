@@ -5,7 +5,7 @@ import { getProgressTrends, type TrendPoint } from '@/lib/auth-store';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock } from 'lucide-react';
+import { Clock, AlertTriangle } from 'lucide-react';
 import { CHART_COLORS } from '@/lib/constants';
 import { useTranslations } from 'next-intl';
 
@@ -29,13 +29,16 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [trends, setTrends] = useState<TrendPoint[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+    setError(false);
     getProgressTrends(selectedUserId || undefined, dateRange).then((data) => {
       setTrends(data);
       setLoading(false);
     }).catch(() => {
+      setError(true);
       setLoading(false);
     });
   }, [dateRange, selectedUserId]);
@@ -66,6 +69,7 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
               <div className="bg-muted flex items-center gap-1 rounded-md p-0.5">
                 {dateRangeOptions.map((opt) => (
                   <button
+                    type="button"
                     key={opt.value}
                     onClick={() => setDateRange(opt.value)}
                     className={`rounded px-2.5 py-1 text-xs transition-colors ${
@@ -85,6 +89,11 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
             <div className="flex h-[300px] items-center justify-center text-slate-400">
               <Clock size={20} className="mr-2 animate-spin" />
               {t('loading')}
+            </div>
+          ) : error ? (
+            <div className="flex h-[300px] flex-col items-center justify-center text-slate-400">
+              <AlertTriangle size={40} className="mb-3 opacity-50" />
+              <p className="text-sm">{t('noData')}</p>
             </div>
           ) : trends.length === 0 ? (
             <div className="flex h-[300px] flex-col items-center justify-center text-slate-400">

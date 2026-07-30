@@ -14,6 +14,7 @@ const avatars = ['AP', 'MI', 'DK', 'ES', 'AV', 'ON'];
 
 export default function ReviewsSection() {
   const t = useTranslations('landing.reviews');
+  const ta = useTranslations('landing.ariaLabels');
   const items = t.raw('items') as Array<{
     name: string;
     role: string;
@@ -66,7 +67,7 @@ export default function ReviewsSection() {
                       <p className="text-muted-foreground text-sm">{review.role}</p>
                     </div>
                   </div>
-                  <div className="mb-4 flex gap-1" role="img" aria-label={'Rating: 5 out of 5'}>
+                  <div className="mb-4 flex gap-1" role="img" aria-label={ta('rating', { rating: 5, total: 5 })}>
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-current text-amber-500" aria-hidden="true" />
                     ))}

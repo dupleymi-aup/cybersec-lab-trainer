@@ -14,6 +14,7 @@ import Link from 'next/link';
 
 export default function LandingFooter() {
   const t = useTranslations('landing.footer');
+  const ta = useTranslations('landing.ariaLabels');
   const sections = t.raw('sections') as Record<string, { title: string; links: string[] }>;
   return (
     <footer className="bg-background border-border/50 border-t">
@@ -38,21 +39,21 @@ export default function LandingFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-accent hover:bg-accent/80 text-muted-foreground hover:text-foreground flex h-10 w-10 items-center justify-center rounded-xl transition-all"
-                aria-label="GitHub"
+                aria-label={ta('github')}
               >
                 <GitHubIcon className="h-5 w-5" aria-hidden="true" />
               </a>
               <a
                 href="mailto:contact@cyberseclab.ru"
                 className="bg-accent hover:bg-accent/80 text-muted-foreground hover:text-foreground flex h-10 w-10 items-center justify-center rounded-xl transition-all"
-                aria-label="Email"
+                aria-label={ta('email')}
               >
                 <Mail className="h-5 w-5" aria-hidden="true" />
               </a>
             </div>
           </div>
           <nav
-            aria-label="Footer navigation"
+            aria-label={ta('footerNav')}
             className="col-span-full grid grid-cols-2 gap-8 md:grid-cols-4 lg:col-span-4"
           >
             {Object.values(sections).map((section) => (

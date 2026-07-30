@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       lastLoginAt: user.lastLoginAt?.toISOString(),
     });
   } catch (error) {
-    logger.error('profile GET error:', { error });
+    logger.error('Failed to fetch profile', { error });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('profile PUT error:', { error });
+    logger.error('Failed to update profile', { error });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

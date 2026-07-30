@@ -278,11 +278,12 @@ export async function POST(request: NextRequest) {
       });
       imported += batchRows.length;
     } catch (error) {
+      logger.warn('CSV import batch create failed', { error });
       for (const row of batchRows) {
         errors.push({
           row: row.rowNum,
           email: row.email,
-          error: error instanceof Error ? error.message : 'Failed to create user',
+          error: 'Failed to create user',
         });
         skipped++;
       }

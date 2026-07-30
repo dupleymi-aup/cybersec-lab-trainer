@@ -7,9 +7,10 @@ import { parseBody } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const isAdmin = auth.role === 'admin';
   const { searchParams } = new URL(request.url);
@@ -87,12 +88,17 @@ export async function GET(request: NextRequest) {
       totalPages: Math.ceil(total / Math.min(limit, 100)),
     },
   });
+  } catch (error) {
+    logger.error('Failed to list users', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireRole(auth.role, 'admin')) return forbidden();
 
   // Rate limit: 10 user creations per minute per admin
   const rateLimit = checkRateLimit(`create-user:${auth.id}`, 10, 60_000);
@@ -177,4 +183,8 @@ export async function POST(request: NextRequest) {
       isBlocked: user.isBlocked,
     },
   });
+  } catch (error) {
+    logger.error('Failed to create user', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

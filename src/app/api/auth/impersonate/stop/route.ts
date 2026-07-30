@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
           details: `Admin ${admin.fullName || admin.id} stopped impersonation [IP: ${ip}]`,
         },
       });
-    } catch {
-      // Audit logging is best-effort
+    } catch (auditError) {
+      logger.warn('Audit logging failed during impersonation stop', { error: auditError });
     }
 
     const response = NextResponse.json({ success: true });

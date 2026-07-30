@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 
 export default function KeyboardShortcuts() {
   const t = useTranslations('common.keyboardShortcuts');
+  const tc = useTranslations('common');
   const [open, setOpen] = useState(false);
 
   const SHORTCUTS = [
@@ -42,9 +43,11 @@ export default function KeyboardShortcuts() {
     <>
       {/* Floating hint button */}
       <button
+        type="button"
         onClick={() => setOpen(true)}
         className="fixed right-4 bottom-4 z-30 flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-white opacity-60 shadow-lg transition-colors hover:bg-slate-700 hover:opacity-100 dark:bg-slate-700"
         title={t('buttonTitle')}
+        aria-label={t('buttonTitle')}
       >
         <Keyboard size={16} />
       </button>
@@ -65,7 +68,7 @@ export default function KeyboardShortcuts() {
                   <Keyboard size={18} className="text-muted-foreground" />
                   <h2 className="font-semibold">{t('title')}</h2>
                 </div>
-                <button onClick={() => setOpen(false)} className="hover:bg-muted rounded p-1 transition-colors">
+                <button type="button" onClick={() => setOpen(false)} className="hover:bg-muted rounded p-1 transition-colors" aria-label={tc('close')}>
                   <X size={16} />
                 </button>
               </div>

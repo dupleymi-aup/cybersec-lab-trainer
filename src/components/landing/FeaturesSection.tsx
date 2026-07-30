@@ -24,8 +24,9 @@ const featureKeys = [
 
 export default function FeaturesSection() {
   const t = useTranslations('landing.features');
+  const ta = useTranslations('landing.ariaLabels');
   return (
-    <section id="features" className="bg-background py-20" aria-label="Features">
+    <section id="features" className="bg-background py-20" aria-label={ta('features')}>
       <div className="container mx-auto px-4">
         <div className="mb-16 text-center">
           <h2 className="text-foreground mb-4 text-3xl font-bold md:text-4xl">{t('title')}</h2>

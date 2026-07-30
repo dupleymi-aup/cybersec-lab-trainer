@@ -94,7 +94,7 @@ export default function OTPModal({ otp, onSubmit, onClose, onResend }: OTPModalP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={te('enterCode')}>
       <div className="bg-card w-full max-w-sm rounded-2xl p-6 shadow-xl">
         <h3 className="mb-2 text-center text-xl font-bold text-slate-900">{te('enterCode')}</h3>
         <p className="text-muted-foreground mb-4 text-center text-sm">{te('codeSentDescription')}</p>

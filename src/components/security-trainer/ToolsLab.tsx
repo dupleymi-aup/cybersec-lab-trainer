@@ -174,6 +174,7 @@ function simpleHash(text: string): {
 // Copy helper
 // ============================================================
 function CopyButton({ text }: { text: string }) {
+  const tc = useTranslations('common');
   const [copied, setCopied] = useState(false);
   const handleCopy = async () => {
     try {
@@ -199,7 +200,7 @@ function CopyButton({ text }: { text: string }) {
     }
   };
   return (
-    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={handleCopy} aria-label="Copy">
+    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={handleCopy} aria-label={tc('copy')}>
       {copied ? <CheckCircle2 size={14} className="text-emerald-500" /> : <Copy size={14} />}
     </Button>
   );
@@ -854,7 +855,7 @@ function vigenereEncrypt(text, key) {
                   size="icon"
                   className="text-slate-400 hover:text-white"
                   onClick={() => setShowPw(!showPw)}
-                  aria-label={showPw ? 'Hide password' : 'Show password'}
+                  aria-label={showPw ? t('passwords.hidePassword') : t('passwords.showPassword')}
                 >
                   {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
                 </Button>

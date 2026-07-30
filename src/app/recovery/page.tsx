@@ -9,5 +9,5 @@ export default async function RecoveryRedirect() {
   const locale = localeCookie && locales.includes(localeCookie)
     ? localeCookie
     : routing.defaultLocale;
-  redirect({ href: '/login', locale });
+  redirect({ href: '/recovery', locale });
 }

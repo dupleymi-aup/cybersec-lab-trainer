@@ -7,9 +7,10 @@ import Link from 'next/link';
 
 export default function CTASection() {
   const t = useTranslations('landing.cta');
+  const ta = useTranslations('landing.ariaLabels');
   const locale = useLocale();
   return (
-    <section className="bg-background relative overflow-hidden py-20" aria-label="Call to action">
+    <section className="bg-background relative overflow-hidden py-20" aria-label={ta('callToAction')}>
       <div className="via-accent/20 absolute inset-0 bg-gradient-to-r from-violet-500/10 to-emerald-500/10" />
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute top-1/2 left-1/2 h-[400px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/10 blur-3xl" />

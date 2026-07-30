@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
-import { parseDays } from '@/lib/utils';
 import { CORE_MODULE_IDS } from '@/lib/module-constants';
 import { logger } from '@/lib/logger';
 
@@ -12,7 +11,6 @@ export async function GET(request: NextRequest) {
     if (!requireRole(auth.role, 'teacher')) return forbidden();
 
     const { searchParams } = new URL(request.url);
-    const _days = parseDays(searchParams);
     const groupId = searchParams.get('groupId') || '';
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
-import { parseDays } from '@/lib/utils';
 import type { Prisma } from '@prisma/client';
 import { logger } from '@/lib/logger';
 
@@ -12,11 +11,7 @@ export async function GET(request: NextRequest) {
     if (!requireRole(auth.role, 'teacher')) return forbidden();
 
     const { searchParams } = new URL(request.url);
-    const days = parseDays(searchParams, 90);
     const groupId = searchParams.get('groupId');
-
-    const now = new Date();
-    const _since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
     const userFilter: Prisma.UserWhereInput = { role: 'student' };
     if (groupId) userFilter.group = groupId;
@@ -26,17 +21,12 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true, group: true, createdAt: true },
     });
 
-    const studentIds = students.map((s: { id: string }) => s.id);
+    const studentIds = students.map((s) => s.id);
 
     const progress = await getPrisma().progress.findMany({
       where: { userId: { in: studentIds }, completed: true },
       select: { userId: true, moduleId: true, score: true, updatedAt: true },
       orderBy: { updatedAt: 'asc' },
-    });
-
-    const quizResults = await getPrisma().quizResult.findMany({
-      where: { userId: { in: studentIds } },
-      select: { userId: true, percentage: true, updatedAt: true },
     });
 
     interface StudentVelocity {
@@ -54,8 +44,7 @@ export async function GET(request: NextRequest) {
     const studentVelocities: StudentVelocity[] = [];
 
     for (const student of students) {
-      const studentProgress = progress.filter((p: { userId: string; score: number | null; updatedAt: Date }) => p.userId === student.id);
-      const _studentQuiz = quizResults.filter((q: { userId: string }) => q.userId === student.id);
+      const studentProgress = progress.filter((p) => p.userId === student.id);
 
       const modulesCompleted = studentProgress.length;
       if (modulesCompleted < 2) continue;

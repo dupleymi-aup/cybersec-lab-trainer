@@ -13,66 +13,72 @@ import { logger } from '@/lib/logger';
 
 // GET /api/admin/announcements - List all announcements
 export async function GET(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireCapability(auth, 'announcements:read')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireCapability(auth, 'announcements:read')) return forbidden();
 
-  // Rate limit: 60 requests per minute
-  const rateLimit = checkRateLimit(`announcements-get:${auth.id}`, 60, 60_000);
-  if (!rateLimit.allowed) {
-    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
+    // Rate limit: 60 requests per minute
+    const rateLimit = checkRateLimit(`announcements-get:${auth.id}`, 60, 60_000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const activeFilter = searchParams.get('active');
+
+    let where: Record<string, unknown> = {};
+    if (activeFilter === 'true') {
+      where = {
+        active: true,
+        OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }],
+      };
+    }
+
+    const announcements = await getPrisma().announcement.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return NextResponse.json({
+      announcements: announcements.map((a) => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        priority: a.priority,
+        active: a.active,
+        expiresAt: a.expiresAt ? a.expiresAt.toISOString() : null,
+        createdAt: a.createdAt.toISOString(),
+      })),
+    });
+  } catch (error) {
+    logger.error('Failed to list announcements', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const { searchParams } = new URL(request.url);
-  const activeFilter = searchParams.get('active');
-
-  let where: Record<string, unknown> = {};
-  if (activeFilter === 'true') {
-    where = {
-      active: true,
-      OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }],
-    };
-  }
-
-  const announcements = await getPrisma().announcement.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-  });
-
-  return NextResponse.json({
-    announcements: announcements.map((a: { id: string; title: string; content: string; priority: string; active: boolean; expiresAt: Date | null; createdAt: Date }) => ({
-      id: a.id,
-      title: a.title,
-      content: a.content,
-      priority: a.priority,
-      active: a.active,
-      expiresAt: a.expiresAt ? a.expiresAt.toISOString() : null,
-      createdAt: a.createdAt.toISOString(),
-    })),
-  });
 }
 
 // POST /api/admin/announcements - Create announcement
 export async function POST(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireCapability(auth, 'announcements:create')) return forbidden();
-
-  // Rate limit: 20 requests per minute
-  const rateLimit = checkRateLimit(`announcements-post:${auth.id}`, 20, 60_000);
-  if (!rateLimit.allowed) {
-    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
-  }
-
-  let body: Record<string, unknown>;
   try {
-    body = await request.json();
-  } catch (e) {
-    logger.error('Invalid JSON body in announcements POST', {
-      error: String(e),
-    });
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireCapability(auth, 'announcements:create')) return forbidden();
+
+    // Rate limit: 20 requests per minute
+    const rateLimit = checkRateLimit(`announcements-post:${auth.id}`, 20, 60_000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch (e) {
+      logger.error('Invalid JSON body in announcements POST', {
+        error: String(e),
+      });
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
   const parsed = createAnnouncementSchema.safeParse(body);
   if (!parsed.success) {
@@ -130,29 +136,34 @@ export async function POST(request: NextRequest) {
     },
     { status: 201 },
   );
+  } catch (error) {
+    logger.error('Failed to create announcement', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // PUT /api/admin/announcements - Update announcement
 export async function PUT(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireCapability(auth, 'announcements:edit')) return forbidden();
-
-  // Rate limit: 20 requests per minute
-  const rateLimit = checkRateLimit(`announcements-put:${auth.id}`, 20, 60_000);
-  if (!rateLimit.allowed) {
-    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
-  }
-
-  let body: Record<string, unknown>;
   try {
-    body = await request.json();
-  } catch (e) {
-    logger.error('Invalid JSON body in announcements PUT', {
-      error: String(e),
-    });
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireCapability(auth, 'announcements:edit')) return forbidden();
+
+    // Rate limit: 20 requests per minute
+    const rateLimit = checkRateLimit(`announcements-put:${auth.id}`, 20, 60_000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch (e) {
+      logger.error('Invalid JSON body in announcements PUT', {
+        error: String(e),
+      });
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
   const parsed = updateAnnouncementSchema.safeParse(body);
   if (!parsed.success) {
@@ -211,22 +222,27 @@ export async function PUT(request: NextRequest) {
       createdAt: announcement.createdAt.toISOString(),
     },
   });
+  } catch (error) {
+    logger.error('Failed to update announcement', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // DELETE /api/admin/announcements - Delete announcement
 export async function DELETE(request: NextRequest) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireCapability(auth, 'announcements:delete')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireCapability(auth, 'announcements:delete')) return forbidden();
 
-  // Rate limit: 20 requests per minute
-  const rateLimit = checkRateLimit(`announcements-delete:${auth.id}`, 20, 60_000);
-  if (!rateLimit.allowed) {
-    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
-  }
+    // Rate limit: 20 requests per minute
+    const rateLimit = checkRateLimit(`announcements-delete:${auth.id}`, 20, 60_000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
+    }
 
-  const { searchParams } = new URL(request.url);
-  let id: string | undefined;
+    const { searchParams } = new URL(request.url);
+    let id: string | undefined;
 
   // Try to get id from query param first
   id = searchParams.get('id') || undefined;
@@ -276,4 +292,8 @@ export async function DELETE(request: NextRequest) {
   }
 
   return NextResponse.json({ success: true });
+  } catch (error) {
+    logger.error('Failed to delete announcement', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

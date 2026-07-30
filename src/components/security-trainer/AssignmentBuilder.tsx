@@ -134,9 +134,9 @@ export default function AssignmentBuilder() {
   const locale = useLocale();
   const typeLabels: Record<Assignment['type'], string> = {
     quiz: t('typeQuiz'),
-    'code-review': 'Code Review',
+    'code-review': t('typeCodeReview'),
     attack: t('typeAttack'),
-    writeup: 'Write-up',
+    writeup: t('typeWriteup'),
     custom: t('typeCustom'),
   };
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -236,7 +236,7 @@ export default function AssignmentBuilder() {
         setEditingId(null);
         fetchAssignments();
       } else {
-        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        const err = await res.json().catch(() => ({ error: undefined }));
         toast.error(err.error || t('saveError'));
       }
     } catch (e) {

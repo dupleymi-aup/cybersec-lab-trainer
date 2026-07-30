@@ -11,25 +11,12 @@ export async function GET(request: NextRequest) {
     if (!requireRole(auth.role, 'teacher')) return forbidden();
 
     const { searchParams } = new URL(request.url);
-    const groupId = searchParams.get('groupId') || '';
     const days = parseDays(searchParams);
     const now = new Date();
     const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-    // Get all incorrect quiz attempts
-    const incorrectAttempts = await getPrisma().quizAttempt.findMany({
-      where: { correct: false, attemptedAt: { gte: since } },
-      select: {
-        questionId: true,
-        category: true,
-        difficulty: true,
-        userId: true,
-        attemptedAt: true,
-      },
-    });
-
     // Get all attempts for context
-    const allAttempts = await getPrisma().quizAttempt.findMany({
+    const filteredAll = await getPrisma().quizAttempt.findMany({
       where: { attemptedAt: { gte: since } },
       select: {
         questionId: true,
@@ -40,16 +27,6 @@ export async function GET(request: NextRequest) {
         attemptedAt: true,
       },
     });
-
-    // Get user info for group filtering
-    const users = await getPrisma().user.findMany({
-      select: { id: true, group: true },
-    });
-    const filteredUsers = new Set(users.filter((u: { id: string; group: string }) => !groupId || u.group === groupId).map((u: { id: string; group: string }) => u.id));
-
-    // Filter attempts
-    const _filteredIncorrect = incorrectAttempts.filter((a: { userId: string }) => filteredUsers.has(a.userId));
-    const filteredAll = allAttempts; // We need all for question stats
 
     // Calculate question-level error rates
     const questionMap = new Map<string, { total: number; incorrect: number; category: string; difficulty: string }>();
@@ -135,7 +112,7 @@ export async function GET(request: NextRequest) {
 
     // Error trends over time (weekly buckets)
     const weekMap = new Map<string, { total: number; incorrect: number }>();
-    for (const attempt of allAttempts) {
+    for (const attempt of filteredAll) {
       const attemptDate = new Date(attempt.attemptedAt);
       const weekStart = new Date(attemptDate);
       weekStart.setDate(attemptDate.getDate() - attemptDate.getDay());

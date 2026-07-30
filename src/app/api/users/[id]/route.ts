@@ -13,9 +13,10 @@ interface UserUpdateBody extends UpdateUserInput {
 
 // GET /api/users/[id] - get single user
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'teacher')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireRole(auth.role, 'teacher')) return forbidden();
 
   const isAdmin = auth.role === 'admin';
   const { id } = await params;
@@ -46,13 +47,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     createdAt: user.createdAt.toISOString(),
     lastLoginAt: user.lastLoginAt?.toISOString(),
   });
+  } catch (error) {
+    logger.error('Failed to get user', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // PUT /api/users/[id] - update user (admin)
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireRole(auth.role, 'admin')) return forbidden();
 
   const { id } = await params;
 
@@ -164,13 +170,18 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       isBlocked: user.isBlocked,
     },
   });
+  } catch (error) {
+    logger.error('Failed to update user', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // DELETE /api/users/[id] - delete user (admin)
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await authenticate(request);
-  if (!auth) return unauthorized();
-  if (!requireRole(auth.role, 'admin')) return forbidden();
+  try {
+    const auth = await authenticate(request);
+    if (!auth) return unauthorized();
+    if (!requireRole(auth.role, 'admin')) return forbidden();
 
   // Rate limit: 10 deletions per minute per admin
   const rateLimit = checkRateLimit(`delete:${auth.id}`, 10, 60_000);
@@ -215,4 +226,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   }
 
   return NextResponse.json({ success: true });
+  } catch (error) {
+    logger.error('Failed to delete user', { error });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

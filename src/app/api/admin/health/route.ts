@@ -76,11 +76,13 @@ export async function GET(request: NextRequest) {
     status: missingEnvVars.length > 0 ? 'warn' : 'ok',
     details: {
       nodeEnv: process.env.NODE_ENV || 'unknown',
-      missingVars: missingEnvVars.length > 0 ? missingEnvVars : undefined,
       hasAdminInviteCode: !!process.env.ADMIN_INVITE_CODE,
     },
   };
-  if (missingEnvVars.length > 0 && overallStatus !== 'error') overallStatus = 'warn';
+  if (missingEnvVars.length > 0) {
+    logger.warn('Missing environment variables', { missing: missingEnvVars });
+    if (overallStatus !== 'error') overallStatus = 'warn';
+  }
 
   // 4. Memory usage
   const memUsage = process.memoryUsage();
@@ -134,11 +136,6 @@ export async function GET(request: NextRequest) {
     details: {
       uptimeSeconds: Math.round(uptimeSeconds),
       uptimeFormatted,
-      nodeVersion: process.version,
-      platform: process.platform,
-      arch: process.arch,
-      pid: process.pid,
-      cwd: process.cwd(),
       nodeEnv: process.env.NODE_ENV || 'development',
     },
   };

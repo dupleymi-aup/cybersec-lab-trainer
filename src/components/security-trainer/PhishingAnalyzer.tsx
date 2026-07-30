@@ -422,6 +422,9 @@ export default function PhishingAnalyzer() {
                         key={ind.id}
                         className={`cursor-pointer border transition-colors ${revealedIndicators.has(ind.id) ? 'border-border' : 'border-slate-100'}`}
                         onClick={() => toggleIndicator(ind.id)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleIndicator(ind.id); } }}
                       >
                         <CardContent className="p-3">
                           <div className="flex items-center gap-2">

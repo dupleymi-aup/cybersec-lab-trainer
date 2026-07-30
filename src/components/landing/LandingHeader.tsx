@@ -9,6 +9,7 @@ import ThemeToggle from '@/components/security-trainer/ThemeToggle';
 
 export default function LandingHeader() {
   const t = useTranslations('landing.header');
+  const ta = useTranslations('landing.ariaLabels');
   const locale = useLocale();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -25,7 +26,7 @@ export default function LandingHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-6 md:flex" aria-label={ta('mainNav')}>
           <a
             href="#how-it-works"
             className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
@@ -55,7 +56,7 @@ export default function LandingHeader() {
               {t('login')}
             </Button>
           </Link>
-          <button className="p-2 md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
+          <button type="button" className="p-2 md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={ta('toggleMenu')}>
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
@@ -65,7 +66,7 @@ export default function LandingHeader() {
         <div
           className="border-border/50 bg-background/95 space-y-3 border-t px-4 py-4 backdrop-blur-xl md:hidden"
           role="navigation"
-          aria-label="Mobile navigation"
+          aria-label={ta('mobileNav')}
         >
           <a
             href="#how-it-works"

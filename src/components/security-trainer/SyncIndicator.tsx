@@ -62,10 +62,12 @@ export default function SyncIndicator() {
       {icons[syncStatus]}
       <span>{labels[syncStatus]}</span>
       <button
+        type="button"
         onClick={handleManualSync}
         disabled={isManualSyncing || syncStatus === 'syncing'}
         className="ml-1 rounded p-0.5 transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-30"
         title={t('syncNow')}
+        aria-label={t('syncNow')}
       >
         <RefreshCw size={12} className={isManualSyncing ? 'animate-spin' : ''} />
       </button>

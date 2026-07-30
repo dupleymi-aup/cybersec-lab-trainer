@@ -136,14 +136,26 @@ export default function PasswordStrengthChecker() {
   const score = useMemo(() => getStrengthScore(password), [password]);
   const crackTime = useMemo(() => calculateCrackTime(password), [password]);
 
-  const strengthKey =
-    score <= 2 ? 'veryWeak' : score <= 4 ? 'weak' : score <= 5 ? 'medium' : score <= 6 ? 'strong' : score <= 7 ? 'secure' : 'excellent';
-  const strengthLabel = t(strengthKey);
-
-  const strengthColor =
-    score <= 2 ? 'text-red-500' : score <= 4 ? 'text-orange-500' : score <= 5 ? 'text-yellow-500' : score <= 6 ? 'text-emerald-400' : score <= 7 ? 'text-emerald-500' : 'text-emerald-600';
-  const strengthBg =
-    score <= 2 ? 'bg-red-500' : score <= 4 ? 'bg-orange-500' : score <= 5 ? 'bg-yellow-500' : score <= 6 ? 'bg-emerald-400' : score <= 7 ? 'bg-emerald-500' : 'bg-emerald-600';
+  const strengthMap: Record<string, { key: string; color: string; bg: string }> = {
+    veryWeak: { key: 'veryWeak', color: 'text-red-500', bg: 'bg-red-500' },
+    weak: { key: 'weak', color: 'text-orange-500', bg: 'bg-orange-500' },
+    medium: { key: 'medium', color: 'text-yellow-500', bg: 'bg-yellow-500' },
+    strong: { key: 'strong', color: 'text-emerald-400', bg: 'bg-emerald-400' },
+    secure: { key: 'secure', color: 'text-emerald-500', bg: 'bg-emerald-500' },
+    excellent: { key: 'excellent', color: 'text-emerald-600', bg: 'bg-emerald-600' },
+  };
+  const getStrengthLevel = (s: number) => {
+    if (s <= 2) return strengthMap.veryWeak;
+    if (s <= 4) return strengthMap.weak;
+    if (s <= 5) return strengthMap.medium;
+    if (s <= 6) return strengthMap.strong;
+    if (s <= 7) return strengthMap.secure;
+    return strengthMap.excellent;
+  };
+  const strength = getStrengthLevel(score);
+  const strengthLabel = t(strength.key);
+  const strengthColor = strength.color;
+  const strengthBg = strength.bg;
 
   const passedCount = checks.filter((c) => c.passed).length;
 
@@ -242,16 +254,18 @@ export default function PasswordStrengthChecker() {
                 />
                 <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1">
                   <button
+                    type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="hover:bg-muted text-muted-foreground rounded-md p-1.5 transition"
-                    title={showPassword ? t('hidePassword') : t('showPassword')}
+                    aria-label={showPassword ? t('hidePassword') : t('showPassword')}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                   <button
+                    type="button"
                     onClick={handleCopy}
                     className="hover:bg-muted text-muted-foreground rounded-md p-1.5 transition"
-                    title={t('copyPassword')}
+                    aria-label={t('copyPassword')}
                     disabled={!password}
                   >
                     {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
@@ -385,7 +399,7 @@ export default function PasswordStrengthChecker() {
             {password && (
               <div className="relative rounded-lg bg-slate-900 p-3 font-mono text-sm break-all text-slate-100">
                 {showPassword ? password : '•'.repeat(password.length)}
-                <button onClick={handleCopy} className="absolute top-2 right-2 rounded bg-slate-800 p-1.5 transition hover:bg-slate-700 dark:bg-slate-700">
+                <button type="button" onClick={handleCopy} className="absolute top-2 right-2 rounded bg-slate-800 p-1.5 transition hover:bg-slate-700 dark:bg-slate-700" aria-label={t('copyPassword')}>
                   {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
                 </button>
               </div>
