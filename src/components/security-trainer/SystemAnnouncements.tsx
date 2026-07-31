@@ -122,7 +122,7 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
     loadData();
   }, [loadData]);
 
-  const handleCreate = async () => {
+  const handleCreate = useCallback(async () => {
     if (!formTitle.trim() || !formContent.trim()) {
       toast.error(t('fillTitleAndContent'));
       return;
@@ -146,9 +146,9 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
       logger.error('Failed to create announcement', { error: e });
       toast.error(t('creationError'));
     }
-  };
+  }, [formTitle, formContent, formPriority, formExpiry, t, loadData]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     try {
       const result = await deleteAnnouncement(id);
       if (!result.success) {
@@ -161,13 +161,13 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
       logger.error('Failed to delete announcement', { error: e });
       toast.error(t('deletionError'));
     }
-  };
+  }, [t, loadData]);
 
-  const handleClearExpired = async () => {
+  const handleClearExpired = useCallback(async () => {
     // Reload from server — server already filters expired
     loadData();
     toast.info(t('listRefreshed'));
-  };
+  }, [loadData, t]);
 
   const sorted = [...announcements].sort((a, b) => {
     const priorityOrder = { high: 0, normal: 1, low: 2 };

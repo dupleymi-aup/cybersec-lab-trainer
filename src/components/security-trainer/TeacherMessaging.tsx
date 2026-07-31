@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Users, MessageSquare, X, AlertCircle, Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -48,7 +48,7 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
     setRecentMessages(all.slice(0, 5));
   }, []);
 
-  const handleSend = () => {
+  const handleSend = useCallback(() => {
     if (!title.trim() || !content.trim()) {
       toast.error(t('fillRequired'));
       return;
@@ -74,13 +74,13 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
     setPriority('normal');
     setTargetGroup('');
     toast.success(t('sent'));
-  };
+  }, [title, content, targetGroup, currentUser, priority, t]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = useCallback((id: string) => {
     const all = loadAll().filter((a) => a.id !== id);
     saveAll(all);
     setRecentMessages(all.slice(0, 5));
-  };
+  }, []);
 
   return (
     <div className="space-y-4">

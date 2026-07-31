@@ -172,13 +172,13 @@ export default function AssignmentBuilder() {
     fetchAssignments();
   }, [fetchAssignments]);
 
-  const openCreateForm = () => {
+  const openCreateForm = useCallback(() => {
     setForm(emptyForm);
     setEditingId(null);
     setShowForm(true);
-  };
+  }, []);
 
-  const openEditForm = (a: Assignment) => {
+  const openEditForm = useCallback((a: Assignment) => {
     setForm({
       title: a.title,
       description: a.description,
@@ -196,9 +196,9 @@ export default function AssignmentBuilder() {
     });
     setEditingId(a.id);
     setShowForm(true);
-  };
+  }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!form.title.trim()) {
       toast.error(t('enterTitle'));
       return;
@@ -245,9 +245,9 @@ export default function AssignmentBuilder() {
     } finally {
       setSaving(false);
     }
-  };
+  }, [form, editingId, fetchAssignments, t]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     if (!confirm(t('confirmDelete'))) return;
     try {
       const headers = await getAuthHeaders();
@@ -265,9 +265,9 @@ export default function AssignmentBuilder() {
       logger.warn('AssignmentBuilder handleDelete failed', { error: e });
       toast.error(t('networkError'));
     }
-  };
+  }, [fetchAssignments, t]);
 
-  const togglePublished = async (a: Assignment) => {
+  const togglePublished = useCallback(async (a: Assignment) => {
     try {
       const headers = await getAuthHeaders();
       const res = await fetch(`/api/assignments/${a.id}`, {
@@ -283,7 +283,7 @@ export default function AssignmentBuilder() {
       logger.warn('AssignmentBuilder togglePublished failed', { error: e });
       toast.error(t('error'));
     }
-  };
+  }, [fetchAssignments, t]);
 
   const filtered = assignments.filter((a) => {
     if (filter === 'published') return a.published;
