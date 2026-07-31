@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import CodeBlock from './CodeBlock';
@@ -173,7 +173,7 @@ function simpleHash(text: string): {
 // ============================================================
 // Copy helper
 // ============================================================
-function CopyButton({ text }: { text: string }) {
+const CopyButton = memo(function CopyButton({ text }: { text: string }) {
   const tc = useTranslations('common');
   const [copied, setCopied] = useState(false);
   const handleCopy = async () => {
@@ -204,7 +204,7 @@ function CopyButton({ text }: { text: string }) {
       {copied ? <CheckCircle2 size={14} className="text-emerald-500" /> : <Copy size={14} />}
     </Button>
   );
-}
+});
 
 export default function ToolsLab() {
   const t = useTranslations('labs.tools');
@@ -338,7 +338,7 @@ export default function ToolsLab() {
     }
   };
 
-  const generatePassword = () => {
+  const generatePassword = useCallback(() => {
     let chars = '';
     if (pwUppercase) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     if (pwLowercase) chars += 'abcdefghijklmnopqrstuvwxyz';
@@ -349,21 +349,35 @@ export default function ToolsLab() {
     crypto.getRandomValues(arr);
     const pw = Array.from(arr, (v) => chars[v % chars.length]).join('');
     setGeneratedPassword(pw);
-  };
+  }, [pwUppercase, pwLowercase, pwNumbers, pwSymbols, pwLength]);
 
-  const caesarResult =
-    caesarMode === 'encrypt' ? caesarEncrypt(caesarText, caesarShift) : caesarDecrypt(caesarText, caesarShift);
+  const caesarResult = useMemo(
+    () => (caesarMode === 'encrypt' ? caesarEncrypt(caesarText, caesarShift) : caesarDecrypt(caesarText, caesarShift)),
+    [caesarMode, caesarText, caesarShift],
+  );
 
-  const vigenereResult =
-    vigenereMode === 'encrypt'
-      ? vigenereEncrypt(vigenereText, vigenereKey)
-      : vigenereDecrypt(vigenereText, vigenereKey);
+  const vigenereResult = useMemo(
+    () =>
+      vigenereMode === 'encrypt'
+        ? vigenereEncrypt(vigenereText, vigenereKey)
+        : vigenereDecrypt(vigenereText, vigenereKey),
+    [vigenereMode, vigenereText, vigenereKey],
+  );
 
-  const xorResult = xorMode === 'encrypt' ? xorEncrypt(xorText, xorKey) : xorDecrypt(xorText, xorKey);
+  const xorResult = useMemo(
+    () => (xorMode === 'encrypt' ? xorEncrypt(xorText, xorKey) : xorDecrypt(xorText, xorKey)),
+    [xorMode, xorText, xorKey],
+  );
 
-  const b64Result = b64Mode === 'encode' ? base64Encode(b64Text) : base64Decode(b64Text);
-  const urlResult = urlMode === 'encode' ? urlEncode(urlText) : urlDecode(urlText);
-  const hashResult = simpleHash(hashText);
+  const b64Result = useMemo(
+    () => (b64Mode === 'encode' ? base64Encode(b64Text) : base64Decode(b64Text)),
+    [b64Mode, b64Text],
+  );
+  const urlResult = useMemo(
+    () => (urlMode === 'encode' ? urlEncode(urlText) : urlDecode(urlText)),
+    [urlMode, urlText],
+  );
+  const hashResult = useMemo(() => simpleHash(hashText), [hashText]);
 
   return (
     <div className="space-y-6">

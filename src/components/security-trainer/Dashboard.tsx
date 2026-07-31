@@ -559,32 +559,35 @@ export default function Dashboard() {
 
   const [showAllActivity, setShowAllActivity] = useState(false);
 
-  const handleStartModule = (moduleId: string) => {
+  const handleStartModule = useCallback((moduleId: string) => {
     setCurrentPage(moduleId as PageType);
-  };
+  }, [setCurrentPage]);
 
-  const quickActions = [
-    ...(user?.role === 'admin' || user?.role === 'teacher'
-      ? [
-          {
-            label: t('quickActions.adminPanel'),
-            page: 'admin-panel' as PageType,
-            icon: Shield,
-            color: 'bg-red-100 text-red-600',
-          },
-        ]
-      : []),
-    ...(user?.role === 'teacher' || user?.role === 'admin'
-      ? [
-          {
-            label: t('quickActions.teacherPanel'),
-            page: 'teacher-panel' as PageType,
-            icon: UserCheck,
-            color: 'bg-amber-100 text-amber-600',
-          },
-        ]
-      : []),
-  ];
+  const quickActions = useMemo(
+    () => [
+      ...(user?.role === 'admin' || user?.role === 'teacher'
+        ? [
+            {
+              label: t('quickActions.adminPanel'),
+              page: 'admin-panel' as PageType,
+              icon: Shield,
+              color: 'bg-red-100 text-red-600',
+            },
+          ]
+        : []),
+      ...(user?.role === 'teacher' || user?.role === 'admin'
+        ? [
+            {
+              label: t('quickActions.teacherPanel'),
+              page: 'teacher-panel' as PageType,
+              icon: UserCheck,
+              color: 'bg-amber-100 text-amber-600',
+            },
+          ]
+        : []),
+    ],
+    [user?.role, t],
+  );
 
   return (
     <div className="space-y-6">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -18,6 +18,12 @@ const PRESETS = [
   { key: '90', labelKey: 'thisQuarter' },
   { key: '180', labelKey: 'lastQuarter' },
 ];
+
+const DeltaIcon = memo(({ direction }: { direction: string }) => {
+  if (direction === 'up') return <ArrowUpRight size={14} className="text-emerald-600" />;
+  if (direction === 'down') return <ArrowDownRight size={14} className="text-red-600" />;
+  return <Minus size={14} className="text-muted-foreground" />;
+});
 
 export default function PeriodComparison({ groupId }: { groupId?: string }) {
   const t = useTranslations('periodComparison');
@@ -129,12 +135,6 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
   const sortedByGain = [...moduleComparison].sort((a, b) => b.periodA - b.periodB - (a.periodA - a.periodB));
   const biggestGains = sortedByGain.filter((m) => m.periodA - m.periodB > 0).slice(0, 3);
   const biggestLosses = sortedByGain.filter((m) => m.periodA - m.periodB < 0).slice(0, 3);
-
-  const DeltaIcon = ({ direction }: { direction: string }) => {
-    if (direction === 'up') return <ArrowUpRight size={14} className="text-emerald-600" />;
-    if (direction === 'down') return <ArrowDownRight size={14} className="text-red-600" />;
-    return <Minus size={14} className="text-muted-foreground" />;
-  };
 
   return (
     <div className="space-y-4">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import {
@@ -35,7 +35,7 @@ interface MetricCardProps {
   iconColor: string;
 }
 
-function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, iconBg, iconColor }: MetricCardProps) {
+const MetricCard = memo(function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, iconBg, iconColor }: MetricCardProps) {
   const trendIcon =
     trend === 'up' ? (
       <TrendingUp size={14} className="text-emerald-500" />
@@ -76,7 +76,7 @@ function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, 
       </Card>
     </motion.div>
   );
-}
+});
 
 function chartData(summary: AdminSummary, groupBy: GroupBy) {
   const source = groupBy === 'group' ? summary.byGroup : groupBy === 'course' ? summary.byCourse : summary.byUniversity;

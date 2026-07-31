@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
@@ -56,12 +56,15 @@ interface Props {
 
 export default function StudentPerformanceReport({ userId, initialDays = 30, groupId: _groupId }: Props) {
   const t = useTranslations('studentPerformance');
-  const PERIOD_OPTIONS = [
-    { key: 7, label: t('days7') },
-    { key: 30, label: t('days30') },
-    { key: 90, label: t('days90') },
-    { key: 180, label: t('days180') },
-  ];
+  const PERIOD_OPTIONS = useMemo(
+    () => [
+      { key: 7, label: t('days7') },
+      { key: 30, label: t('days30') },
+      { key: 90, label: t('days90') },
+      { key: 180, label: t('days180') },
+    ],
+    [t],
+  );
   const formatDate = useDateFormatter();
   const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);

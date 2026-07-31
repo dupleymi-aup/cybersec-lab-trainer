@@ -127,13 +127,17 @@ export default function ProfilePage() {
     return unsub;
   }, []);
 
-  const challengeStats = {
-    owaspCorrect: studiedOwaspItems.length,
-    authCorrect: secureCodingCorrectCount,
-  };
+  const challengeStats = useMemo(
+    () => ({
+      owaspCorrect: studiedOwaspItems.length,
+      authCorrect: secureCodingCorrectCount,
+    }),
+    [studiedOwaspItems, secureCodingCorrectCount],
+  );
 
-  const unlockedAchievements = achievements.filter((a) =>
-    getAchievementStatus(a.id, completedModules, quizScores, challengeStats),
+  const unlockedAchievements = useMemo(
+    () => achievements.filter((a) => getAchievementStatus(a.id, completedModules, quizScores, challengeStats)),
+    [completedModules, quizScores, challengeStats],
   );
   const unlockedCount = unlockedAchievements.length;
   const totalAchievements = achievements.length;

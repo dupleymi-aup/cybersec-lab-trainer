@@ -341,7 +341,7 @@ export default function QuizSystem() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  const resetQuiz = () => {
+  const resetQuiz = useCallback(() => {
     setQuizState('select');
     setCurrentQuestion(0);
     setCorrectCount(0);
@@ -352,7 +352,7 @@ export default function QuizSystem() {
     setTimerActive(false);
     setStreak(0);
     setMaxStreak(0);
-  };
+  }, []);
 
   const timerPercent = (timeLeft / 30) * 100;
   const timerColor = timeLeft > 20 ? 'stroke-emerald-500' : timeLeft > 10 ? 'stroke-amber-500' : 'stroke-red-500';
