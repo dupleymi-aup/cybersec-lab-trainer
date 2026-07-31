@@ -77,6 +77,12 @@ describe('env validation', () => {
     );
   });
 
+  it('should default nodeEnv to development when NODE_ENV unset', async () => {
+    delete process.env.NODE_ENV;
+    const { env } = await import('@/lib/env');
+    expect(env.nodeEnv).toBe('development');
+  });
+
   it('should use Math.random fallback when crypto.getRandomValues unavailable', async () => {
     process.env.NODE_ENV = 'development';
     delete process.env.TOKEN_SECRET;

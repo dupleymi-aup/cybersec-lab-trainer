@@ -147,6 +147,10 @@ describe('Capability System', () => {
     it('teacher gets own for assignments:read (own-scoped)', () => {
       expect(getScopeForCap('teacher', 'assignments:read_own')).toBe('own');
     });
+
+    it('teacher gets all scope for assignments:read (has read_all variant)', () => {
+      expect(getScopeForCap('teacher', 'assignments:read')).toBe('all');
+    });
   });
 
   describe('listCapabilities', () => {

@@ -19,6 +19,7 @@ export default defineConfig({
         '**/*.config.*',
         '.next/',
         'public/',
+        'src/lib/data/index.ts',
       ],
       thresholds: {
         lines: 30,

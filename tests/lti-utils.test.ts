@@ -254,6 +254,16 @@ describe('syncGradesToPlatform', () => {
     expect(result.success).toBe(false);
     expect(result.error).toBe('DB connection failed');
   });
+
+  it('returns Unknown error when thrown value is not an Error', async () => {
+    vi.mocked(getPrisma).mockImplementation(() => {
+      throw 'string failure';
+    });
+
+    const result = await syncGradesToPlatform('p1', 'u1', 'module1', 85, 100, 'Quiz 1');
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Unknown error');
+  });
 });
 
 describe('fetchNrpsMembers', () => {
@@ -352,6 +362,37 @@ describe('fetchNrpsMembers', () => {
     expect(members[0]).toEqual({
       userId: 'u1', email: '', name: '', status: 'Active',
     });
+  });
+
+  it('defaults missing user_id to empty string', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        members: [{ email: 'a@test.com' }],
+      }),
+    });
+
+    const members = await fetchNrpsMembers(
+      'https://lms/memberships',
+      'https://lms/token',
+      'client-123',
+      'privateKeyPem',
+    );
+
+    expect(members[0]).toEqual({
+      userId: '', email: 'a@test.com', name: '', status: 'Active',
+    });
+  });
+
+  it('reports Unknown error when fetch rejects with non-Error', async () => {
+    global.fetch = vi.fn().mockRejectedValue('Network glitch');
+
+    await expect(fetchNrpsMembers(
+      'https://lms/memberships',
+      'https://lms/token',
+      'client-123',
+      'privateKeyPem',
+    )).rejects.toThrow('NRPS sync failed: Unknown error');
   });
 });
 

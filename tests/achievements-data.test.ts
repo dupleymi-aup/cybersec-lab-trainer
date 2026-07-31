@@ -112,6 +112,24 @@ describe('isAchievementUnlocked', () => {
     it('ssrf-hunter: unlocks with ssrf score >= 80', () => {
       expect(isAchievementUnlocked('ssrf-hunter', emptyModules, emptyOwasp, { ssrf: 80 })).toBe(true);
     });
+    it('crypto-explorer: locked without tools score', () => {
+      expect(isAchievementUnlocked('crypto-explorer', emptyModules, emptyOwasp, emptyScores)).toBe(false);
+    });
+    it('network-ninja: locked without network score', () => {
+      expect(isAchievementUnlocked('network-ninja', emptyModules, emptyOwasp, emptyScores)).toBe(false);
+    });
+    it('social-engineer: locked without social score', () => {
+      expect(isAchievementUnlocked('social-engineer', emptyModules, emptyOwasp, emptyScores)).toBe(false);
+    });
+    it('all-headers-correct: locked without headers score', () => {
+      expect(isAchievementUnlocked('all-headers-correct', emptyModules, emptyOwasp, emptyScores)).toBe(false);
+    });
+    it('idor-detective: locked without idor score', () => {
+      expect(isAchievementUnlocked('idor-detective', emptyModules, emptyOwasp, emptyScores)).toBe(false);
+    });
+    it('ssrf-hunter: locked without ssrf score', () => {
+      expect(isAchievementUnlocked('ssrf-hunter', emptyModules, emptyOwasp, emptyScores)).toBe(false);
+    });
   });
 
   describe('secure coding achievements', () => {

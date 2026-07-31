@@ -43,6 +43,22 @@ describe('getAchievementStatus', () => {
     expect(getAchievementStatus('perfect-challenge', [], {}, challengeStats)).toBe(true);
   });
 
+  it('should not unlock owasp-challenger without challengeStats', () => {
+    expect(getAchievementStatus('owasp-challenger', [], {}, undefined)).toBe(false);
+  });
+
+  it('should not unlock auth-challenger without challengeStats', () => {
+    expect(getAchievementStatus('auth-challenger', [], {}, undefined)).toBe(false);
+  });
+
+  it('should not unlock perfect-challenge without challengeStats', () => {
+    expect(getAchievementStatus('perfect-challenge', [], {}, undefined)).toBe(false);
+  });
+
+  it('should not unlock first-challenge without challengeStats', () => {
+    expect(getAchievementStatus('first-challenge', [], {}, undefined)).toBe(false);
+  });
+
   it('should unlock full-completion when 8+ modules done (matching achievement-utils logic)', () => {
     // achievement-utils checks completedModules.length >= modules.length
     // modules.length is > 8, so we need enough modules

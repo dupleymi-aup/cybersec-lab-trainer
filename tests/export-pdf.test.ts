@@ -18,7 +18,22 @@ vi.mock('jspdf', () => ({
   }),
 }));
 
-const mockAutoTable = vi.fn();
+const mockAutoTable = vi.fn((_doc: unknown, options?: { didParseCell?: (data: { column: { index: number }; cell: { raw: unknown; styles: Record<string, unknown> } }) => void }) => {
+  if (options?.didParseCell) {
+    options.didParseCell({
+      column: { index: 4 },
+      cell: { raw: '80', styles: {} },
+    });
+    options.didParseCell({
+      column: { index: 4 },
+      cell: { raw: '50', styles: {} },
+    });
+    options.didParseCell({
+      column: { index: 0 },
+      cell: { raw: '80', styles: {} },
+    });
+  }
+});
 vi.mock('jspdf-autotable', () => ({
   autoTable: mockAutoTable,
 }));
@@ -76,6 +91,28 @@ describe('PDF generation functions', () => {
 
   it('generateStudentReportPDF without recommendations', async () => {
     await generateStudentReportPDF(student, kpis, progress, quizResults, []);
+    expect(mockDoc.text).toHaveBeenCalled();
+  });
+
+  it('generateStudentReportPDF with incomplete progress row', async () => {
+    const mixedProgress = [{ moduleId: 'm1', completed: true, score: 90 }, { moduleId: 'm2', completed: false }];
+    await generateStudentReportPDF(student, kpis, mixedProgress, quizResults, recommendations);
+    expect(mockDoc.text).toHaveBeenCalled();
+  });
+
+  it('generateStudentReportPDF falls back when lastAutoTable missing', async () => {
+    const saved = mockDoc.lastAutoTable;
+    mockDoc.lastAutoTable = undefined;
+    try {
+      await generateStudentReportPDF(student, kpis, progress, quizResults, recommendations);
+      expect(mockDoc.text).toHaveBeenCalled();
+    } finally {
+      mockDoc.lastAutoTable = saved;
+    }
+  });
+
+  it('generateStudentReportPDF with unmapped locale uses it as-is', async () => {
+    await generateStudentReportPDF(student, kpis, progress, quizResults, recommendations, 'fr');
     expect(mockDoc.text).toHaveBeenCalled();
   });
 
@@ -149,6 +186,19 @@ describe('PDF generation functions', () => {
     const stats = [{ category: 'XSS', totalAttempts: 10, uniqueStudents: 5 }];
     await generateQuizRetryPDF(stats, []);
     expect(mockAutoTable).toHaveBeenCalled();
+  });
+
+  it('generateQuizRetryPDF falls back when lastAutoTable missing', async () => {
+    const saved = mockDoc.lastAutoTable;
+    mockDoc.lastAutoTable = undefined;
+    const stats = [{ category: 'XSS', totalAttempts: 10, uniqueStudents: 5 }];
+    const retryers = [{ fullName: 'John', group: 'G1', retryCount: 3 }];
+    try {
+      await generateQuizRetryPDF(stats, retryers);
+      expect(mockAutoTable).toHaveBeenCalled();
+    } finally {
+      mockDoc.lastAutoTable = saved;
+    }
   });
 });
 

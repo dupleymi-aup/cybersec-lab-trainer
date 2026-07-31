@@ -72,6 +72,19 @@ describe('notification-store extended', () => {
       useNotificationStore.getState().markAsRead('fake-id');
       expect(useNotificationStore.getState().unreadCount).toBe(0);
     });
+
+    it('should leave other notifications untouched when marking one as read', () => {
+      const { addNotification } = useNotificationStore.getState();
+      addNotification({ type: 'system', title: 'a', message: 'm' });
+      addNotification({ type: 'system', title: 'b', message: 'm' });
+      const [first, second] = useNotificationStore.getState().notifications;
+      useNotificationStore.getState().markAsRead(first.id);
+      const state = useNotificationStore.getState();
+      expect(state.notifications[0].read).toBe(true);
+      expect(state.notifications[1].read).toBe(false);
+      expect(state.notifications[1].id).toBe(second.id);
+      expect(state.unreadCount).toBe(1);
+    });
   });
 
   describe('markAllAsRead', () => {
@@ -231,6 +244,15 @@ describe('notification-store extended', () => {
       });
       await loadAnnouncementsIntoNotifications();
       expect(useNotificationStore.getState().notifications).toHaveLength(1);
+    });
+
+    it('should handle response without announcements field', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ ok: true }),
+      });
+      await loadAnnouncementsIntoNotifications();
+      expect(useNotificationStore.getState().notifications).toHaveLength(0);
     });
   });
 });
