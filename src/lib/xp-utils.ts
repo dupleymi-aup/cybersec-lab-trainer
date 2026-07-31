@@ -105,8 +105,8 @@ export function getXpForNextLevel(xp: number): {
   if (level >= MAX_LEVEL) {
     return { current: xp, needed: 0, nextLevel: MAX_LEVEL };
   }
-  const currentLevelXp = XP_TABLE[level - 1] ?? 0;
-  const nextLevelXp = XP_TABLE[level] ?? XP_TABLE[XP_TABLE.length - 1];
+  const currentLevelXp = XP_TABLE[level - 1];
+  const nextLevelXp = XP_TABLE[level];
   return {
     current: xp - currentLevelXp,
     needed: nextLevelXp - xp,

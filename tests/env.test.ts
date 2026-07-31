@@ -76,4 +76,24 @@ describe('env validation', () => {
       'DATABASE_URL not set. Database features will be disabled. Set DATABASE_URL in .env to enable Prisma.',
     );
   });
+
+  it('should use Math.random fallback when crypto.getRandomValues unavailable', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.TOKEN_SECRET;
+    const originalCrypto = globalThis.crypto;
+    Object.defineProperty(globalThis, 'crypto', {
+      configurable: true,
+      value: { getRandomValues: undefined },
+    });
+    try {
+      const { env } = await import('@/lib/env');
+      expect(env.tokenSecret).toBeTruthy();
+      expect(env.tokenSecret.length).toBeGreaterThan(0);
+    } finally {
+      Object.defineProperty(globalThis, 'crypto', {
+        configurable: true,
+        value: originalCrypto,
+      });
+    }
+  });
 });
