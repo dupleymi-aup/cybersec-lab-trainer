@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
@@ -83,7 +83,7 @@ export default function LtiPlatformManager() {
     privateKey: '',
   });
 
-  const loadPlatforms = async () => {
+  const loadPlatforms = useCallback(async () => {
     setLoading(true);
     try {
       const headers = await getAuthHeaders();
@@ -100,14 +100,13 @@ export default function LtiPlatformManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     loadPlatforms();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadPlatforms]);
 
-  const loadGradeSyncs = async (platformId: string) => {
+  const loadGradeSyncs = useCallback(async (platformId: string) => {
     setLoadingSyncs(true);
     try {
       const headers = await getAuthHeaders();
@@ -124,9 +123,23 @@ export default function LtiPlatformManager() {
     } finally {
       setLoadingSyncs(false);
     }
-  };
+  }, []);
 
-  const handleSubmit = async () => {
+  const resetForm = useCallback(() => {
+    setFormData({
+      name: '',
+      issuer: '',
+      clientId: '',
+      authUrl: '',
+      tokenUrl: '',
+      keysetUrl: '',
+      deploymentId: '',
+      publicKey: '',
+      privateKey: '',
+    });
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
     const { name, issuer, clientId, authUrl, tokenUrl, keysetUrl, deploymentId } = formData;
     if (!name || !issuer || !clientId || !authUrl || !tokenUrl || !keysetUrl || !deploymentId) {
       toast.error(t('fillRequired'));
@@ -158,9 +171,9 @@ export default function LtiPlatformManager() {
       logger.warn('LtiPlatformManager handleSubmit failed', { error: e });
       toast.error(t('networkError'));
     }
-  };
+  }, [formData, editingPlatform, resetForm, loadPlatforms, t]);
 
-  const handleDelete = async (id: string, name: string) => {
+  const handleDelete = useCallback(async (id: string, name: string) => {
     if (!confirm(t('confirmDelete', { name }))) return;
     try {
       const headers = await getAuthHeaders();
@@ -182,9 +195,9 @@ export default function LtiPlatformManager() {
       logger.warn('LtiPlatformManager handleDelete failed', { error: e });
       toast.error(t('networkError'));
     }
-  };
+  }, [selectedPlatformId, loadPlatforms, t]);
 
-  const handleToggleActive = async (platform: LtiPlatform) => {
+  const handleToggleActive = useCallback(async (platform: LtiPlatform) => {
     try {
       const headers = await getAuthHeaders();
       const res = await fetch(`/api/lti/platforms/${platform.id}`, {
@@ -201,23 +214,9 @@ export default function LtiPlatformManager() {
         logger.warn('LtiPlatformManager handleToggleActive failed', { error: e });
       toast.error(t('networkError'));
     }
-  };
+  }, [loadPlatforms, t]);
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      issuer: '',
-      clientId: '',
-      authUrl: '',
-      tokenUrl: '',
-      keysetUrl: '',
-      deploymentId: '',
-      publicKey: '',
-      privateKey: '',
-    });
-  };
-
-  const startEdit = (platform: LtiPlatform) => {
+  const startEdit = useCallback((platform: LtiPlatform) => {
     setEditingPlatform(platform);
     setFormData({
       name: platform.name,
@@ -231,12 +230,12 @@ export default function LtiPlatformManager() {
       privateKey: '',
     });
     setShowForm(true);
-  };
+  }, []);
 
-  const copyToClipboard = (text: string, label: string) => {
+  const copyToClipboard = useCallback((text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(t('copied', { label }));
-  };
+  }, [t]);
 
   const statusIcon = (status: string) => {
     switch (status) {

@@ -153,16 +153,16 @@ export default function StudentAssignments() {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleStartAssignment = (a: Assignment) => {
+  const handleStartAssignment = useCallback((a: Assignment) => {
     setViewingId(a.id);
     setSubmissionText('');
     if (a.timeLimit) {
       setTimer(a.timeLimit * 60);
       setTimerRunning(true);
     }
-  };
+  }, []);
 
-  const handleSubmit = async (a: Assignment) => {
+  const handleSubmit = useCallback(async (a: Assignment) => {
     if (!submissionText.trim()) {
       toast.error(t('enterSolution'));
       return;
@@ -193,7 +193,7 @@ export default function StudentAssignments() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [submissionText, fetchData, t]);
 
   const getMyBestSubmission = (a: Assignment) => {
     const mySubs = submissions[a.id] || [];
