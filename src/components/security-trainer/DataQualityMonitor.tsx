@@ -36,19 +36,21 @@ export default function DataQualityMonitor({ groupId, days }: { groupId?: string
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const toggleIssue = (type: string) => {
-    const next = new Set(expandedIssues);
-    if (next.has(type)) next.delete(type); else next.add(type);
-    setExpandedIssues(next);
-  };
+  const toggleIssue = useCallback((type: string) => {
+    setExpandedIssues((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type); else next.add(type);
+      return next;
+    });
+  }, []);
 
-  const handleSendReminders = (issue: DataQualityIssue) => {
+  const handleSendReminders = useCallback((issue: DataQualityIssue) => {
     if (!issue.affectedStudents?.length) return;
     issue.affectedStudents.forEach((s) => {
       addNotification({ type: 'warning', title: t('sendReminders'), message: t('reminderSent', { name: s.fullName }) });
     });
     toast.success(t('remindersSent', { count: issue.affectedStudents.length }));
-  };
+  }, [addNotification, t]);
 
   const getHealthColor = (score: number) => score >= 80 ? HEALTH_COLORS.good : score >= 50 ? HEALTH_COLORS.warning : HEALTH_COLORS.poor;
   const getHealthLabel = (score: number) => score >= 80 ? t('healthExcellent') : score >= 50 ? t('healthWarning') : t('healthCritical');

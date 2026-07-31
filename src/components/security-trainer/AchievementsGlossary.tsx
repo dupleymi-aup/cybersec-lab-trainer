@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { achievements as achievementDefs } from '@/lib/data';
@@ -82,12 +82,16 @@ export default function AchievementsAndGlossary() {
   const getAchievement = (id: string) => getAchievementStatus(id, completedModules, quizScores, challengeStats);
   const unlockedCount = countUnlockedAchievements(completedModules, quizScores, challengeStats);
 
-  const filteredTerms = glossaryTerms.filter(
-    (term) =>
-      (activeCategory === '' || term.categoryKey === activeCategory) &&
-      (searchTerm === '' ||
-        t(`g.${term.termKey}.t`).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t(`g.${term.termKey}.d`).toLowerCase().includes(searchTerm.toLowerCase())),
+  const filteredTerms = useMemo(
+    () =>
+      glossaryTerms.filter(
+        (term) =>
+          (activeCategory === '' || term.categoryKey === activeCategory) &&
+          (searchTerm === '' ||
+            t(`g.${term.termKey}.t`).toLowerCase().includes(searchTerm.toLowerCase()) ||
+            t(`g.${term.termKey}.d`).toLowerCase().includes(searchTerm.toLowerCase())),
+      ),
+    [activeCategory, searchTerm, t],
   );
 
   return (
