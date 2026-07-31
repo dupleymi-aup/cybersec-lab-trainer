@@ -215,7 +215,7 @@ export default function AdminPanel() {
     return { storageKB: (storageUsed / 1024).toFixed(1), keysCount };
   }, []);
 
-  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+  const handleRoleChange = useCallback(async (userId: string, newRole: UserRole) => {
     try {
       const result = await changeUserRole(userId, newRole);
       if (result.success) {
@@ -227,9 +227,9 @@ export default function AdminPanel() {
     } catch (e) {
       logger.error('Failed to change user role', { error: e });
     }
-  };
+  }, [t, refresh]);
 
-  const handleDeleteUser = async (userId: string, fullName: string) => {
+  const handleDeleteUser = useCallback(async (userId: string, fullName: string) => {
     if (!confirm(t('actions.confirmDelete', { name: fullName }))) return;
     try {
       const result = await deleteUser(userId);
@@ -242,9 +242,9 @@ export default function AdminPanel() {
     } catch (e) {
       logger.error('Failed to delete user', { error: e });
     }
-  };
+  }, [t, refresh]);
 
-  const handleToggleBlock = async (userId: string) => {
+  const handleToggleBlock = useCallback(async (userId: string) => {
     try {
       const result = await toggleUserBlock(userId);
       if (result.success) {
@@ -257,28 +257,30 @@ export default function AdminPanel() {
     } catch (e) {
       logger.error('Failed to toggle user block', { error: e });
     }
-  };
+  }, [allUsers, t, refresh]);
 
-  const handleToggleSelect = (userId: string) => {
-    const next = new Set(selectedUserIds);
-    if (next.has(userId)) {
-      next.delete(userId);
-    } else {
-      next.add(userId);
-    }
-    setSelectedUserIds(next);
-  };
+  const handleToggleSelect = useCallback((userId: string) => {
+    setSelectedUserIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) {
+        next.delete(userId);
+      } else {
+        next.add(userId);
+      }
+      return next;
+    });
+  }, []);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     const filteredIds = filteredUsers.filter((u) => u.id !== user?.id).map((u) => u.id);
     if (selectedUserIds.size === filteredIds.length) {
       setSelectedUserIds(new Set());
     } else {
       setSelectedUserIds(new Set(filteredIds));
     }
-  };
+  }, [filteredUsers, selectedUserIds, user]);
 
-  const handleCSVImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCSVImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -344,9 +346,9 @@ export default function AdminPanel() {
     };
     reader.readAsText(file);
     if (fileInputRef.current) fileInputRef.current.value = '';
-  };
+  }, [allUsers, t, refresh]);
 
-  const handleClearProgress = () => {
+  const handleClearProgress = useCallback(() => {
     if (!confirm(t('actions.confirmClearProgress'))) return;
     if (typeof window === 'undefined') return;
     try {
@@ -363,9 +365,9 @@ export default function AdminPanel() {
       logger.warn('AdminPanel: localStorage clear failed', { error: String(e) });
     }
     toast.success(t('actions.progressCleared'));
-  };
+  }, [t]);
 
-  const handleExportData = () => {
+  const handleExportData = useCallback(() => {
     const data = {
       users: allUsers,
       exportedAt: new Date().toISOString(),
@@ -380,7 +382,7 @@ export default function AdminPanel() {
     a.click();
     URL.revokeObjectURL(url);
     toast.success(t('actions.dataExported'));
-  };
+  }, [allUsers, t]);
 
   return (
     <div className="space-y-6">

@@ -350,7 +350,7 @@ export default function TeacherPanel() {
     }
   };
 
-  const deleteDeadline = async (id: string) => {
+  const deleteDeadline = useCallback(async (id: string) => {
     try {
       const headers = await getAuthHeaders();
       const res = await fetch(`/api/deadlines/${id}`, {
@@ -364,7 +364,7 @@ export default function TeacherPanel() {
     } catch (err) {
       logger.error('Failed to delete deadline', { error: err });
     }
-  };
+  }, []);
 
   const filteredStudents = useMemo(
     () =>
@@ -393,33 +393,86 @@ export default function TeacherPanel() {
 
   // Calculate stats
   const totalStudents = students.length;
-  const activeStudents = students.filter((s) => {
-    const progress = progressMap.get(s.id);
-    return progress && progress.completedModules.length > 0;
-  }).length;
+  const { activeStudents, avgCompletion, avgQuizScore } = useMemo(() => {
+    const active = students.filter((s) => {
+      const progress = progressMap.get(s.id);
+      return progress && progress.completedModules.length > 0;
+    }).length;
 
-  const avgCompletion =
-    totalStudents > 0
-      ? Math.round(
-          students.reduce((acc, s) => {
-            const progress = progressMap.get(s.id);
-            return acc + (progress ? progress.completedModules.length : 0);
-          }, 0) / totalStudents,
-        )
-      : 0;
+    const avgModules =
+      totalStudents > 0
+        ? Math.round(
+            students.reduce((acc, s) => {
+              const progress = progressMap.get(s.id);
+              return acc + (progress ? progress.completedModules.length : 0);
+            }, 0) / totalStudents,
+          )
+        : 0;
 
-  const avgQuizScore =
-    totalStudents > 0
-      ? Math.round(
-          students.reduce((acc, s) => {
-            const progress = progressMap.get(s.id);
-            if (!progress) return acc;
-            const scores = Object.values(progress.quizScores);
-            if (scores.length === 0) return acc;
-            return acc + scores.reduce((a, b) => a + b, 0) / scores.length;
-          }, 0) / totalStudents,
-        )
-      : 0;
+    const avgScore =
+      totalStudents > 0
+        ? Math.round(
+            students.reduce((acc, s) => {
+              const progress = progressMap.get(s.id);
+              if (!progress) return acc;
+              const scores = Object.values(progress.quizScores);
+              if (scores.length === 0) return acc;
+              return acc + scores.reduce((a, b) => a + b, 0) / scores.length;
+            }, 0) / totalStudents,
+          )
+        : 0;
+
+    return { activeStudents: active, avgCompletion: avgModules, avgQuizScore: avgScore };
+  }, [students, progressMap, totalStudents]);
+
+  const quizScoreDistribution = useMemo(() => {
+    const ranges = [
+      { label: '0-20%', min: 0, max: 20, color: '#ef4444' },
+      { label: '21-40%', min: 21, max: 40, color: '#f97316' },
+      { label: '41-60%', min: 41, max: 60, color: '#f59e0b' },
+      { label: '61-80%', min: 61, max: 80, color: '#84cc16' },
+      { label: '81-100%', min: 81, max: 100, color: '#10b981' },
+    ];
+    return ranges.map((range) => {
+      let count = 0;
+      students.forEach((s) => {
+        const progress = getSp(s.id);
+        const scores = Object.values(progress.quizScores);
+        if (scores.length > 0) {
+          const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+          if (avg >= range.min && avg <= range.max) count++;
+        }
+      });
+      return { range: range.label, count, color: range.color };
+    });
+  }, [students, getSp]);
+
+  const engagementLeaderboard = useMemo(() => {
+    const now = new Date();
+    return students
+      .map((s) => {
+        const progress = getSp(s.id);
+        const scores = Object.values(progress.quizScores);
+        const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+        const daysSinceActive = progress.lastActive
+          ? Math.floor((now.getTime() - new Date(progress.lastActive).getTime()) / (1000 * 60 * 60 * 24))
+          : 999;
+        const activityFactor = Math.min(25, Math.round((Math.max(0, 30 - daysSinceActive) / 30) * 25));
+        const completionFactor = Math.min(25, Math.round((progress.completedModules.length / 12) * 25));
+        const quizFactor = Math.round((avgScore / 100) * 25);
+        const attemptsFactor = Math.min(25, Math.round((scores.length / 10) * 25));
+        const engagementScore = activityFactor + completionFactor + quizFactor + attemptsFactor;
+        return {
+          ...s,
+          progress,
+          avgScore,
+          daysSinceActive,
+          engagementScore,
+        };
+      })
+      .sort((a, b) => b.engagementScore - a.engagementScore)
+      .slice(0, 10);
+  }, [students, getSp]);
 
   // At-risk student detection
   const atRiskStudents = useMemo(() => {
@@ -1660,47 +1713,24 @@ export default function TeacherPanel() {
           <Card className="border-border">
             <CardContent className="p-5">
               <h3 className="mb-4 text-sm font-semibold">{t('quizScoreDistribution')}</h3>
-              {(() => {
-                const ranges = [
-                  { label: '0-20%', min: 0, max: 20, color: '#ef4444' },
-                  { label: '21-40%', min: 21, max: 40, color: '#f97316' },
-                  { label: '41-60%', min: 41, max: 60, color: '#f59e0b' },
-                  { label: '61-80%', min: 61, max: 80, color: '#84cc16' },
-                  { label: '81-100%', min: 81, max: 100, color: '#10b981' },
-                ];
-                const distribution = ranges.map((range) => {
-                  let count = 0;
-                  students.forEach((s) => {
-                    const progress = getSp(s.id);
-                    const scores = Object.values(progress.quizScores);
-                    if (scores.length > 0) {
-                      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-                      if (avg >= range.min && avg <= range.max) count++;
-                    }
-                  });
-                  return { range: range.label, count, color: range.color };
-                });
-                return (
-                  <ResponsiveContainer width="100%" height={250}>
-                    <PieChart>
-                      <Pie
-                        data={distribution}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        dataKey="count"
-                        nameKey="range"
-                        label={(entry) => `${entry.name} (${((entry.percent ?? 0) * 100).toFixed(0)}%)`}
-                      >
-                        {distribution.map((entry) => (
-                          <Cell key={entry.color + entry.range} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                );
-              })()}
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={quizScoreDistribution}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="count"
+                    nameKey="range"
+                    label={(entry) => `${entry.name} (${((entry.percent ?? 0) * 100).toFixed(0)}%)`}
+                  >
+                    {quizScoreDistribution.map((entry) => (
+                      <Cell key={entry.color + entry.range} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
 
@@ -1712,33 +1742,7 @@ export default function TeacherPanel() {
                 {t('engagementLeaders')}
               </h3>
               <div className="space-y-2">
-                {(() => {
-                  const now = new Date();
-                  const engagementData = students
-                    .map((s) => {
-                      const progress = getSp(s.id);
-                      const scores = Object.values(progress.quizScores);
-                      const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-                      const daysSinceActive = progress.lastActive
-                        ? Math.floor((now.getTime() - new Date(progress.lastActive).getTime()) / (1000 * 60 * 60 * 24))
-                        : 999;
-                      const activityFactor = Math.min(25, Math.round((Math.max(0, 30 - daysSinceActive) / 30) * 25));
-                      const completionFactor = Math.min(25, Math.round((progress.completedModules.length / 12) * 25));
-                      const quizFactor = Math.round((avgScore / 100) * 25);
-                      const attemptsFactor = Math.min(25, Math.round((scores.length / 10) * 25));
-                      const engagementScore = activityFactor + completionFactor + quizFactor + attemptsFactor;
-                      return {
-                        ...s,
-                        progress,
-                        avgScore,
-                        daysSinceActive,
-                        engagementScore,
-                      };
-                    })
-                    .sort((a, b) => b.engagementScore - a.engagementScore)
-                    .slice(0, 10);
-
-                  return engagementData.map((student, i) => (
+                {engagementLeaderboard.map((student, i) => (
                     <motion.div
                       key={student.id}
                       initial={{ opacity: 0, x: -10 }}
@@ -1785,8 +1789,7 @@ export default function TeacherPanel() {
                         </Badge>
                       </div>
                     </motion.div>
-                  ));
-                })()}
+                ))}
               </div>
             </CardContent>
           </Card>
