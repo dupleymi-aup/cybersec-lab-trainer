@@ -292,9 +292,9 @@ export async function bulkChangeRole(
 export async function bulkToggleBlock(
   userIds: string[],
   currentUserId: string,
-  _blocked: boolean,
+  blocked: boolean,
 ): Promise<{ success: boolean; error?: string; count: number }> {
-  const action = _blocked ? 'block' : 'unblock';
+  const action = blocked ? 'block' : 'unblock';
   if (userIds.includes(currentUserId)) return { success: false, error: `Cannot ${action} yourself`, count: 0 };
   const results = await Promise.allSettled(
     userIds.filter((id) => id !== currentUserId).map((id) => toggleUserBlock(id)),
