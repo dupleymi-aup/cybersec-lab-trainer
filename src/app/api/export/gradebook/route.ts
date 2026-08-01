@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    const csv = generateGradebookCSV(students, []);
+    const csv = generateGradebookCSV(students);
 
     return new NextResponse(csv, {
       headers: {

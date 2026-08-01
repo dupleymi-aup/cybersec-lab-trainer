@@ -254,8 +254,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
         }),
       );
 
-      const moduleNames = modules.map((m) => m.title);
-      const csv = generateGradebookCSV(studentData, moduleNames);
+      const csv = generateGradebookCSV(studentData);
       const date = new Date().toISOString().split('T')[0];
       downloadCSV(csv, `gradebook-${date}.csv`);
 

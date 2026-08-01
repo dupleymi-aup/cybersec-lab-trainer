@@ -75,11 +75,7 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
       avgScore: s.avgQuizScore || 0,
     }));
 
-    await generateGradebookPDF(
-      students,
-      (data.modules || []).map((m: { moduleId: string }) => m.moduleId),
-      groupId || 'all',
-    );
+    await generateGradebookPDF(students);
   },
 
   'at-risk': async (days, groupId): Promise<void> => {
@@ -98,7 +94,6 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
         modulesCompleted: s.modulesCompleted || 0,
         avgQuizScore: s.avgQuizScore || 0,
       })),
-      days,
     );
   },
 
@@ -106,28 +101,28 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
     const { getComprehensiveSummary } = await import('./analytics-api');
     const summary = await getComprehensiveSummary(days, groupId);
 
-    await generateAnalyticsPDF(summary, summary.moduleDistribution || [], summary.trends, groupId || 'all');
+    await generateAnalyticsPDF(summary, summary.moduleDistribution || []);
   },
 
   'module-performance': async (days, groupId): Promise<void> => {
     const { getModulePerformance } = await import('./analytics-api');
     const data = await getModulePerformance(days, groupId);
 
-    await generateModulePerformancePDF(data || [], groupId || 'all');
+    await generateModulePerformancePDF(data || []);
   },
 
-  'group-comparison': async (days, groupId): Promise<void> => {
+  'group-comparison': async (days, _groupId): Promise<void> => {
     const { getGroupComparison } = await import('./analytics-api');
     const data = await getGroupComparison(days);
 
-    await generateGroupComparisonPDF(data.dimensions || [], groupId || 'all');
+    await generateGroupComparisonPDF(data.dimensions || []);
   },
 
   'quiz-retry': async (days, groupId): Promise<void> => {
     const { getQuizRetryAnalytics } = await import('./analytics-api');
     const data = await getQuizRetryAnalytics(days, groupId);
 
-    await generateQuizRetryPDF(data.categoryRetryStats || [], data.topRetryers || [], groupId || 'all');
+    await generateQuizRetryPDF(data.categoryRetryStats || [], data.topRetryers || []);
   },
 };
 
@@ -186,7 +181,7 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
 
       // Send email notification if configured
       if (report.email) {
-        await sendEmailNotification(report, new Blob(), now);
+        await sendEmailNotification(report);
       }
 
       results.success++;
@@ -230,7 +225,7 @@ async function _saveReport(report: ScheduledReportRecord, pdfBlob: Blob, now: Da
   fs.writeFileSync(filePath, buffer);
 }
 
-async function sendEmailNotification(report: ScheduledReportRecord, _pdfBlob: Blob, _now: Date): Promise<void> {
+async function sendEmailNotification(report: ScheduledReportRecord): Promise<void> {
   // Placeholder for email sending logic
   // In production, integrate with SendGrid, Resend, or nodemailer
   logger.warn(`[Email] Notification would be sent to ${report.email} for report ${report.id}`);

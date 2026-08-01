@@ -184,8 +184,6 @@ export async function generateGradebookPDF(
     quizCount: number;
     avgScore: number;
   }>,
-  _modules: string[] = [],
-  _groupId: string = 'all',
   locale?: string,
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
@@ -240,7 +238,6 @@ export async function generateAtRiskPDF(
     modulesCompleted: number;
     avgQuizScore: number;
   }>,
-  _days: number = 30,
   locale?: string,
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
@@ -317,8 +314,6 @@ export async function generateAnalyticsPDF(
     completionRate: number;
     avgScore: number;
   }>,
-  _trends?: unknown,
-  _groupId: string = 'all',
   locale?: string,
 ): Promise<void> {
   const dist = moduleDistribution || summary.moduleDistribution || [];
@@ -393,7 +388,6 @@ export async function generateModulePerformancePDF(
     avgScore: number;
     difficultyIndex: number;
   }>,
-  _groupId: string = 'all',
   locale?: string,
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
@@ -454,8 +448,6 @@ export async function generateGroupComparisonPDF(
     topModule: string;
     weakestModule: string;
   }>,
-  _dimensionType: string = 'group',
-  _groupId: string = 'all',
   locale?: string,
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
@@ -524,7 +516,6 @@ export async function generateQuizRetryPDF(
     group: string;
     retryCount: number;
   }> = [],
-  _groupId: string = 'all',
   locale?: string,
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
@@ -599,7 +590,6 @@ export function generateGradebookCSV(
     avgScore: number;
     lastActive: string;
   }>,
-  _modules: string[],
 ): string {
   const headers = [
     'Name',
