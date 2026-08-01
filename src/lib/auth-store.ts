@@ -732,19 +732,11 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
           });
 
-          import('./store')
-            .then(({ invalidateTokenCache }) => invalidateTokenCache())
-            .catch((e) => {
-              logger.warn('invalidateTokenCache failed', { error: e });
-            });
-
-          // Migrate anonymous progress to user
-          const { migrateProgressToUser } = await import('./store');
-          migrateProgressToUser(data.user.id);
-
-          // Load user's progress from server
-          const { useAppStore } = await import('./store');
-          useAppStore
+          // Migrate anonymous progress to user and load from server
+          const storeModule = await import('./store');
+          storeModule.invalidateTokenCache();
+          storeModule.migrateProgressToUser(data.user.id);
+          storeModule.useAppStore
             .getState()
             .loadFromDatabase(data.user.id)
             .catch((e) => {
@@ -785,7 +777,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         import('./store')
-          .then(({ invalidateTokenCache }) => invalidateTokenCache())
+          .then((m) => m.invalidateTokenCache())
           .catch((e) => {
             logger.warn('invalidateTokenCache failed', { error: e });
           });
