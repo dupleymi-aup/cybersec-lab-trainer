@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true, group: true, createdAt: true },
     });
 
-    const studentIds = students.map((s) => s.id);
+    const studentIds = students.map((s: { id: string }) => s.id);
 
     const progress = await getPrisma().progress.findMany({
       where: { userId: { in: studentIds }, completed: true },
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     const studentVelocities: StudentVelocity[] = [];
 
     for (const student of students) {
-      const studentProgress = progress.filter((p) => p.userId === student.id);
+      const studentProgress = progress.filter((p: { userId: string }) => p.userId === student.id);
 
       const modulesCompleted = studentProgress.length;
       if (modulesCompleted < 2) continue;

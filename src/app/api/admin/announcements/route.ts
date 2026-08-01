@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
+import type { Announcement } from '@prisma/client';
 import {
   authenticate,
   unauthorized,
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      announcements: announcements.map((a) => ({
+      announcements: announcements.map((a: Announcement) => ({
         id: a.id,
         title: a.title,
         content: a.content,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
+import type { Progress } from '@prisma/client';
 import { authenticate, unauthorized } from '@/lib/api-middleware';
 import { syncGradesToPlatform } from '@/lib/lti-utils';
 import { modules } from '@/lib/data';
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     completedModules,
     quizScores,
-    progress: progress.map((p) => ({
+    progress: progress.map((p: Progress) => ({
       moduleId: p.moduleId,
       completed: p.completed,
       score: p.score,
