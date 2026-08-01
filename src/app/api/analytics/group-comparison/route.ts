@@ -3,17 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { logger } from '@/lib/logger';
-
-const MODULE_NAMES: Record<string, string> = {
-  owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL Injection',
-  xss: 'XSS',
-  csrf: 'CSRF',
-  auth: 'Authentication',
-  'secure-coding': 'Secure Coding',
-  tools: 'Tools',
-  'security-headers': 'Security Headers',
-};
+import { MODULE_SHORT_NAMES } from '@/lib/module-names';
 
 export async function GET(request: NextRequest) {
   try {
@@ -133,7 +123,7 @@ export async function GET(request: NextRequest) {
       const studentsWithProgress = new Set(data.progress.filter((p: ProgressRow) => p.completed).map((p: ProgressRow) => p.userId)).size;
       const achievementRate = studentCount > 0 ? Math.round((studentsWithProgress / studentCount) * 10000) / 100 : 0;
 
-      const moduleStats = Object.keys(MODULE_NAMES).map((moduleId) => {
+      const moduleStats = Object.keys(MODULE_SHORT_NAMES).map((moduleId) => {
         const mp = data.progress.filter((p: ProgressRow) => p.moduleId === moduleId);
         const completed = mp.filter((p: ProgressRow) => p.completed).length;
         return {
@@ -145,10 +135,10 @@ export async function GET(request: NextRequest) {
 
       moduleStats.sort((a, b) => b.rate - a.rate);
       const topModule = moduleStats[0]?.moduleId
-        ? MODULE_NAMES[moduleStats[0].moduleId] || moduleStats[0].moduleId
+        ? MODULE_SHORT_NAMES[moduleStats[0].moduleId] || moduleStats[0].moduleId
         : '-';
       const weakestModule = moduleStats[moduleStats.length - 1]?.moduleId
-        ? MODULE_NAMES[moduleStats[moduleStats.length - 1].moduleId] || moduleStats[moduleStats.length - 1].moduleId
+        ? MODULE_SHORT_NAMES[moduleStats[moduleStats.length - 1].moduleId] || moduleStats[moduleStats.length - 1].moduleId
         : '-';
 
       return {

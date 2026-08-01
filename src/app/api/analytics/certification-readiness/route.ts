@@ -6,19 +6,9 @@ import { isAchievementUnlocked } from '@/lib/data/achievements-data';
 import type { Prisma } from '@prisma/client';
 import { TOTAL_MODULES } from '@/lib/module-constants';
 import { logger } from '@/lib/logger';
+import { CATEGORY_NAMES } from '@/lib/module-names';
 
 const ALL_QUIZ_CATEGORIES = ['sql', 'xss', 'csrf', 'auth', 'general', 'owasp', 'coding', 'network', 'social'];
-const CATEGORY_NAMES: Record<string, string> = {
-  sql: 'SQL Injection',
-  xss: 'XSS Attacks',
-  csrf: 'CSRF Attacks',
-  auth: 'Authentication',
-  general: 'General',
-  owasp: 'OWASP Top 10',
-  coding: 'Secure Coding',
-  network: 'Networks',
-  social: 'Social Engineering',
-};
 
 export async function GET(request: NextRequest) {
   try {

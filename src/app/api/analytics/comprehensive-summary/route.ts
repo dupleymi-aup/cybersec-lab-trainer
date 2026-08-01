@@ -3,21 +3,11 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { MODULE_SHORT_NAMES } from '@/lib/module-names';
 
 // In-memory response cache with 30s TTL
 const cache = new Map<string, { data: unknown; expiresAt: number }>();
 const CACHE_TTL = 30_000; // 30 seconds
-
-const MODULE_NAMES: Record<string, string> = {
-  owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL Injection',
-  xss: 'XSS',
-  csrf: 'CSRF',
-  auth: 'Authentication',
-  'secure-coding': 'Secure Coding',
-  tools: 'Tools',
-  'security-headers': 'Security Headers',
-};
 
 export async function GET(request: NextRequest) {
   try {
@@ -187,7 +177,7 @@ export async function GET(request: NextRequest) {
       progressByModule.get(p.moduleId)?.push(p);
     }
 
-    const moduleDistribution = Object.keys(MODULE_NAMES).map((moduleId) => {
+    const moduleDistribution = Object.keys(MODULE_SHORT_NAMES).map((moduleId) => {
       const mp = progressByModule.get(moduleId) || [];
       const completed = mp.filter((p: ProgressRow) => p.completed).length;
       const completionRate = totalStudents > 0 ? Math.round((completed / totalStudents) * 10000) / 100 : 0;
@@ -196,7 +186,7 @@ export async function GET(request: NextRequest) {
         scores.length > 0 ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 10) / 10 : 0;
       return {
         moduleId,
-        moduleName: MODULE_NAMES[moduleId],
+        moduleName: MODULE_SHORT_NAMES[moduleId],
         completionRate,
         avgScore,
       };

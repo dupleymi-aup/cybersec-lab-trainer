@@ -4,18 +4,7 @@ import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-mi
 import { parseDays } from '@/lib/utils';
 import type { Prisma } from '@prisma/client';
 import { logger } from '@/lib/logger';
-
-const CATEGORY_NAMES: Record<string, string> = {
-  sql: 'SQL Injection',
-  xss: 'XSS Attacks',
-  csrf: 'CSRF Attacks',
-  auth: 'Authentication',
-  general: 'General',
-  owasp: 'OWASP Top 10',
-  coding: 'Secure Coding',
-  network: 'Networks',
-  social: 'Social Engineering',
-};
+import { CATEGORY_NAMES } from '@/lib/module-names';
 
 export async function GET(request: NextRequest) {
   try {

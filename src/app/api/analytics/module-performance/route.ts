@@ -3,17 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { parseDays } from '@/lib/utils';
 import { logger } from '@/lib/logger';
-
-const MODULE_NAMES: Record<string, string> = {
-  owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL Injection',
-  xss: 'XSS',
-  csrf: 'CSRF',
-  auth: 'Authentication',
-  'secure-coding': 'Secure Coding',
-  tools: 'Tools',
-  'security-headers': 'Security Headers',
-};
+import { MODULE_SHORT_NAMES } from '@/lib/module-names';
 
 export async function GET(request: NextRequest) {
   try {
@@ -49,7 +39,7 @@ export async function GET(request: NextRequest) {
       select: { userId: true, moduleId: true, completed: true, score: true },
     });
 
-    const moduleIds = Object.keys(MODULE_NAMES);
+    const moduleIds = Object.keys(MODULE_SHORT_NAMES);
     const modules = moduleIds.map((moduleId) => {
       const moduleProgress = progressRecords.filter((p: ProgressRow) => p.moduleId === moduleId);
       const completedCount = moduleProgress.filter((p: ProgressRow) => p.completed).length;
@@ -70,7 +60,7 @@ export async function GET(request: NextRequest) {
 
       return {
         moduleId,
-        moduleName: MODULE_NAMES[moduleId] || moduleId,
+        moduleName: MODULE_SHORT_NAMES[moduleId] || moduleId,
         totalStudents,
         completedCount,
         completionRate,
@@ -109,7 +99,7 @@ export async function GET(request: NextRequest) {
           const completionRate = totalStudents > 0 ? Math.round((completedCount / totalStudents) * 10000) / 100 : 0;
           return {
             moduleId,
-            moduleName: MODULE_NAMES[moduleId],
+            moduleName: MODULE_SHORT_NAMES[moduleId],
             completedCount,
             completionRate,
             avgScore,

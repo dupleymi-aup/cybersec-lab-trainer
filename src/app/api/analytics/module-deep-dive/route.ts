@@ -4,19 +4,7 @@ import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-mi
 import { parseDays } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
-
-const MODULE_NAMES: Record<string, string> = {
-  owasp: 'OWASP Top 10',
-  'sql-injection': 'SQL Injection',
-  xss: 'XSS Attacks',
-  csrf: 'CSRF Attacks',
-  auth: 'Authentication',
-  'secure-coding': 'Secure Coding',
-  tools: 'Tools',
-  'security-headers': 'Security Headers',
-  idor: 'IDOR',
-  ssrf: 'SSRF',
-};
+import { MODULE_SHORT_NAMES } from '@/lib/module-names';
 
 const MODULE_LEVEL_COUNTS: Record<string, number> = {
   owasp: 10,
@@ -244,7 +232,7 @@ export async function GET(request: NextRequest) {
 
       results.push({
         moduleId,
-        moduleName: MODULE_NAMES[moduleId] || moduleId,
+        moduleName: MODULE_SHORT_NAMES[moduleId] || moduleId,
         levels,
         challengeScores: challengeRanges,
         totalStudents,
