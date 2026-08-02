@@ -12,6 +12,10 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done
+- **Hydration fixes**: replaced `<head>` inside `<body>` with `next/script` for JSON-LD in locale layout; fixed ThemeToggle hydration mismatch with mounted state guard
+- **Zod validation**: added schemas to 20+ API routes (admin, auth, LTI, progress, users, CSP report, scheduled reports)
+- **i18n**: added missing `goBack` key to `studentProgress` in ru.json and zh.json
+- **Lint**: suppressed unused `target_link_uri` warning in oidc-login route
 - **Repo cleanup**: removed 76 generated Playwright report/test-result files from git tracking (were in .gitignore but still tracked, ~102K lines deleted)
 - **Removed unused `uuid` dependency** — project uses custom `validate-uuid.ts` with regex
 - **Fixed `packageManager` field** — corepack injected yarn reference; project uses npm
