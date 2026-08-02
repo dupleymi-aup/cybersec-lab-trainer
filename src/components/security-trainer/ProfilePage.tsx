@@ -393,6 +393,7 @@ export default function ProfilePage() {
             </div>
             <button
               onClick={() => fileInputRef.current?.click()}
+              aria-label={t('uploadAvatar')}
               className="absolute -right-1 -bottom-1 flex h-7 w-7 items-center justify-center rounded-full bg-violet-600 transition hover:bg-violet-700"
             >
               <Camera className="h-3.5 w-3.5 text-white" />
@@ -667,6 +668,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => setShowOld(!showOld)}
+                aria-label={showOld ? t('hidePassword') : t('showPassword')}
                 className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 hover:text-slate-300"
               >
                 {showOld ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -687,6 +689,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => setShowNew(!showNew)}
+                aria-label={showNew ? t('hidePassword') : t('showPassword')}
                 className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 hover:text-slate-300"
               >
                 {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -748,6 +751,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
+                aria-label={showConfirm ? t('hidePassword') : t('showPassword')}
                 className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 hover:text-slate-300"
               >
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

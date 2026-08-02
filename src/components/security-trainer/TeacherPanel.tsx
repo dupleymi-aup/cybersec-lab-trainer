@@ -1015,6 +1015,7 @@ export default function TeacherPanel() {
                           <button
                             onClick={() => deleteDeadline(d.id)}
                             className="shrink-0 rounded p-1.5 text-red-400 transition-colors hover:bg-red-100 hover:text-red-600"
+                            aria-label={t('deleteDeadline')}
                             title={t('deleteDeadline')}
                           >
                             <Trash2 size={14} />

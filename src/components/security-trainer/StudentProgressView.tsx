@@ -243,6 +243,7 @@ export default function StudentProgressView({
             setData(null);
             onBack();
           }}
+          aria-label={t('goBack')}
           className="hover:bg-muted rounded-lg p-1.5 transition-colors"
         >
           <ArrowLeft size={18} className="text-muted-foreground" />

@@ -1956,6 +1956,7 @@
     "rarityCommon": "Common"
   },
   "studentProgress": {
+    "goBack": "Go back",
     "avatar": "Avatar",
     "modules": "Modules",
     "quizzes": "Quizzes",
@@ -2952,7 +2953,14 @@
   },
   "commonAria": {
     "back": "Back",
-    "close": "Close"
+    "close": "Close",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "togglePasswordVisibility": "Toggle password visibility",
+    "uploadAvatar": "Upload avatar",
+    "goBack": "Go back",
+    "copy": "Copy",
+    "delete": "Delete"
   },
   "appModules": {
     "dashboard": "Dashboard",

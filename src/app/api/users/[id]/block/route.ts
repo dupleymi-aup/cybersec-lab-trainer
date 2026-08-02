@@ -62,7 +62,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         },
       });
     } catch (error) {
-      logger.warn('Audit logging failed', { error });
+      logger.warn('Audit logging failed', { error: String(error) });
     }
 
     return NextResponse.json({
@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (error) {
-    logger.error('Failed to toggle user block status', { error });
+    logger.error('Failed to toggle user block status', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

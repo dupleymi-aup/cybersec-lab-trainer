@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { getPrisma } from '@/lib/db';
+import { createLtiPlatformSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
 
 /**
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(platforms);
   } catch (error) {
-    logger.error('Failed to list LTI platforms', { error });
+    logger.error('Failed to list LTI platforms', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -55,31 +56,16 @@ export async function POST(request: NextRequest) {
   if (!requireRole(auth.role, 'admin')) return forbidden();
 
   try {
-    const body = await request.json();
-    const { name, issuer, clientId, authUrl, tokenUrl, keysetUrl, deploymentId, publicKey, privateKey } = body;
-
-    if (!name || !issuer || !clientId || !authUrl || !tokenUrl || !keysetUrl || !deploymentId) {
+    const rawBody = await request.json();
+    const parsed = createLtiPlatformSchema.safeParse(rawBody);
+    if (!parsed.success) {
       return NextResponse.json(
-        {
-          error: 'Missing required fields: name, issuer, clientId, authUrl, tokenUrl, keysetUrl, deploymentId',
-        },
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
         { status: 400 },
       );
     }
 
-    // Validate URL schemes to prevent javascript:/data: URLs
-    const urlFields = { authUrl, tokenUrl, keysetUrl };
-    for (const [fieldName, urlValue] of Object.entries(urlFields)) {
-      try {
-        const parsed = new URL(urlValue as string);
-        if (!['http:', 'https:'].includes(parsed.protocol)) {
-          return NextResponse.json({ error: `${fieldName} must use http: or https: protocol` }, { status: 400 });
-        }
-      } catch (e) {
-        logger.error('Invalid JSON in platforms POST', { error: String(e) });
-        return NextResponse.json({ error: `${fieldName} is not a valid URL` }, { status: 400 });
-      }
-    }
+    const { name, issuer, clientId, authUrl, tokenUrl, keysetUrl, deploymentId, publicKey, privateKey } = parsed.data;
 
     const platform = await getPrisma().ltiPlatform.create({
       data: {

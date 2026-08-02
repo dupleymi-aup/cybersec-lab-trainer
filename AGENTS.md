@@ -12,6 +12,10 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done
+- **Repo cleanup**: removed 76 generated Playwright report/test-result files from git tracking (were in .gitignore but still tracked, ~102K lines deleted)
+- **Removed unused `uuid` dependency** — project uses custom `validate-uuid.ts` with regex
+- **Fixed `packageManager` field** — corepack injected yarn reference; project uses npm
+- **Tracked `public/sw.js`** service worker (removed from .gitignore)
 - **Vulnerabilities eliminated**: 11 npm vulns (2 critical) → **0**. `npm update` all deps in range + `overrides`: postcss 8.5.25 (3 high postcss CVEs), sharp 0.35.3 (libvips CVEs) inside next
 - **Prisma pinned to 6.19.3** (exact) — Prisma 7.x breaking change: `url` in datasource block rejected (needs prisma.config.ts + adapter); project runtime expects Prisma 6 client architecture (`@prisma/client/runtime/library.js`). Do NOT bump to 7.x without migrating schema/config.
 - **Bug fix**: 5 TS2345 errors from recharts 3.10.1 stricter `Tooltip labelFormatter` typing (ReactNode) — fixed with `formatDate(String(v))` in AdvancedAnalytics, ErrorPatternsAnalytics, StudentPerformanceReport
@@ -23,7 +27,7 @@ This project belongs to the work account — always use the `github-work` host a
 - (none)
 
 ### Blocked
-- (none) — previously 6 npm vulns, now resolved via overrides
+- (none)
 
 ## Historic (previous sessions)
 

@@ -68,12 +68,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to reset user password', { error });
+    logger.error('Failed to reset user password', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

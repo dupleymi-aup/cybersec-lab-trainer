@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    logger.error('Failed to list announcements', { error });
+    logger.error('Failed to list announcements', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return NextResponse.json(
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
     { status: 201 },
   );
   } catch (error) {
-    logger.error('Failed to create announcement', { error });
+    logger.error('Failed to create announcement', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -208,7 +208,7 @@ export async function PUT(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return NextResponse.json({
@@ -224,7 +224,7 @@ export async function PUT(request: NextRequest) {
     },
   });
   } catch (error) {
-    logger.error('Failed to update announcement', { error });
+    logger.error('Failed to update announcement', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -289,12 +289,12 @@ export async function DELETE(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to delete announcement', { error });
+    logger.error('Failed to delete announcement', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -322,3 +322,93 @@ export const impersonateSchema = z.object({
 });
 
 export type ImpersonateInput = z.infer<typeof impersonateSchema>;
+
+// Recovery OTP verify validation
+export const recoveryVerifySchema = z.object({
+  emailOrPhone: z.string().min(1, 'Email or phone is required').max(255),
+  otp: z.string().min(4, 'OTP must be at least 4 characters').max(10),
+});
+
+export type RecoveryVerifyInput = z.infer<typeof recoveryVerifySchema>;
+
+// Recovery password reset validation
+export const recoveryResetSchema = z.object({
+  emailOrPhone: z.string().min(1, 'Email or phone is required').max(255),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters').max(128),
+  otp: z.string().min(4, 'OTP must be at least 4 characters').max(10),
+});
+
+export type RecoveryResetInput = z.infer<typeof recoveryResetSchema>;
+
+// LTI platform creation validation
+export const createLtiPlatformSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(200),
+  issuer: z.string().min(1, 'Issuer is required').max(500),
+  clientId: z.string().min(1, 'Client ID is required').max(200),
+  deploymentId: z.string().min(1, 'Deployment ID is required').max(200),
+  authUrl: z.string().url('Invalid auth URL').max(2048).refine(
+    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
+    'authUrl must use http: or https: protocol',
+  ),
+  tokenUrl: z.string().url('Invalid token URL').max(2048).refine(
+    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
+    'tokenUrl must use http: or https: protocol',
+  ),
+  keysetUrl: z.string().url('Invalid keyset URL').max(2048).refine(
+    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
+    'keysetUrl must use http: or https: protocol',
+  ),
+  privateKey: z.string().max(8192).optional(),
+  publicKey: z.string().max(8192).optional(),
+});
+
+export type CreateLtiPlatformInput = z.infer<typeof createLtiPlatformSchema>;
+
+// LTI platform update validation
+export const updateLtiPlatformSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  issuer: z.string().min(1).max(500).optional(),
+  clientId: z.string().min(1).max(200).optional(),
+  deploymentId: z.string().min(1).max(200).optional(),
+  authUrl: z.string().url().max(2048).refine(
+    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
+    'authUrl must use http: or https: protocol',
+  ).optional(),
+  tokenUrl: z.string().url().max(2048).refine(
+    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
+    'tokenUrl must use http: or https: protocol',
+  ).optional(),
+  keysetUrl: z.string().url().max(2048).refine(
+    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
+    'keysetUrl must use http: or https: protocol',
+  ).optional(),
+  privateKey: z.string().max(8192).optional(),
+  publicKey: z.string().max(8192).optional(),
+  isActive: z.boolean().optional(),
+});
+
+export type UpdateLtiPlatformInput = z.infer<typeof updateLtiPlatformSchema>;
+
+// Admin user export validation
+export const adminExportSchema = z.object({
+  role: z.enum(['student', 'teacher', 'admin']).optional(),
+  group: z.string().max(100).optional(),
+  university: z.string().max(200).optional(),
+  course: z.string().max(100).optional(),
+  ids: z.array(z.string().uuid()).max(1000).optional(),
+});
+
+export type AdminExportInput = z.infer<typeof adminExportSchema>;
+
+// LTI OIDC login validation
+export const oidcLoginSchema = z.object({
+  iss: z.string().min(1, 'Issuer is required').max(2048),
+  login_hint: z.string().min(1, 'Login hint is required').max(2048),
+  target_link_uri: z.string().min(1, 'Target link URI is required').max(2048),
+  client_id: z.string().max(200).optional(),
+  lti_message_hint: z.string().max(2048).optional(),
+  state: z.string().max(512).optional(),
+  nonce: z.string().max(512).optional(),
+});
+
+export type OidcLoginInput = z.infer<typeof oidcLoginSchema>;

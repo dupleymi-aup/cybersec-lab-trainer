@@ -3,14 +3,15 @@ import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
 import { logger } from '@/lib/logger';
 import { hashPassword, validateEmail, validatePhone } from '@/lib/auth-utils';
+import { z } from 'zod';
 
-interface RequestBody {
-  csv: string;
-  role?: string;
-  defaultGroup?: string;
-  defaultCourse?: string;
-  defaultUniversity?: string;
-}
+const importBodySchema = z.object({
+  csv: z.string().min(1, 'CSV content is required').max(1_000_000, 'CSV content too large (max 1MB)'),
+  role: z.enum(['student', 'teacher', 'admin']).optional(),
+  defaultGroup: z.string().max(100).optional().default(''),
+  defaultCourse: z.string().max(100).optional().default(''),
+  defaultUniversity: z.string().max(200).optional().default(''),
+});
 
 interface ParsedRow {
   email: string;
@@ -99,24 +100,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
-  let body: RequestBody;
+  let rawBody: unknown;
   try {
-    body = await request.json();
+    rawBody = await request.json();
   } catch (e) {
     logger.error('Invalid JSON in users import', { error: String(e) });
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { csv, role, defaultGroup = '', defaultCourse = '', defaultUniversity = '' } = body;
-
-  if (!csv || typeof csv !== 'string' || csv.trim().length === 0) {
-    return NextResponse.json({ error: 'CSV content is required' }, { status: 400 });
+  const parsed = importBodySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+      { status: 400 },
+    );
   }
 
-  // Validate role if provided
-  if (role && !['student', 'teacher', 'admin'].includes(role)) {
-    return NextResponse.json({ error: 'Invalid role. Must be: student, teacher, admin' }, { status: 400 });
-  }
+  const { csv, role, defaultGroup, defaultCourse, defaultUniversity } = parsed.data;
 
   const rows = parseCSV(csv);
   if (rows.length === 0) {
@@ -278,7 +278,7 @@ export async function POST(request: NextRequest) {
       });
       imported += batchRows.length;
     } catch (error) {
-      logger.warn('CSV import batch create failed', { error });
+      logger.warn('CSV import batch create failed', { error: String(error) });
       for (const row of batchRows) {
         errors.push({
           row: row.rowNum,
@@ -306,7 +306,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return NextResponse.json({

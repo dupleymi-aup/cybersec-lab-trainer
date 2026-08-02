@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPrisma } from '@/lib/db';
 import { authenticate, unauthorized, forbidden, requireRole, checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { adminExportSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
-
-interface ExportRequestBody {
-  role?: string;
-  group?: string;
-  university?: string;
-  course?: string;
-  ids?: string[];
-}
 
 function escapeCsvField(value: string | number | boolean | null | undefined): string {
   if (value == null) return '';
@@ -35,20 +28,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
   }
 
-  let body: ExportRequestBody;
+  let rawBody: unknown;
   try {
-    body = await request.json();
+    rawBody = await request.json();
   } catch (e) {
     logger.error('Users export failed', { error: String(e) });
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { role, group, university, course, ids } = body;
+  const parsed = adminExportSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+      { status: 400 },
+    );
+  }
+
+  const { role, group, university, course, ids } = parsed.data;
 
   // Build where clause
   const where: Record<string, unknown> = {};
 
-  if (ids && Array.isArray(ids) && ids.length > 0) {
+  if (ids && ids.length > 0) {
     where.id = { in: ids };
   } else {
     if (role) where.role = role;
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return new NextResponse(csvContent, {

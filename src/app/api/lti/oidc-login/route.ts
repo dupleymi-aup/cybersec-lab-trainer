@@ -3,6 +3,7 @@ import { getPrisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { DEFAULT_APP_URL } from '@/lib/constants';
 import { checkRateLimit, getClientIp } from '@/lib/api-middleware';
+import { oidcLoginSchema } from '@/lib/validations/api';
 
 /**
  * POST /api/lti/oidc-login
@@ -21,25 +22,16 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const {
-      iss, // issuer (platform URL)
-      login_hint,
-      target_link_uri,
-      client_id,
-      lti_message_hint,
-      state,
-      nonce,
-    } = body;
-
-    if (!iss || !login_hint || !target_link_uri) {
+    const rawBody = await request.json();
+    const parsed = oidcLoginSchema.safeParse(rawBody);
+    if (!parsed.success) {
       return NextResponse.json(
-        {
-          error: 'Missing required OIDC login parameters: iss, login_hint, target_link_uri',
-        },
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
         { status: 400 },
       );
     }
+
+    const { iss, login_hint, target_link_uri: _target_link_uri, client_id, lti_message_hint, state, nonce } = parsed.data;
 
     // Find the platform by issuer
     const platform = await getPrisma().ltiPlatform.findFirst({

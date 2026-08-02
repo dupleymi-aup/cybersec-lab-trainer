@@ -224,7 +224,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ cohorts, overallRetention });
   } catch (error) {
-    logger.error('analytics/cohort GET error', { error });
+    logger.error('analytics/cohort GET error', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

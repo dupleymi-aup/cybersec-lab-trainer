@@ -1,11 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+const cspReportBodySchema = z.object({
+  'csp-report': z
+    .object({
+      'document-uri': z.string().max(2048).optional(),
+      'violated-directive': z.string().max(512).optional(),
+      'effective-directive': z.string().max(512).optional(),
+      'original-policy': z.string().max(4096).optional(),
+      'source-file': z.string().max(2048).optional(),
+      'line-number': z.number().int().optional(),
+      'column-number': z.number().int().optional(),
+      'status-code': z.number().int().optional(),
+      referrer: z.string().max(2048).optional(),
+      'blocked-uri': z.string().max(2048).optional(),
+      disposition: z.string().max(64).optional(),
+    })
+    .passthrough()
+    .optional(),
+}).passthrough();
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const rawBody = await request.json();
+    const parsed = cspReportBodySchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return new NextResponse(null, { status: 204 });
+    }
 
-    const report = body['csp-report'] || body;
+    const report = parsed.data['csp-report'] || parsed.data;
 
     logger.warn('CSP violation detected', {
       documentUri: report['document-uri'] || report.documentUrl,

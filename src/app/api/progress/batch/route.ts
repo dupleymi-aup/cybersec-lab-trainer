@@ -5,6 +5,7 @@ import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-mi
 import { parseBody } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { batchProgressSchema } from '@/lib/validations/api';
+import { modules } from '@/lib/data';
 
 // GET /api/progress/batch?userIds=id1,id2,id3
 // Fetch progress for multiple students at once (teacher/admin only)
@@ -162,8 +163,12 @@ export async function POST(request: NextRequest) {
       let progressSaved = 0;
       let quizSaved = 0;
 
+      // Validate moduleId against known modules to prevent fake progress records
+      const validModuleIds = new Set(modules.map((m) => m.id));
+
       // Save progress
       for (const p of progressArray) {
+        if (!validModuleIds.has(p.moduleId)) continue;
         await client.progress.upsert({
           where: { userId_moduleId: { userId: auth.id, moduleId: p.moduleId } },
           create: {

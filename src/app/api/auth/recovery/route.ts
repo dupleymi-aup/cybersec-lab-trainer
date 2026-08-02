@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(genericResponse);
   } catch (error) {
-    logger.error('Failed to send recovery OTP', { error });
+    logger.error('Failed to send recovery OTP', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

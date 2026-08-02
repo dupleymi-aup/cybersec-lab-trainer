@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (auditError) {
-      logger.warn('Audit logging failed during impersonation stop', { error: auditError });
+      logger.warn('Audit logging failed during impersonation stop', { error: String(auditError) });
     }
 
     const response = NextResponse.json({ success: true });

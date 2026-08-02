@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     },
   });
   } catch (error) {
-    logger.error('Failed to list users', { error });
+    logger.error('Failed to list users', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return NextResponse.json({
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
     },
   });
   } catch (error) {
-    logger.error('Failed to create user', { error });
+    logger.error('Failed to create user', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

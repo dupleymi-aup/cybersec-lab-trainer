@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     try {
       return JSON.parse(val);
     } catch (e) {
-      logger.warn('progress parseJsonField failed', { error: e });
+      logger.warn('progress parseJsonField failed', { error: String(e) });
       return val;
     }
   };
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     })),
   });
   } catch (error) {
-    logger.error('Failed to fetch progress', { error });
+    logger.error('Failed to fetch progress', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
     autoSync: completed && score !== undefined,
   });
   } catch (error) {
-    logger.error('Failed to save progress', { error });
+    logger.error('Failed to save progress', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

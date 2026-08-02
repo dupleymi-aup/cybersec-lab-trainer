@@ -1956,6 +1956,7 @@
     "rarityCommon": "普通"
   },
   "studentProgress": {
+    "goBack": "返回上一页",
     "avatar": "头像",
     "modules": "模块",
     "quizzes": "测验",
@@ -2952,7 +2953,14 @@
   },
   "commonAria": {
     "back": "返回",
-    "close": "关闭"
+    "close": "关闭",
+    "showPassword": "显示密码",
+    "hidePassword": "隐藏密码",
+    "togglePasswordVisibility": "切换密码可见性",
+    "uploadAvatar": "上传头像",
+    "goBack": "返回上一页",
+    "copy": "复制",
+    "delete": "删除"
   },
   "appModules": {
     "dashboard": "仪表板",

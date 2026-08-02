@@ -4,24 +4,22 @@ import { hashPassword, validatePassword } from '@/lib/auth-utils';
 import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
 import { timingSafeEqual } from 'crypto';
+import { recoveryResetSchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
-interface PasswordResetBody {
-  emailOrPhone: string;
-  newPassword: string;
-  otp: string;
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const bodyResult = await parseBody<PasswordResetBody>(request);
+    const bodyResult = await parseBody(request);
     if (!bodyResult.ok) return bodyResult.response;
-    const { emailOrPhone, newPassword, otp } = bodyResult.data;
-
-    if (!emailOrPhone || !newPassword || !otp) {
-      return NextResponse.json({ error: 'Email/phone, OTP and new password required' }, { status: 400 });
+    const parsed = recoveryResetSchema.safeParse(bodyResult.data);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
     }
+    const { emailOrPhone, newPassword, otp } = parsed.data;
 
     // Validate password strength
     const passwordValidation = validatePassword(newPassword);

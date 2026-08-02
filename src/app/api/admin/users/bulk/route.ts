@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (error) {
-      logger.warn('Audit logging failed', { error });
+      logger.warn('Audit logging failed', { error: String(error) });
     }
 
     return NextResponse.json({

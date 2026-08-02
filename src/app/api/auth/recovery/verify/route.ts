@@ -3,23 +3,22 @@ import { getPrisma } from '@/lib/db';
 import { otpStore } from '@/lib/otp-store';
 import { checkRateLimit } from '@/lib/api-middleware';
 import { timingSafeEqual } from 'crypto';
+import { recoveryVerifySchema } from '@/lib/validations/api';
 import { parseBody } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
-interface OtpVerifyBody {
-  emailOrPhone: string;
-  otp: string;
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const bodyResult = await parseBody<OtpVerifyBody>(request);
+    const bodyResult = await parseBody(request);
     if (!bodyResult.ok) return bodyResult.response;
-    const { emailOrPhone, otp } = bodyResult.data;
-
-    if (!emailOrPhone || !otp) {
-      return NextResponse.json({ error: 'Email/phone and OTP required' }, { status: 400 });
+    const parsed = recoveryVerifySchema.safeParse(bodyResult.data);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
     }
+    const { emailOrPhone, otp } = parsed.data;
 
     // Find user to get the OTP store key
     const user = await getPrisma().user.findFirst({

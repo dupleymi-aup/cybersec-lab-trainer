@@ -1956,6 +1956,7 @@
     "rarityCommon": "Обычное"
   },
   "studentProgress": {
+    "goBack": "Вернуться назад",
     "avatar": "Аватар",
     "modules": "Модули",
     "quizzes": "Квизы",
@@ -2952,7 +2953,14 @@
   },
   "commonAria": {
     "back": "Назад",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
+    "togglePasswordVisibility": "Переключить видимость пароля",
+    "uploadAvatar": "Загрузить аватар",
+    "goBack": "Вернуться назад",
+    "copy": "Копировать",
+    "delete": "Удалить"
   },
   "appModules": {
     "dashboard": "Панель управления",

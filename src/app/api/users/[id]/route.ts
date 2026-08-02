@@ -48,7 +48,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     lastLoginAt: user.lastLoginAt?.toISOString(),
   });
   } catch (error) {
-    logger.error('Failed to get user', { error });
+    logger.error('Failed to get user', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -148,7 +148,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return NextResponse.json({
@@ -171,7 +171,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     },
   });
   } catch (error) {
-    logger.error('Failed to update user', { error });
+    logger.error('Failed to update user', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -222,12 +222,12 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       },
     });
   } catch (error) {
-    logger.warn('Audit logging failed', { error });
+    logger.warn('Audit logging failed', { error: String(error) });
   }
 
   return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to delete user', { error });
+    logger.error('Failed to delete user', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

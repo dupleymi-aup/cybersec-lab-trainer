@@ -224,6 +224,7 @@ export default function AuthSecurityLab() {
                 />
                 <button
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? tc('commonAria.hidePassword') : tc('commonAria.showPassword')}
                   className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}

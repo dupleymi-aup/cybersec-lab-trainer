@@ -1,21 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, unauthorized, forbidden, requireRole } from '@/lib/api-middleware';
 import { getPrisma } from '@/lib/db';
+import { updateLtiPlatformSchema } from '@/lib/validations/api';
 import { logger } from '@/lib/logger';
 import { parseBody } from '@/lib/utils';
-
-interface LtiPlatformUpdateBody {
-  name?: string;
-  issuer?: string;
-  clientId?: string;
-  authUrl?: string;
-  tokenUrl?: string;
-  keysetUrl?: string;
-  deploymentId?: string;
-  publicKey?: string;
-  privateKey?: string;
-  isActive?: boolean;
-}
 
 /**
  * GET /api/lti/platforms/[id]
@@ -103,9 +91,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   if (!requireRole(auth.role, 'admin')) return forbidden();
 
   const { id } = await params;
-  const bodyResult = await parseBody<LtiPlatformUpdateBody>(request);
+  const bodyResult = await parseBody(request);
   if (!bodyResult.ok) return bodyResult.response;
-  const body = bodyResult.data;
+  const parsed = updateLtiPlatformSchema.safeParse(bodyResult.data);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
+      { status: 400 },
+    );
+  }
+  const body = parsed.data;
 
   try {
     const platform = await getPrisma().ltiPlatform.update({
@@ -117,9 +112,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         ...(body.authUrl !== undefined && { authUrl: body.authUrl }),
         ...(body.tokenUrl !== undefined && { tokenUrl: body.tokenUrl }),
         ...(body.keysetUrl !== undefined && { keysetUrl: body.keysetUrl }),
-        ...(body.deploymentId !== undefined && {
-          deploymentId: body.deploymentId,
-        }),
+        ...(body.deploymentId !== undefined && { deploymentId: body.deploymentId }),
         ...(body.publicKey !== undefined && { publicKey: body.publicKey }),
         ...(body.privateKey !== undefined && { privateKey: body.privateKey }),
         ...(body.isActive !== undefined && { isActive: body.isActive }),

@@ -423,6 +423,7 @@ export default function LtiPlatformManager() {
                       <button
                         type="button"
                         onClick={() => setShowPrivateKey(!showPrivateKey)}
+                        aria-label={showPrivateKey ? tc('commonAria.hidePassword') : tc('commonAria.showPassword')}
                         className="text-muted-foreground absolute top-1/2 right-2 -translate-y-1/2"
                       >
                         {showPrivateKey ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -528,7 +529,7 @@ export default function LtiPlatformManager() {
                   <div className="flex items-center gap-1">
                     <span className="text-muted-foreground">{t('clientIdLabel')}:</span>
                     <code className="bg-muted rounded px-1 text-[10px]">{p.clientId}</code>
-                    <button type="button" onClick={() => copyToClipboard(p.clientId, t('clientIdLabel'))}>
+                    <button type="button" aria-label={tc('commonAria.copy')} onClick={() => copyToClipboard(p.clientId, t('clientIdLabel'))}>
                       <Copy size={10} className="text-muted-foreground" />
                     </button>
                   </div>
