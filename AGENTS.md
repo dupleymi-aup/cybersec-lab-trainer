@@ -12,23 +12,18 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done
-- **API route hardening** — added outer try/catch + logger to 11 handlers across 8 routes: admin/announcements (GET/POST/PUT/DELETE), admin/users/[id]/reset-password (POST), users (GET/POST), users/[id] (GET/PUT/DELETE), users/[id]/block (PUT), users/[id]/role (PUT), progress (GET/POST), lti/platforms (GET)
-- **Bug fix**: analytics/error-patterns/route.ts — `allAttempts` → `filteredAll` (undefined variable reference)
-- **Bug fix**: ToolsLab.tsx — `tc` properly defined with `useTranslations('common')` inside CopyButton
-- **Bug fix**: recovery/page.tsx — redirect was going to `/login` instead of `/recovery`
-- **Bug fix**: AuthSecurityLab.tsx — `!` assertion replaced with `??` fallback
-- **Middleware→Proxy**: Renamed `src/middleware.ts` → `src/proxy.ts` (Next.js 16 deprecation)
-- **Dead routes removed**: `src/app/main/` and `src/app/dashboard-app/` — root-level redirect pages that always returned 404 due to next-intl proxy locale prefixing
-- **next.config.ts**: Removed stale `/app` → `/dashboard-app` redirects that led to 404
-- **0 ESLint warnings, 0 TypeScript errors**
-- **261 tests pass** across 22 files
-- **Full verification**: lint ✓, typecheck ✓, build ✓, tests ✓
+- **Vulnerabilities eliminated**: 11 npm vulns (2 critical) → **0**. `npm update` all deps in range + `overrides`: postcss 8.5.25 (3 high postcss CVEs), sharp 0.35.3 (libvips CVEs) inside next
+- **Prisma pinned to 6.19.3** (exact) — Prisma 7.x breaking change: `url` in datasource block rejected (needs prisma.config.ts + adapter); project runtime expects Prisma 6 client architecture (`@prisma/client/runtime/library.js`). Do NOT bump to 7.x without migrating schema/config.
+- **Bug fix**: 5 TS2345 errors from recharts 3.10.1 stricter `Tooltip labelFormatter` typing (ReactNode) — fixed with `formatDate(String(v))` in AdvancedAnalytics, ErrorPatternsAnalytics, StudentPerformanceReport
+- **Removed legacy `tailwind.config.ts`** — imported `tailwindcss-animate` (pruned transitive dep); Tailwind 4 uses CSS-first config (`globals.css` with `@import 'tw-animate-css'`)
+- **0 ESLint warnings, 0 TypeScript errors, 531 tests pass** (31 files)
+- **Full verification**: lint ✓, typecheck ✓, build ✓, tests ✓, `npm audit` → 0 vulnerabilities
 
 ### In Progress
 - (none)
 
 ### Blocked
-- 6 npm vulns unfixable without breaking changes (Prisma transitive via @prisma/dev, Next.js transitive via postcss)
+- (none) — previously 6 npm vulns, now resolved via overrides
 
 ## Historic (previous sessions)
 
