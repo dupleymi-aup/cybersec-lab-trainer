@@ -175,7 +175,11 @@ export default function ErrorPatternsAnalytics({
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={difficultyErrorRates}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="difficulty" tick={{ fontSize: 12 }} tickFormatter={(v) => t(DIFFICULTY_LABELS[v] || v)} />
+                <XAxis
+                  dataKey="difficulty"
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(v) => t(DIFFICULTY_LABELS[v] || v)}
+                />
                 <YAxis domain={[0, 100]} />
                 <Tooltip formatter={(v) => [`${v ?? 0}%`, t('error')]} />
                 <Bar dataKey="errorRate" name="%" radius={[4, 4, 0, 0]}>
@@ -203,7 +207,7 @@ export default function ErrorPatternsAnalytics({
                   tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })}
                 />
                 <YAxis />
-                <Tooltip labelFormatter={(v) => formatDate(v)} />
+                <Tooltip labelFormatter={(v) => formatDate(String(v))} />
                 <Legend />
                 <Line type="monotone" dataKey="errorRate" stroke="#ef4444" name={t('errorRate')} dot={false} />
                 <Line type="monotone" dataKey="incorrectCount" stroke="#f59e0b" name={t('errorCount')} dot={false} />

@@ -286,13 +286,16 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                         )}
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-muted-foreground text-xs">{s.modulesCompleted} {t('modules')}</span>
+                        <span className="text-muted-foreground text-xs">
+                          {s.modulesCompleted} {t('modules')}
+                        </span>
                         <Badge
                           variant={
                             s.avgHoursPerModule < 6 ? 'default' : s.avgHoursPerModule < 12 ? 'secondary' : 'destructive'
                           }
                         >
-                          {s.avgHoursPerModule}{tc('hoursShort')}
+                          {s.avgHoursPerModule}
+                          {tc('hoursShort')}
                         </Badge>
                       </div>
                     </motion.div>
@@ -349,7 +352,9 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs">{q.totalAttempts} {t('attempts')}</span>
+                        <span className="text-muted-foreground text-xs">
+                          {q.totalAttempts} {t('attempts')}
+                        </span>
                         <Badge variant={q.errorRate > 70 ? 'destructive' : q.errorRate > 50 ? 'secondary' : 'default'}>
                           {q.errorRate}% {t('errorRate')}
                         </Badge>
@@ -375,7 +380,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
                       tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip labelFormatter={(v) => formatDate(v)} />
+                    <Tooltip labelFormatter={(v) => formatDate(String(v))} />
                     <Legend />
                     <Line type="monotone" dataKey="errorRate" stroke="#ef4444" name={t('errorPercent')} dot={false} />
                   </LineChart>

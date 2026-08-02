@@ -46,8 +46,6 @@ import { generateStudentReportPDF, generateStudentReportCSV, downloadCSV } from 
 import KPICard from './KPICard';
 import { logger } from '@/lib/logger';
 
-
-
 interface Props {
   userId: string;
   initialDays?: number;
@@ -543,7 +541,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                       tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip labelFormatter={(v) => formatDate(v)} />
+                    <Tooltip labelFormatter={(v) => formatDate(String(v))} />
                     <Legend />
                     <Area
                       type="monotone"
@@ -576,7 +574,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                       tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis />
-                    <Tooltip labelFormatter={(v) => formatDate(v)} />
+                    <Tooltip labelFormatter={(v) => formatDate(String(v))} />
                     <Legend />
                     <Bar dataKey="count" fill="#6366f1" name={t('logins')} />
                     <Bar dataKey="successCount" fill="#10b981" name={t('successful')} />
@@ -603,7 +601,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                       tickFormatter={(v) => formatDate(v, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis domain={[0, 100]} />
-                    <Tooltip labelFormatter={(v) => formatDate(v)} />
+                    <Tooltip labelFormatter={(v) => formatDate(String(v))} />
                     <Legend />
                     {Array.from(new Set(quizCategoryTrajectory.map((p) => p.category))).map((category, i) => {
                       const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -739,7 +737,11 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                                 {gap.gap}%
                               </span>
                               <Badge variant={severityColor} className="text-[10px]">
-                                {gap.severity === 'high' ? t('criticalLevel') : gap.severity === 'medium' ? t('mediumLevel') : t('normal')}
+                                {gap.severity === 'high'
+                                  ? t('criticalLevel')
+                                  : gap.severity === 'medium'
+                                    ? t('mediumLevel')
+                                    : t('normal')}
                               </Badge>
                             </div>
                           </motion.div>
@@ -809,7 +811,11 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-bold">{rec.title}</p>
                               <Badge variant={priorityBadge} className="text-[10px]">
-                                {rec.priority === 'high' ? t('high') : rec.priority === 'medium' ? t('medium') : t('low')}
+                                {rec.priority === 'high'
+                                  ? t('high')
+                                  : rec.priority === 'medium'
+                                    ? t('medium')
+                                    : t('low')}
                               </Badge>
                             </div>
                             <p className="text-muted-foreground mt-1 text-xs">{rec.description}</p>
