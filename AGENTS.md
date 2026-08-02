@@ -12,7 +12,7 @@ This project belongs to the work account — always use the `github-work` host a
 ## Session summary
 
 ### Done
-- **Hydration fixes**: replaced `<head>` inside `<body>` with `next/script` for JSON-LD in locale layout; fixed ThemeToggle hydration mismatch with mounted state guard
+- **Hydration fixes**: moved JSON-LD to client component (`JsonLdScript`) injecting into `document.head` via useEffect (next/script still renders `<head>` in nested layouts); fixed ThemeToggle hydration mismatch with mounted state guard
 - **Zod validation**: added schemas to 20+ API routes (admin, auth, LTI, progress, users, CSP report, scheduled reports)
 - **i18n**: added missing `goBack` key to `studentProgress` in ru.json and zh.json
 - **Lint**: suppressed unused `target_link_uri` warning in oidc-login route
