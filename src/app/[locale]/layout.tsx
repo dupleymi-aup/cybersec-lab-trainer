@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/routing';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import JsonLdScript from '@/components/JsonLdScript';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -69,12 +69,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <Script
-        id="json-ld"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLdScript data={jsonLd} />
       <ErrorBoundary>{children}</ErrorBoundary>
     </NextIntlClientProvider>
   );
