@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import ThemeToggle from '@/components/security-trainer/ThemeToggle';
+import LanguageSwitcher from '@/components/landing/LanguageSwitcher';
 
 export default function LandingHeader() {
   const t = useTranslations('landing.header');
@@ -31,20 +32,23 @@ export default function LandingHeader() {
             href="#how-it-works"
             className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
           >
-            {t('dashboard')}
+            {t('howItWorks')}
           </a>
           <a
             href="#features"
             className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
           >
-            {t('register')}
+            {t('features')}
           </a>
           <a href="#faq" className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
-            {t('login')}
+            {t('faq')}
           </a>
         </nav>
 
         <div className="flex items-center gap-2">
+          <div className="hidden lg:block">
+            <LanguageSwitcher variant="header" />
+          </div>
           <ThemeToggle />
           <Link href={`/${locale}/register`}>
             <Button size="sm" className="hidden bg-violet-600 text-white hover:bg-violet-700 sm:inline-flex">
@@ -72,8 +76,17 @@ export default function LandingHeader() {
             href="#how-it-works"
             className="text-muted-foreground hover:text-foreground block py-2 text-sm font-medium"
           >
-            {t('dashboard')}
+            {t('howItWorks')}
           </a>
+          <a href="#features" className="text-muted-foreground hover:text-foreground block py-2 text-sm font-medium">
+            {t('features')}
+          </a>
+          <a href="#faq" className="text-muted-foreground hover:text-foreground block py-2 text-sm font-medium">
+            {t('faq')}
+          </a>
+          <div className="sm:hidden">
+            <LanguageSwitcher variant="header" />
+          </div>
           <Link href={`/${locale}/register`}>
             <Button size="sm" className="w-full bg-violet-600 text-white hover:bg-violet-700">
               {t('register')}

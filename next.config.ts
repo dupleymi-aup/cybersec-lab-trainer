@@ -15,6 +15,23 @@ const baseConfig = {
     return [];
   },
   async headers() {
+    const csp = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net",
+      "style-src 'self' 'unsafe-inline' https://unpkg.com data:",
+      "img-src 'self' data: blob: https: http:",
+      "font-src 'self' data: https: http:",
+      "connect-src 'self' https: http: wss: ws: data: blob:",
+      "media-src 'self' data: blob: https:",
+      "object-src 'none'",
+      "frame-src 'self' https: http:",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "worker-src 'self' blob:",
+      "upgrade-insecure-requests",
+    ].join("; ");
+
     return [
       {
         source: "/(.*)",
@@ -53,42 +70,11 @@ const baseConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://unpkg.com/swagger-ui-dist@5",
-              "style-src 'self' 'unsafe-inline' https://unpkg.com/swagger-ui-dist@5",
-              "img-src 'self' data: blob:",
-              "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self'",
-              "media-src 'self'",
-              "object-src 'none'",
-              "frame-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "frame-ancestors 'none'",
-              "worker-src 'self'",
-              "upgrade-insecure-requests",
-            ].join("; "),
+            value: csp,
           },
           {
             key: "Content-Security-Policy-Report-Only",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' https://unpkg.com/swagger-ui-dist@5",
-              "style-src 'self' 'unsafe-inline' https://unpkg.com/swagger-ui-dist@5",
-              "img-src 'self' data: blob:",
-              "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self'",
-              "media-src 'self'",
-              "object-src 'none'",
-              "frame-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "frame-ancestors 'none'",
-              "worker-src 'self'",
-              "upgrade-insecure-requests",
-              "report-uri /api/csp-report",
-            ].join("; "),
+            value: `${csp}; report-uri /api/csp-report`,
           },
         ],
       },

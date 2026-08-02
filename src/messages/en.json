@@ -36,7 +36,10 @@
       "logo": "CyberSec Lab",
       "login": "Log In",
       "register": "Register",
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "howItWorks": "How It Works",
+      "features": "Features",
+      "faq": "FAQ"
     },
     "hero": {
       "badge": "Program 09.03.04 Software Engineering",
@@ -142,7 +145,7 @@
       "items": [
         {
           "name": "Alexey Petrov",
-          "role": "Student, MSU",
+          "role": "Student",
           "text": "Great platform for learning OWASP Top 10. Interactive quizzes are better than reading theory.",
           "achievement": "Completed OWASP Top 10"
         },
@@ -154,7 +157,7 @@
         },
         {
           "name": "Dmitry Kozlov",
-          "role": "Teacher, ITMO",
+          "role": "Teacher",
           "text": "LTI integration with Moodle works great.",
           "achievement": "50+ students"
         },
@@ -172,7 +175,7 @@
         },
         {
           "name": "Olga Novikova",
-          "role": "Student, SPbU",
+          "role": "Student",
           "text": "Helped me prepare for security olympiad.",
           "achievement": "Olympiad winner"
         }

@@ -36,7 +36,10 @@
       "logo": "CyberSec Lab",
       "login": "登录",
       "register": "注册",
-      "dashboard": "控制台"
+      "dashboard": "控制台",
+      "howItWorks": "使用方法",
+      "features": "功能",
+      "faq": "常见问题"
     },
     "hero": {
       "badge": "专业 09.03.04 软件工程",
@@ -142,7 +145,7 @@
       "items": [
         {
           "name": "Alexey Petrov",
-          "role": "学生，莫斯科国立大学",
+          "role": "学生",
           "text": "平台帮助我理解了OWASP Top 10。交互式测验比阅读理论好得多。",
           "achievement": "完成 OWASP Top 10"
         },
@@ -154,7 +157,7 @@
         },
         {
           "name": "Dmitry Kozlov",
-          "role": "教师，ITMO大学",
+          "role": "教师",
           "text": "LTI集成与Moodle运行良好。",
           "achievement": "50+名学生"
         },
@@ -172,7 +175,7 @@
         },
         {
           "name": "Olga Novikova",
-          "role": "学生，圣彼得堡国立大学",
+          "role": "学生",
           "text": "帮助我准备网络安全竞赛。",
           "achievement": "竞赛获奖者"
         }
