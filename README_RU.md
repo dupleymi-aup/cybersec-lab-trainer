@@ -200,7 +200,6 @@ cybersec-lab-trainer/
 ├── package.json                    # Зависимости и скрипты
 ├── next.config.ts                  # Конфигурация Next.js
 ├── tsconfig.json                   # Конфигурация TypeScript
-├── tailwind.config.ts              # Конфигурация Tailwind CSS
 ├── README.md                       # Краткая документация (RU)
 ├── README_RU.md                    # Полная документация на русском
 ├── README_EN.md                    # Full documentation in English

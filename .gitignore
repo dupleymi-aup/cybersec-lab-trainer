@@ -7,7 +7,6 @@ out/
 *.log
 next-env.d.ts
 tsconfig.tsbuildinfo
-public/sw.js
 public/workbox-*.js
 public/fallback-*.js
 prisma/dev.db
