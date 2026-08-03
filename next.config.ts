@@ -15,21 +15,23 @@ const baseConfig = {
     return [];
   },
   async headers() {
+    // Единая свободная политика для всех окружений:
+    // ничего не блокируем — скрипты/стили из любых источников,
+    // встраивание в iframe (LMS), формы на внешние URL (OIDC).
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdn.jsdelivr.net",
-      "style-src 'self' 'unsafe-inline' https://unpkg.com data:",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data: blob:",
+      "style-src 'self' 'unsafe-inline' https: http: data:",
       "img-src 'self' data: blob: https: http:",
       "font-src 'self' data: https: http:",
       "connect-src 'self' https: http: wss: ws: data: blob:",
-      "media-src 'self' data: blob: https:",
-      "object-src 'none'",
+      "media-src 'self' data: blob: https: http:",
+      "object-src 'self'",
       "frame-src 'self' https: http:",
       "base-uri 'self'",
-      "form-action 'self'",
-      "frame-ancestors 'none'",
+      "form-action *",
+      "frame-ancestors *",
       "worker-src 'self' blob:",
-      "upgrade-insecure-requests",
     ].join("; ");
 
     return [
@@ -39,10 +41,6 @@ const baseConfig = {
           {
             key: "X-Content-Type-Options",
             value: "nosniff",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
           },
           {
             key: "X-XSS-Protection",
