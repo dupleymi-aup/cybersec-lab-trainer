@@ -102,9 +102,7 @@ export default function IDORLab() {
             </Badge>
             {isCompleted && <Badge className="border-0 bg-emerald-100 text-emerald-700">{t('completed')}</Badge>}
           </div>
-          <p className="text-muted-foreground mt-0.5 text-sm">
-            {t('description')}
-          </p>
+          <p className="text-muted-foreground mt-0.5 text-sm">{t('description')}</p>
         </div>
       </div>
 
@@ -114,7 +112,8 @@ export default function IDORLab() {
           <div className="mb-2 flex items-center justify-between text-sm">
             <span className="text-muted-foreground">{t('labProgress')}</span>
             <span className="text-foreground/70 font-medium">
-              {currentScenario + 1} / {idorScenarios.length} — {t('scenarioOf', { current: currentScenario + 1, total: idorScenarios.length })}
+              {currentScenario + 1} / {idorScenarios.length} —{' '}
+              {t('scenarioOf', { current: currentScenario + 1, total: idorScenarios.length })}
             </span>
           </div>
           <Progress value={progressPct} className="h-2" />
@@ -247,9 +246,13 @@ export default function IDORLab() {
                     <CardContent className="p-3">
                       <p className="text-sm font-medium">
                         {selectedOption != null && scenario.options[selectedOption]?.correct ? (
-                          <span className="text-emerald-600">{t('correct')} {scenario.fixExplanation}</span>
+                          <span className="text-emerald-600">
+                            {t('correct')} {scenario.fixExplanation}
+                          </span>
                         ) : (
-                          <span className="text-red-600">{t('incorrect')} {scenario.fixExplanation}</span>
+                          <span className="text-red-600">
+                            {t('incorrect')} {scenario.fixExplanation}
+                          </span>
                         )}
                       </p>
                     </CardContent>
@@ -275,7 +278,11 @@ export default function IDORLab() {
       {/* Defense mechanisms */}
       <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
         <CardContent className="p-5">
-          <button type="button" onClick={() => setShowAllDefenses(!showAllDefenses)} className="flex w-full items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAllDefenses(!showAllDefenses)}
+            className="flex w-full items-center gap-2"
+          >
             <Shield size={20} className="text-emerald-600" />
             <h3 className="font-semibold text-emerald-800">{t('idorDefense')}</h3>
             <ChevronLeft

@@ -29,7 +29,11 @@ export async function GET(request: NextRequest) {
       where: { userId: auth.id },
       select: { moduleId: true, completed: true },
     });
-    const completedModules = new Set(progress.filter((p: { moduleId: string; completed: boolean }) => p.completed).map((p: { moduleId: string; completed: boolean }) => p.moduleId));
+    const completedModules = new Set(
+      progress
+        .filter((p: { moduleId: string; completed: boolean }) => p.completed)
+        .map((p: { moduleId: string; completed: boolean }) => p.moduleId),
+    );
 
     const quizResults = await getPrisma().quizResult.findMany({
       where: { userId: auth.id },
@@ -39,38 +43,59 @@ export async function GET(request: NextRequest) {
 
     // Filter to upcoming (within 7 days) or overdue deadlines, exclude completed
     const upcoming = deadlines
-      .filter((d: { id: string; group: string; scope: string; scopeId: string; dueAt: Date; title: string; description: string | null }) => {
-        const due = new Date(d.dueAt);
-        // Include if overdue or due within 7 days
-        if (due < sevenDaysFromNow) {
-          // Check if completed
-          if (d.scope === 'course') {
-            // Course deadline: check if all modules are done
-            const allModulesCompleted = progress.length > 0 && progress.every((p: { moduleId: string; completed: boolean }) => p.completed);
-            return !allModulesCompleted;
+      .filter(
+        (d: {
+          id: string;
+          group: string;
+          scope: string;
+          scopeId: string;
+          dueAt: Date;
+          title: string;
+          description: string | null;
+        }) => {
+          const due = new Date(d.dueAt);
+          // Include if overdue or due within 7 days
+          if (due < sevenDaysFromNow) {
+            // Check if completed
+            if (d.scope === 'course') {
+              // Course deadline: check if all modules are done
+              const allModulesCompleted =
+                progress.length > 0 && progress.every((p: { moduleId: string; completed: boolean }) => p.completed);
+              return !allModulesCompleted;
+            }
+            if (d.scope === 'module') return !completedModules.has(d.scopeId);
+            if (d.scope === 'quiz') return !completedQuizzes.has(d.scopeId);
           }
-          if (d.scope === 'module') return !completedModules.has(d.scopeId);
-          if (d.scope === 'quiz') return !completedQuizzes.has(d.scopeId);
-        }
-        return false;
-      })
-      .map((d: { id: string; group: string; scope: string; scopeId: string; dueAt: Date; title: string; description: string | null }) => {
-        const due = new Date(d.dueAt);
-        const diffMs = due.getTime() - now.getTime();
-        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-        const isOverdue = diffDays < 0;
+          return false;
+        },
+      )
+      .map(
+        (d: {
+          id: string;
+          group: string;
+          scope: string;
+          scopeId: string;
+          dueAt: Date;
+          title: string;
+          description: string | null;
+        }) => {
+          const due = new Date(d.dueAt);
+          const diffMs = due.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+          const isOverdue = diffDays < 0;
 
-        return {
-          id: d.id,
-          scope: d.scope,
-          scopeId: d.scopeId,
-          dueAt: d.dueAt,
-          title: d.title,
-          description: d.description,
-          daysLeft: diffDays,
-          isOverdue,
-        };
-      });
+          return {
+            id: d.id,
+            scope: d.scope,
+            scopeId: d.scopeId,
+            dueAt: d.dueAt,
+            title: d.title,
+            description: d.description,
+            daysLeft: diffDays,
+            isOverdue,
+          };
+        },
+      );
 
     return NextResponse.json({ upcoming });
   } catch (error) {

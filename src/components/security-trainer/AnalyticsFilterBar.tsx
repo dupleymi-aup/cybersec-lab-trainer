@@ -15,8 +15,16 @@ export default function AnalyticsFilterBar() {
 
   useEffect(() => {
     let cancelled = false;
-    getAllGroups().then((g) => { if (!cancelled) setGroups(g); }).catch(() => { /* ignore */ });
-    return () => { cancelled = true; };
+    getAllGroups()
+      .then((g) => {
+        if (!cancelled) setGroups(g);
+      })
+      .catch(() => {
+        /* ignore */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -55,7 +63,8 @@ export default function AnalyticsFilterBar() {
                 days === d ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {d}{t('daysShort')}
+              {d}
+              {t('daysShort')}
             </button>
           ))}
         </div>
@@ -67,10 +76,13 @@ export default function AnalyticsFilterBar() {
           <div className="h-6 w-px bg-slate-200" />
           <div className="flex items-center gap-1.5 text-xs text-blue-600">
             <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />
-            {t('filter')}:
-            {groupId && <span className="font-medium">{groupId}</span>}
+            {t('filter')}:{groupId && <span className="font-medium">{groupId}</span>}
             {groupId && days !== 30 && <span>·</span>}
-            {days !== 30 && <span className="font-medium">{days} {t('days')}</span>}
+            {days !== 30 && (
+              <span className="font-medium">
+                {days} {t('days')}
+              </span>
+            )}
           </div>
         </>
       )}

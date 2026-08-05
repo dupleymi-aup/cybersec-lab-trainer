@@ -57,34 +57,45 @@ export default function ActivityHeatmap() {
 
   useEffect(() => {
     let cancelled = false;
-    getAllUsers().then((users) => {
-      if (!cancelled) setStudents(users.filter((u) => u.role === 'student'));
-    }).catch((e) => {
-      logger.error('Failed to load users for heatmap', { error: e });
-    });
-    return () => { cancelled = true; };
+    getAllUsers()
+      .then((users) => {
+        if (!cancelled) setStudents(users.filter((u) => u.role === 'student'));
+      })
+      .catch((e) => {
+        logger.error('Failed to load users for heatmap', { error: e });
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    getActivityHeatmap(selectedUserId || undefined, dateRange).then((data) => {
-      if (!cancelled) {
-        setHeatmapData(data);
-        setLoading(false);
-      }
-    }).catch((e) => {
-      logger.error('Failed to load heatmap data', { error: e });
-      if (!cancelled) setLoading(false);
-    });
-    return () => { cancelled = true; };
+    getActivityHeatmap(selectedUserId || undefined, dateRange)
+      .then((data) => {
+        if (!cancelled) {
+          setHeatmapData(data);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        logger.error('Failed to load heatmap data', { error: e });
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [selectedUserId, dateRange]);
 
-  const dateRangeOptions: { value: DateRange; label: string }[] = useMemo(() => [
-    { value: '90d', label: t('days90') },
-    { value: '180d', label: t('days180') },
-    { value: '365d', label: t('days365') },
-  ], [t]);
+  const dateRangeOptions: { value: DateRange; label: string }[] = useMemo(
+    () => [
+      { value: '90d', label: t('days90') },
+      { value: '180d', label: t('days180') },
+      { value: '365d', label: t('days365') },
+    ],
+    [t],
+  );
 
   const gridData = useMemo(() => {
     if (!heatmapData) return null;
@@ -119,7 +130,20 @@ export default function ActivityHeatmap() {
       weeks.push(week);
     }
 
-    const monthKeys = ['monthJan', 'monthFeb', 'monthMar', 'monthApr', 'monthMay', 'monthJun', 'monthJul', 'monthAug', 'monthSep', 'monthOct', 'monthNov', 'monthDec'] as const;
+    const monthKeys = [
+      'monthJan',
+      'monthFeb',
+      'monthMar',
+      'monthApr',
+      'monthMay',
+      'monthJun',
+      'monthJul',
+      'monthAug',
+      'monthSep',
+      'monthOct',
+      'monthNov',
+      'monthDec',
+    ] as const;
     const monthLabels: Array<{ weekIndex: number; month: number; label: string }> = [];
     let lastMonth = -1;
     for (let w = 0; w < numWeeks; w++) {
@@ -164,7 +188,9 @@ export default function ActivityHeatmap() {
       return (
         <div className="rounded bg-slate-800 px-3 py-2 text-xs text-white shadow-lg dark:bg-slate-700">
           <p className="font-medium">{label}</p>
-          <p>{value} {t('activities')}</p>
+          <p>
+            {value} {t('activities')}
+          </p>
         </div>
       );
     }
@@ -186,7 +212,9 @@ export default function ActivityHeatmap() {
           >
             <option value="">{t('allStudents')}</option>
             {students.map((s) => (
-              <option key={s.id} value={s.id}>{s.fullName}</option>
+              <option key={s.id} value={s.id}>
+                {s.fullName}
+              </option>
             ))}
           </select>
           <div className="bg-muted flex items-center gap-1 rounded-md p-0.5">
@@ -224,52 +252,76 @@ export default function ActivityHeatmap() {
             <Card className="border-border">
               <CardContent className="p-5">
                 <div className="mb-1 ml-8 flex">
-                  {gridData && gridData.monthLabels.map((ml) => (
-                    <div key={ml.weekIndex} className="text-muted-foreground absolute text-[10px]" style={{ left: `calc(2rem + ${ml.weekIndex} * 14px)` }}>
-                      {ml.label}
-                    </div>
-                  ))}
-                  <div className="relative h-4 w-full">
-                    {gridData && gridData.monthLabels.map((ml) => (
-                      <span key={ml.weekIndex} className="text-muted-foreground absolute text-[10px]" style={{ left: `${ml.weekIndex * 14}px` }}>
+                  {gridData &&
+                    gridData.monthLabels.map((ml) => (
+                      <div
+                        key={ml.weekIndex}
+                        className="text-muted-foreground absolute text-[10px]"
+                        style={{ left: `calc(2rem + ${ml.weekIndex} * 14px)` }}
+                      >
                         {ml.label}
-                      </span>
+                      </div>
                     ))}
+                  <div className="relative h-4 w-full">
+                    {gridData &&
+                      gridData.monthLabels.map((ml) => (
+                        <span
+                          key={ml.weekIndex}
+                          className="text-muted-foreground absolute text-[10px]"
+                          style={{ left: `${ml.weekIndex * 14}px` }}
+                        >
+                          {ml.label}
+                        </span>
+                      ))}
                   </div>
                 </div>
 
                 <div className="flex">
                   <div className="flex flex-col justify-around pt-0.5 pr-1" style={{ height: `${7 * 14}px` }}>
                     {dayLabels.map((label, i) => (
-                      <div key={i} className="text-muted-foreground text-[10px] leading-[14px]">{label}</div>
+                      <div key={i} className="text-muted-foreground text-[10px] leading-[14px]">
+                        {label}
+                      </div>
                     ))}
                   </div>
                   <div className="flex gap-[2px] overflow-x-auto">
-                    {gridData && gridData.weeks.map((week, weekIdx) => (
-                      <div key={weekIdx} className="flex flex-col gap-[2px]">
-                        {week.map((day, dayIdx) => {
-                          const level = getLevel(day.count);
-                          return (
-                            <div
-                              key={dayIdx}
-                              className={`h-3 w-3 rounded-sm ${levelColors[level]} cursor-pointer transition-colors hover:ring-1 hover:ring-slate-400`}
-                              onMouseEnter={(e) => {
-                                const rect = e.currentTarget.getBoundingClientRect();
-                                setTooltip({ visible: true, date: day.date, count: day.count, x: rect.left + rect.width / 2, y: rect.top });
-                              }}
-                              onMouseLeave={() => setTooltip((prev) => ({ ...prev, visible: false }))}
-                            />
-                          );
-                        })}
-                      </div>
-                    ))}
+                    {gridData &&
+                      gridData.weeks.map((week, weekIdx) => (
+                        <div key={weekIdx} className="flex flex-col gap-[2px]">
+                          {week.map((day, dayIdx) => {
+                            const level = getLevel(day.count);
+                            return (
+                              <div
+                                key={dayIdx}
+                                className={`h-3 w-3 rounded-sm ${levelColors[level]} cursor-pointer transition-colors hover:ring-1 hover:ring-slate-400`}
+                                onMouseEnter={(e) => {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setTooltip({
+                                    visible: true,
+                                    date: day.date,
+                                    count: day.count,
+                                    x: rect.left + rect.width / 2,
+                                    y: rect.top,
+                                  });
+                                }}
+                                onMouseLeave={() => setTooltip((prev) => ({ ...prev, visible: false }))}
+                              />
+                            );
+                          })}
+                        </div>
+                      ))}
                   </div>
                 </div>
 
                 {tooltip.visible && (
-                  <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded bg-slate-800 px-3 py-2 text-xs text-white shadow-lg dark:bg-slate-700" style={{ left: tooltip.x, top: tooltip.y - 8 }}>
+                  <div
+                    className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded bg-slate-800 px-3 py-2 text-xs text-white shadow-lg dark:bg-slate-700"
+                    style={{ left: tooltip.x, top: tooltip.y - 8 }}
+                  >
                     <p className="font-medium">{formatDate(tooltip.date, locale)}</p>
-                    <p>{tooltip.count} {t('activities')}</p>
+                    <p>
+                      {tooltip.count} {t('activities')}
+                    </p>
                   </div>
                 )}
 
@@ -284,32 +336,50 @@ export default function ActivityHeatmap() {
             </Card>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100"><Zap size={16} className="text-emerald-600" /></div>
+                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
+                    <Zap size={16} className="text-emerald-600" />
+                  </div>
                   <p className="text-2xl font-bold text-emerald-600">{heatmapData.totalActivities}</p>
                   <p className="text-muted-foreground mt-1 text-xs">{t('totalActivities')}</p>
                 </CardContent>
               </Card>
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-sky-100"><Calendar size={16} className="text-sky-600" /></div>
-                  <p className="text-2xl font-bold text-sky-600">{heatmapData.mostActiveDay ? formatDate(heatmapData.mostActiveDay, locale) : '—'}</p>
+                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-sky-100">
+                    <Calendar size={16} className="text-sky-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-sky-600">
+                    {heatmapData.mostActiveDay ? formatDate(heatmapData.mostActiveDay, locale) : '—'}
+                  </p>
                   <p className="text-muted-foreground mt-1 text-xs">{t('mostActiveDay')}</p>
                 </CardContent>
               </Card>
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-violet-100"><Clock size={16} className="text-violet-600" /></div>
-                  <p className="text-2xl font-bold text-violet-600">{heatmapData.mostActiveHour !== undefined ? `${String(heatmapData.mostActiveHour).padStart(2, '0')}:00` : '—'}</p>
+                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-violet-100">
+                    <Clock size={16} className="text-violet-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-violet-600">
+                    {heatmapData.mostActiveHour !== undefined
+                      ? `${String(heatmapData.mostActiveHour).padStart(2, '0')}:00`
+                      : '—'}
+                  </p>
                   <p className="text-muted-foreground mt-1 text-xs">{t('mostActiveHour')}</p>
                 </CardContent>
               </Card>
               <Card className="border-border">
                 <CardContent className="p-4 text-center">
-                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100"><Flame size={16} className="text-amber-600" /></div>
+                  <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100">
+                    <Flame size={16} className="text-amber-600" />
+                  </div>
                   <p className="text-2xl font-bold text-amber-600">{heatmapData.streakDays}</p>
                   <p className="text-muted-foreground mt-1 text-xs">{t('streakDays')}</p>
                 </CardContent>
@@ -317,11 +387,18 @@ export default function ActivityHeatmap() {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold"><Clock size={16} className="text-slate-400" />{t('activityByHour')}</h3>
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                    <Clock size={16} className="text-slate-400" />
+                    {t('activityByHour')}
+                  </h3>
                   <div className="h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={hourChartData}>
@@ -337,7 +414,10 @@ export default function ActivityHeatmap() {
               </Card>
               <Card className="border-border">
                 <CardContent className="p-5">
-                  <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold"><Calendar size={16} className="text-slate-400" />{t('activityByDay')}</h3>
+                  <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                    <Calendar size={16} className="text-slate-400" />
+                    {t('activityByDay')}
+                  </h3>
                   <div className="h-[200px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={dayChartData}>

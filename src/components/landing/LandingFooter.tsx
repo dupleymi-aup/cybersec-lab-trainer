@@ -72,9 +72,7 @@ export default function LandingFooter() {
         </div>
         <div className="border-border mt-12 border-t pt-8">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-muted-foreground text-sm">
-              {t('copyright', { year: new Date().getFullYear() })}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('copyright', { year: new Date().getFullYear() })}</p>
             <div className="flex items-center gap-6">
               <div className="text-muted-foreground flex items-center gap-2 text-sm">
                 <BookOpen className="h-4 w-4" aria-hidden="true" />

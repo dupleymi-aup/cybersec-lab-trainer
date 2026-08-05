@@ -68,7 +68,12 @@ export default function KeyboardShortcuts() {
                   <Keyboard size={18} className="text-muted-foreground" />
                   <h2 className="font-semibold">{t('title')}</h2>
                 </div>
-                <button type="button" onClick={() => setOpen(false)} className="hover:bg-muted rounded p-1 transition-colors" aria-label={tc('close')}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="hover:bg-muted rounded p-1 transition-colors"
+                  aria-label={tc('close')}
+                >
                   <X size={16} />
                 </button>
               </div>

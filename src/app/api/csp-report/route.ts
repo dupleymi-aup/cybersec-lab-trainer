@@ -2,24 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
-const cspReportBodySchema = z.object({
-  'csp-report': z
-    .object({
-      'document-uri': z.string().max(2048).optional(),
-      'violated-directive': z.string().max(512).optional(),
-      'effective-directive': z.string().max(512).optional(),
-      'original-policy': z.string().max(4096).optional(),
-      'source-file': z.string().max(2048).optional(),
-      'line-number': z.number().int().optional(),
-      'column-number': z.number().int().optional(),
-      'status-code': z.number().int().optional(),
-      referrer: z.string().max(2048).optional(),
-      'blocked-uri': z.string().max(2048).optional(),
-      disposition: z.string().max(64).optional(),
-    })
-    .passthrough()
-    .optional(),
-}).passthrough();
+const cspReportBodySchema = z
+  .object({
+    'csp-report': z
+      .object({
+        'document-uri': z.string().max(2048).optional(),
+        'violated-directive': z.string().max(512).optional(),
+        'effective-directive': z.string().max(512).optional(),
+        'original-policy': z.string().max(4096).optional(),
+        'source-file': z.string().max(2048).optional(),
+        'line-number': z.number().int().optional(),
+        'column-number': z.number().int().optional(),
+        'status-code': z.number().int().optional(),
+        referrer: z.string().max(2048).optional(),
+        'blocked-uri': z.string().max(2048).optional(),
+        disposition: z.string().max(64).optional(),
+      })
+      .passthrough()
+      .optional(),
+  })
+  .passthrough();
 
 export async function POST(request: NextRequest) {
   try {

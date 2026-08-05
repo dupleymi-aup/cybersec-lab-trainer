@@ -250,9 +250,7 @@ export default function APISecurityLab() {
             <p className="text-muted-foreground text-sm">OWASP API Security Top 10 (2023)</p>
           </div>
         </div>
-        <p className="text-muted-foreground text-sm">
-          {t('subtitle')}
-        </p>
+        <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         <div className="mt-3 flex items-center gap-2">
           <Badge variant="secondary" className="text-xs">
             {t('topics')}

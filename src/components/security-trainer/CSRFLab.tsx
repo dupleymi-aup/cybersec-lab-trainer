@@ -146,9 +146,7 @@ export default function CSRFLab() {
       <Card className="border-border">
         <CardContent className="p-5">
           <h2 className="mb-2 font-semibold">{t('whatIsCsrf')}</h2>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            {t('csrfDescription')}
-          </p>
+          <p className="text-muted-foreground text-sm leading-relaxed">{t('csrfDescription')}</p>
         </CardContent>
       </Card>
 
@@ -360,7 +358,8 @@ export default function CSRFLab() {
                       <CardContent className="space-y-4 p-5">
                         <div className="flex items-center justify-between">
                           <h3 className="flex items-center gap-2 text-sm font-semibold text-amber-800">
-                            <BookOpen size={16} /> {t('challengeNumber', { current: currentChallenge + 1, total: csrfChallenges.length })}
+                            <BookOpen size={16} />{' '}
+                            {t('challengeNumber', { current: currentChallenge + 1, total: csrfChallenges.length })}
                           </h3>
                           {csrfChallengeScores.total > 0 && (
                             <Badge className="border-0 bg-amber-100 text-amber-700">
@@ -495,7 +494,9 @@ export default function CSRFLab() {
                     <>
                       <h3 className="flex items-center gap-2 text-sm font-semibold text-violet-800">
                         <Trophy size={16} /> {t('quizQuestion', { current: quizIndex + 1, total: csrfQuizzes.length })}
-                        <span className="ml-auto text-xs font-normal">{t('correctCount', { count: correctCount })}</span>
+                        <span className="ml-auto text-xs font-normal">
+                          {t('correctCount', { count: correctCount })}
+                        </span>
                       </h3>
                       <p className="text-sm font-medium">{currentQuiz.question}</p>
                       <div className="space-y-2">

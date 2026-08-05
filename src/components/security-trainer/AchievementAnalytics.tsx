@@ -46,26 +46,33 @@ export default function AchievementAnalytics({ groupId, students }: AchievementA
   const [data, setData] = useState<AchievementStat[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const rarityLabels: Record<string, string> = useMemo(() => ({
-    epic: t('rarityEpic'),
-    rare: t('rarityRare'),
-    uncommon: t('rarityUncommon'),
-    common: t('rarityCommon'),
-  }), [t]);
+  const rarityLabels: Record<string, string> = useMemo(
+    () => ({
+      epic: t('rarityEpic'),
+      rare: t('rarityRare'),
+      uncommon: t('rarityUncommon'),
+      common: t('rarityCommon'),
+    }),
+    [t],
+  );
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    getAchievementAnalytics(groupId).then((result) => {
-      if (!cancelled) {
-        setData(result);
-        setLoading(false);
-      }
-    }).catch((e) => {
-      logger.error('Failed to load achievement analytics', { error: e });
-      if (!cancelled) setLoading(false);
-    });
-    return () => { cancelled = true; };
+    getAchievementAnalytics(groupId)
+      .then((result) => {
+        if (!cancelled) {
+          setData(result);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        logger.error('Failed to load achievement analytics', { error: e });
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [groupId]);
 
   const achievementMap = useMemo(() => {

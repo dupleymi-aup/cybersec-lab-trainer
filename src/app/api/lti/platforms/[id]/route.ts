@@ -95,10 +95,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   if (!bodyResult.ok) return bodyResult.response;
   const parsed = updateLtiPlatformSchema.safeParse(bodyResult.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors }, { status: 400 });
   }
   const body = parsed.data;
 

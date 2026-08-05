@@ -35,7 +35,9 @@ export async function GET(request: NextRequest) {
     type ProgressRow = { userId: string; moduleId: string; score: number | null; completed: boolean; updatedAt: Date };
 
     const userMap = new Map<string, UserRow>(users.map((u: UserRow) => [u.id, u]));
-    const filteredUsers: Set<string> = new Set(users.filter((u: UserRow) => !groupId || u.group === groupId).map((u: UserRow) => u.id));
+    const filteredUsers: Set<string> = new Set(
+      users.filter((u: UserRow) => !groupId || u.group === groupId).map((u: UserRow) => u.id),
+    );
 
     const progress = allProgress.filter((p: ProgressRow) => filteredUsers.has(p.userId));
 
@@ -86,7 +88,9 @@ export async function GET(request: NextRequest) {
       const userTimes: number[] = [];
 
       for (const [moduleId, completionDate] of completions) {
-        const progressEntry = progress.find((p: ProgressRow) => p.userId === userId && p.moduleId === moduleId && p.completed);
+        const progressEntry = progress.find(
+          (p: ProgressRow) => p.userId === userId && p.moduleId === moduleId && p.completed,
+        );
         if (!progressEntry) continue;
 
         const startDate = userModuleStarts.get(userId)?.get(moduleId) || completionDate;

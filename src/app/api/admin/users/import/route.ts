@@ -110,10 +110,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = importBodySchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors }, { status: 400 });
   }
 
   const { csv, role, defaultGroup, defaultCourse, defaultUniversity } = parsed.data;

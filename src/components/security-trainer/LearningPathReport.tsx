@@ -241,8 +241,12 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
                   <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">#</th>
                   <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('module')}</th>
                   <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completed')}</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('totalStudents')}</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completionPercent')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">
+                    {t('totalStudents')}
+                  </th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">
+                    {t('completionPercent')}
+                  </th>
                   <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('dropoff')}</th>
                 </tr>
               </thead>

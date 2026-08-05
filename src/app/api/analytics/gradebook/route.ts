@@ -73,7 +73,9 @@ export async function GET(request: NextRequest) {
       const avgQuizScore =
         studentQuizResults.length > 0
           ? Math.round(
-              (studentQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / studentQuizResults.length) * 10,
+              (studentQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) /
+                studentQuizResults.length) *
+                10,
             ) / 10
           : 0;
 

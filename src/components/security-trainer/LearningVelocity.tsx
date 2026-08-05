@@ -244,7 +244,12 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
                   <Bar dataKey="avgDaysPerModule" name={t('daysPerModule')} fill="#6366f1" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="avgScoreImprovement" name={t('scoreImprovement')} fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="avgScoreImprovement"
+                    name={t('scoreImprovement')}
+                    fill="#10b981"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -273,7 +278,9 @@ export default function LearningVelocity({ groupId: propGroupId, days: propDays 
                   )}
                 </div>
                 <div className="flex items-center gap-4 text-xs">
-                  <span className="text-muted-foreground">{v.avgDaysPerModule} {t('daysModuleShort')}</span>
+                  <span className="text-muted-foreground">
+                    {v.avgDaysPerModule} {t('daysModuleShort')}
+                  </span>
                   <span className={v.scoreImprovement > 0 ? 'text-emerald-600' : 'text-red-600'}>
                     {v.scoreImprovement > 0 ? '+' : ''}
                     {v.scoreImprovement}

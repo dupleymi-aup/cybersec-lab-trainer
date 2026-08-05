@@ -104,7 +104,9 @@ export async function GET(request: NextRequest) {
 
     const dimensions = Array.from(groups.entries()).map(([name, data]) => {
       const studentCount = data.students.length;
-      const activeStudents = data.students.filter((s: StudentRow) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo).length;
+      const activeStudents = data.students.filter(
+        (s: StudentRow) => s.lastLoginAt && s.lastLoginAt >= thirtyDaysAgo,
+      ).length;
       const activeRate = studentCount > 0 ? Math.round((activeStudents / studentCount) * 10000) / 100 : 0;
 
       const completedModules = data.progress.filter((p: ProgressRow) => p.completed).length;
@@ -114,13 +116,18 @@ export async function GET(request: NextRequest) {
 
       const avgQuizScore =
         data.quizResults.length > 0
-          ? Math.round((data.quizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / data.quizResults.length) * 10) /
-            10
+          ? Math.round(
+              (data.quizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) /
+                data.quizResults.length) *
+                10,
+            ) / 10
           : 0;
 
       const totalQuizAttempts = data.quizAttempts.length;
 
-      const studentsWithProgress = new Set(data.progress.filter((p: ProgressRow) => p.completed).map((p: ProgressRow) => p.userId)).size;
+      const studentsWithProgress = new Set(
+        data.progress.filter((p: ProgressRow) => p.completed).map((p: ProgressRow) => p.userId),
+      ).size;
       const achievementRate = studentCount > 0 ? Math.round((studentsWithProgress / studentCount) * 10000) / 100 : 0;
 
       const moduleStats = Object.keys(MODULE_SHORT_NAMES).map((moduleId) => {
@@ -138,7 +145,8 @@ export async function GET(request: NextRequest) {
         ? MODULE_SHORT_NAMES[moduleStats[0].moduleId] || moduleStats[0].moduleId
         : '-';
       const weakestModule = moduleStats[moduleStats.length - 1]?.moduleId
-        ? MODULE_SHORT_NAMES[moduleStats[moduleStats.length - 1].moduleId] || moduleStats[moduleStats.length - 1].moduleId
+        ? MODULE_SHORT_NAMES[moduleStats[moduleStats.length - 1].moduleId] ||
+          moduleStats[moduleStats.length - 1].moduleId
         : '-';
 
       return {

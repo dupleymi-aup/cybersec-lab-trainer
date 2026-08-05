@@ -60,7 +60,12 @@ export default function LandingHeader() {
               {t('login')}
             </Button>
           </Link>
-          <button type="button" className="p-2 md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label={ta('toggleMenu')}>
+          <button
+            type="button"
+            className="p-2 md:hidden"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={ta('toggleMenu')}
+          >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>

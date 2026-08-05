@@ -208,7 +208,12 @@ export default function TeacherMessaging({ currentUser, groups = [] }: { current
                     <p className="mt-1 text-[10px] text-slate-400">{formatDate(msg.createdAt)}</p>
                   </div>
                 </div>
-                <button type="button" onClick={() => handleDelete(msg.id)} className="shrink-0 text-slate-300 hover:text-red-500" aria-label={tc('delete')}>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(msg.id)}
+                  className="shrink-0 text-slate-300 hover:text-red-500"
+                  aria-label={tc('delete')}
+                >
                   <X size={14} />
                 </button>
               </div>

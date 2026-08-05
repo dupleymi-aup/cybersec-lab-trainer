@@ -39,6 +39,12 @@ function apiWarn(fnName: string, error: unknown) {
   });
 }
 
+function getApiBaseUrl(): string {
+  if (typeof window !== 'undefined') return '';
+  const configured = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL;
+  return configured ? configured.replace(/\/$/, '') : '';
+}
+
 async function getAuthHeaders(): Promise<Record<string, string>> {
   // Auth is now handled via httpOnly cookies sent automatically by the browser
   return { 'Content-Type': 'application/json' };
@@ -55,9 +61,12 @@ async function apiFetch(url: string, options: RequestInit = {}, timeoutMs = 1000
           .find((row) => row.startsWith('csrf-token='))
           ?.split('=')[1]
       : undefined;
+  // Server-side callers (e.g. the scheduled report runner) must use absolute URLs;
+  // the browser sends relative paths to the same origin automatically.
+  const absoluteUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `${getApiBaseUrl()}${url}`;
   let res: Response;
   try {
-    res = await fetch(url, {
+    res = await fetch(absoluteUrl, {
       ...options,
       signal: controller.signal,
       headers: {

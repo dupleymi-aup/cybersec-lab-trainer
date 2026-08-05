@@ -126,9 +126,7 @@ export default memo(function GroupManager({ onRefresh }: GroupManagerProps) {
           </h3>
 
           {groups.length === 0 ? (
-            <p className="text-muted-foreground py-4 text-center text-sm">
-              {t('noGroups')}
-            </p>
+            <p className="text-muted-foreground py-4 text-center text-sm">{t('noGroups')}</p>
           ) : (
             <div className="space-y-2">
               {groups.map((name) => (
@@ -180,7 +178,9 @@ export default memo(function GroupManager({ onRefresh }: GroupManagerProps) {
                         </div>
                         <div>
                           <p className="text-sm font-medium">{name}</p>
-                          <p className="text-muted-foreground text-xs">{t('usersCount', { count: groupCounts[name] || 0 })}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {t('usersCount', { count: groupCounts[name] || 0 })}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">

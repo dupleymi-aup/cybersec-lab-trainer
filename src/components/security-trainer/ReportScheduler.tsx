@@ -41,8 +41,18 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
     { value: 'gradebook', label: t('gradebook'), icon: FileText, color: 'bg-blue-100 text-blue-700' },
     { value: 'at-risk', label: t('atRisk'), icon: AlertTriangle, color: 'bg-red-100 text-red-700' },
     { value: 'analytics', label: t('analytics'), icon: BarChart3, color: 'bg-indigo-100 text-indigo-700' },
-    { value: 'module-performance', label: t('modulePerformance'), icon: BookOpen, color: 'bg-emerald-100 text-emerald-700' },
-    { value: 'group-comparison', label: t('groupComparison'), icon: GitCompare, color: 'bg-violet-100 text-violet-700' },
+    {
+      value: 'module-performance',
+      label: t('modulePerformance'),
+      icon: BookOpen,
+      color: 'bg-emerald-100 text-emerald-700',
+    },
+    {
+      value: 'group-comparison',
+      label: t('groupComparison'),
+      icon: GitCompare,
+      color: 'bg-violet-100 text-violet-700',
+    },
     { value: 'quiz-retry', label: t('quizRetries'), icon: Calendar, color: 'bg-amber-100 text-amber-700' },
   ];
   const FREQUENCY_OPTIONS = [
@@ -67,15 +77,19 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
   useEffect(() => {
     let cancelled = false;
     loadReports();
-    getAllUsers().then((users) => {
-      if (!cancelled) {
-        const uniqueGroups = [...new Set(users.map((u) => u.group).filter(Boolean))];
-        setGroups(uniqueGroups);
-      }
-    }).catch((e) => {
-      logger.error('Failed to load users for report scheduler', { error: e });
-    });
-    return () => { cancelled = true; };
+    getAllUsers()
+      .then((users) => {
+        if (!cancelled) {
+          const uniqueGroups = [...new Set(users.map((u) => u.group).filter(Boolean))];
+          setGroups(uniqueGroups);
+        }
+      })
+      .catch((e) => {
+        logger.error('Failed to load users for report scheduler', { error: e });
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const loadReports = async () => {
@@ -366,9 +380,7 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
           <CardContent className="p-8 text-center">
             <Calendar size={40} className="text-muted-foreground mx-auto mb-3" />
             <p className="text-sm font-medium">{t('noSchedules')}</p>
-            <p className="text-muted-foreground mt-1 text-xs">
-              {t('createFirst')}
-            </p>
+            <p className="text-muted-foreground mt-1 text-xs">{t('createFirst')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -405,8 +417,14 @@ export default function ReportScheduler({ groupId, days: _days }: { groupId?: st
                               <Clock size={12} />
                               {formatSchedule(report)}
                             </span>
-                            {report.groupId && <span>{t('groupId')} {report.groupId}</span>}
-                            <span>{report.days} {t('daysData')}</span>
+                            {report.groupId && (
+                              <span>
+                                {t('groupId')} {report.groupId}
+                              </span>
+                            )}
+                            <span>
+                              {report.days} {t('daysData')}
+                            </span>
                           </div>
                           <p className="text-muted-foreground mt-0.5 text-xs">
                             {t('lastGenerated')} {formatLastGenerated(report.lastGenerated)}

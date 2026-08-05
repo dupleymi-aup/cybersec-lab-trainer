@@ -18,35 +18,35 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!auth) return unauthorized();
     if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const isAdmin = auth.role === 'admin';
-  const { id } = await params;
+    const isAdmin = auth.role === 'admin';
+    const { id } = await params;
 
-  const user = await getPrisma().user.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      email: true,
-      phone: true,
-      fullName: true,
-      group: true,
-      course: true,
-      university: true,
-      avatar: true,
-      bio: true,
-      role: true,
-      createdAt: true,
-      lastLoginAt: true,
-      ...(isAdmin && { loginCount: true, isBlocked: true }),
-    },
-  });
+    const user = await getPrisma().user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        phone: true,
+        fullName: true,
+        group: true,
+        course: true,
+        university: true,
+        avatar: true,
+        bio: true,
+        role: true,
+        createdAt: true,
+        lastLoginAt: true,
+        ...(isAdmin && { loginCount: true, isBlocked: true }),
+      },
+    });
 
-  if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-  return NextResponse.json({
-    ...user,
-    createdAt: user.createdAt.toISOString(),
-    lastLoginAt: user.lastLoginAt?.toISOString(),
-  });
+    return NextResponse.json({
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      lastLoginAt: user.lastLoginAt?.toISOString(),
+    });
   } catch (error) {
     logger.error('Failed to get user', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -60,116 +60,116 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (!auth) return unauthorized();
     if (!requireRole(auth.role, 'admin')) return forbidden();
 
-  const { id } = await params;
+    const { id } = await params;
 
-  // Validate UUID format
-  if (!validateUuid(id)) {
-    return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
-  }
-
-  const bodyResult = await parseBody<UserUpdateBody>(request);
-  if (!bodyResult.ok) return bodyResult.response;
-  const { fullName, phone, group, course, university, avatar, bio, role, email } = bodyResult.data;
-
-  // Validate role if provided
-  if (role !== undefined && !['student', 'teacher', 'admin'].includes(role)) {
-    return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
-  }
-
-  // Prevent self-role-change
-  if (id === auth.id && role !== undefined) {
-    return NextResponse.json({ error: 'Cannot change your own role via this endpoint' }, { status: 403 });
-  }
-
-  // Validate phone format if provided
-  if (phone !== undefined) {
-    const { validatePhone } = await import('@/lib/auth-utils');
-    if (phone && !validatePhone(phone)) {
-      return NextResponse.json({ error: 'Invalid phone format' }, { status: 400 });
-    }
-  }
-
-  // Validate email format if provided
-  if (email !== undefined) {
-    const { validateEmail } = await import('@/lib/auth-utils');
-    if (!validateEmail(email)) {
-      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    // Validate UUID format
+    if (!validateUuid(id)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
-    // Check for duplicate email
-    const existing = await getPrisma().user.findFirst({
-      where: { email: email, id: { not: id } },
-    });
-    if (existing) {
-      return NextResponse.json({ error: 'Email is already in use' }, { status: 409 });
+    const bodyResult = await parseBody<UserUpdateBody>(request);
+    if (!bodyResult.ok) return bodyResult.response;
+    const { fullName, phone, group, course, university, avatar, bio, role, email } = bodyResult.data;
+
+    // Validate role if provided
+    if (role !== undefined && !['student', 'teacher', 'admin'].includes(role)) {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
     }
-  }
 
-  const user = await getPrisma().user.update({
-    where: { id },
-    data: {
-      ...(fullName !== undefined && { fullName }),
-      ...(phone !== undefined && { phone }),
-      ...(group !== undefined && { group }),
-      ...(course !== undefined && { course }),
-      ...(university !== undefined && { university }),
-      ...(avatar !== undefined && { avatar }),
-      ...(bio !== undefined && { bio }),
-      ...(role !== undefined && { role }),
-      ...(email !== undefined && { email: email }),
-      ...(role !== undefined && { tokenVersion: { increment: 1 } }), // Revoke tokens on role change
-    },
-  });
+    // Prevent self-role-change
+    if (id === auth.id && role !== undefined) {
+      return NextResponse.json({ error: 'Cannot change your own role via this endpoint' }, { status: 403 });
+    }
 
-  // Audit log the user update
-  try {
-    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
-    const ip = getClientIp(request);
-    const appliedFields = [
-      ...(fullName !== undefined ? ['fullName'] : []),
-      ...(phone !== undefined ? ['phone'] : []),
-      ...(group !== undefined ? ['group'] : []),
-      ...(course !== undefined ? ['course'] : []),
-      ...(university !== undefined ? ['university'] : []),
-      ...(avatar !== undefined ? ['avatar'] : []),
-      ...(bio !== undefined ? ['bio'] : []),
-      ...(role !== undefined ? ['role'] : []),
-      ...(email !== undefined ? ['email'] : []),
-    ];
-    await getPrisma().auditLog.create({
+    // Validate phone format if provided
+    if (phone !== undefined) {
+      const { validatePhone } = await import('@/lib/auth-utils');
+      if (phone && !validatePhone(phone)) {
+        return NextResponse.json({ error: 'Invalid phone format' }, { status: 400 });
+      }
+    }
+
+    // Validate email format if provided
+    if (email !== undefined) {
+      const { validateEmail } = await import('@/lib/auth-utils');
+      if (!validateEmail(email)) {
+        return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+      }
+
+      // Check for duplicate email
+      const existing = await getPrisma().user.findFirst({
+        where: { email: email, id: { not: id } },
+      });
+      if (existing) {
+        return NextResponse.json({ error: 'Email is already in use' }, { status: 409 });
+      }
+    }
+
+    const user = await getPrisma().user.update({
+      where: { id },
       data: {
-        id: crypto.randomUUID(),
-        adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'user_update',
-        targetId: id,
-        targetName: user.fullName || user.email,
-        details: `Admin ${auth.id} updated user ${user.email}: ${appliedFields.join(', ') || 'none'} [IP: ${ip}]`,
+        ...(fullName !== undefined && { fullName }),
+        ...(phone !== undefined && { phone }),
+        ...(group !== undefined && { group }),
+        ...(course !== undefined && { course }),
+        ...(university !== undefined && { university }),
+        ...(avatar !== undefined && { avatar }),
+        ...(bio !== undefined && { bio }),
+        ...(role !== undefined && { role }),
+        ...(email !== undefined && { email: email }),
+        ...(role !== undefined && { tokenVersion: { increment: 1 } }), // Revoke tokens on role change
       },
     });
-  } catch (error) {
-    logger.warn('Audit logging failed', { error: String(error) });
-  }
 
-  return NextResponse.json({
-    success: true,
-    user: {
-      id: user.id,
-      email: user.email,
-      phone: user.phone,
-      fullName: user.fullName,
-      group: user.group,
-      course: user.course,
-      university: user.university,
-      avatar: user.avatar,
-      bio: user.bio,
-      role: user.role,
-      createdAt: user.createdAt.toISOString(),
-      lastLoginAt: user.lastLoginAt?.toISOString(),
-      loginCount: user.loginCount,
-      isBlocked: user.isBlocked,
-    },
-  });
+    // Audit log the user update
+    try {
+      const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
+      const ip = getClientIp(request);
+      const appliedFields = [
+        ...(fullName !== undefined ? ['fullName'] : []),
+        ...(phone !== undefined ? ['phone'] : []),
+        ...(group !== undefined ? ['group'] : []),
+        ...(course !== undefined ? ['course'] : []),
+        ...(university !== undefined ? ['university'] : []),
+        ...(avatar !== undefined ? ['avatar'] : []),
+        ...(bio !== undefined ? ['bio'] : []),
+        ...(role !== undefined ? ['role'] : []),
+        ...(email !== undefined ? ['email'] : []),
+      ];
+      await getPrisma().auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          adminId: auth.id,
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: 'user_update',
+          targetId: id,
+          targetName: user.fullName || user.email,
+          details: `Admin ${auth.id} updated user ${user.email}: ${appliedFields.join(', ') || 'none'} [IP: ${ip}]`,
+        },
+      });
+    } catch (error) {
+      logger.warn('Audit logging failed', { error: String(error) });
+    }
+
+    return NextResponse.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        fullName: user.fullName,
+        group: user.group,
+        course: user.course,
+        university: user.university,
+        avatar: user.avatar,
+        bio: user.bio,
+        role: user.role,
+        createdAt: user.createdAt.toISOString(),
+        lastLoginAt: user.lastLoginAt?.toISOString(),
+        loginCount: user.loginCount,
+        isBlocked: user.isBlocked,
+      },
+    });
   } catch (error) {
     logger.error('Failed to update user', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -183,49 +183,49 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     if (!auth) return unauthorized();
     if (!requireRole(auth.role, 'admin')) return forbidden();
 
-  // Rate limit: 10 deletions per minute per admin
-  const rateLimit = checkRateLimit(`delete:${auth.id}`, 10, 60_000);
-  if (!rateLimit.allowed) {
-    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
-  }
+    // Rate limit: 10 deletions per minute per admin
+    const rateLimit = checkRateLimit(`delete:${auth.id}`, 10, 60_000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
+    }
 
-  const { id } = await params;
+    const { id } = await params;
 
-  // Validate UUID format
-  if (!validateUuid(id)) {
-    return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
-  }
+    // Validate UUID format
+    if (!validateUuid(id)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
 
-  // Prevent self-deletion
-  if (id === auth.id) {
-    return NextResponse.json({ error: 'Cannot delete your own account via this endpoint' }, { status: 403 });
-  }
+    // Prevent self-deletion
+    if (id === auth.id) {
+      return NextResponse.json({ error: 'Cannot delete your own account via this endpoint' }, { status: 403 });
+    }
 
-  const user = await getPrisma().user.findUnique({ where: { id } });
-  if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const user = await getPrisma().user.findUnique({ where: { id } });
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-  await getPrisma().user.delete({ where: { id } });
+    await getPrisma().user.delete({ where: { id } });
 
-  // Audit log the deletion
-  try {
-    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
-    const ip = getClientIp(request);
-    await getPrisma().auditLog.create({
-      data: {
-        id: crypto.randomUUID(),
-        adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'user_deleted',
-        targetId: id,
-        targetName: user.fullName || user.email,
-        details: `Admin ${auth.id} deleted user ${user.email} (role: ${user.role}) [IP: ${ip}]`,
-      },
-    });
-  } catch (error) {
-    logger.warn('Audit logging failed', { error: String(error) });
-  }
+    // Audit log the deletion
+    try {
+      const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
+      const ip = getClientIp(request);
+      await getPrisma().auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          adminId: auth.id,
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: 'user_deleted',
+          targetId: id,
+          targetName: user.fullName || user.email,
+          details: `Admin ${auth.id} deleted user ${user.email} (role: ${user.role}) [IP: ${ip}]`,
+        },
+      });
+    } catch (error) {
+      logger.warn('Audit logging failed', { error: String(error) });
+    }
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (error) {
     logger.error('Failed to delete user', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

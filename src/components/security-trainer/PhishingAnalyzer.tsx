@@ -166,7 +166,12 @@ export default function PhishingAnalyzer() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard' as PageType)} aria-label={tc('back')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setCurrentPage('dashboard' as PageType)}
+          aria-label={tc('back')}
+        >
           <ChevronLeft size={20} />
         </Button>
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100">
@@ -174,9 +179,7 @@ export default function PhishingAnalyzer() {
         </div>
         <div>
           <h1 className="text-xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground text-xs">
-            {t('subtitle')}
-          </p>
+          <p className="text-muted-foreground text-xs">{t('subtitle')}</p>
         </div>
         {score.total > 0 && (
           <Badge className="ml-auto border-0 bg-emerald-100 text-emerald-700">
@@ -293,9 +296,7 @@ export default function PhishingAnalyzer() {
             <CardContent className="p-5">
               {/* Email metadata */}
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <Badge className={difficultyColors[currentEmail.difficulty]}>
-                  {t(currentEmail.difficulty)}
-                </Badge>
+                <Badge className={difficultyColors[currentEmail.difficulty]}>{t(currentEmail.difficulty)}</Badge>
                 <span className="text-xs text-slate-400">
                   {t('emailCounter', { current: currentEmailIndex + 1, total: filteredEmails.length })}
                 </span>
@@ -424,7 +425,12 @@ export default function PhishingAnalyzer() {
                         onClick={() => toggleIndicator(ind.id)}
                         role="button"
                         tabIndex={0}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleIndicator(ind.id); } }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleIndicator(ind.id);
+                          }
+                        }}
                       >
                         <CardContent className="p-3">
                           <div className="flex items-center gap-2">
@@ -494,9 +500,7 @@ export default function PhishingAnalyzer() {
 
       {currentPhase === 'practice' && filteredEmails.length === 0 && (
         <Card>
-          <CardContent className="text-muted-foreground p-8 text-center">
-            {t('noEmails')}
-          </CardContent>
+          <CardContent className="text-muted-foreground p-8 text-center">{t('noEmails')}</CardContent>
         </Card>
       )}
     </div>

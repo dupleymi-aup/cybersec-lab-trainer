@@ -6,7 +6,19 @@ import { useAppStore, type PageType } from '@/lib/store';
 import { modules, quizCategories } from '@/lib/data';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search, X, LayoutDashboard, Database, FileText, Link, Lock, Code, Shield, HelpCircle, BookOpen, Trophy, GraduationCap,
+  Search,
+  X,
+  LayoutDashboard,
+  Database,
+  FileText,
+  Link,
+  Lock,
+  Code,
+  Shield,
+  HelpCircle,
+  BookOpen,
+  Trophy,
+  GraduationCap,
 } from 'lucide-react';
 
 interface SearchResult {
@@ -34,12 +46,15 @@ export default function GlobalSearch() {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const pageNavItems: { id: PageType; label: string; icon: React.ReactNode }[] = useMemo(() => [
-    { id: 'dashboard', label: t('home'), icon: <LayoutDashboard size={16} /> },
-    { id: 'achievements', label: t('achievements'), icon: <Trophy size={16} /> },
-    { id: 'quiz', label: t('quizzes'), icon: <HelpCircle size={16} /> },
-    { id: 'profile', label: t('profile'), icon: <GraduationCap size={16} /> },
-  ], [t]);
+  const pageNavItems: { id: PageType; label: string; icon: React.ReactNode }[] = useMemo(
+    () => [
+      { id: 'dashboard', label: t('home'), icon: <LayoutDashboard size={16} /> },
+      { id: 'achievements', label: t('achievements'), icon: <Trophy size={16} /> },
+      { id: 'quiz', label: t('quizzes'), icon: <HelpCircle size={16} /> },
+      { id: 'profile', label: t('profile'), icon: <GraduationCap size={16} /> },
+    ],
+    [t],
+  );
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
@@ -76,13 +91,25 @@ export default function GlobalSearch() {
 
     for (const mod of modules) {
       if (mod.title.toLowerCase().includes(q) || mod.description.toLowerCase().includes(q)) {
-        items.push({ id: `mod-${mod.id}`, title: mod.title, subtitle: `${t('module')} · ${mod.difficulty}`, icon: iconMap[mod.icon] || <BookOpen size={16} />, page: mod.id as PageType });
+        items.push({
+          id: `mod-${mod.id}`,
+          title: mod.title,
+          subtitle: `${t('module')} · ${mod.difficulty}`,
+          icon: iconMap[mod.icon] || <BookOpen size={16} />,
+          page: mod.id as PageType,
+        });
       }
     }
 
     for (const cat of quizCategories) {
       if (cat.name.toLowerCase().includes(q)) {
-        items.push({ id: `quiz-${cat.id}`, title: cat.name, subtitle: `${t('quiz')} · ${cat.count}`, icon: <HelpCircle size={16} />, page: 'quiz' });
+        items.push({
+          id: `quiz-${cat.id}`,
+          title: cat.name,
+          subtitle: `${t('quiz')} · ${cat.count}`,
+          icon: <HelpCircle size={16} />,
+          page: 'quiz',
+        });
       }
     }
 
@@ -102,27 +129,58 @@ export default function GlobalSearch() {
       >
         <Search size={14} />
         <span className="flex-1 text-left">{t('placeholder')}</span>
-        <kbd className="bg-muted text-muted-foreground hidden items-center gap-0.5 rounded px-1.5 py-0.5 font-mono text-[10px] md:inline-flex">⌘K</kbd>
+        <kbd className="bg-muted text-muted-foreground hidden items-center gap-0.5 rounded px-1.5 py-0.5 font-mono text-[10px] md:inline-flex">
+          ⌘K
+        </kbd>
       </button>
 
       <AnimatePresence>
         {open && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/40" onClick={() => setOpen(false)} />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: -10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -10 }} transition={{ duration: 0.15 }} className="fixed top-[15vh] left-1/2 z-50 w-full max-w-lg -translate-x-1/2">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/40"
+              onClick={() => setOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              transition={{ duration: 0.15 }}
+              className="fixed top-[15vh] left-1/2 z-50 w-full max-w-lg -translate-x-1/2"
+            >
               <div className="bg-card border-border mx-4 overflow-hidden rounded-xl border shadow-2xl">
                 <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
                   <Search size={18} className="shrink-0 text-slate-400" />
-                  <input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('searchModules')} className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400" />
-                  <button type="button" onClick={() => setOpen(false)} aria-label={t('closeSearch')} className="hover:text-muted-foreground text-slate-400">
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={t('searchModules')}
+                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    aria-label={t('closeSearch')}
+                    className="hover:text-muted-foreground text-slate-400"
+                  >
                     <X size={16} />
                   </button>
                 </div>
                 <div className="max-h-[60vh] overflow-y-auto p-2">
-                  {query.trim() && results.length === 0 && <p className="py-8 text-center text-sm text-slate-400">{t('nothingFound')}</p>}
+                  {query.trim() && results.length === 0 && (
+                    <p className="py-8 text-center text-sm text-slate-400">{t('nothingFound')}</p>
+                  )}
                   {!query.trim() && <p className="py-8 text-center text-sm text-slate-400">{t('startTyping')}</p>}
                   {results.map((result) => (
-                    <button key={result.id} onClick={() => handleSelect(result.page)} className="hover:bg-secondary flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors">
+                    <button
+                      key={result.id}
+                      onClick={() => handleSelect(result.page)}
+                      className="hover:bg-secondary flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors"
+                    >
                       <span className="text-muted-foreground shrink-0">{result.icon}</span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{result.title}</p>

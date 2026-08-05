@@ -39,7 +39,9 @@ export async function GET(request: NextRequest) {
         where: { id: { in: userIds }, role: 'student' },
         select: { id: true, group: true },
       });
-      allowedIds = targetUsers.filter((u: { id: string; group: string | null }) => u.group === auth.group).map((u: { id: string }) => u.id);
+      allowedIds = targetUsers
+        .filter((u: { id: string; group: string | null }) => u.group === auth.group)
+        .map((u: { id: string }) => u.id);
     } else if (auth.role === 'admin') {
       const targetUsers = await getPrisma().user.findMany({
         where: { id: { in: userIds }, role: 'student' },

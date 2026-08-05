@@ -174,23 +174,30 @@ export default function AdminPanel() {
       })
       .finally(() => setLoadingUsers(false));
   }, [refreshKey]);
-  const filteredUsers = useMemo(() => allUsers.filter((u) => {
-    const matchesSearch =
-      searchTerm === '' ||
-      u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === '' || u.role === roleFilter;
-    return matchesSearch && matchesRole;
-  }), [allUsers, searchTerm, roleFilter]);
+  const filteredUsers = useMemo(
+    () =>
+      allUsers.filter((u) => {
+        const matchesSearch =
+          searchTerm === '' ||
+          u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          u.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesRole = roleFilter === '' || u.role === roleFilter;
+        return matchesSearch && matchesRole;
+      }),
+    [allUsers, searchTerm, roleFilter],
+  );
 
   // DB Stats
-  const userStats = useMemo(() => ({
-    totalUsers: allUsers.length,
-    studentCount: allUsers.filter((u) => u.role === 'student').length,
-    teacherCount: allUsers.filter((u) => u.role === 'teacher').length,
-    adminCount: allUsers.filter((u) => u.role === 'admin').length,
-    blockedCount: allUsers.filter((u) => u.isBlocked).length,
-  }), [allUsers]);
+  const userStats = useMemo(
+    () => ({
+      totalUsers: allUsers.length,
+      studentCount: allUsers.filter((u) => u.role === 'student').length,
+      teacherCount: allUsers.filter((u) => u.role === 'teacher').length,
+      adminCount: allUsers.filter((u) => u.role === 'admin').length,
+      blockedCount: allUsers.filter((u) => u.isBlocked).length,
+    }),
+    [allUsers],
+  );
   const { totalUsers, studentCount, teacherCount, adminCount, blockedCount } = userStats;
 
   // LocalStorage usage
@@ -215,49 +222,58 @@ export default function AdminPanel() {
     return { storageKB: (storageUsed / 1024).toFixed(1), keysCount };
   }, []);
 
-  const handleRoleChange = useCallback(async (userId: string, newRole: UserRole) => {
-    try {
-      const result = await changeUserRole(userId, newRole);
-      if (result.success) {
-        toast.success(t('actions.roleChanged', { role: getRoleLabel(newRole) }));
-        refresh();
-      } else {
-        toast.error(result.error);
+  const handleRoleChange = useCallback(
+    async (userId: string, newRole: UserRole) => {
+      try {
+        const result = await changeUserRole(userId, newRole);
+        if (result.success) {
+          toast.success(t('actions.roleChanged', { role: getRoleLabel(newRole) }));
+          refresh();
+        } else {
+          toast.error(result.error);
+        }
+      } catch (e) {
+        logger.error('Failed to change user role', { error: e });
       }
-    } catch (e) {
-      logger.error('Failed to change user role', { error: e });
-    }
-  }, [t, refresh]);
+    },
+    [t, refresh],
+  );
 
-  const handleDeleteUser = useCallback(async (userId: string, fullName: string) => {
-    if (!confirm(t('actions.confirmDelete', { name: fullName }))) return;
-    try {
-      const result = await deleteUser(userId);
-      if (result.success) {
-        toast.success(t('actions.userDeleted'));
-        refresh();
-      } else {
-        toast.error(result.error);
+  const handleDeleteUser = useCallback(
+    async (userId: string, fullName: string) => {
+      if (!confirm(t('actions.confirmDelete', { name: fullName }))) return;
+      try {
+        const result = await deleteUser(userId);
+        if (result.success) {
+          toast.success(t('actions.userDeleted'));
+          refresh();
+        } else {
+          toast.error(result.error);
+        }
+      } catch (e) {
+        logger.error('Failed to delete user', { error: e });
       }
-    } catch (e) {
-      logger.error('Failed to delete user', { error: e });
-    }
-  }, [t, refresh]);
+    },
+    [t, refresh],
+  );
 
-  const handleToggleBlock = useCallback(async (userId: string) => {
-    try {
-      const result = await toggleUserBlock(userId);
-      if (result.success) {
-        const isNowBlocked = allUsers.find((u) => u.id === userId)?.isBlocked;
-        toast.success(isNowBlocked ? t('actions.userBlocked') : t('actions.userUnblocked'));
-        refresh();
-      } else {
-        toast.error(result.error);
+  const handleToggleBlock = useCallback(
+    async (userId: string) => {
+      try {
+        const result = await toggleUserBlock(userId);
+        if (result.success) {
+          const isNowBlocked = allUsers.find((u) => u.id === userId)?.isBlocked;
+          toast.success(isNowBlocked ? t('actions.userBlocked') : t('actions.userUnblocked'));
+          refresh();
+        } else {
+          toast.error(result.error);
+        }
+      } catch (e) {
+        logger.error('Failed to toggle user block', { error: e });
       }
-    } catch (e) {
-      logger.error('Failed to toggle user block', { error: e });
-    }
-  }, [allUsers, t, refresh]);
+    },
+    [allUsers, t, refresh],
+  );
 
   const handleToggleSelect = useCallback((userId: string) => {
     setSelectedUserIds((prev) => {
@@ -280,73 +296,78 @@ export default function AdminPanel() {
     }
   }, [filteredUsers, selectedUserIds, user]);
 
-  const handleCSVImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleCSVImport = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const text = event.target?.result as string;
-        const lines = text.split('\n').filter((l) => l.trim());
-        if (lines.length < 2) {
-          toast.error(t('actions.csvEmpty'));
-          return;
-        }
-
-        // Parse header
-        const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
-        const nameIdx = headers.findIndex((h) => h.includes('name'));
-        const emailIdx = headers.findIndex((h) => h.includes('email'));
-        const phoneIdx = headers.findIndex((h) => h.includes('phone'));
-        const roleIdx = headers.findIndex((h) => h.includes('role'));
-        const groupIdx = headers.findIndex((h) => h.includes('group'));
-
-        if (nameIdx === -1 || emailIdx === -1) {
-          toast.error(t('actions.csvMissingColumns'));
-          return;
-        }
-
-        let created = 0;
-        let skipped = 0;
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(',').map((c) => c.trim());
-          const fullName = cols[nameIdx] || '';
-          const email = cols[emailIdx] || '';
-          const phone = cols[phoneIdx] || '+7000000000';
-          const roleStr = (cols[roleIdx] || 'student').toLowerCase();
-          const group = cols[groupIdx] || '';
-          const role: UserRole = ['student', 'teacher', 'admin'].includes(roleStr) ? (roleStr as UserRole) : 'student';
-
-          // Check duplicate
-          const existing = allUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
-          if (existing) {
-            skipped++;
-            continue;
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const text = event.target?.result as string;
+          const lines = text.split('\n').filter((l) => l.trim());
+          if (lines.length < 2) {
+            toast.error(t('actions.csvEmpty'));
+            return;
           }
 
-          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-          const array = new Uint8Array(14);
-          crypto.getRandomValues(array);
-          const defaultPassword = Array.from(array, (b) => chars[b % chars.length]).join('');
-          const result = await createUser(
-            { email, phone, fullName, role, group, course: '', university: '' },
-            defaultPassword,
-          );
-          if (result.success) created++;
-          else skipped++;
-        }
+          // Parse header
+          const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+          const nameIdx = headers.findIndex((h) => h.includes('name'));
+          const emailIdx = headers.findIndex((h) => h.includes('email'));
+          const phoneIdx = headers.findIndex((h) => h.includes('phone'));
+          const roleIdx = headers.findIndex((h) => h.includes('role'));
+          const groupIdx = headers.findIndex((h) => h.includes('group'));
 
-        toast.success(t('actions.csvImported', { created, skipped }));
-        refresh();
-      } catch (e) {
-        logger.warn('AdminPanel handleCSVImport failed', { error: e });
-        toast.error(t('actions.csvParseError'));
-      }
-    };
-    reader.readAsText(file);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  }, [allUsers, t, refresh]);
+          if (nameIdx === -1 || emailIdx === -1) {
+            toast.error(t('actions.csvMissingColumns'));
+            return;
+          }
+
+          let created = 0;
+          let skipped = 0;
+          for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map((c) => c.trim());
+            const fullName = cols[nameIdx] || '';
+            const email = cols[emailIdx] || '';
+            const phone = cols[phoneIdx] || '+7000000000';
+            const roleStr = (cols[roleIdx] || 'student').toLowerCase();
+            const group = cols[groupIdx] || '';
+            const role: UserRole = ['student', 'teacher', 'admin'].includes(roleStr)
+              ? (roleStr as UserRole)
+              : 'student';
+
+            // Check duplicate
+            const existing = allUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+            if (existing) {
+              skipped++;
+              continue;
+            }
+
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            const array = new Uint8Array(14);
+            crypto.getRandomValues(array);
+            const defaultPassword = Array.from(array, (b) => chars[b % chars.length]).join('');
+            const result = await createUser(
+              { email, phone, fullName, role, group, course: '', university: '' },
+              defaultPassword,
+            );
+            if (result.success) created++;
+            else skipped++;
+          }
+
+          toast.success(t('actions.csvImported', { created, skipped }));
+          refresh();
+        } catch (e) {
+          logger.warn('AdminPanel handleCSVImport failed', { error: e });
+          toast.error(t('actions.csvParseError'));
+        }
+      };
+      reader.readAsText(file);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    },
+    [allUsers, t, refresh],
+  );
 
   const handleClearProgress = useCallback(() => {
     if (!confirm(t('actions.confirmClearProgress'))) return;
@@ -1039,7 +1060,11 @@ function AnalyticsSubTabs({
   const [summary, setSummary] = useState<ComprehensiveSummary | null>(null);
 
   useEffect(() => {
-    getComprehensiveSummary(days, groupId).then(setSummary).catch(() => { /* ignore */ });
+    getComprehensiveSummary(days, groupId)
+      .then(setSummary)
+      .catch(() => {
+        /* ignore */
+      });
   }, [days, groupId]);
 
   return (

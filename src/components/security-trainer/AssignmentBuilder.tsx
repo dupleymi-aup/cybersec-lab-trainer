@@ -87,8 +87,6 @@ const emptyForm: AssignmentForm = {
   published: false,
 };
 
-
-
 const typeIcons: Record<Assignment['type'], typeof FileText> = {
   quiz: FileText,
   'code-review': Edit2,
@@ -111,19 +109,25 @@ function useGroups() {
 
   useEffect(() => {
     let cancelled = false;
-    import('@/lib/auth-store').then(({ getAllUsers }) => {
-      getAllUsers().then((users) => {
-        if (!cancelled) {
-          const unique = [...new Set(users.map((u) => u.group).filter(Boolean))];
-          setGroups(unique);
-        }
-      }).catch((e) => {
-        logger.error('Failed to load users for assignment groups', { error: e });
+    import('@/lib/auth-store')
+      .then(({ getAllUsers }) => {
+        getAllUsers()
+          .then((users) => {
+            if (!cancelled) {
+              const unique = [...new Set(users.map((u) => u.group).filter(Boolean))];
+              setGroups(unique);
+            }
+          })
+          .catch((e) => {
+            logger.error('Failed to load users for assignment groups', { error: e });
+          });
+      })
+      .catch((e) => {
+        logger.error('Failed to load auth-store for assignment groups', { error: e });
       });
-    }).catch((e) => {
-      logger.error('Failed to load auth-store for assignment groups', { error: e });
-    });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return groups;
@@ -247,43 +251,49 @@ export default function AssignmentBuilder() {
     }
   }, [form, editingId, fetchAssignments, t]);
 
-  const handleDelete = useCallback(async (id: string) => {
-    if (!confirm(t('confirmDelete'))) return;
-    try {
-      const headers = await getAuthHeaders();
-      const res = await fetch(`/api/assignments/${id}`, {
-        method: 'DELETE',
-        headers,
-      });
-      if (res.ok) {
-        toast.success(t('assignmentDeleted'));
-        fetchAssignments();
-      } else {
-        toast.error(t('deleteError'));
+  const handleDelete = useCallback(
+    async (id: string) => {
+      if (!confirm(t('confirmDelete'))) return;
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`/api/assignments/${id}`, {
+          method: 'DELETE',
+          headers,
+        });
+        if (res.ok) {
+          toast.success(t('assignmentDeleted'));
+          fetchAssignments();
+        } else {
+          toast.error(t('deleteError'));
+        }
+      } catch (e) {
+        logger.warn('AssignmentBuilder handleDelete failed', { error: e });
+        toast.error(t('networkError'));
       }
-    } catch (e) {
-      logger.warn('AssignmentBuilder handleDelete failed', { error: e });
-      toast.error(t('networkError'));
-    }
-  }, [fetchAssignments, t]);
+    },
+    [fetchAssignments, t],
+  );
 
-  const togglePublished = useCallback(async (a: Assignment) => {
-    try {
-      const headers = await getAuthHeaders();
-      const res = await fetch(`/api/assignments/${a.id}`, {
-        method: 'PUT',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ published: !a.published }),
-      });
-      if (res.ok) {
-        toast.success(a.published ? t('unpublished') : t('published'));
-        fetchAssignments();
+  const togglePublished = useCallback(
+    async (a: Assignment) => {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`/api/assignments/${a.id}`, {
+          method: 'PUT',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ published: !a.published }),
+        });
+        if (res.ok) {
+          toast.success(a.published ? t('unpublished') : t('published'));
+          fetchAssignments();
+        }
+      } catch (e) {
+        logger.warn('AssignmentBuilder togglePublished failed', { error: e });
+        toast.error(t('error'));
       }
-    } catch (e) {
-      logger.warn('AssignmentBuilder togglePublished failed', { error: e });
-      toast.error(t('error'));
-    }
-  }, [fetchAssignments, t]);
+    },
+    [fetchAssignments, t],
+  );
 
   const filtered = assignments.filter((a) => {
     if (filter === 'published') return a.published;
@@ -653,11 +663,7 @@ export default function AssignmentBuilder() {
           <CardContent className="p-12 text-center text-slate-400">
             <FileText size={40} className="mx-auto mb-3 opacity-50" />
             <p className="text-sm">
-              {filter === 'all'
-                ? t('noAssignments')
-                : filter === 'published'
-                  ? t('noPublished')
-                  : t('noDrafts')}
+              {filter === 'all' ? t('noAssignments') : filter === 'published' ? t('noPublished') : t('noDrafts')}
             </p>
           </CardContent>
         </Card>
@@ -716,7 +722,11 @@ export default function AssignmentBuilder() {
                         <span className="flex items-center gap-1">
                           <Clock size={12} /> {a.timeLimit ? `${a.timeLimit} ${t('minutes')}` : t('noLimit')}
                         </span>
-                        {a.attempts > 0 && <span>{t('attemptsLabel')} {a.attempts}</span>}
+                        {a.attempts > 0 && (
+                          <span>
+                            {t('attemptsLabel')} {a.attempts}
+                          </span>
+                        )}
                         {a.group && (
                           <span className="flex items-center gap-1">
                             <Users size={12} /> {a.group}

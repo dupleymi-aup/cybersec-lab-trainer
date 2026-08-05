@@ -9,6 +9,7 @@
 
 import { getPrisma } from './db';
 import { logger } from './logger';
+import { sendReportEmail } from './email';
 import {
   generateGradebookPDF,
   generateAtRiskPDF,
@@ -59,11 +60,16 @@ interface AtRiskStudent {
   trend: 'improving' | 'declining' | 'stable';
 }
 
-const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Promise<void>> = {
-  gradebook: async (days, groupId): Promise<void> => {
+interface GeneratedReport {
+  blob: Blob;
+  filename: string;
+}
+
+const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Promise<GeneratedReport | null>> = {
+  gradebook: async (days, groupId): Promise<GeneratedReport | null> => {
     const { getGradebook } = await import('./analytics-api');
     const data = await getGradebook({ groupId: groupId || undefined, days });
-    if (!data.students?.length) return;
+    if (!data.students?.length) return null;
 
     const students = data.students.map((s: GradebookStudent) => ({
       id: s.id,
@@ -75,15 +81,16 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
       avgScore: s.avgQuizScore || 0,
     }));
 
-    await generateGradebookPDF(students);
+    const blob = await generateGradebookPDF(students, undefined, 'buffer');
+    return blob ? { blob, filename: 'gradebook.pdf' } : null;
   },
 
-  'at-risk': async (days, groupId): Promise<void> => {
+  'at-risk': async (days, groupId): Promise<GeneratedReport | null> => {
     const { getAtRiskStudents } = await import('./analytics-api');
     const data = await getAtRiskStudents(days, groupId);
-    if (!data.atRiskStudents?.length) return;
+    if (!data.atRiskStudents?.length) return null;
 
-    await generateAtRiskPDF(
+    const blob = await generateAtRiskPDF(
       data.atRiskStudents.map((s: AtRiskStudent) => ({
         fullName: s.fullName,
         email: s.email || '',
@@ -94,35 +101,42 @@ const REPORT_GENERATORS: Record<string, (days: number, groupId?: string) => Prom
         modulesCompleted: s.modulesCompleted || 0,
         avgQuizScore: s.avgQuizScore || 0,
       })),
+      undefined,
+      'buffer',
     );
+    return blob ? { blob, filename: 'at-risk-students.pdf' } : null;
   },
 
-  analytics: async (days, groupId): Promise<void> => {
+  analytics: async (days, groupId): Promise<GeneratedReport | null> => {
     const { getComprehensiveSummary } = await import('./analytics-api');
     const summary = await getComprehensiveSummary(days, groupId);
 
-    await generateAnalyticsPDF(summary, summary.moduleDistribution || []);
+    const blob = await generateAnalyticsPDF(summary, summary.moduleDistribution || [], undefined, 'buffer');
+    return blob ? { blob, filename: 'analytics-report.pdf' } : null;
   },
 
-  'module-performance': async (days, groupId): Promise<void> => {
+  'module-performance': async (days, groupId): Promise<GeneratedReport | null> => {
     const { getModulePerformance } = await import('./analytics-api');
     const data = await getModulePerformance(days, groupId);
 
-    await generateModulePerformancePDF(data || []);
+    const blob = await generateModulePerformancePDF(data || [], undefined, 'buffer');
+    return blob ? { blob, filename: 'module-performance.pdf' } : null;
   },
 
-  'group-comparison': async (days, _groupId): Promise<void> => {
+  'group-comparison': async (days): Promise<GeneratedReport | null> => {
     const { getGroupComparison } = await import('./analytics-api');
     const data = await getGroupComparison(days);
 
-    await generateGroupComparisonPDF(data.dimensions || []);
+    const blob = await generateGroupComparisonPDF(data.dimensions || [], undefined, 'buffer');
+    return blob ? { blob, filename: 'group-comparison.pdf' } : null;
   },
 
-  'quiz-retry': async (days, groupId): Promise<void> => {
+  'quiz-retry': async (days, groupId): Promise<GeneratedReport | null> => {
     const { getQuizRetryAnalytics } = await import('./analytics-api');
     const data = await getQuizRetryAnalytics(days, groupId);
 
-    await generateQuizRetryPDF(data.categoryRetryStats || [], data.topRetryers || []);
+    const blob = await generateQuizRetryPDF(data.categoryRetryStats || [], data.topRetryers || [], undefined, 'buffer');
+    return blob ? { blob, filename: 'quiz-retry.pdf' } : null;
   },
 };
 
@@ -143,6 +157,11 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
 
   for (const report of reports) {
     try {
+      // Defensive double-check: skip inactive reports regardless of the query filter
+      if (!report.isActive) {
+        continue;
+      }
+
       // Check if this report should run today
       const shouldRun = shouldExecuteReport(report, dayOfWeek, dayOfMonth);
       if (!shouldRun) {
@@ -171,18 +190,28 @@ export async function runScheduledReports(now: Date = new Date()): Promise<{
         continue;
       }
 
-      await generator(report.days, report.groupId || undefined);
+      const generated = await generator(report.days, report.groupId || undefined);
+      if (!generated) {
+        // No data for the selected range — nothing to produce, don't mark as failed
+        results.skipped++;
+        continue;
+      }
+
+      // Send email notification if configured, otherwise store to disk
+      if (report.email) {
+        const sent = await sendReportEmail(report.email, report.reportType, generated.filename, generated.blob);
+        if (!sent) {
+          await saveReportToDisk(report, generated.blob, now);
+        }
+      } else {
+        await saveReportToDisk(report, generated.blob, now);
+      }
 
       // Update lastGenerated timestamp
       await getPrisma().scheduledReport.update({
         where: { id: report.id },
         data: { lastGenerated: now },
       });
-
-      // Send email notification if configured
-      if (report.email) {
-        await sendEmailNotification(report);
-      }
 
       results.success++;
     } catch (error) {
@@ -209,9 +238,9 @@ function shouldExecuteReport(report: ScheduledReportRecord, dayOfWeek: number, d
   }
 }
 
-async function _saveReport(report: ScheduledReportRecord, pdfBlob: Blob, now: Date): Promise<void> {
-  const fs = await import('fs');
-  const path = await import('path');
+async function saveReportToDisk(report: ScheduledReportRecord, pdfBlob: Blob, now: Date): Promise<void> {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
   const reportsDir = path.join(process.cwd(), 'reports');
 
   if (!fs.existsSync(reportsDir)) {
@@ -223,23 +252,6 @@ async function _saveReport(report: ScheduledReportRecord, pdfBlob: Blob, now: Da
 
   const buffer = Buffer.from(await pdfBlob.arrayBuffer());
   fs.writeFileSync(filePath, buffer);
-}
-
-async function sendEmailNotification(report: ScheduledReportRecord): Promise<void> {
-  // Placeholder for email sending logic
-  // In production, integrate with SendGrid, Resend, or nodemailer
-  logger.warn(`[Email] Notification would be sent to ${report.email} for report ${report.id}`);
-
-  // Example with nodemailer:
-  // const nodemailer = await import('nodemailer');
-  // const transporter = nodemailer.createTransport({ ... });
-  // await transporter.sendMail({
-  //   from: 'reports@cybersec-lab.com',
-  //   to: report.email,
-  //   subject: `Отчёт: ${report.reportType}`,
-  //   text: `Автоматический отчёт за ${now.toLocaleDateString('ru-RU')}`,
-  //   attachments: [{ filename: 'report.pdf', content: await pdfBlob.arrayBuffer() }],
-  // });
 }
 
 // Run if executed directly

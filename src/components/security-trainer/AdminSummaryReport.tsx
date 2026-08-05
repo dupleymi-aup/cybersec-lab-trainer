@@ -35,7 +35,17 @@ interface MetricCardProps {
   iconColor: string;
 }
 
-const MetricCard = memo(function MetricCard({ icon, value, label, trend, delta, deltaSuffix, delay = 0, iconBg, iconColor }: MetricCardProps) {
+const MetricCard = memo(function MetricCard({
+  icon,
+  value,
+  label,
+  trend,
+  delta,
+  deltaSuffix,
+  delay = 0,
+  iconBg,
+  iconColor,
+}: MetricCardProps) {
   const trendIcon =
     trend === 'up' ? (
       <TrendingUp size={14} className="text-emerald-500" />
@@ -260,7 +270,11 @@ export default function AdminSummaryReport() {
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
                   formatter={(value) =>
-                    value === 'students' ? t('studentsLabel') : value === 'avgCompletion' ? `${t('completion')} (%)` : value
+                    value === 'students'
+                      ? t('studentsLabel')
+                      : value === 'avgCompletion'
+                        ? `${t('completion')} (%)`
+                        : value
                   }
                 />
                 <Bar yAxisId="left" dataKey="students" name="students" radius={[4, 4, 0, 0]}>
@@ -292,7 +306,13 @@ export default function AdminSummaryReport() {
             <h3 className="mb-4 text-sm font-semibold">
               {t('summary')}{' '}
               <span className="font-normal text-slate-400">
-                ({groupBy === 'group' ? t('summaryByGroup') : groupBy === 'course' ? t('summaryByCourse') : t('summaryByUniversity')})
+                (
+                {groupBy === 'group'
+                  ? t('summaryByGroup')
+                  : groupBy === 'course'
+                    ? t('summaryByCourse')
+                    : t('summaryByUniversity')}
+                )
               </span>
             </h3>
             <div className="overflow-x-auto">

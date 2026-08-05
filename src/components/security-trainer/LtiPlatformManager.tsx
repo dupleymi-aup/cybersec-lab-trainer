@@ -173,48 +173,54 @@ export default function LtiPlatformManager() {
     }
   }, [formData, editingPlatform, resetForm, loadPlatforms, t]);
 
-  const handleDelete = useCallback(async (id: string, name: string) => {
-    if (!confirm(t('confirmDelete', { name }))) return;
-    try {
-      const headers = await getAuthHeaders();
-      const res = await fetch(`/api/lti/platforms/${id}`, {
-        method: 'DELETE',
-        headers,
-      });
-      if (res.ok) {
-        toast.success(t('platformDeleted'));
-        if (selectedPlatformId === id) {
-          setSelectedPlatformId(null);
-          setGradeSyncs([]);
+  const handleDelete = useCallback(
+    async (id: string, name: string) => {
+      if (!confirm(t('confirmDelete', { name }))) return;
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`/api/lti/platforms/${id}`, {
+          method: 'DELETE',
+          headers,
+        });
+        if (res.ok) {
+          toast.success(t('platformDeleted'));
+          if (selectedPlatformId === id) {
+            setSelectedPlatformId(null);
+            setGradeSyncs([]);
+          }
+          loadPlatforms();
+        } else {
+          toast.error(t('deleteError'));
         }
-        loadPlatforms();
-      } else {
-        toast.error(t('deleteError'));
+      } catch (e) {
+        logger.warn('LtiPlatformManager handleDelete failed', { error: e });
+        toast.error(t('networkError'));
       }
-    } catch (e) {
-      logger.warn('LtiPlatformManager handleDelete failed', { error: e });
-      toast.error(t('networkError'));
-    }
-  }, [selectedPlatformId, loadPlatforms, t]);
+    },
+    [selectedPlatformId, loadPlatforms, t],
+  );
 
-  const handleToggleActive = useCallback(async (platform: LtiPlatform) => {
-    try {
-      const headers = await getAuthHeaders();
-      const res = await fetch(`/api/lti/platforms/${platform.id}`, {
-        method: 'PUT',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive: !platform.isActive }),
-      });
-      if (res.ok) {
-        toast.success(platform.isActive ? t('platformDeactivated') : t('platformActivated'));
-        loadPlatforms();
+  const handleToggleActive = useCallback(
+    async (platform: LtiPlatform) => {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`/api/lti/platforms/${platform.id}`, {
+          method: 'PUT',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isActive: !platform.isActive }),
+        });
+        if (res.ok) {
+          toast.success(platform.isActive ? t('platformDeactivated') : t('platformActivated'));
+          loadPlatforms();
+        }
+      } catch (e) {
+        if (process.env.NODE_ENV === 'development')
+          logger.warn('LtiPlatformManager handleToggleActive failed', { error: e });
+        toast.error(t('networkError'));
       }
-    } catch (e) {
-      if (process.env.NODE_ENV === 'development')
-        logger.warn('LtiPlatformManager handleToggleActive failed', { error: e });
-      toast.error(t('networkError'));
-    }
-  }, [loadPlatforms, t]);
+    },
+    [loadPlatforms, t],
+  );
 
   const startEdit = useCallback((platform: LtiPlatform) => {
     setEditingPlatform(platform);
@@ -232,10 +238,13 @@ export default function LtiPlatformManager() {
     setShowForm(true);
   }, []);
 
-  const copyToClipboard = useCallback((text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(t('copied', { label }));
-  }, [t]);
+  const copyToClipboard = useCallback(
+    (text: string, label: string) => {
+      navigator.clipboard.writeText(text);
+      toast.success(t('copied', { label }));
+    },
+    [t],
+  );
 
   const statusIcon = (status: string) => {
     switch (status) {
@@ -296,7 +305,8 @@ export default function LtiPlatformManager() {
               <code className="bg-muted rounded px-1">{appUrl}/api/lti/oidc-login</code>
             </li>
             <li>
-              {t('moodleStep4Prefix')} <strong>Issuer, Client ID, Deployment ID</strong> {t('moodleStep4From')} {t('moodleStep4Suffix')}
+              {t('moodleStep4Prefix')} <strong>Issuer, Client ID, Deployment ID</strong> {t('moodleStep4From')}{' '}
+              {t('moodleStep4Suffix')}
             </li>
             <li>
               {t('moodleStep3Prefix')} <strong>Keyset URL</strong>:{' '}
@@ -323,9 +333,7 @@ export default function LtiPlatformManager() {
           >
             <Card className="border-blue-200 dark:border-blue-800">
               <CardContent className="space-y-3 p-4">
-                <h3 className="text-sm font-semibold">
-                  {editingPlatform ? t('editPlatform') : t('newPlatform')}
-                </h3>
+                <h3 className="text-sm font-semibold">{editingPlatform ? t('editPlatform') : t('newPlatform')}</h3>
 
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div>
@@ -529,7 +537,11 @@ export default function LtiPlatformManager() {
                   <div className="flex items-center gap-1">
                     <span className="text-muted-foreground">{t('clientIdLabel')}:</span>
                     <code className="bg-muted rounded px-1 text-[10px]">{p.clientId}</code>
-                    <button type="button" aria-label={tc('commonAria.copy')} onClick={() => copyToClipboard(p.clientId, t('clientIdLabel'))}>
+                    <button
+                      type="button"
+                      aria-label={tc('commonAria.copy')}
+                      onClick={() => copyToClipboard(p.clientId, t('clientIdLabel'))}
+                    >
                       <Copy size={10} className="text-muted-foreground" />
                     </button>
                   </div>

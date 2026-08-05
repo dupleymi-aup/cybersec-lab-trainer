@@ -135,7 +135,9 @@ export async function GET(request: NextRequest) {
       const scores = groupProgress.filter((p: ProgressRow) => p.score != null).map((p: ProgressRow) => p.score ?? 0);
       const avgScore = scores.length > 0 ? scores.reduce((a: number, b: number) => a + b, 0) / scores.length : 0;
       const variance =
-        scores.length > 1 ? scores.reduce((sum: number, s: number) => sum + Math.pow(s - avgScore, 2), 0) / scores.length : 0;
+        scores.length > 1
+          ? scores.reduce((sum: number, s: number) => sum + Math.pow(s - avgScore, 2), 0) / scores.length
+          : 0;
       const performanceVariance = Math.round(Math.sqrt(variance) * 10) / 10;
 
       const studentScores = groupStudents
@@ -148,8 +150,10 @@ export async function GET(request: NextRequest) {
 
       const topQuartile = studentScores.slice(0, Math.max(1, Math.floor(studentScores.length / 4)));
       const restScores = studentScores.slice(Math.max(1, Math.floor(studentScores.length / 4)));
-      const topAvg = topQuartile.length > 0 ? topQuartile.reduce((a: number, b: number) => a + b, 0) / topQuartile.length : 0;
-      const restAvg = restScores.length > 0 ? restScores.reduce((a: number, b: number) => a + b, 0) / restScores.length : 0;
+      const topAvg =
+        topQuartile.length > 0 ? topQuartile.reduce((a: number, b: number) => a + b, 0) / topQuartile.length : 0;
+      const restAvg =
+        restScores.length > 0 ? restScores.reduce((a: number, b: number) => a + b, 0) / restScores.length : 0;
       const peerInfluenceScore = topAvg > 0 && restAvg > 0 ? Math.round((restAvg / topAvg) * 100) : 0;
 
       const integrationDays: number[] = [];
@@ -157,9 +161,7 @@ export async function GET(request: NextRequest) {
         const sProgress = groupProgress.filter((p: ProgressRow) => p.userId === s.id);
         if (sProgress.length > 0) {
           const firstActivity = new Date(Math.min(...sProgress.map((p: ProgressRow) => p.updatedAt.getTime())));
-          const daysToIntegrate = Math.floor(
-            (firstActivity.getTime() - s.createdAt.getTime()) / (24 * 60 * 60 * 1000),
-          );
+          const daysToIntegrate = Math.floor((firstActivity.getTime() - s.createdAt.getTime()) / (24 * 60 * 60 * 1000));
           if (daysToIntegrate >= 0) integrationDays.push(daysToIntegrate);
         }
       }
@@ -178,12 +180,12 @@ export async function GET(request: NextRequest) {
           : 0;
       const completionRate =
         groupStudents.length > 0
-          ? Math.round((groupProgress.filter((p: ProgressRow) => p.completed).length / (groupStudents.length * 10)) * 100)
+          ? Math.round(
+              (groupProgress.filter((p: ProgressRow) => p.completed).length / (groupStudents.length * 10)) * 100,
+            )
           : 0;
       const quizRate =
-        groupStudents.length > 0
-          ? Math.min(100, Math.round((groupQuizResults.length / groupStudents.length) * 20))
-          : 0;
+        groupStudents.length > 0 ? Math.min(100, Math.round((groupQuizResults.length / groupStudents.length) * 20)) : 0;
       const healthScore = Math.round(activityRate * 0.4 + completionRate * 0.35 + quizRate * 0.25);
 
       const recentWeeks = activityTimeline.slice(-4);
@@ -223,14 +225,15 @@ export async function GET(request: NextRequest) {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([week, data]) => ({
         week,
-        avgHealthScore:
-          Math.round((data.healthScores.reduce((a, b) => a + b, 0) / data.healthScores.length) * 10) / 10,
+        avgHealthScore: Math.round((data.healthScores.reduce((a, b) => a + b, 0) / data.healthScores.length) * 10) / 10,
         totalActive: students.filter((s: StudentRow) => {
           const weekStart = new Date(week);
           const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
           return (
             progress.some((p: ProgressRow) => p.userId === s.id && p.updatedAt >= weekStart && p.updatedAt < weekEnd) ||
-            quizAttempts.some((q: QuizAttemptRow) => q.userId === s.id && q.attemptedAt >= weekStart && q.attemptedAt < weekEnd)
+            quizAttempts.some(
+              (q: QuizAttemptRow) => q.userId === s.id && q.attemptedAt >= weekStart && q.attemptedAt < weekEnd,
+            )
           );
         }).length,
       }));

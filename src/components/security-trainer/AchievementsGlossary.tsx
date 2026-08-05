@@ -179,9 +179,7 @@ export default function AchievementsAndGlossary() {
                         <div className="mb-1 flex items-center gap-2">
                           <h3 className="text-sm font-semibold">{ach.title}</h3>
                           {unlocked ? (
-                            <Badge className="bg-emerald-100 text-emerald-700 text-[10px]">
-                              {t('unlocked')}
-                            </Badge>
+                            <Badge className="bg-emerald-100 text-[10px] text-emerald-700">{t('unlocked')}</Badge>
                           ) : (
                             <Badge variant="secondary" className="text-[10px]">
                               {ach.condition}
@@ -220,7 +218,12 @@ export default function AchievementsAndGlossary() {
               onClick={() => setActiveCategory('')}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveCategory(''); } }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveCategory('');
+                }
+              }}
             >
               {t('all')} ({glossaryTerms.length})
             </Badge>
@@ -236,7 +239,12 @@ export default function AchievementsAndGlossary() {
                   onClick={() => setActiveCategory(activeCategory === catKey ? '' : catKey)}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveCategory(activeCategory === catKey ? '' : catKey); } }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActiveCategory(activeCategory === catKey ? '' : catKey);
+                    }
+                  }}
                 >
                   {t(catKey)} ({count})
                 </Badge>
@@ -277,9 +285,7 @@ export default function AchievementsAndGlossary() {
               </motion.div>
             ))}
             {filteredTerms.length === 0 && (
-              <div className="py-8 text-center text-sm text-slate-400">
-                {t('nothingFound', { query: searchTerm })}
-              </div>
+              <div className="py-8 text-center text-sm text-slate-400">{t('nothingFound', { query: searchTerm })}</div>
             )}
           </div>
         </TabsContent>

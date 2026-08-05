@@ -70,7 +70,9 @@ export async function GET(request: NextRequest) {
 
     const avgQuizScore =
       quizResults.length > 0
-        ? Math.round((quizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / quizResults.length) * 10) / 10
+        ? Math.round(
+            (quizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / quizResults.length) * 10,
+          ) / 10
         : 0;
 
     // Engagement score (composite 0-100)
@@ -96,8 +98,7 @@ export async function GET(request: NextRequest) {
     const prevActiveStudents = students.filter(
       (s: StudentRow) => s.lastLoginAt && s.lastLoginAt >= prevSince && s.lastLoginAt < since,
     ).length;
-    const prevActivePercentage =
-      totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * 10000) / 100 : 0;
+    const prevActivePercentage = totalStudents > 0 ? Math.round((prevActiveStudents / totalStudents) * 10000) / 100 : 0;
 
     const prevProgress = await getPrisma().progress.findMany({
       where: {
@@ -120,7 +121,11 @@ export async function GET(request: NextRequest) {
       totalStudents > 0 ? Math.round((prevCompleted / (totalStudents * totalModules)) * 10000) / 100 : 0;
     const prevAvgQuizScore =
       prevQuizResults.length > 0
-        ? Math.round((prevQuizResults.reduce((sum: number, q: { percentage: number }) => sum + q.percentage, 0) / prevQuizResults.length) * 10) / 10
+        ? Math.round(
+            (prevQuizResults.reduce((sum: number, q: { percentage: number }) => sum + q.percentage, 0) /
+              prevQuizResults.length) *
+              10,
+          ) / 10
         : 0;
 
     const prevActivityFactor = Math.min(25, Math.round((prevActivePercentage / 100) * 25));
@@ -183,7 +188,9 @@ export async function GET(request: NextRequest) {
       const completionRate = totalStudents > 0 ? Math.round((completed / totalStudents) * 10000) / 100 : 0;
       const scores = mp.filter((p: ProgressRow) => p.score != null).map((p: ProgressRow) => p.score as number);
       const avgScore =
-        scores.length > 0 ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 10) / 10 : 0;
+        scores.length > 0
+          ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 10) / 10
+          : 0;
       return {
         moduleId,
         moduleName: MODULE_SHORT_NAMES[moduleId],
@@ -225,7 +232,9 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    const topPerformers = studentPerformance.sort((a: { score: number }, b: { score: number }) => b.score - a.score).slice(0, 10);
+    const topPerformers = studentPerformance
+      .sort((a: { score: number }, b: { score: number }) => b.score - a.score)
+      .slice(0, 10);
 
     // Recent activity (simplified - last 20 events from various sources)
     const recentActivity: Array<{

@@ -246,11 +246,7 @@ export default function SQLInjectionLab() {
                           {hintLevel === 1 ? t('hint1Label') : hintLevel === 2 ? t('hint2Label') : t('hint3Label')}
                         </p>
                         <p className="text-xs text-amber-800">
-                          {hintLevel === 1
-                            ? t('hint1Text')
-                            : hintLevel === 2
-                              ? t('hint2Text')
-                              : challenge.hint}
+                          {hintLevel === 1 ? t('hint1Text') : hintLevel === 2 ? t('hint2Text') : challenge.hint}
                         </p>
                       </div>
                       {hintLevel < 3 && (
@@ -313,9 +309,7 @@ export default function SQLInjectionLab() {
                     <p className="text-muted-foreground mb-2 text-xs">
                       {t('yourInput')} <code className="font-mono text-red-600">{userInput}</code>
                     </p>
-                    <p className="text-muted-foreground text-xs">
-                      {t('trySuggestions')}
-                    </p>
+                    <p className="text-muted-foreground text-xs">{t('trySuggestions')}</p>
                   </div>
                 )}
 
@@ -341,9 +335,7 @@ export default function SQLInjectionLab() {
                           <h4 className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
                             <ShieldCheck size={14} /> {t('howToProtect')}
                           </h4>
-                          <p className="text-xs text-emerald-600">
-                            {t('protectionText')}
-                          </p>
+                          <p className="text-xs text-emerald-600">{t('protectionText')}</p>
                         </div>
                       </div>
                     </motion.div>

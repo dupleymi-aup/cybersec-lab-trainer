@@ -304,7 +304,9 @@ export default function AtRiskReport({
                           ))}
                         </div>
                       </td>
-                      <td className="px-3 py-2.5 text-right text-xs">{student.lastActiveDays} {t('days')}</td>
+                      <td className="px-3 py-2.5 text-right text-xs">
+                        {student.lastActiveDays} {t('days')}
+                      </td>
                       <td className="px-3 py-2.5 text-right text-xs">{student.modulesCompleted}</td>
                       <td className="px-3 py-2.5 text-right font-medium">{student.avgQuizScore}%</td>
                       <td className="px-3 py-2.5 text-center">

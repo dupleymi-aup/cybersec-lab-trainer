@@ -148,20 +148,23 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
     }
   }, [formTitle, formContent, formPriority, formExpiry, t, loadData]);
 
-  const handleDelete = useCallback(async (id: string) => {
-    try {
-      const result = await deleteAnnouncement(id);
-      if (!result.success) {
-        toast.error(result.error || t('deletionError'));
-        return;
+  const handleDelete = useCallback(
+    async (id: string) => {
+      try {
+        const result = await deleteAnnouncement(id);
+        if (!result.success) {
+          toast.error(result.error || t('deletionError'));
+          return;
+        }
+        toast.success(t('announcementDeleted'));
+        loadData();
+      } catch (e) {
+        logger.error('Failed to delete announcement', { error: e });
+        toast.error(t('deletionError'));
       }
-      toast.success(t('announcementDeleted'));
-      loadData();
-    } catch (e) {
-      logger.error('Failed to delete announcement', { error: e });
-      toast.error(t('deletionError'));
-    }
-  }, [t, loadData]);
+    },
+    [t, loadData],
+  );
 
   const handleClearExpired = useCallback(async () => {
     // Reload from server — server already filters expired
@@ -298,7 +301,11 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="text-sm font-semibold">{ann.title}</h3>
                           <Badge className={`text-[10px] ${pConfig.badge}`}>
-                            {ann.priority === 'high' ? t('priorityHighBadge') : ann.priority === 'normal' ? t('priorityNormalBadge') : t('priorityLowBadge')}
+                            {ann.priority === 'high'
+                              ? t('priorityHighBadge')
+                              : ann.priority === 'normal'
+                                ? t('priorityNormalBadge')
+                                : t('priorityLowBadge')}
                           </Badge>
                           {isExpiring && (
                             <Badge variant="outline" className="border-amber-200 text-[10px] text-amber-600">
@@ -309,8 +316,14 @@ export default function SystemAnnouncements({ currentUser: _currentUser }: { cur
                         <p className="text-muted-foreground mt-1 text-xs whitespace-pre-wrap">{ann.content}</p>
                         <div className="mt-2 flex items-center gap-3 text-[10px] text-slate-400">
                           <span>{formatDate(ann.createdAt)}</span>
-                          <span>{t('author')}: {ann.author}</span>
-                          {ann.expiresAt && <span>{t('validUntil')}: {formatDate(ann.expiresAt)}</span>}
+                          <span>
+                            {t('author')}: {ann.author}
+                          </span>
+                          {ann.expiresAt && (
+                            <span>
+                              {t('validUntil')}: {formatDate(ann.expiresAt)}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

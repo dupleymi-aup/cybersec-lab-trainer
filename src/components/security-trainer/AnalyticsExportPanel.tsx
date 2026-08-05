@@ -131,12 +131,9 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
   const [printPreview, setPrintPreview] = useState(false);
   const [internalDays, setInternalDays] = useState(30);
 
-  const handlePrintPreviewEscape = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setPrintPreview(false);
-    },
-    [],
-  );
+  const handlePrintPreviewEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') setPrintPreview(false);
+  }, []);
 
   useEffect(() => {
     if (printPreview) {
@@ -761,9 +758,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
           <h2 className="text-xl font-bold">{t('title')}</h2>
           <p className="text-muted-foreground mt-1 text-sm">{t('subtitle')}</p>
         </div>
-        {!controlled && (
-          <PeriodSelector value={effectiveDays} onChange={setInternalDays} getLabel={(d) => `${d}d`} />
-        )}
+        {!controlled && <PeriodSelector value={effectiveDays} onChange={setInternalDays} getLabel={(d) => `${d}d`} />}
       </div>
 
       {/* Export cards */}
@@ -933,7 +928,10 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
                     raw = localStorage.getItem(progressKey);
                   } catch (e) {
                     // localStorage unavailable
-                    logger.warn('AnalyticsExportPanel: localStorage getItem failed', { key: progressKey, error: String(e) });
+                    logger.warn('AnalyticsExportPanel: localStorage getItem failed', {
+                      key: progressKey,
+                      error: String(e),
+                    });
                   }
                   let moduleCount = 0;
                   let quizCount = 0;

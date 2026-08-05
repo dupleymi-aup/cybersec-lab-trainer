@@ -22,32 +22,35 @@ interface WeaknessItem {
 export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
   const t = useTranslations('weaknessAnalyzer');
 
-  const SEVERITY_CONFIG = useMemo(() => ({
-    critical: {
-      color: '#ef4444',
-      bg: 'bg-red-50',
-      text: 'text-red-700',
-      label: t('severityCritical'),
-    },
-    high: {
-      color: '#f97316',
-      bg: 'bg-orange-50',
-      text: 'text-orange-700',
-      label: t('severityHigh'),
-    },
-    medium: {
-      color: '#f59e0b',
-      bg: 'bg-amber-50',
-      text: 'text-amber-700',
-      label: t('severityMedium'),
-    },
-    low: {
-      color: '#84cc16',
-      bg: 'bg-lime-50',
-      text: 'text-lime-700',
-      label: t('severityLow'),
-    },
-  }), [t]);
+  const SEVERITY_CONFIG = useMemo(
+    () => ({
+      critical: {
+        color: '#ef4444',
+        bg: 'bg-red-50',
+        text: 'text-red-700',
+        label: t('severityCritical'),
+      },
+      high: {
+        color: '#f97316',
+        bg: 'bg-orange-50',
+        text: 'text-orange-700',
+        label: t('severityHigh'),
+      },
+      medium: {
+        color: '#f59e0b',
+        bg: 'bg-amber-50',
+        text: 'text-amber-700',
+        label: t('severityMedium'),
+      },
+      low: {
+        color: '#84cc16',
+        bg: 'bg-lime-50',
+        text: 'text-lime-700',
+        label: t('severityLow'),
+      },
+    }),
+    [t],
+  );
 
   const [days, setDays] = useState(90);
   const [loading, setLoading] = useState(true);
@@ -95,7 +98,11 @@ export default function WeaknessAnalyzer({ groupId }: { groupId?: string }) {
               score: Math.round(avgMetric),
               severity,
               type: 'module',
-              details: t('moduleDetails', { completed: mod.completedCount, total: mod.totalStudents, score: mod.avgScore }),
+              details: t('moduleDetails', {
+                completed: mod.completedCount,
+                total: mod.totalStudents,
+                score: mod.avgScore,
+              }),
               recommendations,
             });
           }

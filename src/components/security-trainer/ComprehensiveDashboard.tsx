@@ -113,9 +113,7 @@ export default function ComprehensiveDashboard({ groupId, days: daysProp }: Comp
   return (
     <div className="space-y-6">
       {/* Period selector (only when not controlled externally) */}
-      {!isControlled && (
-        <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => tc(`days${d}`)} />
-      )}
+      {!isControlled && <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => tc(`days${d}`)} />}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

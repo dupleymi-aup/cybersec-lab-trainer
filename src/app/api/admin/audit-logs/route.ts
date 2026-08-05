@@ -64,17 +64,29 @@ export async function GET(request: NextRequest) {
     ]);
 
     return NextResponse.json({
-      logs: logs.map((log: { id: string; adminId: string; adminName: string; action: string; targetId: string; targetName: string; details: string; timestamp: Date; admin: { id: string; email: string; fullName: string; role: string } | null }) => ({
-        id: log.id,
-        adminId: log.adminId,
-        adminName: log.adminName,
-        action: log.action,
-        targetId: log.targetId,
-        targetName: log.targetName,
-        details: log.details,
-        timestamp: log.timestamp.toISOString(),
-        admin: log.admin,
-      })),
+      logs: logs.map(
+        (log: {
+          id: string;
+          adminId: string;
+          adminName: string;
+          action: string;
+          targetId: string;
+          targetName: string;
+          details: string;
+          timestamp: Date;
+          admin: { id: string; email: string; fullName: string; role: string } | null;
+        }) => ({
+          id: log.id,
+          adminId: log.adminId,
+          adminName: log.adminName,
+          action: log.action,
+          targetId: log.targetId,
+          targetName: log.targetName,
+          details: log.details,
+          timestamp: log.timestamp.toISOString(),
+          admin: log.admin,
+        }),
+      ),
       pagination: {
         page,
         limit: Math.min(limit, 100),

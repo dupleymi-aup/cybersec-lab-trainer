@@ -38,10 +38,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = adminExportSchema.safeParse(rawBody);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error.flatten().fieldErrors },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten().fieldErrors }, { status: 400 });
   }
 
   const { role, group, university, course, ids } = parsed.data;
@@ -97,21 +94,35 @@ export async function POST(request: NextRequest) {
   // Build CSV rows
   const rows = [
     headers.join(','),
-    ...users.map((u: { id: string; email: string; phone: string | null; fullName: string; group: string | null; course: string | null; university: string | null; role: string; createdAt: Date; lastLoginAt: Date | null; loginCount: number; isBlocked: boolean }) =>
-      [
-        escapeCsvField(u.id),
-        escapeCsvField(u.email),
-        escapeCsvField(u.phone),
-        escapeCsvField(u.fullName),
-        escapeCsvField(u.group),
-        escapeCsvField(u.course),
-        escapeCsvField(u.university),
-        escapeCsvField(u.role),
-        escapeCsvField(u.createdAt.toISOString()),
-        escapeCsvField(u.lastLoginAt?.toISOString() ?? ''),
-        escapeCsvField(u.loginCount),
-        escapeCsvField(u.isBlocked),
-      ].join(','),
+    ...users.map(
+      (u: {
+        id: string;
+        email: string;
+        phone: string | null;
+        fullName: string;
+        group: string | null;
+        course: string | null;
+        university: string | null;
+        role: string;
+        createdAt: Date;
+        lastLoginAt: Date | null;
+        loginCount: number;
+        isBlocked: boolean;
+      }) =>
+        [
+          escapeCsvField(u.id),
+          escapeCsvField(u.email),
+          escapeCsvField(u.phone),
+          escapeCsvField(u.fullName),
+          escapeCsvField(u.group),
+          escapeCsvField(u.course),
+          escapeCsvField(u.university),
+          escapeCsvField(u.role),
+          escapeCsvField(u.createdAt.toISOString()),
+          escapeCsvField(u.lastLoginAt?.toISOString() ?? ''),
+          escapeCsvField(u.loginCount),
+          escapeCsvField(u.isBlocked),
+        ].join(','),
     ),
   ];
 

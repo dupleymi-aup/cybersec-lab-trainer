@@ -105,14 +105,18 @@ export default function ActivityCalendar() {
         {currentStreak > 0 && (
           <div className="flex items-center gap-1.5">
             <Flame size={16} className="text-orange-500" />
-            <span className="text-foreground/70 font-semibold">{currentStreak} {t('daysShort')}</span>
+            <span className="text-foreground/70 font-semibold">
+              {currentStreak} {t('daysShort')}
+            </span>
             <span className="text-slate-400">{t('currentStreak')}</span>
           </div>
         )}
         {longestStreak > 0 && (
           <div className="flex items-center gap-1.5">
             <CalendarDays size={14} className="text-violet-500" />
-            <span className="text-foreground/70 font-semibold">{longestStreak} {t('daysShort')}</span>
+            <span className="text-foreground/70 font-semibold">
+              {longestStreak} {t('daysShort')}
+            </span>
             <span className="text-slate-400">{t('longestStreak')}</span>
           </div>
         )}

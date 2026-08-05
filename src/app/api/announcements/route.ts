@@ -23,7 +23,15 @@ export async function GET(_request: NextRequest) {
       },
     });
 
-    type AnnouncementRow = { id: string; title: string; content: string; author: string; priority: string; expiresAt: Date | null; createdAt: Date };
+    type AnnouncementRow = {
+      id: string;
+      title: string;
+      content: string;
+      author: string;
+      priority: string;
+      expiresAt: Date | null;
+      createdAt: Date;
+    };
     return NextResponse.json({
       announcements: announcements.map((a: AnnouncementRow) => ({
         ...a,

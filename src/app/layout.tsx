@@ -49,8 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
     header?.logo && hero?.title && hero?.titleHighlight
       ? `${header.logo} — ${hero.title} ${hero.titleHighlight}`
       : 'CyberSec Lab — Cybersecurity Training Platform';
-  const description =
-    hero?.subtitle || 'Interactive platform for learning web application vulnerabilities.';
+  const description = hero?.subtitle || 'Interactive platform for learning web application vulnerabilities.';
   return {
     title,
     description,

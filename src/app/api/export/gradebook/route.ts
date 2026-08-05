@@ -23,7 +23,9 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const userIds = users.map((u: { id: string; fullName: string | null; email: string; group: string | null }) => u.id);
+    const userIds = users.map(
+      (u: { id: string; fullName: string | null; email: string; group: string | null }) => u.id,
+    );
 
     const progressRecords = await getPrisma().progress.findMany({
       where: { userId: { in: userIds } },
@@ -53,15 +55,38 @@ export async function GET(request: NextRequest) {
       const userProgress = progressByUser.get(user.id) || [];
       const userQuizzes = quizByUser.get(user.id) || [];
 
-      const modulesCompleted = userProgress.filter((p: { userId: string; completed: boolean; updatedAt: Date }) => p.completed).length;
+      const modulesCompleted = userProgress.filter(
+        (p: { userId: string; completed: boolean; updatedAt: Date }) => p.completed,
+      ).length;
       const quizCount = userQuizzes.length;
       const avgScore =
-        userQuizzes.length > 0 ? userQuizzes.reduce((sum: number, q: { userId: string; percentage: number; updatedAt: Date }) => sum + q.percentage, 0) / userQuizzes.length : 0;
+        userQuizzes.length > 0
+          ? userQuizzes.reduce(
+              (sum: number, q: { userId: string; percentage: number; updatedAt: Date }) => sum + q.percentage,
+              0,
+            ) / userQuizzes.length
+          : 0;
 
       const lastProgressDate =
-        userProgress.length > 0 ? new Date(Math.max(...userProgress.map((p: { userId: string; completed: boolean; updatedAt: Date }) => p.updatedAt.getTime()))) : null;
+        userProgress.length > 0
+          ? new Date(
+              Math.max(
+                ...userProgress.map((p: { userId: string; completed: boolean; updatedAt: Date }) =>
+                  p.updatedAt.getTime(),
+                ),
+              ),
+            )
+          : null;
       const lastQuizDate =
-        userQuizzes.length > 0 ? new Date(Math.max(...userQuizzes.map((q: { userId: string; percentage: number; updatedAt: Date }) => q.updatedAt.getTime()))) : null;
+        userQuizzes.length > 0
+          ? new Date(
+              Math.max(
+                ...userQuizzes.map((q: { userId: string; percentage: number; updatedAt: Date }) =>
+                  q.updatedAt.getTime(),
+                ),
+              ),
+            )
+          : null;
 
       let lastActive = 'N/A';
       if (lastProgressDate && lastQuizDate) {

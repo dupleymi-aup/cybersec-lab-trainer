@@ -34,15 +34,16 @@ export async function GET(request: NextRequest) {
       select: { id: true, fullName: true, group: true },
     });
     type UserRecord = { id: string; fullName: string | null; group: string };
-    const userMap = new Map<string, UserRecord>(
-      users.map((u: UserRecord) => [u.id, u])
-    );
+    const userMap = new Map<string, UserRecord>(users.map((u: UserRecord) => [u.id, u]));
     const filteredUsers = new Set(
-      users.filter((u: UserRecord) => !groupId || u.group === groupId).map((u: UserRecord) => u.id)
+      users.filter((u: UserRecord) => !groupId || u.group === groupId).map((u: UserRecord) => u.id),
     );
 
     // Group attempts by user+quiz to find session boundaries
-    const userQuizMap = new Map<string, Map<string, Array<{ correct: boolean; attemptedAt: Date; category: string }>>>();
+    const userQuizMap = new Map<
+      string,
+      Map<string, Array<{ correct: boolean; attemptedAt: Date; category: string }>>
+    >();
     for (const attempt of attempts) {
       if (!filteredUsers.has(attempt.userId)) continue;
 

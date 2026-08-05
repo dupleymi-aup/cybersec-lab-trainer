@@ -115,9 +115,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
     <div className="space-y-6">
       {/* Period + dimension selector */}
       <div className="flex flex-wrap items-center gap-3">
-        {!isControlled && (
-          <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => t(`${d}d`)} />
-        )}
+        {!isControlled && <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => t(`${d}d`)} />}
         <div className="bg-muted flex gap-1 rounded-lg p-1">
           {DIMENSION_OPTIONS.map(({ key, labelKey }) => (
             <button
@@ -255,15 +253,19 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
                 <thead>
                   <tr className="border-border border-b">
                     <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">#</th>
-                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">
-                      {t(dimension)}
-                    </th>
+                    <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t(dimension)}</th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('students')}</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('completion')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">
+                      {t('completion')}
+                    </th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('avgScore')}</th>
                     <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('activity')}</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('bestModule')}</th>
-                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('weakestModule')}</th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">
+                      {t('bestModule')}
+                    </th>
+                    <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">
+                      {t('weakestModule')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

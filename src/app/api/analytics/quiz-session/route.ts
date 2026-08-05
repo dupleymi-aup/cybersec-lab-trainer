@@ -107,7 +107,10 @@ export async function GET(request: NextRequest) {
       const percentage = Math.round((correctCount / session.attempts.length) * 100);
 
       // Get quiz result score if available
-      const qr = quizResults.find((r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) => r.userId === session.userId && r.quizId === session.quizId);
+      const qr = quizResults.find(
+        (r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) =>
+          r.userId === session.userId && r.quizId === session.quizId,
+      );
 
       sessionsWithDuration.push({
         userId: session.userId,
@@ -193,7 +196,10 @@ export async function GET(request: NextRequest) {
       const firstAttempt = sessionsWithDuration.find((a) => a.userId === s.userId && a.quizId === s.quizId);
       if (!firstAttempt) continue;
       // Use the quiz result updatedAt for the hour
-      const qr = quizResults.find((r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) => r.userId === s.userId && r.quizId === s.quizId);
+      const qr = quizResults.find(
+        (r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) =>
+          r.userId === s.userId && r.quizId === s.quizId,
+      );
       if (!qr) continue;
       const hour = qr.updatedAt.getHours();
       const existing = hourlyMap.get(hour) || { total: 0, count: 0 };
@@ -227,11 +233,17 @@ export async function GET(request: NextRequest) {
     }
     // Use session durations for the avgDuration calculation
     const weekdaySessions = sessionsWithDuration.filter((s) => {
-      const qr = quizResults.find((r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) => r.userId === s.userId && r.quizId === s.quizId);
+      const qr = quizResults.find(
+        (r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) =>
+          r.userId === s.userId && r.quizId === s.quizId,
+      );
       return qr && qr.updatedAt.getDay() !== 0 && qr.updatedAt.getDay() !== 6;
     });
     const weekendSessions = sessionsWithDuration.filter((s) => {
-      const qr = quizResults.find((r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) => r.userId === s.userId && r.quizId === s.quizId);
+      const qr = quizResults.find(
+        (r: { userId: string; quizId: string; percentage: number; score: number; total: number; updatedAt: Date }) =>
+          r.userId === s.userId && r.quizId === s.quizId,
+      );
       return qr && (qr.updatedAt.getDay() === 0 || qr.updatedAt.getDay() === 6);
     });
 

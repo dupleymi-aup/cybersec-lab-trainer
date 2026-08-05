@@ -288,7 +288,13 @@ export default function CertificationReadiness({
                             <PolarGrid />
                             <PolarAngleAxis dataKey="name" tick={{ fontSize: 9 }} />
                             <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 8 }} />
-                            <Radar name={t('score')} dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.4} />
+                            <Radar
+                              name={t('score')}
+                              dataKey="score"
+                              stroke="#6366f1"
+                              fill="#6366f1"
+                              fillOpacity={0.4}
+                            />
                           </RadarChart>
                         </ResponsiveContainer>
                       </div>

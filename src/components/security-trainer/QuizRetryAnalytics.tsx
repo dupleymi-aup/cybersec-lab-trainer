@@ -158,7 +158,9 @@ export default function QuizRetryAnalytics({
                   <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('category')}</th>
                   <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('attempts')}</th>
                   <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('students')}</th>
-                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('avgAttemptsPerStudent')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">
+                    {t('avgAttemptsPerStudent')}
+                  </th>
                 </tr>
               </thead>
               <tbody>

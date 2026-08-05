@@ -233,7 +233,8 @@ export default function StudentDrillDown({
                   <Card className="border-border">
                     <CardContent className="p-4">
                       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
-                        <Award size={16} className="text-amber-500" /> {t('achievementsTitle', { count: data.achievements.length })}
+                        <Award size={16} className="text-amber-500" />{' '}
+                        {t('achievementsTitle', { count: data.achievements.length })}
                       </h3>
                       <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
                         {data.achievements.map((ach) => (

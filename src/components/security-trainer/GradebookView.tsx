@@ -37,8 +37,16 @@ export default function GradebookView({
 
   useEffect(() => {
     let cancelled = false;
-    getAllUsers().then((users) => { if (!cancelled) setAllUsers(users); }).catch(() => { /* ignore */ });
-    return () => { cancelled = true; };
+    getAllUsers()
+      .then((users) => {
+        if (!cancelled) setAllUsers(users);
+      })
+      .catch(() => {
+        /* ignore */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -159,7 +167,9 @@ export default function GradebookView({
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-secondary border-border border-b">
-                  <th className="bg-secondary sticky left-0 z-10 min-w-[200px] p-3 text-left font-semibold">{t('student')}</th>
+                  <th className="bg-secondary sticky left-0 z-10 min-w-[200px] p-3 text-left font-semibold">
+                    {t('student')}
+                  </th>
                   <th className="min-w-[100px] p-3 text-left font-semibold">{t('group')}</th>
                   {data.modules.map((module) => (
                     <th key={module.moduleId} className="min-w-[80px] p-3 text-center font-semibold">

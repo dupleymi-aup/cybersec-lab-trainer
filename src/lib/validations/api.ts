@@ -346,18 +346,24 @@ export const createLtiPlatformSchema = z.object({
   issuer: z.string().min(1, 'Issuer is required').max(500),
   clientId: z.string().min(1, 'Client ID is required').max(200),
   deploymentId: z.string().min(1, 'Deployment ID is required').max(200),
-  authUrl: z.string().url('Invalid auth URL').max(2048).refine(
-    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
-    'authUrl must use http: or https: protocol',
-  ),
-  tokenUrl: z.string().url('Invalid token URL').max(2048).refine(
-    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
-    'tokenUrl must use http: or https: protocol',
-  ),
-  keysetUrl: z.string().url('Invalid keyset URL').max(2048).refine(
-    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
-    'keysetUrl must use http: or https: protocol',
-  ),
+  authUrl: z
+    .string()
+    .url('Invalid auth URL')
+    .max(2048)
+    .refine((url) => ['http:', 'https:'].includes(new URL(url).protocol), 'authUrl must use http: or https: protocol'),
+  tokenUrl: z
+    .string()
+    .url('Invalid token URL')
+    .max(2048)
+    .refine((url) => ['http:', 'https:'].includes(new URL(url).protocol), 'tokenUrl must use http: or https: protocol'),
+  keysetUrl: z
+    .string()
+    .url('Invalid keyset URL')
+    .max(2048)
+    .refine(
+      (url) => ['http:', 'https:'].includes(new URL(url).protocol),
+      'keysetUrl must use http: or https: protocol',
+    ),
   privateKey: z.string().max(8192).optional(),
   publicKey: z.string().max(8192).optional(),
 });
@@ -370,18 +376,24 @@ export const updateLtiPlatformSchema = z.object({
   issuer: z.string().min(1).max(500).optional(),
   clientId: z.string().min(1).max(200).optional(),
   deploymentId: z.string().min(1).max(200).optional(),
-  authUrl: z.string().url().max(2048).refine(
-    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
-    'authUrl must use http: or https: protocol',
-  ).optional(),
-  tokenUrl: z.string().url().max(2048).refine(
-    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
-    'tokenUrl must use http: or https: protocol',
-  ).optional(),
-  keysetUrl: z.string().url().max(2048).refine(
-    (url) => ['http:', 'https:'].includes(new URL(url).protocol),
-    'keysetUrl must use http: or https: protocol',
-  ).optional(),
+  authUrl: z
+    .string()
+    .url()
+    .max(2048)
+    .refine((url) => ['http:', 'https:'].includes(new URL(url).protocol), 'authUrl must use http: or https: protocol')
+    .optional(),
+  tokenUrl: z
+    .string()
+    .url()
+    .max(2048)
+    .refine((url) => ['http:', 'https:'].includes(new URL(url).protocol), 'tokenUrl must use http: or https: protocol')
+    .optional(),
+  keysetUrl: z
+    .string()
+    .url()
+    .max(2048)
+    .refine((url) => ['http:', 'https:'].includes(new URL(url).protocol), 'keysetUrl must use http: or https: protocol')
+    .optional(),
   privateKey: z.string().max(8192).optional(),
   publicKey: z.string().max(8192).optional(),
   isActive: z.boolean().optional(),

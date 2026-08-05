@@ -20,7 +20,11 @@ export async function GET(request: NextRequest) {
     const users = await getPrisma().user.findMany({
       select: { id: true, group: true, fullName: true },
     });
-    const filteredUserIds = new Set(users.filter((u: { id: string; group: string; fullName: string | null }) => !groupId || u.group === groupId).map((u: { id: string }) => u.id));
+    const filteredUserIds = new Set(
+      users
+        .filter((u: { id: string; group: string; fullName: string | null }) => !groupId || u.group === groupId)
+        .map((u: { id: string }) => u.id),
+    );
 
     // Get all quiz attempts in period
     const allAttempts = await getPrisma().quizAttempt.findMany({
@@ -34,7 +38,10 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const attempts = allAttempts.filter((a: { userId: string; category: string; difficulty: string; correct: boolean; attemptedAt: Date }) => filteredUserIds.has(a.userId));
+    const attempts = allAttempts.filter(
+      (a: { userId: string; category: string; difficulty: string; correct: boolean; attemptedAt: Date }) =>
+        filteredUserIds.has(a.userId),
+    );
 
     // --- Difficulty Breakdown ---
     const diffMap = new Map<string, { total: number; correct: number; students: Set<string> }>();
@@ -108,7 +115,9 @@ export async function GET(request: NextRequest) {
       if (attempt.correct) studentDiffs[attempt.difficulty].correct++;
     }
 
-    const userMap = new Map(users.map((u: { id: string; group: string; fullName: string | null }) => [u.id, u.fullName]));
+    const userMap = new Map(
+      users.map((u: { id: string; group: string; fullName: string | null }) => [u.id, u.fullName]),
+    );
     const studentPerformanceByDifficulty = Array.from(studentDiffMap.entries())
       .map(([userId, diffs]) => ({
         userId,

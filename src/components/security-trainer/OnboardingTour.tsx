@@ -48,10 +48,30 @@ function useRoleTourSteps(role: UserRole, t: ReturnType<typeof useTranslations>)
   if (role === 'student') {
     return [
       { title: t('studentWelcome.title'), description: t('studentWelcome.description'), icon: icons.bookGreen },
-      { title: t('studentModules.title'), description: t('studentModules.description'), icon: icons.book, action: t('studentModules.action') },
-      { title: t('studentQuizzes.title'), description: t('studentQuizzes.description'), icon: icons.help, action: t('studentQuizzes.action') },
-      { title: t('studentAssignments.title'), description: t('studentAssignments.description'), icon: icons.bookViolet, action: t('studentAssignments.action') },
-      { title: t('studentAchievements.title'), description: t('studentAchievements.description'), icon: icons.trophy, action: t('studentAchievements.action') },
+      {
+        title: t('studentModules.title'),
+        description: t('studentModules.description'),
+        icon: icons.book,
+        action: t('studentModules.action'),
+      },
+      {
+        title: t('studentQuizzes.title'),
+        description: t('studentQuizzes.description'),
+        icon: icons.help,
+        action: t('studentQuizzes.action'),
+      },
+      {
+        title: t('studentAssignments.title'),
+        description: t('studentAssignments.description'),
+        icon: icons.bookViolet,
+        action: t('studentAssignments.action'),
+      },
+      {
+        title: t('studentAchievements.title'),
+        description: t('studentAchievements.description'),
+        icon: icons.trophy,
+        action: t('studentAchievements.action'),
+      },
       { title: t('studentTips.title'), description: t('studentTips.description'), icon: icons.check },
     ];
   }
@@ -59,11 +79,36 @@ function useRoleTourSteps(role: UserRole, t: ReturnType<typeof useTranslations>)
   if (role === 'teacher') {
     return [
       { title: t('teacherWelcome.title'), description: t('teacherWelcome.description'), icon: icons.users },
-      { title: t('teacherModules.title'), description: t('teacherModules.description'), icon: icons.book, action: t('teacherModules.action') },
-      { title: t('teacherCreateAssignments.title'), description: t('teacherCreateAssignments.description'), icon: icons.shield, action: t('teacherCreateAssignments.action') },
-      { title: t('teacherGradeSubmissions.title'), description: t('teacherGradeSubmissions.description'), icon: icons.checkAmber, action: t('teacherGradeSubmissions.action') },
-      { title: t('teacherViewAnalytics.title'), description: t('teacherViewAnalytics.description'), icon: icons.trophySky, action: t('teacherViewAnalytics.action') },
-      { title: t('teacherManageDeadlines.title'), description: t('teacherManageDeadlines.description'), icon: icons.helpBlue, action: t('teacherManageDeadlines.action') },
+      {
+        title: t('teacherModules.title'),
+        description: t('teacherModules.description'),
+        icon: icons.book,
+        action: t('teacherModules.action'),
+      },
+      {
+        title: t('teacherCreateAssignments.title'),
+        description: t('teacherCreateAssignments.description'),
+        icon: icons.shield,
+        action: t('teacherCreateAssignments.action'),
+      },
+      {
+        title: t('teacherGradeSubmissions.title'),
+        description: t('teacherGradeSubmissions.description'),
+        icon: icons.checkAmber,
+        action: t('teacherGradeSubmissions.action'),
+      },
+      {
+        title: t('teacherViewAnalytics.title'),
+        description: t('teacherViewAnalytics.description'),
+        icon: icons.trophySky,
+        action: t('teacherViewAnalytics.action'),
+      },
+      {
+        title: t('teacherManageDeadlines.title'),
+        description: t('teacherManageDeadlines.description'),
+        icon: icons.helpBlue,
+        action: t('teacherManageDeadlines.action'),
+      },
       { title: t('teacherTips.title'), description: t('teacherTips.description'), icon: icons.check },
     ];
   }
@@ -72,11 +117,36 @@ function useRoleTourSteps(role: UserRole, t: ReturnType<typeof useTranslations>)
   return [
     { title: t('adminWelcome.title'), description: t('adminWelcome.description'), icon: icons.shieldCheck },
     { title: t('adminFullAccess.title'), description: t('adminFullAccess.description'), icon: icons.shieldCheckBlue },
-    { title: t('adminUserManagement.title'), description: t('adminUserManagement.description'), icon: icons.users, action: t('adminUserManagement.action') },
-    { title: t('adminAuditLogs.title'), description: t('adminAuditLogs.description'), icon: icons.shield, action: t('adminAuditLogs.action') },
-    { title: t('adminSystemSettings.title'), description: t('adminSystemSettings.description'), icon: icons.helpSky, action: t('adminSystemSettings.action') },
-    { title: t('adminAdvancedAnalytics.title'), description: t('adminAdvancedAnalytics.description'), icon: icons.trophy, action: t('adminAdvancedAnalytics.action') },
-    { title: t('adminAnnouncements.title'), description: t('adminAnnouncements.description'), icon: icons.book, action: t('adminAnnouncements.action') },
+    {
+      title: t('adminUserManagement.title'),
+      description: t('adminUserManagement.description'),
+      icon: icons.users,
+      action: t('adminUserManagement.action'),
+    },
+    {
+      title: t('adminAuditLogs.title'),
+      description: t('adminAuditLogs.description'),
+      icon: icons.shield,
+      action: t('adminAuditLogs.action'),
+    },
+    {
+      title: t('adminSystemSettings.title'),
+      description: t('adminSystemSettings.description'),
+      icon: icons.helpSky,
+      action: t('adminSystemSettings.action'),
+    },
+    {
+      title: t('adminAdvancedAnalytics.title'),
+      description: t('adminAdvancedAnalytics.description'),
+      icon: icons.trophy,
+      action: t('adminAdvancedAnalytics.action'),
+    },
+    {
+      title: t('adminAnnouncements.title'),
+      description: t('adminAnnouncements.description'),
+      icon: icons.book,
+      action: t('adminAnnouncements.action'),
+    },
     { title: t('adminTips.title'), description: t('adminTips.description'), icon: icons.check },
   ];
 }

@@ -23,11 +23,7 @@ function ChartErrorFallback({ onRetry }: { onRetry: () => void }) {
       <div className="text-center">
         <AlertTriangle className="mx-auto mb-2 h-8 w-8 text-amber-500" />
         <p className="text-muted-foreground text-sm">{t('chartFailed')}</p>
-        <button
-          type="button"
-          onClick={onRetry}
-          className="text-primary mt-2 text-xs hover:underline"
-        >
+        <button type="button" onClick={onRetry} className="text-primary mt-2 text-xs hover:underline">
           {t('tryAgain')}
         </button>
       </div>
@@ -56,11 +52,7 @@ export class ChartErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
 
-      return (
-        <ChartErrorFallback
-          onRetry={() => this.setState({ hasError: false, error: null })}
-        />
-      );
+      return <ChartErrorFallback onRetry={() => this.setState({ hasError: false, error: null })} />;
     }
 
     return this.props.children;

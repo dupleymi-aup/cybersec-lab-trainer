@@ -123,7 +123,11 @@ export default function GroupDynamics({ groupId: propGroupId, days: propDays }: 
                     <Badge
                       className={`text-[10px] ${g.trend === 'improving' ? 'bg-emerald-100 text-emerald-700' : g.trend === 'declining' ? 'bg-red-100 text-red-700' : 'bg-muted text-muted-foreground'}`}
                     >
-                      {g.trend === 'improving' ? t('improving') : g.trend === 'declining' ? t('declining') : t('stable')}
+                      {g.trend === 'improving'
+                        ? t('improving')
+                        : g.trend === 'declining'
+                          ? t('declining')
+                          : t('stable')}
                     </Badge>
                   </div>
                 </div>

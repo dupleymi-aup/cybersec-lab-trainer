@@ -47,12 +47,16 @@ export default function StudentComparisonView(props: Props = {}) {
 
   useEffect(() => {
     let cancelled = false;
-    getAllUsers().then((users) => {
-      if (!cancelled) setAllUsers(users.filter((u) => u.role === 'student'));
-    }).catch((e) => {
-      logger.error('Failed to load users for comparison', { error: e });
-    });
-    return () => { cancelled = true; };
+    getAllUsers()
+      .then((users) => {
+        if (!cancelled) setAllUsers(users.filter((u) => u.role === 'student'));
+      })
+      .catch((e) => {
+        logger.error('Failed to load users for comparison', { error: e });
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -144,7 +148,9 @@ export default function StudentComparisonView(props: Props = {}) {
             })}
           </div>
           {selectedStudents.length > 0 && (
-            <p className="text-muted-foreground mt-2 text-xs">{t('selectedCount', { count: selectedStudents.length })}</p>
+            <p className="text-muted-foreground mt-2 text-xs">
+              {t('selectedCount', { count: selectedStudents.length })}
+            </p>
           )}
         </CardContent>
       </Card>
@@ -188,9 +194,7 @@ export default function StudentComparisonView(props: Props = {}) {
                   <Tooltip />
                 </RadarChart>
               </ResponsiveContainer>
-              <p className="mt-2 text-center text-xs text-slate-400">
-                {t('radarNote')}
-              </p>
+              <p className="mt-2 text-center text-xs text-slate-400">{t('radarNote')}</p>
             </CardContent>
           </Card>
 
@@ -265,7 +269,11 @@ export default function StudentComparisonView(props: Props = {}) {
                     <Tooltip />
                     <Legend />
                     {data.students.map((student, i) => (
-                      <Bar key={student.id} dataKey={studentNames[student.id] || t('student')} fill={STUDENT_COLORS[i]} />
+                      <Bar
+                        key={student.id}
+                        dataKey={studentNames[student.id] || t('student')}
+                        fill={STUDENT_COLORS[i]}
+                      />
                     ))}
                   </BarChart>
                 </ResponsiveContainer>

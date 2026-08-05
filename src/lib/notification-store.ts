@@ -133,8 +133,7 @@ export const NotificationHelper = {
     });
   },
   deadlineWarning: (title: string, daysLeft: number) => {
-    const urgency =
-      daysLeft <= 0 ? 'Overdue!' : daysLeft === 1 ? 'Last day tomorrow!' : `${daysLeft} days left`;
+    const urgency = daysLeft <= 0 ? 'Overdue!' : daysLeft === 1 ? 'Last day tomorrow!' : `${daysLeft} days left`;
     useNotificationStore.getState().addNotification({
       type: 'deadline',
       title: `Deadline: ${title}`,

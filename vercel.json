@@ -3,6 +3,10 @@
     {
       "path": "/api/deadlines/check",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/scheduled-reports/run",
+      "schedule": "0 8 * * *"
     }
   ]
 }

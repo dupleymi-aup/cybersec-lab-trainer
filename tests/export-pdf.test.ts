@@ -200,6 +200,40 @@ describe('PDF generation functions', () => {
       mockDoc.lastAutoTable = saved;
     }
   });
+
+  it('generateGradebookPDF returns a Blob in buffer mode without downloading', async () => {
+    const students = [{ id: '1', fullName: 'John', email: 'j@t.com', group: 'G1', modulesCompleted: 5, quizCount: 3, avgScore: 85 }];
+    const blob = await generateGradebookPDF(students, undefined, 'buffer');
+    expect(blob).toBeInstanceOf(Blob);
+    expect(mockDoc.output).toHaveBeenCalledWith('blob');
+  });
+
+  it('generateAtRiskPDF returns a Blob in buffer mode without downloading', async () => {
+    const atRisk = [{
+      fullName: 'Jane', email: 'j@t.com', group: 'G1', riskScore: 80,
+      reasons: ['Low engagement'], lastActiveDays: 30, modulesCompleted: 2, avgQuizScore: 40,
+    }];
+    const blob = await generateAtRiskPDF(atRisk, undefined, 'buffer');
+    expect(blob).toBeInstanceOf(Blob);
+  });
+
+  it('generateAnalyticsPDF returns a Blob in buffer mode', async () => {
+    const summary = {
+      kpis: {
+        totalStudents: 100, activeStudents: 80, activePercentage: 80,
+        avgCompletionRate: 70, avgQuizScore: 75, totalModulesCompleted: 500,
+        totalQuizAttempts: 1000, engagementScore: 85,
+      },
+    };
+    const blob = await generateAnalyticsPDF(summary, [], undefined, 'buffer');
+    expect(blob).toBeInstanceOf(Blob);
+  });
+
+  it('generateQuizRetryPDF returns a Blob in buffer mode', async () => {
+    const stats = [{ category: 'XSS', totalAttempts: 10, uniqueStudents: 5 }];
+    const blob = await generateQuizRetryPDF(stats, [], undefined, 'buffer');
+    expect(blob).toBeInstanceOf(Blob);
+  });
 });
 
 describe('downloadCSV', () => {

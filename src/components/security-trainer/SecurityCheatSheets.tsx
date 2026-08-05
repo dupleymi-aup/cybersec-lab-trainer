@@ -77,9 +77,7 @@ export default function SecurityCheatSheets() {
             <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
           </div>
         </div>
-        <p className="text-muted-foreground text-sm">
-          {t('description')}
-        </p>
+        <p className="text-muted-foreground text-sm">{t('description')}</p>
       </div>
 
       {/* Search */}

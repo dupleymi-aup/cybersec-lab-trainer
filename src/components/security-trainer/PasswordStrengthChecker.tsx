@@ -56,18 +56,39 @@ function calculateCrackTime(password: string): CrackTime {
 
   if (seconds < 1) return { key: 'crackInstant', seconds: 0, color: 'text-red-500' };
   if (seconds < 60) return { key: 'crackSeconds', seconds, color: 'text-red-500' };
-  if (seconds < 3600) return { key: 'crackMinutes', value: Math.round(seconds / 60), seconds, color: 'text-orange-500' };
-  if (seconds < 86400) return { key: 'crackHours', value: Math.round(seconds / 3600), seconds, color: 'text-yellow-500' };
-  if (seconds < 31536000) return { key: 'crackDays', value: Math.round(seconds / 86400), seconds, color: 'text-emerald-400' };
-  if (seconds < 31536000 * 1000) return { key: 'crackYears', value: Math.round(seconds / 31536000), seconds, color: 'text-emerald-500' };
-  if (seconds < 31536000 * 1_000_000) return { key: 'crackThousandYears', value: Math.round(seconds / 31536000 / 1000), seconds, color: 'text-emerald-500' };
-  if (seconds < 31536000 * 1_000_000_000) return { key: 'crackMillionYears', value: Math.round(seconds / 31536000 / 1_000_000), seconds, color: 'text-emerald-600' };
+  if (seconds < 3600)
+    return { key: 'crackMinutes', value: Math.round(seconds / 60), seconds, color: 'text-orange-500' };
+  if (seconds < 86400)
+    return { key: 'crackHours', value: Math.round(seconds / 3600), seconds, color: 'text-yellow-500' };
+  if (seconds < 31536000)
+    return { key: 'crackDays', value: Math.round(seconds / 86400), seconds, color: 'text-emerald-400' };
+  if (seconds < 31536000 * 1000)
+    return { key: 'crackYears', value: Math.round(seconds / 31536000), seconds, color: 'text-emerald-500' };
+  if (seconds < 31536000 * 1_000_000)
+    return {
+      key: 'crackThousandYears',
+      value: Math.round(seconds / 31536000 / 1000),
+      seconds,
+      color: 'text-emerald-500',
+    };
+  if (seconds < 31536000 * 1_000_000_000)
+    return {
+      key: 'crackMillionYears',
+      value: Math.round(seconds / 31536000 / 1_000_000),
+      seconds,
+      color: 'text-emerald-600',
+    };
   return { key: 'crackInfinite', seconds, color: 'text-emerald-600' };
 }
 
 function generatePassword(
   length: number = 16,
-  options: { uppercase: boolean; lowercase: boolean; numbers: boolean; symbols: boolean } = { uppercase: true, lowercase: true, numbers: true, symbols: true },
+  options: { uppercase: boolean; lowercase: boolean; numbers: boolean; symbols: boolean } = {
+    uppercase: true,
+    lowercase: true,
+    numbers: true,
+    symbols: true,
+  },
 ): string {
   const chars = {
     uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -129,7 +150,11 @@ export default function PasswordStrengthChecker() {
       { label: t('checkNumbers'), description: t('checkNumbersDesc'), passed: /[0-9]/.test(password) },
       { label: t('checkSymbols'), description: t('checkSymbolsDesc'), passed: /[^a-zA-Z0-9]/.test(password) },
       { label: t('checkNoRepeats'), description: t('checkNoRepeatsDesc'), passed: !/(.)\1{2,}/.test(password) },
-      { label: t('checkNoSequences'), description: t('checkNoSequencesDesc'), passed: !/(012|123|234|345|456|567|678|789|abc|bcd|cde|def)/i.test(password) },
+      {
+        label: t('checkNoSequences'),
+        description: t('checkNoSequencesDesc'),
+        passed: !/(012|123|234|345|456|567|678|789|abc|bcd|cde|def)/i.test(password),
+      },
     ],
     [password, t],
   );
@@ -209,20 +234,26 @@ export default function PasswordStrengthChecker() {
     return t('entropyLow');
   }, [password.length, t]);
 
-  const recommendations = useMemo(() => [
-    { title: t('rec1Title'), desc: t('rec1Desc') },
-    { title: t('rec2Title'), desc: t('rec2Desc') },
-    { title: t('rec3Title'), desc: t('rec3Desc') },
-    { title: t('rec4Title'), desc: t('rec4Desc') },
-    { title: t('rec5Title'), desc: t('rec5Desc') },
-  ], [t]);
+  const recommendations = useMemo(
+    () => [
+      { title: t('rec1Title'), desc: t('rec1Desc') },
+      { title: t('rec2Title'), desc: t('rec2Desc') },
+      { title: t('rec3Title'), desc: t('rec3Desc') },
+      { title: t('rec4Title'), desc: t('rec4Desc') },
+      { title: t('rec5Title'), desc: t('rec5Desc') },
+    ],
+    [t],
+  );
 
-  const generatorOptions = useMemo(() => [
-    { key: 'uppercase' as const, label: 'A-Z', desc: t('uppercaseAZ') },
-    { key: 'lowercase' as const, label: 'a-z', desc: t('lowercaseAZ') },
-    { key: 'numbers' as const, label: '0-9', desc: t('numbersLabel') },
-    { key: 'symbols' as const, label: '!@#', desc: t('symbolsLabel') },
-  ], [t]);
+  const generatorOptions = useMemo(
+    () => [
+      { key: 'uppercase' as const, label: 'A-Z', desc: t('uppercaseAZ') },
+      { key: 'lowercase' as const, label: 'a-z', desc: t('lowercaseAZ') },
+      { key: 'numbers' as const, label: '0-9', desc: t('numbersLabel') },
+      { key: 'symbols' as const, label: '!@#', desc: t('symbolsLabel') },
+    ],
+    [t],
+  );
 
   return (
     <div className="space-y-6">
@@ -307,9 +338,7 @@ export default function PasswordStrengthChecker() {
                   <span className="text-foreground text-sm font-bold">
                     {entropyValue} {t('bits')}
                   </span>
-                  <span className="text-muted-foreground text-xs">
-                    ({entropyLevel})
-                  </span>
+                  <span className="text-muted-foreground text-xs">({entropyLevel})</span>
                 </div>
               </motion.div>
             )}
@@ -335,11 +364,21 @@ export default function PasswordStrengthChecker() {
                       : 'bg-muted/30 border-border/50'
                   }`}
                 >
-                  <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${check.passed ? 'bg-emerald-500' : 'bg-muted'}`}>
-                    {check.passed ? <Check size={12} className="text-white" /> : <X size={12} className="text-muted-foreground" />}
+                  <div
+                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${check.passed ? 'bg-emerald-500' : 'bg-muted'}`}
+                  >
+                    {check.passed ? (
+                      <Check size={12} className="text-white" />
+                    ) : (
+                      <X size={12} className="text-muted-foreground" />
+                    )}
                   </div>
                   <div>
-                    <p className={`text-sm font-medium ${check.passed ? 'text-emerald-700 dark:text-emerald-400' : 'text-muted-foreground'}`}>{check.label}</p>
+                    <p
+                      className={`text-sm font-medium ${check.passed ? 'text-emerald-700 dark:text-emerald-400' : 'text-muted-foreground'}`}
+                    >
+                      {check.label}
+                    </p>
                     <p className="text-muted-foreground text-xs">{check.description}</p>
                   </div>
                 </div>
@@ -369,7 +408,9 @@ export default function PasswordStrengthChecker() {
                       : 'bg-muted/30 border-border/50'
                   }`}
                 >
-                  <div className={`flex h-5 w-5 items-center justify-center rounded ${genOptions[opt.key] ? 'bg-violet-500' : 'bg-muted'}`}>
+                  <div
+                    className={`flex h-5 w-5 items-center justify-center rounded ${genOptions[opt.key] ? 'bg-violet-500' : 'bg-muted'}`}
+                  >
                     {genOptions[opt.key] ? <Check size={12} className="text-white" /> : null}
                   </div>
                   <div className="text-left">
@@ -384,11 +425,24 @@ export default function PasswordStrengthChecker() {
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <Label className="text-sm">{t('length')}</Label>
-                <Badge variant="secondary" className="font-mono">{genLength}</Badge>
+                <Badge variant="secondary" className="font-mono">
+                  {genLength}
+                </Badge>
               </div>
-              <input type="range" min="8" max="64" value={genLength} onChange={(e) => setGenLength(Number(e.target.value))} className="w-full accent-violet-500" />
+              <input
+                type="range"
+                min="8"
+                max="64"
+                value={genLength}
+                onChange={(e) => setGenLength(Number(e.target.value))}
+                className="w-full accent-violet-500"
+              />
               <div className="text-muted-foreground mt-1 flex justify-between text-xs">
-                <span>8</span><span>16</span><span>32</span><span>48</span><span>64</span>
+                <span>8</span>
+                <span>16</span>
+                <span>32</span>
+                <span>48</span>
+                <span>64</span>
               </div>
             </div>
 
@@ -400,7 +454,12 @@ export default function PasswordStrengthChecker() {
             {password && (
               <div className="relative rounded-lg bg-slate-900 p-3 font-mono text-sm break-all text-slate-100">
                 {showPassword ? password : '•'.repeat(password.length)}
-                <button type="button" onClick={handleCopy} className="absolute top-2 right-2 rounded bg-slate-800 p-1.5 transition hover:bg-slate-700 dark:bg-slate-700" aria-label={t('copyPassword')}>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="absolute top-2 right-2 rounded bg-slate-800 p-1.5 transition hover:bg-slate-700 dark:bg-slate-700"
+                  aria-label={t('copyPassword')}
+                >
                   {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
                 </button>
               </div>
@@ -417,8 +476,24 @@ export default function PasswordStrengthChecker() {
             {t('top10')}
           </h3>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
-            {['123456', 'password', '12345678', 'qwerty', '123456789', '111111', '1234567', 'dragon', '123123', 'baseball'].map((p, i) => (
-              <div key={i} className="rounded bg-red-100 px-3 py-2 text-center font-mono text-sm text-red-700 line-through opacity-60 dark:bg-red-900/30 dark:text-red-400">{p}</div>
+            {[
+              '123456',
+              'password',
+              '12345678',
+              'qwerty',
+              '123456789',
+              '111111',
+              '1234567',
+              'dragon',
+              '123123',
+              'baseball',
+            ].map((p, i) => (
+              <div
+                key={i}
+                className="rounded bg-red-100 px-3 py-2 text-center font-mono text-sm text-red-700 line-through opacity-60 dark:bg-red-900/30 dark:text-red-400"
+              >
+                {p}
+              </div>
             ))}
           </div>
           <p className="mt-3 text-xs text-amber-700 dark:text-amber-500">{t('top10Warning')}</p>

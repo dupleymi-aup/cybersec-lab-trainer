@@ -58,7 +58,7 @@ export default function AuditLogView() {
   const [showFilters, setShowFilters] = useState(false);
 
   const actionLabels: Record<AuditAction, string> = Object.fromEntries(
-    Object.entries(ACTION_LABEL_KEYS).map(([key, labelKey]) => [key, t(labelKey as keyof typeof ACTION_LABEL_KEYS)])
+    Object.entries(ACTION_LABEL_KEYS).map(([key, labelKey]) => [key, t(labelKey as keyof typeof ACTION_LABEL_KEYS)]),
   ) as Record<AuditAction, string>;
 
   const loadData = async () => {
@@ -111,36 +111,62 @@ export default function AuditLogView() {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder={t('searchPlaceholder')} className="text-sm" />
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder={t('searchPlaceholder')}
+            className="text-sm"
+          />
         </div>
         <Button variant={showFilters ? 'default' : 'outline'} size="sm" onClick={() => setShowFilters(!showFilters)}>
           <Filter size={14} className="mr-1" /> {t('filters')}
         </Button>
-        <Button variant="outline" size="sm" onClick={handleClear} className="border-red-200 text-red-600 hover:bg-red-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleClear}
+          className="border-red-200 text-red-600 hover:bg-red-50"
+        >
           <Trash2 size={14} className="mr-1" /> {t('clear')}
         </Button>
       </div>
 
       <AnimatePresence>
         {showFilters && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
             <Card className="border-border">
               <CardContent className="grid grid-cols-2 gap-3 p-4">
                 <div>
                   <label className="text-muted-foreground mb-1 block text-xs">{t('actionType')}</label>
-                  <select value={filterAction} onChange={(e) => setFilterAction(e.target.value)} className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm">
+                  <select
+                    value={filterAction}
+                    onChange={(e) => setFilterAction(e.target.value)}
+                    className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm"
+                  >
                     <option value="">{t('allActions')}</option>
                     {(Object.keys(actionLabels) as AuditAction[]).map((a) => (
-                      <option key={a} value={a}>{actionLabels[a]}</option>
+                      <option key={a} value={a}>
+                        {actionLabels[a]}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
                   <label className="text-muted-foreground mb-1 block text-xs">{t('administrator')}</label>
-                  <select value={filterAdmin} onChange={(e) => setFilterAdmin(e.target.value)} className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm">
+                  <select
+                    value={filterAdmin}
+                    onChange={(e) => setFilterAdmin(e.target.value)}
+                    className="border-border bg-card w-full rounded-md border px-3 py-2 text-sm"
+                  >
                     <option value="">{t('all')}</option>
                     {adminNames.map((name) => (
-                      <option key={name} value={name}>{name}</option>
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -158,21 +184,36 @@ export default function AuditLogView() {
       ) : (
         <div className="space-y-2">
           {filtered.map((entry, i) => (
-            <motion.div key={entry.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i * 0.02, 0.3) }}>
+            <motion.div
+              key={entry.id}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(i * 0.02, 0.3) }}
+            >
               <Card className="hover:border-border border-slate-100 transition-colors">
                 <CardContent className="p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="mb-1 flex flex-wrap items-center gap-2">
-                        <Badge className={`text-[10px] ${actionColors[entry.action]}`}>{actionLabels[entry.action]}</Badge>
+                        <Badge className={`text-[10px] ${actionColors[entry.action]}`}>
+                          {actionLabels[entry.action]}
+                        </Badge>
                         <span className="text-foreground/70 text-xs font-medium">{entry.adminName}</span>
                         <span className="text-xs text-slate-400">→</span>
-                        <span className="text-muted-foreground truncate text-xs font-medium">{entry.targetName || '—'}</span>
+                        <span className="text-muted-foreground truncate text-xs font-medium">
+                          {entry.targetName || '—'}
+                        </span>
                       </div>
                       <p className="text-muted-foreground text-xs">{entry.details}</p>
                     </div>
                     <span className="text-[10px] whitespace-nowrap text-slate-400">
-                      {new Date(entry.timestamp).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                      {new Date(entry.timestamp).toLocaleString(locale, {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </span>
                   </div>
                 </CardContent>

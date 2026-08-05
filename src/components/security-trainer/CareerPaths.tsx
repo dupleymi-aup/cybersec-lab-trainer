@@ -245,7 +245,9 @@ export default function CareerPaths() {
                     <span className="font-medium">{sector.demand}</span>
                   </div>
                   <p className="mt-1 text-xs text-emerald-600">{sector.growth}</p>
-                  <p className="text-muted-foreground mt-1 text-[11px]">{t('keyAreas')} {sector.key}</p>
+                  <p className="text-muted-foreground mt-1 text-[11px]">
+                    {t('keyAreas')} {sector.key}
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -288,10 +290,14 @@ export default function CareerPaths() {
                       </div>
                       <span className={`text-sm font-semibold ${level.color}`}>{level.level}</span>
                     </div>
-                    <p className="text-muted-foreground mb-2 text-xs">{t('modulesLabel')} {level.modules}+</p>
+                    <p className="text-muted-foreground mb-2 text-xs">
+                      {t('modulesLabel')} {level.modules}+
+                    </p>
                     <p className="text-muted-foreground text-[11px]">{level.description}</p>
                     {isCurrentLevel && (
-                      <Badge className="mt-2 border-0 bg-indigo-100 text-[10px] text-indigo-700">{t('yourLevel')}</Badge>
+                      <Badge className="mt-2 border-0 bg-indigo-100 text-[10px] text-indigo-700">
+                        {t('yourLevel')}
+                      </Badge>
                     )}
                   </CardContent>
                 </Card>
@@ -305,9 +311,7 @@ export default function CareerPaths() {
       <Card className="bg-gradient-to-r from-indigo-600 to-blue-700 text-white">
         <CardContent className="p-6">
           <h3 className="mb-2 text-lg font-bold">{t('readyToStart')}</h3>
-          <p className="mb-4 text-sm text-indigo-100">
-            {t('readyToStartDesc')}
-          </p>
+          <p className="mb-4 text-sm text-indigo-100">{t('readyToStartDesc')}</p>
           <Button className="bg-card text-indigo-700 hover:bg-indigo-50" onClick={() => setCurrentPage('dashboard')}>
             {t('backToDashboard')} <ArrowRight size={16} className="ml-2" />
           </Button>

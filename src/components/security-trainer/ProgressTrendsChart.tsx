@@ -34,13 +34,15 @@ export default function ProgressTrendsChart({ students, groupId: _groupId }: Pro
   useEffect(() => {
     setLoading(true);
     setError(false);
-    getProgressTrends(selectedUserId || undefined, dateRange).then((data) => {
-      setTrends(data);
-      setLoading(false);
-    }).catch(() => {
-      setError(true);
-      setLoading(false);
-    });
+    getProgressTrends(selectedUserId || undefined, dateRange)
+      .then((data) => {
+        setTrends(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError(true);
+        setLoading(false);
+      });
   }, [dateRange, selectedUserId]);
 
   return (

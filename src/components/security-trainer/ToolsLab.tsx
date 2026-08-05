@@ -373,10 +373,7 @@ export default function ToolsLab() {
     () => (b64Mode === 'encode' ? base64Encode(b64Text) : base64Decode(b64Text)),
     [b64Mode, b64Text],
   );
-  const urlResult = useMemo(
-    () => (urlMode === 'encode' ? urlEncode(urlText) : urlDecode(urlText)),
-    [urlMode, urlText],
-  );
+  const urlResult = useMemo(() => (urlMode === 'encode' ? urlEncode(urlText) : urlDecode(urlText)), [urlMode, urlText]);
   const hashResult = useMemo(() => simpleHash(hashText), [hashText]);
 
   return (

@@ -81,62 +81,62 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-  const parsed = createAnnouncementSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
-  }
+    const parsed = createAnnouncementSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
 
-  const { title, content, priority = 'medium', expiresAt } = parsed.data;
+    const { title, content, priority = 'medium', expiresAt } = parsed.data;
 
-  const parsedExpiresAt = expiresAt ? new Date(expiresAt) : null;
+    const parsedExpiresAt = expiresAt ? new Date(expiresAt) : null;
 
-  const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
-  const ip = getClientIp(request);
-  const announcementId = crypto.randomUUID();
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
+    const ip = getClientIp(request);
+    const announcementId = crypto.randomUUID();
 
-  const announcement = await getPrisma().announcement.create({
-    data: {
-      id: announcementId,
-      title,
-      content,
-      author: adminUser?.fullName || adminUser?.email || 'Unknown',
-      priority: priority,
-      expiresAt: parsedExpiresAt,
-    },
-  });
-
-  // Audit log
-  try {
-    await getPrisma().auditLog.create({
+    const announcement = await getPrisma().announcement.create({
       data: {
-        id: crypto.randomUUID(),
-        adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'announcement_create',
-        targetId: announcement.id,
-        targetName: announcement.title,
-        details: `Admin ${auth.id} created announcement "${announcement.title}" [IP: ${ip}]`,
+        id: announcementId,
+        title,
+        content,
+        author: adminUser?.fullName || adminUser?.email || 'Unknown',
+        priority: priority,
+        expiresAt: parsedExpiresAt,
       },
     });
-  } catch (error) {
-    logger.warn('Audit logging failed', { error: String(error) });
-  }
 
-  return NextResponse.json(
-    {
-      success: true,
-      announcement: {
-        id: announcement.id,
-        title: announcement.title,
-        content: announcement.content,
-        priority: announcement.priority,
-        active: announcement.active,
-        expiresAt: announcement.expiresAt ? announcement.expiresAt.toISOString() : null,
-        createdAt: announcement.createdAt.toISOString(),
+    // Audit log
+    try {
+      await getPrisma().auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          adminId: auth.id,
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: 'announcement_create',
+          targetId: announcement.id,
+          targetName: announcement.title,
+          details: `Admin ${auth.id} created announcement "${announcement.title}" [IP: ${ip}]`,
+        },
+      });
+    } catch (error) {
+      logger.warn('Audit logging failed', { error: String(error) });
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        announcement: {
+          id: announcement.id,
+          title: announcement.title,
+          content: announcement.content,
+          priority: announcement.priority,
+          active: announcement.active,
+          expiresAt: announcement.expiresAt ? announcement.expiresAt.toISOString() : null,
+          createdAt: announcement.createdAt.toISOString(),
+        },
       },
-    },
-    { status: 201 },
-  );
+      { status: 201 },
+    );
   } catch (error) {
     logger.error('Failed to create announcement', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -166,63 +166,63 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-  const parsed = updateAnnouncementSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
-  }
+    const parsed = updateAnnouncementSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
 
-  const { id, title, content, priority, active, expiresAt } = parsed.data;
+    const { id, title, content, priority, active, expiresAt } = parsed.data;
 
-  const existing = await getPrisma().announcement.findUnique({ where: { id } });
-  if (!existing) {
-    return NextResponse.json({ error: 'Announcement not found' }, { status: 404 });
-  }
+    const existing = await getPrisma().announcement.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Announcement not found' }, { status: 404 });
+    }
 
-  const parsedExpiresAt = expiresAt === null ? null : expiresAt !== undefined ? new Date(expiresAt) : undefined;
+    const parsedExpiresAt = expiresAt === null ? null : expiresAt !== undefined ? new Date(expiresAt) : undefined;
 
-  const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
-  const ip = getClientIp(request);
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
+    const ip = getClientIp(request);
 
-  const announcement = await getPrisma().announcement.update({
-    where: { id },
-    data: {
-      ...(title !== undefined ? { title } : {}),
-      ...(content !== undefined ? { content } : {}),
-      ...(priority !== undefined && typeof priority === 'string' ? { priority } : {}),
-      ...(active !== undefined && typeof active === 'boolean' ? { active } : {}),
-      ...(parsedExpiresAt !== undefined ? { expiresAt: parsedExpiresAt } : {}),
-    },
-  });
-
-  // Audit log
-  try {
-    await getPrisma().auditLog.create({
+    const announcement = await getPrisma().announcement.update({
+      where: { id },
       data: {
-        id: crypto.randomUUID(),
-        adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'announcement_update',
-        targetId: announcement.id,
-        targetName: announcement.title,
-        details: `Admin ${auth.id} updated announcement "${announcement.title}" [IP: ${ip}]`,
+        ...(title !== undefined ? { title } : {}),
+        ...(content !== undefined ? { content } : {}),
+        ...(priority !== undefined && typeof priority === 'string' ? { priority } : {}),
+        ...(active !== undefined && typeof active === 'boolean' ? { active } : {}),
+        ...(parsedExpiresAt !== undefined ? { expiresAt: parsedExpiresAt } : {}),
       },
     });
-  } catch (error) {
-    logger.warn('Audit logging failed', { error: String(error) });
-  }
 
-  return NextResponse.json({
-    success: true,
-    announcement: {
-      id: announcement.id,
-      title: announcement.title,
-      content: announcement.content,
-      priority: announcement.priority,
-      active: announcement.active,
-      expiresAt: announcement.expiresAt ? announcement.expiresAt.toISOString() : null,
-      createdAt: announcement.createdAt.toISOString(),
-    },
-  });
+    // Audit log
+    try {
+      await getPrisma().auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          adminId: auth.id,
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: 'announcement_update',
+          targetId: announcement.id,
+          targetName: announcement.title,
+          details: `Admin ${auth.id} updated announcement "${announcement.title}" [IP: ${ip}]`,
+        },
+      });
+    } catch (error) {
+      logger.warn('Audit logging failed', { error: String(error) });
+    }
+
+    return NextResponse.json({
+      success: true,
+      announcement: {
+        id: announcement.id,
+        title: announcement.title,
+        content: announcement.content,
+        priority: announcement.priority,
+        active: announcement.active,
+        expiresAt: announcement.expiresAt ? announcement.expiresAt.toISOString() : null,
+        createdAt: announcement.createdAt.toISOString(),
+      },
+    });
   } catch (error) {
     logger.error('Failed to update announcement', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -245,54 +245,54 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     let id: string | undefined;
 
-  // Try to get id from query param first
-  id = searchParams.get('id') || undefined;
+    // Try to get id from query param first
+    id = searchParams.get('id') || undefined;
 
-  // If not in query, try to get from body
-  if (!id) {
-    try {
-      const body = await request.json();
-      id = body?.id;
-    } catch (e) {
-      logger.error('Invalid JSON body in announcements DELETE', {
-        error: String(e),
-      });
-      // No JSON body
+    // If not in query, try to get from body
+    if (!id) {
+      try {
+        const body = await request.json();
+        id = body?.id;
+      } catch (e) {
+        logger.error('Invalid JSON body in announcements DELETE', {
+          error: String(e),
+        });
+        // No JSON body
+      }
     }
-  }
 
-  if (!id || typeof id !== 'string') {
-    return NextResponse.json({ error: 'Announcement ID is required' }, { status: 400 });
-  }
+    if (!id || typeof id !== 'string') {
+      return NextResponse.json({ error: 'Announcement ID is required' }, { status: 400 });
+    }
 
-  const existing = await getPrisma().announcement.findUnique({ where: { id } });
-  if (!existing) {
-    return NextResponse.json({ error: 'Announcement not found' }, { status: 404 });
-  }
+    const existing = await getPrisma().announcement.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Announcement not found' }, { status: 404 });
+    }
 
-  const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
-  const ip = getClientIp(request);
+    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
+    const ip = getClientIp(request);
 
-  await getPrisma().announcement.delete({ where: { id } });
+    await getPrisma().announcement.delete({ where: { id } });
 
-  // Audit log
-  try {
-    await getPrisma().auditLog.create({
-      data: {
-        id: crypto.randomUUID(),
-        adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'announcement_delete',
-        targetId: id,
-        targetName: existing.title,
-        details: `Admin ${auth.id} deleted announcement "${existing.title}" [IP: ${ip}]`,
-      },
-    });
-  } catch (error) {
-    logger.warn('Audit logging failed', { error: String(error) });
-  }
+    // Audit log
+    try {
+      await getPrisma().auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          adminId: auth.id,
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: 'announcement_delete',
+          targetId: id,
+          targetName: existing.title,
+          details: `Admin ${auth.id} deleted announcement "${existing.title}" [IP: ${ip}]`,
+        },
+      });
+    } catch (error) {
+      logger.warn('Audit logging failed', { error: String(error) });
+    }
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (error) {
     logger.error('Failed to delete announcement', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

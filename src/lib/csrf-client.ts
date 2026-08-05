@@ -31,5 +31,3 @@ export function getCsrfHeaders(extraHeaders?: Record<string, string>): Record<st
     ...extraHeaders,
   };
 }
-
-

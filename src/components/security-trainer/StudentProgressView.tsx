@@ -320,7 +320,9 @@ export default function StudentProgressView({
                   <span className="text-muted-foreground text-xs">{t('avgScore')}</span>
                 </div>
                 <p className="mt-1 text-xl font-bold">{data.kpis.avgQuizScore}%</p>
-                <p className="mt-1 text-xs text-slate-400">{data.kpis.totalQuizAttempts} {t('attempts')}</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  {data.kpis.totalQuizAttempts} {t('attempts')}
+                </p>
               </CardContent>
             </Card>
             <Card className="border-border">
@@ -330,7 +332,9 @@ export default function StudentProgressView({
                   <span className="text-muted-foreground text-xs">{t('engagement')}</span>
                 </div>
                 <p className="mt-1 text-xl font-bold">{data.kpis.engagementScore}%</p>
-                <p className="mt-1 text-xs text-slate-400">{t('inactiveFor')} {data.kpis.lastActiveDays} {t('days')}</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  {t('inactiveFor')} {data.kpis.lastActiveDays} {t('days')}
+                </p>
               </CardContent>
             </Card>
             <Card className="border-border">

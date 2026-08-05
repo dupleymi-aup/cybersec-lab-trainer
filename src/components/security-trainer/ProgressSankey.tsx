@@ -166,7 +166,9 @@ export default function ProgressSankey({
                 >
                   <div className="w-40 flex-shrink-0 text-right">
                     <p className="text-sm font-medium">{stage.label}</p>
-                    <p className="text-muted-foreground text-xs">{stage.value} {t('students')}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {stage.value} {t('students')}
+                    </p>
                   </div>
                   <div className="relative flex-1">
                     <div
@@ -217,7 +219,9 @@ export default function ProgressSankey({
                 >
                   {conv.rate}%
                 </p>
-                <p className="text-muted-foreground mt-1 text-xs">{t('churn')}: {conv.dropoff} {t('students')}</p>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  {t('churn')}: {conv.dropoff} {t('students')}
+                </p>
               </motion.div>
             ))}
           </div>

@@ -559,9 +559,12 @@ export default function Dashboard() {
 
   const [showAllActivity, setShowAllActivity] = useState(false);
 
-  const handleStartModule = useCallback((moduleId: string) => {
-    setCurrentPage(moduleId as PageType);
-  }, [setCurrentPage]);
+  const handleStartModule = useCallback(
+    (moduleId: string) => {
+      setCurrentPage(moduleId as PageType);
+    },
+    [setCurrentPage],
+  );
 
   const quickActions = useMemo(
     () => [

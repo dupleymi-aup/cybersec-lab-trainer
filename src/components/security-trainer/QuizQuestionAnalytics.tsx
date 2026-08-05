@@ -60,16 +60,20 @@ export default function QuizQuestionAnalytics() {
     const catParam = category === ALL_CATEGORIES ? undefined : category;
     const diffParam = difficulty === ALL_DIFFICULTIES ? undefined : difficulty;
 
-    getQuizQuestionAnalytics(catParam, diffParam).then((data) => {
-      if (!cancelled) {
-        setStats(data);
-        setLoading(false);
-      }
-    }).catch((e) => {
-      logger.error('Failed to load quiz question analytics', { error: e });
-      if (!cancelled) setLoading(false);
-    });
-    return () => { cancelled = true; };
+    getQuizQuestionAnalytics(catParam, diffParam)
+      .then((data) => {
+        if (!cancelled) {
+          setStats(data);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        logger.error('Failed to load quiz question analytics', { error: e });
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [category, difficulty]);
 
   const hardestQuestions = useMemo(() => {

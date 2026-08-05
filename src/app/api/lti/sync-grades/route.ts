@@ -39,9 +39,13 @@ export async function POST(request: NextRequest) {
 
     // Teachers can only sync grades for students in their group
     if (auth.role !== 'admin') {
-      const targetUser = await getPrisma().user.findUnique({ where: { id: userId }, select: { group: true, role: true } });
+      const targetUser = await getPrisma().user.findUnique({
+        where: { id: userId },
+        select: { group: true, role: true },
+      });
       if (!targetUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-      if (targetUser.role !== 'student') return NextResponse.json({ error: 'Can only sync grades for students' }, { status: 403 });
+      if (targetUser.role !== 'student')
+        return NextResponse.json({ error: 'Can only sync grades for students' }, { status: 403 });
       const teacher = await getPrisma().user.findUnique({ where: { id: auth.id }, select: { group: true } });
       if (!teacher || teacher.group !== targetUser.group) return forbidden();
     }

@@ -182,9 +182,7 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-red-600">
               <AlertCircle size={16} /> {t('rushedQuizzesDetected', { count: rushedQuizzes.length })}
             </h3>
-            <p className="text-muted-foreground mb-3 text-xs">
-              {t('rushedDescription')}
-            </p>
+            <p className="text-muted-foreground mb-3 text-xs">{t('rushedDescription')}</p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead className="bg-secondary border-border border-b">
@@ -203,7 +201,8 @@ export default function QuizSessionAnalytics({ groupId: propGroupId, days: propD
                       <td className="text-muted-foreground p-2">{r.category}</td>
                       <td className="p-2 text-center">
                         <Badge variant="destructive" className="text-[10px]">
-                          {r.duration}{tc('secondsShort')}
+                          {r.duration}
+                          {tc('secondsShort')}
                         </Badge>
                       </td>
                       <td className="p-2 text-center">{r.questionCount}</td>

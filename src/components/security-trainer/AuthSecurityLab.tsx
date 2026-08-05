@@ -617,8 +617,8 @@ const isValid = authenticator.check(token, user.secret);
                   <p className="text-xs leading-relaxed text-sky-700">{t('sessions.jwtDescription')}</p>
                 </div>
 
-              <CodeBlock
-                code={`// JWT generation
+                <CodeBlock
+                  code={`// JWT generation
 const jwt = require('jsonwebtoken');
 
 function login(user) {

@@ -51,6 +51,21 @@ async function downloadPDF(pdfBlob: Blob, filename: string): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
+export type PdfOutputMode = 'download' | 'buffer';
+
+interface PdfDocument {
+  output(type: 'blob'): Blob;
+}
+
+// Emits a jsPDF document: triggers a browser download by default, or returns the
+// PDF as a Blob when mode is 'buffer' (used by the server-side report runner).
+export async function emitPdf(doc: PdfDocument, filename: string, mode: PdfOutputMode = 'download'): Promise<Blob | null> {
+  const pdfBlob = doc.output('blob');
+  if (mode === 'buffer') return pdfBlob;
+  await downloadPDF(pdfBlob, filename);
+  return null;
+}
+
 // Generate student performance PDF report
 export async function generateStudentReportPDF(
   student: {
@@ -176,7 +191,8 @@ export async function generateGradebookPDF(
     avgScore: number;
   }>,
   locale?: string,
-): Promise<void> {
+  mode: PdfOutputMode = 'download',
+): Promise<Blob | null> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
@@ -213,8 +229,7 @@ export async function generateGradebookPDF(
     doc.text(`CyberSec Lab Trainer — Page ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'gradebook.pdf');
+  return emitPdf(doc, 'gradebook.pdf', mode);
 }
 
 // Generate at-risk students PDF
@@ -230,7 +245,8 @@ export async function generateAtRiskPDF(
     avgQuizScore: number;
   }>,
   locale?: string,
-): Promise<void> {
+  mode: PdfOutputMode = 'download',
+): Promise<Blob | null> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
@@ -275,8 +291,7 @@ export async function generateAtRiskPDF(
     doc.text(`CyberSec Lab Trainer — Page ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'at-risk-students.pdf');
+  return emitPdf(doc, 'at-risk-students.pdf', mode);
 }
 
 // Generate comprehensive analytics PDF
@@ -306,7 +321,8 @@ export async function generateAnalyticsPDF(
     avgScore: number;
   }>,
   locale?: string,
-): Promise<void> {
+  mode: PdfOutputMode = 'download',
+): Promise<Blob | null> {
   const dist = moduleDistribution || summary.moduleDistribution || [];
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
@@ -364,8 +380,7 @@ export async function generateAnalyticsPDF(
     doc.text(`CyberSec Lab Trainer — Page ${i}/${pageCount}`, 14, 290);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'analytics-report.pdf');
+  return emitPdf(doc, 'analytics-report.pdf', mode);
 }
 
 // Generate module performance PDF
@@ -380,7 +395,8 @@ export async function generateModulePerformancePDF(
     difficultyIndex: number;
   }>,
   locale?: string,
-): Promise<void> {
+  mode: PdfOutputMode = 'download',
+): Promise<Blob | null> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
@@ -421,8 +437,7 @@ export async function generateModulePerformancePDF(
     doc.text(`CyberSec Lab Trainer — Page ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'module-performance.pdf');
+  return emitPdf(doc, 'module-performance.pdf', mode);
 }
 
 // Generate group comparison PDF
@@ -440,7 +455,8 @@ export async function generateGroupComparisonPDF(
     weakestModule: string;
   }>,
   locale?: string,
-): Promise<void> {
+  mode: PdfOutputMode = 'download',
+): Promise<Blob | null> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
@@ -491,8 +507,7 @@ export async function generateGroupComparisonPDF(
     doc.text(`CyberSec Lab Trainer — Page ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'group-comparison.pdf');
+  return emitPdf(doc, 'group-comparison.pdf', mode);
 }
 
 // Generate quiz retry PDF
@@ -508,7 +523,8 @@ export async function generateQuizRetryPDF(
     retryCount: number;
   }> = [],
   locale?: string,
-): Promise<void> {
+  mode: PdfOutputMode = 'download',
+): Promise<Blob | null> {
   const { jsPDF } = await import('jspdf');
   const { autoTable } = await import('jspdf-autotable');
   const doc = new jsPDF('landscape');
@@ -565,8 +581,7 @@ export async function generateQuizRetryPDF(
     doc.text(`CyberSec Lab Trainer — Page ${i}/${pageCount}`, 14, 200);
   }
 
-  const pdfBlob = doc.output('blob');
-  await downloadPDF(pdfBlob, 'quiz-retry.pdf');
+  return emitPdf(doc, 'quiz-retry.pdf', mode);
 }
 
 // Generate gradebook CSV string
@@ -582,15 +597,7 @@ export function generateGradebookCSV(
     lastActive: string;
   }>,
 ): string {
-  const headers = [
-    'Name',
-    'Email',
-    'Group',
-    'Modules Completed',
-    'Quizzes Completed',
-    'Avg Score (%)',
-    'Last Active',
-  ];
+  const headers = ['Name', 'Email', 'Group', 'Modules Completed', 'Quizzes Completed', 'Avg Score (%)', 'Last Active'];
   const rows = students.map((s) => [
     s.fullName,
     s.email,

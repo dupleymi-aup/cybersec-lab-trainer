@@ -159,7 +159,10 @@ export default function ModulePerformanceReport(props: ModulePerformanceReportPr
                   tickFormatter={(v) => `${v}%`}
                 />
                 <Tooltip
-                  formatter={(value, name) => [`${value}%`, name === 'completionRate' ? t('completion') : t('avgScore')]}
+                  formatter={(value, name) => [
+                    `${value}%`,
+                    name === 'completionRate' ? t('completion') : t('avgScore'),
+                  ]}
                 />
                 <Bar dataKey="completionRate" name="completionRate" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry, index) => (

@@ -197,9 +197,7 @@ export default function XSSLab() {
                 <ShieldAlert size={16} className="text-amber-500" />
                 {t('sanitizationToggle')}
               </h3>
-              <p className="text-muted-foreground mt-1 text-xs">
-                {t('sanitizationDesc')}
-              </p>
+              <p className="text-muted-foreground mt-1 text-xs">{t('sanitizationDesc')}</p>
             </div>
             <div className="flex items-center gap-3">
               <Badge variant={sanitized ? 'default' : 'destructive'} className="text-[10px]">

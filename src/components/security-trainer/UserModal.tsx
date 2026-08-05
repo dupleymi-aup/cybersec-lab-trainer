@@ -113,7 +113,10 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
     }
 
     try {
-      const result = await createUser({ email, phone, fullName, role, group, course, university, inviteCode }, password);
+      const result = await createUser(
+        { email, phone, fullName, role, group, course, university, inviteCode },
+        password,
+      );
       if (result.success) {
         toast.success(t('userCreated'));
         onSuccess();
@@ -164,7 +167,13 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose} role="dialog" aria-modal="true" aria-label={mode === 'create' ? t('createTitle') : t('editTitle')}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={mode === 'create' ? t('createTitle') : t('editTitle')}
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -174,9 +183,7 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
       >
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold">
-            {mode === 'create' ? t('createTitle') : t('editTitle')}
-          </h2>
+          <h2 className="text-lg font-bold">{mode === 'create' ? t('createTitle') : t('editTitle')}</h2>
           <Button variant="ghost" size="icon" onClick={onClose} aria-label={tc('close')}>
             <X size={18} />
           </Button>
@@ -187,7 +194,11 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
             {/* Full Name */}
             <div className="space-y-1.5">
               <Label>{t('nameLabel')}</Label>
-              <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={t('namePlaceholder')} />
+              <Input
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder={t('namePlaceholder')}
+              />
             </div>
 
             {/* Email + Phone */}
@@ -320,7 +331,11 @@ export default function UserModal({ mode, user, onClose, onSuccess }: UserModalP
               </div>
               <div className="space-y-1.5">
                 <Label>{t('universityLabel')}</Label>
-                <Input value={university} onChange={(e) => setUniversity(e.target.value)} placeholder={t('universityPlaceholder')} />
+                <Input
+                  value={university}
+                  onChange={(e) => setUniversity(e.target.value)}
+                  placeholder={t('universityPlaceholder')}
+                />
               </div>
             </div>
 

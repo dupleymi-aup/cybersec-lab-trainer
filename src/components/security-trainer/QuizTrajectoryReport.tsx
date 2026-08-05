@@ -163,9 +163,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
   return (
     <div className="space-y-6">
       {/* Period selector (hidden when controlled externally) */}
-      {!isControlled && (
-        <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => `${d}d`} />
-      )}
+      {!isControlled && <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => `${d}d`} />}
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

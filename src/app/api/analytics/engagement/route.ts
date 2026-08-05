@@ -111,7 +111,8 @@ export async function GET(request: NextRequest) {
 
       const avgQuizScore =
         studentQuizResults.length > 0
-          ? studentQuizResults.reduce((sum: number, q: { percentage: number }) => sum + q.percentage, 0) / studentQuizResults.length
+          ? studentQuizResults.reduce((sum: number, q: { percentage: number }) => sum + q.percentage, 0) /
+            studentQuizResults.length
           : 0;
 
       // Calculate last active days
@@ -213,7 +214,9 @@ export async function GET(request: NextRequest) {
       const dayStart = new Date(dateStr);
       const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
 
-      const dayLogins = loginActivity.filter((l: { userId: string | null; timestamp: Date }) => l.timestamp >= dayStart && l.timestamp < dayEnd);
+      const dayLogins = loginActivity.filter(
+        (l: { userId: string | null; timestamp: Date }) => l.timestamp >= dayStart && l.timestamp < dayEnd,
+      );
       const avgLoginsPerStudent = totalStudents > 0 ? Math.round((dayLogins.length / totalStudents) * 1000) / 10 : 0;
 
       engagementTrend.push({ date: dateStr, avgLoginsPerStudent });

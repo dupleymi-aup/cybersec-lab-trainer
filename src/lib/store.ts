@@ -210,18 +210,21 @@ const loadFromDatabase = async (
       ...(data.progress &&
         data.progress.length > 0 &&
         (() => {
-          const updates: Partial<Pick<AppState,
-            | 'sqlCompletedLevels'
-            | 'xssCompletedLevels'
-            | 'csrfCompletedSteps'
-            | 'csrfChallengeScores'
-            | 'secureCodingAnsweredChallenges'
-            | 'secureCodingCorrectCount'
-            | 'studiedOwaspItems'
-            | 'owaspChallengeScores'
-            | 'authChallengeScores'
-            | 'headersChallengeScores'
-          >> = {};
+          const updates: Partial<
+            Pick<
+              AppState,
+              | 'sqlCompletedLevels'
+              | 'xssCompletedLevels'
+              | 'csrfCompletedSteps'
+              | 'csrfChallengeScores'
+              | 'secureCodingAnsweredChallenges'
+              | 'secureCodingCorrectCount'
+              | 'studiedOwaspItems'
+              | 'owaspChallengeScores'
+              | 'authChallengeScores'
+              | 'headersChallengeScores'
+            >
+          > = {};
           for (const p of data.progress) {
             if (p.sqlLevels) updates.sqlCompletedLevels = p.sqlLevels;
             if (p.xssLevels) updates.xssCompletedLevels = p.xssLevels;

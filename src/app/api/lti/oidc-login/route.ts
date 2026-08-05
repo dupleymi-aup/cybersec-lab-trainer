@@ -31,7 +31,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { iss, login_hint, target_link_uri: _target_link_uri, client_id, lti_message_hint, state, nonce } = parsed.data;
+    const {
+      iss,
+      login_hint,
+      target_link_uri: _target_link_uri,
+      client_id,
+      lti_message_hint,
+      state,
+      nonce,
+    } = parsed.data;
 
     // Find the platform by issuer
     const platform = await getPrisma().ltiPlatform.findFirst({
@@ -50,10 +58,7 @@ export async function POST(request: NextRequest) {
     authUrl.searchParams.set('scope', 'openid');
     authUrl.searchParams.set('response_type', 'id_token');
     authUrl.searchParams.set('client_id', effectiveClientId);
-    authUrl.searchParams.set(
-      'redirect_uri',
-      `${process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL}/api/lti/launch`,
-    );
+    authUrl.searchParams.set('redirect_uri', `${process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL}/api/lti/launch`);
     authUrl.searchParams.set('login_hint', login_hint);
     authUrl.searchParams.set('state', state || crypto.randomUUID());
     authUrl.searchParams.set('nonce', nonce || crypto.randomUUID());
@@ -125,10 +130,7 @@ export async function GET(request: NextRequest) {
     authUrl.searchParams.set('scope', 'openid');
     authUrl.searchParams.set('response_type', 'id_token');
     authUrl.searchParams.set('client_id', effectiveClientId);
-    authUrl.searchParams.set(
-      'redirect_uri',
-      `${process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL}/api/lti/launch`,
-    );
+    authUrl.searchParams.set('redirect_uri', `${process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL}/api/lti/launch`);
     authUrl.searchParams.set('login_hint', body.login_hint);
     authUrl.searchParams.set('state', body.state || crypto.randomUUID());
     authUrl.searchParams.set('nonce', body.nonce || crypto.randomUUID());

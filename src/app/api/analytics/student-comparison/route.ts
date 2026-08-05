@@ -61,7 +61,14 @@ export async function GET(request: NextRequest) {
 
     const totalModules = 12;
 
-    type UserRow = { id: string; fullName: string; email: string; group: string; avatar: string | null; lastLoginAt: Date | null };
+    type UserRow = {
+      id: string;
+      fullName: string;
+      email: string;
+      group: string;
+      avatar: string | null;
+      lastLoginAt: Date | null;
+    };
     type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
     type QuizResultRow = { userId: string; quizId: string; percentage: number };
     type QuizAttemptRow = { userId: string; category: string; correct: boolean };
@@ -74,7 +81,11 @@ export async function GET(request: NextRequest) {
       const modulesCompleted = userProgress.filter((p: ProgressRow) => p.completed).length;
       const avgQuizScore =
         userQuizResults.length > 0
-          ? Math.round((userQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / userQuizResults.length) * 10) / 10
+          ? Math.round(
+              (userQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) /
+                userQuizResults.length) *
+                10,
+            ) / 10
           : 0;
       const totalQuizAttempts = userQuizAttempts.length;
 

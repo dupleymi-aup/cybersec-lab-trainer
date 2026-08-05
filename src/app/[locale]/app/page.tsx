@@ -166,11 +166,29 @@ const roleRestrictedPages: Record<string, UserRole> = {
 };
 
 const validPageIds = [
-  'dashboard', 'owasp', 'sql-injection', 'xss', 'csrf', 'auth',
-  'secure-coding', 'tools', 'security-headers', 'idor', 'ssrf',
-  'api-security', 'phishing-analyzer', 'career-paths', 'quiz',
-  'achievements', 'cheat-sheets', 'password-checker', 'profile',
-  'teacher-panel', 'admin-panel', 'leaderboard', 'assignments',
+  'dashboard',
+  'owasp',
+  'sql-injection',
+  'xss',
+  'csrf',
+  'auth',
+  'secure-coding',
+  'tools',
+  'security-headers',
+  'idor',
+  'ssrf',
+  'api-security',
+  'phishing-analyzer',
+  'career-paths',
+  'quiz',
+  'achievements',
+  'cheat-sheets',
+  'password-checker',
+  'profile',
+  'teacher-panel',
+  'admin-panel',
+  'leaderboard',
+  'assignments',
 ];
 
 export default function DashboardAppPage() {
@@ -184,31 +202,130 @@ export default function DashboardAppPage() {
   const user = useAuthStore((s) => s.user);
   const impersonation = getImpersonationState();
 
-  const pages = useMemo<Record<string, React.ReactNode>>(() => ({
-    dashboard: <ModuleWrapper name={tm('dashboard')}><Dashboard /></ModuleWrapper>,
-    owasp: <ModuleWrapper name={tm('owaspTop10')} pageId="owasp"><LazyOWASPTop10 /></ModuleWrapper>,
-    'sql-injection': <ModuleWrapper name={tm('sqlInjectionLab')} pageId="sql-injection"><LazySQLInjectionLab /></ModuleWrapper>,
-    xss: <ModuleWrapper name={tm('xssLab')} pageId="xss"><LazyXSSLab /></ModuleWrapper>,
-    csrf: <ModuleWrapper name={tm('csrfLab')} pageId="csrf"><LazyCSRFLab /></ModuleWrapper>,
-    auth: <ModuleWrapper name={tm('authLab')} pageId="auth"><LazyAuthSecurityLab /></ModuleWrapper>,
-    'secure-coding': <ModuleWrapper name={tm('secureCodingLab')} pageId="secure-coding"><LazySecureCodingLab /></ModuleWrapper>,
-    tools: <ModuleWrapper name={tm('toolsLab')} pageId="tools"><LazyToolsLab /></ModuleWrapper>,
-    'security-headers': <ModuleWrapper name={tm('securityHeadersLab')} pageId="security-headers"><LazySecurityHeadersLab /></ModuleWrapper>,
-    idor: <ModuleWrapper name={tm('idorLab')} pageId="idor"><LazyIDORLab /></ModuleWrapper>,
-    ssrf: <ModuleWrapper name={tm('ssrfLab')} pageId="ssrf"><LazySSRFLab /></ModuleWrapper>,
-    'api-security': <ModuleWrapper name={tm('apiSecurityLab')} pageId="api-security"><LazyAPISecurityLab /></ModuleWrapper>,
-    'phishing-analyzer': <ModuleWrapper name={tm('phishingAnalyzer')} pageId="phishing-analyzer"><LazyPhishingAnalyzer /></ModuleWrapper>,
-    'career-paths': <ModuleWrapper name={tm('careerPaths')} pageId="career-paths"><LazyCareerPaths /></ModuleWrapper>,
-    quiz: <ModuleWrapper name={tm('quizSystem')}><LazyQuizSystem /></ModuleWrapper>,
-    achievements: <ModuleWrapper name={tm('achievements')}><LazyAchievementsGlossary /></ModuleWrapper>,
-    'cheat-sheets': <ModuleWrapper name={tm('cheatSheets')}><LazySecurityCheatSheets /></ModuleWrapper>,
-    'password-checker': <ModuleWrapper name={tm('passwordChecker')}><LazyPasswordStrengthChecker /></ModuleWrapper>,
-    profile: <ModuleWrapper name={tm('profile')}><LazyProfilePage /></ModuleWrapper>,
-    'teacher-panel': <ModuleWrapper name={tm('teacherPanel')}><LazyRoleGuard requiredRole="teacher"><LazyTeacherPanel /></LazyRoleGuard></ModuleWrapper>,
-    'admin-panel': <ModuleWrapper name={tm('adminPanel')}><LazyRoleGuard requiredRole="admin"><LazyAdminPanel /></LazyRoleGuard></ModuleWrapper>,
-    leaderboard: <ModuleWrapper name={tm('leaderboard')}><LazyLeaderboard /></ModuleWrapper>,
-    assignments: <ModuleWrapper name={tm('assignments')}><LazyStudentAssignments /></ModuleWrapper>,
-  }), [tm]);
+  const pages = useMemo<Record<string, React.ReactNode>>(
+    () => ({
+      dashboard: (
+        <ModuleWrapper name={tm('dashboard')}>
+          <Dashboard />
+        </ModuleWrapper>
+      ),
+      owasp: (
+        <ModuleWrapper name={tm('owaspTop10')} pageId="owasp">
+          <LazyOWASPTop10 />
+        </ModuleWrapper>
+      ),
+      'sql-injection': (
+        <ModuleWrapper name={tm('sqlInjectionLab')} pageId="sql-injection">
+          <LazySQLInjectionLab />
+        </ModuleWrapper>
+      ),
+      xss: (
+        <ModuleWrapper name={tm('xssLab')} pageId="xss">
+          <LazyXSSLab />
+        </ModuleWrapper>
+      ),
+      csrf: (
+        <ModuleWrapper name={tm('csrfLab')} pageId="csrf">
+          <LazyCSRFLab />
+        </ModuleWrapper>
+      ),
+      auth: (
+        <ModuleWrapper name={tm('authLab')} pageId="auth">
+          <LazyAuthSecurityLab />
+        </ModuleWrapper>
+      ),
+      'secure-coding': (
+        <ModuleWrapper name={tm('secureCodingLab')} pageId="secure-coding">
+          <LazySecureCodingLab />
+        </ModuleWrapper>
+      ),
+      tools: (
+        <ModuleWrapper name={tm('toolsLab')} pageId="tools">
+          <LazyToolsLab />
+        </ModuleWrapper>
+      ),
+      'security-headers': (
+        <ModuleWrapper name={tm('securityHeadersLab')} pageId="security-headers">
+          <LazySecurityHeadersLab />
+        </ModuleWrapper>
+      ),
+      idor: (
+        <ModuleWrapper name={tm('idorLab')} pageId="idor">
+          <LazyIDORLab />
+        </ModuleWrapper>
+      ),
+      ssrf: (
+        <ModuleWrapper name={tm('ssrfLab')} pageId="ssrf">
+          <LazySSRFLab />
+        </ModuleWrapper>
+      ),
+      'api-security': (
+        <ModuleWrapper name={tm('apiSecurityLab')} pageId="api-security">
+          <LazyAPISecurityLab />
+        </ModuleWrapper>
+      ),
+      'phishing-analyzer': (
+        <ModuleWrapper name={tm('phishingAnalyzer')} pageId="phishing-analyzer">
+          <LazyPhishingAnalyzer />
+        </ModuleWrapper>
+      ),
+      'career-paths': (
+        <ModuleWrapper name={tm('careerPaths')} pageId="career-paths">
+          <LazyCareerPaths />
+        </ModuleWrapper>
+      ),
+      quiz: (
+        <ModuleWrapper name={tm('quizSystem')}>
+          <LazyQuizSystem />
+        </ModuleWrapper>
+      ),
+      achievements: (
+        <ModuleWrapper name={tm('achievements')}>
+          <LazyAchievementsGlossary />
+        </ModuleWrapper>
+      ),
+      'cheat-sheets': (
+        <ModuleWrapper name={tm('cheatSheets')}>
+          <LazySecurityCheatSheets />
+        </ModuleWrapper>
+      ),
+      'password-checker': (
+        <ModuleWrapper name={tm('passwordChecker')}>
+          <LazyPasswordStrengthChecker />
+        </ModuleWrapper>
+      ),
+      profile: (
+        <ModuleWrapper name={tm('profile')}>
+          <LazyProfilePage />
+        </ModuleWrapper>
+      ),
+      'teacher-panel': (
+        <ModuleWrapper name={tm('teacherPanel')}>
+          <LazyRoleGuard requiredRole="teacher">
+            <LazyTeacherPanel />
+          </LazyRoleGuard>
+        </ModuleWrapper>
+      ),
+      'admin-panel': (
+        <ModuleWrapper name={tm('adminPanel')}>
+          <LazyRoleGuard requiredRole="admin">
+            <LazyAdminPanel />
+          </LazyRoleGuard>
+        </ModuleWrapper>
+      ),
+      leaderboard: (
+        <ModuleWrapper name={tm('leaderboard')}>
+          <LazyLeaderboard />
+        </ModuleWrapper>
+      ),
+      assignments: (
+        <ModuleWrapper name={tm('assignments')}>
+          <LazyStudentAssignments />
+        </ModuleWrapper>
+      ),
+    }),
+    [tm],
+  );
 
   useEffect(() => {
     if (!isAuthenticated) {

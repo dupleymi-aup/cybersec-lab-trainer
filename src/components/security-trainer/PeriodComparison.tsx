@@ -37,16 +37,16 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
   useEffect(() => {
     setLoading(true);
     setError(false);
-    Promise.all([getComprehensiveSummary(periodA, groupId), getComprehensiveSummary(periodB, groupId)]).then(
-      ([a, b]) => {
+    Promise.all([getComprehensiveSummary(periodA, groupId), getComprehensiveSummary(periodB, groupId)])
+      .then(([a, b]) => {
         setDataA(a);
         setDataB(b);
         setLoading(false);
-      },
-    ).catch(() => {
-      setError(true);
-      setLoading(false);
-    });
+      })
+      .catch(() => {
+        setError(true);
+        setLoading(false);
+      });
   }, [periodA, periodB, groupId]);
 
   if (error) {
@@ -288,7 +288,8 @@ export default function PeriodComparison({ groupId }: { groupId?: string }) {
             const stableDeltas = kpiComparisons.filter((k) => k.delta.direction === 'stable').length;
             const trend =
               positiveDeltas > negativeDeltas ? 'improving' : negativeDeltas > positiveDeltas ? 'declining' : 'stable';
-            const trendLabel = trend === 'improving' ? t('improving') : trend === 'declining' ? t('declining') : t('stable');
+            const trendLabel =
+              trend === 'improving' ? t('improving') : trend === 'declining' ? t('declining') : t('stable');
             const trendColor =
               trend === 'improving'
                 ? 'text-emerald-600'

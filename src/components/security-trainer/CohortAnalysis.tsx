@@ -288,7 +288,9 @@ export default function CohortAnalysis({ groupId }: CohortAnalysisProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-border border-b">
-                  <th className="text-muted-foreground min-w-[140px] px-3 py-2 text-left font-semibold">{t('cohort')}</th>
+                  <th className="text-muted-foreground min-w-[140px] px-3 py-2 text-left font-semibold">
+                    {t('cohort')}
+                  </th>
                   <th className="text-muted-foreground px-2 py-2 text-center font-semibold">{t('students')}</th>
                   {RETENTION_WEEKS.map((w) => (
                     <th key={w.key} className="text-muted-foreground min-w-[90px] px-2 py-2 text-center font-semibold">

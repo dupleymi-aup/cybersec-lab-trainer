@@ -298,7 +298,9 @@ export default function PredictiveInsights({ groupId }: Props) {
                 <Tooltip />
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
-                  formatter={(value) => (value === 'actual' ? t('actual') : value === 'predicted' ? t('forecast') : t('range'))}
+                  formatter={(value) =>
+                    value === 'actual' ? t('actual') : value === 'predicted' ? t('forecast') : t('range')
+                  }
                 />
                 <Area
                   type="monotone"
@@ -360,7 +362,12 @@ export default function PredictiveInsights({ groupId }: Props) {
                     .map((i) => (
                       <li key={i.label} className="flex items-start gap-1.5 text-xs text-red-600">
                         <AlertTriangle size={12} className="mt-0.5 flex-shrink-0" />
-                        {t('forecastDecline', { label: i.label.toLowerCase(), current: i.current, predicted: i.predicted, unit: i.unit })}
+                        {t('forecastDecline', {
+                          label: i.label.toLowerCase(),
+                          current: i.current,
+                          predicted: i.predicted,
+                          unit: i.unit,
+                        })}
                       </li>
                     ))}
                   {insights
@@ -379,7 +386,7 @@ export default function PredictiveInsights({ groupId }: Props) {
                 (trendData[trendData.length - 1]?.modulesCompleted || 0) * 0.8 && (
                 <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
                   <p className="mb-2 text-sm font-medium text-amber-700">{t('longTermRisks')}</p>
-                    <p className="text-xs text-amber-600">{t('longTermDesc')}</p>
+                  <p className="text-xs text-amber-600">{t('longTermDesc')}</p>
                 </div>
               )}
             {insights.filter((i) => i.trend === 'up' && i.label !== t('riskOfFallingBehind')).length > 0 && (
@@ -391,7 +398,12 @@ export default function PredictiveInsights({ groupId }: Props) {
                     .map((i) => (
                       <li key={i.label} className="flex items-start gap-1.5 text-xs text-emerald-600">
                         <TrendingUp size={12} className="mt-0.5 flex-shrink-0" />
-                        {t('growthLabel', { label: i.label.toLowerCase(), current: i.current, predicted: i.predicted, unit: i.unit })}
+                        {t('growthLabel', {
+                          label: i.label.toLowerCase(),
+                          current: i.current,
+                          predicted: i.predicted,
+                          unit: i.unit,
+                        })}
                       </li>
                     ))}
                 </ul>

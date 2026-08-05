@@ -230,38 +230,19 @@
       "sections": {
         "platform": {
           "title": "Platform",
-          "links": [
-            "Modules",
-            "Features",
-            "Pricing",
-            "LTI Integration"
-          ]
+          "links": ["Modules", "Features", "Pricing", "LTI Integration"]
         },
         "resources": {
           "title": "Resources",
-          "links": [
-            "Documentation",
-            "Guide",
-            "Blog",
-            "OWASP Top 10"
-          ]
+          "links": ["Documentation", "Guide", "Blog", "OWASP Top 10"]
         },
         "company": {
           "title": "Company",
-          "links": [
-            "About",
-            "Contact",
-            "Careers",
-            "Partners"
-          ]
+          "links": ["About", "Contact", "Careers", "Partners"]
         },
         "legal": {
           "title": "Legal",
-          "links": [
-            "Privacy",
-            "Terms",
-            "Cookies"
-          ]
+          "links": ["Privacy", "Terms", "Cookies"]
         }
       },
       "copyright": "(c) {year} CyberSec Lab. All rights reserved.",
@@ -2231,15 +2212,39 @@
     "networkTitle": "Network Security",
     "toolsTitle": "Useful CLI Commands",
     "owasp": {
-      "a01": { "title": "A01 — Broken Access Control", "content": "Check authorization on every endpoint. Use deny-by-default." },
-      "a02": { "title": "A02 — Cryptographic Failures", "content": "Use bcrypt for passwords, TLS 1.3 for transport, AES-256 for storage." },
+      "a01": {
+        "title": "A01 — Broken Access Control",
+        "content": "Check authorization on every endpoint. Use deny-by-default."
+      },
+      "a02": {
+        "title": "A02 — Cryptographic Failures",
+        "content": "Use bcrypt for passwords, TLS 1.3 for transport, AES-256 for storage."
+      },
       "a03": { "title": "A03 — Injection", "content": "Use parameterized queries. Never concatenate SQL." },
-      "a04": { "title": "A04 — Insecure Design", "content": "Threat modeling at design stage. Rate limiting, CAPTCHA, business logic validation." },
-      "a05": { "title": "A05 — Security Misconfiguration", "content": "Disable debug mode in production. Security headers. Update dependencies." },
-      "a06": { "title": "A06 — Vulnerable Components", "content": "Dependency audit: npm audit, Snyk, Dependabot. Lock files are mandatory." },
-      "a07": { "title": "A07 — Auth Failures", "content": "MFA required. Short-lived sessions. Secure password reset tokens." },
-      "a08": { "title": "A08 — Data Integrity", "content": "SRI for CDN resources. Digital signatures. CI/CD pipeline security." },
-      "a09": { "title": "A09 — Logging Failures", "content": "Log auth events, errors, access. Never log passwords or tokens." },
+      "a04": {
+        "title": "A04 — Insecure Design",
+        "content": "Threat modeling at design stage. Rate limiting, CAPTCHA, business logic validation."
+      },
+      "a05": {
+        "title": "A05 — Security Misconfiguration",
+        "content": "Disable debug mode in production. Security headers. Update dependencies."
+      },
+      "a06": {
+        "title": "A06 — Vulnerable Components",
+        "content": "Dependency audit: npm audit, Snyk, Dependabot. Lock files are mandatory."
+      },
+      "a07": {
+        "title": "A07 — Auth Failures",
+        "content": "MFA required. Short-lived sessions. Secure password reset tokens."
+      },
+      "a08": {
+        "title": "A08 — Data Integrity",
+        "content": "SRI for CDN resources. Digital signatures. CI/CD pipeline security."
+      },
+      "a09": {
+        "title": "A09 — Logging Failures",
+        "content": "Log auth events, errors, access. Never log passwords or tokens."
+      },
       "a10": { "title": "A10 — SSRF", "content": "Allowlist domains. Block private IPs. Validate URLs after redirect." }
     },
     "headers": {
@@ -2253,11 +2258,17 @@
       "dns": { "title": "X-DNS-Prefetch-Control", "content": "Disables DNS prefetch for privacy." }
     },
     "sql": {
-      "prepared": { "title": "Parameterized Queries", "content": "Gold standard defense. Data is passed separately from SQL code." },
+      "prepared": {
+        "title": "Parameterized Queries",
+        "content": "Gold standard defense. Data is passed separately from SQL code."
+      },
       "orm": { "title": "ORM (Prisma, Sequelize)", "content": "ORM automatically parameterizes queries." },
       "stored": { "title": "Stored Procedures", "content": "Use stored procedures for complex queries." },
       "validation": { "title": "Input Validation", "content": "Validate type, format, and length of input data." },
-      "privilege": { "title": "Least Privilege DB Account", "content": "Application should not use SA/root DB account." },
+      "privilege": {
+        "title": "Least Privilege DB Account",
+        "content": "Application should not use SA/root DB account."
+      },
       "waf": { "title": "WAF Rules", "content": "Additional defense layer. Does not replace parameterization!" }
     },
     "xss": {
@@ -2266,7 +2277,10 @@
       "textcontent": { "title": "textContent vs innerHTML", "content": "textContent does not interpret HTML." },
       "csp": { "title": "CSP (Content Security Policy)", "content": "Blocks inline scripts and external sources." },
       "httponly": { "title": "HttpOnly Cookies", "content": "JavaScript cannot read HttpOnly cookies." },
-      "react": { "title": "React Auto-Escaping", "content": "React auto-escapes JSX, but dangerouslySetInnerHTML is dangerous." }
+      "react": {
+        "title": "React Auto-Escaping",
+        "content": "React auto-escapes JSX, but dangerouslySetInnerHTML is dangerous."
+      }
     },
     "auth": {
       "hashing": { "title": "Password Hashing", "content": "Use bcrypt or Argon2. Never MD5/SHA1." },
@@ -2274,7 +2288,10 @@
       "ratelimit": { "title": "Rate Limiting", "content": "Protection against brute force and credential stuffing." },
       "mfa": { "title": "MFA / 2FA", "content": "TOTP (Google Authenticator), WebAuthn (passkeys)." },
       "reset": { "title": "Password Reset", "content": "Cryptographically random token, 1 hour expiry, single use." },
-      "session": { "title": "Session Security", "content": "Secure, HttpOnly, SameSite cookies. Regenerate after login." }
+      "session": {
+        "title": "Session Security",
+        "content": "Secure, HttpOnly, SameSite cookies. Regenerate after login."
+      }
     },
     "crypto": {
       "hashing": { "title": "Password Hashing", "content": "bcrypt (cost 12+), Argon2id (recommended)." },
@@ -2285,11 +2302,17 @@
       "random": { "title": "Random Generation", "content": "crypto.randomBytes for cryptographically random values." }
     },
     "network": {
-      "ports": { "title": "Ports and Protocols", "content": "22:SSH, 53:DNS, 80:HTTP, 443:HTTPS, 3306:MySQL, 5432:PostgreSQL" },
+      "ports": {
+        "title": "Ports and Protocols",
+        "content": "22:SSH, 53:DNS, 80:HTTP, 443:HTTPS, 3306:MySQL, 5432:PostgreSQL"
+      },
       "firewall": { "title": "Firewall (iptables)", "content": "Block everything, allow only what's needed." },
       "dns": { "title": "DNS Security", "content": "DNSSEC for signed records. DoH/DoT for privacy." },
       "ssh": { "title": "SSH Hardening", "content": "Disable root login, password auth. Use keys." },
-      "segmentation": { "title": "Network Segmentation", "content": "Separate network into zones: public, private, DMZ." },
+      "segmentation": {
+        "title": "Network Segmentation",
+        "content": "Separate network into zones: public, private, DMZ."
+      },
       "ids": { "title": "IDS/IPS", "content": "Snort, Suricata for anomaly detection." }
     },
     "tools": {
@@ -3474,106 +3497,406 @@
     "catMethodologies": "Methodologies",
     "catTools": "Tools",
     "g": {
-      "owasp": { "t": "OWASP", "d": "Open Worldwide Application Security Project \u2014 non-profit developing web application security standards and tools. Best known for OWASP Top 10." },
-      "sqli": { "t": "SQL Injection", "d": "Attack where malicious SQL code is inserted into queries via user input. Allows reading, modifying, and deleting database data." },
-      "xss": { "t": "XSS (Cross-Site Scripting)", "d": "Injection of malicious scripts into web pages executed in the victim's browser. Can be reflected, stored, or DOM-based." },
-      "csrf": { "t": "CSRF (Cross-Site Request Forgery)", "d": "Attack forcing an authenticated user's browser to perform unwanted actions on a target site via forged requests." },
-      "ssrf": { "t": "SSRF (Server-Side Request Forgery)", "d": "Attack forcing a server application to make HTTP requests to internal resources as directed by the attacker. Dangerous in cloud environments." },
-      "xssi": { "t": "XSSI (Cross-Site Script Inclusion)", "d": "Attack where an attacker includes sensitive JavaScript files from a third-party site, bypassing Same-Origin Policy." },
-      "hashing": { "t": "Hashing", "d": "One-way transformation of data of arbitrary length into a fixed-length string. Used for password storage and data integrity verification." },
-      "salt": { "t": "Salt", "d": "Random data added to a password before hashing. Prevents rainbow table attacks and ensures unique hashes for identical passwords." },
-      "bcrypt": { "t": "bcrypt", "d": "Adaptive hash function based on Blowfish. Specifically designed for password hashing, includes salt and configurable cost factor." },
-      "argon2": { "t": "Argon2", "d": "Winner of the PHC (Password Hashing Competition). Supports configurable memory and time usage, resistant to GPU attacks." },
-      "jwt": { "t": "JWT (JSON Web Token)", "d": "Compact, URL-safe token with three parts (Header.Payload.Signature) for transmitting information between parties. Used for authentication." },
-      "oauth": { "t": "OAuth 2.0", "d": "Authorization protocol allowing applications to get limited access to user accounts on other services without sharing passwords." },
-      "mfa": { "t": "MFA (Multi-Factor Authentication)", "d": "Using two or more factors to verify identity: something you know (password), something you have (phone), something you are (biometrics)." },
-      "waf": { "t": "WAF (Web Application Firewall)", "d": "Firewall for web applications filtering HTTP traffic between the application and the internet. Detects and blocks attacks." },
-      "cors": { "t": "CORS (Cross-Origin Resource Sharing)", "d": "Browser security mechanism controlling requests to resources from other domains. Uses Access-Control-* headers for allow/deny." },
-      "sop": { "t": "Same-Origin Policy", "d": "Fundamental browser security policy preventing a web page from accessing resources of another domain without explicit permission." },
-      "https": { "t": "HTTPS / TLS", "d": "Encryption protocol for data transfer between client and server. Provides confidentiality (encryption), integrity (no modifications), and authentication." },
-      "tls13": { "t": "TLS 1.3", "d": "Latest TLS version. Simplified handshake (1-RTT), removed deprecated algorithms, mandatory encryption. Recommended for all new projects." },
-      "rateLimiting": { "t": "Rate Limiting", "d": "Limiting the number of requests from one client within a certain period. Protects against brute force, DDoS, and user enumeration." },
-      "bruteForce": { "t": "Brute Force", "d": "Attack method by exhaustive enumeration of all possible options (passwords, keys). Effective against weak passwords. Countermeasures: Rate Limiting, account lockout." },
-      "rainbowTable": { "t": "Rainbow Table", "d": "Pre-computed hash table for快速 password cracking. Salting makes rainbow tables useless." },
-      "sessionHijacking": { "t": "Session Hijacking", "d": "Interception of a session token by an attacker to gain access to an authenticated user's session. Protection: HttpOnly, Secure, SameSite cookies." },
-      "clickjacking": { "t": "Clickjacking", "d": "Attack where an invisible malicious element is overlaid on a legitimate button/link. Protection: X-Frame-Options, CSP frame-ancestors." },
-      "domClobbering": { "t": "DOM Clobbering", "d": "Technique of injecting HTML elements with specific id/name to overwrite document DOM properties, potentially altering application logic." },
-      "prototypePollution": { "t": "Prototype Pollution", "d": "Attack on JavaScript applications through modification of Object prototype, which can lead to altered application behavior and arbitrary code execution." },
-      "preparedStatement": { "t": "Prepared Statement", "d": "Parameterized SQL query where data is passed separately from SQL code. Completely prevents SQL injection." },
-      "sanitization": { "t": "Sanitization", "d": "Process of cleaning input data from potentially dangerous content (HTML tags, scripts, special characters) before use in the application." },
-      "xssPayload": { "t": "XSS Payload", "d": "Malicious code (usually JavaScript) injected during an XSS attack. Can range from simple alert() to complex data-stealing frameworks." },
-      "pentesting": { "t": "Penetration Testing", "d": "Security testing method where an authorized specialist simulates attacks on a system to find vulnerabilities before malicious actors do." },
-      "threatModeling": { "t": "Threat Modeling", "d": "Process of systematically identifying threats and vulnerabilities in application architecture during design (STRIDE, DREAD, PASTA)." },
-      "owaspZap": { "t": "OWASP ZAP", "d": "Zed Attack Proxy \u2014 free open-source tool for automated and manual web application security testing." },
-      "burpSuite": { "t": "Burp Suite", "d": "Commercial web application security testing platform. Includes proxy, vulnerability scanner, request replay tool." },
-      "nmap": { "t": "Nmap", "d": "Utility for port scanning and service discovery on networks. Used for security auditing and detecting open ports on servers." },
-      "idor": { "t": "IDOR", "d": "Insecure Direct Object Reference \u2014 vulnerability where a user can access another user's data by changing the object identifier in the request." },
-      "openRedirect": { "t": "Open Redirect", "d": "Vulnerability allowing redirection of a user to an arbitrary external URL via an application parameter. Used in phishing attacks." },
-      "pathTraversal": { "t": "Path Traversal", "d": "Attack where the attacker accesses files outside the permitted directory through path manipulation (e.g., ../../../etc/passwd)." },
-      "xxe": { "t": "XXE (XML External Entity)", "d": "External entity injection in XML parsers. Allows reading local files, performing SSRF and DoS attacks. Occurs when DTD processing is enabled." },
-      "deserialization": { "t": "Deserialization Attack", "d": "Attack via unsafe object deserialization. Attacker creates a malicious serialized object that executes arbitrary code upon deserialization." },
-      "hmac": { "t": "HMAC", "d": "Hash-based Message Authentication Code \u2014 mechanism for verifying message integrity and authenticity using a cryptographic hash and secret key." },
-      "aes": { "t": "AES", "d": "Advanced Encryption Standard \u2014 symmetric block cipher algorithm. Uses 128, 192, or 256-bit keys. Industry standard for data encryption." },
-      "rsa": { "t": "RSA", "d": "Asymmetric encryption algorithm using a key pair (public and private). Used for encryption, digital signatures, and key exchange." },
-      "saml": { "t": "SAML", "d": "Security Assertion Markup Language \u2014 standard for exchanging authentication and authorization data between Identity Provider and Service Provider. Used in SSO." },
-      "sso": { "t": "SSO (Single Sign-On)", "d": "Mechanism allowing a user to authenticate once and access multiple applications without re-entering a password." },
-      "rbac": { "t": "RBAC", "d": "Role-Based Access Control \u2014 access control model where permissions are assigned to roles, and users receive roles. Simplifies permission management in large organizations." },
-      "inputValidation": { "t": "Input Validation", "d": "Process of checking input data against expected format, type, range, and length. First line of defense against injection and other attacks." },
-      "securityHeaders": { "t": "Security Headers", "d": "Set of HTTP headers for enhancing security: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy." },
-      "metasploit": { "t": "Metasploit", "d": "Framework for developing and executing exploits. Used by penetration testers to verify system security. Contains exploit and payload database." },
-      "wireshark": { "t": "Wireshark", "d": "Open-source network traffic analyzer. Allows capturing and analyzing packets, checking TLS connections, detecting anomalies." },
-      "stride": { "t": "STRIDE", "d": "Threat classification model: Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation of Privilege. Used in Threat Modeling." },
-      "dos": { "t": "DoS / DDoS", "d": "Denial of Service / Distributed DoS \u2014 availability attack aiming to make a service unavailable to legitimate users. DDoS uses multiple sources (botnet)." },
-      "dns": { "t": "DNS (Domain Name System)", "d": "Distributed system for translating domain names (example.com) to IP addresses (93.184.216.34). DNS attacks include spoofing, poisoning, hijacking." },
-      "dnsSpoofing": { "t": "DNS Spoofing", "d": "Attack where the attacker substitutes DNS responses, directing the victim to a fake server instead of the legitimate one. Protection: DNSSEC." },
-      "certPinning": { "t": "Certificate Pinning", "d": "Mechanism where a client 'pins' to a specific SSL certificate or CA. Even if an attacker obtains a fake certificate, the connection is rejected." },
-      "hsts": { "t": "HSTS (HTTP Strict Transport Security)", "d": "HTTP header instructing the browser to always use HTTPS for a given domain. Prevents downgrade attacks and SSL-stripping." },
-      "zeroDay": { "t": "0-day (Zero-Day)", "d": "Vulnerability unknown to the developer or for which no patch exists. Attackers can exploit it before a fix is released." },
-      "worm": { "t": "WORM", "d": "Write Once, Read Many \u2014 data storage model where written data cannot be modified or deleted. Used to protect security logs from tampering." },
-      "cia": { "t": "CIA Triad", "d": "Confidentiality, Integrity, Availability \u2014 fundamental information security model: confidentiality (data accessible only to authorized), integrity (data not modified), availability (data accessible when needed)." },
-      "nonRepudiation": { "t": "Non-repudiation", "d": "System property guaranteeing a party cannot deny participation in a transaction. Ensured by digital signatures and logging." },
-      "securityMisconfiguration": { "t": "Security Misconfiguration", "d": "OWASP A05 \u2014 vulnerability caused by improper application configuration: debug enabled in production, default passwords, open cloud storage, missing security headers." },
-      "brokenAuth": { "t": "Broken Authentication", "d": "OWASP A07 \u2014 flaws in authentication mechanisms: weak passwords, missing MFA, predictable session tokens, vulnerable password reset." },
-      "credentialStuffing": { "t": "Credential Stuffing", "d": "Automated login attempts on multiple services using email/passwords from a single breach. People reuse passwords, making the attack effective." },
-      "tokenAuth": { "t": "Token-based Auth", "d": "Authentication model where after login the server issues a token (JWT) that the client presents with each request. Stateless \u2014 server doesn't store session." },
-      "sessionAuth": { "t": "Session-based Auth", "d": "Traditional model where the server stores a session (in memory/DB/Redis) and sends the client a session ID in a cookie. Stateful." },
-      "refreshToken": { "t": "Refresh Token", "d": "Long-lived token used to obtain new short-lived access tokens without re-entering a password. Stored in HttpOnly cookie for security." },
-      "totp": { "t": "TOTP", "d": "Time-based One-Time Password (RFC 6238) \u2014 algorithm for generating one-time codes based on a shared secret and current time. Used in Google Authenticator, Authy." },
-      "fido2": { "t": "FIDO2 / WebAuthn", "d": "Passwordless authentication standards using hardware keys (YubiKey) or biometrics. Cryptographically verify device presence \u2014 phishing protection." },
-      "sri": { "t": "Subresource Integrity (SRI)", "d": "Mechanism for verifying integrity of external resources (CDN scripts, styles) by hash. integrity=\"sha384-...\" attribute guarantees the file wasn't modified." },
-      "csp": { "t": "CSP (Content Security Policy)", "d": "HTTP header defining allowed sources for scripts, styles, images and other resources. script-src 'self' blocks inline scripts \u2014 effective XSS protection." },
-      "xcto": { "t": "X-Content-Type-Options", "d": "HTTP header with nosniff value, preventing browsers from determining MIME type by content. Without it, a .jpg file could be interpreted as JavaScript." },
-      "referrerPolicy": { "t": "Referrer-Policy", "d": "HTTP header controlling how much information about the previous page is sent in the Referer header. strict-origin-when-cross-origin is recommended." },
-      "permissionsPolicy": { "t": "Permissions-Policy", "d": "HTTP header restricting browser API usage (camera, microphone, geolocation) for the current document and iframe. Replacement for deprecated Feature-Policy." },
-      "helmet": { "t": "Helmet.js", "d": "Express.js library for configuring security HTTP headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy and others." },
-      "dependabot": { "t": "Dependabot", "d": "Automatic GitHub service that monitors dependencies and creates PRs when vulnerabilities or available updates are found." },
-      "snyk": { "t": "Snyk", "d": "Developer security platform: scanning dependencies, containers, IaC files for vulnerabilities. Integrates into CI/CD for automated checks." },
-      "siem": { "t": "SIEM", "d": "Security Information and Event Management \u2014 platform for collecting, correlating, and analyzing security logs in real-time. Examples: Splunk, ELK Stack, IBM QRadar." },
-      "hibp": { "t": "Have I Been Pwned", "d": "Troy Hunt's service for checking if emails or passwords have appeared in known data breaches. API allows integration into applications." },
-      "owaspTop10": { "t": "OWASP Top 10", "d": "List of 10 most critical web application security threats, updated every 3-4 years. Current version is 2021. Industry standard for developers and auditors." },
-      "supplyChain": { "t": "Supply Chain Attack", "d": "Attack through compromise of development components: libraries (npm, PyPI), CI/CD systems, build tools. Examples: SolarWinds (2020), event-stream (2018)." },
-      "raceCondition": { "t": "Race Condition", "d": "Vulnerability arising when concurrent operations' result depends on execution order. Example: double spending in parallel requests." },
-      "avalanche": { "t": "Avalanche Effect", "d": "Property of cryptographic hash functions: changing even one bit of input data completely changes the hash. Good hashes change ~50% of bits." },
-      "collision": { "t": "Collision", "d": "Situation where two different inputs produce the same hash. MD5 and SHA-1 are vulnerable to collision attacks. SHA-256 and bcrypt are considered resistant." },
-      "ecc": { "t": "ECC (Elliptic Curve Cryptography)", "d": "Asymmetric cryptography based on elliptic curves. Provides equivalent strength to RSA with smaller key sizes (256-bit ECC = 3072-bit RSA). Used in TLS 1.3, Bitcoin." },
-      "oauth21": { "t": "OAuth 2.1", "d": "Updated version of OAuth 2.0: mandatory PKCE, removal of implicit grant and resource owner password credentials. Simplifies spec and improves security." },
-      "pkce": { "t": "PKCE", "d": "Proof Key for Code Exchange \u2014 OAuth 2.0 extension for protecting against authorization code interception. Generates code verifier and code challenge." },
-      "oidc": { "t": "OpenID Connect (OIDC)", "d": "Authentication protocol on top of OAuth 2.0. Returns ID Token (JWT) with user info (sub, email, name). Used for SSO in Google, Microsoft, GitHub." },
-      "apiSecurity": { "t": "API Security", "d": "Protecting API endpoints: authentication (API keys, JWT, OAuth), authorization (RBAC, ABAC), rate limiting, input validation, TLS, CORS policy, audit logs." },
-      "graphql": { "t": "GraphQL Security", "d": "GraphQL-specific threats: Query Depth Attack, Introspection exposure, Batch Attack. Protection: depth limits, disable introspection, complexity analysis." },
-      "asvs": { "t": "OWASP ASVS", "d": "Application Security Verification Standard \u2014 detailed standard for assessing web application security. Contains 300+ requirements at levels L1, L2, L3." },
-      "zeroTrust": { "t": "Zero Trust", "d": "Security model: 'never trust, always verify'. Every request is authenticated and authorized regardless of source. Microsegmentation, MFA, least privilege." },
-      "devsecops": { "t": "DevSecOps", "d": "Integrating security into CI/CD: SAST, DAST, SCA, IaC scanning, automated checks before deployment." },
-      "sast": { "t": "SAST", "d": "Static Application Security Testing \u2014 analyzing source code for vulnerabilities without running the application. Finds SQLi, XSS, hardcoded secrets." },
-      "dast": { "t": "DAST", "d": "Dynamic Application Security Testing \u2014 testing running applications for vulnerabilities. Simulates attacker attacks. Examples: OWASP ZAP, Burp Suite, Nessus." },
-      "promptInjection": { "t": "Prompt Injection", "d": "Attack on LLMs through injecting malicious instructions in prompts. Can make the model perform unwanted actions, leak secrets, or bypass restrictions." },
-      "llmSecurity": { "t": "LLM Security", "d": "Large Language Model security: protection against prompt injection, data poisoning, model theft, inference attacks. Includes OWASP Top 10 for LLM Applications." },
-      "ragPoisoning": { "t": "RAG Poisoning", "d": "Attack on Retrieval-Augmented Generation systems by injecting malicious data into knowledge base. Model outputs compromised answers." },
-      "modelTheft": { "t": "Model Theft", "d": "Theft of trained ML models through extraction attacks (API queries to recover parameters) or direct access to model weights." },
-      "sbom": { "t": "SBOM", "d": "Software Bill of Materials \u2014 complete list of software components: libraries, dependencies, versions, licenses. Necessary for vulnerability management and compliance." },
-      "secretsMgmt": { "t": "Secrets Management", "d": "Managing secrets (passwords, API keys, tokens) in applications and infrastructure. Practices: don't hardcode, use HashiCorp Vault, AWS Secrets Manager." },
-      "cloudNative": { "t": "Cloud-Native Security", "d": "Security of cloud-native applications: containers (Docker), orchestration (Kubernetes), service meshes (Istio), serverless." },
-      "ebpf": { "t": "eBPF Security", "d": "Using extended Berkeley Packet Filter for kernel-level Linux security: monitoring syscalls, network packets, processes. Detects anomalies without modifying applications." }
+      "owasp": {
+        "t": "OWASP",
+        "d": "Open Worldwide Application Security Project \u2014 non-profit developing web application security standards and tools. Best known for OWASP Top 10."
+      },
+      "sqli": {
+        "t": "SQL Injection",
+        "d": "Attack where malicious SQL code is inserted into queries via user input. Allows reading, modifying, and deleting database data."
+      },
+      "xss": {
+        "t": "XSS (Cross-Site Scripting)",
+        "d": "Injection of malicious scripts into web pages executed in the victim's browser. Can be reflected, stored, or DOM-based."
+      },
+      "csrf": {
+        "t": "CSRF (Cross-Site Request Forgery)",
+        "d": "Attack forcing an authenticated user's browser to perform unwanted actions on a target site via forged requests."
+      },
+      "ssrf": {
+        "t": "SSRF (Server-Side Request Forgery)",
+        "d": "Attack forcing a server application to make HTTP requests to internal resources as directed by the attacker. Dangerous in cloud environments."
+      },
+      "xssi": {
+        "t": "XSSI (Cross-Site Script Inclusion)",
+        "d": "Attack where an attacker includes sensitive JavaScript files from a third-party site, bypassing Same-Origin Policy."
+      },
+      "hashing": {
+        "t": "Hashing",
+        "d": "One-way transformation of data of arbitrary length into a fixed-length string. Used for password storage and data integrity verification."
+      },
+      "salt": {
+        "t": "Salt",
+        "d": "Random data added to a password before hashing. Prevents rainbow table attacks and ensures unique hashes for identical passwords."
+      },
+      "bcrypt": {
+        "t": "bcrypt",
+        "d": "Adaptive hash function based on Blowfish. Specifically designed for password hashing, includes salt and configurable cost factor."
+      },
+      "argon2": {
+        "t": "Argon2",
+        "d": "Winner of the PHC (Password Hashing Competition). Supports configurable memory and time usage, resistant to GPU attacks."
+      },
+      "jwt": {
+        "t": "JWT (JSON Web Token)",
+        "d": "Compact, URL-safe token with three parts (Header.Payload.Signature) for transmitting information between parties. Used for authentication."
+      },
+      "oauth": {
+        "t": "OAuth 2.0",
+        "d": "Authorization protocol allowing applications to get limited access to user accounts on other services without sharing passwords."
+      },
+      "mfa": {
+        "t": "MFA (Multi-Factor Authentication)",
+        "d": "Using two or more factors to verify identity: something you know (password), something you have (phone), something you are (biometrics)."
+      },
+      "waf": {
+        "t": "WAF (Web Application Firewall)",
+        "d": "Firewall for web applications filtering HTTP traffic between the application and the internet. Detects and blocks attacks."
+      },
+      "cors": {
+        "t": "CORS (Cross-Origin Resource Sharing)",
+        "d": "Browser security mechanism controlling requests to resources from other domains. Uses Access-Control-* headers for allow/deny."
+      },
+      "sop": {
+        "t": "Same-Origin Policy",
+        "d": "Fundamental browser security policy preventing a web page from accessing resources of another domain without explicit permission."
+      },
+      "https": {
+        "t": "HTTPS / TLS",
+        "d": "Encryption protocol for data transfer between client and server. Provides confidentiality (encryption), integrity (no modifications), and authentication."
+      },
+      "tls13": {
+        "t": "TLS 1.3",
+        "d": "Latest TLS version. Simplified handshake (1-RTT), removed deprecated algorithms, mandatory encryption. Recommended for all new projects."
+      },
+      "rateLimiting": {
+        "t": "Rate Limiting",
+        "d": "Limiting the number of requests from one client within a certain period. Protects against brute force, DDoS, and user enumeration."
+      },
+      "bruteForce": {
+        "t": "Brute Force",
+        "d": "Attack method by exhaustive enumeration of all possible options (passwords, keys). Effective against weak passwords. Countermeasures: Rate Limiting, account lockout."
+      },
+      "rainbowTable": {
+        "t": "Rainbow Table",
+        "d": "Pre-computed hash table for快速 password cracking. Salting makes rainbow tables useless."
+      },
+      "sessionHijacking": {
+        "t": "Session Hijacking",
+        "d": "Interception of a session token by an attacker to gain access to an authenticated user's session. Protection: HttpOnly, Secure, SameSite cookies."
+      },
+      "clickjacking": {
+        "t": "Clickjacking",
+        "d": "Attack where an invisible malicious element is overlaid on a legitimate button/link. Protection: X-Frame-Options, CSP frame-ancestors."
+      },
+      "domClobbering": {
+        "t": "DOM Clobbering",
+        "d": "Technique of injecting HTML elements with specific id/name to overwrite document DOM properties, potentially altering application logic."
+      },
+      "prototypePollution": {
+        "t": "Prototype Pollution",
+        "d": "Attack on JavaScript applications through modification of Object prototype, which can lead to altered application behavior and arbitrary code execution."
+      },
+      "preparedStatement": {
+        "t": "Prepared Statement",
+        "d": "Parameterized SQL query where data is passed separately from SQL code. Completely prevents SQL injection."
+      },
+      "sanitization": {
+        "t": "Sanitization",
+        "d": "Process of cleaning input data from potentially dangerous content (HTML tags, scripts, special characters) before use in the application."
+      },
+      "xssPayload": {
+        "t": "XSS Payload",
+        "d": "Malicious code (usually JavaScript) injected during an XSS attack. Can range from simple alert() to complex data-stealing frameworks."
+      },
+      "pentesting": {
+        "t": "Penetration Testing",
+        "d": "Security testing method where an authorized specialist simulates attacks on a system to find vulnerabilities before malicious actors do."
+      },
+      "threatModeling": {
+        "t": "Threat Modeling",
+        "d": "Process of systematically identifying threats and vulnerabilities in application architecture during design (STRIDE, DREAD, PASTA)."
+      },
+      "owaspZap": {
+        "t": "OWASP ZAP",
+        "d": "Zed Attack Proxy \u2014 free open-source tool for automated and manual web application security testing."
+      },
+      "burpSuite": {
+        "t": "Burp Suite",
+        "d": "Commercial web application security testing platform. Includes proxy, vulnerability scanner, request replay tool."
+      },
+      "nmap": {
+        "t": "Nmap",
+        "d": "Utility for port scanning and service discovery on networks. Used for security auditing and detecting open ports on servers."
+      },
+      "idor": {
+        "t": "IDOR",
+        "d": "Insecure Direct Object Reference \u2014 vulnerability where a user can access another user's data by changing the object identifier in the request."
+      },
+      "openRedirect": {
+        "t": "Open Redirect",
+        "d": "Vulnerability allowing redirection of a user to an arbitrary external URL via an application parameter. Used in phishing attacks."
+      },
+      "pathTraversal": {
+        "t": "Path Traversal",
+        "d": "Attack where the attacker accesses files outside the permitted directory through path manipulation (e.g., ../../../etc/passwd)."
+      },
+      "xxe": {
+        "t": "XXE (XML External Entity)",
+        "d": "External entity injection in XML parsers. Allows reading local files, performing SSRF and DoS attacks. Occurs when DTD processing is enabled."
+      },
+      "deserialization": {
+        "t": "Deserialization Attack",
+        "d": "Attack via unsafe object deserialization. Attacker creates a malicious serialized object that executes arbitrary code upon deserialization."
+      },
+      "hmac": {
+        "t": "HMAC",
+        "d": "Hash-based Message Authentication Code \u2014 mechanism for verifying message integrity and authenticity using a cryptographic hash and secret key."
+      },
+      "aes": {
+        "t": "AES",
+        "d": "Advanced Encryption Standard \u2014 symmetric block cipher algorithm. Uses 128, 192, or 256-bit keys. Industry standard for data encryption."
+      },
+      "rsa": {
+        "t": "RSA",
+        "d": "Asymmetric encryption algorithm using a key pair (public and private). Used for encryption, digital signatures, and key exchange."
+      },
+      "saml": {
+        "t": "SAML",
+        "d": "Security Assertion Markup Language \u2014 standard for exchanging authentication and authorization data between Identity Provider and Service Provider. Used in SSO."
+      },
+      "sso": {
+        "t": "SSO (Single Sign-On)",
+        "d": "Mechanism allowing a user to authenticate once and access multiple applications without re-entering a password."
+      },
+      "rbac": {
+        "t": "RBAC",
+        "d": "Role-Based Access Control \u2014 access control model where permissions are assigned to roles, and users receive roles. Simplifies permission management in large organizations."
+      },
+      "inputValidation": {
+        "t": "Input Validation",
+        "d": "Process of checking input data against expected format, type, range, and length. First line of defense against injection and other attacks."
+      },
+      "securityHeaders": {
+        "t": "Security Headers",
+        "d": "Set of HTTP headers for enhancing security: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy."
+      },
+      "metasploit": {
+        "t": "Metasploit",
+        "d": "Framework for developing and executing exploits. Used by penetration testers to verify system security. Contains exploit and payload database."
+      },
+      "wireshark": {
+        "t": "Wireshark",
+        "d": "Open-source network traffic analyzer. Allows capturing and analyzing packets, checking TLS connections, detecting anomalies."
+      },
+      "stride": {
+        "t": "STRIDE",
+        "d": "Threat classification model: Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation of Privilege. Used in Threat Modeling."
+      },
+      "dos": {
+        "t": "DoS / DDoS",
+        "d": "Denial of Service / Distributed DoS \u2014 availability attack aiming to make a service unavailable to legitimate users. DDoS uses multiple sources (botnet)."
+      },
+      "dns": {
+        "t": "DNS (Domain Name System)",
+        "d": "Distributed system for translating domain names (example.com) to IP addresses (93.184.216.34). DNS attacks include spoofing, poisoning, hijacking."
+      },
+      "dnsSpoofing": {
+        "t": "DNS Spoofing",
+        "d": "Attack where the attacker substitutes DNS responses, directing the victim to a fake server instead of the legitimate one. Protection: DNSSEC."
+      },
+      "certPinning": {
+        "t": "Certificate Pinning",
+        "d": "Mechanism where a client 'pins' to a specific SSL certificate or CA. Even if an attacker obtains a fake certificate, the connection is rejected."
+      },
+      "hsts": {
+        "t": "HSTS (HTTP Strict Transport Security)",
+        "d": "HTTP header instructing the browser to always use HTTPS for a given domain. Prevents downgrade attacks and SSL-stripping."
+      },
+      "zeroDay": {
+        "t": "0-day (Zero-Day)",
+        "d": "Vulnerability unknown to the developer or for which no patch exists. Attackers can exploit it before a fix is released."
+      },
+      "worm": {
+        "t": "WORM",
+        "d": "Write Once, Read Many \u2014 data storage model where written data cannot be modified or deleted. Used to protect security logs from tampering."
+      },
+      "cia": {
+        "t": "CIA Triad",
+        "d": "Confidentiality, Integrity, Availability \u2014 fundamental information security model: confidentiality (data accessible only to authorized), integrity (data not modified), availability (data accessible when needed)."
+      },
+      "nonRepudiation": {
+        "t": "Non-repudiation",
+        "d": "System property guaranteeing a party cannot deny participation in a transaction. Ensured by digital signatures and logging."
+      },
+      "securityMisconfiguration": {
+        "t": "Security Misconfiguration",
+        "d": "OWASP A05 \u2014 vulnerability caused by improper application configuration: debug enabled in production, default passwords, open cloud storage, missing security headers."
+      },
+      "brokenAuth": {
+        "t": "Broken Authentication",
+        "d": "OWASP A07 \u2014 flaws in authentication mechanisms: weak passwords, missing MFA, predictable session tokens, vulnerable password reset."
+      },
+      "credentialStuffing": {
+        "t": "Credential Stuffing",
+        "d": "Automated login attempts on multiple services using email/passwords from a single breach. People reuse passwords, making the attack effective."
+      },
+      "tokenAuth": {
+        "t": "Token-based Auth",
+        "d": "Authentication model where after login the server issues a token (JWT) that the client presents with each request. Stateless \u2014 server doesn't store session."
+      },
+      "sessionAuth": {
+        "t": "Session-based Auth",
+        "d": "Traditional model where the server stores a session (in memory/DB/Redis) and sends the client a session ID in a cookie. Stateful."
+      },
+      "refreshToken": {
+        "t": "Refresh Token",
+        "d": "Long-lived token used to obtain new short-lived access tokens without re-entering a password. Stored in HttpOnly cookie for security."
+      },
+      "totp": {
+        "t": "TOTP",
+        "d": "Time-based One-Time Password (RFC 6238) \u2014 algorithm for generating one-time codes based on a shared secret and current time. Used in Google Authenticator, Authy."
+      },
+      "fido2": {
+        "t": "FIDO2 / WebAuthn",
+        "d": "Passwordless authentication standards using hardware keys (YubiKey) or biometrics. Cryptographically verify device presence \u2014 phishing protection."
+      },
+      "sri": {
+        "t": "Subresource Integrity (SRI)",
+        "d": "Mechanism for verifying integrity of external resources (CDN scripts, styles) by hash. integrity=\"sha384-...\" attribute guarantees the file wasn't modified."
+      },
+      "csp": {
+        "t": "CSP (Content Security Policy)",
+        "d": "HTTP header defining allowed sources for scripts, styles, images and other resources. script-src 'self' blocks inline scripts \u2014 effective XSS protection."
+      },
+      "xcto": {
+        "t": "X-Content-Type-Options",
+        "d": "HTTP header with nosniff value, preventing browsers from determining MIME type by content. Without it, a .jpg file could be interpreted as JavaScript."
+      },
+      "referrerPolicy": {
+        "t": "Referrer-Policy",
+        "d": "HTTP header controlling how much information about the previous page is sent in the Referer header. strict-origin-when-cross-origin is recommended."
+      },
+      "permissionsPolicy": {
+        "t": "Permissions-Policy",
+        "d": "HTTP header restricting browser API usage (camera, microphone, geolocation) for the current document and iframe. Replacement for deprecated Feature-Policy."
+      },
+      "helmet": {
+        "t": "Helmet.js",
+        "d": "Express.js library for configuring security HTTP headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy and others."
+      },
+      "dependabot": {
+        "t": "Dependabot",
+        "d": "Automatic GitHub service that monitors dependencies and creates PRs when vulnerabilities or available updates are found."
+      },
+      "snyk": {
+        "t": "Snyk",
+        "d": "Developer security platform: scanning dependencies, containers, IaC files for vulnerabilities. Integrates into CI/CD for automated checks."
+      },
+      "siem": {
+        "t": "SIEM",
+        "d": "Security Information and Event Management \u2014 platform for collecting, correlating, and analyzing security logs in real-time. Examples: Splunk, ELK Stack, IBM QRadar."
+      },
+      "hibp": {
+        "t": "Have I Been Pwned",
+        "d": "Troy Hunt's service for checking if emails or passwords have appeared in known data breaches. API allows integration into applications."
+      },
+      "owaspTop10": {
+        "t": "OWASP Top 10",
+        "d": "List of 10 most critical web application security threats, updated every 3-4 years. Current version is 2021. Industry standard for developers and auditors."
+      },
+      "supplyChain": {
+        "t": "Supply Chain Attack",
+        "d": "Attack through compromise of development components: libraries (npm, PyPI), CI/CD systems, build tools. Examples: SolarWinds (2020), event-stream (2018)."
+      },
+      "raceCondition": {
+        "t": "Race Condition",
+        "d": "Vulnerability arising when concurrent operations' result depends on execution order. Example: double spending in parallel requests."
+      },
+      "avalanche": {
+        "t": "Avalanche Effect",
+        "d": "Property of cryptographic hash functions: changing even one bit of input data completely changes the hash. Good hashes change ~50% of bits."
+      },
+      "collision": {
+        "t": "Collision",
+        "d": "Situation where two different inputs produce the same hash. MD5 and SHA-1 are vulnerable to collision attacks. SHA-256 and bcrypt are considered resistant."
+      },
+      "ecc": {
+        "t": "ECC (Elliptic Curve Cryptography)",
+        "d": "Asymmetric cryptography based on elliptic curves. Provides equivalent strength to RSA with smaller key sizes (256-bit ECC = 3072-bit RSA). Used in TLS 1.3, Bitcoin."
+      },
+      "oauth21": {
+        "t": "OAuth 2.1",
+        "d": "Updated version of OAuth 2.0: mandatory PKCE, removal of implicit grant and resource owner password credentials. Simplifies spec and improves security."
+      },
+      "pkce": {
+        "t": "PKCE",
+        "d": "Proof Key for Code Exchange \u2014 OAuth 2.0 extension for protecting against authorization code interception. Generates code verifier and code challenge."
+      },
+      "oidc": {
+        "t": "OpenID Connect (OIDC)",
+        "d": "Authentication protocol on top of OAuth 2.0. Returns ID Token (JWT) with user info (sub, email, name). Used for SSO in Google, Microsoft, GitHub."
+      },
+      "apiSecurity": {
+        "t": "API Security",
+        "d": "Protecting API endpoints: authentication (API keys, JWT, OAuth), authorization (RBAC, ABAC), rate limiting, input validation, TLS, CORS policy, audit logs."
+      },
+      "graphql": {
+        "t": "GraphQL Security",
+        "d": "GraphQL-specific threats: Query Depth Attack, Introspection exposure, Batch Attack. Protection: depth limits, disable introspection, complexity analysis."
+      },
+      "asvs": {
+        "t": "OWASP ASVS",
+        "d": "Application Security Verification Standard \u2014 detailed standard for assessing web application security. Contains 300+ requirements at levels L1, L2, L3."
+      },
+      "zeroTrust": {
+        "t": "Zero Trust",
+        "d": "Security model: 'never trust, always verify'. Every request is authenticated and authorized regardless of source. Microsegmentation, MFA, least privilege."
+      },
+      "devsecops": {
+        "t": "DevSecOps",
+        "d": "Integrating security into CI/CD: SAST, DAST, SCA, IaC scanning, automated checks before deployment."
+      },
+      "sast": {
+        "t": "SAST",
+        "d": "Static Application Security Testing \u2014 analyzing source code for vulnerabilities without running the application. Finds SQLi, XSS, hardcoded secrets."
+      },
+      "dast": {
+        "t": "DAST",
+        "d": "Dynamic Application Security Testing \u2014 testing running applications for vulnerabilities. Simulates attacker attacks. Examples: OWASP ZAP, Burp Suite, Nessus."
+      },
+      "promptInjection": {
+        "t": "Prompt Injection",
+        "d": "Attack on LLMs through injecting malicious instructions in prompts. Can make the model perform unwanted actions, leak secrets, or bypass restrictions."
+      },
+      "llmSecurity": {
+        "t": "LLM Security",
+        "d": "Large Language Model security: protection against prompt injection, data poisoning, model theft, inference attacks. Includes OWASP Top 10 for LLM Applications."
+      },
+      "ragPoisoning": {
+        "t": "RAG Poisoning",
+        "d": "Attack on Retrieval-Augmented Generation systems by injecting malicious data into knowledge base. Model outputs compromised answers."
+      },
+      "modelTheft": {
+        "t": "Model Theft",
+        "d": "Theft of trained ML models through extraction attacks (API queries to recover parameters) or direct access to model weights."
+      },
+      "sbom": {
+        "t": "SBOM",
+        "d": "Software Bill of Materials \u2014 complete list of software components: libraries, dependencies, versions, licenses. Necessary for vulnerability management and compliance."
+      },
+      "secretsMgmt": {
+        "t": "Secrets Management",
+        "d": "Managing secrets (passwords, API keys, tokens) in applications and infrastructure. Practices: don't hardcode, use HashiCorp Vault, AWS Secrets Manager."
+      },
+      "cloudNative": {
+        "t": "Cloud-Native Security",
+        "d": "Security of cloud-native applications: containers (Docker), orchestration (Kubernetes), service meshes (Istio), serverless."
+      },
+      "ebpf": {
+        "t": "eBPF Security",
+        "d": "Using extended Berkeley Packet Filter for kernel-level Linux security: monitoring syscalls, network packets, processes. Detects anomalies without modifying applications."
+      }
     }
   },
   "syncIndicator": {

@@ -240,15 +240,21 @@ export default function Leaderboard() {
                 <div className="mt-2 flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
                     <Target size={14} className="text-emerald-500" />
-                    <span className="text-sm">{completedModules.length} {t('modulesLabel')}</span>
+                    <span className="text-sm">
+                      {completedModules.length} {t('modulesLabel')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Star size={14} className="text-amber-500" />
-                    <span className="text-sm">{currentUserStats.quizAvg}% {t('quizzesLabel')}</span>
+                    <span className="text-sm">
+                      {currentUserStats.quizAvg}% {t('quizzesLabel')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Flame size={14} className="text-orange-500" />
-                    <span className="text-sm">{currentUserStats.streak} {t('daysLabel')}</span>
+                    <span className="text-sm">
+                      {currentUserStats.streak} {t('daysLabel')}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Zap size={14} className="text-violet-500" />

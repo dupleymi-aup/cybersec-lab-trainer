@@ -46,7 +46,10 @@ export default function RecoveryPage() {
     if (cooldown <= 0) return;
     const timer = setInterval(() => {
       setCooldown((c) => {
-        if (c <= 1) { clearInterval(timer); return 0; }
+        if (c <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
         return c - 1;
       });
     }, 1000);
@@ -205,8 +208,10 @@ export default function RecoveryPage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (step === 'otp') { setStep('contact'); setDigits(['', '', '', '', '', '']); }
-                  else if (step === 'reset') setStep('otp');
+                  if (step === 'otp') {
+                    setStep('contact');
+                    setDigits(['', '', '', '', '', '']);
+                  } else if (step === 'reset') setStep('otp');
                 }}
                 className="text-muted-foreground hover:text-foreground mb-2 inline-flex items-center gap-1 text-sm"
               >
@@ -250,10 +255,7 @@ export default function RecoveryPage() {
                     {loading ? t('recovery.sending') : t('recovery.enterContact')}
                   </Button>
                   <div className="text-center">
-                    <Link
-                      href={`/${locale}/login`}
-                      className="text-muted-foreground hover:text-foreground text-sm"
-                    >
+                    <Link href={`/${locale}/login`} className="text-muted-foreground hover:text-foreground text-sm">
                       {t('recovery.backToLogin')}
                     </Link>
                   </div>
@@ -272,7 +274,9 @@ export default function RecoveryPage() {
                     {digits.map((digit, i) => (
                       <Input
                         key={i}
-                        ref={(el) => { inputsRef.current[i] = el; }}
+                        ref={(el) => {
+                          inputsRef.current[i] = el;
+                        }}
                         type="text"
                         inputMode="numeric"
                         maxLength={1}
@@ -312,13 +316,14 @@ export default function RecoveryPage() {
                       disabled={cooldown > 0 || loading}
                       className={`text-violet-600 ${cooldown > 0 ? 'cursor-not-allowed opacity-50' : 'hover:underline'}`}
                     >
-                      {cooldown > 0
-                        ? t('recovery.resendCountdown', { seconds: cooldown })
-                        : t('recovery.resendOtp')}
+                      {cooldown > 0 ? t('recovery.resendCountdown', { seconds: cooldown }) : t('recovery.resendOtp')}
                     </button>
                     <button
                       type="button"
-                      onClick={() => { setStep('contact'); setDigits(['', '', '', '', '', '']); }}
+                      onClick={() => {
+                        setStep('contact');
+                        setDigits(['', '', '', '', '', '']);
+                      }}
                       className="text-muted-foreground hover:text-foreground"
                     >
                       {t('recovery.changeMethod')}
@@ -434,9 +439,7 @@ export default function RecoveryPage() {
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
                     <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                   </div>
-                  <p className="text-muted-foreground text-sm">
-                    {t('recovery.passwordResetSuccess')}
-                  </p>
+                  <p className="text-muted-foreground text-sm">{t('recovery.passwordResetSuccess')}</p>
                   <Button
                     onClick={() => router.push(`/${locale}/login`)}
                     className="w-full bg-violet-600 hover:bg-violet-700"

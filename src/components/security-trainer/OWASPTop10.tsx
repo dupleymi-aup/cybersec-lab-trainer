@@ -254,11 +254,7 @@ export default function OWASPTop10() {
             <h2 className="mb-2 text-2xl font-bold">
               {allStudied ? t('allLessonsComplete') : t('studiedCount', { count: studiedCount, total: totalCount })}
             </h2>
-            <p className="mb-6 text-emerald-100">
-              {allStudied
-                ? t('congratsAll')
-                : t('congratsPartial')}
-            </p>
+            <p className="mb-6 text-emerald-100">{allStudied ? t('congratsAll') : t('congratsPartial')}</p>
             <div className="flex justify-center gap-3">
               <Button
                 variant="outline"

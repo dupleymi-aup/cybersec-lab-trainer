@@ -102,9 +102,11 @@ export async function GET(request: NextRequest) {
       let quizScoreTrend = 50; // neutral
       if (studentQuizzes.length >= 2) {
         const midPoint = Math.floor(studentQuizzes.length / 2);
-        const firstHalf = studentQuizzes.slice(0, midPoint).reduce((s: number, q: QuizResultRow) => s + q.percentage, 0) / midPoint;
+        const firstHalf =
+          studentQuizzes.slice(0, midPoint).reduce((s: number, q: QuizResultRow) => s + q.percentage, 0) / midPoint;
         const secondHalf =
-          studentQuizzes.slice(midPoint).reduce((s: number, q: QuizResultRow) => s + q.percentage, 0) / (studentQuizzes.length - midPoint);
+          studentQuizzes.slice(midPoint).reduce((s: number, q: QuizResultRow) => s + q.percentage, 0) /
+          (studentQuizzes.length - midPoint);
         const trend = secondHalf - firstHalf; // positive = improving, negative = declining
         quizScoreTrend = Math.max(0, Math.min(100, Math.round(50 - trend)));
       }

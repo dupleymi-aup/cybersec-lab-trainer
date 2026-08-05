@@ -45,7 +45,9 @@ export default function ExecutiveSummaryExport({ groupId, days }: { groupId?: st
       doc.setTextColor(150);
       doc.text(t('period', { days: days || 30 }), 105, 100, { align: 'center' });
       doc.text(
-        t('generationDate', { date: new Date().toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' }) }),
+        t('generationDate', {
+          date: new Date().toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' }),
+        }),
         105,
         110,
         { align: 'center' },

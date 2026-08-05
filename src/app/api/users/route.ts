@@ -12,82 +12,97 @@ export async function GET(request: NextRequest) {
     if (!auth) return unauthorized();
     if (!requireRole(auth.role, 'teacher')) return forbidden();
 
-  const isAdmin = auth.role === 'admin';
-  const { searchParams } = new URL(request.url);
+    const isAdmin = auth.role === 'admin';
+    const { searchParams } = new URL(request.url);
 
-  // Pagination with validation
-  const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
-  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')));
-  const skip = (page - 1) * limit;
+    // Pagination with validation
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')));
+    const skip = (page - 1) * limit;
 
-  // Filters
-  const role = searchParams.get('role') || undefined;
-  const search = searchParams.get('search') || undefined;
-  const sortBy = searchParams.get('sortBy') || 'createdAt';
-  const sortOrder = searchParams.get('sortOrder') || 'desc';
-  const isBlocked = searchParams.get('isBlocked');
+    // Filters
+    const role = searchParams.get('role') || undefined;
+    const search = searchParams.get('search') || undefined;
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const isBlocked = searchParams.get('isBlocked');
 
-  const where: Record<string, unknown> = {};
-  if (role && ['student', 'teacher', 'admin'].includes(role)) {
-    where.role = role;
-  }
-  if (search) {
-    where.OR = [
-      { fullName: { contains: search, mode: 'insensitive' as const } },
-      { email: { contains: search, mode: 'insensitive' as const } },
-      { phone: { contains: search, mode: 'insensitive' as const } },
-      { group: { contains: search, mode: 'insensitive' as const } },
-    ];
-  }
-  if (isBlocked !== undefined && isAdmin) {
-    where.isBlocked = isBlocked === 'true';
-  }
+    const where: Record<string, unknown> = {};
+    if (role && ['student', 'teacher', 'admin'].includes(role)) {
+      where.role = role;
+    }
+    if (search) {
+      where.OR = [
+        { fullName: { contains: search, mode: 'insensitive' as const } },
+        { email: { contains: search, mode: 'insensitive' as const } },
+        { phone: { contains: search, mode: 'insensitive' as const } },
+        { group: { contains: search, mode: 'insensitive' as const } },
+      ];
+    }
+    if (isBlocked !== undefined && isAdmin) {
+      where.isBlocked = isBlocked === 'true';
+    }
 
-  const validSortFields = ['createdAt', 'fullName', 'email', 'role', 'lastLoginAt', 'loginCount'] as const;
-  const sortField = (
-    validSortFields.includes(sortBy as (typeof validSortFields)[number]) ? sortBy : 'createdAt'
-  ) as (typeof validSortFields)[number];
-  const order = sortOrder === 'asc' ? 'asc' : 'desc';
+    const validSortFields = ['createdAt', 'fullName', 'email', 'role', 'lastLoginAt', 'loginCount'] as const;
+    const sortField = (
+      validSortFields.includes(sortBy as (typeof validSortFields)[number]) ? sortBy : 'createdAt'
+    ) as (typeof validSortFields)[number];
+    const order = sortOrder === 'asc' ? 'asc' : 'desc';
 
-  const [users, total] = await Promise.all([
-    getPrisma().user.findMany({
-      where,
-      select: {
-        id: true,
-        email: true,
-        phone: true,
-        fullName: true,
-        group: true,
-        course: true,
-        university: true,
-        avatar: true,
-        bio: true,
-        role: true,
-        createdAt: true,
-        lastLoginAt: true,
-        ...(isAdmin && { loginCount: true, isBlocked: true }),
+    const [users, total] = await Promise.all([
+      getPrisma().user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          phone: true,
+          fullName: true,
+          group: true,
+          course: true,
+          university: true,
+          avatar: true,
+          bio: true,
+          role: true,
+          createdAt: true,
+          lastLoginAt: true,
+          ...(isAdmin && { loginCount: true, isBlocked: true }),
+        },
+        orderBy: { [sortField]: order },
+        skip,
+        take: Math.min(limit, 100),
+      }),
+      getPrisma().user.count({ where }),
+    ]);
+
+    type UserRow = {
+      id: string;
+      email: string;
+      phone: string | null;
+      fullName: string | null;
+      group: string | null;
+      course: string | null;
+      university: string | null;
+      avatar: string | null;
+      bio: string | null;
+      role: string;
+      createdAt: Date;
+      lastLoginAt: Date | null;
+      loginCount?: number;
+      isBlocked?: boolean;
+    };
+    return NextResponse.json({
+      users: users.map((u: UserRow) => ({
+        ...u,
+        createdAt: u.createdAt.toISOString(),
+        lastLoginAt: u.lastLoginAt?.toISOString(),
+      })),
+      pagination: {
+        page,
+        limit: Math.min(limit, 100),
+        total,
+        totalPages: Math.ceil(total / Math.min(limit, 100)),
       },
-      orderBy: { [sortField]: order },
-      skip,
-      take: Math.min(limit, 100),
-    }),
-    getPrisma().user.count({ where }),
-  ]);
-
-  type UserRow = { id: string; email: string; phone: string | null; fullName: string | null; group: string | null; course: string | null; university: string | null; avatar: string | null; bio: string | null; role: string; createdAt: Date; lastLoginAt: Date | null; loginCount?: number; isBlocked?: boolean };
-  return NextResponse.json({
-    users: users.map((u: UserRow) => ({
-      ...u,
-      createdAt: u.createdAt.toISOString(),
-      lastLoginAt: u.lastLoginAt?.toISOString(),
-    })),
-    pagination: {
-      page,
-      limit: Math.min(limit, 100),
-      total,
-      totalPages: Math.ceil(total / Math.min(limit, 100)),
-    },
-  });
+    });
   } catch (error) {
     logger.error('Failed to list users', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -100,89 +115,92 @@ export async function POST(request: NextRequest) {
     if (!auth) return unauthorized();
     if (!requireRole(auth.role, 'admin')) return forbidden();
 
-  // Rate limit: 10 user creations per minute per admin
-  const rateLimit = checkRateLimit(`create-user:${auth.id}`, 10, 60_000);
-  if (!rateLimit.allowed) {
-    return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
-  }
+    // Rate limit: 10 user creations per minute per admin
+    const rateLimit = checkRateLimit(`create-user:${auth.id}`, 10, 60_000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests', retryAfter: rateLimit.retryAfter }, { status: 429 });
+    }
 
-  const bodyResult = await parseBody(request);
-  if (!bodyResult.ok) return bodyResult.response;
-  const body = bodyResult.data as Record<string, unknown>;
-  const parsed = createUserSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
-  }
-  const { email, phone, fullName, role, password, group, course, university, bio, avatar } = parsed.data;
+    const bodyResult = await parseBody(request);
+    if (!bodyResult.ok) return bodyResult.response;
+    const body = bodyResult.data as Record<string, unknown>;
+    const parsed = createUserSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+    const { email, phone, fullName, role, password, group, course, university, bio, avatar } = parsed.data;
 
-  // Enforce password strength requirements server-side
-  const pwValidation = validatePassword(password);
-  if (!pwValidation.valid) {
-    return NextResponse.json({ error: 'Password does not meet requirements', details: pwValidation.errors }, { status: 400 });
-  }
+    // Enforce password strength requirements server-side
+    const pwValidation = validatePassword(password);
+    if (!pwValidation.valid) {
+      return NextResponse.json(
+        { error: 'Password does not meet requirements', details: pwValidation.errors },
+        { status: 400 },
+      );
+    }
 
-  const existing = await getPrisma().user.findFirst({
-    where: { OR: [{ email }, { phone }] },
-  });
-  if (existing) {
-    return NextResponse.json({ error: 'User already exists' }, { status: 409 });
-  }
+    const existing = await getPrisma().user.findFirst({
+      where: { OR: [{ email }, { phone }] },
+    });
+    if (existing) {
+      return NextResponse.json({ error: 'User already exists' }, { status: 409 });
+    }
 
-  const passwordHash = await hashPassword(password);
-  const user = await getPrisma().user.create({
-    data: {
-      id: crypto.randomUUID(),
-      email,
-      phone,
-      fullName,
-      role: role ?? 'student',
-      passwordHash,
-      group: group || '',
-      course: course || '',
-      university: university || '',
-      bio: bio || '',
-      avatar: avatar || '',
-    },
-  });
-
-  // Audit log the user creation
-  try {
-    const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
-    const ip = getClientIp(request);
-    await getPrisma().auditLog.create({
+    const passwordHash = await hashPassword(password);
+    const user = await getPrisma().user.create({
       data: {
         id: crypto.randomUUID(),
-        adminId: auth.id,
-        adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
-        action: 'user_created',
-        targetId: user.id,
-        targetName: user.fullName || user.email,
-        details: `Admin ${auth.id} created user ${user.email} (role: ${user.role}) [IP: ${ip}]`,
+        email,
+        phone,
+        fullName,
+        role: role ?? 'student',
+        passwordHash,
+        group: group || '',
+        course: course || '',
+        university: university || '',
+        bio: bio || '',
+        avatar: avatar || '',
       },
     });
-  } catch (error) {
-    logger.warn('Audit logging failed', { error: String(error) });
-  }
 
-  return NextResponse.json({
-    success: true,
-    user: {
-      id: user.id,
-      email: user.email,
-      phone: user.phone,
-      fullName: user.fullName,
-      group: user.group,
-      course: user.course,
-      university: user.university,
-      avatar: user.avatar,
-      bio: user.bio,
-      role: user.role,
-      createdAt: user.createdAt.toISOString(),
-      lastLoginAt: user.lastLoginAt?.toISOString(),
-      loginCount: user.loginCount,
-      isBlocked: user.isBlocked,
-    },
-  });
+    // Audit log the user creation
+    try {
+      const adminUser = await getPrisma().user.findUnique({ where: { id: auth.id } });
+      const ip = getClientIp(request);
+      await getPrisma().auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          adminId: auth.id,
+          adminName: adminUser?.fullName || adminUser?.email || 'Unknown',
+          action: 'user_created',
+          targetId: user.id,
+          targetName: user.fullName || user.email,
+          details: `Admin ${auth.id} created user ${user.email} (role: ${user.role}) [IP: ${ip}]`,
+        },
+      });
+    } catch (error) {
+      logger.warn('Audit logging failed', { error: String(error) });
+    }
+
+    return NextResponse.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        fullName: user.fullName,
+        group: user.group,
+        course: user.course,
+        university: user.university,
+        avatar: user.avatar,
+        bio: user.bio,
+        role: user.role,
+        createdAt: user.createdAt.toISOString(),
+        lastLoginAt: user.lastLoginAt?.toISOString(),
+        loginCount: user.loginCount,
+        isBlocked: user.isBlocked,
+      },
+    });
   } catch (error) {
     logger.error('Failed to create user', { error: String(error) });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

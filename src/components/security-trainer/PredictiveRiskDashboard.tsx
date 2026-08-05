@@ -224,7 +224,9 @@ export default function PredictiveRiskDashboard({
                           <p className="text-2xl font-bold text-red-600">{student.riskScore}</p>
                           <p className="text-muted-foreground text-xs">{t('risk')}</p>
                         </div>
-                        <Badge variant="destructive">{Math.round(student.dropoutProbability * 100)}% {t('dropout')}</Badge>
+                        <Badge variant="destructive">
+                          {Math.round(student.dropoutProbability * 100)}% {t('dropout')}
+                        </Badge>
                       </div>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1">
@@ -254,7 +256,9 @@ export default function PredictiveRiskDashboard({
                   <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('risk')}</th>
                   <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('dropout')}</th>
                   <th className="text-muted-foreground px-3 py-2 text-right text-xs font-medium">{t('dropoutWeek')}</th>
-                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">{t('recommendations')}</th>
+                  <th className="text-muted-foreground px-3 py-2 text-left text-xs font-medium">
+                    {t('recommendations')}
+                  </th>
                 </tr>
               </thead>
               <tbody>

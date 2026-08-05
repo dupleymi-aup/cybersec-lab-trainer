@@ -101,9 +101,7 @@ export default function SSRFLab() {
             </Badge>
             {isCompleted && <Badge className="border-0 bg-emerald-100 text-emerald-700">{t('completed')}</Badge>}
           </div>
-          <p className="text-muted-foreground mt-0.5 text-sm">
-            {t('subtitle')}
-          </p>
+          <p className="text-muted-foreground mt-0.5 text-sm">{t('subtitle')}</p>
         </div>
       </div>
 
@@ -245,9 +243,13 @@ export default function SSRFLab() {
                     <CardContent className="p-3">
                       <p className="text-sm font-medium">
                         {selectedOption !== null && scenario.options[selectedOption]?.correct ? (
-                          <span className="text-emerald-600">{t('correct')} {scenario.fixExplanation}</span>
+                          <span className="text-emerald-600">
+                            {t('correct')} {scenario.fixExplanation}
+                          </span>
                         ) : (
-                          <span className="text-red-600">{t('incorrect')} {scenario.fixExplanation}</span>
+                          <span className="text-red-600">
+                            {t('incorrect')} {scenario.fixExplanation}
+                          </span>
                         )}
                       </p>
                     </CardContent>
@@ -273,7 +275,11 @@ export default function SSRFLab() {
       {/* Defense mechanisms */}
       <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
         <CardContent className="p-5">
-          <button type="button" onClick={() => setShowAllDefenses(!showAllDefenses)} className="flex w-full items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAllDefenses(!showAllDefenses)}
+            className="flex w-full items-center gap-2"
+          >
             <Shield size={20} className="text-emerald-600" />
             <h3 className="font-semibold text-emerald-800">{t('ssrfDefense')}</h3>
             <ChevronLeft

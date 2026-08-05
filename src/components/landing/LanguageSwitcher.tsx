@@ -10,15 +10,9 @@ const localeMeta: Record<string, { label: string; name: string }> = {
   zh: { label: '中', name: '中文' },
 };
 
-const locales = routing.locales
-  .filter((code) => code in localeMeta)
-  .map((code) => ({ code, ...localeMeta[code] }));
+const locales = routing.locales.filter((code) => code in localeMeta).map((code) => ({ code, ...localeMeta[code] }));
 
-export default function LanguageSwitcher({
-  variant = 'floating',
-}: {
-  variant?: 'floating' | 'header';
-}) {
+export default function LanguageSwitcher({ variant = 'floating' }: { variant?: 'floating' | 'header' }) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -27,13 +21,12 @@ export default function LanguageSwitcher({
     router.push(pathname, { locale: newLocale });
   };
 
-  const position =
-    variant === 'floating'
-      ? 'fixed top-16 right-4 z-50 hidden sm:block lg:hidden'
-      : '';
+  const position = variant === 'floating' ? 'fixed top-16 right-4 z-50 hidden sm:block lg:hidden' : '';
 
   return (
-    <div className={`bg-background/80 border-border flex items-center gap-1 rounded-lg border px-2 py-1.5 shadow-sm backdrop-blur-sm ${position}`}>
+    <div
+      className={`bg-background/80 border-border flex items-center gap-1 rounded-lg border px-2 py-1.5 shadow-sm backdrop-blur-sm ${position}`}
+    >
       <Globe className="text-muted-foreground h-4 w-4" aria-hidden="true" />
       {locales.map((l) => (
         <button

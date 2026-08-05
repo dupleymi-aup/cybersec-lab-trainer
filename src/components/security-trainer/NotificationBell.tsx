@@ -53,18 +53,18 @@ export default memo(function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<FilterKey>('all');
 
-  const FILTERS = useMemo(() => [
-    { key: 'all', label: t('filterAll') },
-    { key: 'unread', label: t('filterUnread') },
-    { key: 'announcement', label: t('filterAnnouncements') },
-  ], [t]);
-
-  const handleEscape = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
-    },
-    [],
+  const FILTERS = useMemo(
+    () => [
+      { key: 'all', label: t('filterAll') },
+      { key: 'unread', label: t('filterUnread') },
+      { key: 'announcement', label: t('filterAnnouncements') },
+    ],
+    [t],
   );
+
+  const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') setIsOpen(false);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -132,7 +132,12 @@ export default memo(function NotificationBell() {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   )}
-                  <button type="button" onClick={() => setIsOpen(false)} className="hover:bg-muted rounded p-1.5 transition-colors" aria-label={tc('close')}>
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="hover:bg-muted rounded p-1.5 transition-colors"
+                    aria-label={tc('close')}
+                  >
                     <X className="h-4 w-4" />
                   </button>
                 </div>

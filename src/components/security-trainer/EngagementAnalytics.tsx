@@ -36,12 +36,16 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
   useEffect(() => {
     let cancelled = false;
     getAllUsers()
-      .then((users) => { if (!cancelled) setAllUsers(users); })
+      .then((users) => {
+        if (!cancelled) setAllUsers(users);
+      })
       .catch((err) => {
         if (process.env.NODE_ENV === 'development')
           logger.error('EngagementAnalytics failed to load users', { error: err });
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {

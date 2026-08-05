@@ -42,12 +42,14 @@ export default function PWAHandler() {
         newWorker.addEventListener('statechange', stateChangeHandler);
       };
 
-      navigator.serviceWorker.ready.then((reg) => {
-        regRef = reg;
-        reg.addEventListener('updatefound', updateFoundHandler);
-      }).catch(() => {
-        // Service worker registration not available
-      });
+      navigator.serviceWorker.ready
+        .then((reg) => {
+          regRef = reg;
+          reg.addEventListener('updatefound', updateFoundHandler);
+        })
+        .catch(() => {
+          // Service worker registration not available
+        });
 
       return () => {
         if (regRef) regRef.removeEventListener('updatefound', updateFoundHandler);

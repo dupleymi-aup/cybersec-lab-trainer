@@ -21,7 +21,15 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const since = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-    type StudentRow = { id: string; fullName: string; email: string; group: string; course: string; university: string; lastLoginAt: Date | null };
+    type StudentRow = {
+      id: string;
+      fullName: string;
+      email: string;
+      group: string;
+      course: string;
+      university: string;
+      lastLoginAt: Date | null;
+    };
     type ProgressRow = { userId: string; moduleId: string; completed: boolean; score: number | null; updatedAt: Date };
     type QuizResultRow = { userId: string; percentage: number; updatedAt: Date };
     const students = await getPrisma().user.findMany({
@@ -104,7 +112,9 @@ export async function GET(request: NextRequest) {
       const avgQuizScore =
         studentQuizResults.length > 0
           ? Math.round(
-              (studentQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) / studentQuizResults.length) * 10,
+              (studentQuizResults.reduce((sum: number, q: QuizResultRow) => sum + q.percentage, 0) /
+                studentQuizResults.length) *
+                10,
             ) / 10
           : 0;
 
@@ -129,13 +139,18 @@ export async function GET(request: NextRequest) {
       const previousActivity = studentQuizResults.filter(
         (q: QuizResultRow) => q.updatedAt >= fourWeeksAgo && q.updatedAt < twoWeeksAgo,
       ).length;
-      const recentScores = studentQuizResults.filter((q: QuizResultRow) => q.updatedAt >= twoWeeksAgo).map((q: QuizResultRow) => q.percentage);
+      const recentScores = studentQuizResults
+        .filter((q: QuizResultRow) => q.updatedAt >= twoWeeksAgo)
+        .map((q: QuizResultRow) => q.percentage);
       const previousScores = studentQuizResults
         .filter((q: QuizResultRow) => q.updatedAt >= fourWeeksAgo && q.updatedAt < twoWeeksAgo)
         .map((q: QuizResultRow) => q.percentage);
-      const recentAvg = recentScores.length > 0 ? recentScores.reduce((a: number, b: number) => a + b, 0) / recentScores.length : 0;
+      const recentAvg =
+        recentScores.length > 0 ? recentScores.reduce((a: number, b: number) => a + b, 0) / recentScores.length : 0;
       const previousAvg =
-        previousScores.length > 0 ? previousScores.reduce((a: number, b: number) => a + b, 0) / previousScores.length : 0;
+        previousScores.length > 0
+          ? previousScores.reduce((a: number, b: number) => a + b, 0) / previousScores.length
+          : 0;
 
       let trend: 'improving' | 'declining' | 'stable' = 'stable';
       if (recentAvg > previousAvg + 5 || recentActivity > previousActivity + 2) trend = 'improving';

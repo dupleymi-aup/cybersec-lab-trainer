@@ -133,7 +133,9 @@ export default function TeacherPanel() {
   useEffect(() => {
     getAllUsers()
       .then((users) => setStudents(users.filter((u) => u.role === 'student')))
-      .catch((e) => { logger.error('Failed to load users for teacher panel', { error: e }); })
+      .catch((e) => {
+        logger.error('Failed to load users for teacher panel', { error: e });
+      })
       .finally(() => setLoadingStudents(false));
   }, []);
 
@@ -1341,7 +1343,7 @@ export default function TeacherPanel() {
               {/* Top students ranking */}
               <Card className="border-border">
                 <CardContent className="p-5">
-                    <h3 className="mb-4 text-sm font-semibold">{t('ranking')}</h3>
+                  <h3 className="mb-4 text-sm font-semibold">{t('ranking')}</h3>
                   {(() => {
                     const studentRankings = students
                       .map((s) => {
@@ -1387,8 +1389,12 @@ export default function TeacherPanel() {
                               </div>
                             </div>
                             <div className="flex items-center gap-4 text-xs">
-                              <span className="text-muted-foreground">{s.mods} {t('modules')}</span>
-                              <span className="text-muted-foreground">{t('quiz')}: {s.avgQ}%</span>
+                              <span className="text-muted-foreground">
+                                {s.mods} {t('modules')}
+                              </span>
+                              <span className="text-muted-foreground">
+                                {t('quiz')}: {s.avgQ}%
+                              </span>
                               <span className="flex items-center gap-0.5 text-slate-400">
                                 <Clock size={10} /> {s.lastActive}
                               </span>
@@ -1514,10 +1520,14 @@ export default function TeacherPanel() {
                         <div className="mb-3 flex items-center justify-between">
                           <h3 className="text-sm font-semibold">{g.name}</h3>
                           {g.name === best.name && (
-                            <Badge className="border-0 bg-emerald-100 text-[10px] text-emerald-700">{t('bestGroup')}</Badge>
+                            <Badge className="border-0 bg-emerald-100 text-[10px] text-emerald-700">
+                              {t('bestGroup')}
+                            </Badge>
                           )}
                           {g.name === worst.name && (
-                            <Badge className="border-0 bg-red-100 text-[10px] text-red-700">{t('needsAttention')}</Badge>
+                            <Badge className="border-0 bg-red-100 text-[10px] text-red-700">
+                              {t('needsAttention')}
+                            </Badge>
                           )}
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
@@ -1744,52 +1754,52 @@ export default function TeacherPanel() {
               </h3>
               <div className="space-y-2">
                 {engagementLeaderboard.map((student, i) => (
-                    <motion.div
-                      key={student.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.03 }}
-                      className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                            i === 0
-                              ? 'bg-amber-100 text-amber-700'
-                              : i === 1
-                                ? 'bg-slate-100 text-slate-600'
-                                : i === 2
-                                  ? 'bg-orange-100 text-orange-700'
-                                  : 'bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          {i + 1}
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold">{student.fullName}</p>
-                          <p className="text-muted-foreground text-[10px]">
-                            {student.group} • {t('modules')}: {student.progress.completedModules.length}
-                          </p>
-                        </div>
+                  <motion.div
+                    key={student.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                          i === 0
+                            ? 'bg-amber-100 text-amber-700'
+                            : i === 1
+                              ? 'bg-slate-100 text-slate-600'
+                              : i === 2
+                                ? 'bg-orange-100 text-orange-700'
+                                : 'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        {i + 1}
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className="text-xs font-bold">{Math.round(student.avgScore)}%</p>
-                          <p className="text-muted-foreground text-[10px]">{t('quiz')}</p>
-                        </div>
-                        <Badge
-                          variant={
-                            student.engagementScore >= 70
-                              ? 'default'
-                              : student.engagementScore >= 40
-                                ? 'secondary'
-                                : 'destructive'
-                          }
-                        >
-                          {student.engagementScore}
-                        </Badge>
+                      <div>
+                        <p className="text-sm font-semibold">{student.fullName}</p>
+                        <p className="text-muted-foreground text-[10px]">
+                          {student.group} • {t('modules')}: {student.progress.completedModules.length}
+                        </p>
                       </div>
-                    </motion.div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-xs font-bold">{Math.round(student.avgScore)}%</p>
+                        <p className="text-muted-foreground text-[10px]">{t('quiz')}</p>
+                      </div>
+                      <Badge
+                        variant={
+                          student.engagementScore >= 70
+                            ? 'default'
+                            : student.engagementScore >= 40
+                              ? 'secondary'
+                              : 'destructive'
+                        }
+                      >
+                        {student.engagementScore}
+                      </Badge>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             </CardContent>

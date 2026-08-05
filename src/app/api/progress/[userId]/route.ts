@@ -37,26 +37,42 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     return NextResponse.json({
-      progress: progress.map((p: { moduleId: string; completed: boolean; score: number | null; sqlLevels: string; xssLevels: string; csrfSteps: string; secureCodingAnswers: string; secureCodingCorrectCount: number; studiedOwaspItems: string; challengeScores: string | null; updatedAt: Date }) => ({
-        moduleId: p.moduleId,
-        completed: p.completed,
-        score: p.score,
-        sqlLevels: p.sqlLevels,
-        xssLevels: p.xssLevels,
-        csrfSteps: p.csrfSteps,
-        secureCodingAnswers: p.secureCodingAnswers,
-        secureCodingCorrectCount: p.secureCodingCorrectCount,
-        studiedOwaspItems: p.studiedOwaspItems,
-        challengeScores: p.challengeScores,
-        updatedAt: p.updatedAt.toISOString(),
-      })),
-      quizResults: quizResults.map((q: { quizId: string; score: number; total: number; percentage: number; updatedAt: Date }) => ({
-        quizId: q.quizId,
-        score: q.score,
-        total: q.total,
-        percentage: q.percentage,
-        updatedAt: q.updatedAt.toISOString(),
-      })),
+      progress: progress.map(
+        (p: {
+          moduleId: string;
+          completed: boolean;
+          score: number | null;
+          sqlLevels: string;
+          xssLevels: string;
+          csrfSteps: string;
+          secureCodingAnswers: string;
+          secureCodingCorrectCount: number;
+          studiedOwaspItems: string;
+          challengeScores: string | null;
+          updatedAt: Date;
+        }) => ({
+          moduleId: p.moduleId,
+          completed: p.completed,
+          score: p.score,
+          sqlLevels: p.sqlLevels,
+          xssLevels: p.xssLevels,
+          csrfSteps: p.csrfSteps,
+          secureCodingAnswers: p.secureCodingAnswers,
+          secureCodingCorrectCount: p.secureCodingCorrectCount,
+          studiedOwaspItems: p.studiedOwaspItems,
+          challengeScores: p.challengeScores,
+          updatedAt: p.updatedAt.toISOString(),
+        }),
+      ),
+      quizResults: quizResults.map(
+        (q: { quizId: string; score: number; total: number; percentage: number; updatedAt: Date }) => ({
+          quizId: q.quizId,
+          score: q.score,
+          total: q.total,
+          percentage: q.percentage,
+          updatedAt: q.updatedAt.toISOString(),
+        }),
+      ),
     });
   } catch (error) {
     logger.error('Get student progress error:', { error: String(error) });

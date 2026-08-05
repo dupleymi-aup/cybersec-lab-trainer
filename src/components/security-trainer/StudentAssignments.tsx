@@ -162,38 +162,41 @@ export default function StudentAssignments() {
     }
   }, []);
 
-  const handleSubmit = useCallback(async (a: Assignment) => {
-    if (!submissionText.trim()) {
-      toast.error(t('enterSolution'));
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const headers = await getAuthHeaders();
-      const res = await fetch(`/api/assignments/${a.id}/submit`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ content: submissionText }),
-      });
-
-      if (res.ok) {
-        toast.success(t('solutionSent'));
-        setViewingId(null);
-        setSubmissionText('');
-        setTimerRunning(false);
-        fetchData();
-      } else {
-        const err = await res.json().catch(() => ({ error: t('error') }));
-        toast.error(err.error || t('sendFailed'));
+  const handleSubmit = useCallback(
+    async (a: Assignment) => {
+      if (!submissionText.trim()) {
+        toast.error(t('enterSolution'));
+        return;
       }
-    } catch (e) {
-      logger.warn('StudentAssignments handleSubmit failed', { error: e });
-      toast.error(t('networkError'));
-    } finally {
-      setSubmitting(false);
-    }
-  }, [submissionText, fetchData, t]);
+
+      setSubmitting(true);
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`/api/assignments/${a.id}/submit`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ content: submissionText }),
+        });
+
+        if (res.ok) {
+          toast.success(t('solutionSent'));
+          setViewingId(null);
+          setSubmissionText('');
+          setTimerRunning(false);
+          fetchData();
+        } else {
+          const err = await res.json().catch(() => ({ error: t('error') }));
+          toast.error(err.error || t('sendFailed'));
+        }
+      } catch (e) {
+        logger.warn('StudentAssignments handleSubmit failed', { error: e });
+        toast.error(t('networkError'));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [submissionText, fetchData, t],
+  );
 
   const getMyBestSubmission = (a: Assignment) => {
     const mySubs = submissions[a.id] || [];
@@ -331,9 +334,7 @@ export default function StudentAssignments() {
             ) : (
               <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <AlertCircle size={20} className="shrink-0 text-amber-500" />
-                <p className="text-sm text-amber-700">
-                  {t('allAttemptsUsed', { count: a.attempts })}
-                </p>
+                <p className="text-sm text-amber-700">{t('allAttemptsUsed', { count: a.attempts })}</p>
               </div>
             )}
 
