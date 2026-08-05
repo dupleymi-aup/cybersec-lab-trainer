@@ -20,16 +20,7 @@ interface JsPdfWithAutoTable {
   lastAutoTable?: { finalY?: number };
 }
 
-const LOCALE_MAP: Record<string, string> = {
-  en: 'en-US',
-  ru: 'ru-RU',
-  zh: 'zh-CN',
-};
-
-function resolveLocale(locale?: string): string {
-  if (!locale) return 'en-US';
-  return LOCALE_MAP[locale] ?? locale;
-}
+import { resolveLocale } from './locale-utils';
 
 function formatDate(date: Date, locale?: string): string {
   return date.toLocaleDateString(resolveLocale(locale), {

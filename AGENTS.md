@@ -24,6 +24,12 @@ This project belongs to the work account — always use the `github-work` host a
 - **Prisma pinned to 6.19.3** (exact) — Prisma 7.x breaking change: `url` in datasource block rejected (needs prisma.config.ts + adapter); project runtime expects Prisma 6 client architecture (`@prisma/client/runtime/library.js`). Do NOT bump to 7.x without migrating schema/config.
 - **Bug fix**: 5 TS2345 errors from recharts 3.10.1 stricter `Tooltip labelFormatter` typing (ReactNode) — fixed with `formatDate(String(v))` in AdvancedAnalytics, ErrorPatternsAnalytics, StudentPerformanceReport
 - **Removed legacy `tailwind.config.ts`** — imported `tailwindcss-animate` (pruned transitive dep); Tailwind 4 uses CSS-first config (`globals.css` with `@import 'tw-animate-css'`)
+- **Dead code cleanup**: removed `invalidateTokenCache` (no-op), unused `apiClient.saveProgress`/`saveFullProgress` methods, made `MODULE_NAME_MAP`/`getCsrfToken` non-exported, removed unused `csrfFetch` function, simplified dead conditional in `stopImpersonation`
+- **DRY refactor — PERIOD_OPTIONS**: extracted `PERIOD_DAYS` constant to `lib/constants.ts`, created shared `PeriodSelector` component, replaced 17 duplicate definitions across analytics components
+- **DRY refactor — locale utils**: extracted `LOCALE_MAP`/`resolveLocale` into shared `lib/locale-utils.ts`, updated `format.ts` and `export-utils.ts`
+- **Type safety**: replaced `unknown` types with proper interfaces — `ProgressItem`/`QuizResultItem` in store.ts, typed `StudentProgress` fields in auth-store.ts, typed `loadFromDatabase` updates with `Partial<Pick<AppState, ...>>`
+- **Coverage thresholds**: raised from 5/12/5/5 to 6/55/70/6 (lines/functions/branches/statements) to match actual coverage and catch regressions
+- **Next.js loading states**: added `loading.tsx` to `app/[locale]/` and `app/[locale]/app/` route segments
 - **0 ESLint warnings, 0 TypeScript errors, 531 tests pass** (31 files)
 - **Full verification**: lint ✓, typecheck ✓, build ✓, tests ✓, `npm audit` → 0 vulnerabilities
 

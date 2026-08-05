@@ -23,6 +23,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTranslations } from 'next-intl';
 import KPICard from './KPICard';
+import PeriodSelector from './PeriodSelector';
 import { logger } from '@/lib/logger';
 
 interface ModuleTimeEntry {
@@ -110,13 +111,6 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
   const [retryData, setRetryData] = useState<RetryAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const PERIOD_OPTIONS = [
-    { key: 7, labelKey: 'days7' },
-    { key: 30, labelKey: 'days30' },
-    { key: 90, labelKey: 'days90' },
-    { key: 180, labelKey: 'days180' },
-  ];
-
   const days = controlledDays ?? internalDays;
 
   useEffect(() => {
@@ -162,21 +156,7 @@ export default function AdvancedAnalytics({ groupId, days: controlledDays }: Pro
     <div className="space-y-6">
       {/* Period selector and sub-tabs */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="bg-muted flex gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, labelKey }) => (
-            <button
-              key={key}
-              onClick={() => setInternalDays(key)}
-              className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                days === key
-                  ? 'bg-background text-foreground font-medium shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {tc(labelKey)}
-            </button>
-          ))}
-        </div>
+        <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => tc(`days${d}`)} />
         <div className="bg-muted flex gap-1 rounded-lg p-1">
           {[
             { key: 'time' as const, label: t('moduleTime'), icon: Clock },

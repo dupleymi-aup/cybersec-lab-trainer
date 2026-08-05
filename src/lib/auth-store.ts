@@ -459,8 +459,6 @@ export async function stopImpersonation(): Promise<{
     const data = JSON.parse(raw);
     if (!data.originalUserId) return { success: false, error: 'No active impersonation' };
 
-    const originalUserData = data.originalUserData;
-
     // Call server to re-issue admin JWT and set the auth cookie
     const res = await fetch('/api/auth/impersonate/stop', {
       method: 'POST',
@@ -474,7 +472,7 @@ export async function stopImpersonation(): Promise<{
 
     localStorage.removeItem(IMPERSONATION_KEY);
 
-    const userData = originalUserData || data.originalUserData;
+    const userData = data.originalUserData;
     if (userData) {
       useAuthStore.setState({
         user: userData,
@@ -601,13 +599,13 @@ interface StudentProgress {
   moduleId: string;
   completed: boolean;
   score: number | null;
-  sqlLevels?: unknown;
-  xssLevels?: unknown;
-  csrfSteps?: unknown;
-  secureCodingAnswers?: unknown;
+  sqlLevels?: string[];
+  xssLevels?: string[];
+  csrfSteps?: number[];
+  secureCodingAnswers?: number[];
   secureCodingCorrectCount?: number;
   studiedOwaspItems?: string[];
-  challengeScores?: unknown;
+  challengeScores?: { correct: number; total: number; answered: number[] };
   updatedAt: string;
 }
 
@@ -734,7 +732,6 @@ export const useAuthStore = create<AuthState>()(
 
           // Migrate anonymous progress to user and load from server
           const storeModule = await import('./store');
-          storeModule.invalidateTokenCache();
           storeModule.migrateProgressToUser(data.user.id);
           storeModule.useAppStore
             .getState()
@@ -776,12 +773,6 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        import('./store')
-          .then((m) => m.invalidateTokenCache())
-          .catch((e) => {
-            logger.warn('invalidateTokenCache failed', { error: e });
-          });
-
         // Clear server-side httpOnly cookie
         try {
           await fetch('/api/auth/logout', {

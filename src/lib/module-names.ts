@@ -1,5 +1,5 @@
 // Server-safe module name lookup (can be imported by API routes)
-export const MODULE_NAME_MAP: Record<string, string> = {
+const MODULE_NAME_MAP: Record<string, string> = {
   owasp: 'OWASP Top 10',
   'sql-injection': 'SQL Injection',
   xss: 'XSS Attacks',

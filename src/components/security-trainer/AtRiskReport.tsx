@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { generateAtRiskPDF, generateAtRiskCSV, downloadCSV } from '@/lib/export-utils';
 import RiskScoreBar from './RiskScoreBar';
+import PeriodSelector from './PeriodSelector';
 import KPICard from './KPICard';
 import StudentDrillDown from './StudentDrillDown';
 import { logger } from '@/lib/logger';
@@ -35,12 +36,6 @@ export default function AtRiskReport({
   const t = useTranslations('atRiskReport');
   const [internalDays, setInternalDays] = useState(30);
 
-  const PERIOD_OPTIONS = [
-    { key: 7, label: t('period7d') },
-    { key: 30, label: t('period30d') },
-    { key: 90, label: t('period90d') },
-    { key: 180, label: t('period180d') },
-  ];
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [sortField, setSortField] = useState<'riskScore' | 'fullName' | 'lastActiveDays' | 'avgQuizScore'>('riskScore');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
@@ -156,21 +151,7 @@ export default function AtRiskReport({
       {/* Toolbar: Period selector + Export buttons */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {controlledDays === undefined && (
-          <div className="bg-muted flex gap-1 rounded-lg p-1">
-            {PERIOD_OPTIONS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setInternalDays(key)}
-                className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                  days === key
-                    ? 'bg-background text-foreground font-medium shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => t(`period${d}d`)} />
         )}
         <div className="ml-auto flex gap-2">
           <Button

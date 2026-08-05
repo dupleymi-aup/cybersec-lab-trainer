@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
@@ -43,6 +43,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { generateStudentReportPDF, generateStudentReportCSV, downloadCSV } from '@/lib/export-utils';
+import PeriodSelector from './PeriodSelector';
 import KPICard from './KPICard';
 import { logger } from '@/lib/logger';
 
@@ -54,15 +55,6 @@ interface Props {
 
 export default function StudentPerformanceReport({ userId, initialDays = 30, groupId: _groupId }: Props) {
   const t = useTranslations('studentPerformance');
-  const PERIOD_OPTIONS = useMemo(
-    () => [
-      { key: 7, label: t('days7') },
-      { key: 30, label: t('days30') },
-      { key: 90, label: t('days90') },
-      { key: 180, label: t('days180') },
-    ],
-    [t],
-  );
   const formatDate = useDateFormatter();
   const formatDateTime = useDateTimeFormatter();
   const [data, setData] = useState<StudentPerformanceData | null>(null);
@@ -209,21 +201,7 @@ export default function StudentPerformanceReport({ userId, initialDays = 30, gro
     <div className="space-y-6">
       {/* Toolbar: Period selector + Export buttons */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="bg-muted flex gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setDays(key)}
-              className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                days === key
-                  ? 'bg-background text-foreground font-medium shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <PeriodSelector value={days} onChange={setDays} getLabel={(d) => t(`days${d}`)} />
         <div className="flex gap-2">
           <Button
             variant="outline"

@@ -12,50 +12,27 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
   return { 'Content-Type': 'application/json' };
 }
 
-/** No-op kept for backwards compatibility */
-export function invalidateTokenCache() {
-  // No longer needed — tokens are in httpOnly cookies
+interface ProgressItem {
+  moduleId: string;
+  completed?: boolean;
+  score?: number;
+  sqlLevels?: string[];
+  xssLevels?: string[];
+  csrfSteps?: number[];
+  csrfChallengeScores?: { correct: number; total: number; answered: number[] };
+  secureCodingAnswers?: number[];
+  secureCodingCorrectCount?: number;
+  studiedOwaspItems?: string[];
+  challengeScores?: { correct: number; total: number; answered: number[] };
+}
+
+interface QuizResultItem {
+  quizId: string;
+  score: number;
+  total: number;
 }
 
 const apiClient = {
-  async saveProgress(moduleId: string, completed: boolean, score?: number) {
-    const response = await fetch('/api/progress', {
-      method: 'POST',
-      headers: await getAuthHeaders(),
-      body: JSON.stringify({ moduleId, completed, score }),
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || 'Failed to save progress');
-    }
-    return response.json();
-  },
-
-  async saveFullProgress(data: {
-    moduleId: string;
-    completed?: boolean;
-    score?: number;
-    sqlLevels?: string[];
-    xssLevels?: string[];
-    csrfSteps?: number[];
-    csrfChallengeScores?: { id: number; correct: boolean }[];
-    secureCodingAnswers?: number[];
-    secureCodingCorrectCount?: number;
-    studiedOwaspItems?: string[];
-    challengeScores?: unknown;
-  }) {
-    const response = await fetch('/api/progress', {
-      method: 'POST',
-      headers: await getAuthHeaders(),
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || 'Failed to save progress');
-    }
-    return response.json();
-  },
-
   async saveQuizResults(quizId: string, score: number, total: number) {
     const response = await fetch('/api/quiz', {
       method: 'POST',
@@ -81,7 +58,7 @@ const apiClient = {
     return response.json();
   },
 
-  async batchSave(progress: unknown[], quizResults: unknown[]) {
+  async batchSave(progress: ProgressItem[], quizResults: QuizResultItem[]) {
     const response = await fetch('/api/progress/batch', {
       method: 'POST',
       headers: await getAuthHeaders(),
@@ -130,7 +107,7 @@ const syncWithDatabase = async (state: AppState, set: (partial: Partial<AppStore
   set({ syncStatus: 'syncing' });
   try {
     // Build full progress array for all modules
-    const progress: Record<string, unknown>[] = state.completedModules.map((moduleId) => ({
+    const progress: ProgressItem[] = state.completedModules.map((moduleId) => ({
       moduleId,
       completed: true,
       score: 100,
@@ -233,7 +210,18 @@ const loadFromDatabase = async (
       ...(data.progress &&
         data.progress.length > 0 &&
         (() => {
-          const updates: Record<string, unknown> = {};
+          const updates: Partial<Pick<AppState,
+            | 'sqlCompletedLevels'
+            | 'xssCompletedLevels'
+            | 'csrfCompletedSteps'
+            | 'csrfChallengeScores'
+            | 'secureCodingAnsweredChallenges'
+            | 'secureCodingCorrectCount'
+            | 'studiedOwaspItems'
+            | 'owaspChallengeScores'
+            | 'authChallengeScores'
+            | 'headersChallengeScores'
+          >> = {};
           for (const p of data.progress) {
             if (p.sqlLevels) updates.sqlCompletedLevels = p.sqlLevels;
             if (p.xssLevels) updates.xssCompletedLevels = p.xssLevels;

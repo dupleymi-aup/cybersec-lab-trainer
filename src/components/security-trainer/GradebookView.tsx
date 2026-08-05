@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTranslations } from 'next-intl';
+import PeriodSelector from './PeriodSelector';
 import StudentDrillDown from './StudentDrillDown';
 
 function getScoreColor(score: number | null): string {
@@ -23,12 +24,6 @@ export default function GradebookView({
   days: controlledDays,
 }: { groupId?: string; days?: number } = {}) {
   const t = useTranslations('gradebook');
-  const PERIOD_OPTIONS = [
-    { key: 7, label: t('period7d') },
-    { key: 30, label: t('period30d') },
-    { key: 90, label: t('period90d') },
-    { key: 180, label: t('period180d') },
-  ];
   const [internalGroupId, setInternalGroupId] = useState('');
   const [internalDays, setInternalDays] = useState(30);
   const groupId = controlledGroupId !== undefined ? controlledGroupId : internalGroupId;
@@ -121,21 +116,7 @@ export default function GradebookView({
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-3">
         {controlledDays === undefined && (
-          <div className="bg-muted flex gap-1 rounded-lg p-1">
-            {PERIOD_OPTIONS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setInternalDays(key)}
-                className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                  days === key
-                    ? 'bg-background text-foreground font-medium shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => t(`period${d}d`)} />
         )}
 
         {controlledGroupId === undefined && (

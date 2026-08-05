@@ -9,14 +9,8 @@ import { getEngagementAnalytics, getAllUsers, type EngagementData, type User as 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import KPICard from './KPICard';
+import PeriodSelector from './PeriodSelector';
 import { logger } from '@/lib/logger';
-
-const PERIOD_OPTIONS = [
-  { key: 7, labelKey: 'days7' },
-  { key: 30, labelKey: 'days30' },
-  { key: 90, labelKey: 'days90' },
-  { key: 180, labelKey: 'days180' },
-];
 
 const DAY_NAME_KEYS = ['daySun', 'dayMon', 'dayTue', 'dayWed', 'dayThu', 'dayFri', 'daySat'] as const;
 
@@ -113,21 +107,7 @@ export default function EngagementAnalytics({ groupId: propGroupId, days: propDa
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-3">
         {showPeriodSelector && (
-          <div className="bg-muted flex gap-1 rounded-lg p-1">
-            {PERIOD_OPTIONS.map(({ key, labelKey }) => (
-              <button
-                key={key}
-                onClick={() => setInternalDays(key)}
-                className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                  days === key
-                    ? 'bg-background text-foreground font-medium shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {tc(labelKey)}
-              </button>
-            ))}
-          </div>
+          <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => tc(`days${d}`)} />
         )}
 
         {showGroupSelector && (

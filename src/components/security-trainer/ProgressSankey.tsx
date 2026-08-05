@@ -7,6 +7,7 @@ import { GitBranch, Loader2, AlertTriangle, Users, BookOpen, Trophy, CheckCircle
 import { getComprehensiveSummary, type ComprehensiveSummary } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import KPICard from './KPICard';
+import PeriodSelector from './PeriodSelector';
 
 const STAGE_COLORS = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
 
@@ -21,13 +22,6 @@ export default function ProgressSankey({
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations('progressSankey');
   const tc = useTranslations('common');
-
-  const PERIOD_OPTIONS = [
-    { key: 7, labelKey: 'days7' },
-    { key: 30, labelKey: 'days30' },
-    { key: 90, labelKey: 'days90' },
-    { key: 180, labelKey: 'days180' },
-  ];
 
   useEffect(() => {
     let cancelled = false;
@@ -135,18 +129,7 @@ export default function ProgressSankey({
     <div className="space-y-6">
       {/* Period selector */}
       {controlledDays === undefined && (
-        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, labelKey }) => (
-            <button
-              type="button"
-              key={key}
-              onClick={() => setInternalDays(key)}
-              className={`rounded-md px-3 py-1.5 text-xs transition-all ${days === key ? 'bg-background text-foreground font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              {tc(labelKey)}
-            </button>
-          ))}
-        </div>
+        <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => tc(`days${d}`)} />
       )}
 
       {/* KPI Cards */}

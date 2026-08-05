@@ -48,6 +48,7 @@ import {
 import { modules } from '@/lib/data';
 import { useDateFormatter } from '@/lib/format';
 import { logger } from '@/lib/logger';
+import PeriodSelector from './PeriodSelector';
 
 interface AnalyticsExportPanelProps {
   students?: Array<{
@@ -78,13 +79,6 @@ interface ExportState {
   studentReportPdf: ExportStatus;
   quizRetryPdf: ExportStatus;
 }
-
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7d' },
-  { key: 30, label: '30d' },
-  { key: 90, label: '90d' },
-  { key: 180, label: '180d' },
-];
 
 const isControlled = (props: AnalyticsExportPanelProps): props is AnalyticsExportPanelProps & { days: number } =>
   props.days !== undefined;
@@ -768,21 +762,7 @@ export default function AnalyticsExportPanel(props: AnalyticsExportPanelProps = 
           <p className="text-muted-foreground mt-1 text-sm">{t('subtitle')}</p>
         </div>
         {!controlled && (
-          <div className="bg-muted flex gap-1 rounded-lg p-1">
-            {PERIOD_OPTIONS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setInternalDays(key)}
-                className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                  effectiveDays === key
-                    ? 'bg-background text-foreground font-medium shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <PeriodSelector value={effectiveDays} onChange={setInternalDays} getLabel={(d) => `${d}d`} />
         )}
       </div>
 

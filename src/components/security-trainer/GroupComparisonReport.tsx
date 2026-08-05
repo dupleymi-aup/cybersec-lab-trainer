@@ -21,13 +21,7 @@ import {
 import { Loader2, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import { getGroupComparison, type GroupComparisonDimension } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
-
-const PERIOD_OPTIONS = [
-  { key: 7, labelKey: '7d' },
-  { key: 30, labelKey: '30d' },
-  { key: 90, labelKey: '90d' },
-  { key: 180, labelKey: '180d' },
-];
+import PeriodSelector from './PeriodSelector';
 
 const DIMENSION_OPTIONS = [
   { key: 'group' as const, labelKey: 'byGroup' },
@@ -122,21 +116,7 @@ export default function GroupComparisonReport({ groupId, days: controlledDays }:
       {/* Period + dimension selector */}
       <div className="flex flex-wrap items-center gap-3">
         {!isControlled && (
-          <div className="bg-muted flex gap-1 rounded-lg p-1">
-            {PERIOD_OPTIONS.map(({ key, labelKey }) => (
-              <button
-                key={key}
-                onClick={() => setInternalDays(key)}
-                className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                  days === key
-                    ? 'bg-background text-foreground font-medium shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t(labelKey)}
-              </button>
-            ))}
-          </div>
+          <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => t(`${d}d`)} />
         )}
         <div className="bg-muted flex gap-1 rounded-lg p-1">
           {DIMENSION_OPTIONS.map(({ key, labelKey }) => (

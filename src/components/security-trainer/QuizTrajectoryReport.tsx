@@ -9,13 +9,7 @@ import { CHART_COLORS } from '@/lib/constants';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
 import KPICard from './KPICard';
-
-const PERIOD_OPTIONS = [
-  { key: 7, label: '7d' },
-  { key: 30, label: '30d' },
-  { key: 90, label: '90d' },
-  { key: 180, label: '180d' },
-];
+import PeriodSelector from './PeriodSelector';
 
 // Consistent color palette for categories — derived from central chart palette
 const CATEGORY_COLORS = [
@@ -170,21 +164,7 @@ export default function QuizTrajectoryReport({ groupId, days: controlledDays }: 
     <div className="space-y-6">
       {/* Period selector (hidden when controlled externally) */}
       {!isControlled && (
-        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setInternalDays(key)}
-              className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                days === key
-                  ? 'bg-background text-foreground font-medium shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => `${d}d`} />
       )}
 
       {/* Summary cards */}

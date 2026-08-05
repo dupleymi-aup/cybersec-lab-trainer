@@ -1,16 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-
-const LOCALE_MAP: Record<string, string> = {
-  en: 'en-US',
-  ru: 'ru-RU',
-  zh: 'zh-CN',
-};
-
-function resolveLocale(locale: string): string {
-  return LOCALE_MAP[locale] ?? locale;
-}
+import { resolveLocale } from './locale-utils';
 
 export function useDateFormatter() {
   const locale = useLocale();

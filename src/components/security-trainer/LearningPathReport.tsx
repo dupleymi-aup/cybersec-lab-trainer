@@ -9,6 +9,7 @@ import { getLearningPathAnalytics, type LearningPathEntry } from '@/lib/auth-sto
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import KPICard from '@/components/security-trainer/KPICard';
+import PeriodSelector from './PeriodSelector';
 
 const FUNNEL_COLORS = ['#6366f1', '#7c3aed', '#8b5cf6', '#a78bfa', '#818cf8', '#a855f7', '#c4b5fd', '#d8b4fe'];
 
@@ -34,13 +35,6 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-
-  const PERIOD_OPTIONS = [
-    { key: 7, label: t('days7') },
-    { key: 30, label: t('days30') },
-    { key: 90, label: t('days90') },
-    { key: 180, label: t('days180') },
-  ];
 
   const effectiveDays = isControlled(props) ? props.days : internalDays;
   const controlled = isControlled(props);
@@ -103,21 +97,7 @@ export default function LearningPathReport(props: LearningPathReportProps = {}) 
     <div className="space-y-6">
       {/* Period selector — hidden when controlled externally */}
       {!controlled && (
-        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setInternalDays(key)}
-              className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                effectiveDays === key
-                  ? 'bg-background text-foreground font-medium shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <PeriodSelector value={effectiveDays} onChange={setInternalDays} getLabel={(d) => t(`days${d}`)} />
       )}
 
       {/* KPI Cards */}

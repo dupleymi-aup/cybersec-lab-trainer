@@ -22,6 +22,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
+import PeriodSelector from './PeriodSelector';
 
 const STUDENT_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444'];
 
@@ -40,13 +41,6 @@ export default function StudentComparisonView(props: Props = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [internalDays, setInternalDays] = useState(30);
-
-  const PERIOD_OPTIONS = [
-    { key: 7, label: t('period7d') },
-    { key: 30, label: t('period30d') },
-    { key: 90, label: t('period90d') },
-    { key: 180, label: t('period180d') },
-  ];
 
   const effectiveDays = isControlled(props) ? props.days : internalDays;
   const controlled = isControlled(props);
@@ -125,21 +119,7 @@ export default function StudentComparisonView(props: Props = {}) {
     <div className="space-y-6">
       {/* Period selector — hidden when controlled externally */}
       {!controlled && (
-        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setInternalDays(key)}
-              className={`rounded-md px-3 py-1.5 text-xs transition-all ${
-                effectiveDays === key
-                  ? 'bg-background text-foreground font-medium shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <PeriodSelector value={effectiveDays} onChange={setInternalDays} getLabel={(d) => t(`period${d}d`)} />
       )}
 
       {/* Student selector */}

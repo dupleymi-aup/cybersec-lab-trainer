@@ -20,6 +20,7 @@ import { getPredictiveRisk, type PredictiveRiskData } from '@/lib/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import KPICard from './KPICard';
+import PeriodSelector from './PeriodSelector';
 
 export default function PredictiveRiskDashboard({
   groupId: controlledGroupId,
@@ -28,12 +29,6 @@ export default function PredictiveRiskDashboard({
   const t = useTranslations('predictiveRisk');
   const tc = useTranslations('common');
   const [internalDays, setInternalDays] = useState(30);
-  const PERIOD_OPTIONS = [
-    { key: 7, label: tc('days7') },
-    { key: 30, label: tc('days30') },
-    { key: 90, label: tc('days90') },
-    { key: 180, label: tc('days180') },
-  ];
   const days = controlledDays !== undefined ? controlledDays : internalDays;
   const [data, setData] = useState<PredictiveRiskData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,18 +95,7 @@ export default function PredictiveRiskDashboard({
     <div className="space-y-6">
       {/* Period selector */}
       {controlledDays === undefined && (
-        <div className="bg-muted flex w-fit gap-1 rounded-lg p-1">
-          {PERIOD_OPTIONS.map(({ key, label }) => (
-            <button
-              type="button"
-              key={key}
-              onClick={() => setInternalDays(key)}
-              className={`rounded-md px-3 py-1.5 text-xs transition-all ${days === key ? 'bg-background text-foreground font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <PeriodSelector value={days} onChange={setInternalDays} getLabel={(d) => tc(`days${d}`)} />
       )}
 
       {/* KPI Cards */}

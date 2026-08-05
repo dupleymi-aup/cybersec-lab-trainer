@@ -18,6 +18,9 @@ export const PERCENT_ROUNDING_FACTOR = 10000; // For Math.round(value * 10000) /
 // Brand
 export const APP_NAME = 'CyberSec Lab';
 
+// Analytics period options (days) — used across all analytics components
+export const PERIOD_DAYS = [7, 30, 90, 180] as const;
+
 // Chart palette — used across all recharts analytics components
 export const CHART_COLORS = {
   primary: '#6366f1', // indigo-500 — main data series
